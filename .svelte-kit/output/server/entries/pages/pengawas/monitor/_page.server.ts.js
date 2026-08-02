@@ -3,7 +3,13 @@ import { g as getDB } from "../../../../chunks/db.js";
 const load = async ({ platform, url, locals }) => {
   const db = getDB(platform);
   const examFilter = url.searchParams.get("exam_id") || "";
-  const exams = await db.prepare("SELECT id, title FROM exams WHERE is_active = 1 AND school_id = ? ORDER BY title").bind(locals.user.school_id).all();
+  const exams = await db.prepare(`
+		SELECT e.id, e.title 
+		FROM exams e 
+		JOIN exam_proctors ep ON e.id = ep.exam_id
+		WHERE e.is_active = 1 AND e.school_id = ? AND ep.proctor_id = ?
+		ORDER BY e.title
+	`).bind(locals.user.school_id, locals.user.id).all();
   let attempts = [];
   if (examFilter) {
     const result = await db.prepare(`
@@ -11,9 +17,10 @@ const load = async ({ platform, url, locals }) => {
 			FROM student_attempts sa
 			JOIN users u ON sa.student_id = u.id
 			JOIN exams e ON sa.exam_id = e.id
-			WHERE sa.exam_id = ? AND e.school_id = ?
+			JOIN exam_proctors ep ON e.id = ep.exam_id
+			WHERE sa.exam_id = ? AND e.school_id = ? AND ep.proctor_id = ?
 			ORDER BY sa.status DESC, sa.start_time DESC
-		`).bind(examFilter, locals.user.school_id).all();
+		`).bind(examFilter, locals.user.school_id, locals.user.id).all();
     attempts = result.results;
   } else {
     const result = await db.prepare(`
@@ -21,9 +28,10 @@ const load = async ({ platform, url, locals }) => {
 			FROM student_attempts sa
 			JOIN users u ON sa.student_id = u.id
 			JOIN exams e ON sa.exam_id = e.id
-			WHERE sa.status = 'mengerjakan' AND e.school_id = ?
+			JOIN exam_proctors ep ON e.id = ep.exam_id
+			WHERE sa.status = 'mengerjakan' AND e.school_id = ? AND ep.proctor_id = ?
 			ORDER BY sa.start_time DESC
-		`).bind(locals.user.school_id).all();
+		`).bind(locals.user.school_id, locals.user.id).all();
     attempts = result.results;
   }
   return { exams: exams.results, attempts, examFilter };

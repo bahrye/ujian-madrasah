@@ -37,6 +37,15 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 		ORDER BY u.name
 	`).bind(examId).all();
 
+	const allProctors = await db.prepare('SELECT id, name, username FROM users WHERE school_id = ? AND role = "pengawas" ORDER BY name').bind(locals.user!.school_id).all();
+	const examProctors = await db.prepare(`
+		SELECT ep.id as exam_proctor_id, u.id as user_id, u.name, u.username
+		FROM exam_proctors ep
+		JOIN users u ON ep.proctor_id = u.id
+		WHERE ep.exam_id = ?
+		ORDER BY u.name
+	`).bind(examId).all();
+
 	return { 
 		exam, 
 		questions: questions.results, 
@@ -46,7 +55,9 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 		classes: classes.results,
 		allStudents: allStudents.results,
 		allTeachers: allTeachers.results,
-		examTeachers: examTeachers.results
+		examTeachers: examTeachers.results,
+		allProctors: allProctors.results,
+		examProctors: examProctors.results
 	};
 };
 
@@ -129,5 +140,34 @@ export const actions: Actions = {
 
 		await db.prepare('DELETE FROM exam_teachers WHERE id = ?').bind(examTeacherId).run();
 		return { success: 'Pengajar berhasil dihapus.' };
+	},
+
+	addProctor: async ({ request, platform, params }) => {
+		const db = getDB(platform);
+		const form = await request.formData();
+		const proctorIds = form.getAll('proctor_ids').map(id => id.toString());
+		if (proctorIds.length === 0) return fail(400, { error: 'Pilih minimal satu pengawas' });
+
+		let added = 0;
+		for (const proctorId of proctorIds) {
+			try {
+				await db.prepare('INSERT INTO exam_proctors (exam_id, proctor_id) VALUES (?, ?)')
+					.bind(params.id, proctorId).run();
+				added++;
+			} catch (e) {
+				// Ignore if already exists
+			}
+		}
+		return { success: `Berhasil menambahkan ${added} pengawas ujian.` };
+	},
+
+	removeProctor: async ({ request, platform, params }) => {
+		const db = getDB(platform);
+		const form = await request.formData();
+		const examProctorId = form.get('exam_proctor_id')?.toString();
+		if (!examProctorId) return fail(400, { error: 'ID pengawas tidak valid' });
+
+		await db.prepare('DELETE FROM exam_proctors WHERE id = ?').bind(examProctorId).run();
+		return { success: 'Pengawas berhasil dihapus.' };
 	}
 };

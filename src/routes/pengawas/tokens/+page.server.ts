@@ -8,12 +8,20 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 
 	const tokens = await db.prepare(`
 		SELECT t.*, e.title as exam_title
-		FROM tokens t JOIN exams e ON t.exam_id = e.id
-		WHERE t.school_id = ?
+		FROM tokens t 
+		JOIN exams e ON t.exam_id = e.id
+		JOIN exam_proctors ep ON e.id = ep.exam_id
+		WHERE t.school_id = ? AND ep.proctor_id = ?
 		ORDER BY t.created_at DESC
-	`).bind(locals.user!.school_id).all();
+	`).bind(locals.user!.school_id, locals.user!.id).all();
 
-	const exams = await db.prepare('SELECT id, title FROM exams WHERE is_active = 1 AND school_id = ? ORDER BY title').bind(locals.user!.school_id).all();
+	const exams = await db.prepare(`
+		SELECT e.id, e.title 
+		FROM exams e
+		JOIN exam_proctors ep ON e.id = ep.exam_id
+		WHERE e.is_active = 1 AND e.school_id = ? AND ep.proctor_id = ?
+		ORDER BY e.title
+	`).bind(locals.user!.school_id, locals.user!.id).all();
 
 	return { tokens: tokens.results, exams: exams.results };
 };

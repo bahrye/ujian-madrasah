@@ -162,3 +162,15 @@ CREATE TABLE IF NOT EXISTS exam_teachers (
 );
 CREATE INDEX IF NOT EXISTS idx_exam_teachers_exam ON exam_teachers(exam_id);
 CREATE INDEX IF NOT EXISTS idx_exam_teachers_teacher ON exam_teachers(teacher_id);
+
+CREATE TABLE IF NOT EXISTS exam_proctors (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	exam_id INTEGER NOT NULL,
+	proctor_id INTEGER NOT NULL,
+	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (exam_id) REFERENCES exams(id) ON DELETE CASCADE,
+	FOREIGN KEY (proctor_id) REFERENCES users(id) ON DELETE CASCADE,
+	UNIQUE(exam_id, proctor_id)
+);
+CREATE INDEX IF NOT EXISTS idx_exam_proctors_exam ON exam_proctors(exam_id);
+CREATE INDEX IF NOT EXISTS idx_exam_proctors_proctor ON exam_proctors(proctor_id);

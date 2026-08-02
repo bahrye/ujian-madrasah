@@ -12,7 +12,8 @@
 	
 	$: allTeachers = data.allTeachers as any[];
 	$: examTeachers = data.examTeachers as any[];
-	
+	$: examProctors = data.examProctors as any[];
+
 	let showAddParticipantModal = false;
 	let addParticipantTab: 'class' | 'student' = 'class';
 	let studentSearch = '';
@@ -20,6 +21,8 @@
 	
 	let showAddTeacherModal = false;
 	let teacherSearch = '';
+	
+	let showAddProctorModal = false;
 
 	let selectedClassId = '';
 	$: previewStudents = selectedClassId ? data.allStudents.filter((s: any) => s.class_id?.toString() === selectedClassId) : [];
@@ -116,6 +119,46 @@
 									<form method="POST" action="?/removeTeacher" use:enhance>
 										<input type="hidden" name="exam_teacher_id" value={teacher.exam_teacher_id} />
 										<button type="submit" class="text-rose-500 hover:text-rose-700 p-1" title="Hapus Pengajar" on:click={(e) => { if (!confirm('Hapus pengajar ini?')) e.preventDefault(); }}>
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+												<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
+											</svg>
+										</button>
+									</form>
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+		{/if}
+	</div>
+
+	<!-- Proctors List -->
+	<div class="card overflow-hidden mb-6">
+		<div class="p-5 border-b border-slate-100 flex items-center justify-between">
+			<h2 class="text-lg font-bold text-slate-800">Daftar Pengawas</h2>
+			<button class="btn-sm btn-primary" on:click={() => (showAddProctorModal = true)}>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
+				</svg>
+				Tambah Pengawas
+			</button>
+		</div>
+		{#if examProctors.length === 0}
+			<div class="p-8 text-center text-slate-400 text-sm">Belum ada pengawas yang ditugaskan untuk ujian ini.</div>
+		{:else}
+			<div class="table-container border-0 rounded-none max-h-64 overflow-y-auto">
+				<table class="table">
+					<thead class="sticky top-0 bg-white"><tr><th>Nama Pengawas</th><th>Username</th><th>Aksi</th></tr></thead>
+					<tbody>
+						{#each examProctors as proctor}
+							<tr>
+								<td class="font-medium text-slate-800">{proctor.name}</td>
+								<td class="font-mono text-sm text-slate-500">{proctor.username}</td>
+								<td>
+									<form method="POST" action="?/removeProctor" use:enhance>
+										<input type="hidden" name="exam_proctor_id" value={proctor.exam_proctor_id} />
+										<button type="submit" class="text-rose-500 hover:text-rose-700 p-1" title="Hapus Pengawas" on:click={(e) => { if (!confirm('Hapus pengawas ini?')) e.preventDefault(); }}>
 											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 												<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
 											</svg>
@@ -377,11 +420,53 @@
 							{/if}
 						</div>
 					</div>
-					<div class="pt-2">
-						<button type="submit" class="btn-primary w-full">Tambahkan Pengajar</button>
+					<div class="mt-6 flex gap-3">
+						<button type="button" class="btn-ghost flex-1" on:click={() => (showAddTeacherModal = false)}>Batal</button>
+						<button type="submit" class="btn-primary flex-1">Tambahkan Terpilih</button>
 					</div>
 				</form>
 			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Add Proctor Modal -->
+{#if showAddProctorModal}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => (showAddProctorModal = false)}>
+		<div class="card p-6 w-full max-w-lg animate-bounce-in max-h-[90vh] flex flex-col" on:click|stopPropagation>
+			<div class="flex items-center justify-between mb-6">
+				<h2 class="text-lg font-bold text-slate-800">Tambah Pengawas</h2>
+				<button class="text-slate-400 hover:text-slate-600" on:click={() => (showAddProctorModal = false)}>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+				</button>
+			</div>
+			
+			<form method="POST" action="?/addProctor" use:enhance={() => { return async ({ update }) => { showAddProctorModal = false; await update(); }; }} class="flex flex-col flex-1 overflow-hidden">
+				<div class="overflow-y-auto flex-1 mb-4 border border-slate-200 rounded-lg p-2">
+					{#each data.allProctors as proctor}
+						{@const isAdded = examProctors.some((p: any) => p.user_id === proctor.id)}
+						<label class="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer border-b border-slate-100 last:border-0 {isAdded ? 'opacity-50' : ''}">
+							<input type="checkbox" name="proctor_ids" value={proctor.id} class="w-4 h-4 text-indigo-600 rounded" disabled={isAdded} />
+							<div class="flex-1">
+								<p class="text-sm font-medium text-slate-800">{proctor.name}</p>
+								<p class="text-xs text-slate-500 font-mono">{proctor.username}</p>
+							</div>
+							{#if isAdded}
+								<span class="text-[10px] font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded">TERPILIH</span>
+							{/if}
+						</label>
+					{:else}
+						<div class="p-4 text-center text-sm text-slate-500">Tidak ada data pengawas.</div>
+					{/each}
+				</div>
+				
+				<div class="mt-4 flex gap-3 pt-4 border-t border-slate-100">
+					<button type="button" class="btn-ghost flex-1" on:click={() => (showAddProctorModal = false)}>Batal</button>
+					<button type="submit" class="btn-primary flex-1">Tambahkan Terpilih</button>
+				</div>
+			</form>
 		</div>
 	</div>
 {/if}
