@@ -79,6 +79,7 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<span class="badge-success">✓ Sudah dinilai</span>`);
         } else {
           $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<span class="badge-warning">⚠ Belum dinilai</span>`);
         }
         $$renderer2.push(`<!--]--></form></div>`);
       }

@@ -91,6 +91,8 @@
 						<button type="submit" class="btn-success btn-sm">Simpan</button>
 						{#if a.score_given != null}
 							<span class="badge-success">✓ Sudah dinilai</span>
+						{:else}
+							<span class="badge-warning">⚠ Belum dinilai</span>
 						{/if}
 					</form>
 				</div>
