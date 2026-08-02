@@ -295,7 +295,7 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => (showAddParticipantModal = false)}>
-		<div class="card p-6 w-full max-w-lg animate-bounce-in" on:click|stopPropagation>
+		<div class="max-h-[90vh] overflow-y-auto card p-6 w-full max-w-lg animate-bounce-in" on:click|stopPropagation>
 			<div class="flex items-center justify-between mb-6">
 				<h2 class="text-lg font-bold text-slate-800">Tambah Peserta Ujian</h2>
 				<button class="text-slate-400 hover:text-slate-600" on:click={() => (showAddParticipantModal = false)}>

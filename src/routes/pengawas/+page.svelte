@@ -215,7 +215,7 @@
 
 {#if showModal && selectedSchedule}
 	<div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" on:click={() => showModal = false}>
-		<div class="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-xl" on:click|stopPropagation>
+		<div class="max-h-[90vh] overflow-y-auto bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-xl" on:click|stopPropagation>
 			<div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
 				<div>
 					<h3 class="font-bold text-lg text-slate-800">Daftar Peserta Ujian</h3>

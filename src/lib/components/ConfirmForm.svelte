@@ -48,7 +48,7 @@
 
 {#if showModal}
 	<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" transition:fade={{duration: 200}}>
-		<div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden" transition:scale={{start: 0.95, duration: 200}}>
+		<div class="max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden" transition:scale={{start: 0.95, duration: 200}}>
 			<div class="p-6">
 				<div class="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center mb-4">
 					<svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

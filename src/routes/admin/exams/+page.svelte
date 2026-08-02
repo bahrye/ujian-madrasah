@@ -117,7 +117,7 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => (showCreateModal = false)}>
-		<div class="card p-6 w-full max-w-lg animate-bounce-in" on:click|stopPropagation>
+		<div class="max-h-[90vh] overflow-y-auto card p-6 w-full max-w-lg animate-bounce-in" on:click|stopPropagation>
 			<h2 class="text-lg font-bold text-slate-800 mb-4">Buat Ujian Baru</h2>
 			<form method="POST" action="?/create" use:enhance={() => { return async ({ update }) => { showCreateModal = false; await update(); }; }} class="space-y-4">
 				<div>
@@ -174,7 +174,7 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => (editingExam = null)}>
-		<div class="card p-6 w-full max-w-lg animate-bounce-in" on:click|stopPropagation>
+		<div class="max-h-[90vh] overflow-y-auto card p-6 w-full max-w-lg animate-bounce-in" on:click|stopPropagation>
 			<h2 class="text-lg font-bold text-slate-800 mb-4">Edit Ujian</h2>
 			<form method="POST" action="?/update" use:enhance={() => { return async ({ update }) => { editingExam = null; await update(); }; }} class="space-y-4">
 				<input type="hidden" name="id" value={editingExam.id} />
@@ -236,7 +236,7 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => (deleteConfirm = null)}>
-		<div class="card p-6 w-full max-w-sm animate-bounce-in text-center" on:click|stopPropagation>
+		<div class="max-h-[90vh] overflow-y-auto card p-6 w-full max-w-sm animate-bounce-in text-center" on:click|stopPropagation>
 			<div class="w-14 h-14 mx-auto rounded-full bg-rose-100 flex items-center justify-center mb-4">
 				<svg class="w-7 h-7 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.warning} />
