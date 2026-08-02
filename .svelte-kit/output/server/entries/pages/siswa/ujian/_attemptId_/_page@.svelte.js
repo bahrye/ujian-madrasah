@@ -1,11 +1,11 @@
 import { l as fallback, d as attr_class, e as escape_html, b as bind_props, i as attr, f as attr_style, a as stringify, c as ensure_array_like, h as head } from "../../../../../chunks/index.js";
+import { o as onDestroy } from "../../../../../chunks/index-server.js";
 import "@sveltejs/kit/internal";
 import "../../../../../chunks/exports.js";
 import "../../../../../chunks/utils2.js";
 import "@sveltejs/kit/internal/server";
 import "../../../../../chunks/root.js";
 import "../../../../../chunks/state.svelte.js";
-import { o as onDestroy } from "../../../../../chunks/index-server.js";
 import { Q as QUESTION_TYPE_LABELS, I as ICONS } from "../../../../../chunks/constants.js";
 import { T as Toast } from "../../../../../chunks/Toast2.js";
 import "../../../../../chunks/toast.js";
@@ -171,6 +171,8 @@ function _page_($$renderer, $$props) {
     let attempt, questions, answerMap, currentQuestion, answeredCount, doubtedCount, unansweredCount;
     let data = $$props["data"];
     let currentIndex = 0;
+    onDestroy(() => {
+    });
     let localAnswers = {};
     let localDoubts = {};
     attempt = data.attempt;

@@ -7,7 +7,7 @@
 	import { ICONS } from '$lib/utils/constants';
 	import Toast from '$lib/components/ui/Toast.svelte';
 	import { toasts } from '$lib/stores/toast';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 
 	export let data;
 
@@ -24,23 +24,53 @@
 	let warnings = 0;
 	let showWarningModal = false;
 	const MAX_WARNINGS = 3;
+	let isUnloading = false;
+
+	let wakeLock: any = null;
+
+	async function requestWakeLock() {
+		try {
+			if ('wakeLock' in navigator) {
+				wakeLock = await (navigator as any).wakeLock.request('screen');
+				wakeLock.addEventListener('release', () => {
+					console.log('Screen Wake Lock released');
+				});
+				console.log('Screen Wake Lock acquired');
+			}
+		} catch (err: any) {
+			console.error(`Wake Lock error: ${err.name}, ${err.message}`);
+		}
+	}
 
 	onMount(() => {
+		requestWakeLock();
+		
 		const savedWarnings = localStorage.getItem(`warnings_${attempt.id}`);
 		if (savedWarnings) {
 			warnings = parseInt(savedWarnings, 10);
 		}
 	});
 
-	beforeNavigate(({ cancel }) => {
+	onDestroy(() => {
+		if (wakeLock !== null) {
+			wakeLock.release();
+			wakeLock = null;
+		}
+	});
+
+	beforeNavigate(({ cancel, willUnload }) => {
 		if (!submitting) {
-			toasts.error('Anda tidak diizinkan keluar dari halaman saat ujian berlangsung!');
-			cancel();
+			if (willUnload) {
+				isUnloading = true;
+			} else {
+				toasts.error('Anda tidak diizinkan keluar dari halaman saat ujian berlangsung!');
+				cancel();
+			}
 		}
 	});
 
 	function handleCheatWarning() {
-		if (showWarningModal || submitting) return; // Prevent multiple triggers at once
+		if (showWarningModal || submitting || isUnloading) return; // Prevent multiple triggers at once
 		
 		warnings += 1;
 		localStorage.setItem(`warnings_${attempt.id}`, warnings.toString());
@@ -67,6 +97,12 @@
 	function handleVisibilityChange() {
 		if (document.visibilityState === 'hidden') {
 			handleCheatWarning();
+		} else if (document.visibilityState === 'visible') {
+			if (wakeLock !== null && wakeLock.released) {
+				requestWakeLock();
+			} else if (wakeLock === null) {
+				requestWakeLock();
+			}
 		}
 	}
 
@@ -146,16 +182,14 @@
 
 	async function handleTimeUp() {
 		toasts.warning('Waktu habis! Jawaban akan disubmit otomatis.');
-		await saveCurrentAnswer();
-		// Submit form
-		const form = document.getElementById('submit-form') as HTMLFormElement;
-		if (form) form.requestSubmit();
+		handleAutoSubmit();
 	}
 </script>
 
 <svelte:head><title>{attempt.exam_title} — Ujian Online Madrasah</title></svelte:head>
 
 <svelte:window 
+	on:beforeunload={() => { isUnloading = true; }}
 	on:contextmenu|preventDefault 
 	on:copy|preventDefault 
 	on:cut|preventDefault 
