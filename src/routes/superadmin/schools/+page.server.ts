@@ -49,5 +49,40 @@ export const actions: Actions = {
 		} catch (e) {
 			return fail(500, { error: 'Gagal merubah status sekolah' });
 		}
+	},
+	edit: async ({ request, platform }) => {
+		const db = getDB(platform);
+		const data = await request.formData();
+		const id = data.get('id')?.toString();
+		const name = data.get('name')?.toString().trim();
+		const address = data.get('address')?.toString().trim() || null;
+
+		if (!id || !name) {
+			return fail(400, { error: 'ID dan Nama sekolah wajib diisi', name, address });
+		}
+
+		try {
+			await db.prepare('UPDATE schools SET name = ?, address = ?, updated_at = datetime("now") WHERE id = ?')
+				.bind(name, address, id)
+				.run();
+			
+			return { success: true };
+		} catch (e) {
+			return fail(500, { error: 'Gagal mengupdate sekolah', name, address });
+		}
+	},
+	delete: async ({ request, platform }) => {
+		const db = getDB(platform);
+		const data = await request.formData();
+		const id = data.get('id')?.toString();
+
+		if (!id) return fail(400, { error: 'ID tidak valid' });
+
+		try {
+			await db.prepare('DELETE FROM schools WHERE id = ?').bind(id).run();
+			return { success: true };
+		} catch (e) {
+			return fail(500, { error: 'Gagal menghapus sekolah' });
+		}
 	}
 };

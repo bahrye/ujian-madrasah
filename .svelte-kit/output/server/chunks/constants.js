@@ -30,6 +30,11 @@ const ATTEMPT_STATUS_COLORS = {
   waktu_habis: "badge-danger"
 };
 const SIDEBAR_MENUS = {
+  superadmin: [
+    { label: "Dashboard", href: "/superadmin", icon: "dashboard" },
+    { label: "Daftar Sekolah", href: "/superadmin/schools", icon: "school" },
+    { label: "Admin Sekolah", href: "/superadmin/admins", icon: "users" }
+  ],
   admin: [
     { label: "Dashboard", href: "/admin", icon: "dashboard" },
     { label: "Pengguna", href: "/admin/users", icon: "users" },
