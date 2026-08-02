@@ -8,7 +8,7 @@ export const load: PageServerLoad = async ({ platform, locals, params }) => {
 
 	// Ambil data attempt
 	const attempt = await db.prepare(`
-		SELECT sa.*, e.title as exam_title, s.name as subject, e.duration_minutes
+		SELECT sa.*, e.title as exam_title, s.name as subject, e.duration_minutes, e.shuffle_questions
 		FROM student_attempts sa
 		JOIN exams e ON sa.exam_id = e.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
@@ -22,11 +22,29 @@ export const load: PageServerLoad = async ({ platform, locals, params }) => {
 	}
 
 	// Ambil soal
-	const questions = await db.prepare(`
+	let questions = await db.prepare(`
 		SELECT q.* FROM questions q
 		WHERE q.exam_id = ?
 		ORDER BY q.question_number
 	`).bind(attempt.exam_id).all();
+
+	let questionsList = questions.results as any[];
+
+	if (attempt.shuffle_questions === 1) {
+		// Implement deterministic shuffle using attempt.id as seed (Mulberry32 PRNG)
+		let seed = attempt.id * 1234567;
+		const random = () => {
+			seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+			let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+			t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+			return ((t ^ t >>> 14) >>> 0) / 4294967296;
+		};
+		
+		for (let i = questionsList.length - 1; i > 0; i--) {
+			const j = Math.floor(random() * (i + 1));
+			[questionsList[i], questionsList[j]] = [questionsList[j], questionsList[i]];
+		}
+	}
 
 	// Ambil jawaban
 	const answers = await db.prepare(`
@@ -50,7 +68,7 @@ export const load: PageServerLoad = async ({ platform, locals, params }) => {
 	}
 
 	if (kvData) {
-		for (const q of questions.results as any[]) {
+		for (const q of questionsList) {
 			if (!answerMap[q.id]) {
 				answerMap[q.id] = { answer_given: '', is_doubted: 0 };
 			}
@@ -65,7 +83,7 @@ export const load: PageServerLoad = async ({ platform, locals, params }) => {
 
 	return {
 		attempt,
-		questions: questions.results,
+		questions: questionsList,
 		answerMap
 	};
 };

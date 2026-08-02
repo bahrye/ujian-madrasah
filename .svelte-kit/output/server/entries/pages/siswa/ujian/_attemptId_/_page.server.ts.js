@@ -4,7 +4,7 @@ const load = async ({ platform, locals, params }) => {
   const db = getDB(platform);
   const attemptId = params.attemptId;
   const attempt = await db.prepare(`
-		SELECT sa.*, e.title as exam_title, s.name as subject, e.duration_minutes
+		SELECT sa.*, e.title as exam_title, s.name as subject, e.duration_minutes, e.shuffle_questions
 		FROM student_attempts sa
 		JOIN exams e ON sa.exam_id = e.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
@@ -14,11 +14,26 @@ const load = async ({ platform, locals, params }) => {
   if (attempt.status !== "mengerjakan") {
     throw redirect(302, "/siswa");
   }
-  const questions = await db.prepare(`
+  let questions = await db.prepare(`
 		SELECT q.* FROM questions q
 		WHERE q.exam_id = ?
 		ORDER BY q.question_number
 	`).bind(attempt.exam_id).all();
+  let questionsList = questions.results;
+  if (attempt.shuffle_questions === 1) {
+    let seed = attempt.id * 1234567;
+    const random = () => {
+      seed |= 0;
+      seed = seed + 1831565813 | 0;
+      let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+    for (let i = questionsList.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      [questionsList[i], questionsList[j]] = [questionsList[j], questionsList[i]];
+    }
+  }
   const answers = await db.prepare(`
 		SELECT sa.* FROM student_answers sa
 		WHERE sa.attempt_id = ?
@@ -39,7 +54,7 @@ const load = async ({ platform, locals, params }) => {
     }
   }
   if (kvData) {
-    for (const q of questions.results) {
+    for (const q of questionsList) {
       if (!answerMap[q.id]) {
         answerMap[q.id] = { answer_given: "", is_doubted: 0 };
       }
@@ -53,7 +68,7 @@ const load = async ({ platform, locals, params }) => {
   }
   return {
     attempt,
-    questions: questions.results,
+    questions: questionsList,
     answerMap
   };
 };

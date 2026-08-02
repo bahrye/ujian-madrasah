@@ -25,9 +25,10 @@ const actions = {
     const durationMinutes = parseInt(form.get("duration_minutes")?.toString() || "60");
     const startTime = form.get("start_time")?.toString() || null;
     const endTime = form.get("end_time")?.toString() || null;
+    const shuffleQuestions = parseInt(form.get("shuffle_questions")?.toString() || "0");
     if (!title) return fail(400, { error: "Judul ujian wajib diisi." });
-    await db.prepare(`INSERT INTO exams (school_id, title, description, subject_id, duration_minutes, start_time, end_time, created_by)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?)`).bind(locals.user.school_id, title, description, subjectId, durationMinutes, startTime, endTime, locals.user?.id).run();
+    await db.prepare(`INSERT INTO exams (school_id, title, description, subject_id, duration_minutes, start_time, end_time, shuffle_questions, created_by)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(locals.user.school_id, title, description, subjectId, durationMinutes, startTime, endTime, shuffleQuestions, locals.user?.id).run();
     return { success: "Ujian berhasil dibuat." };
   },
   update: async ({ request, platform, locals }) => {
@@ -41,9 +42,10 @@ const actions = {
     const startTime = form.get("start_time")?.toString() || null;
     const endTime = form.get("end_time")?.toString() || null;
     const isActive = form.get("is_active")?.toString() === "1" ? 1 : 0;
+    const shuffleQuestions = parseInt(form.get("shuffle_questions")?.toString() || "0");
     if (!id || !title) return fail(400, { error: "Data tidak lengkap." });
     await db.prepare(`UPDATE exams SET title=?, description=?, subject_id=?, duration_minutes=?,
-			start_time=?, end_time=?, is_active=?, updated_at=datetime('now') WHERE id=? AND school_id=?`).bind(title, description, subjectId, durationMinutes, startTime, endTime, isActive, id, locals.user.school_id).run();
+			start_time=?, end_time=?, is_active=?, shuffle_questions=?, updated_at=datetime('now') WHERE id=? AND school_id=?`).bind(title, description, subjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, id, locals.user.school_id).run();
     return { success: "Ujian berhasil diperbarui." };
   },
   delete: async ({ request, platform, locals }) => {

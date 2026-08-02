@@ -153,6 +153,13 @@
 						<input id="c-end" name="end_time" type="datetime-local" class="input" />
 					</div>
 				</div>
+				<div>
+					<label class="label" for="c-shuffle">Pengaturan Soal</label>
+					<select id="c-shuffle" name="shuffle_questions" class="input">
+						<option value="0">Tidak Acak (Sesuai Urutan)</option>
+						<option value="1">Acak Soal (Berbeda tiap siswa)</option>
+					</select>
+				</div>
 				<div class="flex gap-3 pt-2">
 					<button type="button" class="btn-ghost flex-1" on:click={() => (showCreateModal = false)}>Batal</button>
 					<button type="submit" class="btn-primary flex-1">Buat Ujian</button>
@@ -203,6 +210,13 @@
 						<label class="label" for="e-end">Waktu Selesai</label>
 						<input id="e-end" name="end_time" type="datetime-local" class="input" value={editingExam.end_time?.slice(0, 16) || ''} />
 					</div>
+				</div>
+				<div>
+					<label class="label" for="e-shuffle">Pengaturan Soal</label>
+					<select id="e-shuffle" name="shuffle_questions" class="input" value={String(editingExam.shuffle_questions || 0)}>
+						<option value="0">Tidak Acak (Sesuai Urutan)</option>
+						<option value="1">Acak Soal (Berbeda tiap siswa)</option>
+					</select>
 				</div>
 				<div class="flex items-center gap-2">
 					<input id="e-active" name="is_active" type="checkbox" value="1" checked={editingExam.is_active} class="rounded border-slate-300" />
