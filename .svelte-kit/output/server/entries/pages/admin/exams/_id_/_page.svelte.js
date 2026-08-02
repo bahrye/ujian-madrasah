@@ -12,11 +12,17 @@ function _page($$renderer, $$props) {
     let exam, questions, attempts, tokens, participants;
     let form = fallback($$props["form"], null);
     let data = $$props["data"];
+    let studentSearch = "";
     exam = data.exam;
     questions = data.questions;
     attempts = data.attempts;
     tokens = data.tokens;
     participants = data.participants;
+    data.allStudents ? data.allStudents.filter((s) => {
+      const matchesSearch = s.name.toLowerCase().includes(studentSearch.toLowerCase()) || s.username.toLowerCase().includes(studentSearch.toLowerCase());
+      const matchesClass = true;
+      return matchesSearch && matchesClass;
+    }) : [];
     if (form?.success) toasts.success(form.success);
     if (form?.error) toasts.error(form.error);
     head("wh8cpz", $$renderer2, ($$renderer3) => {
@@ -39,7 +45,7 @@ function _page($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--> <div class="mt-4 flex flex-wrap gap-4 text-xs text-slate-500"><span>Mulai: ${escape_html(exam.start_time ? new Date(exam.start_time).toLocaleString("id-ID") : "-")}</span> <span>Selesai: ${escape_html(exam.end_time ? new Date(exam.end_time).toLocaleString("id-ID") : "-")}</span></div></div> <div class="grid grid-cols-3 gap-4"><div class="card p-4 text-center"><p class="text-2xl font-bold text-gradient">${escape_html(questions.length)}</p> <p class="text-xs text-slate-500">Soal</p></div> <div class="card p-4 text-center"><p class="text-2xl font-bold text-gradient-cyan">${escape_html(attempts.length)}</p> <p class="text-xs text-slate-500">Peserta</p></div> <div class="card p-4 text-center"><p class="text-2xl font-bold text-amber-500">${escape_html(tokens.length)}</p> <p class="text-xs text-slate-500">Token</p></div></div> <div class="card overflow-hidden"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><h2 class="text-lg font-bold text-slate-800">Daftar Soal</h2> <a${attr("href", `/guru/bank-soal/${stringify(exam.id)}`)} class="btn-sm btn-outline">Kelola Soal</a></div> `);
+    $$renderer2.push(`<!--]--> <div class="mt-4 flex flex-wrap gap-4 text-xs text-slate-500"><span>Mulai: ${escape_html(exam.start_time ? new Date(exam.start_time).toLocaleString("id-ID") : "-")}</span> <span>Selesai: ${escape_html(exam.end_time ? new Date(exam.end_time).toLocaleString("id-ID") : "-")}</span></div></div> <div class="grid grid-cols-3 gap-4"><div class="card p-4 text-center"><p class="text-2xl font-bold text-gradient">${escape_html(questions.length)}</p> <p class="text-xs text-slate-500">Soal</p></div> <div class="card p-4 text-center"><p class="text-2xl font-bold text-gradient-cyan">${escape_html(participants.length)}</p> <p class="text-xs text-slate-500">Peserta</p></div> <div class="card p-4 text-center"><p class="text-2xl font-bold text-amber-500">${escape_html(tokens.length)}</p> <p class="text-xs text-slate-500">Token</p></div></div> <div class="card overflow-hidden"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><h2 class="text-lg font-bold text-slate-800">Daftar Soal</h2> <a${attr("href", `/guru/bank-soal/${stringify(exam.id)}`)} class="btn-sm btn-outline">Kelola Soal</a></div> `);
     if (questions.length === 0) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div class="p-8 text-center text-slate-400 text-sm">Belum ada soal untuk ujian ini.</div>`);

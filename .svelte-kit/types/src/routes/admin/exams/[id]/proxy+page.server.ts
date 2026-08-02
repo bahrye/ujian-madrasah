@@ -66,16 +66,20 @@ export const actions = {
 	addParticipantStudent: async ({ request, platform, params }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
 		const form = await request.formData();
-		const studentId = form.get('student_id')?.toString();
-		if (!studentId) return fail(400, { error: 'Pilih siswa terlebih dahulu' });
+		const studentIds = form.getAll('student_ids').map(id => id.toString());
+		if (studentIds.length === 0) return fail(400, { error: 'Pilih minimal satu siswa' });
 
-		try {
-			await db.prepare('INSERT INTO exam_participants (exam_id, student_id) VALUES (?, ?)')
-				.bind(params.id, studentId).run();
-			return { success: 'Berhasil menambahkan siswa ke peserta ujian.' };
-		} catch (e) {
-			return fail(400, { error: 'Siswa sudah menjadi peserta di ujian ini.' });
+		let added = 0;
+		for (const studentId of studentIds) {
+			try {
+				await db.prepare('INSERT INTO exam_participants (exam_id, student_id) VALUES (?, ?)')
+					.bind(params.id, studentId).run();
+				added++;
+			} catch (e) {
+				// Ignore if already exists (UNIQUE constraint)
+			}
 		}
+		return { success: `Berhasil menambahkan ${added} siswa ke peserta ujian.` };
 	},
 
 	removeParticipant: async ({ request, platform, params }: import('./$types').RequestEvent) => {

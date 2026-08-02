@@ -12,6 +12,14 @@
 	
 	let showAddParticipantModal = false;
 	let addParticipantTab: 'class' | 'student' = 'class';
+	let studentSearch = '';
+	let studentClassFilter = '';
+
+	$: filteredStudents = data.allStudents ? data.allStudents.filter((s: any) => {
+		const matchesSearch = s.name.toLowerCase().includes(studentSearch.toLowerCase()) || s.username.toLowerCase().includes(studentSearch.toLowerCase());
+		const matchesClass = studentClassFilter ? s.class_id?.toString() === studentClassFilter : true;
+		return matchesSearch && matchesClass;
+	}) : [];
 
 	import { toasts } from '$lib/stores/toast';
 	$: if (form?.success) toasts.success(form.success);
@@ -61,7 +69,7 @@
 			<p class="text-xs text-slate-500">Soal</p>
 		</div>
 		<div class="card p-4 text-center">
-			<p class="text-2xl font-bold text-gradient-cyan">{attempts.length}</p>
+			<p class="text-2xl font-bold text-gradient-cyan">{participants.length}</p>
 			<p class="text-xs text-slate-500">Peserta</p>
 		</div>
 		<div class="card p-4 text-center">
@@ -197,15 +205,48 @@
 					</div>
 				</form>
 			{:else}
-				<form method="POST" action="?/addParticipantStudent" use:enhance={() => { return async ({ update }) => { showAddParticipantModal = false; await update(); }; }} class="space-y-4">
+				<form method="POST" action="?/addParticipantStudent" use:enhance={() => { return async ({ update }) => { showAddParticipantModal = false; studentSearch = ''; studentClassFilter = ''; await update(); }; }} class="space-y-4">
 					<div>
-						<label class="label" for="add-student">Pilih Siswa</label>
-						<select id="add-student" name="student_id" class="input" required>
-							<option value="">-- Pilih Siswa --</option>
-							{#each data.allStudents as s}
-								<option value={s.id}>{s.name} ({s.username})</option>
+						<div class="flex items-center justify-between mb-2">
+							<label class="label mb-0 block">Pilih Siswa</label>
+							<button type="button" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium" on:click={() => {
+								const checkboxes = document.querySelectorAll('input[name="student_ids"]:not(:disabled)');
+								const allChecked = Array.from(checkboxes).length > 0 && Array.from(checkboxes).every(cb => (cb as HTMLInputElement).checked);
+								checkboxes.forEach(cb => (cb as HTMLInputElement).checked = !allChecked);
+							}}>
+								Pilih Semua / Batal (Sesuai Filter)
+							</button>
+						</div>
+						
+						<!-- Filters -->
+						<div class="grid grid-cols-2 gap-2 mb-3">
+							<input type="text" placeholder="Cari nama/NISN..." bind:value={studentSearch} class="input text-sm py-1.5" />
+							<select bind:value={studentClassFilter} class="input text-sm py-1.5">
+								<option value="">Semua Kelas</option>
+								{#each data.classes as c}
+									<option value={c.id.toString()}>{c.name}</option>
+								{/each}
+							</select>
+						</div>
+
+						<div class="border border-slate-200 rounded-lg max-h-60 overflow-y-auto p-2 bg-slate-50">
+							{#each filteredStudents as s}
+								{@const isParticipant = participants.some(p => p.user_id === s.id)}
+								<label class="flex items-center gap-3 p-2 rounded transition-colors {isParticipant ? 'bg-slate-100 opacity-70' : 'hover:bg-white cursor-pointer'}">
+									<input type="checkbox" name="student_ids" value={s.id} class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-50" checked={isParticipant} disabled={isParticipant} />
+									<div class="flex flex-col flex-1">
+										<span class="text-sm font-medium text-slate-800">{s.name}</span>
+										<span class="text-xs text-slate-500 font-mono">{s.username}</span>
+									</div>
+									{#if isParticipant}
+										<span class="text-[10px] badge-success">Sudah Masuk</span>
+									{/if}
+								</label>
 							{/each}
-						</select>
+							{#if filteredStudents.length === 0}
+								<div class="p-4 text-center text-sm text-slate-500">Tidak ada data siswa yang cocok dengan filter.</div>
+							{/if}
+						</div>
 					</div>
 					<div class="pt-2">
 						<button type="submit" class="btn-primary w-full">Tambahkan Siswa</button>
