@@ -17,6 +17,19 @@
 		<p class="text-sm text-slate-500 mt-1">Rekap nilai seluruh ujian</p>
 	</div>
 
+	<!-- Filter -->
+	<div class="card p-4">
+		<form method="GET" class="flex flex-col md:flex-row gap-3">
+			<select name="exam_id" class="select flex-1" on:change={(e) => e.currentTarget.form?.submit()}>
+				<option value="">Semua Ujian</option>
+				{#each data.exams as exam}
+					<option value={exam.id} selected={data.examFilter === String(exam.id)}>{exam.title}</option>
+				{/each}
+			</select>
+			<button type="submit" class="btn-secondary md:w-auto w-full">Tampilkan</button>
+		</form>
+	</div>
+
 	<div class="card overflow-hidden">
 		{#if results.length === 0}
 			<div class="p-12 text-center text-slate-400">Belum ada hasil ujian.</div>

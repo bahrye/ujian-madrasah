@@ -637,6 +637,49 @@
       "_toast.js"
     ]
   },
+  "src/routes/guru/results/+page.server.ts": {
+    "file": "entries/pages/guru/results/_page.server.ts.js",
+    "name": "entries/pages/guru/results/_page.server.ts",
+    "src": "src/routes/guru/results/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/guru/results/+page.svelte": {
+    "file": "entries/pages/guru/results/_page.svelte.js",
+    "name": "entries/pages/guru/results/_page.svelte",
+    "src": "src/routes/guru/results/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_exports.js",
+      "_utils2.js",
+      "_root.js",
+      "_state.svelte.js",
+      "_constants.js"
+    ]
+  },
+  "src/routes/guru/results/[attemptId]/+page.server.ts": {
+    "file": "entries/pages/guru/results/_attemptId_/_page.server.ts.js",
+    "name": "entries/pages/guru/results/_attemptId_/_page.server.ts",
+    "src": "src/routes/guru/results/[attemptId]/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/guru/results/[attemptId]/+page.svelte": {
+    "file": "entries/pages/guru/results/_attemptId_/_page.svelte.js",
+    "name": "entries/pages/guru/results/_attemptId_/_page.svelte",
+    "src": "src/routes/guru/results/[attemptId]/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_constants.js",
+      "_html.js"
+    ]
+  },
   "src/routes/login/+page.server.ts": {
     "file": "entries/pages/login/_page.server.ts.js",
     "name": "entries/pages/login/_page.server.ts",

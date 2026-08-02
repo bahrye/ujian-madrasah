@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg"]),
 	mimeTypes: {".svg":"image/svg+xml"},
 	_: {
-		client: {start:"_app/immutable/entry/start.DObvi0PH.js",app:"_app/immutable/entry/app.DLxWbxBN.js",imports:["_app/immutable/entry/start.DObvi0PH.js","_app/immutable/chunks/D6K6sTnQ.js","_app/immutable/chunks/CeghRj4g.js","_app/immutable/chunks/BNACDoGZ.js","_app/immutable/chunks/CSaYYiLa.js","_app/immutable/entry/app.DLxWbxBN.js","_app/immutable/chunks/BNACDoGZ.js","_app/immutable/chunks/CSaYYiLa.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CeghRj4g.js","_app/immutable/chunks/lO_yT19u.js","_app/immutable/chunks/BLnsRq1k.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:false},
+		client: {start:"_app/immutable/entry/start.BCkCWUQ7.js",app:"_app/immutable/entry/app.CHb4F6Zj.js",imports:["_app/immutable/entry/start.BCkCWUQ7.js","_app/immutable/chunks/9i03UTY1.js","_app/immutable/chunks/Cyp6lZf_.js","_app/immutable/chunks/BYpKmSk7.js","_app/immutable/chunks/C4hz3o9S.js","_app/immutable/chunks/Dd0U9sfd.js","_app/immutable/entry/app.CHb4F6Zj.js","_app/immutable/chunks/BYpKmSk7.js","_app/immutable/chunks/C4hz3o9S.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/Cyp6lZf_.js","_app/immutable/chunks/C5YBDGaV.js","_app/immutable/chunks/DmTSHefo.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:false},
 		nodes: [
 			__memo(() => import('../output/server/nodes/0.js')),
 			__memo(() => import('../output/server/nodes/1.js')),
@@ -45,7 +45,9 @@ return {
 			__memo(() => import('../output/server/nodes/30.js')),
 			__memo(() => import('../output/server/nodes/31.js')),
 			__memo(() => import('../output/server/nodes/32.js')),
-			__memo(() => import('../output/server/nodes/33.js'))
+			__memo(() => import('../output/server/nodes/33.js')),
+			__memo(() => import('../output/server/nodes/34.js')),
+			__memo(() => import('../output/server/nodes/35.js'))
 		],
 		remotes: {
 			
@@ -185,80 +187,94 @@ return {
 				endpoint: null
 			},
 			{
+				id: "/guru/results",
+				pattern: /^\/guru\/results\/?$/,
+				params: [],
+				page: { layouts: [0,3,], errors: [1,,], leaf: 23 },
+				endpoint: null
+			},
+			{
+				id: "/guru/results/[attemptId]",
+				pattern: /^\/guru\/results\/([^/]+?)\/?$/,
+				params: [{"name":"attemptId","optional":false,"rest":false,"chained":false}],
+				page: { layouts: [0,3,], errors: [1,,], leaf: 24 },
+				endpoint: null
+			},
+			{
 				id: "/login",
 				pattern: /^\/login\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 23 },
+				page: { layouts: [0,], errors: [1,], leaf: 25 },
 				endpoint: null
 			},
 			{
 				id: "/pengawas",
 				pattern: /^\/pengawas\/?$/,
 				params: [],
-				page: { layouts: [0,4,], errors: [1,,], leaf: 24 },
+				page: { layouts: [0,4,], errors: [1,,], leaf: 26 },
 				endpoint: null
 			},
 			{
 				id: "/pengawas/monitor",
 				pattern: /^\/pengawas\/monitor\/?$/,
 				params: [],
-				page: { layouts: [0,4,], errors: [1,,], leaf: 25 },
+				page: { layouts: [0,4,], errors: [1,,], leaf: 27 },
 				endpoint: null
 			},
 			{
 				id: "/pengawas/tokens",
 				pattern: /^\/pengawas\/tokens\/?$/,
 				params: [],
-				page: { layouts: [0,4,], errors: [1,,], leaf: 26 },
+				page: { layouts: [0,4,], errors: [1,,], leaf: 28 },
 				endpoint: null
 			},
 			{
 				id: "/siswa",
 				pattern: /^\/siswa\/?$/,
 				params: [],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 27 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 29 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/jadwal",
 				pattern: /^\/siswa\/jadwal\/?$/,
 				params: [],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 28 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 30 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/ujian",
 				pattern: /^\/siswa\/ujian\/?$/,
 				params: [],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 29 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 31 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/ujian/[attemptId]",
 				pattern: /^\/siswa\/ujian\/([^/]+?)\/?$/,
 				params: [{"name":"attemptId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,], errors: [1,], leaf: 30 },
+				page: { layouts: [0,], errors: [1,], leaf: 32 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin",
 				pattern: /^\/superadmin\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 31 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 33 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin/admins",
 				pattern: /^\/superadmin\/admins\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 32 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 34 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin/schools",
 				pattern: /^\/superadmin\/schools\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 33 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 35 },
 				endpoint: null
 			}
 		],

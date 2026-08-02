@@ -29,7 +29,7 @@ declare module "$app/types" {
 	type MatcherParam<M> = M extends (param : string) => param is (infer U extends string) ? U : string;
 
 	export interface AppTypes {
-		RouteId(): "/" | "/admin" | "/admin/bank-soal" | "/admin/bank-soal/[examId]" | "/admin/classes" | "/admin/exams" | "/admin/exams/[id]" | "/admin/results" | "/admin/results/[attemptId]" | "/admin/students" | "/admin/subjects" | "/admin/users" | "/api" | "/api/exams" | "/api/exams/[id]" | "/api/exams/[id]/questions" | "/api/logout" | "/api/setup" | "/guru" | "/guru/bank-soal" | "/guru/bank-soal/[examId]" | "/guru/penilaian" | "/login" | "/pengawas" | "/pengawas/monitor" | "/pengawas/tokens" | "/siswa" | "/siswa/jadwal" | "/siswa/ujian" | "/siswa/ujian/[attemptId]" | "/superadmin" | "/superadmin/admins" | "/superadmin/schools";
+		RouteId(): "/" | "/admin" | "/admin/bank-soal" | "/admin/bank-soal/[examId]" | "/admin/classes" | "/admin/exams" | "/admin/exams/[id]" | "/admin/results" | "/admin/results/[attemptId]" | "/admin/students" | "/admin/subjects" | "/admin/users" | "/api" | "/api/exams" | "/api/exams/[id]" | "/api/exams/[id]/questions" | "/api/logout" | "/api/setup" | "/guru" | "/guru/bank-soal" | "/guru/bank-soal/[examId]" | "/guru/penilaian" | "/guru/results" | "/guru/results/[attemptId]" | "/login" | "/pengawas" | "/pengawas/monitor" | "/pengawas/tokens" | "/siswa" | "/siswa/jadwal" | "/siswa/ujian" | "/siswa/ujian/[attemptId]" | "/superadmin" | "/superadmin/admins" | "/superadmin/schools";
 		RouteParams(): {
 			"/admin/bank-soal/[examId]": { examId: string };
 			"/admin/exams/[id]": { id: string };
@@ -37,6 +37,7 @@ declare module "$app/types" {
 			"/api/exams/[id]": { id: string };
 			"/api/exams/[id]/questions": { id: string };
 			"/guru/bank-soal/[examId]": { examId: string };
+			"/guru/results/[attemptId]": { attemptId: string };
 			"/siswa/ujian/[attemptId]": { attemptId: string }
 		};
 		LayoutParams(): {
@@ -58,10 +59,12 @@ declare module "$app/types" {
 			"/api/exams/[id]/questions": { id: string };
 			"/api/logout": Record<string, never>;
 			"/api/setup": Record<string, never>;
-			"/guru": { examId?: string | undefined };
+			"/guru": { examId?: string | undefined; attemptId?: string | undefined };
 			"/guru/bank-soal": { examId?: string | undefined };
 			"/guru/bank-soal/[examId]": { examId: string };
 			"/guru/penilaian": Record<string, never>;
+			"/guru/results": { attemptId?: string | undefined };
+			"/guru/results/[attemptId]": { attemptId: string };
 			"/login": Record<string, never>;
 			"/pengawas": Record<string, never>;
 			"/pengawas/monitor": Record<string, never>;
@@ -74,7 +77,7 @@ declare module "$app/types" {
 			"/superadmin/admins": Record<string, never>;
 			"/superadmin/schools": Record<string, never>
 		};
-		Pathname(): "/" | "/admin" | "/admin/bank-soal" | `/admin/bank-soal/${string}` & {} | "/admin/classes" | "/admin/exams" | `/admin/exams/${string}` & {} | "/admin/results" | `/admin/results/${string}` & {} | "/admin/students" | "/admin/subjects" | "/admin/users" | `/api/exams/${string}/questions` & {} | "/api/logout" | "/api/setup" | "/guru" | "/guru/bank-soal" | `/guru/bank-soal/${string}` & {} | "/guru/penilaian" | "/login" | "/pengawas" | "/pengawas/monitor" | "/pengawas/tokens" | "/siswa" | "/siswa/jadwal" | "/siswa/ujian" | `/siswa/ujian/${string}` & {} | "/superadmin" | "/superadmin/admins" | "/superadmin/schools";
+		Pathname(): "/" | "/admin" | "/admin/bank-soal" | `/admin/bank-soal/${string}` & {} | "/admin/classes" | "/admin/exams" | `/admin/exams/${string}` & {} | "/admin/results" | `/admin/results/${string}` & {} | "/admin/students" | "/admin/subjects" | "/admin/users" | `/api/exams/${string}/questions` & {} | "/api/logout" | "/api/setup" | "/guru" | "/guru/bank-soal" | `/guru/bank-soal/${string}` & {} | "/guru/penilaian" | "/guru/results" | `/guru/results/${string}` & {} | "/login" | "/pengawas" | "/pengawas/monitor" | "/pengawas/tokens" | "/siswa" | "/siswa/jadwal" | "/siswa/ujian" | `/siswa/ujian/${string}` & {} | "/superadmin" | "/superadmin/admins" | "/superadmin/schools";
 		ResolvedPathname(): `${"" | `/${string}`}${ReturnType<AppTypes['Pathname']>}`;
 		Asset(): "/favicon.svg" | string & {};
 	}
