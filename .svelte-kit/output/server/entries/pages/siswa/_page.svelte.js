@@ -31,9 +31,8 @@ function _page($$renderer, $$props) {
       const seconds = Math.floor(diff % (1e3 * 60) / 1e3);
       return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
     }
-    function getAttemptRemainingTime(createdAtStr, durationMinutes, current) {
-      const start = new Date(createdAtStr);
-      const end = new Date(start.getTime() + durationMinutes * 6e4);
+    function getAttemptRemainingTime(endTimeStr, current) {
+      const end = new Date(endTimeStr);
       const diff = end.getTime() - current.getTime();
       if (diff <= 0) return "00:00:00";
       const hours = Math.floor(diff / (1e3 * 60 * 60));
@@ -102,7 +101,7 @@ function _page($$renderer, $$props) {
         $$renderer2.push(`<tr><td class="font-medium">${escape_html(a.exam_title)}</td><td class="text-slate-500">${escape_html(a.subject || "-")}</td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[a.status]))}>${escape_html(ATTEMPT_STATUS_LABELS[a.status])}</span></td><td class="font-mono text-sm">`);
         if (a.status === "mengerjakan") {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<span class="text-amber-600 font-bold flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> ${escape_html(getAttemptRemainingTime(a.created_at, a.duration_minutes, currentTime))}</span>`);
+          $$renderer2.push(`<span class="inline-flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> ${escape_html(getAttemptRemainingTime(a.end_time, currentTime))}</span>`);
         } else {
           $$renderer2.push("<!--[-1-->");
           $$renderer2.push(`<span class="text-slate-400">-</span>`);

@@ -34,7 +34,7 @@
 			if (myAttempts) {
 				for (const a of myAttempts) {
 					if (a.status === 'mengerjakan' && !submittingAttempts.has(a.id)) {
-						if (isAttemptExpired(a.created_at, a.duration_minutes, currentTime)) {
+						if (isAttemptExpired(a.end_time, currentTime)) {
 							submittingAttempts.add(a.id);
 							submittingAttempts = submittingAttempts; // trigger reactivity
 							
@@ -101,9 +101,8 @@
 		return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 	}
 
-	function getAttemptRemainingTime(createdAtStr: string, durationMinutes: number, current: Date) {
-		const start = new Date(createdAtStr);
-		const end = new Date(start.getTime() + durationMinutes * 60000);
+	function getAttemptRemainingTime(endTimeStr: string, current: Date) {
+		const end = new Date(endTimeStr);
 		const diff = end.getTime() - current.getTime();
 		
 		if (diff <= 0) return '00:00:00';
@@ -115,9 +114,8 @@
 		return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 	}
 
-	function isAttemptExpired(createdAtStr: string, durationMinutes: number, current: Date) {
-		const start = new Date(createdAtStr);
-		const end = new Date(start.getTime() + durationMinutes * 60000);
+	function isAttemptExpired(endTimeStr: string, current: Date) {
+		const end = new Date(endTimeStr);
 		return current.getTime() >= end.getTime();
 	}
 </script>
@@ -235,11 +233,11 @@
 									<td><span class={ATTEMPT_STATUS_COLORS[a.status]}>{ATTEMPT_STATUS_LABELS[a.status]}</span></td>
 									<td class="font-mono text-sm">
 										{#if a.status === 'mengerjakan'}
-											<span class="text-amber-600 font-bold flex items-center gap-1">
+											<span class="inline-flex items-center gap-1">
 												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 													<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} />
 												</svg>
-												{getAttemptRemainingTime(a.created_at, a.duration_minutes, currentTime)}
+												{getAttemptRemainingTime(a.end_time, currentTime)}
 											</span>
 										{:else}
 											<span class="text-slate-400">-</span>

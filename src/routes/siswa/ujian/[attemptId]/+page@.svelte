@@ -101,17 +101,25 @@
 		});
 	}
 
+	let cheatWarningTimeout: any;
+
 	function handleCheatWarning() {
 		if (showWarningModal || showDisqualifiedModal || submitting || isUnloading) return; // Prevent multiple triggers at once
 		
-		warnings += 1;
-		localStorage.setItem(`warnings_${attempt.id}`, warnings.toString());
+		if (cheatWarningTimeout) clearTimeout(cheatWarningTimeout);
+		
+		cheatWarningTimeout = setTimeout(() => {
+			if (isUnloading) return; // If page is actually unloading (reload/close), abort the warning
+			
+			warnings += 1;
+			localStorage.setItem(`warnings_${attempt.id}`, warnings.toString());
 
-		if (warnings > MAX_WARNINGS) {
-			triggerDisqualification();
-		} else {
-			showWarningModal = true;
-		}
+			if (warnings > MAX_WARNINGS) {
+				triggerDisqualification();
+			} else {
+				showWarningModal = true;
+			}
+		}, 500);
 	}
 
 	async function handleAutoSubmit() {
