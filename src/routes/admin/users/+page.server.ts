@@ -3,13 +3,13 @@ import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { hashPassword } from '$lib/server/auth';
 
-export const load: PageServerLoad = async ({ platform, url }) => {
+export const load: PageServerLoad = async ({ platform, url, locals }) => {
 	const db = getDB(platform);
 	const search = url.searchParams.get('search') || '';
 	const roleFilter = url.searchParams.get('role') || '';
 
-	let query = 'SELECT id, username, name, role, is_active, created_at FROM users WHERE 1=1';
-	const params: unknown[] = [];
+	let query = 'SELECT id, username, name, role, is_active, created_at FROM users WHERE school_id = ?';
+	const params: unknown[] = [locals.user!.school_id];
 
 	if (search) {
 		query += ' AND (username LIKE ? OR name LIKE ?)';
@@ -28,9 +28,10 @@ export const load: PageServerLoad = async ({ platform, url }) => {
 };
 
 export const actions: Actions = {
-	create: async ({ request, platform }) => {
+	create: async ({ request, platform, locals }) => {
 		const db = getDB(platform);
 		const form = await request.formData();
+		const schoolId = locals.user!.school_id;
 
 		const username = form.get('username')?.toString().trim();
 		const password = form.get('password')?.toString();
@@ -51,16 +52,17 @@ export const actions: Actions = {
 		}
 
 		const passwordHash = await hashPassword(password);
-		await db.prepare('INSERT INTO users (username, password_hash, name, role) VALUES (?, ?, ?, ?)')
-			.bind(username, passwordHash, name, role)
+		await db.prepare('INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)')
+			.bind(schoolId, username, passwordHash, name, role)
 			.run();
 
 		return { success: 'Pengguna berhasil ditambahkan.' };
 	},
 
-	update: async ({ request, platform }) => {
+	update: async ({ request, platform, locals }) => {
 		const db = getDB(platform);
 		const form = await request.formData();
+		const schoolId = locals.user!.school_id;
 
 		const id = form.get('id')?.toString();
 		const name = form.get('name')?.toString().trim();
@@ -74,26 +76,27 @@ export const actions: Actions = {
 
 		if (password) {
 			const passwordHash = await hashPassword(password);
-			await db.prepare('UPDATE users SET name = ?, role = ?, password_hash = ?, is_active = ?, updated_at = datetime(\'now\') WHERE id = ?')
-				.bind(name, role, passwordHash, isActive === '1' ? 1 : 0, id)
+			await db.prepare('UPDATE users SET name = ?, role = ?, password_hash = ?, is_active = ?, updated_at = datetime(\'now\') WHERE id = ? AND school_id = ?')
+				.bind(name, role, passwordHash, isActive === '1' ? 1 : 0, id, schoolId)
 				.run();
 		} else {
-			await db.prepare('UPDATE users SET name = ?, role = ?, is_active = ?, updated_at = datetime(\'now\') WHERE id = ?')
-				.bind(name, role, isActive === '1' ? 1 : 0, id)
+			await db.prepare('UPDATE users SET name = ?, role = ?, is_active = ?, updated_at = datetime(\'now\') WHERE id = ? AND school_id = ?')
+				.bind(name, role, isActive === '1' ? 1 : 0, id, schoolId)
 				.run();
 		}
 
 		return { success: 'Pengguna berhasil diperbarui.' };
 	},
 
-	delete: async ({ request, platform }) => {
+	delete: async ({ request, platform, locals }) => {
 		const db = getDB(platform);
 		const form = await request.formData();
 		const id = form.get('id')?.toString();
+		const schoolId = locals.user!.school_id;
 
 		if (!id) return fail(400, { error: 'ID tidak valid.' });
 
-		await db.prepare('DELETE FROM users WHERE id = ?').bind(id).run();
+		await db.prepare('DELETE FROM users WHERE id = ? AND school_id = ?').bind(id, schoolId).run();
 		return { success: 'Pengguna berhasil dihapus.' };
 	}
 };

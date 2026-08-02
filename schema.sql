@@ -3,13 +3,24 @@
 -- Database Schema untuk Cloudflare D1 (SQLite)
 -- ============================================
 
+-- Tabel Sekolah (Tenant)
+CREATE TABLE IF NOT EXISTS schools (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    address TEXT,
+    is_active INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 -- Tabel Pengguna
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    school_id INTEGER REFERENCES schools(id) ON DELETE CASCADE,
     username TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     name TEXT NOT NULL,
-    role TEXT NOT NULL CHECK(role IN ('admin', 'guru', 'pengawas', 'siswa')),
+    role TEXT NOT NULL CHECK(role IN ('superadmin', 'admin', 'guru', 'pengawas', 'siswa')),
     is_active INTEGER NOT NULL DEFAULT 1,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -18,6 +29,7 @@ CREATE TABLE IF NOT EXISTS users (
 -- Tabel Ujian
 CREATE TABLE IF NOT EXISTS exams (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    school_id INTEGER NOT NULL REFERENCES schools(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
     description TEXT DEFAULT '',
     subject TEXT DEFAULT '',
@@ -35,6 +47,7 @@ CREATE TABLE IF NOT EXISTS exams (
 -- Tabel Token Ujian
 CREATE TABLE IF NOT EXISTS tokens (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    school_id INTEGER NOT NULL REFERENCES schools(id) ON DELETE CASCADE,
     exam_id INTEGER NOT NULL REFERENCES exams(id) ON DELETE CASCADE,
     token_code TEXT NOT NULL UNIQUE,
     is_released INTEGER NOT NULL DEFAULT 0,
@@ -89,8 +102,10 @@ CREATE TABLE IF NOT EXISTS student_answers (
 -- ============================================
 -- Indexes untuk performa query
 -- ============================================
+CREATE INDEX IF NOT EXISTS idx_users_school ON users(school_id);
 CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+CREATE INDEX IF NOT EXISTS idx_exams_school ON exams(school_id);
 CREATE INDEX IF NOT EXISTS idx_exams_active ON exams(is_active);
 CREATE INDEX IF NOT EXISTS idx_tokens_exam ON tokens(exam_id);
 CREATE INDEX IF NOT EXISTS idx_tokens_code ON tokens(token_code);

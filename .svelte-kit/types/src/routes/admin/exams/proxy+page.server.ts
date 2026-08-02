@@ -3,7 +3,7 @@ import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 
-export const load = async ({ platform }: Parameters<PageServerLoad>[0]) => {
+export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) => {
 	const db = getDB(platform);
 	const exams = await db.prepare(`
 		SELECT e.*, u.name as creator_name,
@@ -11,8 +11,9 @@ export const load = async ({ platform }: Parameters<PageServerLoad>[0]) => {
 			(SELECT COUNT(*) FROM student_attempts WHERE exam_id = e.id) as attempt_count
 		FROM exams e
 		LEFT JOIN users u ON e.created_by = u.id
+		WHERE e.school_id = ?
 		ORDER BY e.created_at DESC
-	`).all();
+	`).bind(locals.user!.school_id).all();
 
 	return { exams: exams.results };
 };
@@ -31,15 +32,15 @@ export const actions = {
 
 		if (!title) return fail(400, { error: 'Judul ujian wajib diisi.' });
 
-		await db.prepare(`INSERT INTO exams (title, description, subject, duration_minutes, start_time, end_time, created_by)
-			VALUES (?, ?, ?, ?, ?, ?, ?)`)
-			.bind(title, description, subject, durationMinutes, startTime, endTime, locals.user?.id)
+		await db.prepare(`INSERT INTO exams (school_id, title, description, subject, duration_minutes, start_time, end_time, created_by)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+			.bind(locals.user!.school_id, title, description, subject, durationMinutes, startTime, endTime, locals.user?.id)
 			.run();
 
 		return { success: 'Ujian berhasil dibuat.' };
 	},
 
-	update: async ({ request, platform }: import('./$types').RequestEvent) => {
+	update: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
 		const form = await request.formData();
 
@@ -55,33 +56,33 @@ export const actions = {
 		if (!id || !title) return fail(400, { error: 'Data tidak lengkap.' });
 
 		await db.prepare(`UPDATE exams SET title=?, description=?, subject=?, duration_minutes=?,
-			start_time=?, end_time=?, is_active=?, updated_at=datetime('now') WHERE id=?`)
-			.bind(title, description, subject, durationMinutes, startTime, endTime, isActive, id)
+			start_time=?, end_time=?, is_active=?, updated_at=datetime('now') WHERE id=? AND school_id=?`)
+			.bind(title, description, subject, durationMinutes, startTime, endTime, isActive, id, locals.user!.school_id)
 			.run();
 
 		return { success: 'Ujian berhasil diperbarui.' };
 	},
 
-	delete: async ({ request, platform }: import('./$types').RequestEvent) => {
+	delete: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
 		const form = await request.formData();
 		const id = form.get('id')?.toString();
 
 		if (!id) return fail(400, { error: 'ID tidak valid.' });
 
-		await db.prepare('DELETE FROM exams WHERE id = ?').bind(id).run();
+		await db.prepare('DELETE FROM exams WHERE id = ? AND school_id = ?').bind(id, locals.user!.school_id).run();
 		return { success: 'Ujian berhasil dihapus.' };
 	},
 
-	toggleActive: async ({ request, platform }: import('./$types').RequestEvent) => {
+	toggleActive: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
 		const form = await request.formData();
 		const id = form.get('id')?.toString();
 
 		if (!id) return fail(400, { error: 'ID tidak valid.' });
 
-		await db.prepare(`UPDATE exams SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END, updated_at=datetime('now') WHERE id = ?`)
-			.bind(id).run();
+		await db.prepare(`UPDATE exams SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END, updated_at=datetime('now') WHERE id = ? AND school_id = ?`)
+			.bind(id, locals.user!.school_id).run();
 
 		return { success: 'Status ujian berhasil diperbarui.' };
 	}

@@ -96,5 +96,22 @@
 		"src/routes/siswa/ujian/[attemptId]/+page.server.ts",
 		"src/routes/siswa/+layout.server.ts",
 		"src/routes/+layout.server.ts"
+	],
+	"/superadmin": [
+		"src/routes/superadmin/+page.server.ts",
+		"src/routes/superadmin/+layout.server.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/superadmin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/superadmin/admins": [
+		"src/routes/superadmin/admins/+page.server.ts",
+		"src/routes/superadmin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/superadmin/schools": [
+		"src/routes/superadmin/schools/+page.server.ts",
+		"src/routes/superadmin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
 	]
 }

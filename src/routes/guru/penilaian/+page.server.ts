@@ -2,7 +2,7 @@ import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 
-export const load: PageServerLoad = async ({ platform, url }) => {
+export const load: PageServerLoad = async ({ platform, url, locals }) => {
 	const db = getDB(platform);
 	const examFilter = url.searchParams.get('exam_id') || '';
 
@@ -14,9 +14,9 @@ export const load: PageServerLoad = async ({ platform, url }) => {
 		JOIN student_attempts st ON sa.attempt_id = st.id
 		JOIN users u ON st.student_id = u.id
 		JOIN exams e ON st.exam_id = e.id
-		WHERE q.type IN ('essay', 'isian_singkat')`;
+		WHERE q.type IN ('essay', 'isian_singkat') AND e.school_id = ?`;
 
-	const params: unknown[] = [];
+	const params: unknown[] = [locals.user!.school_id];
 	if (examFilter) {
 		query += ' AND e.id = ?';
 		params.push(examFilter);
@@ -24,7 +24,7 @@ export const load: PageServerLoad = async ({ platform, url }) => {
 	query += ' ORDER BY e.id, u.name, q.question_number';
 
 	const answers = await db.prepare(query).bind(...params).all();
-	const exams = await db.prepare('SELECT id, title FROM exams ORDER BY title').all();
+	const exams = await db.prepare('SELECT id, title FROM exams WHERE school_id = ? ORDER BY title').bind(locals.user!.school_id).all();
 
 	return { answers: answers.results, exams: exams.results, examFilter };
 };

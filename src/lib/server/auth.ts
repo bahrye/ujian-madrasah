@@ -7,9 +7,10 @@ export const COOKIE_NAME = 'ujian_auth_token';
 
 export interface UserPayload {
 	id: number;
+	school_id: number | null;
 	username: string;
 	name: string;
-	role: 'admin' | 'guru' | 'pengawas' | 'siswa';
+	role: 'superadmin' | 'admin' | 'guru' | 'pengawas' | 'siswa';
 }
 
 /**
@@ -103,6 +104,7 @@ export async function verifyToken(token: string): Promise<UserPayload | null> {
 		const { payload } = await jwtVerify(token, JWT_SECRET);
 		return {
 			id: payload.id as number,
+			school_id: payload.school_id as number | null,
 			username: payload.username as string,
 			name: payload.name as string,
 			role: payload.role as UserPayload['role']

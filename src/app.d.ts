@@ -16,9 +16,10 @@ declare global {
 		interface Locals {
 			user: {
 				id: number;
+				school_id: number | null;
 				username: string;
 				name: string;
-				role: 'admin' | 'guru' | 'pengawas' | 'siswa';
+				role: 'superadmin' | 'admin' | 'guru' | 'pengawas' | 'siswa';
 			} | null;
 		}
 
