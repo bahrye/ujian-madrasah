@@ -1,0 +1,23 @@
+# ============================================
+# Aplikasi Ujian Online Madrasah
+# Konfigurasi Cloudflare Pages + D1
+# ============================================
+
+name = "ujian-madrasah"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = ".svelte-kit/cloudflare"
+
+# --------------------------------------------
+# Cloudflare D1 Database Binding
+# --------------------------------------------
+# Langkah setup:
+# 1. Jalankan: npm run db:create
+# 2. Salin database_id dari output ke bawah ini
+# 3. Jalankan: npm run db:migrate
+# 4. Jalankan: npm run deploy
+# --------------------------------------------
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ujian-madrasah-db"
+database_id = "3057bc21-48e7-4442-af56-18f3ae8b5221"

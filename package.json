@@ -1,0 +1,33 @@
+{
+  "name": "ujian-madrasah",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "deploy": "vite build && wrangler pages deploy .svelte-kit/cloudflare",
+    "db:create": "wrangler d1 create ujian-madrasah-db",
+    "db:migrate": "wrangler d1 execute ujian-madrasah-db --remote --file=./schema.sql",
+    "db:migrate:local": "wrangler d1 execute ujian-madrasah-db --local --file=./schema.sql",
+    "db:seed": "wrangler d1 execute ujian-madrasah-db --remote --file=./seed.sql",
+    "db:seed:local": "wrangler d1 execute ujian-madrasah-db --local --file=./seed.sql"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-cloudflare": "^4.8.0",
+    "@sveltejs/kit": "^2.9.0",
+    "@sveltejs/vite-plugin-svelte": "^4.0.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "svelte": "^5.0.0",
+    "svelte-check": "^4.0.0",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.0",
+    "vite": "^5.4.0"
+  },
+  "dependencies": {
+    "jose": "^5.9.0"
+  }
+}

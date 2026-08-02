@@ -1,0 +1,84 @@
+import { fail, error } from "@sveltejs/kit";
+import { g as getDB } from "../../../../../chunks/db.js";
+const load = async ({ platform, params }) => {
+  const db = getDB(platform);
+  const exam = await db.prepare("SELECT * FROM exams WHERE id = ?").bind(params.examId).first();
+  if (!exam) throw error(404, "Ujian tidak ditemukan");
+  const questions = await db.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number").bind(params.examId).all();
+  return { exam, questions: questions.results };
+};
+const actions = {
+  create: async ({ request, platform, params }) => {
+    const db = getDB(platform);
+    const form = await request.formData();
+    const type = form.get("type")?.toString();
+    const questionText = form.get("question_text")?.toString().trim();
+    const points = parseInt(form.get("points")?.toString() || "1");
+    const mediaType = form.get("media_type")?.toString() || null;
+    const mediaUrl = form.get("media_url")?.toString().trim() || null;
+    const audioMaxPlays = parseInt(form.get("audio_max_plays")?.toString() || "3");
+    if (!type || !questionText) return fail(400, { error: "Tipe dan teks soal wajib diisi." });
+    const last = await db.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(params.examId).first();
+    const nextNum = (last?.max_num ?? 0) + 1;
+    let optionsJson = null;
+    let correctAnswerJson = null;
+    if (type === "pilihan_ganda") {
+      const opts = [];
+      for (let i = 0; i < 5; i++) {
+        const opt = form.get(`option_${i}`)?.toString().trim();
+        if (opt) opts.push(opt);
+      }
+      optionsJson = JSON.stringify(opts);
+      correctAnswerJson = JSON.stringify(form.get("correct_answer")?.toString() || "A");
+    } else if (type === "benar_salah") {
+      optionsJson = JSON.stringify(["Benar", "Salah"]);
+      correctAnswerJson = JSON.stringify(form.get("correct_answer")?.toString() || "Benar");
+    } else if (type === "isian_singkat") {
+      correctAnswerJson = JSON.stringify(form.get("correct_answer")?.toString().trim() || "");
+    } else if (type === "menjodohkan") {
+      const leftItems = [];
+      const rightItems = [];
+      for (let i = 0; i < 6; i++) {
+        const l = form.get(`left_${i}`)?.toString().trim();
+        const r = form.get(`right_${i}`)?.toString().trim();
+        if (l && r) {
+          leftItems.push(l);
+          rightItems.push(r);
+        }
+      }
+      optionsJson = JSON.stringify({ left: leftItems, right: rightItems });
+      const mapping = {};
+      leftItems.forEach((_, i) => {
+        mapping[String(i)] = String(i);
+      });
+      correctAnswerJson = JSON.stringify(mapping);
+    }
+    await db.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points,
+			media_type, media_url, audio_max_plays, options_json, correct_answer_json)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
+      params.examId,
+      type,
+      questionText,
+      nextNum,
+      points,
+      mediaType === "none" ? null : mediaType,
+      mediaUrl,
+      audioMaxPlays,
+      optionsJson,
+      correctAnswerJson
+    ).run();
+    return { success: "Soal berhasil ditambahkan." };
+  },
+  delete: async ({ request, platform }) => {
+    const db = getDB(platform);
+    const form = await request.formData();
+    const id = form.get("id")?.toString();
+    if (!id) return fail(400, { error: "ID tidak valid." });
+    await db.prepare("DELETE FROM questions WHERE id = ?").bind(id).run();
+    return { success: "Soal berhasil dihapus." };
+  }
+};
+export {
+  actions,
+  load
+};

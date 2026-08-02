@@ -1,0 +1,100 @@
+{
+	"/": [
+		"src/routes/+page.server.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin": [
+		"src/routes/admin/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/exams": [
+		"src/routes/admin/exams/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/exams/[id]": [
+		"src/routes/admin/exams/[id]/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/results": [
+		"src/routes/admin/results/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/users": [
+		"src/routes/admin/users/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/api/logout": [
+		"src/routes/api/logout/+server.ts"
+	],
+	"/api/setup": [
+		"src/routes/api/setup/+server.ts"
+	],
+	"/guru": [
+		"src/routes/guru/+page.server.ts",
+		"src/routes/guru/+layout.server.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/guru/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/guru/bank-soal": [
+		"src/routes/guru/bank-soal/+page.server.ts",
+		"src/routes/guru/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/guru/bank-soal/[examId]": [
+		"src/routes/guru/bank-soal/[examId]/+page.server.ts",
+		"src/routes/guru/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/guru/penilaian": [
+		"src/routes/guru/penilaian/+page.server.ts",
+		"src/routes/guru/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/login": [
+		"src/routes/login/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/pengawas": [
+		"src/routes/pengawas/+page.server.ts",
+		"src/routes/pengawas/+layout.server.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/pengawas/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/pengawas/monitor": [
+		"src/routes/pengawas/monitor/+page.server.ts",
+		"src/routes/pengawas/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/pengawas/tokens": [
+		"src/routes/pengawas/tokens/+page.server.ts",
+		"src/routes/pengawas/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/siswa": [
+		"src/routes/siswa/+page.server.ts",
+		"src/routes/siswa/+layout.server.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/siswa/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/siswa/ujian": [
+		"src/routes/siswa/ujian/+page.server.ts",
+		"src/routes/siswa/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/siswa/ujian/[attemptId]": [
+		"src/routes/siswa/ujian/[attemptId]/+page.server.ts",
+		"src/routes/siswa/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	]
+}

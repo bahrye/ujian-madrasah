@@ -1,0 +1,10 @@
+import * as server from '../entries/pages/admin/_layout.server.ts.js';
+
+export const index = 2;
+let component_cache;
+export const component = async () => component_cache ??= (await import('../entries/pages/admin/_layout.svelte.js')).default;
+export { server };
+export const server_id = "src/routes/admin/+layout.server.ts";
+export const imports = ["_app/immutable/nodes/2.rvj3c-EP.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/Dq_Rz00O.js","_app/immutable/chunks/DessmbUq.js","_app/immutable/chunks/tBUZo7Y1.js","_app/immutable/chunks/4UOKLfAq.js","_app/immutable/chunks/XkMkWOCG.js","_app/immutable/chunks/DOJsHMrm.js","_app/immutable/chunks/B9i2VuGb.js","_app/immutable/chunks/BqIN69hD.js","_app/immutable/chunks/7OkFE9vF.js","_app/immutable/chunks/C6iW4SJY.js","_app/immutable/chunks/C27vI7iq.js","_app/immutable/chunks/Us5dCgoZ.js","_app/immutable/chunks/DNBHBBZP.js","_app/immutable/chunks/C35mZYFz.js","_app/immutable/chunks/DyCUtUGg.js","_app/immutable/chunks/BsVi_vsh.js"];
+export const stylesheets = [];
+export const fonts = [];

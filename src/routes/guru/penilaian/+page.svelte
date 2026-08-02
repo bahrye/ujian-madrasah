@@ -1,0 +1,86 @@
+<script lang="ts">
+	import { enhance } from '$app/forms';
+	import { QUESTION_TYPE_LABELS } from '$lib/utils/constants';
+	import { toasts } from '$lib/stores/toast';
+
+	export let data;
+	export let form: any;
+
+	$: if (form?.success) toasts.success(form.success);
+	$: if (form?.error) toasts.error(form.error);
+	$: answers = data.answers as any[];
+</script>
+
+<svelte:head><title>Penilaian — Ujian Online Madrasah</title></svelte:head>
+
+<div class="space-y-6 animate-in">
+	<div>
+		<h1 class="text-2xl font-bold text-slate-800">Penilaian Jawaban</h1>
+		<p class="text-sm text-slate-500 mt-1">Nilai jawaban essay dan isian singkat siswa</p>
+	</div>
+
+	<!-- Filter -->
+	<div class="card p-4">
+		<form method="GET" class="flex gap-3">
+			<select name="exam_id" class="select flex-1">
+				<option value="">Semua Ujian</option>
+				{#each data.exams as exam}
+					<option value={exam.id} selected={data.examFilter === String(exam.id)}>{exam.title}</option>
+				{/each}
+			</select>
+			<button type="submit" class="btn-secondary btn-sm">Filter</button>
+		</form>
+	</div>
+
+	<!-- Answers to Grade -->
+	{#if answers.length === 0}
+		<div class="card p-12 text-center text-slate-400">
+			<p class="text-lg font-medium mb-1">Tidak ada jawaban yang perlu dinilai</p>
+			<p class="text-sm">Jawaban essay/isian siswa akan muncul di sini.</p>
+		</div>
+	{:else}
+		<div class="space-y-4">
+			{#each answers as a (a.answer_id)}
+				<div class="card p-5 {a.score_given != null ? 'border-l-4 border-emerald-400' : 'border-l-4 border-amber-400'}">
+					<div class="flex flex-wrap items-center gap-2 mb-3">
+						<span class="badge-info">{a.exam_title}</span>
+						<span class="badge-primary">{QUESTION_TYPE_LABELS[a.type]}</span>
+						<span class="text-sm font-semibold text-slate-700">{a.student_name}</span>
+					</div>
+
+					<p class="text-sm font-medium text-slate-700 mb-2">{a.question_text}</p>
+
+					{#if a.correct_answer_json && a.type === 'isian_singkat'}
+						<p class="text-xs text-emerald-600 mb-2">Kunci: {JSON.parse(a.correct_answer_json)}</p>
+					{/if}
+
+					<div class="bg-slate-50 rounded-xl p-3 mb-3">
+						<p class="text-xs font-semibold text-slate-500 mb-1">Jawaban Siswa:</p>
+						<p class="text-sm text-slate-800 whitespace-pre-wrap">{a.answer_given || '(Tidak dijawab)'}</p>
+					</div>
+
+					<form method="POST" action="?/grade" use:enhance class="flex items-center gap-3">
+						<input type="hidden" name="answer_id" value={a.answer_id} />
+						<input type="hidden" name="max_points" value={a.points} />
+						<label class="text-sm font-medium text-slate-600">Nilai:</label>
+						<input
+							name="score_given"
+							type="number"
+							min="0"
+							max={a.points}
+							step="0.5"
+							class="input w-24"
+							value={a.score_given ?? ''}
+							placeholder="0-{a.points}"
+						/>
+						<span class="text-xs text-slate-400">/ {a.points}</span>
+						<button type="submit" class="btn-success btn-sm">Simpan</button>
+						{#if a.score_given != null}
+							<span class="badge-success">✓ Sudah dinilai</span>
+						{/if}
+					</form>
+				</div>
+			{/each}
+		</div>
+	{/if}
+</div>
