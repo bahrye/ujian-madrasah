@@ -203,11 +203,16 @@ function _page_($$renderer, $$props) {
       });
     });
     Toast($$renderer2);
-    $$renderer2.push(`<!----> <div class="min-h-screen bg-slate-50 flex flex-col select-none"><header class="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-200 px-4 py-3"><div class="max-w-4xl mx-auto flex items-center justify-between gap-3"><div class="flex-1 min-w-0 overflow-hidden"><h1${attr_class(`text-sm font-bold text-slate-800 whitespace-nowrap ${"truncate"}`)}>${escape_html(attempt.exam_title)} `);
+    $$renderer2.push(`<!----> <div class="min-h-screen bg-slate-50 flex flex-col select-none"><header class="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-200 px-4 py-3"><div class="max-w-4xl mx-auto flex items-center justify-between gap-3"><div class="flex-1 min-w-0 overflow-hidden flex flex-col gap-0.5"><div class="flex items-center gap-2"><h1${attr_class(`text-sm font-bold text-slate-800 whitespace-nowrap ${"truncate"}`)}>${escape_html(attempt.exam_title)} `);
     {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--></h1> <p class="text-xs text-slate-500 truncate">${escape_html(attempt.subject || "")} · Soal ${escape_html(currentIndex + 1)}/${escape_html(questions.length)}</p></div> <div class="flex items-center gap-2 sm:gap-3">`);
+    $$renderer2.push(`<!--]--></h1></div> <div class="flex items-center gap-2"><p class="text-xs text-slate-500 truncate">${escape_html(attempt.subject || "")} · Soal ${escape_html(currentIndex + 1)}/${escape_html(questions.length)}</p> `);
+    {
+      $$renderer2.push("<!--[-1-->");
+      $$renderer2.push(`<span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">Tersimpan</span>`);
+    }
+    $$renderer2.push(`<!--]--></div></div> <div class="flex items-center gap-2 sm:gap-3">`);
     {
       $$renderer2.push("<!--[-1-->");
     }

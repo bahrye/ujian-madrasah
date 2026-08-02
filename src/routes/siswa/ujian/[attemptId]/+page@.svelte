@@ -186,28 +186,45 @@
 		if (currentIndex < questions.length - 1) goToQuestion(currentIndex + 1);
 	}
 
+	let saveTimeout: any;
+	let isSaving = false;
+	
+	function triggerAutoSave() {
+		if (saveTimeout) clearTimeout(saveTimeout);
+		saveTimeout = setTimeout(() => {
+			saveCurrentAnswer();
+		}, 1000);
+	}
+
 	function handleAnswer(e: CustomEvent<{ questionId: number; answer: string }>) {
 		localAnswers[e.detail.questionId] = e.detail.answer;
 		localAnswers = localAnswers; // trigger reactivity
+		triggerAutoSave();
 	}
 
 	function handleDoubt(e: CustomEvent<{ questionId: number; doubted: boolean }>) {
 		localDoubts[e.detail.questionId] = e.detail.doubted;
 		localDoubts = localDoubts;
+		triggerAutoSave();
 	}
 
 	async function saveCurrentAnswer() {
-		if (!currentQuestion) return;
-		const qId = currentQuestion.id;
+		if (saveTimeout) clearTimeout(saveTimeout);
+		isSaving = true;
 		const form = new FormData();
-		form.set('question_id', String(qId));
-		form.set('answer_given', localAnswers[qId] || '');
-		form.set('is_doubted', localDoubts[qId] ? '1' : '0');
+		form.set('answers', JSON.stringify(localAnswers));
+		form.set('doubts', JSON.stringify(localDoubts));
 
 		try {
-			await fetch('?/saveAnswer', { method: 'POST', body: form });
+			await fetch('?/saveAnswer', { 
+				method: 'POST', 
+				body: form,
+				headers: { 'x-sveltekit-action': 'true' } 
+			});
 		} catch (err) {
 			console.error('Save error:', err);
+		} finally {
+			isSaving = false;
 		}
 	}
 
@@ -235,17 +252,26 @@
 	<!-- Exam Header -->
 	<header class="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-200 px-4 py-3">
 		<div class="max-w-4xl mx-auto flex items-center justify-between gap-3">
-			<div class="flex-1 min-w-0 overflow-hidden" bind:clientWidth={titleClientWidth}>
-				<h1 
-					bind:this={titleElement}
-					class="text-sm font-bold text-slate-800 whitespace-nowrap {isTitleOverflowing ? 'animate-[marquee_10s_linear_infinite]' : 'truncate'}"
-				>
-					{attempt.exam_title}
-					{#if isTitleOverflowing}
-						<span class="pl-8">{attempt.exam_title}</span>
+			<div class="flex-1 min-w-0 overflow-hidden flex flex-col gap-0.5" bind:clientWidth={titleClientWidth}>
+				<div class="flex items-center gap-2">
+					<h1 
+						bind:this={titleElement}
+						class="text-sm font-bold text-slate-800 whitespace-nowrap {isTitleOverflowing ? 'animate-[marquee_10s_linear_infinite]' : 'truncate'}"
+					>
+						{attempt.exam_title}
+						{#if isTitleOverflowing}
+							<span class="pl-8">{attempt.exam_title}</span>
+						{/if}
+					</h1>
+				</div>
+				<div class="flex items-center gap-2">
+					<p class="text-xs text-slate-500 truncate">{attempt.subject || ''} · Soal {currentIndex + 1}/{questions.length}</p>
+					{#if isSaving}
+						<span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 animate-pulse">Menyimpan...</span>
+					{:else}
+						<span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">Tersimpan</span>
 					{/if}
-				</h1>
-				<p class="text-xs text-slate-500 truncate">{attempt.subject || ''} · Soal {currentIndex + 1}/{questions.length}</p>
+				</div>
 			</div>
 			<div class="flex items-center gap-2 sm:gap-3">
 				{#if warnings > 0}

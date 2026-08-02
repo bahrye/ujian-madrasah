@@ -21,3 +21,8 @@ pages_build_output_dir = ".svelte-kit/cloudflare"
 binding = "DB"
 database_name = "ujian-madrasah-db"
 database_id = "3057bc21-48e7-4442-af56-18f3ae8b5221"
+
+[[kv_namespaces]]
+binding = "EXAM_ANSWERS"
+id = "5cb204e550c1481a9e5cce6f90891ea4"
+preview_id = "e6556346e6494d518f99a91ae699a4f1"

@@ -41,6 +41,29 @@ export const load = async ({ platform, locals, params }: Parameters<PageServerLo
 		answerMap[a.question_id] = a;
 	}
 
+	const kv = platform?.env?.EXAM_ANSWERS;
+	let kvData: any = null;
+	if (kv) {
+		const stored = await kv.get(`attempt_${attemptId}_answers`);
+		if (stored) {
+			try { kvData = JSON.parse(stored); } catch {}
+		}
+	}
+
+	if (kvData) {
+		for (const q of questions.results as any[]) {
+			if (!answerMap[q.id]) {
+				answerMap[q.id] = { answer_given: '', is_doubted: 0 };
+			}
+			if (kvData.answers && typeof kvData.answers[q.id] !== 'undefined') {
+				answerMap[q.id].answer_given = kvData.answers[q.id];
+			}
+			if (kvData.doubts && typeof kvData.doubts[q.id] !== 'undefined') {
+				answerMap[q.id].is_doubted = kvData.doubts[q.id] ? 1 : 0;
+			}
+		}
+	}
+
 	return {
 		attempt,
 		questions: questions.results,
@@ -50,20 +73,24 @@ export const load = async ({ platform, locals, params }: Parameters<PageServerLo
 
 export const actions = {
 	saveAnswer: async ({ request, platform, params }: import('./$types').RequestEvent) => {
-		const db = getDB(platform);
+		const kv = platform?.env?.EXAM_ANSWERS;
+		if (!kv) return fail(500, { error: 'KV not configured' });
+
 		const form = await request.formData();
+		const answersStr = form.get('answers')?.toString();
+		const doubtsStr = form.get('doubts')?.toString();
 
-		const questionId = form.get('question_id')?.toString();
-		const answerGiven = form.get('answer_given')?.toString() ?? '';
-		const isDoubted = form.get('is_doubted')?.toString() === '1' ? 1 : 0;
-
-		if (!questionId) return fail(400, { error: 'Data tidak valid.' });
-
-		await db.prepare(`
-			UPDATE student_answers
-			SET answer_given = ?, is_doubted = ?, answered_at = datetime('now')
-			WHERE attempt_id = ? AND question_id = ?
-		`).bind(answerGiven, isDoubted, params.attemptId, questionId).run();
+		if (answersStr) {
+			try {
+				const payload = {
+					answers: JSON.parse(answersStr),
+					doubts: doubtsStr ? JSON.parse(doubtsStr) : {}
+				};
+				await kv.put(`attempt_${params.attemptId}_answers`, JSON.stringify(payload));
+			} catch (e) {
+				return fail(400, { error: 'Invalid JSON payload' });
+			}
+		}
 
 		return { saved: true };
 	},
@@ -78,6 +105,31 @@ export const actions = {
 
 		if (!attempt || attempt.status !== 'mengerjakan') {
 			return fail(400, { error: 'Sesi ujian tidak valid.' });
+		}
+
+		const kv = platform?.env?.EXAM_ANSWERS;
+		if (kv) {
+			const stored = await kv.get(`attempt_${attemptId}_answers`);
+			if (stored) {
+				try {
+					const kvData = JSON.parse(stored);
+					if (kvData && kvData.answers) {
+						const kvUpdateStmts = [];
+						for (const [qIdStr, ansVal] of Object.entries(kvData.answers)) {
+							const qId = parseInt(qIdStr, 10);
+							const isDoubted = kvData.doubts && kvData.doubts[qId] ? 1 : 0;
+							kvUpdateStmts.push(
+								db.prepare(`UPDATE student_answers SET answer_given = ?, is_doubted = ?, answered_at = datetime('now') WHERE attempt_id = ? AND question_id = ?`)
+								.bind(String(ansVal), isDoubted, attemptId, qId)
+							);
+						}
+						if (kvUpdateStmts.length > 0) {
+							await db.batch(kvUpdateStmts);
+						}
+					}
+					await kv.delete(`attempt_${attemptId}_answers`);
+				} catch (e) {}
+			}
 		}
 
 		// Auto-grade soal objektif
