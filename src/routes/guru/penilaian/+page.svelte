@@ -21,19 +21,33 @@
 
 	<!-- Filter -->
 	<div class="card p-4">
-		<form method="GET" class="flex gap-3">
-			<select name="exam_id" class="select flex-1">
-				<option value="">Semua Ujian</option>
+		<form method="GET" class="flex flex-col md:flex-row gap-3">
+			<select name="exam_id" class="select flex-1" on:change={(e) => e.currentTarget.form?.submit()}>
+				<option value="" disabled selected={data.examParam === null}>-- Pilih Ujian Terlebih Dahulu --</option>
+				<option value="all" selected={data.examParam === 'all'}>Semua Ujian</option>
 				{#each data.exams as exam}
-					<option value={exam.id} selected={data.examFilter === String(exam.id)}>{exam.title}</option>
+					<option value={exam.id} selected={data.examParam === String(exam.id)}>{exam.title}</option>
 				{/each}
 			</select>
-			<button type="submit" class="btn-secondary btn-sm">Filter</button>
+			
+			<select name="student_id" class="select flex-1" disabled={data.examParam === null}>
+				<option value="">Semua Siswa</option>
+				{#each data.students as student}
+					<option value={student.id} selected={data.studentFilter === String(student.id)}>{student.name}</option>
+				{/each}
+			</select>
+			
+			<button type="submit" class="btn-secondary md:w-auto w-full" disabled={data.examParam === null}>Tampilkan</button>
 		</form>
 	</div>
 
 	<!-- Answers to Grade -->
-	{#if answers.length === 0}
+	{#if data.examParam === null}
+		<div class="card p-12 text-center text-slate-400">
+			<p class="text-lg font-medium mb-1">Pilih filter ujian di atas</p>
+			<p class="text-sm">Anda harus memilih ujian dan/atau siswa terlebih dahulu.</p>
+		</div>
+	{:else if answers.length === 0}
 		<div class="card p-12 text-center text-slate-400">
 			<p class="text-lg font-medium mb-1">Tidak ada jawaban yang perlu dinilai</p>
 			<p class="text-sm">Jawaban essay/isian siswa akan muncul di sini.</p>

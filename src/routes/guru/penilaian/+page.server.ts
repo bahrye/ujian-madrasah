@@ -4,29 +4,59 @@ import { getDB } from '$lib/server/db';
 
 export const load: PageServerLoad = async ({ platform, url, locals }) => {
 	const db = getDB(platform);
-	const examFilter = url.searchParams.get('exam_id') || '';
+	const examParam = url.searchParams.get('exam_id');
+	const studentFilter = url.searchParams.get('student_id') || '';
 
-	let query = `SELECT sa.id as answer_id, sa.answer_given, sa.score_given, sa.is_correct,
-		q.id as question_id, q.question_text, q.type, q.points, q.correct_answer_json,
-		st.id as attempt_id, u.name as student_name, e.title as exam_title, e.id as exam_id
-		FROM student_answers sa
-		JOIN questions q ON sa.question_id = q.id
-		JOIN student_attempts st ON sa.attempt_id = st.id
-		JOIN users u ON st.student_id = u.id
-		JOIN exams e ON st.exam_id = e.id
-		WHERE q.type IN ('essay', 'isian_singkat') AND e.school_id = ?`;
+	let answers: any[] = [];
+	let students: any[] = [];
 
-	const params: unknown[] = [locals.user!.school_id];
-	if (examFilter) {
-		query += ' AND e.id = ?';
-		params.push(examFilter);
-	}
-	query += ' ORDER BY e.id, u.name, q.question_number';
-
-	const answers = await db.prepare(query).bind(...params).all();
 	const exams = await db.prepare('SELECT id, title FROM exams WHERE school_id = ? ORDER BY title').bind(locals.user!.school_id).all();
 
-	return { answers: answers.results, exams: exams.results, examFilter };
+	if (examParam !== null) {
+		const isAllExams = examParam === 'all';
+		const examFilter = isAllExams ? '' : examParam;
+		
+		let studentQuery = `SELECT DISTINCT u.id, u.name 
+			FROM student_attempts st 
+			JOIN users u ON st.student_id = u.id 
+			JOIN exams e ON st.exam_id = e.id 
+			WHERE e.school_id = ?`;
+		const studentParams: any[] = [locals.user!.school_id];
+		
+		if (examFilter !== '') {
+			studentQuery += ` AND e.id = ?`;
+			studentParams.push(examFilter);
+		}
+		studentQuery += ` ORDER BY u.name`;
+		const studentsResult = await db.prepare(studentQuery).bind(...studentParams).all();
+		students = studentsResult.results;
+
+		let query = `SELECT sa.id as answer_id, sa.answer_given, sa.score_given, sa.is_correct,
+			q.id as question_id, q.question_text, q.type, q.points, q.correct_answer_json,
+			st.id as attempt_id, u.name as student_name, e.title as exam_title, e.id as exam_id
+			FROM student_answers sa
+			JOIN questions q ON sa.question_id = q.id
+			JOIN student_attempts st ON sa.attempt_id = st.id
+			JOIN users u ON st.student_id = u.id
+			JOIN exams e ON st.exam_id = e.id
+			WHERE q.type IN ('essay', 'isian_singkat') AND e.school_id = ?`;
+
+		const params: unknown[] = [locals.user!.school_id];
+		if (examFilter !== '') {
+			query += ' AND e.id = ?';
+			params.push(examFilter);
+		}
+		if (studentFilter !== '') {
+			query += ' AND u.id = ?';
+			params.push(studentFilter);
+		}
+		query += ' ORDER BY e.id, u.name, q.question_number';
+
+		const answersResult = await db.prepare(query).bind(...params).all();
+		answers = answersResult.results;
+	}
+
+	return { answers, exams: exams.results, students, examParam, studentFilter };
 };
 
 export const actions: Actions = {
