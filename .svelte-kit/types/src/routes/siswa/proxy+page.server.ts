@@ -8,16 +8,21 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 
 	// Ujian aktif yang tokennya sudah dirilis
 	const activeExams = await db.prepare(`
-		SELECT DISTINCT e.*, t.token_code, t.expires_at as token_expires, s.name as subject
+		SELECT DISTINCT 
+			e.*, 
+			s.name as subject,
+			(
+				SELECT GROUP_CONCAT(u.name, ', ')
+				FROM exam_proctors epr
+				JOIN users u ON epr.proctor_id = u.id
+				WHERE epr.exam_id = e.id
+			) as proctors
 		FROM exams e
-		JOIN tokens t ON t.exam_id = e.id
 		JOIN exam_participants ep ON ep.exam_id = e.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		WHERE e.is_active = 1
 		AND e.school_id = ?
 		AND ep.student_id = ?
-		AND t.is_released = 1
-		AND datetime(t.expires_at) > datetime('now')
 		ORDER BY e.start_time
 	`).bind(locals.user!.school_id, userId).all();
 

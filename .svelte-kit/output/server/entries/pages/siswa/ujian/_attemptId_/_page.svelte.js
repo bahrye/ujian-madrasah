@@ -1,11 +1,11 @@
-import { ai as ssr_context, l as fallback, d as attr_class, e as escape_html, b as bind_props, i as attr, f as attr_style, a as stringify, c as ensure_array_like, h as head } from "../../../../../chunks/index.js";
+import { l as fallback, d as attr_class, e as escape_html, b as bind_props, i as attr, f as attr_style, a as stringify, c as ensure_array_like, h as head } from "../../../../../chunks/index.js";
 import "@sveltejs/kit/internal";
 import "../../../../../chunks/exports.js";
 import "../../../../../chunks/utils2.js";
 import "@sveltejs/kit/internal/server";
 import "../../../../../chunks/root.js";
 import "../../../../../chunks/state.svelte.js";
-import "clsx";
+import { o as onDestroy } from "../../../../../chunks/index-server.js";
 import { Q as QUESTION_TYPE_LABELS, I as ICONS } from "../../../../../chunks/constants.js";
 import { T as Toast } from "../../../../../chunks/Toast2.js";
 import "../../../../../chunks/toast.js";
@@ -13,10 +13,6 @@ function html(value) {
   var html2 = String(value ?? "");
   var open = "<!---->";
   return open + html2 + "<!---->";
-}
-function onDestroy(fn) {
-  /** @type {SSRContext} */
-  ssr_context.r.on_destroy(fn);
 }
 function Timer($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {

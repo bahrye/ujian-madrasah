@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { ICONS, ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS } from '$lib/utils/constants';
+	import { onMount, onDestroy } from 'svelte';
 
 	export let data;
 	$: activeExams = (data.activeExams as any[]).filter(exam => {
@@ -21,6 +22,63 @@
 	});
 	$: myAttempts = data.myAttempts as any[];
 	$: activeAttempt = data.activeAttempt as any;
+
+	let currentTime = new Date();
+	let intervalId: any;
+
+	onMount(() => {
+		intervalId = setInterval(() => {
+			currentTime = new Date();
+		}, 1000);
+	});
+
+	onDestroy(() => {
+		if (intervalId) clearInterval(intervalId);
+	});
+
+	function formatTimeRange(startStr: string | null, endStr: string | null) {
+		if (!startStr) return '--:--';
+		const start = new Date(startStr);
+		const startFormatted = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(start);
+		
+		if (!endStr) return `${startFormatted} - Selesai`;
+		
+		const end = new Date(endStr);
+		const endFormatted = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(end);
+
+		if (
+			start.getDate() === end.getDate() &&
+			start.getMonth() === end.getMonth() &&
+			start.getFullYear() === end.getFullYear()
+		) {
+			return `${startFormatted} - ${endFormatted}`;
+		}
+
+		const startDateFormatted = new Intl.DateTimeFormat('id-ID', {
+			day: 'numeric',
+			month: 'short',
+			year: 'numeric'
+		}).format(start);
+		const endDateFormatted = new Intl.DateTimeFormat('id-ID', {
+			day: 'numeric',
+			month: 'short',
+			year: 'numeric'
+		}).format(end);
+
+		return `${startDateFormatted} ${startFormatted} - ${endDateFormatted} ${endFormatted}`;
+	}
+
+	function getCountdownString(startStr: string, current: Date) {
+		const start = new Date(startStr);
+		const diff = start.getTime() - current.getTime();
+		if (diff <= 0) return null;
+		
+		const hours = Math.floor(diff / (1000 * 60 * 60));
+		const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+		const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+		
+		return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+	}
 </script>
 
 <svelte:head><title>Dashboard Siswa — Ujian Online Madrasah</title></svelte:head>
@@ -67,7 +125,7 @@
 		{:else}
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 				{#each activeExams as exam (exam.id)}
-					<div class="card-hover p-5">
+					<div class="card-hover p-5 flex flex-col h-full">
 						<div class="flex items-start justify-between mb-3">
 							<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center">
 								<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -77,16 +135,41 @@
 							<span class="badge-success">Tersedia</span>
 						</div>
 						<h3 class="font-bold text-slate-800">{exam.title}</h3>
-						<p class="text-sm text-slate-500 mt-1">{exam.subject || 'Umum'}</p>
-						<div class="flex flex-wrap gap-3 mt-3 text-xs text-slate-500">
-							<span class="flex items-center gap-1">
-								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<p class="text-sm text-slate-500 mt-1 mb-4">{exam.subject || 'Umum'}</p>
+						
+						<div class="space-y-2 mb-4 mt-auto">
+							<div class="flex items-center text-sm text-slate-600">
+								<svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} />
 								</svg>
-								{exam.duration_minutes} menit
-							</span>
+								<span>Pukul: {formatTimeRange(exam.start_time, exam.end_time)}</span>
+							</div>
+							<div class="flex items-center text-sm text-slate-600">
+								<svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.exam} />
+								</svg>
+								<span>Durasi: {exam.duration_minutes} menit</span>
+							</div>
+							<div class="flex items-center text-sm text-slate-600">
+								<svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.users} />
+								</svg>
+								<span class="line-clamp-1" title={exam.proctors || 'Belum ada pengawas'}>Pengawas: {exam.proctors || '-'}</span>
+							</div>
 						</div>
-						<a href="/siswa/ujian" class="btn-primary w-full mt-4 justify-center">Mulai Ujian</a>
+						
+						<div class="pt-4 border-t border-slate-100 mt-auto">
+							{#if exam.start_time && getCountdownString(exam.start_time, currentTime)}
+								<button disabled class="btn w-full justify-center bg-slate-800 text-white cursor-not-allowed flex gap-2 border-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),_0_2px_4px_rgba(0,0,0,0.3)]">
+									<svg class="w-5 h-5 animate-spin-slow opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+										<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} />
+									</svg>
+									<span class="font-mono text-lg tracking-widest font-bold">{getCountdownString(exam.start_time, currentTime)}</span>
+								</button>
+							{:else}
+								<a href="/siswa/ujian" class="btn btn-primary w-full justify-center shadow-lg shadow-indigo-500/30">Mulai Ujian</a>
+							{/if}
+						</div>
 					</div>
 				{/each}
 			</div>

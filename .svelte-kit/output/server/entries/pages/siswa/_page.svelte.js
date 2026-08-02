@@ -1,9 +1,36 @@
 import { h as head, e as escape_html, i as attr, a as stringify, c as ensure_array_like, d as attr_class, j as clsx, b as bind_props } from "../../../chunks/index.js";
 import { A as ATTEMPT_STATUS_COLORS, a as ATTEMPT_STATUS_LABELS, I as ICONS } from "../../../chunks/constants.js";
+import { o as onDestroy } from "../../../chunks/index-server.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let activeExams, myAttempts, activeAttempt;
     let data = $$props["data"];
+    let currentTime = /* @__PURE__ */ new Date();
+    onDestroy(() => {
+    });
+    function formatTimeRange(startStr, endStr) {
+      if (!startStr) return "--:--";
+      const start = new Date(startStr);
+      const startFormatted = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" }).format(start);
+      if (!endStr) return `${startFormatted} - Selesai`;
+      const end = new Date(endStr);
+      const endFormatted = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" }).format(end);
+      if (start.getDate() === end.getDate() && start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
+        return `${startFormatted} - ${endFormatted}`;
+      }
+      const startDateFormatted = new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric" }).format(start);
+      const endDateFormatted = new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric" }).format(end);
+      return `${startDateFormatted} ${startFormatted} - ${endDateFormatted} ${endFormatted}`;
+    }
+    function getCountdownString(startStr, current) {
+      const start = new Date(startStr);
+      const diff = start.getTime() - current.getTime();
+      if (diff <= 0) return null;
+      const hours = Math.floor(diff / (1e3 * 60 * 60));
+      const minutes = Math.floor(diff % (1e3 * 60 * 60) / (1e3 * 60));
+      const seconds = Math.floor(diff % (1e3 * 60) / 1e3);
+      return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    }
     activeExams = data.activeExams.filter((exam) => {
       if (!exam.start_time) return true;
       const start = new Date(exam.start_time);
@@ -40,7 +67,15 @@ function _page($$renderer, $$props) {
       const each_array = ensure_array_like(activeExams);
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
         let exam = each_array[$$index];
-        $$renderer2.push(`<div class="card-hover p-5"><div class="flex items-start justify-between mb-3"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg></div> <span class="badge-success">Tersedia</span></div> <h3 class="font-bold text-slate-800">${escape_html(exam.title)}</h3> <p class="text-sm text-slate-500 mt-1">${escape_html(exam.subject || "Umum")}</p> <div class="flex flex-wrap gap-3 mt-3 text-xs text-slate-500"><span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> ${escape_html(exam.duration_minutes)} menit</span></div> <a href="/siswa/ujian" class="btn-primary w-full mt-4 justify-center">Mulai Ujian</a></div>`);
+        $$renderer2.push(`<div class="card-hover p-5 flex flex-col h-full"><div class="flex items-start justify-between mb-3"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg></div> <span class="badge-success">Tersedia</span></div> <h3 class="font-bold text-slate-800">${escape_html(exam.title)}</h3> <p class="text-sm text-slate-500 mt-1 mb-4">${escape_html(exam.subject || "Umum")}</p> <div class="space-y-2 mb-4 mt-auto"><div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> <span>Pukul: ${escape_html(formatTimeRange(exam.start_time, exam.end_time))}</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg> <span>Durasi: ${escape_html(exam.duration_minutes)} menit</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.users)}></path></svg> <span class="line-clamp-1"${attr("title", exam.proctors || "Belum ada pengawas")}>Pengawas: ${escape_html(exam.proctors || "-")}</span></div></div> <div class="pt-4 border-t border-slate-100 mt-auto">`);
+        if (exam.start_time && getCountdownString(exam.start_time, currentTime)) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<button disabled="" class="btn w-full justify-center bg-slate-800 text-white cursor-not-allowed flex gap-2 border-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),_0_2px_4px_rgba(0,0,0,0.3)]"><svg class="w-5 h-5 animate-spin-slow opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> <span class="font-mono text-lg tracking-widest font-bold">${escape_html(getCountdownString(exam.start_time, currentTime))}</span></button>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<a href="/siswa/ujian" class="btn btn-primary w-full justify-center shadow-lg shadow-indigo-500/30">Mulai Ujian</a>`);
+        }
+        $$renderer2.push(`<!--]--></div></div>`);
       }
       $$renderer2.push(`<!--]--></div>`);
     }
