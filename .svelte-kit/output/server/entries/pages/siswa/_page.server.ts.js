@@ -21,7 +21,7 @@ const load = async ({ platform, locals }) => {
 		ORDER BY e.start_time
 	`).bind(locals.user.school_id, userId).all();
   const myAttempts = await db.prepare(`
-		SELECT sa.*, e.title as exam_title, s.name as subject
+		SELECT sa.*, e.title as exam_title, s.name as subject, e.duration_minutes
 		FROM student_attempts sa
 		JOIN exams e ON sa.exam_id = e.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
@@ -29,7 +29,7 @@ const load = async ({ platform, locals }) => {
 		ORDER BY sa.created_at DESC
 	`).bind(userId).all();
   const activeAttempt = await db.prepare(`
-		SELECT sa.id, e.title as exam_title
+		SELECT sa.id, e.title as exam_title, e.duration_minutes, sa.created_at
 		FROM student_attempts sa JOIN exams e ON sa.exam_id = e.id
 		WHERE sa.student_id = ? AND sa.status = 'mengerjakan'
 		LIMIT 1

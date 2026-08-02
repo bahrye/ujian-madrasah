@@ -23,6 +23,7 @@
 	// Anti-cheat state
 	let warnings = 0;
 	let showWarningModal = false;
+	let showDisqualifiedModal = false;
 	const MAX_WARNINGS = 3;
 	let isUnloading = false;
 	
@@ -60,6 +61,9 @@
 		const savedWarnings = localStorage.getItem(`warnings_${attempt.id}`);
 		if (savedWarnings) {
 			warnings = parseInt(savedWarnings, 10);
+			if (warnings > MAX_WARNINGS) {
+				triggerDisqualification();
+			}
 		}
 	});
 
@@ -81,15 +85,30 @@
 		}
 	});
 
+	function triggerDisqualification() {
+		isUnloading = true; // allow navigation later
+		showDisqualifiedModal = true;
+		submitting = true;
+		saveCurrentAnswer().then(() => {
+			const fd = new FormData();
+			fetch('?/submit', { 
+				method: 'POST', 
+				body: fd,
+				headers: {
+					'x-sveltekit-action': 'true'
+				}
+			}).catch(console.error);
+		});
+	}
+
 	function handleCheatWarning() {
-		if (showWarningModal || submitting || isUnloading) return; // Prevent multiple triggers at once
+		if (showWarningModal || showDisqualifiedModal || submitting || isUnloading) return; // Prevent multiple triggers at once
 		
 		warnings += 1;
 		localStorage.setItem(`warnings_${attempt.id}`, warnings.toString());
-		
+
 		if (warnings > MAX_WARNINGS) {
-			toasts.error('Batas maksimal peringatan terlampaui. Ujian disubmit otomatis.');
-			handleAutoSubmit();
+			triggerDisqualification();
 		} else {
 			showWarningModal = true;
 		}
@@ -381,31 +400,36 @@
 	</div>
 {/if}
 
-<!-- Anti-Cheat Warning Modal -->
 {#if showWarningModal}
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-	<div class="bg-white rounded-2xl w-full max-w-md p-6 sm:p-8 shadow-2xl text-center border-t-4 border-red-500">
-		<div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4 text-red-500">
-			<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-				<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-			</svg>
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+		<div class="bg-white rounded-2xl w-full max-w-sm p-6 text-center shadow-xl animate-in fade-in zoom-in-95 duration-200">
+			<div class="w-16 h-16 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
+				<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+				</svg>
+			</div>
+			<h3 class="text-xl font-bold text-slate-800 mb-2">Peringatan Kecurangan!</h3>
+			<p class="text-slate-600 mb-6 text-sm">Anda terdeteksi melakukan aktivitas di luar halaman ujian. Peringatan ke-{warnings} dari {MAX_WARNINGS}. Jika melebihi batas, ujian akan otomatis dihentikan.</p>
+			<button class="btn-primary w-full" on:click={() => showWarningModal = false}>
+				Saya Mengerti
+			</button>
 		</div>
-		<h2 class="text-xl font-bold text-slate-800 mb-2">Peringatan Kecurangan!</h2>
-		<p class="text-slate-600 mb-4 text-sm">
-			Anda terdeteksi meninggalkan halaman ujian (berpindah aplikasi atau tab). Tindakan ini tercatat di sistem sebagai indikasi kecurangan.
-		</p>
-		<div class="bg-red-50 border border-red-100 rounded-xl p-3 mb-6">
-			<p class="text-sm font-semibold text-red-600">Peringatan ke-{warnings} dari {MAX_WARNINGS}</p>
-			<p class="text-xs text-red-500 mt-1">Jika mencapai batas maksimal, ujian akan diselesaikan secara paksa.</p>
-		</div>
-		<button
-			class="btn-primary w-full bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/30"
-			on:click={() => (showWarningModal = false)}
-		>
-			Saya Mengerti & Kembali ke Ujian
-		</button>
 	</div>
-</div>
+{/if}
+
+{#if showDisqualifiedModal}
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+		<div class="bg-white rounded-2xl w-full max-w-sm p-6 text-center shadow-xl animate-in fade-in zoom-in-95 duration-200 border-t-4 border-rose-500">
+			<div class="w-16 h-16 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4">
+				<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+				</svg>
+			</div>
+			<h3 class="text-xl font-bold text-slate-800 mb-2">Ujian Dihentikan</h3>
+			<p class="text-slate-600 mb-6 text-sm">Anda telah melanggar batas maksimal peringatan ({MAX_WARNINGS} kali). Ujian Anda diselesaikan secara otomatis.</p>
+			<button class="btn-danger w-full" on:click={() => window.location.href = '/siswa'}>
+				Kembali ke Dashboard
+			</button>
+		</div>
+	</div>
 {/if}

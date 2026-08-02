@@ -25,9 +25,9 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		ORDER BY e.start_time
 	`).bind(locals.user!.school_id, userId).all();
 
-	// Riwayat ujian siswa
+	// Riwayat Ujian (dan yang sedang berjalan)
 	const myAttempts = await db.prepare(`
-		SELECT sa.*, e.title as exam_title, s.name as subject
+		SELECT sa.*, e.title as exam_title, s.name as subject, e.duration_minutes
 		FROM student_attempts sa
 		JOIN exams e ON sa.exam_id = e.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
@@ -37,7 +37,7 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 
 	// Ujian yang sedang dikerjakan
 	const activeAttempt = await db.prepare(`
-		SELECT sa.id, e.title as exam_title
+		SELECT sa.id, e.title as exam_title, e.duration_minutes, sa.created_at
 		FROM student_attempts sa JOIN exams e ON sa.exam_id = e.id
 		WHERE sa.student_id = ? AND sa.status = 'mengerjakan'
 		LIMIT 1

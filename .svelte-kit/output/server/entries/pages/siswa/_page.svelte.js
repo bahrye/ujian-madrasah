@@ -31,6 +31,16 @@ function _page($$renderer, $$props) {
       const seconds = Math.floor(diff % (1e3 * 60) / 1e3);
       return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
     }
+    function getAttemptRemainingTime(createdAtStr, durationMinutes, current) {
+      const start = new Date(createdAtStr);
+      const end = new Date(start.getTime() + durationMinutes * 6e4);
+      const diff = end.getTime() - current.getTime();
+      if (diff <= 0) return "00:00:00";
+      const hours = Math.floor(diff / (1e3 * 60 * 60));
+      const minutes = Math.floor(diff % (1e3 * 60 * 60) / (1e3 * 60));
+      const seconds = Math.floor(diff % (1e3 * 60) / 1e3);
+      return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    }
     activeExams = data.activeExams.filter((exam) => {
       if (!exam.start_time) return true;
       const start = new Date(exam.start_time);
@@ -85,11 +95,19 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<div class="card p-6 text-center text-slate-400 text-sm">Belum ada riwayat ujian.</div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="card overflow-hidden"><div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Ujian</th><th>Mapel</th><th>Status</th><th>Nilai</th><th>Tanggal</th></tr></thead><tbody><!--[-->`);
+      $$renderer2.push(`<div class="card overflow-hidden"><div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Ujian</th><th>Mapel</th><th>Status</th><th>Sisa Waktu</th><th>Nilai</th><th>Tanggal</th></tr></thead><tbody><!--[-->`);
       const each_array_1 = ensure_array_like(myAttempts);
       for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
         let a = each_array_1[$$index_1];
-        $$renderer2.push(`<tr><td class="font-medium">${escape_html(a.exam_title)}</td><td class="text-slate-500">${escape_html(a.subject || "-")}</td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[a.status]))}>${escape_html(ATTEMPT_STATUS_LABELS[a.status])}</span></td><td${attr_class(`font-bold ${(a.score ?? 0) >= 70 ? "text-emerald-600" : "text-rose-600"}`)}>${escape_html(a.score != null ? a.score.toFixed(1) : "-")}</td><td class="text-xs text-slate-500">${escape_html(new Date(a.created_at).toLocaleDateString("id-ID"))}</td></tr>`);
+        $$renderer2.push(`<tr><td class="font-medium">${escape_html(a.exam_title)}</td><td class="text-slate-500">${escape_html(a.subject || "-")}</td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[a.status]))}>${escape_html(ATTEMPT_STATUS_LABELS[a.status])}</span></td><td class="font-mono text-sm">`);
+        if (a.status === "mengerjakan") {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<span class="text-amber-600 font-bold flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> ${escape_html(getAttemptRemainingTime(a.created_at, a.duration_minutes, currentTime))}</span>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<span class="text-slate-400">-</span>`);
+        }
+        $$renderer2.push(`<!--]--></td><td${attr_class(`font-bold ${(a.score ?? 0) >= 70 ? "text-emerald-600" : "text-rose-600"}`)}>${escape_html(a.score != null ? a.score.toFixed(1) : "-")}</td><td class="text-xs text-slate-500">${escape_html(new Date(a.created_at).toLocaleDateString("id-ID"))}</td></tr>`);
       }
       $$renderer2.push(`<!--]--></tbody></table></div></div>`);
     }

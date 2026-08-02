@@ -25,10 +25,31 @@
 
 	let currentTime = new Date();
 	let intervalId: any;
+	let submittingAttempts = new Set<number>();
 
 	onMount(() => {
 		intervalId = setInterval(() => {
 			currentTime = new Date();
+			
+			if (myAttempts) {
+				for (const a of myAttempts) {
+					if (a.status === 'mengerjakan' && !submittingAttempts.has(a.id)) {
+						if (isAttemptExpired(a.created_at, a.duration_minutes, currentTime)) {
+							submittingAttempts.add(a.id);
+							submittingAttempts = submittingAttempts; // trigger reactivity
+							
+							const fd = new FormData();
+							fetch(`/siswa/ujian/${a.id}?/submit`, {
+								method: 'POST',
+								body: fd,
+								headers: { 'x-sveltekit-action': 'true' }
+							}).then(() => {
+								window.location.reload();
+							}).catch(console.error);
+						}
+					}
+				}
+			}
 		}, 1000);
 	});
 
@@ -78,6 +99,26 @@
 		const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 		
 		return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+	}
+
+	function getAttemptRemainingTime(createdAtStr: string, durationMinutes: number, current: Date) {
+		const start = new Date(createdAtStr);
+		const end = new Date(start.getTime() + durationMinutes * 60000);
+		const diff = end.getTime() - current.getTime();
+		
+		if (diff <= 0) return '00:00:00';
+		
+		const hours = Math.floor(diff / (1000 * 60 * 60));
+		const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+		const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+		
+		return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+	}
+
+	function isAttemptExpired(createdAtStr: string, durationMinutes: number, current: Date) {
+		const start = new Date(createdAtStr);
+		const end = new Date(start.getTime() + durationMinutes * 60000);
+		return current.getTime() >= end.getTime();
 	}
 </script>
 
@@ -185,13 +226,25 @@
 			<div class="card overflow-hidden">
 				<div class="table-container border-0 rounded-none">
 					<table class="table">
-						<thead><tr><th>Ujian</th><th>Mapel</th><th>Status</th><th>Nilai</th><th>Tanggal</th></tr></thead>
+						<thead><tr><th>Ujian</th><th>Mapel</th><th>Status</th><th>Sisa Waktu</th><th>Nilai</th><th>Tanggal</th></tr></thead>
 						<tbody>
 							{#each myAttempts as a}
 								<tr>
 									<td class="font-medium">{a.exam_title}</td>
 									<td class="text-slate-500">{a.subject || '-'}</td>
 									<td><span class={ATTEMPT_STATUS_COLORS[a.status]}>{ATTEMPT_STATUS_LABELS[a.status]}</span></td>
+									<td class="font-mono text-sm">
+										{#if a.status === 'mengerjakan'}
+											<span class="text-amber-600 font-bold flex items-center gap-1">
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+													<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} />
+												</svg>
+												{getAttemptRemainingTime(a.created_at, a.duration_minutes, currentTime)}
+											</span>
+										{:else}
+											<span class="text-slate-400">-</span>
+										{/if}
+									</td>
 									<td class="font-bold {(a.score ?? 0) >= 70 ? 'text-emerald-600' : 'text-rose-600'}">{a.score != null ? a.score.toFixed(1) : '-'}</td>
 									<td class="text-xs text-slate-500">{new Date(a.created_at).toLocaleDateString('id-ID')}</td>
 								</tr>
