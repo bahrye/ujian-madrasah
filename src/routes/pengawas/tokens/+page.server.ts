@@ -71,7 +71,17 @@ export const actions: Actions = {
 		const id = form.get('id')?.toString();
 		if (!id) return fail(400, { error: 'ID tidak valid.' });
 
-		await db.prepare('DELETE FROM tokens WHERE id = ? AND school_id = ?').bind(id, locals.user!.school_id).run();
-		return { success: 'Token berhasil dihapus.' };
+		try {
+			const usage = await db.prepare('SELECT COUNT(*) as count FROM student_attempts WHERE token_id = ?').bind(id).first() as {count: number};
+			if (usage && usage.count > 0) {
+				return fail(400, { error: 'Gagal dihapus: Token ini telah digunakan oleh peserta ujian.' });
+			}
+			
+			await db.prepare('DELETE FROM tokens WHERE id = ? AND school_id = ?').bind(id, locals.user!.school_id).run();
+			return { success: 'Token berhasil dihapus.' };
+		} catch (err: any) {
+			console.error('Delete token error:', err);
+			return fail(500, { error: 'Terjadi kesalahan sistem saat menghapus token.' });
+		}
 	}
 };
