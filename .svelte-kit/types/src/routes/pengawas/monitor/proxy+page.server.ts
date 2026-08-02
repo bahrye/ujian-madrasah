@@ -52,7 +52,7 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 					try {
 						const data = JSON.parse(stored);
 						if (data && data.answers) {
-							answeredCount = Object.keys(data.answers).length;
+							answeredCount = Object.values(data.answers).filter(val => val !== null && val !== '').length;
 						}
 					} catch (e) {}
 				}

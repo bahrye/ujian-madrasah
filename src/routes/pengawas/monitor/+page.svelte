@@ -100,12 +100,17 @@
 								</td>
 								<td class="text-xs">
 									{#if a.status === 'mengerjakan'}
-										{@const start = new Date(a.start_time).getTime()}
+										{@const startStr = a.start_time.replace(' ', 'T') + (a.start_time.includes('Z') ? '' : 'Z')}
+										{@const start = new Date(startStr).getTime()}
 										{@const end = start + (a.duration_minutes * 60 * 1000)}
 										{@const remainingMs = end - currentTime}
 										{#if remainingMs > 0}
-											{@const m = Math.floor(remainingMs / 60000)}
-											<span class="text-slate-600 font-medium">{m} mnt</span>
+											{@const totalM = Math.floor(remainingMs / 60000)}
+											{@const h = Math.floor(totalM / 60)}
+											{@const m = totalM % 60}
+											<span class="text-slate-600 font-medium">
+												{#if h > 0}{h} jam {/if}{m} mnt
+											</span>
 										{:else}
 											<span class="text-rose-500 font-bold">Habis</span>
 										{/if}

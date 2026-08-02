@@ -86,13 +86,23 @@ function _page($$renderer, $$props) {
         $$renderer2.push(`<!--]--></td><td class="text-xs">`);
         if (a.status === "mengerjakan") {
           $$renderer2.push("<!--[0-->");
-          const start = new Date(a.start_time).getTime();
+          const startStr = a.start_time.replace(" ", "T") + (a.start_time.includes("Z") ? "" : "Z");
+          const start = new Date(startStr).getTime();
           const end = start + a.duration_minutes * 60 * 1e3;
           const remainingMs = end - currentTime;
           if (remainingMs > 0) {
             $$renderer2.push("<!--[0-->");
-            const m = Math.floor(remainingMs / 6e4);
-            $$renderer2.push(`<span class="text-slate-600 font-medium">${escape_html(m)} mnt</span>`);
+            const totalM = Math.floor(remainingMs / 6e4);
+            const h = Math.floor(totalM / 60);
+            const m = totalM % 60;
+            $$renderer2.push(`<span class="text-slate-600 font-medium">`);
+            if (h > 0) {
+              $$renderer2.push("<!--[0-->");
+              $$renderer2.push(`${escape_html(h)} jam`);
+            } else {
+              $$renderer2.push("<!--[-1-->");
+            }
+            $$renderer2.push(`<!--]-->${escape_html(m)} mnt</span>`);
           } else {
             $$renderer2.push("<!--[-1-->");
             $$renderer2.push(`<span class="text-rose-500 font-bold">Habis</span>`);
