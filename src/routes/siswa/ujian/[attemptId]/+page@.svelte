@@ -65,10 +65,18 @@
 		}
 	}
 
+	let warningLogs: { time: number, type: string }[] = [];
+
 	onMount(() => {
 		requestWakeLock();
 		
 		const savedWarnings = localStorage.getItem(`warnings_${attempt.id}`);
+		const savedLogs = localStorage.getItem(`warningLogs_${attempt.id}`);
+		
+		if (savedLogs) {
+			try { warningLogs = JSON.parse(savedLogs); } catch {}
+		}
+
 		if (savedWarnings) {
 			warnings = parseInt(savedWarnings, 10);
 			if (warnings > MAX_WARNINGS) {
@@ -121,7 +129,7 @@
 
 	let cheatWarningTimeout: any;
 
-	function handleCheatWarning() {
+	function handleCheatWarning(type = 'Meninggalkan halaman ujian') {
 		if (showWarningModal || showDisqualifiedModal || submitting || isUnloading) return; // Prevent multiple triggers at once
 		
 		if (cheatWarningTimeout) clearTimeout(cheatWarningTimeout);
@@ -130,7 +138,11 @@
 			if (isUnloading) return; // If page is actually unloading (reload/close), abort the warning
 			
 			warnings += 1;
+			warningLogs.push({ time: Date.now(), type });
 			localStorage.setItem(`warnings_${attempt.id}`, warnings.toString());
+			localStorage.setItem(`warningLogs_${attempt.id}`, JSON.stringify(warningLogs));
+			
+			triggerAutoSave();
 
 			if (warnings > MAX_WARNINGS) {
 				triggerDisqualification();
@@ -153,7 +165,7 @@
 
 	function handleVisibilityChange() {
 		if (document.visibilityState === 'hidden') {
-			handleCheatWarning();
+			handleCheatWarning('Membuka tab/aplikasi lain (Visibility Hidden)');
 		} else if (document.visibilityState === 'visible') {
 			if (wakeLock !== null && wakeLock.released) {
 				requestWakeLock();
@@ -164,10 +176,10 @@
 	}
 
 	function handleBlur() {
-		// handleCheatWarning();
+		// handleCheatWarning('Window blur / Tidak fokus pada halaman');
 		// Note: we can optionally listen to window blur, but visibilitychange is usually more reliable
 		// For stricter rules, we can uncomment the blur listener.
-		handleCheatWarning();
+		handleCheatWarning('Tidak fokus pada halaman ujian (Window Blur)');
 	}
 
 	// Local answer state
@@ -240,6 +252,8 @@
 		const form = new FormData();
 		form.set('answers', JSON.stringify(localAnswers));
 		form.set('doubts', JSON.stringify(localDoubts));
+		form.set('warnings', warnings.toString());
+		form.set('warningLogs', JSON.stringify(warningLogs));
 
 		try {
 			await fetch('?/saveAnswer', { 

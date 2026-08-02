@@ -78,12 +78,16 @@ export const actions: Actions = {
 		const form = await request.formData();
 		const answersStr = form.get('answers')?.toString();
 		const doubtsStr = form.get('doubts')?.toString();
+		const warningsStr = form.get('warnings')?.toString();
+		const warningLogsStr = form.get('warningLogs')?.toString();
 
-		if (answersStr) {
+		if (answersStr || warningsStr) {
 			try {
 				const payload = {
-					answers: JSON.parse(answersStr),
-					doubts: doubtsStr ? JSON.parse(doubtsStr) : {}
+					answers: answersStr ? JSON.parse(answersStr) : {},
+					doubts: doubtsStr ? JSON.parse(doubtsStr) : {},
+					warnings: warningsStr ? parseInt(warningsStr, 10) : 0,
+					warningLogs: warningLogsStr ? JSON.parse(warningLogsStr) : []
 				};
 				await kv.put(`attempt_${params.attemptId}_answers`, JSON.stringify(payload));
 			} catch (e) {

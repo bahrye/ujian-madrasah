@@ -45,6 +45,8 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 	const kv = platform?.env?.EXAM_ANSWERS;
 	const attemptsWithProgress = await Promise.all(attempts.map(async (a) => {
 		let answeredCount = 0;
+		let warnings = 0;
+		let warningLogs: any[] = [];
 		if (a.status === 'mengerjakan') {
 			if (kv) {
 				const stored = await kv.get(`attempt_${a.id}_answers`);
@@ -54,6 +56,8 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 						if (data && data.answers) {
 							answeredCount = Object.values(data.answers).filter(val => val !== null && val !== '').length;
 						}
+						if (data && data.warnings) warnings = data.warnings;
+						if (data && data.warningLogs) warningLogs = data.warningLogs;
 					} catch (e) {}
 				}
 			}
@@ -68,7 +72,9 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 
 		return {
 			...a,
-			answeredCount
+			answeredCount,
+			warnings,
+			warningLogs
 		};
 	}));
 

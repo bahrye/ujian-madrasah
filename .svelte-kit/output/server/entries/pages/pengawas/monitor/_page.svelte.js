@@ -55,7 +55,7 @@ function _page($$renderer, $$props) {
       } else {
         $$renderer2.push("<!--[-1-->");
       }
-      $$renderer2.push(`<!--]--><th>Status</th><th class="w-32">Progress</th><th>Sisa Waktu</th><th class="text-right">Aksi</th></tr></thead><tbody><!--[-->`);
+      $$renderer2.push(`<!--]--><th>Status</th><th class="w-24 text-center">Pelanggaran</th><th class="w-32">Progress</th><th>Sisa Waktu</th><th class="text-right">Aksi</th></tr></thead><tbody><!--[-->`);
       const each_array_1 = ensure_array_like(attempts);
       for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
         let a = each_array_1[$$index_1];
@@ -73,7 +73,22 @@ function _page($$renderer, $$props) {
         } else {
           $$renderer2.push("<!--[-1-->");
         }
-        $$renderer2.push(`<!--]--> ${escape_html(ATTEMPT_STATUS_LABELS[a.status] || a.status)}</span></td><td class="w-32">`);
+        $$renderer2.push(`<!--]--> ${escape_html(ATTEMPT_STATUS_LABELS[a.status] || a.status)}</span></td><td class="text-center">`);
+        if (a.warnings > 0) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<div class="flex items-center justify-center gap-1"><span class="px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-bold text-xs">${escape_html(a.warnings)} kali</span> `);
+          if (a.warningLogs && a.warningLogs.length > 0) {
+            $$renderer2.push("<!--[0-->");
+            $$renderer2.push(`<button class="btn-ghost btn-sm p-1 rounded-full text-slate-400 hover:text-slate-600"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></button>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+          }
+          $$renderer2.push(`<!--]--></div>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<span class="text-slate-400 text-xs">-</span>`);
+        }
+        $$renderer2.push(`<!--]--></td><td class="w-32">`);
         if (a.question_count > 0) {
           $$renderer2.push("<!--[0-->");
           const pct = Math.round(a.answeredCount / a.question_count * 100);
@@ -124,6 +139,10 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<!--]--></tbody></table></div>`);
     }
     $$renderer2.push(`<!--]--></div></div> `);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--> `);
     {
       $$renderer2.push("<!--[-1-->");
     }
