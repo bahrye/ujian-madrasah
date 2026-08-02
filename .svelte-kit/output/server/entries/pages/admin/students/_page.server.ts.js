@@ -35,22 +35,55 @@ const actions = {
     const db = getDB(platform);
     const data = await request.formData();
     const name = data.get("name")?.toString().trim();
-    const username = data.get("username")?.toString().trim();
+    const nisn = data.get("nisn")?.toString().trim();
     const class_id = data.get("class_id")?.toString() || null;
-    const password = data.get("password")?.toString();
-    if (!name || !username || !password) {
-      return fail(400, { error: "Semua field wajib diisi" });
+    if (!name || !nisn) {
+      return fail(400, { error: "Nama dan NISN wajib diisi" });
     }
     try {
-      const existing = await db.prepare("SELECT id FROM users WHERE username = ?").bind(username).first();
+      const existing = await db.prepare("SELECT id FROM users WHERE username = ?").bind(nisn).first();
       if (existing) {
-        return fail(400, { error: "Username sudah digunakan" });
+        return fail(400, { error: "NISN sudah terdaftar" });
       }
-      const passwordHash = await hashPassword(password);
-      await db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?, ?)").bind(locals.user.school_id, class_id, username, passwordHash, name, "siswa").run();
+      const passwordHash = await hashPassword(nisn);
+      await db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?, ?)").bind(locals.user.school_id, class_id, nisn, passwordHash, name, "siswa").run();
       return { success: true };
     } catch (e) {
       return fail(500, { error: "Gagal menambahkan siswa" });
+    }
+  },
+  edit: async ({ request, locals, platform }) => {
+    const db = getDB(platform);
+    const data = await request.formData();
+    const id = data.get("id")?.toString();
+    const name = data.get("name")?.toString().trim();
+    const nisn = data.get("nisn")?.toString().trim();
+    const class_id = data.get("class_id")?.toString() || null;
+    if (!id || !name || !nisn) {
+      return fail(400, { error: "ID, Nama dan NISN wajib diisi" });
+    }
+    try {
+      const existing = await db.prepare("SELECT id FROM users WHERE username = ? AND id != ?").bind(nisn, id).first();
+      if (existing) {
+        return fail(400, { error: "NISN sudah digunakan siswa lain" });
+      }
+      const passwordHash = await hashPassword(nisn);
+      await db.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, class_id = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, nisn, passwordHash, class_id, id, locals.user.school_id).run();
+      return { success: true };
+    } catch (e) {
+      return fail(500, { error: "Gagal mengupdate siswa" });
+    }
+  },
+  delete: async ({ request, locals, platform }) => {
+    const db = getDB(platform);
+    const data = await request.formData();
+    const id = data.get("id")?.toString();
+    if (!id) return fail(400, { error: "ID tidak valid" });
+    try {
+      await db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(id, locals.user.school_id).run();
+      return { success: true };
+    } catch (e) {
+      return fail(500, { error: "Gagal menghapus siswa" });
     }
   },
   toggleStatus: async ({ request, platform, locals }) => {

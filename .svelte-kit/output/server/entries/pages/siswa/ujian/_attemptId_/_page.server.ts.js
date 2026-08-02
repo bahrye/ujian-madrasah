@@ -4,9 +4,10 @@ const load = async ({ platform, locals, params }) => {
   const db = getDB(platform);
   const attemptId = params.attemptId;
   const attempt = await db.prepare(`
-		SELECT sa.*, e.title as exam_title, e.subject, e.duration_minutes
+		SELECT sa.*, e.title as exam_title, s.name as subject, e.duration_minutes
 		FROM student_attempts sa
 		JOIN exams e ON sa.exam_id = e.id
+		LEFT JOIN subjects s ON e.subject_id = s.id
 		WHERE sa.id = ? AND sa.student_id = ?
 	`).bind(attemptId, locals.user.id).first();
   if (!attempt) throw error(404, "Sesi ujian tidak ditemukan.");

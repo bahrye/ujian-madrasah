@@ -7,13 +7,15 @@
 	export let form: ActionData;
 
 	let isAdding = false;
+	let editingUser: any = null;
 	let filterClass = '';
 
 	$: if (form?.error) {
 		toasts.error(form.error);
 	} else if (form?.success) {
-		toasts.success('Berhasil menambahkan siswa');
+		toasts.success('Berhasil menyimpan data siswa');
 		isAdding = false;
+		editingUser = null;
 	}
 
 	function handleFilterChange(e: Event) {
@@ -56,28 +58,56 @@
 						<input type="text" id="name" name="name" class="input" required placeholder="Nama Siswa" />
 					</div>
 					<div>
-						<label for="username" class="block text-sm font-medium text-slate-700 mb-1">Username (NIS) <span class="text-red-500">*</span></label>
-						<input type="text" id="username" name="username" class="input" required placeholder="NIS / Username" />
+						<label for="nisn" class="block text-sm font-medium text-slate-700 mb-1">NISN <span class="text-red-500">*</span></label>
+						<input type="text" id="nisn" name="nisn" class="input" required placeholder="10 Digit NISN" />
+						<p class="text-xs text-slate-500 mt-1">NISN juga akan menjadi Password login.</p>
 					</div>
 				</div>
-				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-					<div>
-						<label for="password" class="block text-sm font-medium text-slate-700 mb-1">Password <span class="text-red-500">*</span></label>
-						<input type="password" id="password" name="password" class="input" required />
-					</div>
-					<div>
-						<label for="class_id" class="block text-sm font-medium text-slate-700 mb-1">Kelas</label>
-						<select id="class_id" name="class_id" class="input">
-							<option value="">Pilih Kelas (Opsional)</option>
-							{#each data.classes as cls (cls.id)}
-								<option value={cls.id}>{cls.name}</option>
-							{/each}
-						</select>
-					</div>
+				<div>
+					<label for="class_id" class="block text-sm font-medium text-slate-700 mb-1">Kelas</label>
+					<select id="class_id" name="class_id" class="input">
+						<option value="">Pilih Kelas (Opsional)</option>
+						{#each data.classes as cls (cls.id)}
+							<option value={cls.id}>{cls.name}</option>
+						{/each}
+					</select>
 				</div>
 				<div class="flex space-x-3 pt-2">
 					<button type="submit" class="btn btn-primary">Simpan Siswa</button>
 					<button type="button" class="btn btn-secondary" on:click={() => (isAdding = false)}>Batal</button>
+				</div>
+			</form>
+		</div>
+	{/if}
+
+	{#if editingUser}
+		<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 animate-fade-in mb-6">
+			<h2 class="text-xl font-bold text-slate-800 mb-4">Edit Siswa</h2>
+			<form method="POST" action="?/edit" use:enhance class="space-y-4 max-w-lg">
+				<input type="hidden" name="id" value={editingUser.id} />
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+					<div>
+						<label for="e-name" class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+						<input type="text" id="e-name" name="name" class="input" required value={editingUser.name} />
+					</div>
+					<div>
+						<label for="e-nisn" class="block text-sm font-medium text-slate-700 mb-1">NISN <span class="text-red-500">*</span></label>
+						<input type="text" id="e-nisn" name="nisn" class="input" required value={editingUser.username} />
+						<p class="text-xs text-slate-500 mt-1">Mengubah NISN akan mereset Password.</p>
+					</div>
+				</div>
+				<div>
+					<label for="e-class_id" class="block text-sm font-medium text-slate-700 mb-1">Kelas</label>
+					<select id="e-class_id" name="class_id" class="input" value={editingUser.class_id}>
+						<option value="">Pilih Kelas (Opsional)</option>
+						{#each data.classes as cls (cls.id)}
+							<option value={cls.id}>{cls.name}</option>
+						{/each}
+					</select>
+				</div>
+				<div class="flex space-x-3 pt-2">
+					<button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+					<button type="button" class="btn btn-secondary" on:click={() => (editingUser = null)}>Batal</button>
 				</div>
 			</form>
 		</div>
@@ -147,13 +177,26 @@
 								{new Date(user.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
 							</td>
 							<td class="p-4 text-right">
-								<form method="POST" action="?/toggleStatus" use:enhance class="inline-block">
-									<input type="hidden" name="id" value={user.id} />
-									<input type="hidden" name="is_active" value={user.is_active} />
-									<button type="submit" class="text-sm {user.is_active ? 'text-amber-600 hover:text-amber-700' : 'text-green-600 hover:text-green-700'} font-medium">
-										{user.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+								<div class="flex items-center justify-end space-x-2">
+									<button class="btn-ghost btn-sm" on:click={() => { editingUser = user; window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+										Edit
 									</button>
-								</form>
+									<form method="POST" action="?/toggleStatus" use:enhance class="inline-block">
+										<input type="hidden" name="id" value={user.id} />
+										<input type="hidden" name="is_active" value={user.is_active} />
+										<button type="submit" class="btn-ghost btn-sm {user.is_active ? 'text-amber-600' : 'text-green-600'}">
+											{user.is_active ? 'Nonaktif' : 'Aktif'}
+										</button>
+									</form>
+									<form method="POST" action="?/delete" use:enhance class="inline-block" on:submit={(e) => {
+										if (!confirm('Hapus siswa ini? Semua rekam jejak ujiannya akan ikut terhapus!')) e.preventDefault();
+									}}>
+										<input type="hidden" name="id" value={user.id} />
+										<button type="submit" class="btn-ghost btn-sm text-red-600">
+											Hapus
+										</button>
+									</form>
+								</div>
 							</td>
 						</tr>
 					{:else}
