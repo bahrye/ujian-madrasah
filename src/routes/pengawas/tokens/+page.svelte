@@ -3,11 +3,13 @@
 	import { ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
 	import { onMount, onDestroy } from 'svelte';
+	import { page } from '$app/stores';
 
 	export let data;
 	export let form: any;
 
 	let showGenerate = false;
+	let selectedExamId = '';
 	let currentTime = Date.now();
 	let intervalId: any;
 
@@ -16,6 +18,11 @@
 	$: tokens = data.tokens as any[];
 
 	onMount(() => {
+		if ($page.url.searchParams.get('generate') === '1') {
+			showGenerate = true;
+			selectedExamId = $page.url.searchParams.get('exam_id') || '';
+		}
+
 		intervalId = setInterval(() => {
 			currentTime = Date.now();
 		}, 1000);
@@ -70,7 +77,7 @@
 				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 					<div>
 						<label class="label" for="t-exam">Ujian</label>
-						<select id="t-exam" name="exam_id" required class="select">
+						<select id="t-exam" name="exam_id" required class="select" bind:value={selectedExamId}>
 							<option value="">Pilih ujian</option>
 							{#each data.exams as exam}
 								<option value={exam.id}>{exam.title}</option>
