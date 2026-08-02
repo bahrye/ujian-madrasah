@@ -136,6 +136,11 @@ const actions = {
     if (!examProctorId) return fail(400, { error: "ID pengawas tidak valid" });
     await db.prepare("DELETE FROM exam_proctors WHERE id = ?").bind(examProctorId).run();
     return { success: "Pengawas berhasil dihapus." };
+  },
+  toggleScoreRelease: async ({ request, platform, params }) => {
+    const db = getDB(platform);
+    await db.prepare(`UPDATE exams SET is_score_released = CASE WHEN is_score_released = 1 THEN 0 ELSE 1 END, updated_at = datetime('now') WHERE id = ?`).bind(params.id).run();
+    return { success: "Status rilis nilai berhasil diperbarui." };
   }
 };
 export {

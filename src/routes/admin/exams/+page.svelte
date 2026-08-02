@@ -160,6 +160,15 @@
 						<option value="1">Acak Soal (Berbeda tiap siswa)</option>
 					</select>
 				</div>
+				<div>
+					<label class="label" for="c-score-type">Tampilkan Nilai ke Siswa</label>
+					<select id="c-score-type" name="show_score_type" class="input">
+						<option value="after_submit">Setelah Ujian Selesai (Otomatis)</option>
+						<option value="after_end_time">Setelah Waktu Jadwal Ujian Berakhir</option>
+						<option value="objective_only">Tampilkan Nilai Selain Isian & Essay Saja</option>
+						<option value="manual">Manual (Oleh Guru/Admin)</option>
+					</select>
+				</div>
 				<div class="flex gap-3 pt-2">
 					<button type="button" class="btn-ghost flex-1" on:click={() => (showCreateModal = false)}>Batal</button>
 					<button type="submit" class="btn-primary flex-1">Buat Ujian</button>
@@ -216,6 +225,15 @@
 					<select id="e-shuffle" name="shuffle_questions" class="input" value={String(editingExam.shuffle_questions || 0)}>
 						<option value="0">Tidak Acak (Sesuai Urutan)</option>
 						<option value="1">Acak Soal (Berbeda tiap siswa)</option>
+					</select>
+				</div>
+				<div>
+					<label class="label" for="e-score-type">Tampilkan Nilai ke Siswa</label>
+					<select id="e-score-type" name="show_score_type" class="input" value={editingExam.show_score_type || 'after_submit'}>
+						<option value="after_submit">Setelah Ujian Selesai (Otomatis)</option>
+						<option value="after_end_time">Setelah Waktu Jadwal Ujian Berakhir</option>
+						<option value="objective_only">Tampilkan Nilai Selain Isian & Essay Saja</option>
+						<option value="manual">Manual (Oleh Guru/Admin)</option>
 					</select>
 				</div>
 				<div class="flex items-center gap-2">

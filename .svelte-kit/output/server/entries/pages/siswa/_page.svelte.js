@@ -113,7 +113,28 @@ function _page($$renderer, $$props) {
           $$renderer2.push("<!--[-1-->");
           $$renderer2.push(`<span class="text-slate-400">-</span>`);
         }
-        $$renderer2.push(`<!--]--></td><td${attr_class(`font-bold ${(a.score ?? 0) >= 70 ? "text-emerald-600" : "text-rose-600"}`)}>${escape_html(a.score != null ? a.score.toFixed(1) : "-")}</td><td class="text-xs text-slate-500">${escape_html(new Date(a.created_at).toLocaleDateString("id-ID"))}</td></tr>`);
+        $$renderer2.push(`<!--]--></td><td class="font-bold">`);
+        if (a.status !== "selesai") {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<span class="text-slate-400 font-normal">-</span>`);
+        } else if ((a.show_score_type || "after_submit") === "manual" && a.is_score_released !== 1) {
+          $$renderer2.push("<!--[1-->");
+          $$renderer2.push(`<span class="text-slate-400 text-xs font-normal font-sans bg-slate-100 px-2 py-1 rounded whitespace-nowrap">Belum dirilis</span>`);
+        } else if ((a.show_score_type || "after_submit") === "after_end_time" && a.exam_end_time && currentTime < parseDate(a.exam_end_time)) {
+          $$renderer2.push("<!--[2-->");
+          $$renderer2.push(`<span class="text-slate-400 text-xs font-normal font-sans bg-slate-100 px-2 py-1 rounded whitespace-nowrap">Menunggu jadwal berakhir</span>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          if ((a.show_score_type || "after_submit") === "objective_only") {
+            $$renderer2.push("<!--[0-->");
+            $$renderer2.push(`<span${attr_class(clsx((a.objective_score ?? 0) >= 70 ? "text-emerald-600" : "text-rose-600"))} title="Nilai Objektif (Tanpa Isian &amp; Essay)">${escape_html(a.objective_score != null ? a.objective_score.toFixed(1) : "-")}</span>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+            $$renderer2.push(`<span${attr_class(clsx((a.score ?? 0) >= 70 ? "text-emerald-600" : "text-rose-600"))}>${escape_html(a.score != null ? a.score.toFixed(1) : "-")}</span>`);
+          }
+          $$renderer2.push(`<!--]-->`);
+        }
+        $$renderer2.push(`<!--]--></td><td class="text-xs text-slate-500">${escape_html(new Date(a.created_at).toLocaleDateString("id-ID"))}</td></tr>`);
       }
       $$renderer2.push(`<!--]--></tbody></table></div></div>`);
     }

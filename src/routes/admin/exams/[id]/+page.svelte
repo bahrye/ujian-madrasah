@@ -58,13 +58,25 @@
 		<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 			<div>
 				<h1 class="text-2xl font-bold text-slate-800">{exam.title}</h1>
-				<p class="text-sm text-slate-500 mt-1">{exam.subject || 'Umum'} · {exam.duration_minutes} menit</p>
+				<p class="text-sm text-slate-500 mt-1">{exam.subject_name || exam.subject || 'Umum'} · {exam.duration_minutes} menit</p>
 			</div>
-			{#if exam.is_active}
-				<span class="badge-success text-sm px-4 py-1.5">Aktif</span>
-			{:else}
-				<span class="badge bg-slate-100 text-slate-500 text-sm px-4 py-1.5">Nonaktif</span>
-			{/if}
+			<div class="flex items-center gap-3">
+				{#if exam.show_score_type === 'manual'}
+					<form method="POST" action="?/toggleScoreRelease" use:enhance>
+						<button type="submit" class="flex items-center gap-2 px-3 py-1.5 rounded-full border {exam.is_score_released ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-slate-50 border-slate-200 text-slate-500'} transition-colors" title="Klik untuk mengubah status rilis nilai manual">
+							<div class="relative inline-flex h-4 w-7 items-center rounded-full {exam.is_score_released ? 'bg-indigo-500' : 'bg-slate-300'} transition-colors">
+								<span class="inline-block h-3 w-3 transform rounded-full bg-white transition-transform {exam.is_score_released ? 'translate-x-3.5' : 'translate-x-0.5'}"></span>
+							</div>
+							<span class="text-xs font-semibold">{exam.is_score_released ? 'Nilai Dirilis' : 'Nilai Disembunyikan'}</span>
+						</button>
+					</form>
+				{/if}
+				{#if exam.is_active}
+					<span class="badge-success text-sm px-4 py-1.5">Aktif</span>
+				{:else}
+					<span class="badge bg-slate-100 text-slate-500 text-sm px-4 py-1.5">Nonaktif</span>
+				{/if}
+			</div>
 		</div>
 		{#if exam.description}
 			<p class="mt-3 text-sm text-slate-600">{exam.description}</p>

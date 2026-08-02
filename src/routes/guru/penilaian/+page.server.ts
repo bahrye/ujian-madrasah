@@ -9,6 +9,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 
 	let answers: any[] = [];
 	let students: any[] = [];
+	let selectedExam: any = null;
 
 	const exams = await db.prepare('SELECT id, title FROM exams WHERE school_id = ? ORDER BY title').bind(locals.user!.school_id).all();
 
@@ -26,6 +27,9 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 		if (examFilter !== '') {
 			studentQuery += ` AND e.id = ?`;
 			studentParams.push(examFilter);
+			
+			// Ambil detail ujian yang dipilih untuk toggle rilis nilai
+			selectedExam = await db.prepare('SELECT id, title, show_score_type, is_score_released FROM exams WHERE id = ?').bind(examFilter).first();
 		}
 		studentQuery += ` ORDER BY u.name`;
 		const studentsResult = await db.prepare(studentQuery).bind(...studentParams).all();
@@ -56,7 +60,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 		answers = answersResult.results;
 	}
 
-	return { answers, exams: exams.results, students, examParam, studentFilter };
+	return { answers, exams: exams.results, students, examParam, studentFilter, selectedExam };
 };
 
 export const actions: Actions = {
@@ -94,5 +98,17 @@ export const actions: Actions = {
 		}
 
 		return { success: 'Nilai berhasil disimpan.' };
+	},
+
+	toggleScoreRelease: async ({ request, platform }) => {
+		const db = getDB(platform);
+		const form = await request.formData();
+		const examId = form.get('exam_id')?.toString();
+
+		if (!examId) return fail(400, { error: 'ID ujian tidak valid.' });
+
+		await db.prepare(`UPDATE exams SET is_score_released = CASE WHEN is_score_released = 1 THEN 0 ELSE 1 END, updated_at = datetime('now') WHERE id = ?`).bind(examId).run();
+		
+		return { success: 'Status rilis nilai berhasil diperbarui.' };
 	}
 };

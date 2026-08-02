@@ -1,4 +1,4 @@
-import { l as fallback, h as head, i as attr, e as escape_html, c as ensure_array_like, a as stringify, d as attr_class, j as clsx, b as bind_props } from "../../../../../chunks/index.js";
+import { l as fallback, h as head, i as attr, e as escape_html, d as attr_class, c as ensure_array_like, a as stringify, j as clsx, b as bind_props } from "../../../../../chunks/index.js";
 import "@sveltejs/kit/internal";
 import "../../../../../chunks/exports.js";
 import "../../../../../chunks/utils2.js";
@@ -34,7 +34,14 @@ function _page($$renderer, $$props) {
         $$renderer4.push(`<title>${escape_html(exam.title)} — Detail Ujian</title>`);
       });
     });
-    $$renderer2.push(`<div class="space-y-6 animate-in"><div class="flex items-center gap-3"><a href="/admin/exams" class="btn-ghost btn-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.chevronLeft)}></path></svg> Kembali</a></div> <div class="card p-6"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div><h1 class="text-2xl font-bold text-slate-800">${escape_html(exam.title)}</h1> <p class="text-sm text-slate-500 mt-1">${escape_html(exam.subject || "Umum")} · ${escape_html(exam.duration_minutes)} menit</p></div> `);
+    $$renderer2.push(`<div class="space-y-6 animate-in"><div class="flex items-center gap-3"><a href="/admin/exams" class="btn-ghost btn-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.chevronLeft)}></path></svg> Kembali</a></div> <div class="card p-6"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div><h1 class="text-2xl font-bold text-slate-800">${escape_html(exam.title)}</h1> <p class="text-sm text-slate-500 mt-1">${escape_html(exam.subject_name || exam.subject || "Umum")} · ${escape_html(exam.duration_minutes)} menit</p></div> <div class="flex items-center gap-3">`);
+    if (exam.show_score_type === "manual") {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<form method="POST" action="?/toggleScoreRelease"><button type="submit"${attr_class(`flex items-center gap-2 px-3 py-1.5 rounded-full border ${exam.is_score_released ? "bg-indigo-50 border-indigo-200 text-indigo-700" : "bg-slate-50 border-slate-200 text-slate-500"} transition-colors`)} title="Klik untuk mengubah status rilis nilai manual"><div${attr_class(`relative inline-flex h-4 w-7 items-center rounded-full ${exam.is_score_released ? "bg-indigo-500" : "bg-slate-300"} transition-colors`)}><span${attr_class(`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${exam.is_score_released ? "translate-x-3.5" : "translate-x-0.5"}`)}></span></div> <span class="text-xs font-semibold">${escape_html(exam.is_score_released ? "Nilai Dirilis" : "Nilai Disembunyikan")}</span></button></form>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--> `);
     if (exam.is_active) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<span class="badge-success text-sm px-4 py-1.5">Aktif</span>`);
@@ -42,7 +49,7 @@ function _page($$renderer, $$props) {
       $$renderer2.push("<!--[-1-->");
       $$renderer2.push(`<span class="badge bg-slate-100 text-slate-500 text-sm px-4 py-1.5">Nonaktif</span>`);
     }
-    $$renderer2.push(`<!--]--></div> `);
+    $$renderer2.push(`<!--]--></div></div> `);
     if (exam.description) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<p class="mt-3 text-sm text-slate-600">${escape_html(exam.description)}</p>`);

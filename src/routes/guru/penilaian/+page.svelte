@@ -41,6 +41,25 @@
 		</form>
 	</div>
 
+	{#if data.selectedExam && data.selectedExam.show_score_type === 'manual'}
+		<div class="card p-4 flex items-center justify-between bg-indigo-50/50 border-indigo-100">
+			<div>
+				<h3 class="font-bold text-slate-800">Status Rilis Nilai Manual</h3>
+				<p class="text-xs text-slate-500 mt-0.5">Pengaturan ujian ini mewajibkan nilai dirilis secara manual oleh Guru/Admin.</p>
+			</div>
+			<form method="POST" action="?/toggleScoreRelease" use:enhance>
+				<input type="hidden" name="exam_id" value={data.selectedExam.id} />
+				<button type="submit" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 {data.selectedExam.is_score_released ? 'bg-indigo-600' : 'bg-slate-200'}" role="switch" aria-checked={data.selectedExam.is_score_released}>
+					<span class="sr-only">Rilis Nilai</span>
+					<span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {data.selectedExam.is_score_released ? 'translate-x-6' : 'translate-x-1'}"></span>
+				</button>
+				<span class="ml-2 text-sm font-medium {data.selectedExam.is_score_released ? 'text-indigo-600' : 'text-slate-400'}">
+					{data.selectedExam.is_score_released ? 'Nilai Dirilis' : 'Disembunyikan'}
+				</span>
+			</form>
+		</div>
+	{/if}
+
 	<!-- Answers to Grade -->
 	{#if data.examParam === null}
 		<div class="card p-12 text-center text-slate-400">

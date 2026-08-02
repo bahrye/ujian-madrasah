@@ -6,6 +6,7 @@ const load = async ({ platform, url, locals }) => {
   const studentFilter = url.searchParams.get("student_id") || "";
   let answers = [];
   let students = [];
+  let selectedExam = null;
   const exams = await db.prepare("SELECT id, title FROM exams WHERE school_id = ? ORDER BY title").bind(locals.user.school_id).all();
   if (examParam !== null) {
     const isAllExams = examParam === "all";
@@ -19,6 +20,7 @@ const load = async ({ platform, url, locals }) => {
     if (examFilter !== "") {
       studentQuery += ` AND e.id = ?`;
       studentParams.push(examFilter);
+      selectedExam = await db.prepare("SELECT id, title, show_score_type, is_score_released FROM exams WHERE id = ?").bind(examFilter).first();
     }
     studentQuery += ` ORDER BY u.name`;
     const studentsResult = await db.prepare(studentQuery).bind(...studentParams).all();
@@ -45,7 +47,7 @@ const load = async ({ platform, url, locals }) => {
     const answersResult = await db.prepare(query).bind(...params).all();
     answers = answersResult.results;
   }
-  return { answers, exams: exams.results, students, examParam, studentFilter };
+  return { answers, exams: exams.results, students, examParam, studentFilter, selectedExam };
 };
 const actions = {
   grade: async ({ request, platform }) => {
@@ -72,6 +74,14 @@ const actions = {
       }
     }
     return { success: "Nilai berhasil disimpan." };
+  },
+  toggleScoreRelease: async ({ request, platform }) => {
+    const db = getDB(platform);
+    const form = await request.formData();
+    const examId = form.get("exam_id")?.toString();
+    if (!examId) return fail(400, { error: "ID ujian tidak valid." });
+    await db.prepare(`UPDATE exams SET is_score_released = CASE WHEN is_score_released = 1 THEN 0 ELSE 1 END, updated_at = datetime('now') WHERE id = ?`).bind(examId).run();
+    return { success: "Status rilis nilai berhasil diperbarui." };
   }
 };
 export {

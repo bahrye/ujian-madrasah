@@ -139,6 +139,8 @@ const actions = {
 		`).bind(attemptId).all();
     let totalScore = 0;
     let totalPoints = 0;
+    let objectiveScore = 0;
+    let objectivePoints = 0;
     const updateStmts = [];
     for (const ans of answers.results) {
       totalPoints += ans.points;
@@ -173,14 +175,19 @@ const actions = {
       }
       const scoreGiven = isCorrect ? ans.points : 0;
       totalScore += scoreGiven;
+      if (ans.type !== "isian_singkat") {
+        objectivePoints += ans.points;
+        objectiveScore += scoreGiven;
+      }
       updateStmts.push(
         db.prepare("UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?").bind(scoreGiven, isCorrect ? 1 : 0, ans.id)
       );
     }
     const finalScore = totalPoints > 0 ? Math.round(totalScore / totalPoints * 1e3) / 10 : 0;
+    const finalObjectiveScore = objectivePoints > 0 ? Math.round(objectiveScore / objectivePoints * 1e3) / 10 : 0;
     updateStmts.push(
       db.prepare(`UPDATE student_attempts SET status = 'selesai', submit_time = datetime('now'),
-				score = ?, total_points = ?, violation_count = ?, violation_logs = ? WHERE id = ?`).bind(finalScore, totalPoints, warnings, warningLogs, attemptId)
+				score = ?, objective_score = ?, total_points = ?, violation_count = ?, violation_logs = ? WHERE id = ?`).bind(finalScore, finalObjectiveScore, totalPoints, warnings, warningLogs, attemptId)
     );
     await db.batch(updateStmts);
     throw redirect(302, "/siswa");
