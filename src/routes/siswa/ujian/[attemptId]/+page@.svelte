@@ -31,10 +31,20 @@
 	let titleClientWidth = 0;
 	let isTitleOverflowing = false;
 	$: if (titleElement && titleClientWidth) {
-		// adding a slight delay to allow dom updates
 		setTimeout(() => {
 			if (titleElement) {
 				isTitleOverflowing = titleElement.scrollWidth > titleClientWidth;
+			}
+		}, 0);
+	}
+
+	let subtitleElement: HTMLElement;
+	let subtitleClientWidth = 0;
+	let isSubtitleOverflowing = false;
+	$: if (subtitleElement && subtitleClientWidth) {
+		setTimeout(() => {
+			if (subtitleElement) {
+				isSubtitleOverflowing = subtitleElement.scrollWidth > subtitleClientWidth;
 			}
 		}, 0);
 	}
@@ -272,13 +282,25 @@
 						{/if}
 					</h1>
 				</div>
-				<div class="flex items-center gap-2">
-					<p class="text-xs text-slate-500 truncate">{attempt.subject || ''} · Soal {currentIndex + 1}/{questions.length}</p>
-					{#if isSaving}
-						<span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 animate-pulse">Menyimpan...</span>
-					{:else}
-						<span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">Tersimpan</span>
-					{/if}
+				<div class="flex items-center gap-2 overflow-hidden w-full">
+					<div class="flex-1 min-w-0 overflow-hidden" bind:clientWidth={subtitleClientWidth}>
+						<p 
+							bind:this={subtitleElement}
+							class="text-xs text-slate-500 whitespace-nowrap {isSubtitleOverflowing ? 'animate-[marquee_15s_linear_infinite]' : 'truncate'}"
+						>
+							{attempt.subject || ''} · Soal {currentIndex + 1}/{questions.length}
+							{#if isSubtitleOverflowing}
+								<span class="pl-8">{attempt.subject || ''} · Soal {currentIndex + 1}/{questions.length}</span>
+							{/if}
+						</p>
+					</div>
+					<div class="shrink-0 flex items-center">
+						{#if isSaving}
+							<span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 animate-pulse">Menyimpan...</span>
+						{:else}
+							<span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">Tersimpan</span>
+						{/if}
+					</div>
 				</div>
 			</div>
 			<div class="flex items-center gap-2 sm:gap-3">
