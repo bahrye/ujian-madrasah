@@ -144,7 +144,7 @@ const actions = {
     const updateStmts = [];
     for (const ans of answers.results) {
       totalPoints += ans.points;
-      if (ans.type === "essay") {
+      if (ans.type === "essay" || ans.type === "isian_singkat") {
         continue;
       }
       if (!ans.correct_answer_json || !ans.answer_given) {
@@ -162,8 +162,6 @@ const actions = {
       let isCorrect = false;
       if (ans.type === "pilihan_ganda" || ans.type === "benar_salah") {
         isCorrect = ans.answer_given === correctAnswer;
-      } else if (ans.type === "isian_singkat") {
-        isCorrect = ans.answer_given.trim().toLowerCase() === String(correctAnswer).trim().toLowerCase();
       } else if (ans.type === "menjodohkan") {
         try {
           const givenMap = JSON.parse(ans.answer_given);
@@ -175,10 +173,8 @@ const actions = {
       }
       const scoreGiven = isCorrect ? ans.points : 0;
       totalScore += scoreGiven;
-      if (ans.type !== "isian_singkat") {
-        objectivePoints += ans.points;
-        objectiveScore += scoreGiven;
-      }
+      objectivePoints += ans.points;
+      objectiveScore += scoreGiven;
       updateStmts.push(
         db.prepare("UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?").bind(scoreGiven, isCorrect ? 1 : 0, ans.id)
       );

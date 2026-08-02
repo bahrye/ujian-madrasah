@@ -178,8 +178,8 @@ export const actions = {
 		for (const ans of answers.results as any[]) {
 			totalPoints += ans.points;
 
-			if (ans.type === 'essay') {
-				// Essay dinilai manual — skip
+			if (ans.type === 'essay' || ans.type === 'isian_singkat') {
+				// Essay dan isian singkat dinilai manual — skip
 				continue;
 			}
 
@@ -201,8 +201,6 @@ export const actions = {
 
 			if (ans.type === 'pilihan_ganda' || ans.type === 'benar_salah') {
 				isCorrect = ans.answer_given === correctAnswer;
-			} else if (ans.type === 'isian_singkat') {
-				isCorrect = ans.answer_given.trim().toLowerCase() === String(correctAnswer).trim().toLowerCase();
 			} else if (ans.type === 'menjodohkan') {
 				try {
 					const givenMap = JSON.parse(ans.answer_given);
@@ -216,10 +214,8 @@ export const actions = {
 			const scoreGiven = isCorrect ? ans.points : 0;
 			totalScore += scoreGiven;
 
-			if (ans.type !== 'isian_singkat') {
-				objectivePoints += ans.points;
-				objectiveScore += scoreGiven;
-			}
+			objectivePoints += ans.points;
+			objectiveScore += scoreGiven;
 
 			updateStmts.push(
 				db.prepare('UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?')
