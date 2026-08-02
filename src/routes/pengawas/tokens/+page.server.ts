@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 	`).bind(locals.user!.school_id, locals.user!.id).all();
 
 	const exams = await db.prepare(`
-		SELECT e.id, e.title 
+		SELECT e.id, e.title, e.start_time, e.end_time
 		FROM exams e
 		JOIN exam_proctors ep ON e.id = ep.exam_id
 		WHERE e.is_active = 1 AND e.school_id = ? AND ep.proctor_id = ?
@@ -36,8 +36,26 @@ export const actions: Actions = {
 
 		if (!examId) return fail(400, { error: 'Pilih ujian terlebih dahulu.' });
 
+		const exam = await db.prepare('SELECT start_time, end_time FROM exams WHERE id = ? AND school_id = ?').bind(examId, locals.user!.school_id).first() as any;
+		if (!exam) return fail(400, { error: 'Ujian tidak ditemukan.' });
+
+		const now = Date.now();
+		if (exam.start_time) {
+			const start = new Date(exam.start_time).getTime();
+			if (now < start - 15 * 60 * 1000) {
+				return fail(400, { error: 'Token hanya dapat di-generate 15 menit sebelum ujian dimulai.' });
+			}
+		}
+
+		if (exam.end_time) {
+			const end = new Date(exam.end_time).getTime();
+			if (now > end) {
+				return fail(400, { error: 'Ujian telah berakhir, tidak dapat men-generate token.' });
+			}
+		}
+
 		const tokenCode = generateTokenCode(6);
-		const expiresAt = new Date(Date.now() + durationHours * 60 * 60 * 1000).toISOString();
+		const expiresAt = new Date(now + durationHours * 60 * 60 * 1000).toISOString();
 
 		await db.prepare('INSERT INTO tokens (school_id, exam_id, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?)')
 			.bind(locals.user!.school_id, examId, tokenCode, locals.user?.id, expiresAt).run();

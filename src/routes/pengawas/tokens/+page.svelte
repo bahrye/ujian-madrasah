@@ -83,7 +83,15 @@
 						<select id="t-exam" name="exam_id" required class="select" bind:value={selectedExamId}>
 							<option value="">Pilih ujian</option>
 							{#each data.exams as exam}
-								<option value={exam.id}>{exam.title}</option>
+								{@const start = exam.start_time ? new Date(exam.start_time).getTime() : 0}
+								{@const end = exam.end_time ? new Date(exam.end_time).getTime() : Infinity}
+								{@const isPastEnd = currentTime > end}
+								{@const isAllowed = (!exam.start_time || currentTime >= start - 15 * 60 * 1000) && !isPastEnd}
+								<option value={exam.id} disabled={!isAllowed}>
+									{exam.title} 
+									{!isAllowed && isPastEnd ? '(Sudah berakhir)' : ''}
+									{!isAllowed && !isPastEnd ? '(Belum waktu generate)' : ''}
+								</option>
 							{/each}
 						</select>
 					</div>
