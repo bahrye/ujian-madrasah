@@ -98,10 +98,10 @@
 				</div>
 				<div>
 					<label for="e-class_id" class="block text-sm font-medium text-slate-700 mb-1">Kelas</label>
-					<select id="e-class_id" name="class_id" class="input" value={editingUser.class_id}>
+					<select id="e-class_id" name="class_id" class="input">
 						<option value="">Pilih Kelas (Opsional)</option>
 						{#each data.classes as cls (cls.id)}
-							<option value={cls.id}>{cls.name}</option>
+							<option value={cls.id} selected={cls.id == editingUser.class_id}>{cls.name}</option>
 						{/each}
 					</select>
 				</div>

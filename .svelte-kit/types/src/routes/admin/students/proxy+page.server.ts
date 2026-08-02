@@ -10,7 +10,7 @@ export const load = async ({ locals, url, platform }: Parameters<PageServerLoad>
 	const classFilter = url.searchParams.get('class') || '';
 
 	let query = `
-		SELECT u.id, u.username, u.name, u.is_active, u.created_at, c.name as class_name 
+		SELECT u.id, u.username, u.name, u.is_active, u.created_at, u.class_id, c.name as class_name 
 		FROM users u 
 		LEFT JOIN classes c ON u.class_id = c.id 
 		WHERE u.school_id = ? AND u.role = 'siswa'

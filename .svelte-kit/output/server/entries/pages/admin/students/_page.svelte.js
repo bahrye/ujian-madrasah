@@ -47,30 +47,19 @@ function _page($$renderer, $$props) {
     $$renderer2.push(`<!--]--> `);
     if (editingUser) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 animate-fade-in mb-6"><h2 class="text-xl font-bold text-slate-800 mb-4">Edit Siswa</h2> <form method="POST" action="?/edit" class="space-y-4 max-w-lg"><input type="hidden" name="id"${attr("value", editingUser.id)}/> <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label for="e-name" class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label> <input type="text" id="e-name" name="name" class="input" required=""${attr("value", editingUser.name)}/></div> <div><label for="e-nisn" class="block text-sm font-medium text-slate-700 mb-1">NISN <span class="text-red-500">*</span></label> <input type="text" id="e-nisn" name="nisn" class="input" required=""${attr("value", editingUser.username)}/> <p class="text-xs text-slate-500 mt-1">Mengubah NISN akan mereset Password.</p></div></div> <div><label for="e-class_id" class="block text-sm font-medium text-slate-700 mb-1">Kelas</label> `);
-      $$renderer2.select(
-        {
-          id: "e-class_id",
-          name: "class_id",
-          class: "input",
-          value: editingUser.class_id
-        },
-        ($$renderer3) => {
-          $$renderer3.option({ value: "" }, ($$renderer4) => {
-            $$renderer4.push(`Pilih Kelas (Opsional)`);
-          });
-          $$renderer3.push(`<!--[-->`);
-          const each_array_1 = ensure_array_like(data.classes);
-          for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
-            let cls = each_array_1[$$index_1];
-            $$renderer3.option({ value: cls.id }, ($$renderer4) => {
-              $$renderer4.push(`${escape_html(cls.name)}`);
-            });
-          }
-          $$renderer3.push(`<!--]-->`);
-        }
-      );
-      $$renderer2.push(`</div> <div class="flex space-x-3 pt-2"><button type="submit" class="btn btn-primary">Simpan Perubahan</button> <button type="button" class="btn btn-secondary">Batal</button></div></form></div>`);
+      $$renderer2.push(`<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 animate-fade-in mb-6"><h2 class="text-xl font-bold text-slate-800 mb-4">Edit Siswa</h2> <form method="POST" action="?/edit" class="space-y-4 max-w-lg"><input type="hidden" name="id"${attr("value", editingUser.id)}/> <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label for="e-name" class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label> <input type="text" id="e-name" name="name" class="input" required=""${attr("value", editingUser.name)}/></div> <div><label for="e-nisn" class="block text-sm font-medium text-slate-700 mb-1">NISN <span class="text-red-500">*</span></label> <input type="text" id="e-nisn" name="nisn" class="input" required=""${attr("value", editingUser.username)}/> <p class="text-xs text-slate-500 mt-1">Mengubah NISN akan mereset Password.</p></div></div> <div><label for="e-class_id" class="block text-sm font-medium text-slate-700 mb-1">Kelas</label> <select id="e-class_id" name="class_id" class="input">`);
+      $$renderer2.option({ value: "" }, ($$renderer3) => {
+        $$renderer3.push(`Pilih Kelas (Opsional)`);
+      });
+      $$renderer2.push(`<!--[-->`);
+      const each_array_1 = ensure_array_like(data.classes);
+      for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
+        let cls = each_array_1[$$index_1];
+        $$renderer2.option({ value: cls.id, selected: cls.id == editingUser.class_id }, ($$renderer3) => {
+          $$renderer3.push(`${escape_html(cls.name)}`);
+        });
+      }
+      $$renderer2.push(`<!--]--></select></div> <div class="flex space-x-3 pt-2"><button type="submit" class="btn btn-primary">Simpan Perubahan</button> <button type="button" class="btn btn-secondary">Batal</button></div></form></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
