@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS tokens (
     exam_id INTEGER NOT NULL REFERENCES exams(id) ON DELETE CASCADE,
     token_code TEXT NOT NULL UNIQUE,
     is_released INTEGER NOT NULL DEFAULT 0,
+    released_at TEXT,
     created_by INTEGER REFERENCES users(id),
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     expires_at TEXT NOT NULL

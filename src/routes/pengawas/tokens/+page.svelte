@@ -2,18 +2,47 @@
 	import { enhance } from '$app/forms';
 	import { ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
+	import { onMount, onDestroy } from 'svelte';
 
 	export let data;
 	export let form: any;
 
 	let showGenerate = false;
+	let currentTime = Date.now();
+	let intervalId: any;
 
 	$: if (form?.success) toasts.success(form.success);
 	$: if (form?.error) toasts.error(form.error);
 	$: tokens = data.tokens as any[];
 
+	onMount(() => {
+		intervalId = setInterval(() => {
+			currentTime = Date.now();
+		}, 1000);
+	});
+
+	onDestroy(() => {
+		if (intervalId) clearInterval(intervalId);
+	});
+
 	function isExpired(expiresAt: string): boolean {
-		return new Date(expiresAt) < new Date();
+		return new Date(expiresAt).getTime() < currentTime;
+	}
+
+	function getReleaseStatus(token: any, current: number) {
+		if (token.is_released === 1) {
+			if (!token.released_at) return { active: true, label: 'Dirilis' };
+			const releasedAt = new Date(token.released_at + 'Z').getTime();
+			const remaining = (releasedAt + 15 * 60 * 1000) - current;
+			if (remaining > 0) {
+				const m = Math.floor(remaining / 60000);
+				const s = Math.floor((remaining % 60000) / 1000);
+				return { active: true, label: `Dirilis (${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')})`, isAuto: false };
+			} else {
+				return { active: false, label: 'Ditarik Otomatis', isAuto: true };
+			}
+		}
+		return { active: false, label: 'Belum dirilis', isAuto: false };
 	}
 </script>
 
@@ -65,17 +94,20 @@
 	<div class="space-y-3">
 		{#each tokens as token (token.id)}
 			{@const expired = isExpired(token.expires_at)}
+			{@const status = getReleaseStatus(token, currentTime)}
 			<div class="card p-5 {expired ? 'opacity-60' : ''}">
 				<div class="flex flex-col sm:flex-row sm:items-center gap-4">
 					<div class="flex-1 min-w-0">
 						<div class="flex items-center gap-3 mb-2">
-							<span class="text-2xl font-mono font-bold tracking-[0.2em] {token.is_released ? 'text-emerald-600' : 'text-slate-700'}">
+							<span class="text-2xl font-mono font-bold tracking-[0.2em] {status.active ? 'text-emerald-600' : 'text-slate-700'}">
 								{token.token_code}
 							</span>
-							{#if token.is_released}
-								<span class="badge-success">Dirilis</span>
+							{#if status.active}
+								<span class="badge-success">{status.label}</span>
+							{:else if status.isAuto}
+								<span class="badge bg-amber-100 text-amber-700">{status.label}</span>
 							{:else}
-								<span class="badge bg-slate-100 text-slate-500">Belum dirilis</span>
+								<span class="badge bg-slate-100 text-slate-500">{status.label}</span>
 							{/if}
 							{#if expired}
 								<span class="badge-danger">Kedaluwarsa</span>
@@ -88,7 +120,7 @@
 					</div>
 					<div class="flex items-center gap-2 flex-shrink-0">
 						{#if !expired}
-							{#if token.is_released}
+							{#if status.active}
 								<form method="POST" action="?/revoke" use:enhance>
 									<input type="hidden" name="id" value={token.id} />
 									<button type="submit" class="btn-sm btn-warning">Tarik</button>

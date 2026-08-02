@@ -693,6 +693,7 @@
     "isEntry": true,
     "imports": [
       "_index.js",
+      "_index-server.js",
       "_exports.js",
       "_utils2.js",
       "_root.js",

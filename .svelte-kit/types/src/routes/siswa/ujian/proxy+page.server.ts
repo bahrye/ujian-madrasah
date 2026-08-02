@@ -44,6 +44,18 @@ export const actions = {
 			return fail(400, { error: 'Ujian tidak aktif.' });
 		}
 
+		// Validasi apakah token dirilis kurang dari 15 menit yang lalu
+		if (token.released_at) {
+			const releasedAt = new Date(token.released_at + 'Z').getTime();
+			const now = new Date().getTime();
+			if (now - releasedAt > 15 * 60 * 1000) {
+				return fail(400, { error: 'Token sudah ditarik otomatis (melewati batas 15 menit).' });
+			}
+		} else {
+			// Fail-safe if released_at is somehow null but is_released is 1
+			return fail(400, { error: 'Status rilis token tidak valid.' });
+		}
+
 		if (new Date(token.expires_at) < new Date()) {
 			return fail(400, { error: 'Token sudah kedaluwarsa.' });
 		}

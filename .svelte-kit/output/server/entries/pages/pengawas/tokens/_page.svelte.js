@@ -1,4 +1,5 @@
 import { h as head, i as attr, c as ensure_array_like, d as attr_class, e as escape_html, b as bind_props } from "../../../../chunks/index.js";
+import { o as onDestroy } from "../../../../chunks/index-server.js";
 import "@sveltejs/kit/internal";
 import "../../../../chunks/exports.js";
 import "../../../../chunks/utils2.js";
@@ -12,8 +13,30 @@ function _page($$renderer, $$props) {
     let tokens;
     let data = $$props["data"];
     let form = $$props["form"];
+    let currentTime = Date.now();
+    onDestroy(() => {
+    });
     function isExpired(expiresAt) {
-      return new Date(expiresAt) < /* @__PURE__ */ new Date();
+      return new Date(expiresAt).getTime() < currentTime;
+    }
+    function getReleaseStatus(token, current) {
+      if (token.is_released === 1) {
+        if (!token.released_at) return { active: true, label: "Dirilis" };
+        const releasedAt = (/* @__PURE__ */ new Date(token.released_at + "Z")).getTime();
+        const remaining = releasedAt + 15 * 60 * 1e3 - current;
+        if (remaining > 0) {
+          const m = Math.floor(remaining / 6e4);
+          const s = Math.floor(remaining % 6e4 / 1e3);
+          return {
+            active: true,
+            label: `Dirilis (${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")})`,
+            isAuto: false
+          };
+        } else {
+          return { active: false, label: "Ditarik Otomatis", isAuto: true };
+        }
+      }
+      return { active: false, label: "Belum dirilis", isAuto: false };
     }
     if (form?.success) toasts.success(form.success);
     if (form?.error) toasts.error(form.error);
@@ -34,13 +57,17 @@ function _page($$renderer, $$props) {
       for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
         let token = each_array_1[$$index_1];
         const expired = isExpired(token.expires_at);
-        $$renderer2.push(`<div${attr_class(`card p-5 ${expired ? "opacity-60" : ""}`)}><div class="flex flex-col sm:flex-row sm:items-center gap-4"><div class="flex-1 min-w-0"><div class="flex items-center gap-3 mb-2"><span${attr_class(`text-2xl font-mono font-bold tracking-[0.2em] ${token.is_released ? "text-emerald-600" : "text-slate-700"}`)}>${escape_html(token.token_code)}</span> `);
-        if (token.is_released) {
+        const status = getReleaseStatus(token, currentTime);
+        $$renderer2.push(`<div${attr_class(`card p-5 ${expired ? "opacity-60" : ""}`)}><div class="flex flex-col sm:flex-row sm:items-center gap-4"><div class="flex-1 min-w-0"><div class="flex items-center gap-3 mb-2"><span${attr_class(`text-2xl font-mono font-bold tracking-[0.2em] ${status.active ? "text-emerald-600" : "text-slate-700"}`)}>${escape_html(token.token_code)}</span> `);
+        if (status.active) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<span class="badge-success">Dirilis</span>`);
+          $$renderer2.push(`<span class="badge-success">${escape_html(status.label)}</span>`);
+        } else if (status.isAuto) {
+          $$renderer2.push("<!--[1-->");
+          $$renderer2.push(`<span class="badge bg-amber-100 text-amber-700">${escape_html(status.label)}</span>`);
         } else {
           $$renderer2.push("<!--[-1-->");
-          $$renderer2.push(`<span class="badge bg-slate-100 text-slate-500">Belum dirilis</span>`);
+          $$renderer2.push(`<span class="badge bg-slate-100 text-slate-500">${escape_html(status.label)}</span>`);
         }
         $$renderer2.push(`<!--]--> `);
         if (expired) {
@@ -52,7 +79,7 @@ function _page($$renderer, $$props) {
         $$renderer2.push(`<!--]--></div> <p class="text-sm text-slate-600">${escape_html(token.exam_title)}</p> <p class="text-xs text-slate-400 mt-1">Berlaku hingga: ${escape_html(new Date(token.expires_at).toLocaleString("id-ID"))}</p></div> <div class="flex items-center gap-2 flex-shrink-0">`);
         if (!expired) {
           $$renderer2.push("<!--[0-->");
-          if (token.is_released) {
+          if (status.active) {
             $$renderer2.push("<!--[0-->");
             $$renderer2.push(`<form method="POST" action="?/revoke"><input type="hidden" name="id"${attr("value", token.id)}/> <button type="submit" class="btn-sm btn-warning">Tarik</button></form>`);
           } else {

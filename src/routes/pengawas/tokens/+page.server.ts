@@ -51,8 +51,8 @@ export const actions: Actions = {
 		const id = form.get('id')?.toString();
 		if (!id) return fail(400, { error: 'ID tidak valid.' });
 
-		await db.prepare('UPDATE tokens SET is_released = 1 WHERE id = ? AND school_id = ?').bind(id, locals.user!.school_id).run();
-		return { success: 'Token berhasil dirilis ke siswa.' };
+		await db.prepare('UPDATE tokens SET is_released = 1, released_at = datetime("now") WHERE id = ? AND school_id = ?').bind(id, locals.user!.school_id).run();
+		return { success: 'Token berhasil dirilis ke siswa. Token akan ditarik otomatis dalam 15 menit.' };
 	},
 
 	revoke: async ({ request, platform, locals }) => {
