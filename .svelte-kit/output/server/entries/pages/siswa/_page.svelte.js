@@ -8,12 +8,19 @@ function _page($$renderer, $$props) {
     let currentTime = /* @__PURE__ */ new Date();
     onDestroy(() => {
     });
+    function parseDate(dateStr) {
+      if (!dateStr) return /* @__PURE__ */ new Date();
+      if (dateStr.includes(" ")) {
+        return /* @__PURE__ */ new Date(dateStr.replace(" ", "T") + (dateStr.includes("Z") ? "" : "Z"));
+      }
+      return new Date(dateStr);
+    }
     function formatTimeRange(startStr, endStr) {
       if (!startStr) return "--:--";
-      const start = new Date(startStr);
+      const start = parseDate(startStr);
       const startFormatted = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" }).format(start);
       if (!endStr) return `${startFormatted} - Selesai`;
-      const end = new Date(endStr);
+      const end = parseDate(endStr);
       const endFormatted = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" }).format(end);
       if (start.getDate() === end.getDate() && start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
         return `${startFormatted} - ${endFormatted}`;
@@ -23,7 +30,7 @@ function _page($$renderer, $$props) {
       return `${startDateFormatted} ${startFormatted} - ${endDateFormatted} ${endFormatted}`;
     }
     function getCountdownString(startStr, current) {
-      const start = new Date(startStr);
+      const start = parseDate(startStr);
       const diff = start.getTime() - current.getTime();
       if (diff <= 0) return null;
       const hours = Math.floor(diff / (1e3 * 60 * 60));
@@ -32,7 +39,7 @@ function _page($$renderer, $$props) {
       return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
     }
     function getAttemptRemainingTime(endTimeStr, current) {
-      const end = new Date(endTimeStr);
+      const end = parseDate(endTimeStr);
       const diff = end.getTime() - current.getTime();
       if (diff <= 0) return "00:00:00";
       const hours = Math.floor(diff / (1e3 * 60 * 60));
@@ -42,8 +49,8 @@ function _page($$renderer, $$props) {
     }
     activeExams = data.activeExams.filter((exam) => {
       if (!exam.start_time) return true;
-      const start = new Date(exam.start_time);
-      const end = exam.end_time ? new Date(exam.end_time) : null;
+      const start = parseDate(exam.start_time);
+      const end = exam.end_time ? parseDate(exam.end_time) : null;
       const today = /* @__PURE__ */ new Date();
       const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
       const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);

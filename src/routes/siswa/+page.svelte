@@ -5,8 +5,8 @@
 	export let data;
 	$: activeExams = (data.activeExams as any[]).filter(exam => {
 		if (!exam.start_time) return true;
-		const start = new Date(exam.start_time);
-		const end = exam.end_time ? new Date(exam.end_time) : null;
+		const start = parseDate(exam.start_time);
+		const end = exam.end_time ? parseDate(exam.end_time) : null;
 		const today = new Date();
 		
 		const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -57,14 +57,22 @@
 		if (intervalId) clearInterval(intervalId);
 	});
 
+	function parseDate(dateStr: string | null) {
+		if (!dateStr) return new Date();
+		if (dateStr.includes(' ')) {
+			return new Date(dateStr.replace(' ', 'T') + (dateStr.includes('Z') ? '' : 'Z'));
+		}
+		return new Date(dateStr);
+	}
+
 	function formatTimeRange(startStr: string | null, endStr: string | null) {
 		if (!startStr) return '--:--';
-		const start = new Date(startStr);
+		const start = parseDate(startStr);
 		const startFormatted = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(start);
 		
 		if (!endStr) return `${startFormatted} - Selesai`;
 		
-		const end = new Date(endStr);
+		const end = parseDate(endStr);
 		const endFormatted = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(end);
 
 		if (
@@ -90,7 +98,7 @@
 	}
 
 	function getCountdownString(startStr: string, current: Date) {
-		const start = new Date(startStr);
+		const start = parseDate(startStr);
 		const diff = start.getTime() - current.getTime();
 		if (diff <= 0) return null;
 		
@@ -102,7 +110,7 @@
 	}
 
 	function getAttemptRemainingTime(endTimeStr: string, current: Date) {
-		const end = new Date(endTimeStr);
+		const end = parseDate(endTimeStr);
 		const diff = end.getTime() - current.getTime();
 		
 		if (diff <= 0) return '00:00:00';
@@ -115,7 +123,7 @@
 	}
 
 	function isAttemptExpired(endTimeStr: string, current: Date) {
-		const end = new Date(endTimeStr);
+		const end = parseDate(endTimeStr);
 		return current.getTime() >= end.getTime();
 	}
 </script>

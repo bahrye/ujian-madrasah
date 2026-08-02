@@ -3,6 +3,7 @@
 	import { ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS, ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
 	import { onMount, onDestroy } from 'svelte';
+	import { invalidateAll } from '$app/navigation';
 
 	export let data;
 	export let form: any;
@@ -18,6 +19,7 @@
 	onMount(() => {
 		interval = setInterval(() => {
 			currentTime = Date.now();
+			invalidateAll();
 		}, 10000); // 10 seconds is good for monitoring
 	});
 
