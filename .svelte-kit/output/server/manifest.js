@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg"]),
 	mimeTypes: {".svg":"image/svg+xml"},
 	_: {
-		client: {start:"_app/immutable/entry/start.CTEYCbOQ.js",app:"_app/immutable/entry/app.CRXuHgk-.js",imports:["_app/immutable/entry/start.CTEYCbOQ.js","_app/immutable/chunks/CQc2cYcg.js","_app/immutable/chunks/nLbxFLzU.js","_app/immutable/chunks/-TJSwNDh.js","_app/immutable/chunks/BEdG_931.js","_app/immutable/entry/app.CRXuHgk-.js","_app/immutable/chunks/-TJSwNDh.js","_app/immutable/chunks/BEdG_931.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/nLbxFLzU.js","_app/immutable/chunks/DohkKvsF.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:false},
+		client: {start:"_app/immutable/entry/start.zd6S4KoJ.js",app:"_app/immutable/entry/app.ynhkWFWF.js",imports:["_app/immutable/entry/start.zd6S4KoJ.js","_app/immutable/chunks/BnTbq41U.js","_app/immutable/chunks/zX8JxDza.js","_app/immutable/chunks/DDxqhf5o.js","_app/immutable/chunks/CL4nhdES.js","_app/immutable/entry/app.ynhkWFWF.js","_app/immutable/chunks/DDxqhf5o.js","_app/immutable/chunks/CL4nhdES.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/zX8JxDza.js","_app/immutable/chunks/Col4vhdl.js","_app/immutable/chunks/D40_HmD-.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:false},
 		nodes: [
 			__memo(() => import('./nodes/0.js')),
 			__memo(() => import('./nodes/1.js')),
@@ -43,7 +43,8 @@ return {
 			__memo(() => import('./nodes/28.js')),
 			__memo(() => import('./nodes/29.js')),
 			__memo(() => import('./nodes/30.js')),
-			__memo(() => import('./nodes/31.js'))
+			__memo(() => import('./nodes/31.js')),
+			__memo(() => import('./nodes/32.js'))
 		],
 		remotes: {
 			
@@ -211,38 +212,45 @@ return {
 				endpoint: null
 			},
 			{
+				id: "/siswa/jadwal",
+				pattern: /^\/siswa\/jadwal\/?$/,
+				params: [],
+				page: { layouts: [0,5,], errors: [1,,], leaf: 27 },
+				endpoint: null
+			},
+			{
 				id: "/siswa/ujian",
 				pattern: /^\/siswa\/ujian\/?$/,
 				params: [],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 27 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 28 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/ujian/[attemptId]",
 				pattern: /^\/siswa\/ujian\/([^/]+?)\/?$/,
 				params: [{"name":"attemptId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 28 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 29 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin",
 				pattern: /^\/superadmin\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 29 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 30 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin/admins",
 				pattern: /^\/superadmin\/admins\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 30 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 31 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin/schools",
 				pattern: /^\/superadmin\/schools\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 31 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 32 },
 				endpoint: null
 			}
 		],

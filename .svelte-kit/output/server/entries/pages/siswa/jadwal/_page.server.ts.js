@@ -1,0 +1,28 @@
+import { g as getDB } from "../../../../chunks/db.js";
+import { redirect } from "@sveltejs/kit";
+const load = async ({ platform, locals }) => {
+  if (locals.user?.role !== "siswa") throw redirect(302, "/");
+  const db = getDB(platform);
+  const examsQuery = await db.prepare(`
+		SELECT 
+			e.*, 
+			s.name as subject,
+			(
+				SELECT GROUP_CONCAT(u.name, ', ')
+				FROM exam_proctors epr
+				JOIN users u ON epr.proctor_id = u.id
+				WHERE epr.exam_id = e.id
+			) as proctors
+		FROM exams e
+		JOIN exam_participants ep ON e.id = ep.exam_id
+		LEFT JOIN subjects s ON e.subject_id = s.id
+		WHERE ep.student_id = ? AND e.school_id = ?
+		ORDER BY e.start_time ASC, e.created_at DESC
+	`).bind(locals.user.id, locals.user.school_id).all();
+  return {
+    schedules: examsQuery.results || []
+  };
+};
+export {
+  load
+};

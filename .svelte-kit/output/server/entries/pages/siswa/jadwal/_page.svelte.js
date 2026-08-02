@@ -1,0 +1,52 @@
+import { h as head, c as ensure_array_like, i as attr, e as escape_html, b as bind_props } from "../../../../chunks/index.js";
+import { I as ICONS } from "../../../../chunks/constants.js";
+function _page($$renderer, $$props) {
+  $$renderer.component(($$renderer2) => {
+    let data = $$props["data"];
+    function formatScheduleDate(dateString) {
+      if (!dateString) return "Belum ditentukan";
+      const date = new Date(dateString);
+      const today = /* @__PURE__ */ new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      if (date.getDate() === tomorrow.getDate() && date.getMonth() === tomorrow.getMonth() && date.getFullYear() === tomorrow.getFullYear()) {
+        return "Besok";
+      }
+      if (date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear()) {
+        return "Hari ini";
+      }
+      return new Intl.DateTimeFormat("id-ID", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      }).format(date);
+    }
+    function formatTime(dateString) {
+      if (!dateString) return "--:--";
+      return new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" }).format(new Date(dateString));
+    }
+    head("8o0fw0", $$renderer2, ($$renderer3) => {
+      $$renderer3.title(($$renderer4) => {
+        $$renderer4.push(`<title>Jadwal Ujian — Ujian Online Madrasah</title>`);
+      });
+    });
+    $$renderer2.push(`<div class="space-y-6 animate-in"><div><h1 class="text-2xl font-bold text-slate-800">Jadwal Ujian</h1> <p class="text-sm text-slate-500 mt-1">Daftar ujian yang harus Anda ikuti beserta jadwalnya</p></div> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`);
+    const each_array = ensure_array_like(data.schedules);
+    if (each_array.length !== 0) {
+      $$renderer2.push("<!--[-->");
+      for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
+        let exam = each_array[$$index];
+        $$renderer2.push(`<div class="card-hover p-5 bg-white border border-slate-200 flex flex-col justify-between h-full"><div><div class="flex items-start justify-between mb-3"><div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.calendar)}></path></svg></div> <span class="badge-primary text-xs font-semibold px-2.5 py-1 rounded-md">${escape_html(formatScheduleDate(exam.start_time))}</span></div> <h3 class="font-bold text-slate-800 text-lg line-clamp-1 mb-1">${escape_html(exam.title)}</h3> <p class="text-sm text-slate-500 mb-4">${escape_html(exam.subject || "Umum")}</p> <div class="space-y-2 mb-4"><div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> <span>Pukul: ${escape_html(formatTime(exam.start_time))}</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg> <span>Durasi: ${escape_html(exam.duration_minutes)} menit</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.users)}></path></svg> <span class="line-clamp-1"${attr("title", exam.proctors || "Belum ada pengawas")}>Pengawas: ${escape_html(exam.proctors || "-")}</span></div></div></div> <div class="pt-4 border-t border-slate-100 mt-auto"><a href="/siswa/ujian" class="btn btn-primary w-full justify-center">Buka Halaman Ujian</a></div></div>`);
+      }
+    } else {
+      $$renderer2.push("<!--[!-->");
+      $$renderer2.push(`<div class="col-span-full py-12 text-center bg-white rounded-2xl border border-slate-200 border-dashed"><div class="w-16 h-16 mx-auto bg-slate-50 rounded-full flex items-center justify-center text-slate-400 mb-4"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.calendar)}></path></svg></div> <h3 class="text-lg font-bold text-slate-800 mb-1">Belum Ada Jadwal</h3> <p class="text-slate-500 max-w-sm mx-auto">Anda belum terdaftar dalam jadwal ujian manapun saat ini. Silakan hubungi guru atau admin jika ini adalah sebuah kesalahan.</p></div>`);
+    }
+    $$renderer2.push(`<!--]--></div></div>`);
+    bind_props($$props, { data });
+  });
+}
+export {
+  _page as default
+};

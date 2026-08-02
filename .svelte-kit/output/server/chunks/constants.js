@@ -57,6 +57,7 @@ const SIDEBAR_MENUS = {
   ],
   siswa: [
     { label: "Dashboard", href: "/siswa", icon: "dashboard" },
+    { label: "Jadwal Ujian", href: "/siswa/jadwal", icon: "calendar" },
     { label: "Mulai Ujian", href: "/siswa/ujian", icon: "exam" }
   ]
 };
@@ -83,7 +84,8 @@ const ICONS = {
   clock: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
   check: "M5 13l4 4L19 7",
   warning: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z",
-  refresh: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+  refresh: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15",
+  calendar: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
 };
 export {
   ATTEMPT_STATUS_COLORS as A,

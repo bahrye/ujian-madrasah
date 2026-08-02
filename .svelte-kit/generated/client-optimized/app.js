@@ -40,7 +40,8 @@ export const nodes = [
 	() => import('./nodes/28'),
 	() => import('./nodes/29'),
 	() => import('./nodes/30'),
-	() => import('./nodes/31')
+	() => import('./nodes/31'),
+	() => import('./nodes/32')
 ];
 
 export const server_loads = [0,2,3,4,5,6];
@@ -66,11 +67,12 @@ export const dictionary = {
 		"/pengawas/monitor": [~24,[4]],
 		"/pengawas/tokens": [~25,[4]],
 		"/siswa": [~26,[5]],
-		"/siswa/ujian": [~27,[5]],
-		"/siswa/ujian/[attemptId]": [~28,[5]],
-		"/superadmin": [~29,[6]],
-		"/superadmin/admins": [~30,[6]],
-		"/superadmin/schools": [~31,[6]]
+		"/siswa/jadwal": [~27,[5]],
+		"/siswa/ujian": [~28,[5]],
+		"/siswa/ujian/[attemptId]": [~29,[5]],
+		"/superadmin": [~30,[6]],
+		"/superadmin/admins": [~31,[6]],
+		"/superadmin/schools": [~32,[6]]
 	};
 
 export const hooks = {
