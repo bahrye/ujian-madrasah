@@ -3,6 +3,8 @@
 	import { QUESTION_TYPE_LABELS, ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
 
+	import { page } from '$app/stores';
+
 	export let data;
 	export let form: any;
 
@@ -23,7 +25,7 @@
 
 <div class="space-y-6 animate-in">
 	<div class="flex items-center gap-3">
-		<a href="/admin/exams/{exam.id}" class="btn-ghost btn-sm">
+		<a href={$page.url.searchParams.get('from') === 'bank' ? '/admin/bank-soal' : `/admin/exams/${exam.id}`} class="btn-ghost btn-sm">
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 				<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.chevronLeft} />
 			</svg>
@@ -187,8 +189,8 @@
 						</div>
 					{/if}
 				</div>
-				<div class="opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-1">
-					<button type="button" class="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors" title="Edit soal" on:click={() => {
+				<div class="flex flex-col gap-2">
+					<button type="button" class="p-2 rounded-xl text-indigo-600 bg-indigo-50 hover:bg-indigo-500 hover:text-white transition-all shadow-sm" title="Edit soal" on:click={() => {
 						editingQuestion = { ...q };
 						if (q.type === 'pilihan_ganda' && q.options_json) {
 							editOptionCount = JSON.parse(q.options_json).length;
@@ -200,7 +202,7 @@
 					</button>
 					<form method="POST" action="?/delete" use:enhance>
 						<input type="hidden" name="id" value={q.id} />
-						<button type="submit" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="Hapus soal" on:click={(e) => { if(!confirm('Hapus soal ini?')) e.preventDefault(); }}>
+						<button type="submit" class="p-2 rounded-xl text-rose-600 bg-rose-50 hover:bg-rose-500 hover:text-white transition-all shadow-sm" title="Hapus soal" on:click={(e) => { if(!confirm('Hapus soal ini?')) e.preventDefault(); }}>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
 							</svg>

@@ -1,0 +1,1 @@
+import{I as i}from"./Ch6JU-ZP.js";function l(a){return function(...r){var t=r[0];return t.stopPropagation(),a==null?void 0:a.apply(this,r)}}function p(a,r){var o;var t=(o=a.$$events)==null?void 0:o[r.type],e=i(t)?t.slice():t==null?[]:[t];for(var s of e)s.call(this,r)}export{p as b,l as s};

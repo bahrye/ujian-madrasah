@@ -15,10 +15,7 @@
     "name": "AppShell",
     "imports": [
       "_index.js",
-      "_exports.js",
-      "_utils2.js",
-      "_root.js",
-      "_state.svelte.js",
+      "_stores.js",
       "_constants.js",
       "_Toast2.js"
     ]
@@ -94,6 +91,17 @@
       "_index.js",
       "_exports.js",
       "_root.js"
+    ]
+  },
+  "_stores.js": {
+    "file": "chunks/stores.js",
+    "name": "stores",
+    "imports": [
+      "_index.js",
+      "_exports.js",
+      "_utils2.js",
+      "_root.js",
+      "_state.svelte.js"
     ]
   },
   "_toast.js": {
@@ -178,7 +186,7 @@
       "_index.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.7kLi-Z9P.css"
+      "_app/immutable/assets/_layout.Cprtfq7D.css"
     ]
   },
   "src/routes/+page.server.ts": {
@@ -270,7 +278,8 @@
       "_root.js",
       "_state.svelte.js",
       "_constants.js",
-      "_toast.js"
+      "_toast.js",
+      "_stores.js"
     ]
   },
   "src/routes/admin/classes/+page.server.ts": {

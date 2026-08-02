@@ -1,34 +1,7 @@
-import { g as getContext, k as fallback, ag as store_get, c as ensure_array_like, i as attr, d as attr_class, e as escape_html, a as stringify, ah as unsubscribe_stores, b as bind_props, s as slot } from "./index.js";
-import "clsx";
-import "@sveltejs/kit/internal";
-import "./exports.js";
-import "./utils2.js";
-import "@sveltejs/kit/internal/server";
-import "./root.js";
-import "./state.svelte.js";
+import { l as fallback, k as store_get, c as ensure_array_like, i as attr, d as attr_class, e as escape_html, a as stringify, u as unsubscribe_stores, b as bind_props, s as slot } from "./index.js";
+import { p as page } from "./stores.js";
 import { I as ICONS, b as ROLE_LABELS } from "./constants.js";
 import { T as Toast } from "./Toast2.js";
-const getStores = () => {
-  const stores$1 = getContext("__svelte__");
-  return {
-    /** @type {typeof page} */
-    page: {
-      subscribe: stores$1.page.subscribe
-    },
-    /** @type {typeof navigating} */
-    navigating: {
-      subscribe: stores$1.navigating.subscribe
-    },
-    /** @type {typeof updated} */
-    updated: stores$1.updated
-  };
-};
-const page = {
-  subscribe(fn) {
-    const store = getStores().page;
-    return store.subscribe(fn);
-  }
-};
 function Sidebar($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     var $$store_subs;

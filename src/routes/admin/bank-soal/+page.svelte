@@ -13,7 +13,7 @@
 
 	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 		{#each data.exams as exam (exam.id)}
-			<a href="/admin/bank-soal/{exam.id}" class="card-hover p-5 group">
+			<a href="/admin/bank-soal/{exam.id}?from=bank" class="card-hover p-5 group">
 				<div class="flex items-start justify-between mb-2">
 					<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center group-hover:scale-110 transition-transform">
 						<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
