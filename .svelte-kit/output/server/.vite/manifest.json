@@ -790,10 +790,10 @@
       "_db.js"
     ]
   },
-  "src/routes/siswa/ujian/[attemptId]/+page.svelte": {
-    "file": "entries/pages/siswa/ujian/_attemptId_/_page.svelte.js",
-    "name": "entries/pages/siswa/ujian/_attemptId_/_page.svelte",
-    "src": "src/routes/siswa/ujian/[attemptId]/+page.svelte",
+  "src/routes/siswa/ujian/[attemptId]/+page@.svelte": {
+    "file": "entries/pages/siswa/ujian/_attemptId_/_page@.svelte.js",
+    "name": "entries/pages/siswa/ujian/_attemptId_/_page@.svelte",
+    "src": "src/routes/siswa/ujian/[attemptId]/+page@.svelte",
     "isEntry": true,
     "imports": [
       "_index.js",

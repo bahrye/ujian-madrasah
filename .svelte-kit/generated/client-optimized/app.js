@@ -69,7 +69,7 @@ export const dictionary = {
 		"/siswa": [~26,[5]],
 		"/siswa/jadwal": [~27,[5]],
 		"/siswa/ujian": [~28,[5]],
-		"/siswa/ujian/[attemptId]": [~29,[5]],
+		"/siswa/ujian/[attemptId]": [~29],
 		"/superadmin": [~30,[6]],
 		"/superadmin/admins": [~31,[6]],
 		"/superadmin/schools": [~32,[6]]

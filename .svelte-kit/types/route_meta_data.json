@@ -127,7 +127,6 @@
 	],
 	"/siswa/ujian/[attemptId]": [
 		"src/routes/siswa/ujian/[attemptId]/+page.server.ts",
-		"src/routes/siswa/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
 	"/superadmin": [
