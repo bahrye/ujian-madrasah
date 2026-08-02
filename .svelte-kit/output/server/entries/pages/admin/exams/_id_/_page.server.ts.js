@@ -1,5 +1,5 @@
 import { g as getDB } from "../../../../../chunks/db.js";
-import { error } from "@sveltejs/kit";
+import { fail, error } from "@sveltejs/kit";
 const load = async ({ platform, params, locals }) => {
   const db = getDB(platform);
   const examId = params.id;

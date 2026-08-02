@@ -1,7 +1,7 @@
 // @ts-nocheck
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad, Actions } from './$types';
 import { getDB } from '$lib/server/db';
-import { error } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 
 export const load = async ({ platform, params, locals }: Parameters<PageServerLoad>[0]) => {
 	const db = getDB(platform);

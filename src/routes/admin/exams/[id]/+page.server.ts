@@ -1,6 +1,6 @@
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad, Actions } from './$types';
 import { getDB } from '$lib/server/db';
-import { error } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ platform, params, locals }) => {
 	const db = getDB(platform);

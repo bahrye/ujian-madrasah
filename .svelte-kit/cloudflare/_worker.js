@@ -1381,7 +1381,7 @@ function text(body, init2) {
     headers: headers2
   });
 }
-function fail2(status, data) {
+function fail(status, data) {
   return new ActionFailure(status, data);
 }
 var init_exports = __esm({
@@ -7852,7 +7852,7 @@ var init__2 = __esm({
   ".svelte-kit/output/server/nodes/1.js"() {
     index2 = 1;
     component2 = async () => component_cache2 ??= (await Promise.resolve().then(() => (init_error_svelte(), error_svelte_exports))).default;
-    imports2 = ["_app/immutable/nodes/1.BPfLGiuV.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js"];
+    imports2 = ["_app/immutable/nodes/1.DSzUApb9.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js"];
     stylesheets2 = [];
     fonts2 = [];
   }
@@ -8247,7 +8247,7 @@ var init__3 = __esm({
     index3 = 2;
     component3 = async () => component_cache3 ??= (await Promise.resolve().then(() => (init_layout_svelte2(), layout_svelte_exports2))).default;
     server_id2 = "src/routes/admin/+layout.server.ts";
-    imports3 = ["_app/immutable/nodes/2.DQe2NI-R.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/B4vfefJD.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/B7QgMtAt.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/BNZVktfm.js", "_app/immutable/chunks/Dbe9yHDH.js"];
+    imports3 = ["_app/immutable/nodes/2.BC9Tw9oT.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/Bvf2GWbJ.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/C5Ds-Edh.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/BNZVktfm.js", "_app/immutable/chunks/Dbe9yHDH.js"];
     stylesheets3 = [];
     fonts3 = [];
   }
@@ -8318,7 +8318,7 @@ var init__4 = __esm({
     index4 = 3;
     component4 = async () => component_cache4 ??= (await Promise.resolve().then(() => (init_layout_svelte3(), layout_svelte_exports3))).default;
     server_id3 = "src/routes/guru/+layout.server.ts";
-    imports4 = ["_app/immutable/nodes/3.C-FiKyx6.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/B4vfefJD.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/B7QgMtAt.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/BNZVktfm.js", "_app/immutable/chunks/Dbe9yHDH.js"];
+    imports4 = ["_app/immutable/nodes/3.DhLOY8EQ.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/Bvf2GWbJ.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/C5Ds-Edh.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/BNZVktfm.js", "_app/immutable/chunks/Dbe9yHDH.js"];
     stylesheets4 = [];
     fonts4 = [];
   }
@@ -8387,7 +8387,7 @@ var init__5 = __esm({
     index5 = 4;
     component5 = async () => component_cache5 ??= (await Promise.resolve().then(() => (init_layout_svelte4(), layout_svelte_exports4))).default;
     server_id4 = "src/routes/pengawas/+layout.server.ts";
-    imports5 = ["_app/immutable/nodes/4.Dco9rX_q.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/B4vfefJD.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/B7QgMtAt.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/BNZVktfm.js", "_app/immutable/chunks/Dbe9yHDH.js"];
+    imports5 = ["_app/immutable/nodes/4.BqLz1U34.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/Bvf2GWbJ.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/C5Ds-Edh.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/BNZVktfm.js", "_app/immutable/chunks/Dbe9yHDH.js"];
     stylesheets5 = [];
     fonts5 = [];
   }
@@ -8456,7 +8456,7 @@ var init__6 = __esm({
     index6 = 5;
     component6 = async () => component_cache6 ??= (await Promise.resolve().then(() => (init_layout_svelte5(), layout_svelte_exports5))).default;
     server_id5 = "src/routes/siswa/+layout.server.ts";
-    imports6 = ["_app/immutable/nodes/5.DCG1loIZ.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/B4vfefJD.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/B7QgMtAt.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/BNZVktfm.js", "_app/immutable/chunks/Dbe9yHDH.js"];
+    imports6 = ["_app/immutable/nodes/5.BAm4lxDw.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/Bvf2GWbJ.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/C5Ds-Edh.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/BNZVktfm.js", "_app/immutable/chunks/Dbe9yHDH.js"];
     stylesheets6 = [];
     fonts6 = [];
   }
@@ -8532,7 +8532,7 @@ var init__7 = __esm({
     index7 = 6;
     component7 = async () => component_cache7 ??= (await Promise.resolve().then(() => (init_layout_svelte6(), layout_svelte_exports6))).default;
     server_id6 = "src/routes/superadmin/+layout.server.ts";
-    imports7 = ["_app/immutable/nodes/6.BxQx50be.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/B4vfefJD.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/B7QgMtAt.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/BNZVktfm.js", "_app/immutable/chunks/Dbe9yHDH.js"];
+    imports7 = ["_app/immutable/nodes/6.C5bxbf6Z.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/Bvf2GWbJ.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/C5Ds-Edh.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/BNZVktfm.js", "_app/immutable/chunks/Dbe9yHDH.js"];
     stylesheets7 = [];
     fonts7 = [];
   }
@@ -8857,11 +8857,11 @@ var init_page_server_ts3 = __esm({
         const data = await request.formData();
         const targetExamId = data.get("target_exam_id")?.toString();
         const questionIdsStr = data.get("question_ids")?.toString();
-        if (!targetExamId || !questionIdsStr) return fail2(400, { error: "Data tidak lengkap" });
+        if (!targetExamId || !questionIdsStr) return fail(400, { error: "Data tidak lengkap" });
         const questionIds = questionIdsStr.split(",").map((id) => parseInt(id.trim())).filter((id) => !isNaN(id));
-        if (questionIds.length === 0) return fail2(400, { error: "Tidak ada soal yang dipilih" });
+        if (questionIds.length === 0) return fail(400, { error: "Tidak ada soal yang dipilih" });
         const target = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(targetExamId, locals.user.school_id).first();
-        if (!target) return fail2(403, { error: "Ujian tujuan tidak valid" });
+        if (!target) return fail(403, { error: "Ujian tujuan tidak valid" });
         const maxQ = await db.prepare("SELECT MAX(question_number) as m FROM questions WHERE exam_id = ?").bind(targetExamId).first();
         let nextNumber = (maxQ?.m || 0) + 1;
         const placeholders = questionIds.map(() => "?").join(",");
@@ -8872,7 +8872,7 @@ var init_page_server_ts3 = __esm({
 			WHERE q.id IN (${placeholders}) AND e.school_id = ?
 		`).bind(...questionIds, locals.user.school_id).all();
         if (!questionsToCopy.results || questionsToCopy.results.length === 0) {
-          return fail2(400, { error: "Soal tidak ditemukan atau tidak valid" });
+          return fail(400, { error: "Soal tidak ditemukan atau tidak valid" });
         }
         const stmts = questionsToCopy.results.map((q) => {
           return db.prepare(`
@@ -8895,7 +8895,7 @@ var init_page_server_ts3 = __esm({
           await db.batch(stmts);
           return { success: true };
         } catch (e3) {
-          return fail2(500, { error: "Gagal menyalin soal" });
+          return fail(500, { error: "Gagal menyalin soal" });
         }
       }
     };
@@ -8980,7 +8980,7 @@ var init__10 = __esm({
     index10 = 9;
     component10 = async () => component_cache10 ??= (await Promise.resolve().then(() => (init_page_svelte3(), page_svelte_exports3))).default;
     server_id9 = "src/routes/admin/bank-soal/+page.server.ts";
-    imports10 = ["_app/immutable/nodes/9.BJkSJWKD.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/CR9EpkAk.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CcJDwDvi.js"];
+    imports10 = ["_app/immutable/nodes/9.Cd3z0rJ1.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/DqwKuy76.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CcJDwDvi.js"];
     stylesheets10 = [];
     fonts10 = [];
   }
@@ -9014,7 +9014,7 @@ var init_page_server_ts4 = __esm({
         const mediaType = form.get("media_type")?.toString() || null;
         const mediaUrl = form.get("media_url")?.toString().trim() || null;
         const audioMaxPlays = parseInt(form.get("audio_max_plays")?.toString() || "3");
-        if (!type || !questionText) return fail2(400, { error: "Tipe dan teks soal wajib diisi." });
+        if (!type || !questionText) return fail(400, { error: "Tipe dan teks soal wajib diisi." });
         const last = await db.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(params.examId).first();
         const nextNum = (last?.max_num ?? 0) + 1;
         let optionsJson = null;
@@ -9075,7 +9075,7 @@ var init_page_server_ts4 = __esm({
         const points = parseInt(form.get("points")?.toString() || "1");
         const mediaType = form.get("media_type")?.toString() || null;
         const mediaUrl = form.get("media_url")?.toString().trim() || null;
-        if (!id || !type || !questionText) return fail2(400, { error: "ID, tipe, dan teks soal wajib diisi." });
+        if (!id || !type || !questionText) return fail(400, { error: "ID, tipe, dan teks soal wajib diisi." });
         let optionsJson = null;
         let correctAnswerJson = null;
         if (type === "pilihan_ganda") {
@@ -9124,7 +9124,7 @@ var init_page_server_ts4 = __esm({
         const db = getDB(platform);
         const form = await request.formData();
         const id = form.get("id")?.toString();
-        if (!id) return fail2(400, { error: "ID tidak valid." });
+        if (!id) return fail(400, { error: "ID tidak valid." });
         await db.prepare("DELETE FROM questions WHERE id = ?").bind(id).run();
         return { success: "Soal berhasil dihapus." };
       }
@@ -9312,7 +9312,7 @@ var init__11 = __esm({
     index11 = 10;
     component11 = async () => component_cache11 ??= (await Promise.resolve().then(() => (init_page_svelte4(), page_svelte_exports4))).default;
     server_id10 = "src/routes/admin/bank-soal/[examId]/+page.server.ts";
-    imports11 = ["_app/immutable/nodes/10.DWqE9AL6.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/CR9EpkAk.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/23xvJz2n.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/BmzH6QoT.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/HUMXMPGN.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/Dbe9yHDH.js", "_app/immutable/chunks/B7QgMtAt.js"];
+    imports11 = ["_app/immutable/nodes/10.DU32PpLg.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/DqwKuy76.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/23xvJz2n.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/DHTAXR0T.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/HUMXMPGN.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/Dbe9yHDH.js", "_app/immutable/chunks/C5Ds-Edh.js"];
     stylesheets11 = [];
     fonts11 = [];
   }
@@ -9343,13 +9343,13 @@ var init_page_server_ts5 = __esm({
         const name = data.get("name")?.toString().trim();
         const level = data.get("level")?.toString().trim() || null;
         if (!name) {
-          return fail2(400, { error: "Nama kelas wajib diisi" });
+          return fail(400, { error: "Nama kelas wajib diisi" });
         }
         try {
           await db.prepare("INSERT INTO classes (school_id, name, level) VALUES (?, ?, ?)").bind(locals.user.school_id, name, level).run();
           return { success: true };
         } catch (e3) {
-          return fail2(500, { error: "Gagal menambahkan kelas" });
+          return fail(500, { error: "Gagal menambahkan kelas" });
         }
       },
       edit: async ({ request, locals, platform }) => {
@@ -9358,24 +9358,24 @@ var init_page_server_ts5 = __esm({
         const id = data.get("id")?.toString();
         const name = data.get("name")?.toString().trim();
         const level = data.get("level")?.toString().trim() || null;
-        if (!id || !name) return fail2(400, { error: "ID dan Nama kelas wajib diisi" });
+        if (!id || !name) return fail(400, { error: "ID dan Nama kelas wajib diisi" });
         try {
           await db.prepare('UPDATE classes SET name = ?, level = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, level, id, locals.user.school_id).run();
           return { success: true };
         } catch (e3) {
-          return fail2(500, { error: "Gagal mengupdate kelas" });
+          return fail(500, { error: "Gagal mengupdate kelas" });
         }
       },
       delete: async ({ request, locals, platform }) => {
         const db = getDB(platform);
         const data = await request.formData();
         const id = data.get("id")?.toString();
-        if (!id) return fail2(400, { error: "ID tidak valid" });
+        if (!id) return fail(400, { error: "ID tidak valid" });
         try {
           await db.prepare("DELETE FROM classes WHERE id = ? AND school_id = ?").bind(id, locals.user.school_id).run();
           return { success: true };
         } catch (e3) {
-          return fail2(500, { error: "Gagal menghapus kelas" });
+          return fail(500, { error: "Gagal menghapus kelas" });
         }
       }
     };
@@ -9487,7 +9487,7 @@ var init__12 = __esm({
     index12 = 11;
     component12 = async () => component_cache12 ??= (await Promise.resolve().then(() => (init_page_svelte5(), page_svelte_exports5))).default;
     server_id11 = "src/routes/admin/classes/+page.server.ts";
-    imports12 = ["_app/immutable/nodes/11.DnQL7M7P.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/CR9EpkAk.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/BmzH6QoT.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/HUMXMPGN.js", "_app/immutable/chunks/Dbe9yHDH.js"];
+    imports12 = ["_app/immutable/nodes/11.D4hAvCOY.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/DqwKuy76.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/DHTAXR0T.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/HUMXMPGN.js", "_app/immutable/chunks/Dbe9yHDH.js"];
     stylesheets12 = [];
     fonts12 = [];
   }
@@ -9530,7 +9530,7 @@ var init_page_server_ts6 = __esm({
         const startTime = form.get("start_time")?.toString() || null;
         const endTime = form.get("end_time")?.toString() || null;
         const shuffleQuestions = parseInt(form.get("shuffle_questions")?.toString() || "0");
-        if (!title) return fail2(400, { error: "Judul ujian wajib diisi." });
+        if (!title) return fail(400, { error: "Judul ujian wajib diisi." });
         await db.prepare(`INSERT INTO exams (school_id, title, description, subject_id, duration_minutes, start_time, end_time, shuffle_questions, created_by)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(locals.user.school_id, title, description, subjectId, durationMinutes, startTime, endTime, shuffleQuestions, locals.user?.id).run();
         return { success: "Ujian berhasil dibuat." };
@@ -9547,7 +9547,7 @@ var init_page_server_ts6 = __esm({
         const endTime = form.get("end_time")?.toString() || null;
         const isActive = form.get("is_active")?.toString() === "1" ? 1 : 0;
         const shuffleQuestions = parseInt(form.get("shuffle_questions")?.toString() || "0");
-        if (!id || !title) return fail2(400, { error: "Data tidak lengkap." });
+        if (!id || !title) return fail(400, { error: "Data tidak lengkap." });
         await db.prepare(`UPDATE exams SET title=?, description=?, subject_id=?, duration_minutes=?,
 			start_time=?, end_time=?, is_active=?, shuffle_questions=?, updated_at=datetime('now') WHERE id=? AND school_id=?`).bind(title, description, subjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, id, locals.user.school_id).run();
         return { success: "Ujian berhasil diperbarui." };
@@ -9556,7 +9556,7 @@ var init_page_server_ts6 = __esm({
         const db = getDB(platform);
         const form = await request.formData();
         const id = form.get("id")?.toString();
-        if (!id) return fail2(400, { error: "ID tidak valid." });
+        if (!id) return fail(400, { error: "ID tidak valid." });
         await db.prepare("DELETE FROM exams WHERE id = ? AND school_id = ?").bind(id, locals.user.school_id).run();
         return { success: "Ujian berhasil dihapus." };
       },
@@ -9564,7 +9564,7 @@ var init_page_server_ts6 = __esm({
         const db = getDB(platform);
         const form = await request.formData();
         const id = form.get("id")?.toString();
-        if (!id) return fail2(400, { error: "ID tidak valid." });
+        if (!id) return fail(400, { error: "ID tidak valid." });
         await db.prepare(`UPDATE exams SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END, updated_at=datetime('now') WHERE id = ? AND school_id = ?`).bind(id, locals.user.school_id).run();
         return { success: "Status ujian berhasil diperbarui." };
       }
@@ -9671,7 +9671,7 @@ var init__13 = __esm({
     index13 = 12;
     component13 = async () => component_cache13 ??= (await Promise.resolve().then(() => (init_page_svelte6(), page_svelte_exports6))).default;
     server_id12 = "src/routes/admin/exams/+page.server.ts";
-    imports13 = ["_app/immutable/nodes/12.CAXONGWX.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/CR9EpkAk.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/23xvJz2n.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/Dbe9yHDH.js"];
+    imports13 = ["_app/immutable/nodes/12.DldPIOXC.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/DqwKuy76.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/23xvJz2n.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/Dbe9yHDH.js"];
     stylesheets13 = [];
     fonts13 = [];
   }
@@ -10054,7 +10054,7 @@ var init__14 = __esm({
     index14 = 13;
     component14 = async () => component_cache14 ??= (await Promise.resolve().then(() => (init_page_svelte7(), page_svelte_exports7))).default;
     server_id13 = "src/routes/admin/exams/[id]/+page.server.ts";
-    imports14 = ["_app/immutable/nodes/13.Cxjcie5W.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/CR9EpkAk.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/23xvJz2n.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/BmzH6QoT.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/HUMXMPGN.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/Dbe9yHDH.js"];
+    imports14 = ["_app/immutable/nodes/13.B_nKziRT.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/DqwKuy76.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/23xvJz2n.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/DHTAXR0T.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/HUMXMPGN.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/Dbe9yHDH.js"];
     stylesheets14 = [];
     fonts14 = [];
   }
@@ -10184,7 +10184,7 @@ var init__15 = __esm({
     index15 = 14;
     component15 = async () => component_cache15 ??= (await Promise.resolve().then(() => (init_page_svelte8(), page_svelte_exports8))).default;
     server_id14 = "src/routes/admin/results/+page.server.ts";
-    imports15 = ["_app/immutable/nodes/14.BdSBC-rE.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/BmzH6QoT.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/CR9EpkAk.js", "_app/immutable/chunks/HUMXMPGN.js"];
+    imports15 = ["_app/immutable/nodes/14.NgoYfPN9.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/DHTAXR0T.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/DqwKuy76.js", "_app/immutable/chunks/HUMXMPGN.js"];
     stylesheets15 = [];
     fonts15 = [];
   }
@@ -10239,18 +10239,18 @@ var init_page_server_ts9 = __esm({
         const nisn = data.get("nisn")?.toString().trim();
         const class_id = data.get("class_id")?.toString() || null;
         if (!name || !nisn) {
-          return fail2(400, { error: "Nama dan NISN wajib diisi" });
+          return fail(400, { error: "Nama dan NISN wajib diisi" });
         }
         try {
           const existing = await db.prepare("SELECT id FROM users WHERE username = ?").bind(nisn).first();
           if (existing) {
-            return fail2(400, { error: "NISN sudah terdaftar" });
+            return fail(400, { error: "NISN sudah terdaftar" });
           }
           const passwordHash = await hashPassword(nisn);
           await db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?, ?)").bind(locals.user.school_id, class_id, nisn, passwordHash, name, "siswa").run();
           return { success: true };
         } catch (e3) {
-          return fail2(500, { error: "Gagal menambahkan siswa" });
+          return fail(500, { error: "Gagal menambahkan siswa" });
         }
       },
       edit: async ({ request, locals, platform }) => {
@@ -10261,30 +10261,30 @@ var init_page_server_ts9 = __esm({
         const nisn = data.get("nisn")?.toString().trim();
         const class_id = data.get("class_id")?.toString() || null;
         if (!id || !name || !nisn) {
-          return fail2(400, { error: "ID, Nama dan NISN wajib diisi" });
+          return fail(400, { error: "ID, Nama dan NISN wajib diisi" });
         }
         try {
           const existing = await db.prepare("SELECT id FROM users WHERE username = ? AND id != ?").bind(nisn, id).first();
           if (existing) {
-            return fail2(400, { error: "NISN sudah digunakan siswa lain" });
+            return fail(400, { error: "NISN sudah digunakan siswa lain" });
           }
           const passwordHash = await hashPassword(nisn);
           await db.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, class_id = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, nisn, passwordHash, class_id, id, locals.user.school_id).run();
           return { success: true };
         } catch (e3) {
-          return fail2(500, { error: "Gagal mengupdate siswa" });
+          return fail(500, { error: "Gagal mengupdate siswa" });
         }
       },
       delete: async ({ request, locals, platform }) => {
         const db = getDB(platform);
         const data = await request.formData();
         const id = data.get("id")?.toString();
-        if (!id) return fail2(400, { error: "ID tidak valid" });
+        if (!id) return fail(400, { error: "ID tidak valid" });
         try {
           await db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(id, locals.user.school_id).run();
           return { success: true };
         } catch (e3) {
-          return fail2(500, { error: "Gagal menghapus siswa" });
+          return fail(500, { error: "Gagal menghapus siswa" });
         }
       },
       toggleStatus: async ({ request, platform, locals }) => {
@@ -10292,13 +10292,13 @@ var init_page_server_ts9 = __esm({
         const data = await request.formData();
         const id = data.get("id")?.toString();
         const currentStatus = data.get("is_active")?.toString();
-        if (!id || !currentStatus) return fail2(400, { error: "Data tidak valid" });
+        if (!id || !currentStatus) return fail(400, { error: "Data tidak valid" });
         const newStatus = currentStatus === "1" ? 0 : 1;
         try {
           await db.prepare('UPDATE users SET is_active = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ? AND role = "siswa"').bind(newStatus, id, locals.user.school_id).run();
           return { success: true };
         } catch (e3) {
-          return fail2(500, { error: "Gagal merubah status" });
+          return fail(500, { error: "Gagal merubah status" });
         }
       }
     };
@@ -10466,7 +10466,7 @@ var init__16 = __esm({
     index16 = 15;
     component16 = async () => component_cache16 ??= (await Promise.resolve().then(() => (init_page_svelte9(), page_svelte_exports9))).default;
     server_id15 = "src/routes/admin/students/+page.server.ts";
-    imports16 = ["_app/immutable/nodes/15.wkpP9RIJ.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/CR9EpkAk.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/BmzH6QoT.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/HUMXMPGN.js", "_app/immutable/chunks/Dbe9yHDH.js"];
+    imports16 = ["_app/immutable/nodes/15.Cn7VbnEO.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/DqwKuy76.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/DHTAXR0T.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/HUMXMPGN.js", "_app/immutable/chunks/Dbe9yHDH.js"];
     stylesheets16 = [];
     fonts16 = [];
   }
@@ -10497,13 +10497,13 @@ var init_page_server_ts10 = __esm({
         const name = data.get("name")?.toString().trim();
         const code = data.get("code")?.toString().trim() || null;
         if (!name) {
-          return fail2(400, { error: "Nama mata pelajaran wajib diisi" });
+          return fail(400, { error: "Nama mata pelajaran wajib diisi" });
         }
         try {
           await db.prepare("INSERT INTO subjects (school_id, name, code) VALUES (?, ?, ?)").bind(locals.user.school_id, name, code).run();
           return { success: true };
         } catch (e3) {
-          return fail2(500, { error: "Gagal menambahkan mata pelajaran" });
+          return fail(500, { error: "Gagal menambahkan mata pelajaran" });
         }
       },
       edit: async ({ request, locals, platform }) => {
@@ -10512,24 +10512,24 @@ var init_page_server_ts10 = __esm({
         const id = data.get("id")?.toString();
         const name = data.get("name")?.toString().trim();
         const code = data.get("code")?.toString().trim() || null;
-        if (!id || !name) return fail2(400, { error: "ID dan Nama wajib diisi" });
+        if (!id || !name) return fail(400, { error: "ID dan Nama wajib diisi" });
         try {
           await db.prepare('UPDATE subjects SET name = ?, code = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, code, id, locals.user.school_id).run();
           return { success: true };
         } catch (e3) {
-          return fail2(500, { error: "Gagal mengupdate mata pelajaran" });
+          return fail(500, { error: "Gagal mengupdate mata pelajaran" });
         }
       },
       delete: async ({ request, locals, platform }) => {
         const db = getDB(platform);
         const data = await request.formData();
         const id = data.get("id")?.toString();
-        if (!id) return fail2(400, { error: "ID tidak valid" });
+        if (!id) return fail(400, { error: "ID tidak valid" });
         try {
           await db.prepare("DELETE FROM subjects WHERE id = ? AND school_id = ?").bind(id, locals.user.school_id).run();
           return { success: true };
         } catch (e3) {
-          return fail2(500, { error: "Gagal menghapus mata pelajaran" });
+          return fail(500, { error: "Gagal menghapus mata pelajaran" });
         }
       }
     };
@@ -10641,7 +10641,7 @@ var init__17 = __esm({
     index17 = 16;
     component17 = async () => component_cache17 ??= (await Promise.resolve().then(() => (init_page_svelte10(), page_svelte_exports10))).default;
     server_id16 = "src/routes/admin/subjects/+page.server.ts";
-    imports17 = ["_app/immutable/nodes/16.CQJWiX9S.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/CR9EpkAk.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/BmzH6QoT.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/HUMXMPGN.js", "_app/immutable/chunks/Dbe9yHDH.js"];
+    imports17 = ["_app/immutable/nodes/16.BqKDLOBd.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/DqwKuy76.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/DHTAXR0T.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/HUMXMPGN.js", "_app/immutable/chunks/Dbe9yHDH.js"];
     stylesheets17 = [];
     fonts17 = [];
   }
@@ -10687,14 +10687,14 @@ var init_page_server_ts11 = __esm({
         const name = form.get("name")?.toString().trim();
         const role = form.get("role")?.toString();
         if (!username || !password || !name || !role) {
-          return fail2(400, { error: "Semua field wajib diisi." });
+          return fail(400, { error: "Semua field wajib diisi." });
         }
         if (!["admin", "guru", "pengawas", "siswa"].includes(role)) {
-          return fail2(400, { error: "Role tidak valid." });
+          return fail(400, { error: "Role tidak valid." });
         }
         const existing = await db.prepare("SELECT id FROM users WHERE username = ?").bind(username).first();
         if (existing) {
-          return fail2(400, { error: "Username sudah digunakan." });
+          return fail(400, { error: "Username sudah digunakan." });
         }
         const passwordHash = await hashPassword(password);
         await db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(schoolId, username, passwordHash, name, role).run();
@@ -10710,7 +10710,7 @@ var init_page_server_ts11 = __esm({
         const password = form.get("password")?.toString();
         const isActive = form.get("is_active")?.toString();
         if (!id || !name || !role) {
-          return fail2(400, { error: "Data tidak lengkap." });
+          return fail(400, { error: "Data tidak lengkap." });
         }
         if (password) {
           const passwordHash = await hashPassword(password);
@@ -10725,7 +10725,7 @@ var init_page_server_ts11 = __esm({
         const form = await request.formData();
         const id = form.get("id")?.toString();
         const schoolId = locals.user.school_id;
-        if (!id) return fail2(400, { error: "ID tidak valid." });
+        if (!id) return fail(400, { error: "ID tidak valid." });
         await db.prepare("DELETE FROM users WHERE id = ? AND school_id = ?").bind(id, schoolId).run();
         return { success: "Pengguna berhasil dihapus." };
       }
@@ -10833,7 +10833,7 @@ var init__18 = __esm({
     index18 = 17;
     component18 = async () => component_cache18 ??= (await Promise.resolve().then(() => (init_page_svelte11(), page_svelte_exports11))).default;
     server_id17 = "src/routes/admin/users/+page.server.ts";
-    imports18 = ["_app/immutable/nodes/17.D8rn-dt3.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/CR9EpkAk.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/23xvJz2n.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/Dbe9yHDH.js"];
+    imports18 = ["_app/immutable/nodes/17.sMPakCrs.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/DqwKuy76.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/23xvJz2n.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/Dbe9yHDH.js"];
     stylesheets18 = [];
     fonts18 = [];
   }
@@ -10992,15 +10992,15 @@ var init_page_server_ts13 = __esm({
         const data = await request.formData();
         const targetExamId = data.get("target_exam_id")?.toString();
         const questionIdsStr = data.get("question_ids")?.toString();
-        if (!targetExamId || !questionIdsStr) return fail2(400, { error: "Data tidak lengkap" });
+        if (!targetExamId || !questionIdsStr) return fail(400, { error: "Data tidak lengkap" });
         const questionIds = questionIdsStr.split(",").map((id) => parseInt(id.trim())).filter((id) => !isNaN(id));
-        if (questionIds.length === 0) return fail2(400, { error: "Tidak ada soal yang dipilih" });
+        if (questionIds.length === 0) return fail(400, { error: "Tidak ada soal yang dipilih" });
         const target = await db.prepare(`
 			SELECT id FROM exams 
 			WHERE id = ? AND school_id = ? 
 			AND (created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = exams.id AND et.teacher_id = ?))
 		`).bind(targetExamId, locals.user.school_id, locals.user.id, locals.user.id).first();
-        if (!target) return fail2(403, { error: "Ujian tujuan tidak valid atau tidak memiliki akses" });
+        if (!target) return fail(403, { error: "Ujian tujuan tidak valid atau tidak memiliki akses" });
         const maxQ = await db.prepare("SELECT MAX(question_number) as m FROM questions WHERE exam_id = ?").bind(targetExamId).first();
         let nextNumber = (maxQ?.m || 0) + 1;
         const placeholders = questionIds.map(() => "?").join(",");
@@ -11011,7 +11011,7 @@ var init_page_server_ts13 = __esm({
 			WHERE q.id IN (${placeholders}) AND e.school_id = ?
 		`).bind(...questionIds, locals.user.school_id).all();
         if (!questionsToCopy.results || questionsToCopy.results.length === 0) {
-          return fail2(400, { error: "Soal tidak ditemukan atau tidak valid" });
+          return fail(400, { error: "Soal tidak ditemukan atau tidak valid" });
         }
         const stmts = questionsToCopy.results.map((q) => {
           return db.prepare(`
@@ -11034,7 +11034,7 @@ var init_page_server_ts13 = __esm({
           await db.batch(stmts);
           return { success: true };
         } catch (e3) {
-          return fail2(500, { error: "Gagal menyalin soal" });
+          return fail(500, { error: "Gagal menyalin soal" });
         }
       }
     };
@@ -11119,7 +11119,7 @@ var init__20 = __esm({
     index20 = 19;
     component20 = async () => component_cache20 ??= (await Promise.resolve().then(() => (init_page_svelte13(), page_svelte_exports13))).default;
     server_id19 = "src/routes/guru/bank-soal/+page.server.ts";
-    imports20 = ["_app/immutable/nodes/19.C2ZEqCAc.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/CR9EpkAk.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CcJDwDvi.js"];
+    imports20 = ["_app/immutable/nodes/19.BRxH8k0T.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/DqwKuy76.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CcJDwDvi.js"];
     stylesheets20 = [];
     fonts20 = [];
   }
@@ -11153,7 +11153,7 @@ var init_page_server_ts14 = __esm({
         const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ?").bind(params.examId).first();
         const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(params.examId, locals.user.id).first();
         if (!exam || exam.created_by !== locals.user.id && !isTeacher) {
-          return fail2(403, { error: "Anda tidak memiliki akses ke ujian ini." });
+          return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         }
         const form = await request.formData();
         const type = form.get("type")?.toString();
@@ -11162,7 +11162,7 @@ var init_page_server_ts14 = __esm({
         const mediaType = form.get("media_type")?.toString() || null;
         const mediaUrl = form.get("media_url")?.toString().trim() || null;
         const audioMaxPlays = parseInt(form.get("audio_max_plays")?.toString() || "3");
-        if (!type || !questionText) return fail2(400, { error: "Tipe dan teks soal wajib diisi." });
+        if (!type || !questionText) return fail(400, { error: "Tipe dan teks soal wajib diisi." });
         const last = await db.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(params.examId).first();
         const nextNum = (last?.max_num ?? 0) + 1;
         let optionsJson = null;
@@ -11219,7 +11219,7 @@ var init_page_server_ts14 = __esm({
         const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ?").bind(params.examId).first();
         const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(params.examId, locals.user.id).first();
         if (!exam || exam.created_by !== locals.user.id && !isTeacher) {
-          return fail2(403, { error: "Anda tidak memiliki akses ke ujian ini." });
+          return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         }
         const form = await request.formData();
         const id = form.get("id")?.toString();
@@ -11228,7 +11228,7 @@ var init_page_server_ts14 = __esm({
         const points = parseInt(form.get("points")?.toString() || "1");
         const mediaType = form.get("media_type")?.toString() || null;
         const mediaUrl = form.get("media_url")?.toString().trim() || null;
-        if (!id || !type || !questionText) return fail2(400, { error: "ID, tipe, dan teks soal wajib diisi." });
+        if (!id || !type || !questionText) return fail(400, { error: "ID, tipe, dan teks soal wajib diisi." });
         let optionsJson = null;
         let correctAnswerJson = null;
         if (type === "pilihan_ganda") {
@@ -11278,11 +11278,11 @@ var init_page_server_ts14 = __esm({
         const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ?").bind(params.examId).first();
         const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(params.examId, locals.user.id).first();
         if (!exam || exam.created_by !== locals.user.id && !isTeacher) {
-          return fail2(403, { error: "Anda tidak memiliki akses ke ujian ini." });
+          return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         }
         const form = await request.formData();
         const id = form.get("id")?.toString();
-        if (!id) return fail2(400, { error: "ID tidak valid." });
+        if (!id) return fail(400, { error: "ID tidak valid." });
         await db.prepare("DELETE FROM questions WHERE id = ?").bind(id).run();
         return { success: "Soal berhasil dihapus." };
       }
@@ -11431,7 +11431,7 @@ var init__21 = __esm({
     index21 = 20;
     component21 = async () => component_cache21 ??= (await Promise.resolve().then(() => (init_page_svelte14(), page_svelte_exports14))).default;
     server_id20 = "src/routes/guru/bank-soal/[examId]/+page.server.ts";
-    imports21 = ["_app/immutable/nodes/20.DjowMzl2.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/CR9EpkAk.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/23xvJz2n.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/BmzH6QoT.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/HUMXMPGN.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/Dbe9yHDH.js"];
+    imports21 = ["_app/immutable/nodes/20.CPAJ1A8n.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/DqwKuy76.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/23xvJz2n.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/DHTAXR0T.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/HUMXMPGN.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/Dbe9yHDH.js"];
     stylesheets21 = [];
     fonts21 = [];
   }
@@ -11502,8 +11502,8 @@ var init_page_server_ts15 = __esm({
         const answerId = form.get("answer_id")?.toString();
         const scoreStr = form.get("score_given")?.toString();
         const maxPoints = parseInt(form.get("max_points")?.toString() || "1");
-        if (!answerId) return fail2(400, { error: "ID jawaban tidak valid." });
-        if (!scoreStr || scoreStr.trim() === "") return fail2(400, { error: "Nilai tidak boleh kosong." });
+        if (!answerId) return fail(400, { error: "ID jawaban tidak valid." });
+        if (!scoreStr || scoreStr.trim() === "") return fail(400, { error: "Nilai tidak boleh kosong." });
         const scoreGiven = parseFloat(scoreStr);
         const isCorrect = scoreGiven >= maxPoints ? 1 : scoreGiven > 0 ? 0 : 0;
         await db.prepare("UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?").bind(scoreGiven, isCorrect, answerId).run();
@@ -11644,7 +11644,7 @@ var init__22 = __esm({
     index22 = 21;
     component22 = async () => component_cache22 ??= (await Promise.resolve().then(() => (init_page_svelte15(), page_svelte_exports15))).default;
     server_id21 = "src/routes/guru/penilaian/+page.server.ts";
-    imports22 = ["_app/immutable/nodes/21.CuZvFXjz.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/CR9EpkAk.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/Dbe9yHDH.js"];
+    imports22 = ["_app/immutable/nodes/21.Yd2LDITW.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/DqwKuy76.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/Dbe9yHDH.js"];
     stylesheets22 = [];
     fonts22 = [];
   }
@@ -11673,17 +11673,17 @@ var init_page_server_ts16 = __esm({
         const username = formData.get("username")?.toString().trim();
         const password = formData.get("password")?.toString();
         if (!username || !password) {
-          return fail2(400, { error: "Username dan kata sandi wajib diisi." });
+          return fail(400, { error: "Username dan kata sandi wajib diisi." });
         }
         try {
           const db = getDB(platform);
           const user = await db.prepare("SELECT * FROM users WHERE username = ? AND is_active = 1").bind(username).first();
           if (!user) {
-            return fail2(401, { error: "Username atau kata sandi salah." });
+            return fail(401, { error: "Username atau kata sandi salah." });
           }
           const valid = await verifyPassword(password, user.password_hash);
           if (!valid) {
-            return fail2(401, { error: "Username atau kata sandi salah." });
+            return fail(401, { error: "Username atau kata sandi salah." });
           }
           const token = await createToken({
             id: user.id,
@@ -11706,7 +11706,7 @@ var init_page_server_ts16 = __esm({
             throw e3;
           }
           console.error("Login error:", e3);
-          return fail2(500, { error: "Terjadi kesalahan server. Silakan coba lagi." });
+          return fail(500, { error: "Terjadi kesalahan server. Silakan coba lagi." });
         }
       }
     };
@@ -11775,7 +11775,7 @@ var init__23 = __esm({
     index23 = 22;
     component23 = async () => component_cache23 ??= (await Promise.resolve().then(() => (init_page_svelte16(), page_svelte_exports16))).default;
     server_id22 = "src/routes/login/+page.server.ts";
-    imports23 = ["_app/immutable/nodes/22.DntTOv7L.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/CR9EpkAk.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/BNZVktfm.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/Dbe9yHDH.js"];
+    imports23 = ["_app/immutable/nodes/22.FLoq25QC.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/DqwKuy76.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/BNZVktfm.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/Dbe9yHDH.js"];
     stylesheets23 = [];
     fonts23 = [];
   }
@@ -12066,7 +12066,7 @@ var init_page_server_ts18 = __esm({
         const db = getDB(platform);
         const form = await request.formData();
         const attemptId = form.get("attempt_id")?.toString();
-        if (!attemptId) return fail2(400, { error: "ID tidak valid." });
+        if (!attemptId) return fail(400, { error: "ID tidak valid." });
         await db.batch([
           db.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(attemptId),
           db.prepare("DELETE FROM student_attempts WHERE id = ?").bind(attemptId)
@@ -12291,7 +12291,7 @@ var init__25 = __esm({
     index25 = 24;
     component25 = async () => component_cache25 ??= (await Promise.resolve().then(() => (init_page_svelte18(), page_svelte_exports18))).default;
     server_id24 = "src/routes/pengawas/monitor/+page.server.ts";
-    imports25 = ["_app/immutable/nodes/24.DzpSHBE6.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/CR9EpkAk.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/BB1o4M0R.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/Dbe9yHDH.js"];
+    imports25 = ["_app/immutable/nodes/24.BaSBww0K.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/DqwKuy76.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/BB1o4M0R.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/Dbe9yHDH.js"];
     stylesheets25 = [];
     fonts25 = [];
   }
@@ -12334,9 +12334,9 @@ var init_page_server_ts19 = __esm({
         const form = await request.formData();
         const examId = form.get("exam_id")?.toString();
         const durationHours = parseInt(form.get("duration_hours")?.toString() || "2");
-        if (!examId) return fail2(400, { error: "Pilih ujian terlebih dahulu." });
+        if (!examId) return fail(400, { error: "Pilih ujian terlebih dahulu." });
         const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(examId, locals.user.school_id).first();
-        if (!exam) return fail2(400, { error: "Ujian tidak ditemukan." });
+        if (!exam) return fail(400, { error: "Ujian tidak ditemukan." });
         const now = Date.now();
         const tokenCode = generateTokenCode(6);
         const expiresAt = new Date(now + durationHours * 60 * 60 * 1e3).toISOString();
@@ -12347,7 +12347,7 @@ var init_page_server_ts19 = __esm({
         const db = getDB(platform);
         const form = await request.formData();
         const id = form.get("id")?.toString();
-        if (!id) return fail2(400, { error: "ID tidak valid." });
+        if (!id) return fail(400, { error: "ID tidak valid." });
         await db.prepare('UPDATE tokens SET is_released = 1, released_at = datetime("now") WHERE id = ? AND school_id = ?').bind(id, locals.user.school_id).run();
         return { success: "Token berhasil dirilis ke siswa. Token akan ditarik otomatis dalam 15 menit." };
       },
@@ -12355,7 +12355,7 @@ var init_page_server_ts19 = __esm({
         const db = getDB(platform);
         const form = await request.formData();
         const id = form.get("id")?.toString();
-        if (!id) return fail2(400, { error: "ID tidak valid." });
+        if (!id) return fail(400, { error: "ID tidak valid." });
         await db.prepare("UPDATE tokens SET is_released = 0 WHERE id = ? AND school_id = ?").bind(id, locals.user.school_id).run();
         return { success: "Token berhasil ditarik." };
       },
@@ -12363,17 +12363,17 @@ var init_page_server_ts19 = __esm({
         const db = getDB(platform);
         const form = await request.formData();
         const id = form.get("id")?.toString();
-        if (!id) return fail2(400, { error: "ID tidak valid." });
+        if (!id) return fail(400, { error: "ID tidak valid." });
         try {
           const usage = await db.prepare("SELECT COUNT(*) as count FROM student_attempts WHERE token_id = ?").bind(id).first();
           if (usage && usage.count > 0) {
-            return fail2(400, { error: "Gagal dihapus: Token ini telah digunakan oleh peserta ujian." });
+            return fail(400, { error: "Gagal dihapus: Token ini telah digunakan oleh peserta ujian." });
           }
           await db.prepare("DELETE FROM tokens WHERE id = ? AND school_id = ?").bind(id, locals.user.school_id).run();
           return { success: "Token berhasil dihapus." };
         } catch (err) {
           console.error("Delete token error:", err);
-          return fail2(500, { error: "Terjadi kesalahan sistem saat menghapus token." });
+          return fail(500, { error: "Terjadi kesalahan sistem saat menghapus token." });
         }
       }
     };
@@ -12510,7 +12510,7 @@ var init__26 = __esm({
     index26 = 25;
     component26 = async () => component_cache26 ??= (await Promise.resolve().then(() => (init_page_svelte19(), page_svelte_exports19))).default;
     server_id25 = "src/routes/pengawas/tokens/+page.server.ts";
-    imports26 = ["_app/immutable/nodes/25.CcZujaoC.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/CR9EpkAk.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/Dbe9yHDH.js", "_app/immutable/chunks/B7QgMtAt.js"];
+    imports26 = ["_app/immutable/nodes/25.2ZvDyW8v.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/DqwKuy76.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/Dbe9yHDH.js", "_app/immutable/chunks/C5Ds-Edh.js"];
     stylesheets26 = [];
     fonts26 = [];
   }
@@ -12904,7 +12904,7 @@ var init_page_server_ts22 = __esm({
         const form = await request.formData();
         const tokenCode = form.get("token")?.toString().trim().toUpperCase();
         if (!tokenCode) {
-          return fail2(400, { error: "Token ujian wajib diisi." });
+          return fail(400, { error: "Token ujian wajib diisi." });
         }
         const token = await db.prepare(`
 			SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
@@ -12912,22 +12912,22 @@ var init_page_server_ts22 = __esm({
 			WHERE t.token_code = ? AND t.is_released = 1
 		`).bind(tokenCode).first();
         if (!token) {
-          return fail2(400, { error: "Token tidak valid atau belum dirilis oleh pengawas." });
+          return fail(400, { error: "Token tidak valid atau belum dirilis oleh pengawas." });
         }
         if (!token.is_active) {
-          return fail2(400, { error: "Ujian tidak aktif." });
+          return fail(400, { error: "Ujian tidak aktif." });
         }
         if (token.released_at) {
           const releasedAt = (/* @__PURE__ */ new Date(token.released_at + "Z")).getTime();
           const now = (/* @__PURE__ */ new Date()).getTime();
           if (now - releasedAt > 15 * 60 * 1e3) {
-            return fail2(400, { error: "Token sudah ditarik otomatis (melewati batas 15 menit)." });
+            return fail(400, { error: "Token sudah ditarik otomatis (melewati batas 15 menit)." });
           }
         } else {
-          return fail2(400, { error: "Status rilis token tidak valid." });
+          return fail(400, { error: "Status rilis token tidak valid." });
         }
         if (new Date(token.expires_at) < /* @__PURE__ */ new Date()) {
-          return fail2(400, { error: "Token sudah kedaluwarsa." });
+          return fail(400, { error: "Token sudah kedaluwarsa." });
         }
         const existingAttempt = await db.prepare(`
 			SELECT id, status FROM student_attempts
@@ -12937,7 +12937,7 @@ var init_page_server_ts22 = __esm({
           if (existingAttempt.status === "mengerjakan") {
             throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
           }
-          return fail2(400, { error: "Anda sudah pernah mengerjakan ujian ini." });
+          return fail(400, { error: "Anda sudah pernah mengerjakan ujian ini." });
         }
         const endTime = new Date(Date.now() + token.duration_minutes * 60 * 1e3).toISOString();
         const result = await db.prepare(`
@@ -13019,7 +13019,7 @@ var init__29 = __esm({
     index29 = 28;
     component29 = async () => component_cache29 ??= (await Promise.resolve().then(() => (init_page_svelte22(), page_svelte_exports22))).default;
     server_id28 = "src/routes/siswa/ujian/+page.server.ts";
-    imports29 = ["_app/immutable/nodes/28.DAb7G5Wc.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/CR9EpkAk.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/CcJDwDvi.js"];
+    imports29 = ["_app/immutable/nodes/28.D_bTXY0n.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/DqwKuy76.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/CcJDwDvi.js"];
     stylesheets29 = [];
     fonts29 = [];
   }
@@ -13111,7 +13111,7 @@ var init_page_server_ts23 = __esm({
     actions17 = {
       saveAnswer: async ({ request, platform, params }) => {
         const kv = platform?.env?.EXAM_ANSWERS;
-        if (!kv) return fail2(500, { error: "KV not configured" });
+        if (!kv) return fail(500, { error: "KV not configured" });
         const form = await request.formData();
         const answersStr = form.get("answers")?.toString();
         const doubtsStr = form.get("doubts")?.toString();
@@ -13127,7 +13127,7 @@ var init_page_server_ts23 = __esm({
             };
             await kv.put(`attempt_${params.attemptId}_answers`, JSON.stringify(payload2));
           } catch (e3) {
-            return fail2(400, { error: "Invalid JSON payload" });
+            return fail(400, { error: "Invalid JSON payload" });
           }
         }
         return { saved: true };
@@ -13137,7 +13137,7 @@ var init_page_server_ts23 = __esm({
         const attemptId = params.attemptId;
         const attempt = await db.prepare("SELECT * FROM student_attempts WHERE id = ? AND student_id = ?").bind(attemptId, locals.user.id).first();
         if (!attempt || attempt.status !== "mengerjakan") {
-          return fail2(400, { error: "Sesi ujian tidak valid." });
+          return fail(400, { error: "Sesi ujian tidak valid." });
         }
         let warnings = 0;
         let warningLogs = "[]";
@@ -13523,7 +13523,7 @@ var init__30 = __esm({
     index30 = 29;
     component30 = async () => component_cache30 ??= (await Promise.resolve().then(() => (init_page_svelte23(), page_svelte_exports23))).default;
     server_id29 = "src/routes/siswa/ujian/[attemptId]/+page.server.ts";
-    imports30 = ["_app/immutable/nodes/29.CVCXvVJB.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/CR9EpkAk.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/BB1o4M0R.js", "_app/immutable/chunks/HUMXMPGN.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/BNZVktfm.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/Dbe9yHDH.js"];
+    imports30 = ["_app/immutable/nodes/29.4fLM4980.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/DqwKuy76.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/BB1o4M0R.js", "_app/immutable/chunks/HUMXMPGN.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/j7RNdwiI.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/B9FCRLYK.js", "_app/immutable/chunks/CcJDwDvi.js", "_app/immutable/chunks/BNZVktfm.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/Dbe9yHDH.js"];
     stylesheets30 = [];
     fonts30 = [];
   }
@@ -13670,21 +13670,21 @@ var init_page_server_ts25 = __esm({
         const password = data.get("password")?.toString();
         const name = data.get("name")?.toString().trim();
         if (!school_id || !username || !password || !name) {
-          return fail2(400, { error: "Semua field wajib diisi", school_id, username, name });
+          return fail(400, { error: "Semua field wajib diisi", school_id, username, name });
         }
         if (password.length < 6) {
-          return fail2(400, { error: "Password minimal 6 karakter", school_id, username, name });
+          return fail(400, { error: "Password minimal 6 karakter", school_id, username, name });
         }
         const existingUser = await db.prepare("SELECT id FROM users WHERE username = ?").bind(username).first();
         if (existingUser) {
-          return fail2(400, { error: "Username sudah digunakan", school_id, username, name });
+          return fail(400, { error: "Username sudah digunakan", school_id, username, name });
         }
         try {
           const password_hash = await hashPassword(password);
           await db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(school_id, username, password_hash, name, "admin").run();
           return { success: true };
         } catch (e3) {
-          return fail2(500, { error: "Gagal menambahkan admin", school_id, username, name });
+          return fail(500, { error: "Gagal menambahkan admin", school_id, username, name });
         }
       },
       toggleStatus: async ({ request, platform }) => {
@@ -13692,25 +13692,25 @@ var init_page_server_ts25 = __esm({
         const data = await request.formData();
         const id = data.get("id")?.toString();
         const currentStatus = data.get("is_active")?.toString();
-        if (!id || !currentStatus) return fail2(400, { error: "Data tidak valid" });
+        if (!id || !currentStatus) return fail(400, { error: "Data tidak valid" });
         const newStatus = currentStatus === "1" ? 0 : 1;
         try {
           await db.prepare('UPDATE users SET is_active = ?, updated_at = datetime("now") WHERE id = ? AND role = "admin"').bind(newStatus, id).run();
           return { success: true };
         } catch (e3) {
-          return fail2(500, { error: "Gagal merubah status admin" });
+          return fail(500, { error: "Gagal merubah status admin" });
         }
       },
       delete: async ({ request, platform }) => {
         const db = getDB(platform);
         const data = await request.formData();
         const id = data.get("id")?.toString();
-        if (!id) return fail2(400, { error: "ID tidak valid" });
+        if (!id) return fail(400, { error: "ID tidak valid" });
         try {
           await db.prepare('DELETE FROM users WHERE id = ? AND role = "admin"').bind(id).run();
           return { success: true };
         } catch (e3) {
-          return fail2(500, { error: "Gagal menghapus admin" });
+          return fail(500, { error: "Gagal menghapus admin" });
         }
       }
     };
@@ -13839,7 +13839,7 @@ var init__32 = __esm({
     index32 = 31;
     component32 = async () => component_cache32 ??= (await Promise.resolve().then(() => (init_page_svelte25(), page_svelte_exports25))).default;
     server_id31 = "src/routes/superadmin/admins/+page.server.ts";
-    imports32 = ["_app/immutable/nodes/31.BD_bQgFA.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/CR9EpkAk.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/BmzH6QoT.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/HUMXMPGN.js", "_app/immutable/chunks/Dbe9yHDH.js"];
+    imports32 = ["_app/immutable/nodes/31.DgbIXFND.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/DqwKuy76.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/DHTAXR0T.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/HUMXMPGN.js", "_app/immutable/chunks/Dbe9yHDH.js"];
     stylesheets32 = [];
     fonts32 = [];
   }
@@ -13868,13 +13868,13 @@ var init_page_server_ts26 = __esm({
         const name = data.get("name")?.toString().trim();
         const address = data.get("address")?.toString().trim() || null;
         if (!name) {
-          return fail2(400, { error: "Nama sekolah wajib diisi", name, address });
+          return fail(400, { error: "Nama sekolah wajib diisi", name, address });
         }
         try {
           await db.prepare("INSERT INTO schools (name, address) VALUES (?, ?)").bind(name, address).run();
           return { success: true };
         } catch (e3) {
-          return fail2(500, { error: "Gagal menambahkan sekolah", name, address });
+          return fail(500, { error: "Gagal menambahkan sekolah", name, address });
         }
       },
       toggleStatus: async ({ request, platform }) => {
@@ -13882,13 +13882,13 @@ var init_page_server_ts26 = __esm({
         const data = await request.formData();
         const id = data.get("id")?.toString();
         const currentStatus = data.get("is_active")?.toString();
-        if (!id || !currentStatus) return fail2(400, { error: "Data tidak valid" });
+        if (!id || !currentStatus) return fail(400, { error: "Data tidak valid" });
         const newStatus = currentStatus === "1" ? 0 : 1;
         try {
           await db.prepare('UPDATE schools SET is_active = ?, updated_at = datetime("now") WHERE id = ?').bind(newStatus, id).run();
           return { success: true };
         } catch (e3) {
-          return fail2(500, { error: "Gagal merubah status sekolah" });
+          return fail(500, { error: "Gagal merubah status sekolah" });
         }
       },
       edit: async ({ request, platform }) => {
@@ -13898,25 +13898,25 @@ var init_page_server_ts26 = __esm({
         const name = data.get("name")?.toString().trim();
         const address = data.get("address")?.toString().trim() || null;
         if (!id || !name) {
-          return fail2(400, { error: "ID dan Nama sekolah wajib diisi", name, address });
+          return fail(400, { error: "ID dan Nama sekolah wajib diisi", name, address });
         }
         try {
           await db.prepare('UPDATE schools SET name = ?, address = ?, updated_at = datetime("now") WHERE id = ?').bind(name, address, id).run();
           return { success: true };
         } catch (e3) {
-          return fail2(500, { error: "Gagal mengupdate sekolah", name, address });
+          return fail(500, { error: "Gagal mengupdate sekolah", name, address });
         }
       },
       delete: async ({ request, platform }) => {
         const db = getDB(platform);
         const data = await request.formData();
         const id = data.get("id")?.toString();
-        if (!id) return fail2(400, { error: "ID tidak valid" });
+        if (!id) return fail(400, { error: "ID tidak valid" });
         try {
           await db.prepare("DELETE FROM schools WHERE id = ?").bind(id).run();
           return { success: true };
         } catch (e3) {
-          return fail2(500, { error: "Gagal menghapus sekolah" });
+          return fail(500, { error: "Gagal menghapus sekolah" });
         }
       }
     };
@@ -14046,7 +14046,7 @@ var init__33 = __esm({
     index33 = 32;
     component33 = async () => component_cache33 ??= (await Promise.resolve().then(() => (init_page_svelte26(), page_svelte_exports26))).default;
     server_id32 = "src/routes/superadmin/schools/+page.server.ts";
-    imports33 = ["_app/immutable/nodes/32.CdI6pUzX.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/CR9EpkAk.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/BmzH6QoT.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/HUMXMPGN.js", "_app/immutable/chunks/Dbe9yHDH.js"];
+    imports33 = ["_app/immutable/nodes/32.DFMwpqJB.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/IezoYWdk.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/DngjJS7A.js", "_app/immutable/chunks/BQKkEFI8.js", "_app/immutable/chunks/DqwKuy76.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/HO8GNNiH.js", "_app/immutable/chunks/227Yc9SM.js", "_app/immutable/chunks/DHTAXR0T.js", "_app/immutable/chunks/DbIJ5SVL.js", "_app/immutable/chunks/CyNw4OuR.js", "_app/immutable/chunks/HUMXMPGN.js", "_app/immutable/chunks/Dbe9yHDH.js"];
     stylesheets33 = [];
     fonts33 = [];
   }
@@ -15224,7 +15224,7 @@ var options = {
     app: ({ head: head2, body, assets: assets2, nonce, env }) => '<!DOCTYPE html>\n<html lang="id">\n	<head>\n		<meta charset="utf-8" />\n		<meta name="viewport" content="width=device-width, initial-scale=1.0" />\n		<meta name="description" content="Aplikasi Ujian Online Madrasah \u2014 Platform ujian digital modern untuk madrasah" />\n		<meta name="theme-color" content="#4F46E5" />\n		<link rel="icon" href="' + assets2 + '/favicon.svg" type="image/svg+xml" />\n		<link rel="preconnect" href="https://fonts.googleapis.com" />\n		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />\n		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />\n		<title>Ujian Online Madrasah</title>\n		' + head2 + '\n	</head>\n	<body data-sveltekit-preload-data="hover">\n		<div style="display: contents">' + body + "</div>\n	</body>\n</html>\n",
     error: error2
   },
-  version_hash: "1z125qz"
+  version_hash: "zgnbh0"
 };
 async function get_hooks() {
   let handle2;
@@ -19209,7 +19209,7 @@ var manifest = (() => {
     assets: /* @__PURE__ */ new Set(["favicon.svg"]),
     mimeTypes: { ".svg": "image/svg+xml" },
     _: {
-      client: { start: "_app/immutable/entry/start.Cq0iXOA8.js", app: "_app/immutable/entry/app.CWMzXLoL.js", imports: ["_app/immutable/entry/start.Cq0iXOA8.js", "_app/immutable/chunks/CbmQ1nei.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/entry/app.CWMzXLoL.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/HUMXMPGN.js"], stylesheets: [], fonts: [], uses_env_dynamic_public: false },
+      client: { start: "_app/immutable/entry/start.B8htHZZ1.js", app: "_app/immutable/entry/app.DcC30Wmh.js", imports: ["_app/immutable/entry/start.B8htHZZ1.js", "_app/immutable/chunks/BBemU5uL.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/entry/app.DcC30Wmh.js", "_app/immutable/chunks/4sJjlQhy.js", "_app/immutable/chunks/ORHH_Igp.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/Bz-vfPr8.js", "_app/immutable/chunks/DRBzC1Fe.js", "_app/immutable/chunks/HUMXMPGN.js"], stylesheets: [], fonts: [], uses_env_dynamic_public: false },
       nodes: [
         __memo(() => Promise.resolve().then(() => (init__(), __exports))),
         __memo(() => Promise.resolve().then(() => (init__2(), __exports2))),
