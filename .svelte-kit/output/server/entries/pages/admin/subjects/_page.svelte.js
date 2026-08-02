@@ -5,6 +5,7 @@ import "../../../../chunks/utils2.js";
 import "@sveltejs/kit/internal/server";
 import "../../../../chunks/root.js";
 import "../../../../chunks/state.svelte.js";
+import { C as ConfirmForm } from "../../../../chunks/ConfirmForm.js";
 import { t as toasts } from "../../../../chunks/toast.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
@@ -44,7 +45,27 @@ function _page($$renderer, $$props) {
       $$renderer2.push("<!--[-->");
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
         let subject = each_array[$$index];
-        $$renderer2.push(`<tr class="hover:bg-slate-50 transition-colors"><td class="p-4 text-sm text-slate-400">#${escape_html(subject.id)}</td><td class="p-4 font-medium text-slate-900">${escape_html(subject.code || "-")}</td><td class="p-4 font-medium text-slate-900">${escape_html(subject.name)}</td><td class="p-4 text-right"><div class="flex items-center justify-end space-x-2"><button class="btn-ghost btn-sm">Edit</button> <form method="POST" action="?/delete" class="inline-block"><input type="hidden" name="id"${attr("value", subject.id)}/> <button type="submit" class="btn-ghost btn-sm text-red-600">Hapus</button></form></div></td></tr>`);
+        $$renderer2.push(`<tr class="hover:bg-slate-50 transition-colors"><td class="p-4 text-sm text-slate-400">#${escape_html(subject.id)}</td><td class="p-4 font-medium text-slate-900">${escape_html(subject.code || "-")}</td><td class="p-4 font-medium text-slate-900">${escape_html(subject.name)}</td><td class="p-4 text-right"><div class="flex items-center justify-end space-x-2"><button class="btn-ghost btn-sm">Edit</button> `);
+        ConfirmForm($$renderer2, {
+          action: "?/delete",
+          confirmTitle: "Hapus Mata Pelajaran",
+          confirmMessage: "Hapus mata pelajaran ini?",
+          buttonClass: "btn-ghost btn-sm text-red-600",
+          buttonTitle: "Hapus",
+          $$slots: {
+            inputs: ($$renderer3) => {
+              {
+                $$renderer3.push(`<input type="hidden" name="id"${attr("value", subject.id)}/>`);
+              }
+            },
+            buttonContent: ($$renderer3) => {
+              {
+                $$renderer3.push(`Hapus`);
+              }
+            }
+          }
+        });
+        $$renderer2.push(`<!----></div></td></tr>`);
       }
     } else {
       $$renderer2.push("<!--[!-->");

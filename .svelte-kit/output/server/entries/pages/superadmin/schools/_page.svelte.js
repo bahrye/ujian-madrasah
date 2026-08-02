@@ -5,6 +5,7 @@ import "../../../../chunks/utils2.js";
 import "@sveltejs/kit/internal/server";
 import "../../../../chunks/root.js";
 import "../../../../chunks/state.svelte.js";
+import { C as ConfirmForm } from "../../../../chunks/ConfirmForm.js";
 import { t as toasts } from "../../../../chunks/toast.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
@@ -62,7 +63,27 @@ function _page($$renderer, $$props) {
           $$renderer2.push("<!--[-1-->");
           $$renderer2.push(`<span class="badge badge-danger">Nonaktif</span>`);
         }
-        $$renderer2.push(`<!--]--></td><td class="p-4 text-right"><div class="flex items-center justify-end space-x-2"><button class="btn-ghost btn-sm">Edit</button> <form method="POST" action="?/toggleStatus" class="inline-block"><input type="hidden" name="id"${attr("value", school.id)}/> <input type="hidden" name="is_active"${attr("value", school.is_active)}/> <button type="submit"${attr_class(`btn-ghost btn-sm ${school.is_active ? "text-amber-600" : "text-green-600"}`)}>${escape_html(school.is_active ? "Nonaktifkan" : "Aktifkan")}</button></form> <form method="POST" action="?/delete" class="inline-block"><input type="hidden" name="id"${attr("value", school.id)}/> <button type="submit" class="btn-ghost btn-sm text-red-600">Hapus</button></form></div></td></tr>`);
+        $$renderer2.push(`<!--]--></td><td class="p-4 text-right"><div class="flex items-center justify-end space-x-2"><button class="btn-ghost btn-sm">Edit</button> <form method="POST" action="?/toggleStatus" class="inline-block"><input type="hidden" name="id"${attr("value", school.id)}/> <input type="hidden" name="is_active"${attr("value", school.is_active)}/> <button type="submit"${attr_class(`btn-ghost btn-sm ${school.is_active ? "text-amber-600" : "text-green-600"}`)}>${escape_html(school.is_active ? "Nonaktifkan" : "Aktifkan")}</button></form> `);
+        ConfirmForm($$renderer2, {
+          action: "?/delete",
+          confirmTitle: "Hapus Sekolah",
+          confirmMessage: "Apakah Anda yakin ingin menghapus sekolah ini? Semua data terkait (user, ujian, dll) akan ikut terhapus!",
+          buttonClass: "btn-ghost btn-sm text-red-600",
+          buttonTitle: "Hapus",
+          $$slots: {
+            inputs: ($$renderer3) => {
+              {
+                $$renderer3.push(`<input type="hidden" name="id"${attr("value", school.id)}/>`);
+              }
+            },
+            buttonContent: ($$renderer3) => {
+              {
+                $$renderer3.push(`Hapus`);
+              }
+            }
+          }
+        });
+        $$renderer2.push(`<!----></div></td></tr>`);
       }
     } else {
       $$renderer2.push("<!--[!-->");

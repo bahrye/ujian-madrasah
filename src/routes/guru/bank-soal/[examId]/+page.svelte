@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import ConfirmForm from '$lib/components/ConfirmForm.svelte';
+	import { fade, slide } from 'svelte/transition';
 	import { QUESTION_TYPE_LABELS, ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
 
@@ -198,14 +200,22 @@
 							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.edit} />
 						</svg>
 					</button>
-					<form method="POST" action="?/delete" use:enhance>
-						<input type="hidden" name="id" value={q.id} />
-						<button type="submit" class="p-2 rounded-xl text-rose-600 bg-rose-50 hover:bg-rose-500 hover:text-white transition-all shadow-sm" title="Hapus soal" on:click={(e) => { if(!confirm('Hapus soal ini?')) e.preventDefault(); }}>
+					<ConfirmForm 
+						action="?/delete"
+						confirmTitle="Hapus Soal"
+						confirmMessage="Hapus soal ini?"
+						buttonClass="p-2 rounded-xl text-rose-600 bg-rose-50 hover:bg-rose-500 hover:text-white transition-all shadow-sm flex items-center justify-center"
+						buttonTitle="Hapus soal"
+					>
+						<svelte:fragment slot="inputs">
+							<input type="hidden" name="id" value={q.id} />
+						</svelte:fragment>
+						<svelte:fragment slot="buttonContent">
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
 							</svg>
-						</button>
-					</form>
+						</svelte:fragment>
+					</ConfirmForm>
 				</div>
 			</div>
 		{:else}

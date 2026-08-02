@@ -3276,7 +3276,7 @@ function unsubscribe_stores(store_values) {
 function slot(renderer, $$props, name, slot_props, fallback_fn) {
   var slot_fn = $$props.$$slots?.[name];
   if (slot_fn === true) {
-    slot_fn = $$props["children"];
+    slot_fn = $$props[name === "default" ? "children" : name];
   }
   if (slot_fn !== void 0) {
     slot_fn(renderer, slot_props);

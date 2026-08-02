@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import ConfirmForm from '$lib/components/ConfirmForm.svelte';
 	import type { PageData, ActionData } from './$types';
 	import { toasts } from '$lib/stores/toast';
 
@@ -105,14 +106,20 @@
 										{admin.is_active ? 'Nonaktifkan' : 'Aktifkan'}
 									</button>
 								</form>
-								<form method="POST" action="?/delete" use:enhance class="inline-block" on:submit={(e) => {
-									if(!confirm(`Yakin ingin menghapus admin ${admin.name}?`)) e.preventDefault();
-								}}>
-									<input type="hidden" name="id" value={admin.id} />
-									<button type="submit" class="btn bg-red-50 text-red-600 hover:bg-red-100 py-1 px-3 text-xs">
+								<ConfirmForm 
+									action="?/delete"
+									confirmTitle="Hapus Admin"
+									confirmMessage={`Yakin ingin menghapus admin ${admin.name}?`}
+									buttonClass="btn bg-red-50 text-red-600 hover:bg-red-100 py-1 px-3 text-xs"
+									buttonTitle="Hapus"
+								>
+									<svelte:fragment slot="inputs">
+										<input type="hidden" name="id" value={admin.id} />
+									</svelte:fragment>
+									<svelte:fragment slot="buttonContent">
 										Hapus
-									</button>
-								</form>
+									</svelte:fragment>
+								</ConfirmForm>
 							</td>
 						</tr>
 					{:else}

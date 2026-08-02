@@ -5,6 +5,7 @@ import "../../../../chunks/utils2.js";
 import "@sveltejs/kit/internal/server";
 import "../../../../chunks/root.js";
 import "../../../../chunks/state.svelte.js";
+import { C as ConfirmForm } from "../../../../chunks/ConfirmForm.js";
 import { t as toasts } from "../../../../chunks/toast.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
@@ -100,7 +101,27 @@ function _page($$renderer, $$props) {
           $$renderer2.push("<!--[-1-->");
           $$renderer2.push(`<span class="badge badge-danger">Nonaktif</span>`);
         }
-        $$renderer2.push(`<!--]--></td><td class="p-4 text-sm text-slate-500">${escape_html(new Date(user.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }))}</td><td class="p-4 text-right"><div class="flex items-center justify-end space-x-2"><button class="btn-ghost btn-sm">Edit</button> <form method="POST" action="?/toggleStatus" class="inline-block"><input type="hidden" name="id"${attr("value", user.id)}/> <input type="hidden" name="is_active"${attr("value", user.is_active)}/> <button type="submit"${attr_class(`btn-ghost btn-sm ${user.is_active ? "text-amber-600" : "text-green-600"}`)}>${escape_html(user.is_active ? "Nonaktif" : "Aktif")}</button></form> <form method="POST" action="?/delete" class="inline-block"><input type="hidden" name="id"${attr("value", user.id)}/> <button type="submit" class="btn-ghost btn-sm text-red-600">Hapus</button></form></div></td></tr>`);
+        $$renderer2.push(`<!--]--></td><td class="p-4 text-sm text-slate-500">${escape_html(new Date(user.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }))}</td><td class="p-4 text-right"><div class="flex items-center justify-end space-x-2"><button class="btn-ghost btn-sm">Edit</button> <form method="POST" action="?/toggleStatus" class="inline-block"><input type="hidden" name="id"${attr("value", user.id)}/> <input type="hidden" name="is_active"${attr("value", user.is_active)}/> <button type="submit"${attr_class(`btn-ghost btn-sm ${user.is_active ? "text-amber-600" : "text-green-600"}`)}>${escape_html(user.is_active ? "Nonaktif" : "Aktif")}</button></form> `);
+        ConfirmForm($$renderer2, {
+          action: "?/delete",
+          confirmTitle: "Hapus Siswa",
+          confirmMessage: "Hapus siswa ini? Semua rekam jejak ujiannya akan ikut terhapus permanen!",
+          buttonClass: "btn-ghost btn-sm text-red-600",
+          buttonTitle: "Hapus",
+          $$slots: {
+            inputs: ($$renderer3) => {
+              {
+                $$renderer3.push(`<input type="hidden" name="id"${attr("value", user.id)}/>`);
+              }
+            },
+            buttonContent: ($$renderer3) => {
+              {
+                $$renderer3.push(`Hapus`);
+              }
+            }
+          }
+        });
+        $$renderer2.push(`<!----></div></td></tr>`);
       }
     } else {
       $$renderer2.push("<!--[!-->");

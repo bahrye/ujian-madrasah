@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import ConfirmForm from '$lib/components/ConfirmForm.svelte';
 	import { QUESTION_TYPE_LABELS, ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS, ICONS } from '$lib/utils/constants';
 
 	export let form: { error?: string; success?: string } | null = null;
@@ -116,14 +117,22 @@
 								<td class="font-medium text-slate-800">{teacher.name}</td>
 								<td class="font-mono text-sm text-slate-500">{teacher.username}</td>
 								<td>
-									<form method="POST" action="?/removeTeacher" use:enhance>
-										<input type="hidden" name="exam_teacher_id" value={teacher.exam_teacher_id} />
-										<button type="submit" class="text-rose-500 hover:text-rose-700 p-1" title="Hapus Pengajar" on:click={(e) => { if (!confirm('Hapus pengajar ini?')) e.preventDefault(); }}>
+									<ConfirmForm 
+										action="?/removeTeacher"
+										confirmTitle="Hapus Pengajar"
+										confirmMessage="Hapus pengajar ini?"
+										buttonClass="text-rose-500 hover:text-rose-700 p-1"
+										buttonTitle="Hapus Pengajar"
+									>
+										<svelte:fragment slot="inputs">
+											<input type="hidden" name="exam_teacher_id" value={teacher.exam_teacher_id} />
+										</svelte:fragment>
+										<svelte:fragment slot="buttonContent">
 											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 												<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
 											</svg>
-										</button>
-									</form>
+										</svelte:fragment>
+									</ConfirmForm>
 								</td>
 							</tr>
 						{/each}
@@ -156,14 +165,22 @@
 								<td class="font-medium text-slate-800">{proctor.name}</td>
 								<td class="font-mono text-sm text-slate-500">{proctor.username}</td>
 								<td>
-									<form method="POST" action="?/removeProctor" use:enhance>
-										<input type="hidden" name="exam_proctor_id" value={proctor.exam_proctor_id} />
-										<button type="submit" class="text-rose-500 hover:text-rose-700 p-1" title="Hapus Pengawas" on:click={(e) => { if (!confirm('Hapus pengawas ini?')) e.preventDefault(); }}>
+									<ConfirmForm 
+										action="?/removeProctor"
+										confirmTitle="Hapus Pengawas"
+										confirmMessage="Hapus pengawas ini?"
+										buttonClass="text-rose-500 hover:text-rose-700 p-1"
+										buttonTitle="Hapus Pengawas"
+									>
+										<svelte:fragment slot="inputs">
+											<input type="hidden" name="exam_proctor_id" value={proctor.exam_proctor_id} />
+										</svelte:fragment>
+										<svelte:fragment slot="buttonContent">
 											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 												<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
 											</svg>
-										</button>
-									</form>
+										</svelte:fragment>
+									</ConfirmForm>
 								</td>
 							</tr>
 						{/each}
@@ -221,14 +238,22 @@
 								<td class="font-medium">{p.student_name}</td>
 								<td>{p.class_name || '-'}</td>
 								<td>
-									<form method="POST" action="?/removeParticipant" use:enhance>
-										<input type="hidden" name="participant_id" value={p.participant_id} />
-										<button type="submit" class="text-rose-500 hover:text-rose-700 p-1" title="Hapus dari ujian" on:click={(e) => { if (!confirm('Hapus siswa ini dari ujian?')) e.preventDefault(); }}>
+									<ConfirmForm 
+										action="?/removeParticipant"
+										confirmTitle="Hapus Siswa dari Ujian"
+										confirmMessage="Hapus siswa ini dari ujian?"
+										buttonClass="text-rose-500 hover:text-rose-700 p-1"
+										buttonTitle="Hapus dari ujian"
+									>
+										<svelte:fragment slot="inputs">
+											<input type="hidden" name="participant_id" value={p.participant_id} />
+										</svelte:fragment>
+										<svelte:fragment slot="buttonContent">
 											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 												<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
 											</svg>
-										</button>
-									</form>
+										</svelte:fragment>
+									</ConfirmForm>
 								</td>
 							</tr>
 						{/each}

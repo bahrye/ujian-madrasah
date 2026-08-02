@@ -5,6 +5,7 @@ import "../../../../chunks/utils2.js";
 import "@sveltejs/kit/internal/server";
 import "../../../../chunks/root.js";
 import "../../../../chunks/state.svelte.js";
+import { C as ConfirmForm } from "../../../../chunks/ConfirmForm.js";
 import { t as toasts } from "../../../../chunks/toast.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
@@ -61,7 +62,27 @@ function _page($$renderer, $$props) {
           $$renderer2.push("<!--[-1-->");
           $$renderer2.push(`<span class="badge badge-danger">Nonaktif</span>`);
         }
-        $$renderer2.push(`<!--]--></td><td class="p-4 text-right space-x-2"><form method="POST" action="?/toggleStatus" class="inline-block"><input type="hidden" name="id"${attr("value", admin.id)}/> <input type="hidden" name="is_active"${attr("value", admin.is_active)}/> <button type="submit" class="btn btn-secondary py-1 px-3 text-xs"${attr("title", admin.is_active ? "Nonaktifkan" : "Aktifkan")}>${escape_html(admin.is_active ? "Nonaktifkan" : "Aktifkan")}</button></form> <form method="POST" action="?/delete" class="inline-block"><input type="hidden" name="id"${attr("value", admin.id)}/> <button type="submit" class="btn bg-red-50 text-red-600 hover:bg-red-100 py-1 px-3 text-xs">Hapus</button></form></td></tr>`);
+        $$renderer2.push(`<!--]--></td><td class="p-4 text-right space-x-2"><form method="POST" action="?/toggleStatus" class="inline-block"><input type="hidden" name="id"${attr("value", admin.id)}/> <input type="hidden" name="is_active"${attr("value", admin.is_active)}/> <button type="submit" class="btn btn-secondary py-1 px-3 text-xs"${attr("title", admin.is_active ? "Nonaktifkan" : "Aktifkan")}>${escape_html(admin.is_active ? "Nonaktifkan" : "Aktifkan")}</button></form> `);
+        ConfirmForm($$renderer2, {
+          action: "?/delete",
+          confirmTitle: "Hapus Admin",
+          confirmMessage: `Yakin ingin menghapus admin ${admin.name}?`,
+          buttonClass: "btn bg-red-50 text-red-600 hover:bg-red-100 py-1 px-3 text-xs",
+          buttonTitle: "Hapus",
+          $$slots: {
+            inputs: ($$renderer3) => {
+              {
+                $$renderer3.push(`<input type="hidden" name="id"${attr("value", admin.id)}/>`);
+              }
+            },
+            buttonContent: ($$renderer3) => {
+              {
+                $$renderer3.push(`Hapus`);
+              }
+            }
+          }
+        });
+        $$renderer2.push(`<!----></td></tr>`);
       }
     } else {
       $$renderer2.push("<!--[!-->");

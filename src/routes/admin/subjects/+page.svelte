@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import ConfirmForm from '$lib/components/ConfirmForm.svelte';
 	import type { PageData, ActionData } from './$types';
 	import { toasts } from '$lib/stores/toast';
 
@@ -103,14 +104,20 @@
 									<button class="btn-ghost btn-sm" on:click={() => { editingSubject = subject; window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
 										Edit
 									</button>
-									<form method="POST" action="?/delete" use:enhance class="inline-block" on:submit={(e) => {
-										if (!confirm('Hapus mata pelajaran ini?')) e.preventDefault();
-									}}>
-										<input type="hidden" name="id" value={subject.id} />
-										<button type="submit" class="btn-ghost btn-sm text-red-600">
+									<ConfirmForm 
+										action="?/delete"
+										confirmTitle="Hapus Mata Pelajaran"
+										confirmMessage="Hapus mata pelajaran ini?"
+										buttonClass="btn-ghost btn-sm text-red-600"
+										buttonTitle="Hapus"
+									>
+										<svelte:fragment slot="inputs">
+											<input type="hidden" name="id" value={subject.id} />
+										</svelte:fragment>
+										<svelte:fragment slot="buttonContent">
 											Hapus
-										</button>
-									</form>
+										</svelte:fragment>
+									</ConfirmForm>
 								</div>
 							</td>
 						</tr>

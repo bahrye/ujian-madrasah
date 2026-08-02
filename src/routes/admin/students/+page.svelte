@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
+	import ConfirmForm from '$lib/components/ConfirmForm.svelte';
 	import type { PageData, ActionData } from './$types';
 	import { toasts } from '$lib/stores/toast';
 
@@ -188,14 +190,20 @@
 											{user.is_active ? 'Nonaktif' : 'Aktif'}
 										</button>
 									</form>
-									<form method="POST" action="?/delete" use:enhance class="inline-block" on:submit={(e) => {
-										if (!confirm('Hapus siswa ini? Semua rekam jejak ujiannya akan ikut terhapus!')) e.preventDefault();
-									}}>
-										<input type="hidden" name="id" value={user.id} />
-										<button type="submit" class="btn-ghost btn-sm text-red-600">
+									<ConfirmForm 
+										action="?/delete"
+										confirmTitle="Hapus Siswa"
+										confirmMessage="Hapus siswa ini? Semua rekam jejak ujiannya akan ikut terhapus permanen!"
+										buttonClass="btn-ghost btn-sm text-red-600"
+										buttonTitle="Hapus"
+									>
+										<svelte:fragment slot="inputs">
+											<input type="hidden" name="id" value={user.id} />
+										</svelte:fragment>
+										<svelte:fragment slot="buttonContent">
 											Hapus
-										</button>
-									</form>
+										</svelte:fragment>
+									</ConfirmForm>
 								</div>
 							</td>
 						</tr>
