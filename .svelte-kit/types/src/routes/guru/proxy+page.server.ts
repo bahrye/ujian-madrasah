@@ -2,21 +2,29 @@
 import type { PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 
-export const load = async ({ platform }: Parameters<PageServerLoad>[0]) => {
+export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) => {
 	const db = getDB(platform);
+	const schoolId = locals.user?.school_id;
 
 	const [examCount, questionCount, pendingGrading] = await Promise.all([
-		db.prepare('SELECT COUNT(*) as c FROM exams').first<{ c: number }>(),
-		db.prepare('SELECT COUNT(*) as c FROM questions').first<{ c: number }>(),
+		db.prepare('SELECT COUNT(*) as c FROM exams WHERE school_id = ?').bind(schoolId).first<{ c: number }>(),
+		db.prepare(`
+			SELECT COUNT(*) as c FROM questions q
+			JOIN exams e ON q.exam_id = e.id
+			WHERE e.school_id = ?
+		`).bind(schoolId).first<{ c: number }>(),
 		db.prepare(`SELECT COUNT(*) as c FROM student_answers sa
 			JOIN questions q ON sa.question_id = q.id
-			WHERE q.type IN ('essay', 'isian_singkat') AND sa.score_given IS NULL`).first<{ c: number }>()
+			JOIN exams e ON q.exam_id = e.id
+			WHERE q.type IN ('essay', 'isian_singkat') AND sa.score_given IS NULL AND e.school_id = ?`).bind(schoolId).first<{ c: number }>()
 	]);
 
 	const recentExams = await db.prepare(`
 		SELECT e.*, (SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count
-		FROM exams e ORDER BY e.created_at DESC LIMIT 5
-	`).all();
+		FROM exams e 
+		WHERE e.school_id = ?
+		ORDER BY e.created_at DESC LIMIT 5
+	`).bind(schoolId).all();
 
 	return {
 		stats: {
