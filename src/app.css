@@ -164,4 +164,9 @@
 	.glass {
 		@apply bg-white/60 backdrop-blur-xl;
 	}
+	
+	@keyframes marquee {
+		0% { transform: translateX(0%); }
+		100% { transform: translateX(calc(-50% - 1rem)); }
+	}
 }

@@ -203,9 +203,17 @@ function _page_($$renderer, $$props) {
       });
     });
     Toast($$renderer2);
-    $$renderer2.push(`<!----> <div class="min-h-screen bg-slate-50 flex flex-col select-none"><header class="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-200 px-4 py-3"><div class="max-w-4xl mx-auto flex items-center justify-between gap-3"><div class="flex-1 min-w-0"><h1 class="text-sm font-bold text-slate-800 truncate">${escape_html(attempt.exam_title)}</h1> <p class="text-xs text-slate-500">${escape_html(attempt.subject || "")} · Soal ${escape_html(currentIndex + 1)}/${escape_html(questions.length)}</p></div> `);
+    $$renderer2.push(`<!----> <div class="min-h-screen bg-slate-50 flex flex-col select-none"><header class="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-200 px-4 py-3"><div class="max-w-4xl mx-auto flex items-center justify-between gap-3"><div class="flex-1 min-w-0 overflow-hidden"><h1${attr_class(`text-sm font-bold text-slate-800 whitespace-nowrap ${"truncate"}`)}>${escape_html(attempt.exam_title)} `);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--></h1> <p class="text-xs text-slate-500 truncate">${escape_html(attempt.subject || "")} · Soal ${escape_html(currentIndex + 1)}/${escape_html(questions.length)}</p></div> <div class="flex items-center gap-2 sm:gap-3">`);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--> `);
     Timer($$renderer2, { endTime: attempt.end_time });
-    $$renderer2.push(`<!----></div> <div class="max-w-4xl mx-auto mt-2"><div class="h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-500"${attr_style(`width: ${stringify(answeredCount / questions.length * 100)}%`)}></div></div></div></header> <main class="flex-1 max-w-4xl mx-auto w-full px-4 py-6">`);
+    $$renderer2.push(`<!----></div></div> <div class="max-w-4xl mx-auto mt-2"><div class="h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-500"${attr_style(`width: ${stringify(answeredCount / questions.length * 100)}%`)}></div></div></div></header> <main class="flex-1 max-w-4xl mx-auto w-full px-4 py-6">`);
     if (currentQuestion) {
       $$renderer2.push("<!--[0-->");
       QuestionRenderer($$renderer2, {

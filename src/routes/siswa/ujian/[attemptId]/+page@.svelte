@@ -25,6 +25,18 @@
 	let showWarningModal = false;
 	const MAX_WARNINGS = 3;
 	let isUnloading = false;
+	
+	let titleElement: HTMLElement;
+	let titleClientWidth = 0;
+	let isTitleOverflowing = false;
+	$: if (titleElement && titleClientWidth) {
+		// adding a slight delay to allow dom updates
+		setTimeout(() => {
+			if (titleElement) {
+				isTitleOverflowing = titleElement.scrollWidth > titleClientWidth;
+			}
+		}, 0);
+	}
 
 	let wakeLock: any = null;
 
@@ -204,11 +216,29 @@
 	<!-- Exam Header -->
 	<header class="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-200 px-4 py-3">
 		<div class="max-w-4xl mx-auto flex items-center justify-between gap-3">
-			<div class="flex-1 min-w-0">
-				<h1 class="text-sm font-bold text-slate-800 truncate">{attempt.exam_title}</h1>
-				<p class="text-xs text-slate-500">{attempt.subject || ''} · Soal {currentIndex + 1}/{questions.length}</p>
+			<div class="flex-1 min-w-0 overflow-hidden" bind:clientWidth={titleClientWidth}>
+				<h1 
+					bind:this={titleElement}
+					class="text-sm font-bold text-slate-800 whitespace-nowrap {isTitleOverflowing ? 'animate-[marquee_10s_linear_infinite]' : 'truncate'}"
+				>
+					{attempt.exam_title}
+					{#if isTitleOverflowing}
+						<span class="pl-8">{attempt.exam_title}</span>
+					{/if}
+				</h1>
+				<p class="text-xs text-slate-500 truncate">{attempt.subject || ''} · Soal {currentIndex + 1}/{questions.length}</p>
 			</div>
-			<Timer endTime={attempt.end_time} on:timeup={handleTimeUp} />
+			<div class="flex items-center gap-2 sm:gap-3">
+				{#if warnings > 0}
+					<div class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 bg-red-50 text-red-600 rounded-full border border-red-200 animate-in fade-in slide-in-from-right-4">
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+						</svg>
+						<span class="text-xs font-bold">{warnings}/{MAX_WARNINGS}</span>
+					</div>
+				{/if}
+				<Timer endTime={attempt.end_time} on:timeup={handleTimeUp} />
+			</div>
 		</div>
 		<!-- Progress Bar -->
 		<div class="max-w-4xl mx-auto mt-2">
