@@ -2,7 +2,23 @@
 	import { ICONS, ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS } from '$lib/utils/constants';
 
 	export let data;
-	$: activeExams = data.activeExams as any[];
+	$: activeExams = (data.activeExams as any[]).filter(exam => {
+		if (!exam.start_time) return true;
+		const start = new Date(exam.start_time);
+		const end = exam.end_time ? new Date(exam.end_time) : null;
+		const today = new Date();
+		
+		const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+		const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+		
+		if (end) {
+			return start <= todayEnd && end >= todayStart;
+		}
+		
+		return start.getFullYear() === today.getFullYear() &&
+			start.getMonth() === today.getMonth() &&
+			start.getDate() === today.getDate();
+	});
 	$: myAttempts = data.myAttempts as any[];
 	$: activeAttempt = data.activeAttempt as any;
 </script>

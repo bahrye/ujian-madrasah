@@ -22,9 +22,29 @@ function _page($$renderer, $$props) {
         year: "numeric"
       }).format(date);
     }
-    function formatTime(dateString) {
-      if (!dateString) return "--:--";
-      return new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" }).format(new Date(dateString));
+    function formatTimeRange(startStr, endStr) {
+      if (!startStr) return "--:--";
+      const start = new Date(startStr);
+      const startFormatted = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" }).format(start);
+      if (!endStr) return `${startFormatted} - Selesai`;
+      const end = new Date(endStr);
+      const endFormatted = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" }).format(end);
+      if (start.getDate() === end.getDate() && start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
+        return `${startFormatted} - ${endFormatted}`;
+      }
+      const startDateFormatted = new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric" }).format(start);
+      const endDateFormatted = new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric" }).format(end);
+      return `${startDateFormatted} ${startFormatted} - ${endDateFormatted} ${endFormatted}`;
+    }
+    function getExamStatus(exam) {
+      const now = /* @__PURE__ */ new Date();
+      if (exam.end_time && now > new Date(exam.end_time)) {
+        return "ended";
+      }
+      if (exam.start_time && now < new Date(exam.start_time)) {
+        return "upcoming";
+      }
+      return "active";
     }
     head("8o0fw0", $$renderer2, ($$renderer3) => {
       $$renderer3.title(($$renderer4) => {
@@ -37,7 +57,18 @@ function _page($$renderer, $$props) {
       $$renderer2.push("<!--[-->");
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
         let exam = each_array[$$index];
-        $$renderer2.push(`<div class="card-hover p-5 bg-white border border-slate-200 flex flex-col justify-between h-full"><div><div class="flex items-start justify-between mb-3"><div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.calendar)}></path></svg></div> <span class="badge-primary text-xs font-semibold px-2.5 py-1 rounded-md">${escape_html(formatScheduleDate(exam.start_time))}</span></div> <h3 class="font-bold text-slate-800 text-lg line-clamp-1 mb-1">${escape_html(exam.title)}</h3> <p class="text-sm text-slate-500 mb-4">${escape_html(exam.subject || "Umum")}</p> <div class="space-y-2 mb-4"><div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> <span>Pukul: ${escape_html(formatTime(exam.start_time))}</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg> <span>Durasi: ${escape_html(exam.duration_minutes)} menit</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.users)}></path></svg> <span class="line-clamp-1"${attr("title", exam.proctors || "Belum ada pengawas")}>Pengawas: ${escape_html(exam.proctors || "-")}</span></div></div></div> <div class="pt-4 border-t border-slate-100 mt-auto"><a href="/siswa/ujian" class="btn btn-primary w-full justify-center">Buka Halaman Ujian</a></div></div>`);
+        $$renderer2.push(`<div class="card-hover p-5 bg-white border border-slate-200 flex flex-col justify-between h-full"><div><div class="flex items-start justify-between mb-3"><div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.calendar)}></path></svg></div> <span class="badge-primary text-xs font-semibold px-2.5 py-1 rounded-md">${escape_html(formatScheduleDate(exam.start_time))}</span></div> <h3 class="font-bold text-slate-800 text-lg line-clamp-1 mb-1">${escape_html(exam.title)}</h3> <p class="text-sm text-slate-500 mb-4">${escape_html(exam.subject || "Umum")}</p> <div class="space-y-2 mb-4"><div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> <span>Pukul: ${escape_html(formatTimeRange(exam.start_time, exam.end_time))}</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg> <span>Durasi: ${escape_html(exam.duration_minutes)} menit</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.users)}></path></svg> <span class="line-clamp-1"${attr("title", exam.proctors || "Belum ada pengawas")}>Pengawas: ${escape_html(exam.proctors || "-")}</span></div></div></div> <div class="pt-4 border-t border-slate-100 mt-auto">`);
+        if (getExamStatus(exam) === "ended") {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<button disabled="" class="btn w-full justify-center bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed">Berakhir</button>`);
+        } else if (getExamStatus(exam) === "upcoming") {
+          $$renderer2.push("<!--[1-->");
+          $$renderer2.push(`<button disabled="" class="btn w-full justify-center bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed">Belum Dimulai</button>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<a href="/siswa/ujian" class="btn btn-primary w-full justify-center">Buka Halaman Ujian</a>`);
+        }
+        $$renderer2.push(`<!--]--></div></div>`);
       }
     } else {
       $$renderer2.push("<!--[!-->");

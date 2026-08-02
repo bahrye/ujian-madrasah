@@ -4,7 +4,18 @@ function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let activeExams, myAttempts, activeAttempt;
     let data = $$props["data"];
-    activeExams = data.activeExams;
+    activeExams = data.activeExams.filter((exam) => {
+      if (!exam.start_time) return true;
+      const start = new Date(exam.start_time);
+      const end = exam.end_time ? new Date(exam.end_time) : null;
+      const today = /* @__PURE__ */ new Date();
+      const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+      if (end) {
+        return start <= todayEnd && end >= todayStart;
+      }
+      return start.getFullYear() === today.getFullYear() && start.getMonth() === today.getMonth() && start.getDate() === today.getDate();
+    });
     myAttempts = data.myAttempts;
     activeAttempt = data.activeAttempt;
     head("1sjgise", $$renderer2, ($$renderer3) => {
