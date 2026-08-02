@@ -106,6 +106,8 @@ CREATE TABLE IF NOT EXISTS student_attempts (
     score REAL,
     total_points INTEGER,
     status TEXT NOT NULL DEFAULT 'mengerjakan' CHECK(status IN ('mengerjakan', 'selesai', 'waktu_habis')),
+    violation_count INTEGER DEFAULT 0,
+    violation_logs TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 

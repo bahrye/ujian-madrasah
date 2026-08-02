@@ -111,12 +111,18 @@ export const actions = {
 			return fail(400, { error: 'Sesi ujian tidak valid.' });
 		}
 
+		let warnings = 0;
+		let warningLogs = '[]';
+
 		const kv = platform?.env?.EXAM_ANSWERS;
 		if (kv) {
 			const stored = await kv.get(`attempt_${attemptId}_answers`);
 			if (stored) {
 				try {
 					const kvData = JSON.parse(stored);
+					if (kvData && kvData.warnings) warnings = kvData.warnings;
+					if (kvData && kvData.warningLogs) warningLogs = JSON.stringify(kvData.warningLogs);
+					
 					if (kvData && kvData.answers) {
 						const kvUpdateStmts = [];
 						for (const [qIdStr, ansVal] of Object.entries(kvData.answers)) {
@@ -201,8 +207,8 @@ export const actions = {
 
 		updateStmts.push(
 			db.prepare(`UPDATE student_attempts SET status = 'selesai', submit_time = datetime('now'),
-				score = ?, total_points = ? WHERE id = ?`)
-				.bind(finalScore, totalPoints, attemptId)
+				score = ?, total_points = ?, violation_count = ?, violation_logs = ? WHERE id = ?`)
+				.bind(finalScore, totalPoints, warnings, warningLogs, attemptId)
 		);
 
 		await db.batch(updateStmts);

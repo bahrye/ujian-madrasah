@@ -125,7 +125,30 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<!--]-->`);
         } else {
           $$renderer2.push("<!--[-1-->");
-          $$renderer2.push(`<span class="text-slate-400">-</span>`);
+          const startStr = a.start_time.replace(" ", "T") + (a.start_time.includes("Z") ? "" : "Z");
+          const submitStr = a.submit_time ? a.submit_time.replace(" ", "T") + (a.submit_time.includes("Z") ? "" : "Z") : startStr;
+          const start = new Date(startStr).getTime();
+          const submit = new Date(submitStr).getTime();
+          const end = start + a.duration_minutes * 60 * 1e3;
+          const remainingMs = end - submit;
+          if (remainingMs > 0) {
+            $$renderer2.push("<!--[0-->");
+            const totalM = Math.floor(remainingMs / 6e4);
+            const h = Math.floor(totalM / 60);
+            const m = totalM % 60;
+            $$renderer2.push(`<span class="text-slate-400 font-medium line-through decoration-slate-400 decoration-2 opacity-80" title="Sisa Waktu Saat Selesai">`);
+            if (h > 0) {
+              $$renderer2.push("<!--[0-->");
+              $$renderer2.push(`${escape_html(h)} jam`);
+            } else {
+              $$renderer2.push("<!--[-1-->");
+            }
+            $$renderer2.push(`<!--]-->${escape_html(m)} mnt</span>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+            $$renderer2.push(`<span class="text-slate-400 font-medium opacity-80">Habis</span>`);
+          }
+          $$renderer2.push(`<!--]-->`);
         }
         $$renderer2.push(`<!--]--></td><td class="text-right">`);
         if (a.status === "mengerjakan") {

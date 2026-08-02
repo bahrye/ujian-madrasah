@@ -136,7 +136,22 @@
 											<span class="text-rose-500 font-bold">Habis</span>
 										{/if}
 									{:else}
-										<span class="text-slate-400">-</span>
+										{@const startStr = a.start_time.replace(' ', 'T') + (a.start_time.includes('Z') ? '' : 'Z')}
+										{@const submitStr = a.submit_time ? (a.submit_time.replace(' ', 'T') + (a.submit_time.includes('Z') ? '' : 'Z')) : startStr}
+										{@const start = new Date(startStr).getTime()}
+										{@const submit = new Date(submitStr).getTime()}
+										{@const end = start + (a.duration_minutes * 60 * 1000)}
+										{@const remainingMs = end - submit}
+										{#if remainingMs > 0}
+											{@const totalM = Math.floor(remainingMs / 60000)}
+											{@const h = Math.floor(totalM / 60)}
+											{@const m = totalM % 60}
+											<span class="text-slate-400 font-medium line-through decoration-slate-400 decoration-2 opacity-80" title="Sisa Waktu Saat Selesai">
+												{#if h > 0}{h} jam {/if}{m} mnt
+											</span>
+										{:else}
+											<span class="text-slate-400 font-medium opacity-80">Habis</span>
+										{/if}
 									{/if}
 								</td>
 								<td class="text-right">

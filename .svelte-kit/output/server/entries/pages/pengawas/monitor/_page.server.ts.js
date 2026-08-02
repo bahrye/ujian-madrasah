@@ -61,6 +61,11 @@ const load = async ({ platform, url, locals }) => {
         if (dbAnswers && dbAnswers.c) answeredCount = dbAnswers.c;
       }
     } else {
+      warnings = a.violation_count || 0;
+      try {
+        warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : [];
+      } catch (e) {
+      }
       const dbAnswers = await db.prepare('SELECT COUNT(*) as c FROM student_answers WHERE attempt_id = ? AND answer_given IS NOT NULL AND answer_given != ""').bind(a.id).first();
       if (dbAnswers && dbAnswers.c) answeredCount = dbAnswers.c;
     }
