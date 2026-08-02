@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg"]),
 	mimeTypes: {".svg":"image/svg+xml"},
 	_: {
-		client: {start:"_app/immutable/entry/start.DWIL-O3u.js",app:"_app/immutable/entry/app.-zzF45wp.js",imports:["_app/immutable/entry/start.DWIL-O3u.js","_app/immutable/chunks/Dz8ORDNu.js","_app/immutable/chunks/CpKxSNMQ.js","_app/immutable/chunks/Ch6JU-ZP.js","_app/immutable/chunks/Bhgwp5-i.js","_app/immutable/entry/app.-zzF45wp.js","_app/immutable/chunks/Ch6JU-ZP.js","_app/immutable/chunks/Bhgwp5-i.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CpKxSNMQ.js","_app/immutable/chunks/EsZKrxhC.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:false},
+		client: {start:"_app/immutable/entry/start.CTEYCbOQ.js",app:"_app/immutable/entry/app.CRXuHgk-.js",imports:["_app/immutable/entry/start.CTEYCbOQ.js","_app/immutable/chunks/CQc2cYcg.js","_app/immutable/chunks/nLbxFLzU.js","_app/immutable/chunks/-TJSwNDh.js","_app/immutable/chunks/BEdG_931.js","_app/immutable/entry/app.CRXuHgk-.js","_app/immutable/chunks/-TJSwNDh.js","_app/immutable/chunks/BEdG_931.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/nLbxFLzU.js","_app/immutable/chunks/DohkKvsF.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:false},
 		nodes: [
 			__memo(() => import('../output/server/nodes/0.js')),
 			__memo(() => import('../output/server/nodes/1.js')),
@@ -125,6 +125,13 @@ return {
 				params: [],
 				page: { layouts: [0,2,], errors: [1,,], leaf: 17 },
 				endpoint: null
+			},
+			{
+				id: "/api/exams/[id]/questions",
+				pattern: /^\/api\/exams\/([^/]+?)\/questions\/?$/,
+				params: [{"name":"id","optional":false,"rest":false,"chained":false}],
+				page: null,
+				endpoint: __memo(() => import('../output/server/entries/endpoints/api/exams/_id_/questions/_server.ts.js'))
 			},
 			{
 				id: "/api/logout",

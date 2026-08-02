@@ -186,7 +186,7 @@
       "_index.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.CduzpEZ6.css"
+      "_app/immutable/assets/_layout.CTUB0pkK.css"
     ]
   },
   "src/routes/+page.server.ts": {
@@ -254,7 +254,11 @@
     "isEntry": true,
     "imports": [
       "_index.js",
-      "_constants.js"
+      "_constants.js",
+      "_exports.js",
+      "_utils2.js",
+      "_root.js",
+      "_state.svelte.js"
     ]
   },
   "src/routes/admin/bank-soal/[examId]/+page.server.ts": {
@@ -444,6 +448,15 @@
       "_toast.js"
     ]
   },
+  "src/routes/api/exams/[id]/questions/+server.ts": {
+    "file": "entries/endpoints/api/exams/_id_/questions/_server.ts.js",
+    "name": "entries/endpoints/api/exams/_id_/questions/_server.ts",
+    "src": "src/routes/api/exams/[id]/questions/+server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
   "src/routes/api/logout/+server.ts": {
     "file": "entries/endpoints/api/logout/_server.ts.js",
     "name": "entries/endpoints/api/logout/_server.ts",
@@ -516,7 +529,11 @@
     "isEntry": true,
     "imports": [
       "_index.js",
-      "_constants.js"
+      "_constants.js",
+      "_exports.js",
+      "_utils2.js",
+      "_root.js",
+      "_state.svelte.js"
     ]
   },
   "src/routes/guru/bank-soal/[examId]/+page.server.ts": {
