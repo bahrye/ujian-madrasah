@@ -16,3 +16,22 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 
 	return { results: results.results };
 };
+
+export const actions = {
+	delete: async ({ request, platform, locals }) => {
+		const db = getDB(platform);
+		const form = await request.formData();
+		const attemptId = form.get('attempt_id')?.toString();
+
+		if (!attemptId) {
+			return { success: false, error: 'ID tidak valid' };
+		}
+
+		// Karena foreign key D1 tidak otomatis cascade jika pragma foreign_keys tidak ON tiap koneksi,
+		// kita pastikan menghapus data anak (answers) terlebih dahulu
+		await db.prepare('DELETE FROM student_answers WHERE attempt_id = ?').bind(attemptId).run();
+		await db.prepare('DELETE FROM student_attempts WHERE id = ?').bind(attemptId).run();
+
+		return { success: true };
+	}
+};

@@ -1,4 +1,10 @@
-import { h as head, c as ensure_array_like, e as escape_html, d as attr_class, j as clsx, b as bind_props } from "../../../../chunks/index.js";
+import { h as head, c as ensure_array_like, e as escape_html, d as attr_class, j as clsx, i as attr, b as bind_props } from "../../../../chunks/index.js";
+import "@sveltejs/kit/internal";
+import "../../../../chunks/exports.js";
+import "../../../../chunks/utils2.js";
+import "@sveltejs/kit/internal/server";
+import "../../../../chunks/root.js";
+import "../../../../chunks/state.svelte.js";
 import { A as ATTEMPT_STATUS_COLORS, a as ATTEMPT_STATUS_LABELS } from "../../../../chunks/constants.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
@@ -16,11 +22,11 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<div class="p-12 text-center text-slate-400">Belum ada hasil ujian.</div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Siswa</th><th>Ujian</th><th>Mapel</th><th>Nilai</th><th>Status</th><th>Waktu Selesai</th></tr></thead><tbody><!--[-->`);
+      $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Siswa</th><th>Ujian</th><th>Mapel</th><th>Nilai</th><th>Status</th><th>Waktu Selesai</th><th class="w-16 text-center">Aksi</th></tr></thead><tbody><!--[-->`);
       const each_array = ensure_array_like(results);
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
         let r = each_array[$$index];
-        $$renderer2.push(`<tr><td class="font-semibold text-slate-800">${escape_html(r.student_name)}</td><td>${escape_html(r.exam_title)}</td><td class="text-slate-500">${escape_html(r.subject || "-")}</td><td><span${attr_class(`text-lg font-bold ${(r.score ?? 0) >= 70 ? "text-emerald-600" : "text-rose-600"}`)}>${escape_html(r.score != null ? r.score.toFixed(1) : "-")}</span></td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[r.status] || "badge-info"))}>${escape_html(ATTEMPT_STATUS_LABELS[r.status])}</span></td><td class="text-xs text-slate-500">${escape_html(r.submit_time ? new Date(r.submit_time).toLocaleString("id-ID") : "-")}</td></tr>`);
+        $$renderer2.push(`<tr><td class="font-semibold text-slate-800">${escape_html(r.student_name)}</td><td>${escape_html(r.exam_title)}</td><td class="text-slate-500">${escape_html(r.subject || "-")}</td><td><span${attr_class(`text-lg font-bold ${(r.score ?? 0) >= 70 ? "text-emerald-600" : "text-rose-600"}`)}>${escape_html(r.score != null ? r.score.toFixed(1) : "-")}</span></td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[r.status] || "badge-info"))}>${escape_html(ATTEMPT_STATUS_LABELS[r.status])}</span></td><td class="text-xs text-slate-500">${escape_html(r.submit_time ? new Date(r.submit_time).toLocaleString("id-ID") : "-")}</td><td class="text-center"><form method="POST" action="?/delete"><input type="hidden" name="attempt_id"${attr("value", r.id)}/> <button type="submit" class="p-1.5 text-rose-500 hover:bg-rose-50 rounded transition-colors" title="Hapus Ujian"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button></form></td></tr>`);
       }
       $$renderer2.push(`<!--]--></tbody></table></div>`);
     }

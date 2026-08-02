@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import { ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS } from '$lib/utils/constants';
 
 	export let data;
@@ -29,6 +30,7 @@
 							<th>Nilai</th>
 							<th>Status</th>
 							<th>Waktu Selesai</th>
+							<th class="w-16 text-center">Aksi</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -44,6 +46,20 @@
 								</td>
 								<td><span class={ATTEMPT_STATUS_COLORS[r.status] || 'badge-info'}>{ATTEMPT_STATUS_LABELS[r.status]}</span></td>
 								<td class="text-xs text-slate-500">{r.submit_time ? new Date(r.submit_time).toLocaleString('id-ID') : '-'}</td>
+								<td class="text-center">
+									<form method="POST" action="?/delete" use:enhance on:submit={(e) => {
+										if (!confirm('Yakin ingin menghapus hasil ujian ini? Ini akan menghapus permanen jawaban siswa!')) {
+											e.preventDefault();
+										}
+									}}>
+										<input type="hidden" name="attempt_id" value={r.id} />
+										<button type="submit" class="p-1.5 text-rose-500 hover:bg-rose-50 rounded transition-colors" title="Hapus Ujian">
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+												<path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+											</svg>
+										</button>
+									</form>
+								</td>
 							</tr>
 						{/each}
 					</tbody>

@@ -380,6 +380,10 @@
     "isEntry": true,
     "imports": [
       "_index.js",
+      "_exports.js",
+      "_utils2.js",
+      "_root.js",
+      "_state.svelte.js",
       "_constants.js"
     ]
   },

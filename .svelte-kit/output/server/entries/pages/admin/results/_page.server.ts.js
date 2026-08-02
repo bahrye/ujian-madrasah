@@ -12,6 +12,20 @@ const load = async ({ platform, locals }) => {
 	`).bind(locals.user.school_id).all();
   return { results: results.results };
 };
+const actions = {
+  delete: async ({ request, platform, locals }) => {
+    const db = getDB(platform);
+    const form = await request.formData();
+    const attemptId = form.get("attempt_id")?.toString();
+    if (!attemptId) {
+      return { success: false, error: "ID tidak valid" };
+    }
+    await db.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(attemptId).run();
+    await db.prepare("DELETE FROM student_attempts WHERE id = ?").bind(attemptId).run();
+    return { success: true };
+  }
+};
 export {
+  actions,
   load
 };
