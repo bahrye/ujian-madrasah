@@ -13,7 +13,8 @@ const load = async ({ platform, url, locals }) => {
   let attempts = [];
   if (examFilter) {
     const result = await db.prepare(`
-			SELECT sa.*, u.name as student_name, u.username
+			SELECT sa.*, u.name as student_name, u.username, e.duration_minutes,
+				(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count
 			FROM student_attempts sa
 			JOIN users u ON sa.student_id = u.id
 			JOIN exams e ON sa.exam_id = e.id
@@ -24,7 +25,8 @@ const load = async ({ platform, url, locals }) => {
     attempts = result.results;
   } else {
     const result = await db.prepare(`
-			SELECT sa.*, u.name as student_name, u.username, e.title as exam_title
+			SELECT sa.*, u.name as student_name, u.username, e.title as exam_title, e.duration_minutes,
+				(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count
 			FROM student_attempts sa
 			JOIN users u ON sa.student_id = u.id
 			JOIN exams e ON sa.exam_id = e.id
@@ -34,7 +36,36 @@ const load = async ({ platform, url, locals }) => {
 		`).bind(locals.user.school_id, locals.user.id).all();
     attempts = result.results;
   }
-  return { exams: exams.results, attempts, examFilter };
+  const kv = platform?.env?.EXAM_ANSWERS;
+  const attemptsWithProgress = await Promise.all(attempts.map(async (a) => {
+    let answeredCount = 0;
+    if (a.status === "mengerjakan") {
+      if (kv) {
+        const stored = await kv.get(`attempt_${a.id}_answers`);
+        if (stored) {
+          try {
+            const data = JSON.parse(stored);
+            if (data && data.answers) {
+              answeredCount = Object.keys(data.answers).length;
+            }
+          } catch (e) {
+          }
+        }
+      }
+      if (answeredCount === 0) {
+        const dbAnswers = await db.prepare('SELECT COUNT(*) as c FROM student_answers WHERE attempt_id = ? AND answer_given IS NOT NULL AND answer_given != ""').bind(a.id).first();
+        if (dbAnswers && dbAnswers.c) answeredCount = dbAnswers.c;
+      }
+    } else {
+      const dbAnswers = await db.prepare('SELECT COUNT(*) as c FROM student_answers WHERE attempt_id = ? AND answer_given IS NOT NULL AND answer_given != ""').bind(a.id).first();
+      if (dbAnswers && dbAnswers.c) answeredCount = dbAnswers.c;
+    }
+    return {
+      ...a,
+      answeredCount
+    };
+  }));
+  return { exams: exams.results, attempts: attemptsWithProgress, examFilter };
 };
 const actions = {
   resetAttempt: async ({ request, platform }) => {

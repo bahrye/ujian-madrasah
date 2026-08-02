@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS, ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
+	import { onMount, onDestroy } from 'svelte';
 
 	export let data;
 	export let form: any;
@@ -11,6 +12,18 @@
 	$: attempts = data.attempts as any[];
 
 	let resetConfirm: number | null = null;
+	let currentTime = Date.now();
+	let interval: any;
+
+	onMount(() => {
+		interval = setInterval(() => {
+			currentTime = Date.now();
+		}, 10000); // 10 seconds is good for monitoring
+	});
+
+	onDestroy(() => {
+		if (interval) clearInterval(interval);
+	});
 </script>
 
 <svelte:head><title>Monitoring Ujian — Ujian Online Madrasah</title></svelte:head>
@@ -52,7 +65,8 @@
 							<th>Username</th>
 							{#if !data.examFilter}<th>Ujian</th>{/if}
 							<th>Status</th>
-							<th>Mulai</th>
+							<th class="w-32">Progress</th>
+							<th>Sisa Waktu</th>
 							<th class="text-right">Aksi</th>
 						</tr>
 					</thead>
@@ -70,7 +84,35 @@
 										{ATTEMPT_STATUS_LABELS[a.status] || a.status}
 									</span>
 								</td>
-								<td class="text-xs text-slate-500">{new Date(a.start_time).toLocaleString('id-ID')}</td>
+								<td class="w-32">
+									{#if a.question_count > 0}
+										{@const pct = Math.round((a.answeredCount / a.question_count) * 100)}
+										{@const color = pct < 30 ? 'bg-slate-300' : pct < 60 ? 'bg-rose-400' : pct < 90 ? 'bg-amber-400' : 'bg-emerald-500'}
+										<div class="flex items-center gap-2">
+											<div class="h-2 flex-1 bg-slate-100 rounded-full overflow-hidden">
+												<div class="h-full {color} transition-all duration-500" style="width: {pct}%"></div>
+											</div>
+											<span class="text-xs font-semibold text-slate-600 w-8 text-right">{pct}%</span>
+										</div>
+									{:else}
+										<span class="text-xs text-slate-400">0%</span>
+									{/if}
+								</td>
+								<td class="text-xs">
+									{#if a.status === 'mengerjakan'}
+										{@const start = new Date(a.start_time).getTime()}
+										{@const end = start + (a.duration_minutes * 60 * 1000)}
+										{@const remainingMs = end - currentTime}
+										{#if remainingMs > 0}
+											{@const m = Math.floor(remainingMs / 60000)}
+											<span class="text-slate-600 font-medium">{m} mnt</span>
+										{:else}
+											<span class="text-rose-500 font-bold">Habis</span>
+										{/if}
+									{:else}
+										<span class="text-slate-400">-</span>
+									{/if}
+								</td>
 								<td class="text-right">
 									{#if a.status === 'mengerjakan'}
 										<button

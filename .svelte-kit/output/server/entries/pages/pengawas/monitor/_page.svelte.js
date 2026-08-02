@@ -1,4 +1,5 @@
-import { h as head, c as ensure_array_like, e as escape_html, i as attr, d as attr_class, j as clsx, b as bind_props } from "../../../../chunks/index.js";
+import { h as head, c as ensure_array_like, e as escape_html, i as attr, d as attr_class, j as clsx, f as attr_style, b as bind_props, a as stringify } from "../../../../chunks/index.js";
+import { o as onDestroy } from "../../../../chunks/index-server.js";
 import "@sveltejs/kit/internal";
 import "../../../../chunks/exports.js";
 import "../../../../chunks/utils2.js";
@@ -12,6 +13,9 @@ function _page($$renderer, $$props) {
     let attempts;
     let data = $$props["data"];
     let form = $$props["form"];
+    let currentTime = Date.now();
+    onDestroy(() => {
+    });
     if (form?.success) toasts.success(form.success);
     if (form?.error) toasts.error(form.error);
     attempts = data.attempts;
@@ -51,7 +55,7 @@ function _page($$renderer, $$props) {
       } else {
         $$renderer2.push("<!--[-1-->");
       }
-      $$renderer2.push(`<!--]--><th>Status</th><th>Mulai</th><th class="text-right">Aksi</th></tr></thead><tbody><!--[-->`);
+      $$renderer2.push(`<!--]--><th>Status</th><th class="w-32">Progress</th><th>Sisa Waktu</th><th class="text-right">Aksi</th></tr></thead><tbody><!--[-->`);
       const each_array_1 = ensure_array_like(attempts);
       for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
         let a = each_array_1[$$index_1];
@@ -69,7 +73,36 @@ function _page($$renderer, $$props) {
         } else {
           $$renderer2.push("<!--[-1-->");
         }
-        $$renderer2.push(`<!--]--> ${escape_html(ATTEMPT_STATUS_LABELS[a.status] || a.status)}</span></td><td class="text-xs text-slate-500">${escape_html(new Date(a.start_time).toLocaleString("id-ID"))}</td><td class="text-right">`);
+        $$renderer2.push(`<!--]--> ${escape_html(ATTEMPT_STATUS_LABELS[a.status] || a.status)}</span></td><td class="w-32">`);
+        if (a.question_count > 0) {
+          $$renderer2.push("<!--[0-->");
+          const pct = Math.round(a.answeredCount / a.question_count * 100);
+          const color = pct < 30 ? "bg-slate-300" : pct < 60 ? "bg-rose-400" : pct < 90 ? "bg-amber-400" : "bg-emerald-500";
+          $$renderer2.push(`<div class="flex items-center gap-2"><div class="h-2 flex-1 bg-slate-100 rounded-full overflow-hidden"><div${attr_class(`h-full ${color} transition-all duration-500`)}${attr_style(`width: ${stringify(pct)}%`)}></div></div> <span class="text-xs font-semibold text-slate-600 w-8 text-right">${escape_html(pct)}%</span></div>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<span class="text-xs text-slate-400">0%</span>`);
+        }
+        $$renderer2.push(`<!--]--></td><td class="text-xs">`);
+        if (a.status === "mengerjakan") {
+          $$renderer2.push("<!--[0-->");
+          const start = new Date(a.start_time).getTime();
+          const end = start + a.duration_minutes * 60 * 1e3;
+          const remainingMs = end - currentTime;
+          if (remainingMs > 0) {
+            $$renderer2.push("<!--[0-->");
+            const m = Math.floor(remainingMs / 6e4);
+            $$renderer2.push(`<span class="text-slate-600 font-medium">${escape_html(m)} mnt</span>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+            $$renderer2.push(`<span class="text-rose-500 font-bold">Habis</span>`);
+          }
+          $$renderer2.push(`<!--]-->`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<span class="text-slate-400">-</span>`);
+        }
+        $$renderer2.push(`<!--]--></td><td class="text-right">`);
         if (a.status === "mengerjakan") {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<button class="btn-sm btn-danger"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.refresh)}></path></svg> Reset</button>`);
