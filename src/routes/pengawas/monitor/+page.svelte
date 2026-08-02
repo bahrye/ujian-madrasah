@@ -65,7 +65,7 @@
 								<td>
 									<span class={ATTEMPT_STATUS_COLORS[a.status] || 'badge-info'}>
 										{#if a.status === 'mengerjakan'}
-											<span class="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse mr-1" />
+											<span class="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse mr-1"></span>
 										{/if}
 										{ATTEMPT_STATUS_LABELS[a.status] || a.status}
 									</span>

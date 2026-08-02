@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS student_answers;
+DROP TABLE IF EXISTS student_attempts;
+DROP TABLE IF EXISTS questions;
+DROP TABLE IF EXISTS tokens;
+DROP TABLE IF EXISTS exams;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS schools;

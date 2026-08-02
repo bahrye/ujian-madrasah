@@ -58,6 +58,7 @@ async function verifyToken(token) {
     const { payload } = await jwtVerify(token, JWT_SECRET);
     return {
       id: payload.id,
+      school_id: payload.school_id,
       username: payload.username,
       name: payload.name,
       role: payload.role

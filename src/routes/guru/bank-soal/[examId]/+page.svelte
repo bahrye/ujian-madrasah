@@ -68,7 +68,7 @@
 
 				<div>
 					<label class="label" for="q-text">Teks Soal</label>
-					<textarea id="q-text" name="question_text" required class="input min-h-[100px]" placeholder="Tuliskan soal di sini..." rows="3" />
+					<textarea id="q-text" name="question_text" required class="input min-h-[100px]" placeholder="Tuliskan soal di sini..." rows="3"></textarea>
 				</div>
 
 				<div>

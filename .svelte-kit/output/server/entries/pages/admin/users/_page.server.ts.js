@@ -1,12 +1,12 @@
 import { fail } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
 import { h as hashPassword } from "../../../../chunks/auth.js";
-const load = async ({ platform, url }) => {
+const load = async ({ platform, url, locals }) => {
   const db = getDB(platform);
   const search = url.searchParams.get("search") || "";
   const roleFilter = url.searchParams.get("role") || "";
-  let query = "SELECT id, username, name, role, is_active, created_at FROM users WHERE 1=1";
-  const params = [];
+  let query = "SELECT id, username, name, role, is_active, created_at FROM users WHERE school_id = ?";
+  const params = [locals.user.school_id];
   if (search) {
     query += " AND (username LIKE ? OR name LIKE ?)";
     params.push(`%${search}%`, `%${search}%`);
@@ -20,9 +20,10 @@ const load = async ({ platform, url }) => {
   return { users: users.results, search, roleFilter };
 };
 const actions = {
-  create: async ({ request, platform }) => {
+  create: async ({ request, platform, locals }) => {
     const db = getDB(platform);
     const form = await request.formData();
+    const schoolId = locals.user.school_id;
     const username = form.get("username")?.toString().trim();
     const password = form.get("password")?.toString();
     const name = form.get("name")?.toString().trim();
@@ -38,12 +39,13 @@ const actions = {
       return fail(400, { error: "Username sudah digunakan." });
     }
     const passwordHash = await hashPassword(password);
-    await db.prepare("INSERT INTO users (username, password_hash, name, role) VALUES (?, ?, ?, ?)").bind(username, passwordHash, name, role).run();
+    await db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(schoolId, username, passwordHash, name, role).run();
     return { success: "Pengguna berhasil ditambahkan." };
   },
-  update: async ({ request, platform }) => {
+  update: async ({ request, platform, locals }) => {
     const db = getDB(platform);
     const form = await request.formData();
+    const schoolId = locals.user.school_id;
     const id = form.get("id")?.toString();
     const name = form.get("name")?.toString().trim();
     const role = form.get("role")?.toString();
@@ -54,18 +56,19 @@ const actions = {
     }
     if (password) {
       const passwordHash = await hashPassword(password);
-      await db.prepare("UPDATE users SET name = ?, role = ?, password_hash = ?, is_active = ?, updated_at = datetime('now') WHERE id = ?").bind(name, role, passwordHash, isActive === "1" ? 1 : 0, id).run();
+      await db.prepare("UPDATE users SET name = ?, role = ?, password_hash = ?, is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, role, passwordHash, isActive === "1" ? 1 : 0, id, schoolId).run();
     } else {
-      await db.prepare("UPDATE users SET name = ?, role = ?, is_active = ?, updated_at = datetime('now') WHERE id = ?").bind(name, role, isActive === "1" ? 1 : 0, id).run();
+      await db.prepare("UPDATE users SET name = ?, role = ?, is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, role, isActive === "1" ? 1 : 0, id, schoolId).run();
     }
     return { success: "Pengguna berhasil diperbarui." };
   },
-  delete: async ({ request, platform }) => {
+  delete: async ({ request, platform, locals }) => {
     const db = getDB(platform);
     const form = await request.formData();
     const id = form.get("id")?.toString();
+    const schoolId = locals.user.school_id;
     if (!id) return fail(400, { error: "ID tidak valid." });
-    await db.prepare("DELETE FROM users WHERE id = ?").bind(id).run();
+    await db.prepare("DELETE FROM users WHERE id = ? AND school_id = ?").bind(id, schoolId).run();
     return { success: "Pengguna berhasil dihapus." };
   }
 };

@@ -136,7 +136,7 @@
 				</div>
 				<div>
 					<label class="label" for="c-desc">Deskripsi</label>
-					<textarea id="c-desc" name="description" class="input" rows="2" placeholder="Deskripsi ujian (opsional)" />
+					<textarea id="c-desc" name="description" class="input" rows="2" placeholder="Deskripsi ujian (opsional)"></textarea>
 				</div>
 				<div class="grid grid-cols-2 gap-3">
 					<div>
@@ -182,7 +182,7 @@
 				</div>
 				<div>
 					<label class="label" for="e-desc">Deskripsi</label>
-					<textarea id="e-desc" name="description" class="input" rows="2" bind:value={editingExam.description} />
+					<textarea id="e-desc" name="description" class="input" rows="2" bind:value={editingExam.description}></textarea>
 				</div>
 				<div class="grid grid-cols-2 gap-3">
 					<div>

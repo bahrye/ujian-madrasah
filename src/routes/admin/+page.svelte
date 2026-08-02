@@ -64,7 +64,7 @@
 							<div
 								class="h-full {item.color} rounded-full transition-all duration-700"
 								style="width: {stats.totalUsers > 0 ? ((stats.roleCounts[item.role] || 0) / stats.totalUsers) * 100 : 0}%"
-							/>
+							></div>
 						</div>
 						<span class="text-sm font-bold text-slate-700 w-8 text-right">{stats.roleCounts[item.role] || 0}</span>
 					</div>

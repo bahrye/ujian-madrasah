@@ -1,18 +1,19 @@
 import { fail } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
-const load = async ({ platform, url }) => {
+const load = async ({ platform, url, locals }) => {
   const db = getDB(platform);
   const examFilter = url.searchParams.get("exam_id") || "";
-  const exams = await db.prepare("SELECT id, title FROM exams WHERE is_active = 1 ORDER BY title").all();
+  const exams = await db.prepare("SELECT id, title FROM exams WHERE is_active = 1 AND school_id = ? ORDER BY title").bind(locals.user.school_id).all();
   let attempts = [];
   if (examFilter) {
     const result = await db.prepare(`
 			SELECT sa.*, u.name as student_name, u.username
 			FROM student_attempts sa
 			JOIN users u ON sa.student_id = u.id
-			WHERE sa.exam_id = ?
+			JOIN exams e ON sa.exam_id = e.id
+			WHERE sa.exam_id = ? AND e.school_id = ?
 			ORDER BY sa.status DESC, sa.start_time DESC
-		`).bind(examFilter).all();
+		`).bind(examFilter, locals.user.school_id).all();
     attempts = result.results;
   } else {
     const result = await db.prepare(`
@@ -20,9 +21,9 @@ const load = async ({ platform, url }) => {
 			FROM student_attempts sa
 			JOIN users u ON sa.student_id = u.id
 			JOIN exams e ON sa.exam_id = e.id
-			WHERE sa.status = 'mengerjakan'
+			WHERE sa.status = 'mengerjakan' AND e.school_id = ?
 			ORDER BY sa.start_time DESC
-		`).all();
+		`).bind(locals.user.school_id).all();
     attempts = result.results;
   }
   return { exams: exams.results, attempts, examFilter };

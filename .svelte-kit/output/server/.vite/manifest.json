@@ -178,7 +178,7 @@
       "_index.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.Bj2f2GFa.css"
+      "_app/immutable/assets/_layout.BtSqlWud.css"
     ]
   },
   "src/routes/+page.server.ts": {
@@ -631,6 +631,88 @@
       "_state.svelte.js",
       "_constants.js",
       "_Toast2.js",
+      "_toast.js"
+    ]
+  },
+  "src/routes/superadmin/+layout.server.ts": {
+    "file": "entries/pages/superadmin/_layout.server.ts.js",
+    "name": "entries/pages/superadmin/_layout.server.ts",
+    "src": "src/routes/superadmin/+layout.server.ts",
+    "isEntry": true
+  },
+  "src/routes/superadmin/+layout.svelte": {
+    "file": "entries/pages/superadmin/_layout.svelte.js",
+    "name": "entries/pages/superadmin/_layout.svelte",
+    "src": "src/routes/superadmin/+layout.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_AppShell.js"
+    ]
+  },
+  "src/routes/superadmin/+page.server.ts": {
+    "file": "entries/pages/superadmin/_page.server.ts.js",
+    "name": "entries/pages/superadmin/_page.server.ts",
+    "src": "src/routes/superadmin/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/superadmin/+page.svelte": {
+    "file": "entries/pages/superadmin/_page.svelte.js",
+    "name": "entries/pages/superadmin/_page.svelte",
+    "src": "src/routes/superadmin/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_StatCard.js"
+    ]
+  },
+  "src/routes/superadmin/admins/+page.server.ts": {
+    "file": "entries/pages/superadmin/admins/_page.server.ts.js",
+    "name": "entries/pages/superadmin/admins/_page.server.ts",
+    "src": "src/routes/superadmin/admins/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js",
+      "_auth.js"
+    ]
+  },
+  "src/routes/superadmin/admins/+page.svelte": {
+    "file": "entries/pages/superadmin/admins/_page.svelte.js",
+    "name": "entries/pages/superadmin/admins/_page.svelte",
+    "src": "src/routes/superadmin/admins/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_exports.js",
+      "_utils2.js",
+      "_root.js",
+      "_state.svelte.js",
+      "_toast.js"
+    ]
+  },
+  "src/routes/superadmin/schools/+page.server.ts": {
+    "file": "entries/pages/superadmin/schools/_page.server.ts.js",
+    "name": "entries/pages/superadmin/schools/_page.server.ts",
+    "src": "src/routes/superadmin/schools/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/superadmin/schools/+page.svelte": {
+    "file": "entries/pages/superadmin/schools/_page.svelte.js",
+    "name": "entries/pages/superadmin/schools/_page.svelte",
+    "src": "src/routes/superadmin/schools/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_exports.js",
+      "_utils2.js",
+      "_root.js",
+      "_state.svelte.js",
       "_toast.js"
     ]
   },

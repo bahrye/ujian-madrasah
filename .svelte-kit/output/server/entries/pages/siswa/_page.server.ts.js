@@ -7,10 +7,11 @@ const load = async ({ platform, locals }) => {
 		FROM exams e
 		JOIN tokens t ON t.exam_id = e.id
 		WHERE e.is_active = 1
+		AND e.school_id = ?
 		AND t.is_released = 1
 		AND datetime(t.expires_at) > datetime('now')
 		ORDER BY e.start_time
-	`).all();
+	`).bind(locals.user.school_id).all();
   const myAttempts = await db.prepare(`
 		SELECT sa.*, e.title as exam_title, e.subject
 		FROM student_attempts sa

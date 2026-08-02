@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { PageData, ActionData } from './$types';
-	import { addToast } from '$lib/stores/toast';
+	import { toasts } from '$lib/stores/toast';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -9,9 +9,9 @@
 	let isAdding = false;
 
 	$: if (form?.error) {
-		addToast(form.error, 'error');
+		toasts.error(form.error);
 	} else if (form?.success) {
-		addToast('Berhasil mengelola admin', 'success');
+		toasts.success('Berhasil mengelola admin');
 		isAdding = false;
 	}
 </script>
