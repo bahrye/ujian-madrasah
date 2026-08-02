@@ -10,10 +10,19 @@
 	$: tokens = data.tokens as any[];
 	$: participants = data.participants as any[];
 	
+	$: allTeachers = data.allTeachers as any[];
+	$: examTeachers = data.examTeachers as any[];
+	
 	let showAddParticipantModal = false;
 	let addParticipantTab: 'class' | 'student' = 'class';
 	let studentSearch = '';
 	let studentClassFilter = '';
+	
+	let showAddTeacherModal = false;
+	let teacherSearch = '';
+
+	let selectedClassId = '';
+	$: previewStudents = selectedClassId ? data.allStudents.filter((s: any) => s.class_id?.toString() === selectedClassId) : [];
 
 	$: filteredStudents = data.allStudents ? data.allStudents.filter((s: any) => {
 		const matchesSearch = s.name.toLowerCase().includes(studentSearch.toLowerCase()) || s.username.toLowerCase().includes(studentSearch.toLowerCase());
@@ -78,11 +87,54 @@
 		</div>
 	</div>
 
+	<!-- Daftar Pengajar -->
+	<div class="card overflow-hidden mb-6">
+		<div class="p-5 border-b border-slate-100 flex items-center justify-between">
+			<div>
+				<h2 class="text-lg font-bold text-slate-800">Daftar Pengajar</h2>
+				<p class="text-xs text-slate-500 mt-0.5">Guru yang diizinkan mengelola bank soal untuk ujian ini.</p>
+			</div>
+			<button class="btn-sm btn-primary" on:click={() => (showAddTeacherModal = true)}>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
+				</svg>
+				Tambah Pengajar
+			</button>
+		</div>
+		{#if examTeachers.length === 0}
+			<div class="p-8 text-center text-slate-400 text-sm">Belum ada pengajar tambahan. Hanya pembuat ujian yang dapat mengelola soal.</div>
+		{:else}
+			<div class="table-container border-0 rounded-none">
+				<table class="table">
+					<thead><tr><th>Nama Guru</th><th>Username</th><th>Aksi</th></tr></thead>
+					<tbody>
+						{#each examTeachers as teacher}
+							<tr>
+								<td class="font-medium text-slate-800">{teacher.name}</td>
+								<td class="font-mono text-sm text-slate-500">{teacher.username}</td>
+								<td>
+									<form method="POST" action="?/removeTeacher" use:enhance>
+										<input type="hidden" name="exam_teacher_id" value={teacher.exam_teacher_id} />
+										<button type="submit" class="text-rose-500 hover:text-rose-700 p-1" title="Hapus Pengajar" on:click={(e) => { if (!confirm('Hapus pengajar ini?')) e.preventDefault(); }}>
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+												<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
+											</svg>
+										</button>
+									</form>
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+		{/if}
+	</div>
+
 	<!-- Questions List -->
-	<div class="card overflow-hidden">
+	<div class="card overflow-hidden mb-6">
 		<div class="p-5 border-b border-slate-100 flex items-center justify-between">
 			<h2 class="text-lg font-bold text-slate-800">Daftar Soal</h2>
-			<a href="/guru/bank-soal/{exam.id}" class="btn-sm btn-outline">Kelola Soal</a>
+			<a href="/admin/bank-soal/{exam.id}" class="btn-sm btn-outline">Kelola Soal</a>
 		</div>
 		{#if questions.length === 0}
 			<div class="p-8 text-center text-slate-400 text-sm">Belum ada soal untuk ujian ini.</div>
@@ -189,19 +241,37 @@
 			</div>
 
 			{#if addParticipantTab === 'class'}
-				<form method="POST" action="?/addParticipantClass" use:enhance={() => { return async ({ update }) => { showAddParticipantModal = false; await update(); }; }} class="space-y-4">
+				<form method="POST" action="?/addParticipantClass" use:enhance={() => { return async ({ update }) => { showAddParticipantModal = false; selectedClassId = ''; await update(); }; }} class="space-y-4">
 					<div>
 						<label class="label" for="add-class">Pilih Kelas</label>
-						<select id="add-class" name="class_id" class="input" required>
+						<select id="add-class" name="class_id" class="input" bind:value={selectedClassId} required>
 							<option value="">-- Pilih Kelas --</option>
 							{#each data.classes as c}
-								<option value={c.id}>{c.name}</option>
+								<option value={c.id.toString()}>{c.name}</option>
 							{/each}
 						</select>
-						<p class="text-xs text-slate-500 mt-1">Semua siswa di kelas ini akan ditambahkan sebagai peserta ujian.</p>
+						<p class="text-xs text-slate-500 mt-1 mb-2">Semua siswa di kelas ini akan ditambahkan sebagai peserta ujian.</p>
+						
+						{#if selectedClassId}
+							<div class="mt-3 border border-slate-200 rounded-lg max-h-48 overflow-y-auto p-2 bg-slate-50">
+								<p class="text-xs font-semibold text-slate-600 px-2 py-1 mb-1 sticky top-0 bg-slate-50">Pratinjau Siswa ({previewStudents.length})</p>
+								{#if previewStudents.length === 0}
+									<p class="text-sm text-slate-500 p-2 text-center">Tidak ada siswa di kelas ini.</p>
+								{:else}
+									<ul class="text-sm text-slate-700 divide-y divide-slate-100">
+										{#each previewStudents as s}
+											<li class="py-1.5 px-2 flex justify-between">
+												<span>{s.name}</span>
+												<span class="text-xs font-mono text-slate-400">{s.username}</span>
+											</li>
+										{/each}
+									</ul>
+								{/if}
+							</div>
+						{/if}
 					</div>
 					<div class="pt-2">
-						<button type="submit" class="btn-primary w-full">Tambahkan Kelas</button>
+						<button type="submit" class="btn-primary w-full" disabled={!selectedClassId || previewStudents.length === 0}>Tambahkan Kelas</button>
 					</div>
 				</form>
 			{:else}
@@ -253,6 +323,65 @@
 					</div>
 				</form>
 			{/if}
+		</div>
+	</div>
+{/if}
+
+{#if showAddTeacherModal}
+	<div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+		<div class="bg-white rounded-2xl w-full max-w-lg shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+			<div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+				<h3 class="font-bold text-slate-800 text-lg">Tambah Pengajar Ujian</h3>
+				<button class="text-slate-400 hover:text-slate-600 p-2 rounded-lg hover:bg-slate-100 transition-colors" on:click={() => showAddTeacherModal = false}>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.close} />
+					</svg>
+				</button>
+			</div>
+			
+			<div class="p-6 overflow-y-auto">
+				<form method="POST" action="?/addTeacher" use:enhance={() => { return async ({ update }) => { showAddTeacherModal = false; teacherSearch = ''; await update(); }; }} class="space-y-4">
+					<div>
+						<div class="flex items-center justify-between mb-2">
+							<label class="label mb-0 block">Pilih Guru</label>
+							<button type="button" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium" on:click={() => {
+								const checkboxes = document.querySelectorAll('input[name="teacher_ids"]:not(:disabled)');
+								const allChecked = Array.from(checkboxes).length > 0 && Array.from(checkboxes).every(cb => (cb as HTMLInputElement).checked);
+								checkboxes.forEach(cb => (cb as HTMLInputElement).checked = !allChecked);
+							}}>
+								Pilih Semua / Batal
+							</button>
+						</div>
+						
+						<!-- Filter -->
+						<div class="mb-3">
+							<input type="text" placeholder="Cari nama guru..." bind:value={teacherSearch} class="input text-sm py-1.5" />
+						</div>
+
+						<div class="border border-slate-200 rounded-lg max-h-60 overflow-y-auto p-2 bg-slate-50">
+							{#each allTeachers.filter(t => t.name.toLowerCase().includes(teacherSearch.toLowerCase()) || t.username.toLowerCase().includes(teacherSearch.toLowerCase())) as t}
+								{@const isTeacher = examTeachers.some(et => et.user_id === t.id)}
+								<label class="flex items-center gap-3 p-2 rounded transition-colors {isTeacher ? 'bg-slate-100 opacity-70' : 'hover:bg-white cursor-pointer'}">
+									<input type="checkbox" name="teacher_ids" value={t.id} class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-50" checked={isTeacher} disabled={isTeacher} />
+									<div class="flex flex-col flex-1">
+										<span class="text-sm font-medium text-slate-800">{t.name}</span>
+										<span class="text-xs text-slate-500 font-mono">{t.username}</span>
+									</div>
+									{#if isTeacher}
+										<span class="text-[10px] badge-success">Sudah Masuk</span>
+									{/if}
+								</label>
+							{/each}
+							{#if allTeachers.filter(t => t.name.toLowerCase().includes(teacherSearch.toLowerCase()) || t.username.toLowerCase().includes(teacherSearch.toLowerCase())).length === 0}
+								<div class="p-4 text-center text-sm text-slate-500">Tidak ada data guru yang cocok.</div>
+							{/if}
+						</div>
+					</div>
+					<div class="pt-2">
+						<button type="submit" class="btn-primary w-full">Tambahkan Pengajar</button>
+					</div>
+				</form>
+			</div>
 		</div>
 	</div>
 {/if}

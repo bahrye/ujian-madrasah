@@ -140,11 +140,25 @@ CREATE INDEX IF NOT EXISTS idx_answers_question ON student_answers(question_id);
 
 -- Tabel Peserta Ujian (baru)
 CREATE TABLE IF NOT EXISTS exam_participants (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    exam_id INTEGER NOT NULL REFERENCES exams(id) ON DELETE CASCADE,
-    student_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    UNIQUE(exam_id, student_id)
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	exam_id INTEGER NOT NULL,
+	student_id INTEGER NOT NULL,
+	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (exam_id) REFERENCES exams(id) ON DELETE CASCADE,
+	FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+	UNIQUE(exam_id, student_id)
 );
-CREATE INDEX IF NOT EXISTS idx_participants_exam ON exam_participants(exam_id);
-CREATE INDEX IF NOT EXISTS idx_participants_student ON exam_participants(student_id);
+CREATE INDEX IF NOT EXISTS idx_exam_participants_exam ON exam_participants(exam_id);
+CREATE INDEX IF NOT EXISTS idx_exam_participants_student ON exam_participants(student_id);
+
+CREATE TABLE IF NOT EXISTS exam_teachers (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	exam_id INTEGER NOT NULL,
+	teacher_id INTEGER NOT NULL,
+	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (exam_id) REFERENCES exams(id) ON DELETE CASCADE,
+	FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE,
+	UNIQUE(exam_id, teacher_id)
+);
+CREATE INDEX IF NOT EXISTS idx_exam_teachers_exam ON exam_teachers(exam_id);
+CREATE INDEX IF NOT EXISTS idx_exam_teachers_teacher ON exam_teachers(teacher_id);

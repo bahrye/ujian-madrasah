@@ -1,15 +1,24 @@
 import { fail, error } from "@sveltejs/kit";
 import { g as getDB } from "../../../../../chunks/db.js";
-const load = async ({ platform, params }) => {
+const load = async ({ platform, params, locals }) => {
   const db = getDB(platform);
-  const exam = await db.prepare("SELECT * FROM exams WHERE id = ?").bind(params.examId).first();
+  const exam = await db.prepare("SELECT * FROM exams WHERE id = ? AND school_id = ?").bind(params.examId, locals.user.school_id).first();
   if (!exam) throw error(404, "Ujian tidak ditemukan");
+  const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(params.examId, locals.user.id).first();
+  if (exam.created_by !== locals.user.id && !isTeacher) {
+    throw error(403, "Anda tidak memiliki akses ke ujian ini.");
+  }
   const questions = await db.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number").bind(params.examId).all();
   return { exam, questions: questions.results };
 };
 const actions = {
-  create: async ({ request, platform, params }) => {
+  create: async ({ request, platform, params, locals }) => {
     const db = getDB(platform);
+    const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ?").bind(params.examId).first();
+    const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(params.examId, locals.user.id).first();
+    if (!exam || exam.created_by !== locals.user.id && !isTeacher) {
+      return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
+    }
     const form = await request.formData();
     const type = form.get("type")?.toString();
     const questionText = form.get("question_text")?.toString().trim();
@@ -69,8 +78,13 @@ const actions = {
     ).run();
     return { success: "Soal berhasil ditambahkan." };
   },
-  delete: async ({ request, platform }) => {
+  delete: async ({ request, platform, params, locals }) => {
     const db = getDB(platform);
+    const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ?").bind(params.examId).first();
+    const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(params.examId, locals.user.id).first();
+    if (!exam || exam.created_by !== locals.user.id && !isTeacher) {
+      return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
+    }
     const form = await request.formData();
     const id = form.get("id")?.toString();
     if (!id) return fail(400, { error: "ID tidak valid." });

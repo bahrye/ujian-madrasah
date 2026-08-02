@@ -28,6 +28,15 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 
 	const classes = await db.prepare('SELECT id, name FROM classes WHERE school_id = ? ORDER BY name').bind(locals.user!.school_id).all();
 	const allStudents = await db.prepare('SELECT id, name, username, class_id FROM users WHERE school_id = ? AND role = "siswa" ORDER BY name').bind(locals.user!.school_id).all();
+	
+	const allTeachers = await db.prepare('SELECT id, name, username FROM users WHERE school_id = ? AND role = "guru" ORDER BY name').bind(locals.user!.school_id).all();
+	const examTeachers = await db.prepare(`
+		SELECT et.id as exam_teacher_id, u.id as user_id, u.name, u.username
+		FROM exam_teachers et
+		JOIN users u ON et.teacher_id = u.id
+		WHERE et.exam_id = ?
+		ORDER BY u.name
+	`).bind(examId).all();
 
 	return { 
 		exam, 
@@ -36,7 +45,9 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 		tokens: tokens.results,
 		participants: participants.results,
 		classes: classes.results,
-		allStudents: allStudents.results
+		allStudents: allStudents.results,
+		allTeachers: allTeachers.results,
+		examTeachers: examTeachers.results
 	};
 };
 
@@ -90,6 +101,35 @@ export const actions = {
 
 		await db.prepare('DELETE FROM exam_participants WHERE id = ?').bind(participantId).run();
 		return { success: 'Peserta berhasil dihapus dari ujian.' };
+	},
+
+	addTeacher: async ({ request, platform, params }: import('./$types').RequestEvent) => {
+		const db = getDB(platform);
+		const form = await request.formData();
+		const teacherIds = form.getAll('teacher_ids').map(id => id.toString());
+		if (teacherIds.length === 0) return fail(400, { error: 'Pilih minimal satu guru' });
+
+		let added = 0;
+		for (const teacherId of teacherIds) {
+			try {
+				await db.prepare('INSERT INTO exam_teachers (exam_id, teacher_id) VALUES (?, ?)')
+					.bind(params.id, teacherId).run();
+				added++;
+			} catch (e) {
+				// Ignore if already exists
+			}
+		}
+		return { success: `Berhasil menambahkan ${added} guru pengajar ujian.` };
+	},
+
+	removeTeacher: async ({ request, platform, params }: import('./$types').RequestEvent) => {
+		const db = getDB(platform);
+		const form = await request.formData();
+		const examTeacherId = form.get('exam_teacher_id')?.toString();
+		if (!examTeacherId) return fail(400, { error: 'ID pengajar tidak valid' });
+
+		await db.prepare('DELETE FROM exam_teachers WHERE id = ?').bind(examTeacherId).run();
+		return { success: 'Pengajar berhasil dihapus.' };
 	}
 };
 ;null as any as Actions;
