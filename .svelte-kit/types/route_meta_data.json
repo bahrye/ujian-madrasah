@@ -41,6 +41,11 @@
 		"src/routes/admin/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/admin/results/[attemptId]": [
+		"src/routes/admin/results/[attemptId]/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/admin/students": [
 		"src/routes/admin/students/+page.server.ts",
 		"src/routes/admin/+layout.server.ts",

@@ -1,6 +1,6 @@
 import { l as fallback, k as store_get, c as ensure_array_like, i as attr, d as attr_class, e as escape_html, a as stringify, u as unsubscribe_stores, b as bind_props, s as slot } from "./index.js";
 import { p as page } from "./stores.js";
-import { I as ICONS, b as ROLE_LABELS } from "./constants.js";
+import { I as ICONS, R as ROLE_LABELS } from "./constants.js";
 import { T as Toast } from "./Toast2.js";
 function Sidebar($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {

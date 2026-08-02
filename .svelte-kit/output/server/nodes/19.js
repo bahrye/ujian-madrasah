@@ -1,10 +1,10 @@
-import * as server from '../entries/pages/guru/bank-soal/_page.server.ts.js';
+import * as server from '../entries/pages/guru/_page.server.ts.js';
 
 export const index = 19;
 let component_cache;
-export const component = async () => component_cache ??= (await import('../entries/pages/guru/bank-soal/_page.svelte.js')).default;
+export const component = async () => component_cache ??= (await import('../entries/pages/guru/_page.svelte.js')).default;
 export { server };
-export const server_id = "src/routes/guru/bank-soal/+page.server.ts";
-export const imports = ["_app/immutable/nodes/19.Cpk-yy5G.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/IezoYWdk.js","_app/immutable/chunks/4sJjlQhy.js","_app/immutable/chunks/ORHH_Igp.js","_app/immutable/chunks/DRBzC1Fe.js","_app/immutable/chunks/DngjJS7A.js","_app/immutable/chunks/BQKkEFI8.js","_app/immutable/chunks/P8PDy6B9.js","_app/immutable/chunks/CLBdZxlA.js","_app/immutable/chunks/Bz-vfPr8.js","_app/immutable/chunks/HO8GNNiH.js","_app/immutable/chunks/B9FCRLYK.js","_app/immutable/chunks/Bfc47y5P.js","_app/immutable/chunks/CcJDwDvi.js"];
+export const server_id = "src/routes/guru/+page.server.ts";
+export const imports = ["_app/immutable/nodes/19.Bynz6IKJ.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/B_wgVCD3.js","_app/immutable/chunks/BNACDoGZ.js","_app/immutable/chunks/CSaYYiLa.js","_app/immutable/chunks/DClR96SM.js","_app/immutable/chunks/B1FwHZj5.js","_app/immutable/chunks/B38xbdib.js","_app/immutable/chunks/lO_yT19u.js","_app/immutable/chunks/BfiCelro.js","_app/immutable/chunks/ChLNHVnn.js","_app/immutable/chunks/CcJDwDvi.js"];
 export const stylesheets = [];
 export const fonts = [];

@@ -7,13 +7,9 @@ import "@sveltejs/kit/internal/server";
 import "../../../../../chunks/root.js";
 import "../../../../../chunks/state.svelte.js";
 import { Q as QUESTION_TYPE_LABELS, I as ICONS } from "../../../../../chunks/constants.js";
+import { h as html } from "../../../../../chunks/html.js";
 import { T as Toast } from "../../../../../chunks/Toast2.js";
 import "../../../../../chunks/toast.js";
-function html(value) {
-  var html2 = String(value ?? "");
-  var open = "<!---->";
-  return open + html2 + "<!---->";
-}
 function Timer($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let hours, minutes, seconds, formattedTime;

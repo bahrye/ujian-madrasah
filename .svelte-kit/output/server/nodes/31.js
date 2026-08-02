@@ -1,10 +1,10 @@
-import * as server from '../entries/pages/superadmin/admins/_page.server.ts.js';
+import * as server from '../entries/pages/superadmin/_page.server.ts.js';
 
 export const index = 31;
 let component_cache;
-export const component = async () => component_cache ??= (await import('../entries/pages/superadmin/admins/_page.svelte.js')).default;
+export const component = async () => component_cache ??= (await import('../entries/pages/superadmin/_page.svelte.js')).default;
 export { server };
-export const server_id = "src/routes/superadmin/admins/+page.server.ts";
-export const imports = ["_app/immutable/nodes/31.Ddi5Rzb4.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/IezoYWdk.js","_app/immutable/chunks/4sJjlQhy.js","_app/immutable/chunks/ORHH_Igp.js","_app/immutable/chunks/DRBzC1Fe.js","_app/immutable/chunks/DngjJS7A.js","_app/immutable/chunks/BQKkEFI8.js","_app/immutable/chunks/P8PDy6B9.js","_app/immutable/chunks/CLBdZxlA.js","_app/immutable/chunks/Bz-vfPr8.js","_app/immutable/chunks/HO8GNNiH.js","_app/immutable/chunks/Bl_e233e.js","_app/immutable/chunks/DbIJ5SVL.js","_app/immutable/chunks/CyNw4OuR.js","_app/immutable/chunks/227Yc9SM.js","_app/immutable/chunks/HUMXMPGN.js","_app/immutable/chunks/Dbe9yHDH.js"];
+export const server_id = "src/routes/superadmin/+page.server.ts";
+export const imports = ["_app/immutable/nodes/31._oeAumSG.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/B_wgVCD3.js","_app/immutable/chunks/BNACDoGZ.js","_app/immutable/chunks/CSaYYiLa.js","_app/immutable/chunks/lO_yT19u.js","_app/immutable/chunks/DClR96SM.js","_app/immutable/chunks/B1FwHZj5.js","_app/immutable/chunks/B38xbdib.js","_app/immutable/chunks/BfiCelro.js","_app/immutable/chunks/ChLNHVnn.js"];
 export const stylesheets = [];
 export const fonts = [];

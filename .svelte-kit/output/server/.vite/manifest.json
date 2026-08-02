@@ -62,6 +62,10 @@
     "file": "chunks/exports.js",
     "name": "exports"
   },
+  "_html.js": {
+    "file": "chunks/html.js",
+    "name": "html"
+  },
   "_index-server.js": {
     "file": "chunks/index-server.js",
     "name": "index-server",
@@ -204,7 +208,7 @@
       "_index.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.C9NdjRbR.css"
+      "_app/immutable/assets/_layout.Cfqi_nN5.css"
     ]
   },
   "src/routes/+page.server.ts": {
@@ -400,6 +404,26 @@
       "_state.svelte.js",
       "_constants.js",
       "_ConfirmForm.js"
+    ]
+  },
+  "src/routes/admin/results/[attemptId]/+page.server.ts": {
+    "file": "entries/pages/admin/results/_attemptId_/_page.server.ts.js",
+    "name": "entries/pages/admin/results/_attemptId_/_page.server.ts",
+    "src": "src/routes/admin/results/[attemptId]/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/admin/results/[attemptId]/+page.svelte": {
+    "file": "entries/pages/admin/results/_attemptId_/_page.svelte.js",
+    "name": "entries/pages/admin/results/_attemptId_/_page.svelte",
+    "src": "src/routes/admin/results/[attemptId]/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_constants.js",
+      "_html.js"
     ]
   },
   "src/routes/admin/students/+page.server.ts": {
@@ -826,6 +850,7 @@
       "_root.js",
       "_state.svelte.js",
       "_constants.js",
+      "_html.js",
       "_Toast2.js",
       "_toast.js"
     ]

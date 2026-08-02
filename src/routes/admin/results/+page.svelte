@@ -48,22 +48,29 @@
 								<td><span class={ATTEMPT_STATUS_COLORS[r.status] || 'badge-info'}>{ATTEMPT_STATUS_LABELS[r.status]}</span></td>
 								<td class="text-xs text-slate-500">{r.submit_time ? new Date(r.submit_time).toLocaleString('id-ID') : '-'}</td>
 								<td class="text-center">
-									<ConfirmForm 
-										action="?/delete"
-										confirmTitle="Hapus Hasil Ujian"
-										confirmMessage="Yakin ingin menghapus hasil ujian ini? Ini akan menghapus permanen jawaban siswa!"
-										buttonClass="p-1.5 text-rose-500 hover:bg-rose-50 rounded transition-colors"
-										buttonTitle="Hapus Ujian"
-									>
-										<svelte:fragment slot="inputs">
-											<input type="hidden" name="attempt_id" value={r.id} />
-										</svelte:fragment>
-										<svelte:fragment slot="buttonContent">
+									<div class="flex items-center justify-center gap-2">
+										<a href="/admin/results/{r.id}" class="p-1.5 text-indigo-500 hover:bg-indigo-50 rounded transition-colors" title="Lihat Detail Ujian">
 											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-												<path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+												<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
 											</svg>
-										</svelte:fragment>
-									</ConfirmForm>
+										</a>
+										<ConfirmForm 
+											action="?/delete"
+											confirmTitle="Hapus Hasil Ujian"
+											confirmMessage="Yakin ingin menghapus hasil ujian ini? Ini akan menghapus permanen jawaban siswa!"
+											buttonClass="p-1.5 text-rose-500 hover:bg-rose-50 rounded transition-colors"
+											buttonTitle="Hapus Ujian"
+										>
+											<svelte:fragment slot="inputs">
+												<input type="hidden" name="attempt_id" value={r.id} />
+											</svelte:fragment>
+											<svelte:fragment slot="buttonContent">
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+													<path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+												</svg>
+											</svelte:fragment>
+										</ConfirmForm>
+									</div>
 								</td>
 							</tr>
 						{/each}

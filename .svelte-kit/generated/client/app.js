@@ -41,7 +41,8 @@ export const nodes = [
 	() => import('./nodes/29'),
 	() => import('./nodes/30'),
 	() => import('./nodes/31'),
-	() => import('./nodes/32')
+	() => import('./nodes/32'),
+	() => import('./nodes/33')
 ];
 
 export const server_loads = [0,2,3,4,5,6];
@@ -55,24 +56,25 @@ export const dictionary = {
 		"/admin/exams": [~12,[2]],
 		"/admin/exams/[id]": [~13,[2]],
 		"/admin/results": [~14,[2]],
-		"/admin/students": [~15,[2]],
-		"/admin/subjects": [~16,[2]],
-		"/admin/users": [~17,[2]],
-		"/guru": [~18,[3]],
-		"/guru/bank-soal": [~19,[3]],
-		"/guru/bank-soal/[examId]": [~20,[3]],
-		"/guru/penilaian": [~21,[3]],
-		"/login": [~22],
-		"/pengawas": [~23,[4]],
-		"/pengawas/monitor": [~24,[4]],
-		"/pengawas/tokens": [~25,[4]],
-		"/siswa": [~26,[5]],
-		"/siswa/jadwal": [~27,[5]],
-		"/siswa/ujian": [~28,[5]],
-		"/siswa/ujian/[attemptId]": [~29],
-		"/superadmin": [~30,[6]],
-		"/superadmin/admins": [~31,[6]],
-		"/superadmin/schools": [~32,[6]]
+		"/admin/results/[attemptId]": [~15,[2]],
+		"/admin/students": [~16,[2]],
+		"/admin/subjects": [~17,[2]],
+		"/admin/users": [~18,[2]],
+		"/guru": [~19,[3]],
+		"/guru/bank-soal": [~20,[3]],
+		"/guru/bank-soal/[examId]": [~21,[3]],
+		"/guru/penilaian": [~22,[3]],
+		"/login": [~23],
+		"/pengawas": [~24,[4]],
+		"/pengawas/monitor": [~25,[4]],
+		"/pengawas/tokens": [~26,[4]],
+		"/siswa": [~27,[5]],
+		"/siswa/jadwal": [~28,[5]],
+		"/siswa/ujian": [~29,[5]],
+		"/siswa/ujian/[attemptId]": [~30],
+		"/superadmin": [~31,[6]],
+		"/superadmin/admins": [~32,[6]],
+		"/superadmin/schools": [~33,[6]]
 	};
 
 export const hooks = {

@@ -1,4 +1,4 @@
-import { h as head, c as ensure_array_like, e as escape_html, d as attr_class, j as clsx, b as bind_props, i as attr } from "../../../../chunks/index.js";
+import { h as head, c as ensure_array_like, e as escape_html, d as attr_class, j as clsx, i as attr, a as stringify, b as bind_props } from "../../../../chunks/index.js";
 import "@sveltejs/kit/internal";
 import "../../../../chunks/exports.js";
 import "../../../../chunks/utils2.js";
@@ -27,7 +27,7 @@ function _page($$renderer, $$props) {
       const each_array = ensure_array_like(results);
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
         let r = each_array[$$index];
-        $$renderer2.push(`<tr><td class="font-semibold text-slate-800">${escape_html(r.student_name)}</td><td>${escape_html(r.exam_title)}</td><td class="text-slate-500">${escape_html(r.subject || "-")}</td><td><span${attr_class(`text-lg font-bold ${(r.score ?? 0) >= 70 ? "text-emerald-600" : "text-rose-600"}`)}>${escape_html(r.score != null ? r.score.toFixed(1) : "-")}</span></td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[r.status] || "badge-info"))}>${escape_html(ATTEMPT_STATUS_LABELS[r.status])}</span></td><td class="text-xs text-slate-500">${escape_html(r.submit_time ? new Date(r.submit_time).toLocaleString("id-ID") : "-")}</td><td class="text-center">`);
+        $$renderer2.push(`<tr><td class="font-semibold text-slate-800">${escape_html(r.student_name)}</td><td>${escape_html(r.exam_title)}</td><td class="text-slate-500">${escape_html(r.subject || "-")}</td><td><span${attr_class(`text-lg font-bold ${(r.score ?? 0) >= 70 ? "text-emerald-600" : "text-rose-600"}`)}>${escape_html(r.score != null ? r.score.toFixed(1) : "-")}</span></td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[r.status] || "badge-info"))}>${escape_html(ATTEMPT_STATUS_LABELS[r.status])}</span></td><td class="text-xs text-slate-500">${escape_html(r.submit_time ? new Date(r.submit_time).toLocaleString("id-ID") : "-")}</td><td class="text-center"><div class="flex items-center justify-center gap-2"><a${attr("href", `/admin/results/${stringify(r.id)}`)} class="p-1.5 text-indigo-500 hover:bg-indigo-50 rounded transition-colors" title="Lihat Detail Ujian"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></a> `);
         ConfirmForm($$renderer2, {
           action: "?/delete",
           confirmTitle: "Hapus Hasil Ujian",
@@ -47,7 +47,7 @@ function _page($$renderer, $$props) {
             }
           }
         });
-        $$renderer2.push(`<!----></td></tr>`);
+        $$renderer2.push(`<!----></div></td></tr>`);
       }
       $$renderer2.push(`<!--]--></tbody></table></div>`);
     }
