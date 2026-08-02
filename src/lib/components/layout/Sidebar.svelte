@@ -9,11 +9,11 @@
 
 	$: currentPath = $page.url.pathname;
 
-	function isActive(href: string): boolean {
+	function isActive(href: string, path: string): boolean {
 		if (href === `/${user?.role}`) {
-			return currentPath === href;
+			return path === href;
 		}
-		return currentPath.startsWith(href);
+		return path.startsWith(href);
 	}
 
 	const roleGradients: Record<string, string> = {
@@ -50,7 +50,7 @@
 			<a
 				href={item.href}
 				class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-					   {isActive(item.href)
+					   {isActive(item.href, currentPath)
 						? 'bg-white/15 text-white shadow-lg shadow-white/5'
 						: 'text-primary-300 hover:text-white hover:bg-white/10'}"
 			>
@@ -58,7 +58,7 @@
 					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS[item.icon] || ''} />
 				</svg>
 				<span>{item.label}</span>
-				{#if isActive(item.href)}
+				{#if isActive(item.href, currentPath)}
 					<div class="ml-auto w-1.5 h-1.5 rounded-full bg-white shadow-lg shadow-white/50"></div>
 				{/if}
 			</a>
@@ -130,7 +130,7 @@
 					<a
 						href={item.href}
 						class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200
-							   {isActive(item.href)
+							   {isActive(item.href, currentPath)
 								? 'bg-white/15 text-white'
 								: 'text-primary-300 hover:text-white hover:bg-white/10'}"
 						on:click={() => (isOpen = false)}

@@ -9,11 +9,11 @@ function Sidebar($$renderer, $$props) {
     let menuItems = fallback($$props["menuItems"], () => [], true);
     let user = $$props["user"];
     let isOpen = fallback($$props["isOpen"], false);
-    function isActive(href) {
+    function isActive(href, path) {
       if (href === `/${user?.role}`) {
-        return currentPath === href;
+        return path === href;
       }
-      return currentPath.startsWith(href);
+      return path.startsWith(href);
     }
     const roleGradients = {
       admin: "from-rose-500 to-pink-500",
@@ -26,8 +26,8 @@ function Sidebar($$renderer, $$props) {
     const each_array = ensure_array_like(menuItems);
     for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
       let item = each_array[$$index];
-      $$renderer2.push(`<a${attr("href", item.href)}${attr_class(`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${isActive(item.href) ? "bg-white/15 text-white shadow-lg shadow-white/5" : "text-primary-300 hover:text-white hover:bg-white/10"}`)}><svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS[item.icon] || "")}></path></svg> <span>${escape_html(item.label)}</span> `);
-      if (isActive(item.href)) {
+      $$renderer2.push(`<a${attr("href", item.href)}${attr_class(`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${isActive(item.href, currentPath) ? "bg-white/15 text-white shadow-lg shadow-white/5" : "text-primary-300 hover:text-white hover:bg-white/10"}`)}><svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS[item.icon] || "")}></path></svg> <span>${escape_html(item.label)}</span> `);
+      if (isActive(item.href, currentPath)) {
         $$renderer2.push("<!--[0-->");
         $$renderer2.push(`<div class="ml-auto w-1.5 h-1.5 rounded-full bg-white shadow-lg shadow-white/50"></div>`);
       } else {
@@ -42,7 +42,7 @@ function Sidebar($$renderer, $$props) {
       const each_array_1 = ensure_array_like(menuItems);
       for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
         let item = each_array_1[$$index_1];
-        $$renderer2.push(`<a${attr("href", item.href)}${attr_class(`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive(item.href) ? "bg-white/15 text-white" : "text-primary-300 hover:text-white hover:bg-white/10"}`)}><svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS[item.icon] || "")}></path></svg> <span>${escape_html(item.label)}</span></a>`);
+        $$renderer2.push(`<a${attr("href", item.href)}${attr_class(`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive(item.href, currentPath) ? "bg-white/15 text-white" : "text-primary-300 hover:text-white hover:bg-white/10"}`)}><svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS[item.icon] || "")}></path></svg> <span>${escape_html(item.label)}</span></a>`);
       }
       $$renderer2.push(`<!--]--></nav> <div class="p-4 border-t border-primary-800/50"><div class="flex items-center gap-3 px-3 py-2"><div${attr_class(`w-9 h-9 rounded-full bg-gradient-to-br ${stringify(roleGradients[user?.role ?? "siswa"])} flex items-center justify-center text-sm font-bold`)}>${escape_html(user?.name?.charAt(0).toUpperCase() ?? "?")}</div> <div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate">${escape_html(user?.name ?? "Pengguna")}</p> <p class="text-xs text-primary-400">${escape_html(ROLE_LABELS[user?.role ?? ""] ?? "")}</p></div></div> <a href="/api/logout" class="mt-2 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-primary-300 hover:text-white hover:bg-white/10 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.logout)}></path></svg> Keluar</a></div></aside></div>`);
     } else {
