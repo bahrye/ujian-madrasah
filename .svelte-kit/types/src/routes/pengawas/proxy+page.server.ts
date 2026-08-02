@@ -20,12 +20,32 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 		`).bind(locals.user!.id, locals.user!.school_id).all()
 	]);
 
+	const participantsDb = await db.prepare(`
+		SELECT ep.exam_id, u.name, c.name as class_name, u.username
+		FROM exam_participants ep
+		JOIN users u ON ep.student_id = u.id
+		LEFT JOIN classes c ON u.class_id = c.id
+		WHERE ep.exam_id IN (SELECT exam_id FROM exam_proctors WHERE proctor_id = ?)
+		ORDER BY c.name, u.name
+	`).bind(locals.user!.id).all();
+
+	const participants = participantsDb.results as any[];
+
+	const schedulesWithParticipants = schedules.results.map((schedule: any) => {
+		const examParticipants = participants.filter(p => p.exam_id === schedule.exam_id);
+		return {
+			...schedule,
+			participant_count: examParticipants.length,
+			participants: examParticipants
+		};
+	});
+
 	return {
 		stats: {
 			activeExams: activeExams?.c ?? 0,
 			totalTokens: tokenCount?.c ?? 0,
 			activeAttempts: activeAttempts?.c ?? 0
 		},
-		schedules: schedules.results
+		schedules: schedulesWithParticipants
 	};
 };
