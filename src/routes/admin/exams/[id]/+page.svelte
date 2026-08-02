@@ -1,11 +1,21 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import { QUESTION_TYPE_LABELS, ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS, ICONS } from '$lib/utils/constants';
 
+	export let form: { error?: string; success?: string } | null = null;
 	export let data;
 	$: exam = data.exam as any;
 	$: questions = data.questions as any[];
 	$: attempts = data.attempts as any[];
 	$: tokens = data.tokens as any[];
+	$: participants = data.participants as any[];
+	
+	let showAddParticipantModal = false;
+	let addParticipantTab: 'class' | 'student' = 'class';
+
+	import { toasts } from '$lib/stores/toast';
+	$: if (form?.success) toasts.success(form.success);
+	$: if (form?.error) toasts.error(form.error);
 </script>
 
 <svelte:head>
@@ -84,10 +94,51 @@
 		{/if}
 	</div>
 
+	<!-- Participants Table -->
+	<div class="card overflow-hidden">
+		<div class="p-5 border-b border-slate-100 flex items-center justify-between">
+			<h2 class="text-lg font-bold text-slate-800">Daftar Peserta Ujian</h2>
+			<button class="btn-sm btn-primary" on:click={() => (showAddParticipantModal = true)}>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
+				</svg>
+				Tambah Peserta
+			</button>
+		</div>
+		{#if participants.length === 0}
+			<div class="p-8 text-center text-slate-400 text-sm">Belum ada peserta yang ditambahkan ke ujian ini. Ujian tidak bisa diakses siswa.</div>
+		{:else}
+			<div class="table-container border-0 rounded-none max-h-96 overflow-y-auto">
+				<table class="table">
+					<thead class="sticky top-0 bg-white"><tr><th>NISN</th><th>Nama Siswa</th><th>Kelas</th><th>Aksi</th></tr></thead>
+					<tbody>
+						{#each participants as p}
+							<tr>
+								<td class="text-xs font-mono">{p.nisn}</td>
+								<td class="font-medium">{p.student_name}</td>
+								<td>{p.class_name || '-'}</td>
+								<td>
+									<form method="POST" action="?/removeParticipant" use:enhance>
+										<input type="hidden" name="participant_id" value={p.participant_id} />
+										<button type="submit" class="text-rose-500 hover:text-rose-700 p-1" title="Hapus dari ujian" on:click={(e) => { if (!confirm('Hapus siswa ini dari ujian?')) e.preventDefault(); }}>
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+												<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
+											</svg>
+										</button>
+									</form>
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+		{/if}
+	</div>
+
 	<!-- Attempts Table -->
 	<div class="card overflow-hidden">
 		<div class="p-5 border-b border-slate-100">
-			<h2 class="text-lg font-bold text-slate-800">Riwayat Peserta</h2>
+			<h2 class="text-lg font-bold text-slate-800">Riwayat Pengerjaan</h2>
 		</div>
 		{#if attempts.length === 0}
 			<div class="p-8 text-center text-slate-400 text-sm">Belum ada peserta yang mengerjakan ujian ini.</div>
@@ -110,3 +161,57 @@
 		{/if}
 	</div>
 </div>
+
+<!-- Add Participant Modal -->
+{#if showAddParticipantModal}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => (showAddParticipantModal = false)}>
+		<div class="card p-6 w-full max-w-lg animate-bounce-in" on:click|stopPropagation>
+			<div class="flex items-center justify-between mb-6">
+				<h2 class="text-lg font-bold text-slate-800">Tambah Peserta Ujian</h2>
+				<button class="text-slate-400 hover:text-slate-600" on:click={() => (showAddParticipantModal = false)}>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+				</button>
+			</div>
+			
+			<div class="flex border-b border-slate-200 mb-4">
+				<button class="px-4 py-2 text-sm font-medium {addParticipantTab === 'class' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'}" on:click={() => (addParticipantTab = 'class')}>Per Kelas</button>
+				<button class="px-4 py-2 text-sm font-medium {addParticipantTab === 'student' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'}" on:click={() => (addParticipantTab = 'student')}>Per Siswa</button>
+			</div>
+
+			{#if addParticipantTab === 'class'}
+				<form method="POST" action="?/addParticipantClass" use:enhance={() => { return async ({ update }) => { showAddParticipantModal = false; await update(); }; }} class="space-y-4">
+					<div>
+						<label class="label" for="add-class">Pilih Kelas</label>
+						<select id="add-class" name="class_id" class="input" required>
+							<option value="">-- Pilih Kelas --</option>
+							{#each data.classes as c}
+								<option value={c.id}>{c.name}</option>
+							{/each}
+						</select>
+						<p class="text-xs text-slate-500 mt-1">Semua siswa di kelas ini akan ditambahkan sebagai peserta ujian.</p>
+					</div>
+					<div class="pt-2">
+						<button type="submit" class="btn-primary w-full">Tambahkan Kelas</button>
+					</div>
+				</form>
+			{:else}
+				<form method="POST" action="?/addParticipantStudent" use:enhance={() => { return async ({ update }) => { showAddParticipantModal = false; await update(); }; }} class="space-y-4">
+					<div>
+						<label class="label" for="add-student">Pilih Siswa</label>
+						<select id="add-student" name="student_id" class="input" required>
+							<option value="">-- Pilih Siswa --</option>
+							{#each data.allStudents as s}
+								<option value={s.id}>{s.name} ({s.username})</option>
+							{/each}
+						</select>
+					</div>
+					<div class="pt-2">
+						<button type="submit" class="btn-primary w-full">Tambahkan Siswa</button>
+					</div>
+				</form>
+			{/if}
+		</div>
+	</div>
+{/if}

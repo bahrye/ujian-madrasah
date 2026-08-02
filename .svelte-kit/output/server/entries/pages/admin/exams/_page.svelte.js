@@ -24,7 +24,7 @@ function _page($$renderer, $$props) {
       $$renderer2.push("<!--[-->");
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
         let exam = each_array[$$index];
-        $$renderer2.push(`<div class="card-hover p-5 flex flex-col"><div class="flex items-start justify-between mb-3"><div class="flex-1 min-w-0"><h3 class="font-bold text-slate-800 truncate">${escape_html(exam.title)}</h3> <p class="text-xs text-slate-500 mt-0.5">${escape_html(exam.subject || "Umum")}</p></div> `);
+        $$renderer2.push(`<div class="card-hover p-5 flex flex-col"><div class="flex items-start justify-between mb-3"><div class="flex-1 min-w-0"><h3 class="font-bold text-slate-800 truncate">${escape_html(exam.title)}</h3> <p class="text-xs text-slate-500 mt-0.5">${escape_html(exam.subject_name || "Umum")}</p></div> `);
         if (exam.is_active) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<span class="badge-success ml-2 flex-shrink-0">Aktif</span>`);

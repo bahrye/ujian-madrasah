@@ -137,3 +137,14 @@ CREATE INDEX IF NOT EXISTS idx_attempts_exam ON student_attempts(exam_id);
 CREATE INDEX IF NOT EXISTS idx_attempts_status ON student_attempts(status);
 CREATE INDEX IF NOT EXISTS idx_answers_attempt ON student_answers(attempt_id);
 CREATE INDEX IF NOT EXISTS idx_answers_question ON student_answers(question_id);
+
+-- Tabel Peserta Ujian (baru)
+CREATE TABLE IF NOT EXISTS exam_participants (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    exam_id INTEGER NOT NULL REFERENCES exams(id) ON DELETE CASCADE,
+    student_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(exam_id, student_id)
+);
+CREATE INDEX IF NOT EXISTS idx_participants_exam ON exam_participants(exam_id);
+CREATE INDEX IF NOT EXISTS idx_participants_student ON exam_participants(student_id);

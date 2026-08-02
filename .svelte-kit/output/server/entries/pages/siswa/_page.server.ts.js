@@ -6,13 +6,15 @@ const load = async ({ platform, locals }) => {
 		SELECT DISTINCT e.*, t.token_code, t.expires_at as token_expires, s.name as subject
 		FROM exams e
 		JOIN tokens t ON t.exam_id = e.id
+		JOIN exam_participants ep ON ep.exam_id = e.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		WHERE e.is_active = 1
 		AND e.school_id = ?
+		AND ep.student_id = ?
 		AND t.is_released = 1
 		AND datetime(t.expires_at) > datetime('now')
 		ORDER BY e.start_time
-	`).bind(locals.user.school_id).all();
+	`).bind(locals.user.school_id, userId).all();
   const myAttempts = await db.prepare(`
 		SELECT sa.*, e.title as exam_title, s.name as subject
 		FROM student_attempts sa

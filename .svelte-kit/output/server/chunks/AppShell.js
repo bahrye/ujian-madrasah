@@ -1,4 +1,4 @@
-import { g as getContext, af as fallback, ag as store_get, c as ensure_array_like, i as attr, d as attr_class, e as escape_html, a as stringify, ah as unsubscribe_stores, b as bind_props, s as slot } from "./index.js";
+import { g as getContext, k as fallback, ag as store_get, c as ensure_array_like, i as attr, d as attr_class, e as escape_html, a as stringify, ah as unsubscribe_stores, b as bind_props, s as slot } from "./index.js";
 import "clsx";
 import "@sveltejs/kit/internal";
 import "./exports.js";

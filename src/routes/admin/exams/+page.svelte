@@ -39,7 +39,7 @@
 				<div class="flex items-start justify-between mb-3">
 					<div class="flex-1 min-w-0">
 						<h3 class="font-bold text-slate-800 truncate">{exam.title}</h3>
-						<p class="text-xs text-slate-500 mt-0.5">{exam.subject || 'Umum'}</p>
+						<p class="text-xs text-slate-500 mt-0.5">{exam.subject_name || 'Umum'}</p>
 					</div>
 					{#if exam.is_active}
 						<span class="badge-success ml-2 flex-shrink-0">Aktif</span>
@@ -127,7 +127,12 @@
 				<div class="grid grid-cols-2 gap-3">
 					<div>
 						<label class="label" for="c-subject">Mata Pelajaran</label>
-						<input id="c-subject" name="subject" type="text" class="input" placeholder="Matematika" />
+						<select id="c-subject" name="subject_id" class="input">
+							<option value="">Pilih Mata Pelajaran</option>
+							{#each data.subjects as subject}
+								<option value={subject.id}>{subject.name}</option>
+							{/each}
+						</select>
 					</div>
 					<div>
 						<label class="label" for="c-duration">Durasi (menit)</label>
@@ -173,7 +178,12 @@
 				<div class="grid grid-cols-2 gap-3">
 					<div>
 						<label class="label" for="e-subject">Mata Pelajaran</label>
-						<input id="e-subject" name="subject" type="text" class="input" bind:value={editingExam.subject} />
+						<select id="e-subject" name="subject_id" class="input" value={editingExam.subject_id}>
+							<option value="">Pilih Mata Pelajaran</option>
+							{#each data.subjects as subject}
+								<option value={subject.id}>{subject.name}</option>
+							{/each}
+						</select>
 					</div>
 					<div>
 						<label class="label" for="e-duration">Durasi (menit)</label>
