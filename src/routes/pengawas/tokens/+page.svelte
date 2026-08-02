@@ -9,7 +9,7 @@
 	export let form: any;
 
 	let showGenerate = false;
-	let selectedExamId = '';
+	let selectedExamId: number | '' = '';
 	let currentTime = Date.now();
 	let intervalId: any;
 
@@ -20,7 +20,10 @@
 	onMount(() => {
 		if ($page.url.searchParams.get('generate') === '1') {
 			showGenerate = true;
-			selectedExamId = $page.url.searchParams.get('exam_id') || '';
+			const examIdParam = $page.url.searchParams.get('exam_id');
+			if (examIdParam) {
+				selectedExamId = parseInt(examIdParam, 10);
+			}
 		}
 
 		intervalId = setInterval(() => {
