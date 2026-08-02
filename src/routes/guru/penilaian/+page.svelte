@@ -89,7 +89,7 @@
 						/>
 						<span class="text-xs text-slate-400">/ {a.points}</span>
 						<button type="submit" class="btn-success btn-sm">Simpan</button>
-						{#if a.score_given != null}
+						{#if a.score_given !== null && a.score_given !== undefined}
 							<span class="badge-success">✓ Sudah dinilai</span>
 						{:else}
 							<span class="badge-warning">⚠ Belum dinilai</span>

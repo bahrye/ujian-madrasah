@@ -74,7 +74,7 @@ function _page($$renderer, $$props) {
           $$renderer2.push("<!--[-1-->");
         }
         $$renderer2.push(`<!--]--> <div class="bg-slate-50 rounded-xl p-3 mb-3"><p class="text-xs font-semibold text-slate-500 mb-1">Jawaban Siswa:</p> <p class="text-sm text-slate-800 whitespace-pre-wrap">${escape_html(a.answer_given || "(Tidak dijawab)")}</p></div> <form method="POST" action="?/grade" class="flex items-center gap-3"><input type="hidden" name="answer_id"${attr("value", a.answer_id)}/> <input type="hidden" name="max_points"${attr("value", a.points)}/> <label class="text-sm font-medium text-slate-600">Nilai:</label> <input name="score_given" type="number" min="0"${attr("max", a.points)} step="0.5" class="input w-24"${attr("value", a.score_given ?? "")}${attr("placeholder", `0-${stringify(a.points)}`)}/> <span class="text-xs text-slate-400">/ ${escape_html(a.points)}</span> <button type="submit" class="btn-success btn-sm">Simpan</button> `);
-        if (a.score_given != null) {
+        if (a.score_given !== null && a.score_given !== void 0) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<span class="badge-success">✓ Sudah dinilai</span>`);
         } else {

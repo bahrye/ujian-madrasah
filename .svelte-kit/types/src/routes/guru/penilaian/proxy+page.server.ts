@@ -66,11 +66,13 @@ export const actions = {
 		const form = await request.formData();
 
 		const answerId = form.get('answer_id')?.toString();
-		const scoreGiven = parseFloat(form.get('score_given')?.toString() || '0');
+		const scoreStr = form.get('score_given')?.toString();
 		const maxPoints = parseInt(form.get('max_points')?.toString() || '1');
 
 		if (!answerId) return fail(400, { error: 'ID jawaban tidak valid.' });
+		if (!scoreStr || scoreStr.trim() === '') return fail(400, { error: 'Nilai tidak boleh kosong.' });
 
+		const scoreGiven = parseFloat(scoreStr);
 		const isCorrect = scoreGiven >= maxPoints ? 1 : (scoreGiven > 0 ? 0 : 0);
 
 		await db.prepare('UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?')
