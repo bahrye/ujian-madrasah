@@ -7,6 +7,7 @@
 	import { ICONS } from '$lib/utils/constants';
 	import Toast from '$lib/components/ui/Toast.svelte';
 	import { toasts } from '$lib/stores/toast';
+	import { onMount } from 'svelte';
 
 	export let data;
 
@@ -18,6 +19,52 @@
 	let showNav = false;
 	let showSubmitConfirm = false;
 	let submitting = false;
+
+	// Anti-cheat state
+	let warnings = 0;
+	let showWarningModal = false;
+	const MAX_WARNINGS = 3;
+
+	onMount(() => {
+		const savedWarnings = localStorage.getItem(`warnings_${attempt.id}`);
+		if (savedWarnings) {
+			warnings = parseInt(savedWarnings, 10);
+		}
+	});
+
+	function handleCheatWarning() {
+		if (showWarningModal || submitting) return; // Prevent multiple triggers at once
+		
+		warnings += 1;
+		localStorage.setItem(`warnings_${attempt.id}`, warnings.toString());
+		
+		if (warnings > MAX_WARNINGS) {
+			toasts.error('Batas maksimal peringatan terlampaui. Ujian disubmit otomatis.');
+			handleAutoSubmit();
+		} else {
+			showWarningModal = true;
+		}
+	}
+
+	async function handleAutoSubmit() {
+		submitting = true;
+		await saveCurrentAnswer();
+		const form = document.getElementById('submit-form') as HTMLFormElement;
+		if (form) form.requestSubmit();
+	}
+
+	function handleVisibilityChange() {
+		if (document.visibilityState === 'hidden') {
+			handleCheatWarning();
+		}
+	}
+
+	function handleBlur() {
+		// handleCheatWarning();
+		// Note: we can optionally listen to window blur, but visibilitychange is usually more reliable
+		// For stricter rules, we can uncomment the blur listener.
+		handleCheatWarning();
+	}
 
 	// Local answer state
 	let localAnswers: Record<number, string> = {};
@@ -97,9 +144,18 @@
 
 <svelte:head><title>{attempt.exam_title} — Ujian Online Madrasah</title></svelte:head>
 
+<svelte:window 
+	on:contextmenu|preventDefault 
+	on:copy|preventDefault 
+	on:cut|preventDefault 
+	on:paste|preventDefault 
+	on:blur={handleBlur} 
+/>
+<svelte:document on:visibilitychange={handleVisibilityChange} />
+
 <Toast />
 
-<div class="min-h-screen bg-slate-50 flex flex-col">
+<div class="min-h-screen bg-slate-50 flex flex-col select-none">
 	<!-- Exam Header -->
 	<header class="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-200 px-4 py-3">
 		<div class="max-w-4xl mx-auto flex items-center justify-between gap-3">
@@ -243,4 +299,33 @@
 			</div>
 		</div>
 	</div>
+{/if}
+
+<!-- Anti-Cheat Warning Modal -->
+{#if showWarningModal}
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+	<div class="bg-white rounded-2xl w-full max-w-md p-6 sm:p-8 shadow-2xl text-center border-t-4 border-red-500">
+		<div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4 text-red-500">
+			<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+			</svg>
+		</div>
+		<h2 class="text-xl font-bold text-slate-800 mb-2">Peringatan Kecurangan!</h2>
+		<p class="text-slate-600 mb-4 text-sm">
+			Anda terdeteksi meninggalkan halaman ujian (berpindah aplikasi atau tab). Tindakan ini tercatat di sistem sebagai indikasi kecurangan.
+		</p>
+		<div class="bg-red-50 border border-red-100 rounded-xl p-3 mb-6">
+			<p class="text-sm font-semibold text-red-600">Peringatan ke-{warnings} dari {MAX_WARNINGS}</p>
+			<p class="text-xs text-red-500 mt-1">Jika mencapai batas maksimal, ujian akan diselesaikan secara paksa.</p>
+		</div>
+		<button
+			class="btn-primary w-full bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/30"
+			on:click={() => (showWarningModal = false)}
+		>
+			Saya Mengerti & Kembali ke Ujian
+		</button>
+	</div>
+</div>
 {/if}
