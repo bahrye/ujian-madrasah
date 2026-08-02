@@ -95,19 +95,27 @@
 		}
 	});
 
+	let isDisqualifying = false;
+
 	function triggerDisqualification() {
 		isUnloading = true; // allow navigation later
 		showDisqualifiedModal = true;
 		submitting = true;
+		isDisqualifying = true;
 		saveCurrentAnswer().then(() => {
 			const fd = new FormData();
-			fetch('?/submit', { 
+			return fetch('?/submit', { 
 				method: 'POST', 
 				body: fd,
 				headers: {
 					'x-sveltekit-action': 'true'
 				}
-			}).catch(console.error);
+			});
+		}).then(() => {
+			isDisqualifying = false;
+		}).catch((err) => {
+			console.error(err);
+			isDisqualifying = false;
 		});
 	}
 
@@ -483,8 +491,8 @@
 			</div>
 			<h3 class="text-xl font-bold text-slate-800 mb-2">Ujian Dihentikan</h3>
 			<p class="text-slate-600 mb-6 text-sm">Anda telah melanggar batas maksimal peringatan ({MAX_WARNINGS} kali). Ujian Anda diselesaikan secara otomatis.</p>
-			<button class="btn-danger w-full" on:click={() => window.location.href = '/siswa'}>
-				Kembali ke Dashboard
+			<button class="btn-danger w-full" disabled={isDisqualifying} on:click={() => window.location.href = '/siswa'}>
+				{isDisqualifying ? 'Memproses Penghentian...' : 'Kembali ke Dashboard'}
 			</button>
 		</div>
 	</div>
