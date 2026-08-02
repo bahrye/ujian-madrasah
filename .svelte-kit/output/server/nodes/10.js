@@ -1,10 +1,10 @@
-import * as server from '../entries/pages/admin/exams/_id_/_page.server.ts.js';
+import * as server from '../entries/pages/admin/bank-soal/_examId_/_page.server.ts.js';
 
 export const index = 10;
 let component_cache;
-export const component = async () => component_cache ??= (await import('../entries/pages/admin/exams/_id_/_page.svelte.js')).default;
+export const component = async () => component_cache ??= (await import('../entries/pages/admin/bank-soal/_examId_/_page.svelte.js')).default;
 export { server };
-export const server_id = "src/routes/admin/exams/[id]/+page.server.ts";
-export const imports = ["_app/immutable/nodes/10.BD8YJBqc.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CaPKEQgU.js","_app/immutable/chunks/-pTrYbTZ.js","_app/immutable/chunks/B9mQgqDt.js","_app/immutable/chunks/WMm59K3l.js","_app/immutable/chunks/DPqbTPA8.js","_app/immutable/chunks/CaJ0Bq-R.js","_app/immutable/chunks/C2zOCRZx.js","_app/immutable/chunks/WkpPKq5w.js","_app/immutable/chunks/BHWRHSZu.js","_app/immutable/chunks/lYmavcFu.js"];
+export const server_id = "src/routes/admin/bank-soal/[examId]/+page.server.ts";
+export const imports = ["_app/immutable/nodes/10.BqoL9nVe.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/BZbEoyCw.js","_app/immutable/chunks/pVKruFo1.js","_app/immutable/chunks/CbTox5fa.js","_app/immutable/chunks/BFKIXuI0.js","_app/immutable/chunks/XzJ121RJ.js","_app/immutable/chunks/DKmcUs-K.js","_app/immutable/chunks/CFki_rzU.js","_app/immutable/chunks/DEm0CsLS.js","_app/immutable/chunks/BFb72ugl.js","_app/immutable/chunks/BKjL5Qlh.js","_app/immutable/chunks/BEe8JXOa.js","_app/immutable/chunks/B6Hc4xX0.js","_app/immutable/chunks/wmSitu1K.js","_app/immutable/chunks/BA6o9f-S.js"];
 export const stylesheets = [];
 export const fonts = [];

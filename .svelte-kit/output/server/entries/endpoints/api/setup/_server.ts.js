@@ -15,29 +15,39 @@ const GET = async ({ platform }) => {
       db.prepare("INSERT INTO schools (name, address) VALUES (?, ?)").bind("Madrasah Aliyah Negeri 1", "Jl. Pendidikan No. 1"),
       db.prepare("INSERT INTO schools (name, address) VALUES (?, ?)").bind("Madrasah Tsanawiyah Negeri 2", "Jl. Kebangsaan No. 2")
     ]);
+    await db.batch([
+      db.prepare("INSERT INTO classes (school_id, name, level) VALUES (?, ?, ?)").bind(1, "X IPA 1", "X"),
+      db.prepare("INSERT INTO classes (school_id, name, level) VALUES (?, ?, ?)").bind(1, "XI IPS 2", "XI"),
+      db.prepare("INSERT INTO classes (school_id, name, level) VALUES (?, ?, ?)").bind(2, "VII A", "VII"),
+      db.prepare("INSERT INTO classes (school_id, name, level) VALUES (?, ?, ?)").bind(2, "VIII B", "VIII"),
+      db.prepare("INSERT INTO subjects (school_id, name, code) VALUES (?, ?, ?)").bind(1, "Matematika", "MTK"),
+      db.prepare("INSERT INTO subjects (school_id, name, code) VALUES (?, ?, ?)").bind(1, "Biologi", "BIO"),
+      db.prepare("INSERT INTO subjects (school_id, name, code) VALUES (?, ?, ?)").bind(2, "Bahasa Arab", "ARB"),
+      db.prepare("INSERT INTO subjects (school_id, name, code) VALUES (?, ?, ?)").bind(2, "Fiqih", "FIQ")
+    ]);
     const passHash = await hashPassword("password123");
     await db.batch([
       // Superadmin (tanpa school_id)
-      db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (NULL, ?, ?, ?, ?)").bind("superadmin", passHash, "Sistem Superadmin", "superadmin"),
+      db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (NULL, NULL, ?, ?, ?, ?)").bind("superadmin", passHash, "Sistem Superadmin", "superadmin"),
       // Sekolah 1 (MAN 1)
-      db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(1, "admin1", passHash, "Admin MAN 1", "admin"),
-      db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(1, "guru1", passHash, "Bapak Ahmad", "guru"),
-      db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(1, "pengawas1", passHash, "Bapak Umar", "pengawas"),
-      db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(1, "siswa1", passHash, "Ahmad Rizki", "siswa"),
+      db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, NULL, ?, ?, ?, ?)").bind(1, "admin1", passHash, "Admin MAN 1", "admin"),
+      db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, NULL, ?, ?, ?, ?)").bind(1, "guru1", passHash, "Bapak Ahmad", "guru"),
+      db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, NULL, ?, ?, ?, ?)").bind(1, "pengawas1", passHash, "Bapak Umar", "pengawas"),
+      db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?, ?)").bind(1, 1, "siswa1", passHash, "Ahmad Rizki", "siswa"),
       // Sekolah 2 (MTsN 2)
-      db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(2, "admin2", passHash, "Admin MTsN 2", "admin"),
-      db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(2, "guru2", passHash, "Ibu Fatimah", "guru"),
-      db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(2, "pengawas2", passHash, "Ibu Aisyah", "pengawas"),
-      db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(2, "siswa2", passHash, "Siti Aisyah", "siswa")
+      db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, NULL, ?, ?, ?, ?)").bind(2, "admin2", passHash, "Admin MTsN 2", "admin"),
+      db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, NULL, ?, ?, ?, ?)").bind(2, "guru2", passHash, "Ibu Fatimah", "guru"),
+      db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, NULL, ?, ?, ?, ?)").bind(2, "pengawas2", passHash, "Ibu Aisyah", "pengawas"),
+      db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?, ?)").bind(2, 3, "siswa2", passHash, "Siti Aisyah", "siswa")
     ]);
     await db.batch([
-      // Ujian untuk Sekolah 1
-      db.prepare(`INSERT INTO exams (school_id, title, description, subject, duration_minutes, start_time, end_time, is_active, created_by)
+      // Ujian untuk Sekolah 1 (Matematika = subject_id 1)
+      db.prepare(`INSERT INTO exams (school_id, subject_id, title, description, duration_minutes, start_time, end_time, is_active, created_by)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
+        1,
         1,
         "Ujian Tengah Semester - Matematika",
         "UTS Matematika Kelas 9 Semester Ganjil",
-        "Matematika",
         90,
         "2024-12-01T08:00:00Z",
         "2024-12-31T17:00:00Z",
@@ -45,13 +55,13 @@ const GET = async ({ platform }) => {
         2
       ),
       // created_by = 2 (admin1)
-      // Ujian untuk Sekolah 2
-      db.prepare(`INSERT INTO exams (school_id, title, description, subject, duration_minutes, start_time, end_time, is_active, created_by)
+      // Ujian untuk Sekolah 2 (Bahasa Arab = subject_id 3)
+      db.prepare(`INSERT INTO exams (school_id, subject_id, title, description, duration_minutes, start_time, end_time, is_active, created_by)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
         2,
+        3,
         "Ujian Akhir Semester - Bahasa Arab",
         "UAS Bahasa Arab Kelas 9 Semester Ganjil",
-        "Bahasa Arab",
         60,
         "2024-12-15T08:00:00Z",
         "2024-12-31T17:00:00Z",

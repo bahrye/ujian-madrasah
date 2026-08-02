@@ -12,8 +12,8 @@ type OptionalUnion<U extends Record<string, any>, A extends keyof U = U extends 
 export type Snapshot<T = any> = Kit.Snapshot<T>;
 type PageServerParentData = EnsureDefined<LayoutServerData>;
 type PageParentData = EnsureDefined<LayoutData>;
-type LayoutRouteId = RouteId | "/" | "/admin" | "/admin/exams" | "/admin/exams/[id]" | "/admin/results" | "/admin/users" | "/guru" | "/guru/bank-soal" | "/guru/bank-soal/[examId]" | "/guru/penilaian" | "/login" | "/pengawas" | "/pengawas/monitor" | "/pengawas/tokens" | "/siswa" | "/siswa/ujian" | "/siswa/ujian/[attemptId]" | "/superadmin" | "/superadmin/admins" | "/superadmin/schools" | null
-type LayoutParams = RouteParams & { id?: string | undefined; examId?: string | undefined; attemptId?: string | undefined }
+type LayoutRouteId = RouteId | "/" | "/admin" | "/admin/bank-soal" | "/admin/bank-soal/[examId]" | "/admin/classes" | "/admin/exams" | "/admin/exams/[id]" | "/admin/results" | "/admin/students" | "/admin/subjects" | "/admin/users" | "/guru" | "/guru/bank-soal" | "/guru/bank-soal/[examId]" | "/guru/penilaian" | "/login" | "/pengawas" | "/pengawas/monitor" | "/pengawas/tokens" | "/siswa" | "/siswa/ujian" | "/siswa/ujian/[attemptId]" | "/superadmin" | "/superadmin/admins" | "/superadmin/schools" | null
+type LayoutParams = RouteParams & { examId?: string | undefined; id?: string | undefined; attemptId?: string | undefined }
 type LayoutServerParentData = EnsureDefined<{}>;
 type LayoutParentData = EnsureDefined<{}>;
 

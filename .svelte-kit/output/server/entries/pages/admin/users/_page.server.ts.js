@@ -5,7 +5,7 @@ const load = async ({ platform, url, locals }) => {
   const db = getDB(platform);
   const search = url.searchParams.get("search") || "";
   const roleFilter = url.searchParams.get("role") || "";
-  let query = "SELECT id, username, name, role, is_active, created_at FROM users WHERE school_id = ?";
+  let query = 'SELECT id, username, name, role, is_active, created_at FROM users WHERE school_id = ? AND role != "siswa" AND role != "superadmin"';
   const params = [locals.user.school_id];
   if (search) {
     query += " AND (username LIKE ? OR name LIKE ?)";

@@ -37,7 +37,11 @@ const SIDEBAR_MENUS = {
   ],
   admin: [
     { label: "Dashboard", href: "/admin", icon: "dashboard" },
+    { label: "Siswa", href: "/admin/students", icon: "users" },
     { label: "Pengguna", href: "/admin/users", icon: "users" },
+    { label: "Kelas", href: "/admin/classes", icon: "school" },
+    { label: "Mata Pelajaran", href: "/admin/subjects", icon: "exam" },
+    { label: "Bank Soal", href: "/admin/bank-soal", icon: "questions" },
     { label: "Ujian", href: "/admin/exams", icon: "exam" },
     { label: "Hasil Ujian", href: "/admin/results", icon: "results" }
   ],

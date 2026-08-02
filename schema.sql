@@ -13,10 +13,31 @@ CREATE TABLE IF NOT EXISTS schools (
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Tabel Kelas
+CREATE TABLE IF NOT EXISTS classes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    school_id INTEGER NOT NULL REFERENCES schools(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    level TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Tabel Mata Pelajaran
+CREATE TABLE IF NOT EXISTS subjects (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    school_id INTEGER NOT NULL REFERENCES schools(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    code TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 -- Tabel Pengguna
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     school_id INTEGER REFERENCES schools(id) ON DELETE CASCADE,
+    class_id INTEGER REFERENCES classes(id) ON DELETE SET NULL,
     username TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     name TEXT NOT NULL,
@@ -30,9 +51,9 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS exams (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     school_id INTEGER NOT NULL REFERENCES schools(id) ON DELETE CASCADE,
+    subject_id INTEGER REFERENCES subjects(id) ON DELETE SET NULL,
     title TEXT NOT NULL,
     description TEXT DEFAULT '',
-    subject TEXT DEFAULT '',
     duration_minutes INTEGER NOT NULL DEFAULT 60,
     start_time TEXT,
     end_time TEXT,

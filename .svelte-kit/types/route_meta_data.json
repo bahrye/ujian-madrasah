@@ -11,6 +11,21 @@
 		"src/routes/admin/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/admin/bank-soal": [
+		"src/routes/admin/bank-soal/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/bank-soal/[examId]": [
+		"src/routes/admin/bank-soal/[examId]/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/classes": [
+		"src/routes/admin/classes/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/admin/exams": [
 		"src/routes/admin/exams/+page.server.ts",
 		"src/routes/admin/+layout.server.ts",
@@ -23,6 +38,16 @@
 	],
 	"/admin/results": [
 		"src/routes/admin/results/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/students": [
+		"src/routes/admin/students/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/subjects": [
+		"src/routes/admin/subjects/+page.server.ts",
 		"src/routes/admin/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],

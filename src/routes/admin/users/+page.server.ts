@@ -8,7 +8,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 	const search = url.searchParams.get('search') || '';
 	const roleFilter = url.searchParams.get('role') || '';
 
-	let query = 'SELECT id, username, name, role, is_active, created_at FROM users WHERE school_id = ?';
+	let query = 'SELECT id, username, name, role, is_active, created_at FROM users WHERE school_id = ? AND role != "siswa" AND role != "superadmin"';
 	const params: unknown[] = [locals.user!.school_id];
 
 	if (search) {
