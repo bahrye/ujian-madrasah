@@ -8,8 +8,10 @@
 
 	let showCreateForm = false;
 	let selectedType = 'pilihan_ganda';
-	let deleteConfirm: number | null = null;
 	let optionCount = 4;
+	
+	let editingQuestion: any = null;
+	let editOptionCount = 4;
 
 	$: if (form?.success) toasts.success(form.success);
 	$: if (form?.error) toasts.error(form.error);
@@ -156,23 +158,55 @@
 					<p class="text-sm text-slate-700 line-clamp-2">{q.question_text}</p>
 					{#if q.options_json}
 						{@const opts = JSON.parse(q.options_json)}
+						{@const correct = q.correct_answer_json ? JSON.parse(q.correct_answer_json) : null}
 						{#if Array.isArray(opts)}
 							<div class="flex flex-wrap gap-1.5 mt-2">
 								{#each opts as opt, i}
-									<span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">{String.fromCharCode(65 + i)}. {opt}</span>
+									{@const isCorrect = (q.type === 'pilihan_ganda' && correct === String.fromCharCode(65 + i)) || (q.type === 'benar_salah' && correct === opt)}
+									<span class="text-[10px] px-2 py-0.5 rounded-md {isCorrect ? 'bg-green-100 text-green-700 font-bold border border-green-200' : 'bg-slate-100 text-slate-600'}">
+										{q.type === 'pilihan_ganda' ? `${String.fromCharCode(65 + i)}. ` : ''}{opt}
+									</span>
+								{/each}
+							</div>
+						{:else if q.type === 'menjodohkan' && opts.left}
+							<div class="mt-2 text-xs text-slate-500">
+								{#each opts.left as l, i}
+									<div class="flex gap-2">
+										<span class="font-medium text-slate-700">{l}</span>
+										<span>→</span>
+										<span class="text-green-600">{opts.right[correct[i]]}</span>
+									</div>
 								{/each}
 							</div>
 						{/if}
 					{/if}
+					{#if q.type === 'isian_singkat' && q.correct_answer_json}
+						<div class="mt-2 text-xs">
+							<span class="text-slate-500">Jawaban Benar:</span>
+							<span class="font-bold text-green-600 ml-1">{JSON.parse(q.correct_answer_json)}</span>
+						</div>
+					{/if}
 				</div>
-				<form method="POST" action="?/delete" use:enhance class="opacity-0 group-hover:opacity-100 transition-opacity">
-					<input type="hidden" name="id" value={q.id} />
-					<button type="submit" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="Hapus soal">
+				<div class="opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-1">
+					<button type="button" class="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors" title="Edit soal" on:click={() => {
+						editingQuestion = { ...q };
+						if (q.type === 'pilihan_ganda' && q.options_json) {
+							editOptionCount = JSON.parse(q.options_json).length;
+						}
+					}}>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
+							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.edit} />
 						</svg>
 					</button>
-				</form>
+					<form method="POST" action="?/delete" use:enhance>
+						<input type="hidden" name="id" value={q.id} />
+						<button type="submit" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="Hapus soal" on:click={(e) => { if(!confirm('Hapus soal ini?')) e.preventDefault(); }}>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
+							</svg>
+						</button>
+					</form>
+				</div>
 			</div>
 		{:else}
 			<div class="text-center py-12 text-slate-400">
@@ -181,3 +215,112 @@
 		{/each}
 	</div>
 </div>
+
+<!-- Edit Modal -->
+{#if editingQuestion}
+	<div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+		<div class="bg-white rounded-2xl w-full max-w-3xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+			<div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+				<h3 class="font-bold text-slate-800 text-lg">Edit Soal (No. {editingQuestion.question_number})</h3>
+				<button class="text-slate-400 hover:text-slate-600 p-2 rounded-lg hover:bg-slate-100 transition-colors" on:click={() => editingQuestion = null}>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.close} />
+					</svg>
+				</button>
+			</div>
+			
+			<div class="p-6 overflow-y-auto">
+				<form method="POST" action="?/edit" use:enhance={() => { return async ({ update }) => { editingQuestion = null; await update(); }; }} class="space-y-4">
+					<input type="hidden" name="id" value={editingQuestion.id} />
+					<input type="hidden" name="type" value={editingQuestion.type} />
+					
+					<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+						<div>
+							<label class="label">Tipe Soal</label>
+							<input type="text" class="input bg-slate-50" value={QUESTION_TYPE_LABELS[editingQuestion.type] || editingQuestion.type} disabled />
+						</div>
+						<div>
+							<label class="label" for="eq-points">Poin</label>
+							<input id="eq-points" name="points" type="number" min="1" class="input" bind:value={editingQuestion.points} />
+						</div>
+						<div>
+							<label class="label" for="eq-media">Media</label>
+							<select id="eq-media" name="media_type" class="select" bind:value={editingQuestion.media_type}>
+								<option value={null}>Tanpa Media</option>
+								<option value="image">Gambar</option>
+								<option value="audio">Audio</option>
+							</select>
+						</div>
+					</div>
+
+					<div>
+						<label class="label" for="eq-text">Teks Soal</label>
+						<textarea id="eq-text" name="question_text" required class="input min-h-[100px]" rows="3" bind:value={editingQuestion.question_text}></textarea>
+					</div>
+
+					<div>
+						<label class="label" for="eq-media-url">URL Media</label>
+						<input id="eq-media-url" name="media_url" type="url" class="input" bind:value={editingQuestion.media_url} />
+					</div>
+
+					<!-- Type-specific fields for edit -->
+					{#if editingQuestion.type === 'pilihan_ganda'}
+						{@const opts = editingQuestion.options_json ? JSON.parse(editingQuestion.options_json) : []}
+						{@const correct = editingQuestion.correct_answer_json ? JSON.parse(editingQuestion.correct_answer_json) : 'A'}
+						<div class="space-y-2">
+							<label class="label">Opsi Jawaban</label>
+							{#each Array(editOptionCount) as _, i}
+								<div class="flex items-center gap-2">
+									<span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500">{String.fromCharCode(65 + i)}</span>
+									<input name="option_{i}" type="text" class="input flex-1" value={opts[i] || ''} required />
+								</div>
+							{/each}
+							{#if editOptionCount < 5}
+								<button type="button" class="text-xs text-indigo-500" on:click={() => editOptionCount++}>+ Tambah opsi</button>
+							{/if}
+							<div class="mt-2">
+								<label class="label" for="eq-correct">Jawaban Benar</label>
+								<select id="eq-correct" name="correct_answer" class="select w-32" value={correct}>
+									{#each Array(editOptionCount) as _, i}
+										<option value={String.fromCharCode(65 + i)}>{String.fromCharCode(65 + i)}</option>
+									{/each}
+								</select>
+							</div>
+						</div>
+					{:else if editingQuestion.type === 'benar_salah'}
+						{@const correct = editingQuestion.correct_answer_json ? JSON.parse(editingQuestion.correct_answer_json) : 'Benar'}
+						<div>
+							<label class="label" for="eq-correct-bs">Jawaban Benar</label>
+							<select id="eq-correct-bs" name="correct_answer" class="select w-32" value={correct}>
+								<option value="Benar">Benar</option>
+								<option value="Salah">Salah</option>
+							</select>
+						</div>
+					{:else if editingQuestion.type === 'isian_singkat'}
+						{@const correct = editingQuestion.correct_answer_json ? JSON.parse(editingQuestion.correct_answer_json) : ''}
+						<div>
+							<label class="label" for="eq-correct-is">Kunci Jawaban</label>
+							<input id="eq-correct-is" name="correct_answer" type="text" class="input" value={correct} />
+						</div>
+					{:else if editingQuestion.type === 'menjodohkan'}
+						{@const opts = editingQuestion.options_json ? JSON.parse(editingQuestion.options_json) : {left:[], right:[]}}
+						<div class="space-y-2">
+							<label class="label">Pasangan (Kiri → Kanan)</label>
+							{#each [0, 1, 2, 3] as i}
+								<div class="grid grid-cols-2 gap-2">
+									<input name="left_{i}" type="text" class="input" value={opts.left?.[i] || ''} />
+									<input name="right_{i}" type="text" class="input" value={opts.right?.[i] || ''} />
+								</div>
+							{/each}
+						</div>
+					{/if}
+
+					<div class="flex gap-3 pt-4 border-t border-slate-100">
+						<button type="button" class="btn-ghost flex-1" on:click={() => editingQuestion = null}>Batal</button>
+						<button type="submit" class="btn-primary flex-1">Simpan Perubahan</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+{/if}
