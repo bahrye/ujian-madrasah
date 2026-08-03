@@ -208,7 +208,7 @@
       "_index.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.ByaiMFro.css"
+      "_app/immutable/assets/_layout.JeIBbWvE.css"
     ]
   },
   "src/routes/+page.server.ts": {
@@ -635,6 +635,54 @@
       "_state.svelte.js",
       "_constants.js",
       "_toast.js"
+    ]
+  },
+  "src/routes/guru/remedial/+page.server.ts": {
+    "file": "entries/pages/guru/remedial/_page.server.ts.js",
+    "name": "entries/pages/guru/remedial/_page.server.ts",
+    "src": "src/routes/guru/remedial/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/guru/remedial/+page.svelte": {
+    "file": "entries/pages/guru/remedial/_page.svelte.js",
+    "name": "entries/pages/guru/remedial/_page.svelte",
+    "src": "src/routes/guru/remedial/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_exports.js",
+      "_utils2.js",
+      "_root.js",
+      "_state.svelte.js",
+      "_constants.js",
+      "_ConfirmForm.js"
+    ]
+  },
+  "src/routes/guru/remedial/[examId]/+page.server.ts": {
+    "file": "entries/pages/guru/remedial/_examId_/_page.server.ts.js",
+    "name": "entries/pages/guru/remedial/_examId_/_page.server.ts",
+    "src": "src/routes/guru/remedial/[examId]/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/guru/remedial/[examId]/+page.svelte": {
+    "file": "entries/pages/guru/remedial/_examId_/_page.svelte.js",
+    "name": "entries/pages/guru/remedial/_examId_/_page.svelte",
+    "src": "src/routes/guru/remedial/[examId]/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_exports.js",
+      "_utils2.js",
+      "_root.js",
+      "_state.svelte.js",
+      "_constants.js",
+      "_ConfirmForm.js"
     ]
   },
   "src/routes/guru/results/+page.server.ts": {

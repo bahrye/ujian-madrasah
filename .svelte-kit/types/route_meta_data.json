@@ -92,6 +92,16 @@
 		"src/routes/guru/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/guru/remedial": [
+		"src/routes/guru/remedial/+page.server.ts",
+		"src/routes/guru/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/guru/remedial/[examId]": [
+		"src/routes/guru/remedial/[examId]/+page.server.ts",
+		"src/routes/guru/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/guru/results": [
 		"src/routes/guru/results/+page.server.ts",
 		"src/routes/guru/+layout.server.ts",

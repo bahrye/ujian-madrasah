@@ -74,6 +74,7 @@ export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
 	],
 	guru: [
 		{ label: 'Dashboard', href: '/guru', icon: 'dashboard' },
+		{ label: 'Ujian Remedial', href: '/guru/remedial', icon: 'exam' },
 		{ label: 'Bank Soal', href: '/guru/bank-soal', icon: 'questions' },
 		{ label: 'Penilaian', href: '/guru/penilaian', icon: 'grading' },
 		{ label: 'Hasil Ujian', href: '/guru/results', icon: 'results' }
