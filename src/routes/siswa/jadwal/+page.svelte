@@ -97,7 +97,12 @@
 							{formatScheduleDate(exam.start_time)}
 						</span>
 					</div>
-					<h3 class="font-bold text-slate-800 text-lg line-clamp-1 mb-1">{exam.title}</h3>
+					{#if exam.title.length > 22}
+						<!-- svelte-ignore a11y-distracting-elements -->
+						<marquee scrollamount="4" class="font-bold text-slate-800 text-lg mb-1">{exam.title}</marquee>
+					{:else}
+						<h3 class="font-bold text-slate-800 text-lg mb-1">{exam.title}</h3>
+					{/if}
 					<p class="text-sm text-slate-500 mb-4">{exam.subject || 'Umum'}</p>
 					
 					<div class="space-y-2 mb-4">
@@ -112,6 +117,12 @@
 								<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.exam} />
 							</svg>
 							<span>Durasi: {exam.duration_minutes} menit</span>
+						</div>
+						<div class="flex items-center text-sm text-slate-600">
+							<svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+							</svg>
+							<span>Soal: {exam.question_count}</span>
 						</div>
 						<div class="flex items-center text-sm text-slate-600">
 							<svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">

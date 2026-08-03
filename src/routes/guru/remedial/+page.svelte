@@ -70,6 +70,7 @@
 							<td>
 								<div class="font-bold text-slate-800 mb-1">{exam.title}</div>
 								<div class="text-xs text-slate-500">Mapel: {exam.subject_name || '-'} | Durasi: {exam.duration_minutes}m</div>
+								<div class="text-xs text-slate-500 mt-0.5">Pengawas: {data.user?.name || '-'}</div>
 							</td>
 							<td>
 								<form method="POST" action="?/toggleActive" use:enhance class="inline-block">

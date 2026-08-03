@@ -11,7 +11,8 @@ const load = async ({ platform, locals }) => {
 				FROM exam_proctors epr
 				JOIN users u ON epr.proctor_id = u.id
 				WHERE epr.exam_id = e.id
-			) as proctors
+			) as proctors,
+			(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count
 		FROM exams e
 		JOIN exam_participants ep ON ep.exam_id = e.id
 		LEFT JOIN subjects s ON e.subject_id = s.id

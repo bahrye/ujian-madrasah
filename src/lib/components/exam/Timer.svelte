@@ -12,13 +12,10 @@
 	let isWarning = false;
 	let isCritical = false;
 
-	$: hours = Math.floor(remainingSeconds / 3600);
-	$: minutes = Math.floor((remainingSeconds % 3600) / 60);
+	$: minutes = Math.floor(remainingSeconds / 60);
 	$: seconds = remainingSeconds % 60;
 
-	$: formattedTime = hours > 0
-		? `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
-		: `${pad(minutes)}:${pad(seconds)}`;
+	$: formattedTime = `${pad(minutes)}:${pad(seconds)}`;
 
 	$: if (showWarning) {
 		isWarning = remainingSeconds <= warningThreshold && remainingSeconds > 60;

@@ -12,7 +12,7 @@ import { T as Toast } from "../../../../../chunks/Toast2.js";
 import "../../../../../chunks/toast.js";
 function Timer($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
-    let hours, minutes, seconds, formattedTime;
+    let minutes, seconds, formattedTime;
     let endTime = $$props["endTime"];
     let showWarning = fallback($$props["showWarning"], true);
     let warningThreshold = fallback($$props["warningThreshold"], 300);
@@ -24,10 +24,9 @@ function Timer($$renderer, $$props) {
     }
     onDestroy(() => {
     });
-    hours = Math.floor(remainingSeconds / 3600);
-    minutes = Math.floor(remainingSeconds % 3600 / 60);
+    minutes = Math.floor(remainingSeconds / 60);
     seconds = remainingSeconds % 60;
-    formattedTime = hours > 0 ? `${pad(hours)}:${pad(minutes)}:${pad(seconds)}` : `${pad(minutes)}:${pad(seconds)}`;
+    formattedTime = `${pad(minutes)}:${pad(seconds)}`;
     if (showWarning) {
       isWarning = remainingSeconds <= warningThreshold && remainingSeconds > 60;
       isCritical = remainingSeconds > 0;
