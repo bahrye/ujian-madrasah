@@ -8,10 +8,14 @@ async function deleteFromCloudinary(url, env) {
     return false;
   }
   try {
-    const parts = url.split("/");
-    const filename = parts.pop() || "";
-    const publicId = filename.split(".")[0];
-    if (!publicId) return false;
+    const uploadSplit = url.split("/upload/");
+    if (uploadSplit.length < 2) return false;
+    let afterUpload = uploadSplit[1];
+    if (afterUpload.match(/^v\d+\//)) {
+      afterUpload = afterUpload.replace(/^v\d+\//, "");
+    }
+    const lastDotIndex = afterUpload.lastIndexOf(".");
+    const publicId = lastDotIndex !== -1 ? afterUpload.substring(0, lastDotIndex) : afterUpload;
     const resourceType = url.match(/\.(mp3|wav|ogg|m4a)$/i) ? "video" : "image";
     const timestamp = Math.round((/* @__PURE__ */ new Date()).getTime() / 1e3).toString();
     const strToSign = `public_id=${publicId}&timestamp=${timestamp}${apiSecret}`;

@@ -11,12 +11,19 @@ export async function deleteFromCloudinary(url: string | null, env: Record<strin
 	}
 
 	try {
-		// Extract public_id (assuming default Cloudinary URLs without folders)
-		const parts = url.split('/');
-		const filename = parts.pop() || '';
-		const publicId = filename.split('.')[0];
+		// Extract public_id correctly handling versions (v123456789) and folders
+		const uploadSplit = url.split('/upload/');
+		if (uploadSplit.length < 2) return false;
 		
-		if (!publicId) return false;
+		let afterUpload = uploadSplit[1];
+		// Remove version prefix if exists (e.g. v1722666666/)
+		if (afterUpload.match(/^v\d+\//)) {
+			afterUpload = afterUpload.replace(/^v\d+\//, '');
+		}
+		
+		// Remove extension to get public_id
+		const lastDotIndex = afterUpload.lastIndexOf('.');
+		const publicId = lastDotIndex !== -1 ? afterUpload.substring(0, lastDotIndex) : afterUpload;
 
 		// Cloudinary treats audio files as 'video' resource type for their API
 		const resourceType = url.match(/\.(mp3|wav|ogg|m4a)$/i) ? 'video' : 'image';
