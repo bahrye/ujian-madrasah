@@ -39,6 +39,9 @@
       "_index.js",
       "_constants.js",
       "_html.js"
+    ],
+    "css": [
+      "_app/immutable/assets/QuestionRenderer.CwYmYea-.css"
     ]
   },
   "_StatCard.js": {

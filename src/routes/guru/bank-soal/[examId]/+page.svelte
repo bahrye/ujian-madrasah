@@ -29,8 +29,8 @@
 
 		const { form, type, index } = activeOptionTarget;
 		const htmlToInsert = mediaType === 'image' 
-			? `<br><img src="${url}" class="max-h-32 object-contain mt-2 rounded-lg border border-slate-200">`
-			: `<br><audio controls src="${url}" class="mt-2 h-10 w-full max-w-[200px]"></audio>`;
+			? `<img src="${url}" class="max-h-32 object-contain rounded-lg border border-slate-200">`
+			: `<audio controls src="${url}" class="w-full"></audio>`;
 
 		let inputId = `${form}_`;
 		if (type === 'pilihan_ganda') inputId += `option_${index}`;
@@ -39,7 +39,8 @@
 		
 		const inputEl = document.getElementById(inputId) as HTMLInputElement;
 		if (inputEl) {
-			inputEl.value = inputEl.value + htmlToInsert;
+			const prefix = inputEl.value.trim() !== '' ? '<br>' : '';
+			inputEl.value = inputEl.value + prefix + htmlToInsert;
 			// Trigger input event to update Svelte bindings if any
 			inputEl.dispatchEvent(new Event('input', { bubbles: true }));
 		}

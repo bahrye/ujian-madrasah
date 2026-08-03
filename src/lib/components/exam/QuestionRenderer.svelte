@@ -153,7 +153,9 @@
 					>
 						{optionLetters[i]}
 					</span>
-					<div class="text-sm prose prose-sm max-w-none flex-1 {answer === optionLetters[i] ? 'text-indigo-700 font-medium' : 'text-slate-700'}">{@html option}</div>
+					<div class="option-content text-sm prose prose-sm max-w-none flex-1 {answer === optionLetters[i] ? 'text-indigo-700 font-medium' : 'text-slate-700'}">
+						{@html option.replace(/^(<br\s*\/?>\s*)+/i, '')}
+					</div>
 				</div>
 			{/each}
 
@@ -239,3 +241,17 @@
 		/>
 	</div>
 {/if}
+
+<style>
+	/* Memaksa elemen media di dalam opsi untuk merentang penuh dan membuang margin tak perlu */
+	.option-content :global(audio) {
+		width: 100% !important;
+		max-width: 100% !important;
+		margin-top: 0 !important;
+		margin-bottom: 0 !important;
+	}
+	.option-content :global(img) {
+		margin-top: 0 !important;
+		margin-bottom: 0 !important;
+	}
+</style>
