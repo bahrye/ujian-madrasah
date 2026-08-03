@@ -55,8 +55,20 @@
 		return `${m}:${s.toString().padStart(2, '0')}`;
 	}
 
+	function getDirectUrl(url: string): string {
+		if (!url) return '';
+		if (url.includes('drive.google.com/file/d/')) {
+			const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+			if (match && match[1]) {
+				return `https://drive.google.com/uc?export=download&id=${match[1]}`;
+			}
+		}
+		return url;
+	}
+
 	onMount(() => {
-		audio = new Audio(src);
+		const directSrc = getDirectUrl(src);
+		audio = new Audio(directSrc);
 		audio.addEventListener('play', handlePlay);
 		audio.addEventListener('pause', handlePause);
 		audio.addEventListener('ended', handleEnded);

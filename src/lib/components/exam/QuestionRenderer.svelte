@@ -47,6 +47,19 @@
 	}
 
 	const optionLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+	function getDirectUrl(url: string | null): string {
+		if (!url) return '';
+		if (url.includes('drive.google.com/file/d/')) {
+			const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+			if (match && match[1]) {
+				return `https://drive.google.com/uc?export=download&id=${match[1]}`;
+			}
+		}
+		return url;
+	}
+
+	$: directMediaUrl = getDirectUrl(question.media_url);
 </script>
 
 <div class="space-y-5 animate-in">
@@ -73,10 +86,10 @@
 	</div>
 
 	<!-- Media -->
-	{#if question.media_type === 'image' && question.media_url}
+	{#if question.media_type === 'image' && directMediaUrl}
 		<div class="rounded-xl overflow-hidden border border-slate-200 bg-white">
 			<img
-				src={question.media_url}
+				src={directMediaUrl}
 				alt="Media soal {question.question_number}"
 				class="max-w-full h-auto max-h-80 mx-auto object-contain"
 				loading="lazy"
@@ -84,8 +97,8 @@
 		</div>
 	{/if}
 
-	{#if question.media_type === 'audio' && question.media_url}
-		<AudioPlayer src={question.media_url} maxPlays={question.audio_max_plays || 3} />
+	{#if question.media_type === 'audio' && directMediaUrl}
+		<AudioPlayer src={directMediaUrl} maxPlays={question.audio_max_plays || 3} />
 	{/if}
 
 	<!-- Question Text -->

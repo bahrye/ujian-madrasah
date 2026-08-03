@@ -27,12 +27,22 @@ function AudioPlayer($$renderer, $$props) {
 }
 function QuestionRenderer($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
-    let options, matchingLeft, matchingRight;
+    let options, matchingLeft, matchingRight, directMediaUrl;
     let question = $$props["question"];
     let answer = fallback($$props["answer"], "");
     let isDoubted = fallback($$props["isDoubted"], false);
     let matchingAnswers = {};
     const optionLetters = ["A", "B", "C", "D", "E", "F", "G", "H"];
+    function getDirectUrl(url) {
+      if (!url) return "";
+      if (url.includes("drive.google.com/file/d/")) {
+        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (match && match[1]) {
+          return `https://drive.google.com/uc?export=download&id=${match[1]}`;
+        }
+      }
+      return url;
+    }
     options = question.options_json ? JSON.parse(question.options_json) : [];
     matchingLeft = question.type === "menjodohkan" && options?.left ? options.left : [];
     matchingRight = question.type === "menjodohkan" && options?.right ? options.right : [];
@@ -43,20 +53,18 @@ function QuestionRenderer($$renderer, $$props) {
         matchingAnswers = {};
       }
     }
+    directMediaUrl = getDirectUrl(question.media_url);
     $$renderer2.push(`<div class="space-y-5 animate-in"><div class="flex items-center justify-between flex-wrap gap-2"><div class="flex items-center gap-3"><span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold text-sm shadow-md shadow-indigo-500/20">${escape_html(question.question_number)}</span> <div><span class="badge-primary text-[10px]">${escape_html(QUESTION_TYPE_LABELS[question.type] || question.type)}</span> <span class="text-xs text-slate-400 ml-2">${escape_html(question.points)} poin</span></div></div> <button${attr_class(`btn-sm ${isDoubted ? "bg-amber-100 text-amber-700 border-2 border-amber-400" : "btn-ghost border border-slate-200"}`)}><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg> ${escape_html(isDoubted ? "Diragu-ragukan" : "Ragu-ragu")}</button></div> `);
-    if (question.media_type === "image" && question.media_url) {
+    if (question.media_type === "image" && directMediaUrl) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="rounded-xl overflow-hidden border border-slate-200 bg-white"><img${attr("src", question.media_url)}${attr("alt", `Media soal ${stringify(question.question_number)}`)} class="max-w-full h-auto max-h-80 mx-auto object-contain" loading="lazy"/></div>`);
+      $$renderer2.push(`<div class="rounded-xl overflow-hidden border border-slate-200 bg-white"><img${attr("src", directMediaUrl)}${attr("alt", `Media soal ${stringify(question.question_number)}`)} class="max-w-full h-auto max-h-80 mx-auto object-contain" loading="lazy"/></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]--> `);
-    if (question.media_type === "audio" && question.media_url) {
+    if (question.media_type === "audio" && directMediaUrl) {
       $$renderer2.push("<!--[0-->");
-      AudioPlayer($$renderer2, {
-        src: question.media_url,
-        maxPlays: question.audio_max_plays || 3
-      });
+      AudioPlayer($$renderer2, { src: directMediaUrl, maxPlays: question.audio_max_plays || 3 });
     } else {
       $$renderer2.push("<!--[-1-->");
     }

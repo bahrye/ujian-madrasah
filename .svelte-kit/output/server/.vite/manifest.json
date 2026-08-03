@@ -31,13 +31,6 @@
       "_state.svelte.js"
     ]
   },
-  "_QuestionNav.js": {
-    "file": "chunks/QuestionNav.js",
-    "name": "QuestionNav",
-    "imports": [
-      "_index.js"
-    ]
-  },
   "_QuestionRenderer.js": {
     "file": "chunks/QuestionRenderer.js",
     "name": "QuestionRenderer",
@@ -224,7 +217,7 @@
       "_index.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.CLygbjbJ.css"
+      "_app/immutable/assets/_layout.BO8y1B1K.css"
     ]
   },
   "src/routes/+page.server.ts": {
@@ -342,7 +335,6 @@
     "imports": [
       "_index.js",
       "_QuestionRenderer.js",
-      "_QuestionNav.js",
       "_constants.js"
     ]
   },
@@ -667,7 +659,6 @@
     "imports": [
       "_index.js",
       "_QuestionRenderer.js",
-      "_QuestionNav.js",
       "_constants.js"
     ]
   },
