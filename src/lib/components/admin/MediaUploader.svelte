@@ -133,6 +133,17 @@
 
 		dispatch('upload', { url, type });
 	}
+
+	function portal(node: HTMLElement) {
+		document.body.appendChild(node);
+		return {
+			destroy() {
+				if (node.parentNode) {
+					node.parentNode.removeChild(node);
+				}
+			}
+		};
+	}
 </script>
 
 <div class="space-y-3">
@@ -251,7 +262,7 @@
 </div>
 
 {#if showBankModal}
-	<div class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+	<div use:portal class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
 		<div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
 			<div class="p-4 border-b flex justify-between items-center bg-slate-50/50">
 				<h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">

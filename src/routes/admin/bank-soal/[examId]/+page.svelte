@@ -49,6 +49,17 @@
 		showOptionMediaPicker = false;
 		activeOptionTarget = null;
 	}
+
+	function portal(node: HTMLElement) {
+		document.body.appendChild(node);
+		return {
+			destroy() {
+				if (node.parentNode) {
+					node.parentNode.removeChild(node);
+				}
+			}
+		};
+	}
 	
 	let editingQuestion: any = null;
 
@@ -419,7 +430,7 @@
 
 <!-- Media Picker Modal for Options -->
 {#if showOptionMediaPicker}
-	<div class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300">
+	<div use:portal class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300">
 		<div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col transform scale-100">
 			<div class="p-4 border-b flex justify-between items-center bg-slate-50/50">
 				<h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">

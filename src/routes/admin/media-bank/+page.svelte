@@ -24,6 +24,16 @@
 			setTimeout(() => errorMsg = '', 6000);
 		}
 	}
+	function portal(node: HTMLElement) {
+		document.body.appendChild(node);
+		return {
+			destroy() {
+				if (node.parentNode) {
+					node.parentNode.removeChild(node);
+				}
+			}
+		};
+	}
 </script>
 
 <svelte:head>
@@ -134,7 +144,7 @@
 
 <!-- Upload Modal -->
 {#if showUploadModal}
-	<div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+	<div use:portal class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 transition-all duration-300">
 		<div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
 			<div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
 				<h3 class="text-lg font-bold text-slate-800">Unggah Media ke Cloudinary</h3>
@@ -171,7 +181,7 @@
 
 <!-- Confirmation Modal -->
 {#if itemToDelete}
-	<div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 transition-all duration-300">
+	<div use:portal class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 transition-all duration-300">
 		<div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col transform scale-100">
 			<div class="p-6">
 				<div class="w-14 h-14 rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-5 mx-auto">
