@@ -7,7 +7,7 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 	const db = getDB(platform);
 	const examId = params.id;
 	
-	const exam = await db.prepare('SELECT e.*, s.name as subject_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id WHERE e.id = ?').bind(examId).first();
+	const exam = await db.prepare('SELECT e.*, s.name as subject_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id WHERE e.id = ? AND e.school_id = ?').bind(examId, locals.user!.school_id).first();
 	if (!exam) throw error(404, 'Ujian tidak ditemukan');
 
 	const questions = await db.prepare('SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number').bind(examId).all();

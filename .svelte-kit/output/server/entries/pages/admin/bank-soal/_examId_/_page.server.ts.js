@@ -2,16 +2,18 @@ import { fail, error } from "@sveltejs/kit";
 import { g as getDB } from "../../../../../chunks/db.js";
 import { d as deleteFromCloudinary } from "../../../../../chunks/cloudinary.js";
 import { b as private_env } from "../../../../../chunks/shared-server.js";
-const load = async ({ platform, params }) => {
+const load = async ({ platform, params, locals }) => {
   const db = getDB(platform);
-  const exam = await db.prepare("SELECT * FROM exams WHERE id = ?").bind(params.examId).first();
+  const exam = await db.prepare("SELECT * FROM exams WHERE id = ? AND school_id = ?").bind(params.examId, locals.user.school_id).first();
   if (!exam) throw error(404, "Ujian tidak ditemukan");
   const questions = await db.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number").bind(params.examId).all();
   return { exam, questions: questions.results };
 };
 const actions = {
-  create: async ({ request, platform, params }) => {
+  create: async ({ request, platform, params, locals }) => {
     const db = getDB(platform);
+    const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(params.examId, locals.user.school_id).first();
+    if (!exam) return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
     const form = await request.formData();
     const type = form.get("type")?.toString();
     const questionText = form.get("question_text")?.toString().trim();
@@ -71,8 +73,10 @@ const actions = {
     ).run();
     return { success: "Soal berhasil ditambahkan." };
   },
-  edit: async ({ request, platform }) => {
+  edit: async ({ request, platform, params, locals }) => {
     const db = getDB(platform);
+    const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(params.examId, locals.user.school_id).first();
+    if (!exam) return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
     const form = await request.formData();
     const id = form.get("id")?.toString();
     const type = form.get("type")?.toString();
@@ -129,8 +133,10 @@ const actions = {
 			WHERE id = ?`).bind(questionText, points, mediaType === "none" ? null : mediaType, mediaUrl, optionsJson, correctAnswerJson, id).run();
     return { success: "Soal berhasil diubah." };
   },
-  delete: async ({ request, platform }) => {
+  delete: async ({ request, platform, params, locals }) => {
     const db = getDB(platform);
+    const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(params.examId, locals.user.school_id).first();
+    if (!exam) return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
     const form = await request.formData();
     const id = form.get("id")?.toString();
     if (!id) return fail(400, { error: "ID tidak valid." });

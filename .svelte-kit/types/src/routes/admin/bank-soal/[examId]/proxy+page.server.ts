@@ -5,9 +5,9 @@ import { getDB } from '$lib/server/db';
 import { deleteFromCloudinary } from '$lib/server/cloudinary';
 import { env } from '$env/dynamic/private';
 
-export const load = async ({ platform, params }: Parameters<PageServerLoad>[0]) => {
+export const load = async ({ platform, params, locals }: Parameters<PageServerLoad>[0]) => {
 	const db = getDB(platform);
-	const exam = await db.prepare('SELECT * FROM exams WHERE id = ?').bind(params.examId).first();
+	const exam = await db.prepare('SELECT * FROM exams WHERE id = ? AND school_id = ?').bind(params.examId, locals.user!.school_id).first();
 	if (!exam) throw error(404, 'Ujian tidak ditemukan');
 
 	const questions = await db.prepare('SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number')
@@ -17,8 +17,10 @@ export const load = async ({ platform, params }: Parameters<PageServerLoad>[0]) 
 };
 
 export const actions = {
-	create: async ({ request, platform, params }: import('./$types').RequestEvent) => {
+	create: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
+		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(params.examId, locals.user!.school_id).first();
+		if (!exam) return fail(403, { error: 'Anda tidak memiliki akses ke ujian ini.' });
 		const form = await request.formData();
 
 		const type = form.get('type')?.toString();
@@ -81,8 +83,10 @@ export const actions = {
 		return { success: 'Soal berhasil ditambahkan.' };
 	},
 
-	edit: async ({ request, platform }: import('./$types').RequestEvent) => {
+	edit: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
+		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(params.examId, locals.user!.school_id).first();
+		if (!exam) return fail(403, { error: 'Anda tidak memiliki akses ke ujian ini.' });
 		const form = await request.formData();
 
 		const id = form.get('id')?.toString();
@@ -150,8 +154,10 @@ export const actions = {
 		return { success: 'Soal berhasil diubah.' };
 	},
 
-	delete: async ({ request, platform }: import('./$types').RequestEvent) => {
+	delete: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
+		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(params.examId, locals.user!.school_id).first();
+		if (!exam) return fail(403, { error: 'Anda tidak memiliki akses ke ujian ini.' });
 		const form = await request.formData();
 		const id = form.get('id')?.toString();
 		if (!id) return fail(400, { error: 'ID tidak valid.' });

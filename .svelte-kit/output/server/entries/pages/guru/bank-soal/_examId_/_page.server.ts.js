@@ -16,7 +16,7 @@ const load = async ({ platform, params, locals }) => {
 const actions = {
   create: async ({ request, platform, params, locals }) => {
     const db = getDB(platform);
-    const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ?").bind(params.examId).first();
+    const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(params.examId, locals.user.school_id).first();
     const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(params.examId, locals.user.id).first();
     if (!exam || exam.created_by !== locals.user.id && !isTeacher) {
       return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
@@ -82,7 +82,7 @@ const actions = {
   },
   edit: async ({ request, platform, params, locals }) => {
     const db = getDB(platform);
-    const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ?").bind(params.examId).first();
+    const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(params.examId, locals.user.school_id).first();
     const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(params.examId, locals.user.id).first();
     if (!exam || exam.created_by !== locals.user.id && !isTeacher) {
       return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
@@ -145,7 +145,7 @@ const actions = {
   },
   delete: async ({ request, platform, params, locals }) => {
     const db = getDB(platform);
-    const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ?").bind(params.examId).first();
+    const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(params.examId, locals.user.school_id).first();
     const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(params.examId, locals.user.id).first();
     if (!exam || exam.created_by !== locals.user.id && !isTeacher) {
       return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
