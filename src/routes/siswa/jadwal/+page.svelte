@@ -7,24 +7,21 @@
 		
 		const date = new Date(dateString);
 		const today = new Date();
-		const tomorrow = new Date(today);
-		tomorrow.setDate(tomorrow.getDate() + 1);
 		
-		if (
-			date.getDate() === tomorrow.getDate() &&
-			date.getMonth() === tomorrow.getMonth() &&
-			date.getFullYear() === tomorrow.getFullYear()
-		) {
-			return 'Besok';
-		}
+		// Reset jam untuk membandingkan murni tanggal
+		date.setHours(0, 0, 0, 0);
+		today.setHours(0, 0, 0, 0);
 		
-		if (
-			date.getDate() === today.getDate() &&
-			date.getMonth() === today.getMonth() &&
-			date.getFullYear() === today.getFullYear()
-		) {
-			return 'Hari ini';
-		}
+		const diffTime = date.getTime() - today.getTime();
+		const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+		
+		if (diffDays === 0) return 'Hari ini';
+		if (diffDays === 1) return 'Besok';
+		if (diffDays === 2) return 'Lusa';
+		if (diffDays > 2) return `${diffDays} hari lagi`;
+		
+		if (diffDays === -1) return 'Kemarin';
+		if (diffDays < -1) return `${Math.abs(diffDays)} hari yang lalu`;
 
 		return new Intl.DateTimeFormat('id-ID', {
 			weekday: 'long',

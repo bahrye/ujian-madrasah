@@ -7,14 +7,16 @@ function _page($$renderer, $$props) {
       if (!dateString) return "Belum ditentukan";
       const date = new Date(dateString);
       const today = /* @__PURE__ */ new Date();
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      if (date.getDate() === tomorrow.getDate() && date.getMonth() === tomorrow.getMonth() && date.getFullYear() === tomorrow.getFullYear()) {
-        return "Besok";
-      }
-      if (date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear()) {
-        return "Hari ini";
-      }
+      date.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+      const diffTime = date.getTime() - today.getTime();
+      const diffDays = Math.round(diffTime / (1e3 * 60 * 60 * 24));
+      if (diffDays === 0) return "Hari ini";
+      if (diffDays === 1) return "Besok";
+      if (diffDays === 2) return "Lusa";
+      if (diffDays > 2) return `${diffDays} hari lagi`;
+      if (diffDays === -1) return "Kemarin";
+      if (diffDays < -1) return `${Math.abs(diffDays)} hari yang lalu`;
       return new Intl.DateTimeFormat("id-ID", {
         weekday: "long",
         day: "numeric",
