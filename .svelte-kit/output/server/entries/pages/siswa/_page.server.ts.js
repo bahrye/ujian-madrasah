@@ -6,11 +6,16 @@ const load = async ({ platform, locals }) => {
 		SELECT DISTINCT 
 			e.*, 
 			s.name as subject,
-			(
-				SELECT GROUP_CONCAT(u.name, ', ')
-				FROM exam_proctors epr
-				JOIN users u ON epr.proctor_id = u.id
-				WHERE epr.exam_id = e.id
+			COALESCE(
+				(
+					SELECT GROUP_CONCAT(u.name, ', ')
+					FROM exam_proctors epr
+					JOIN users u ON epr.proctor_id = u.id
+					WHERE epr.exam_id = e.id
+				),
+				(
+					SELECT u.name FROM users u WHERE u.id = e.created_by AND u.role = 'guru'
+				)
 			) as proctors,
 			(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count
 		FROM exams e
