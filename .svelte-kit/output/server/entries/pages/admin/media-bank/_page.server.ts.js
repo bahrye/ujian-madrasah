@@ -56,6 +56,15 @@ const actions = {
     await db.prepare("DELETE FROM uploaded_media WHERE url = ?").bind(mediaUrl).run();
     await db.prepare("UPDATE questions SET media_url = NULL, media_type = NULL WHERE media_url = ?").bind(mediaUrl).run();
     return { success: "Media berhasil dihapus dari Cloudinary dan Database." };
+  },
+  toggleVisibility: async ({ request, platform, locals }) => {
+    const db = getDB(platform);
+    const form = await request.formData();
+    const mediaUrl = form.get("media_url")?.toString();
+    const isPublic = form.get("is_public")?.toString() === "1" ? 1 : 0;
+    if (!mediaUrl) return fail(400, { error: "URL Media tidak valid." });
+    await db.prepare("UPDATE uploaded_media SET is_public = ? WHERE url = ?").bind(isPublic, mediaUrl).run();
+    return { success: isPublic ? "Media berhasil ditampilkan untuk semua guru." : "Media berhasil disembunyikan (Privat)." };
   }
 };
 export {

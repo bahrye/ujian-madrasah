@@ -93,9 +93,19 @@
 						{/if}
 						<div class="absolute top-2 left-2 flex flex-col gap-1 items-start">
 							<span class="badge badge-primary shadow-sm">{item.media_type}</span>
-							<span class="badge {item.is_public ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'} shadow-sm text-[10px] border">
-								{item.is_public ? '🌐 Publik' : '🔒 Privat'}
-							</span>
+						</div>
+						<div class="absolute top-2 right-2">
+							<form method="POST" action="?/toggleVisibility" use:enhance>
+								<input type="hidden" name="media_url" value={item.media_url} />
+								<input type="hidden" name="is_public" value={item.is_public ? '0' : '1'} />
+								<button type="submit" class="group relative px-2.5 py-1 rounded-full border shadow-sm transition-all flex items-center gap-1.5 {item.is_public ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'}">
+									<span class="w-2 h-2 rounded-full {item.is_public ? 'bg-emerald-500' : 'bg-slate-400'} transition-colors"></span>
+									<span class="text-[10px] font-semibold tracking-wide">
+										{item.is_public ? 'PUBLIK' : 'PRIVAT'}
+									</span>
+									<div class="absolute inset-0 bg-white/0 group-hover:bg-black/5 rounded-full transition-colors"></div>
+								</button>
+							</form>
 						</div>
 					</div>
 

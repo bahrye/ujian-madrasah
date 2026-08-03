@@ -69,9 +69,9 @@ export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
 		{ label: 'Kelas', href: '/admin/classes', icon: 'school' },
 		{ label: 'Mata Pelajaran', href: '/admin/subjects', icon: 'exam' },
 		{ label: 'Bank Soal', href: '/admin/bank-soal', icon: 'questions' },
+		{ label: 'Bank Media', href: '/admin/media-bank', icon: 'folder' },
 		{ label: 'Ujian', href: '/admin/exams', icon: 'exam' },
-		{ label: 'Hasil Ujian', href: '/admin/results', icon: 'results' },
-		{ label: 'Bank Media', href: '/admin/media-bank', icon: 'folder' }
+		{ label: 'Hasil Ujian', href: '/admin/results', icon: 'results' }
 	],
 	guru: [
 		{ label: 'Dashboard', href: '/guru', icon: 'dashboard' },

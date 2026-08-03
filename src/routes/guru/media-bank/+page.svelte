@@ -102,7 +102,7 @@
 									<button type="submit" class="group relative px-2.5 py-1 rounded-full border shadow-sm transition-all flex items-center gap-1.5 {item.is_public ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'}">
 										<span class="w-2 h-2 rounded-full {item.is_public ? 'bg-emerald-500' : 'bg-slate-400'} transition-colors"></span>
 										<span class="text-[10px] font-semibold tracking-wide">
-											{item.is_public ? 'DITAMPILKAN KESEMUA' : 'DISEMBUNYIKAN'}
+											{item.is_public ? 'PUBLIK' : 'PRIVAT'}
 										</span>
 										<div class="absolute inset-0 bg-white/0 group-hover:bg-black/5 rounded-full transition-colors"></div>
 									</button>
