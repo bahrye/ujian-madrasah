@@ -71,7 +71,7 @@ export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
 		{ label: 'Bank Soal', href: '/admin/bank-soal', icon: 'questions' },
 		{ label: 'Ujian', href: '/admin/exams', icon: 'exam' },
 		{ label: 'Hasil Ujian', href: '/admin/results', icon: 'results' },
-		{ label: 'Bank Berkas', href: '/admin/media-bank', icon: 'folder' }
+		{ label: 'Bank Media', href: '/admin/media-bank', icon: 'folder' }
 	],
 	guru: [
 		{ label: 'Dashboard', href: '/guru', icon: 'dashboard' },

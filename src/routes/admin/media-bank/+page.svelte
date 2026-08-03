@@ -37,7 +37,7 @@
 </script>
 
 <svelte:head>
-	<title>Bank Berkas - Ujian Madrasah</title>
+	<title>Bank Media - Ujian Madrasah</title>
 </svelte:head>
 
 <div class="max-w-6xl mx-auto">
@@ -45,7 +45,7 @@
 		<div>
 			<h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
 				<svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
-				Bank Berkas (Cloudinary)
+				Bank Media (Cloudinary)
 			</h1>
 			<p class="text-slate-500 mt-1">Kelola semua file gambar dan audio yang telah diunggah ke Cloudinary dan terhubung dengan soal ujian.</p>
 		</div>
@@ -74,7 +74,7 @@
 			<div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
 				<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
 			</div>
-			<h3 class="text-lg font-medium text-slate-900">Bank Berkas Kosong</h3>
+			<h3 class="text-lg font-medium text-slate-900">Bank Media Kosong</h3>
 			<p class="text-slate-500 mt-1">Belum ada file media Cloudinary yang terhubung dengan soal ujian.</p>
 		</div>
 	{:else}
