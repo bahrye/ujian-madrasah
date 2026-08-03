@@ -12,9 +12,43 @@
 	let showCreateForm = false;
 	let selectedType = 'pilihan_ganda';
 	let optionCount = 4;
+	let editOptionCount = 4;
+	let options: string[] = ['', '', '', ''];
+
+	// Media picker for options
+	let showOptionMediaPicker = false;
+	let activeOptionTarget: { form: 'create' | 'edit', type: 'pilihan_ganda' | 'menjodohkan_left' | 'menjodohkan_right', index: number } | null = null;
+
+	function openOptionMediaPicker(form: 'create' | 'edit', type: 'pilihan_ganda' | 'menjodohkan_left' | 'menjodohkan_right', index: number) {
+		activeOptionTarget = { form, type, index };
+		showOptionMediaPicker = true;
+	}
+
+	function insertMediaToOption(url: string, mediaType: string) {
+		if (!activeOptionTarget) return;
+
+		const { form, type, index } = activeOptionTarget;
+		const htmlToInsert = mediaType === 'image' 
+			? `<br><img src="${url}" class="max-h-32 object-contain mt-2 rounded-lg border border-slate-200">`
+			: `<br><audio controls src="${url}" class="mt-2 h-10 w-full max-w-[200px]"></audio>`;
+
+		let inputId = `${form}_`;
+		if (type === 'pilihan_ganda') inputId += `option_${index}`;
+		else if (type === 'menjodohkan_left') inputId += `left_${index}`;
+		else if (type === 'menjodohkan_right') inputId += `right_${index}`;
+		
+		const inputEl = document.getElementById(inputId) as HTMLInputElement;
+		if (inputEl) {
+			inputEl.value = inputEl.value + htmlToInsert;
+			// Trigger input event to update Svelte bindings if any
+			inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+		}
+		
+		showOptionMediaPicker = false;
+		activeOptionTarget = null;
+	}
 	
 	let editingQuestion: any = null;
-	let editOptionCount = 4;
 
 	$: if (form?.success) toasts.success(form.success);
 	$: if (form?.error) toasts.error(form.error);
@@ -108,7 +142,10 @@
 						{#each Array(optionCount) as _, i}
 							<div class="flex items-center gap-2">
 								<span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500">{String.fromCharCode(65 + i)}</span>
-								<input name="option_{i}" type="text" class="input flex-1" placeholder="Opsi {String.fromCharCode(65 + i)}" required />
+								<input id="create_option_{i}" name="option_{i}" type="text" class="input flex-1" placeholder="Opsi {String.fromCharCode(65 + i)}" required bind:value={options[i]} />
+								<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 shrink-0" on:click={() => openOptionMediaPicker('create', 'pilihan_ganda', i)} title="Tambahkan Media">
+									🖼️
+								</button>
 							</div>
 						{/each}
 						{#if optionCount < 5}
@@ -141,8 +178,14 @@
 						<label class="label">Pasangan (Kiri → Kanan)</label>
 						{#each [0, 1, 2, 3] as i}
 							<div class="grid grid-cols-2 gap-2">
-								<input name="left_{i}" type="text" class="input" placeholder="Kiri {i + 1}" />
-								<input name="right_{i}" type="text" class="input" placeholder="Kanan {i + 1}" />
+								<div class="flex gap-1">
+									<input id="create_left_{i}" name="left_{i}" type="text" class="input w-full" placeholder="Kiri {i + 1}" />
+									<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-2 shrink-0" on:click={() => openOptionMediaPicker('create', 'menjodohkan_left', i)} title="Media">🖼️</button>
+								</div>
+								<div class="flex gap-1">
+									<input id="create_right_{i}" name="right_{i}" type="text" class="input w-full" placeholder="Kanan {i + 1}" />
+									<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-2 shrink-0" on:click={() => openOptionMediaPicker('create', 'menjodohkan_right', i)} title="Media">🖼️</button>
+								</div>
 							</div>
 						{/each}
 					</div>
@@ -310,7 +353,10 @@
 							{#each Array(editOptionCount) as _, i}
 								<div class="flex items-center gap-2">
 									<span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500">{String.fromCharCode(65 + i)}</span>
-									<input name="option_{i}" type="text" class="input flex-1" value={opts[i] || ''} required />
+									<input id="edit_option_{i}" name="option_{i}" type="text" class="input flex-1" value={opts[i] || ''} required />
+									<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 shrink-0" on:click={() => openOptionMediaPicker('edit', 'pilihan_ganda', i)} title="Tambahkan Media">
+										🖼️
+									</button>
 								</div>
 							{/each}
 							{#if editOptionCount < 5}
@@ -346,8 +392,14 @@
 							<label class="label">Pasangan (Kiri → Kanan)</label>
 							{#each [0, 1, 2, 3] as i}
 								<div class="grid grid-cols-2 gap-2">
-									<input name="left_{i}" type="text" class="input" value={opts.left?.[i] || ''} />
-									<input name="right_{i}" type="text" class="input" value={opts.right?.[i] || ''} />
+									<div class="flex gap-1">
+										<input id="edit_left_{i}" name="left_{i}" type="text" class="input w-full" value={opts.left?.[i] || ''} placeholder="Kiri {i + 1}" />
+										<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-2 shrink-0" on:click={() => openOptionMediaPicker('edit', 'menjodohkan_left', i)} title="Media">🖼️</button>
+									</div>
+									<div class="flex gap-1">
+										<input id="edit_right_{i}" name="right_{i}" type="text" class="input w-full" value={opts.right?.[i] || ''} placeholder="Kanan {i + 1}" />
+										<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-2 shrink-0" on:click={() => openOptionMediaPicker('edit', 'menjodohkan_right', i)} title="Media">🖼️</button>
+									</div>
 								</div>
 							{/each}
 						</div>
@@ -358,6 +410,34 @@
 						<button type="submit" class="btn-primary flex-1">Simpan Perubahan</button>
 					</div>
 				</form>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Media Picker Modal for Options -->
+{#if showOptionMediaPicker}
+	<div class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300">
+		<div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col transform scale-100">
+			<div class="p-4 border-b flex justify-between items-center bg-slate-50/50">
+				<h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+					<svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2-2v12a2 2 0 002 2z" /></svg>
+					Tambahkan Media ke Opsi
+				</h3>
+				<button type="button" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" on:click={() => showOptionMediaPicker = false}>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+				</button>
+			</div>
+			<div class="p-5">
+				<p class="text-sm text-slate-500 mb-4">Pilih media dari bank berkas atau unggah baru. HTML media akan otomatis ditambahkan ke opsi jawaban.</p>
+				<div class="border border-indigo-100 bg-indigo-50/30 rounded-xl p-4">
+					<MediaUploader 
+						label="Pilih / Unggah Media"
+						on:upload={(e) => {
+							insertMediaToOption(e.detail.url, e.detail.type);
+						}}
+					/>
+				</div>
 			</div>
 		</div>
 	</div>

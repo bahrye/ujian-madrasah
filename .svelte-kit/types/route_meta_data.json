@@ -79,6 +79,9 @@
 	"/api/logout": [
 		"src/routes/api/logout/+server.ts"
 	],
+	"/api/media": [
+		"src/routes/api/media/+server.ts"
+	],
 	"/api/proxy-media": [
 		"src/routes/api/proxy-media/+server.ts"
 	],

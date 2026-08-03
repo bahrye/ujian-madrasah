@@ -136,7 +136,7 @@
 					>
 						{optionLetters[i]}
 					</span>
-					<span class="text-sm {answer === optionLetters[i] ? 'text-indigo-700 font-medium' : 'text-slate-700'}">{option}</span>
+					<span class="text-sm prose prose-sm max-w-none {answer === optionLetters[i] ? 'text-indigo-700 font-medium' : 'text-slate-700'}">{@html option}</span>
 				</button>
 			{/each}
 
@@ -181,7 +181,7 @@
 			<div class="space-y-3">
 				{#each matchingLeft as leftItem, leftIdx}
 					<div class="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200">
-						<span class="flex-1 text-sm font-medium text-slate-700">{leftItem}</span>
+						<span class="flex-1 text-sm font-medium text-slate-700 prose prose-sm max-w-none">{@html leftItem}</span>
 						<svg class="w-5 h-5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
 						</svg>

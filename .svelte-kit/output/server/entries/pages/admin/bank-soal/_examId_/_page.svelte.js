@@ -109,6 +109,10 @@ function _page($$renderer, $$props) {
     {
       $$renderer2.push("<!--[-1-->");
     }
+    $$renderer2.push(`<!--]--> `);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
     $$renderer2.push(`<!--]-->`);
     if ($$store_subs) unsubscribe_stores($$store_subs);
     bind_props($$props, { data, form });

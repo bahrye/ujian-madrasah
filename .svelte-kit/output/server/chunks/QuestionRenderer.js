@@ -114,7 +114,7 @@ function QuestionRenderer($$renderer, $$props) {
       const each_array = ensure_array_like(options);
       for (let i = 0, $$length = each_array.length; i < $$length; i++) {
         let option = each_array[i];
-        $$renderer2.push(`<button${attr_class(`w-full flex items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-all duration-200 ${answer === optionLetters[i] ? "border-indigo-500 bg-indigo-50 shadow-md shadow-indigo-500/10" : "border-slate-200 hover:border-indigo-300 hover:bg-slate-50"}`)}><span${attr_class(`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0 transition-colors ${answer === optionLetters[i] ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white" : "bg-slate-100 text-slate-500"}`)}>${escape_html(optionLetters[i])}</span> <span${attr_class(`text-sm ${answer === optionLetters[i] ? "text-indigo-700 font-medium" : "text-slate-700"}`)}>${escape_html(option)}</span></button>`);
+        $$renderer2.push(`<button${attr_class(`w-full flex items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-all duration-200 ${answer === optionLetters[i] ? "border-indigo-500 bg-indigo-50 shadow-md shadow-indigo-500/10" : "border-slate-200 hover:border-indigo-300 hover:bg-slate-50"}`)}><span${attr_class(`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0 transition-colors ${answer === optionLetters[i] ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white" : "bg-slate-100 text-slate-500"}`)}>${escape_html(optionLetters[i])}</span> <span${attr_class(`text-sm prose prose-sm max-w-none ${answer === optionLetters[i] ? "text-indigo-700 font-medium" : "text-slate-700"}`)}>${html(option)}</span></button>`);
       }
       $$renderer2.push(`<!--]-->`);
     } else if (question.type === "benar_salah") {
@@ -143,7 +143,7 @@ function QuestionRenderer($$renderer, $$props) {
       const each_array_2 = ensure_array_like(matchingLeft);
       for (let leftIdx = 0, $$length = each_array_2.length; leftIdx < $$length; leftIdx++) {
         let leftItem = each_array_2[leftIdx];
-        $$renderer2.push(`<div class="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200"><span class="flex-1 text-sm font-medium text-slate-700">${escape_html(leftItem)}</span> <svg class="w-5 h-5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg> `);
+        $$renderer2.push(`<div class="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200"><span class="flex-1 text-sm font-medium text-slate-700 prose prose-sm max-w-none">${html(leftItem)}</span> <svg class="w-5 h-5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg> `);
         $$renderer2.select(
           {
             class: "select max-w-[200px]",
