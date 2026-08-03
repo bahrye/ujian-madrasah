@@ -50,6 +50,7 @@
 
 	function getDirectUrl(url: string | null): string {
 		if (!url) return '';
+		if (question.media_type === 'audio') return url; // Let AudioPlayer handle audio URLs
 		if (url.includes('drive.google.com/file/d/')) {
 			const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
 			if (match && match[1]) {
@@ -62,7 +63,7 @@
 						directLink += `&resourcekey=${resourceKey}`;
 					}
 				} catch (e) {}
-				return `/api/proxy-media?url=${encodeURIComponent(directLink)}`;
+				return directLink;
 			}
 		}
 		return url;

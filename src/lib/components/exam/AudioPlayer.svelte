@@ -12,6 +12,25 @@
 	let progress = 0;
 	let canPlay = true;
 
+	let isGoogleDrive = false;
+	let gDrivePreviewUrl = '';
+
+	$: {
+		if (src && src.includes('drive.google.com/file/d/')) {
+			isGoogleDrive = true;
+			const match = src.match(/\/d\/([a-zA-Z0-9_-]+)/);
+			if (match && match[1]) {
+				const id = match[1];
+				gDrivePreviewUrl = `https://drive.google.com/file/d/${id}/preview`;
+				try {
+					const urlObj = new URL(src);
+					const resourceKey = urlObj.searchParams.get('resourcekey');
+					if (resourceKey) gDrivePreviewUrl += `?resourcekey=${resourceKey}`;
+				} catch (e) {}
+			}
+		}
+	}
+
 	$: canPlay = playCount < maxPlays;
 	$: if (duration > 0) {
 		progress = (currentTime / duration) * 100;
@@ -55,29 +74,9 @@
 		return `${m}:${s.toString().padStart(2, '0')}`;
 	}
 
-	function getDirectUrl(url: string): string {
-		if (!url) return '';
-		if (url.includes('drive.google.com/file/d/')) {
-			const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-			if (match && match[1]) {
-				const id = match[1];
-				let directLink = `https://drive.google.com/uc?export=download&id=${id}`;
-				try {
-					const urlObj = new URL(url);
-					const resourceKey = urlObj.searchParams.get('resourcekey');
-					if (resourceKey) {
-						directLink += `&resourcekey=${resourceKey}`;
-					}
-				} catch (e) {}
-				return `/api/proxy-media?url=${encodeURIComponent(directLink)}`;
-			}
-		}
-		return url;
-	}
-
 	onMount(() => {
-		const directSrc = getDirectUrl(src);
-		audio = new Audio(directSrc);
+		if (isGoogleDrive) return; // Do not initialize HTML5 audio for Google Drive
+		audio = new Audio(src);
 		audio.addEventListener('play', handlePlay);
 		audio.addEventListener('pause', handlePause);
 		audio.addEventListener('ended', handleEnded);
@@ -95,9 +94,18 @@
 	});
 </script>
 
-<div class="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl border border-slate-200 p-3">
-	<div class="flex items-center gap-3">
-		<!-- Play/Pause Button -->
+{#if isGoogleDrive}
+	<div class="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl border border-slate-200 overflow-hidden">
+		<iframe src={gDrivePreviewUrl} title="Audio Preview" class="w-full h-[140px] border-0" allow="autoplay"></iframe>
+		<div class="p-3 bg-amber-50 border-t border-amber-100 text-xs text-amber-700 flex items-start gap-2 leading-relaxed">
+			<svg class="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+			<p><b>Catatan:</b> File audio ini di-host di Google Drive. Kebijakan keamanan Google mematikan fitur pemutar bawaan kami, sehingga <b>Batas Putar (Max Plays) tidak berlaku</b> untuk file ini. Kami menyarankan Anda memindahkan audio ke layanan <i>hosting</i> langsung (seperti Vocaroo) jika fitur batasan putar dibutuhkan.</p>
+		</div>
+	</div>
+{:else}
+	<div class="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl border border-slate-200 p-3">
+		<div class="flex items-center gap-3">
+			<!-- Play/Pause Button -->
 		<button
 			class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 flex-shrink-0
 				   {canPlay
@@ -129,7 +137,7 @@
 			</div>
 			<div class="flex justify-between mt-1.5">
 				<span class="text-xs text-slate-500 font-medium">{formatTime(currentTime)}</span>
-				<span class="text-xs text-slate-500 font-medium">{formatTime(duration)}</span>
+				<span class="text-xs font-medium text-slate-500 min-w-[36px]">{formatTime(duration)}</span>
 			</div>
 		</div>
 
@@ -142,3 +150,4 @@
 		</div>
 	</div>
 </div>
+{/if}

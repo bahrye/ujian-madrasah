@@ -1,4 +1,4 @@
-import { l as fallback, d as attr_class, i as attr, f as attr_style, e as escape_html, b as bind_props, a as stringify, c as ensure_array_like } from "./index.js";
+import { l as fallback, i as attr, d as attr_class, f as attr_style, e as escape_html, b as bind_props, a as stringify, c as ensure_array_like } from "./index.js";
 import { Q as QUESTION_TYPE_LABELS } from "./constants.js";
 import { h as html } from "./html.js";
 function AudioPlayer($$renderer, $$props) {
@@ -10,18 +10,46 @@ function AudioPlayer($$renderer, $$props) {
     let duration = 0;
     let progress = 0;
     let canPlay = true;
+    let isGoogleDrive = false;
+    let gDrivePreviewUrl = "";
     function formatTime(secs) {
       const m = Math.floor(secs / 60);
       const s = Math.floor(secs % 60);
       return `${m}:${s.toString().padStart(2, "0")}`;
     }
-    canPlay = playCount < maxPlays;
-    $$renderer2.push(`<div class="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl border border-slate-200 p-3"><div class="flex items-center gap-3"><button${attr_class(`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 flex-shrink-0 ${canPlay ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:scale-105" : "bg-slate-300 text-slate-500 cursor-not-allowed"}`)}${attr("disabled", !canPlay, true)}${attr("title", canPlay ? "Putar" : "Batas putar tercapai")}>`);
     {
-      $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>`);
+      if (src && src.includes("drive.google.com/file/d/")) {
+        isGoogleDrive = true;
+        const match = src.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (match && match[1]) {
+          const id = match[1];
+          gDrivePreviewUrl = `https://drive.google.com/file/d/${id}/preview`;
+          try {
+            const urlObj = new URL(src);
+            const resourceKey = urlObj.searchParams.get("resourcekey");
+            if (resourceKey) gDrivePreviewUrl += `?resourcekey=${resourceKey}`;
+          } catch (e) {
+          }
+        }
+      }
     }
-    $$renderer2.push(`<!--]--></button> <div class="flex-1 min-w-0"><div class="h-2 bg-slate-200 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-150"${attr_style(`width: ${stringify(progress)}%`)}></div></div> <div class="flex justify-between mt-1.5"><span class="text-xs text-slate-500 font-medium">${escape_html(formatTime(currentTime))}</span> <span class="text-xs text-slate-500 font-medium">${escape_html(formatTime(duration))}</span></div></div> <div class="flex-shrink-0 text-center"><div${attr_class(`text-xs font-bold ${canPlay ? "text-indigo-600" : "text-rose-500"}`)}>${escape_html(playCount)}/${escape_html(maxPlays)}</div> <div class="text-[10px] text-slate-400">putar</div></div></div></div>`);
+    canPlay = playCount < maxPlays;
+    if (
+      // Do not initialize HTML5 audio for Google Drive
+      isGoogleDrive
+    ) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<div class="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl border border-slate-200 overflow-hidden"><iframe${attr("src", gDrivePreviewUrl)} title="Audio Preview" class="w-full h-[140px] border-0" allow="autoplay"></iframe> <div class="p-3 bg-amber-50 border-t border-amber-100 text-xs text-amber-700 flex items-start gap-2 leading-relaxed"><svg class="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <p><b>Catatan:</b> File audio ini di-host di Google Drive. Kebijakan keamanan Google mematikan fitur pemutar bawaan kami, sehingga <b>Batas Putar (Max Plays) tidak berlaku</b> untuk file ini. Kami menyarankan Anda memindahkan audio ke layanan <i>hosting</i> langsung (seperti Vocaroo) jika fitur batasan putar dibutuhkan.</p></div></div>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+      $$renderer2.push(`<div class="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl border border-slate-200 p-3"><div class="flex items-center gap-3"><button${attr_class(`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 flex-shrink-0 ${canPlay ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:scale-105" : "bg-slate-300 text-slate-500 cursor-not-allowed"}`)}${attr("disabled", !canPlay, true)}${attr("title", canPlay ? "Putar" : "Batas putar tercapai")}>`);
+      {
+        $$renderer2.push("<!--[-1-->");
+        $$renderer2.push(`<svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>`);
+      }
+      $$renderer2.push(`<!--]--></button> <div class="flex-1 min-w-0"><div class="h-2 bg-slate-200 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-150"${attr_style(`width: ${stringify(progress)}%`)}></div></div> <div class="flex justify-between mt-1.5"><span class="text-xs text-slate-500 font-medium">${escape_html(formatTime(currentTime))}</span> <span class="text-xs font-medium text-slate-500 min-w-[36px]">${escape_html(formatTime(duration))}</span></div></div> <div class="flex-shrink-0 text-center"><div${attr_class(`text-xs font-bold ${canPlay ? "text-indigo-600" : "text-rose-500"}`)}>${escape_html(playCount)}/${escape_html(maxPlays)}</div> <div class="text-[10px] text-slate-400">putar</div></div></div></div>`);
+    }
+    $$renderer2.push(`<!--]-->`);
     bind_props($$props, { src, maxPlays });
   });
 }
@@ -35,6 +63,7 @@ function QuestionRenderer($$renderer, $$props) {
     const optionLetters = ["A", "B", "C", "D", "E", "F", "G", "H"];
     function getDirectUrl(url) {
       if (!url) return "";
+      if (question.media_type === "audio") return url;
       if (url.includes("drive.google.com/file/d/")) {
         const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
         if (match && match[1]) {
@@ -48,7 +77,7 @@ function QuestionRenderer($$renderer, $$props) {
             }
           } catch (e) {
           }
-          return `/api/proxy-media?url=${encodeURIComponent(directLink)}`;
+          return directLink;
         }
       }
       return url;

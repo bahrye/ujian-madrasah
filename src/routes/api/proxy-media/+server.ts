@@ -16,7 +16,11 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 		});
 
 		if (!response.ok) {
-			throw error(response.status, 'Failed to fetch media from source');
+			const text = await response.text();
+			return new Response(`Upstream error: ${response.status} ${response.statusText}\n\n${text}`, {
+				status: response.status,
+				headers: { 'Content-Type': 'text/plain' }
+			});
 		}
 
 		// Create clean headers to bypass CORP/CORS issues from the origin
@@ -38,6 +42,6 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 		});
 	} catch (err: any) {
 		console.error('Proxy Error:', err);
-		throw error(500, 'Failed to proxy media');
+		return new Response(`Proxy Error: ${err.message}`, { status: 500 });
 	}
 };

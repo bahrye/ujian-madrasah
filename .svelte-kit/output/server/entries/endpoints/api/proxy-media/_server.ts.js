@@ -11,7 +11,13 @@ const GET = async ({ url, fetch }) => {
       }
     });
     if (!response.ok) {
-      throw error(response.status, "Failed to fetch media from source");
+      const text = await response.text();
+      return new Response(`Upstream error: ${response.status} ${response.statusText}
+
+${text}`, {
+        status: response.status,
+        headers: { "Content-Type": "text/plain" }
+      });
     }
     const headers = new Headers();
     headers.set("Content-Type", response.headers.get("Content-Type") || "application/octet-stream");
@@ -28,7 +34,7 @@ const GET = async ({ url, fetch }) => {
     });
   } catch (err) {
     console.error("Proxy Error:", err);
-    throw error(500, "Failed to proxy media");
+    return new Response(`Proxy Error: ${err.message}`, { status: 500 });
   }
 };
 export {
