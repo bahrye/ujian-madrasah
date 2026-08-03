@@ -1,6 +1,6 @@
 import { fail, redirect, error } from "@sveltejs/kit";
 import { g as getDB } from "../../../../../chunks/db.js";
-const load = async ({ platform, locals, params }) => {
+const load = async ({ platform, locals, params, cookies }) => {
   const db = getDB(platform);
   const attemptId = params.attemptId;
   const attempt = await db.prepare(`
@@ -13,6 +13,10 @@ const load = async ({ platform, locals, params }) => {
   if (!attempt) throw error(404, "Sesi ujian tidak ditemukan.");
   if (attempt.status !== "mengerjakan") {
     throw redirect(302, "/siswa");
+  }
+  const isVerified = cookies.get("exam_token_verified_" + attemptId);
+  if (!isVerified) {
+    throw redirect(302, `/siswa/ujian?exam_id=${attempt.exam_id}`);
   }
   let questions = await db.prepare(`
 		SELECT q.* FROM questions q

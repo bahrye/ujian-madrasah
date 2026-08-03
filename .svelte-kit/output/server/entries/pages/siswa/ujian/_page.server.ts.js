@@ -2,13 +2,6 @@ import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
 const load = async ({ platform, locals, url }) => {
   const db = getDB(platform);
-  const activeAttempt = await db.prepare(`
-		SELECT sa.id FROM student_attempts sa
-		WHERE sa.student_id = ? AND sa.status = 'mengerjakan' LIMIT 1
-	`).bind(locals.user.id).first();
-  if (activeAttempt) {
-    throw redirect(302, `/siswa/ujian/${activeAttempt.id}`);
-  }
   const examId = url.searchParams.get("exam_id");
   if (!examId) throw redirect(302, "/siswa/jadwal");
   const exam = await db.prepare(`
@@ -33,7 +26,7 @@ const load = async ({ platform, locals, url }) => {
   return { exam };
 };
 const actions = {
-  validateToken: async ({ request, platform, locals }) => {
+  validateToken: async ({ request, platform, locals, cookies }) => {
     const db = getDB(platform);
     const form = await request.formData();
     const tokenCode = form.get("token")?.toString().trim().toUpperCase();
@@ -56,12 +49,15 @@ const actions = {
     if (new Date(token.expires_at) < /* @__PURE__ */ new Date()) return fail(400, { error: "Token sudah kedaluwarsa." });
     const existingAttempt = await db.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`).bind(locals.user.id, token.exam_id).first();
     if (existingAttempt) {
-      if (existingAttempt.status === "mengerjakan") throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
+      if (existingAttempt.status === "mengerjakan") {
+        cookies.set("exam_token_verified_" + existingAttempt.id, "true", { path: "/" });
+        throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
+      }
       return fail(400, { error: "Anda sudah pernah mengerjakan ujian ini." });
     }
     return { success: true, tokenCode, examId };
   },
-  startExam: async ({ request, platform, locals }) => {
+  startExam: async ({ request, platform, locals, cookies }) => {
     const db = getDB(platform);
     const form = await request.formData();
     const tokenCode = form.get("token")?.toString().trim().toUpperCase();
@@ -95,6 +91,7 @@ const actions = {
       const stmts = questions.results.map((q) => db.prepare("INSERT INTO student_answers (attempt_id, question_id) VALUES (?, ?)").bind(attemptId, q.id));
       await db.batch(stmts);
     }
+    cookies.set("exam_token_verified_" + attemptId, "true", { path: "/" });
     throw redirect(302, `/siswa/ujian/${attemptId}`);
   }
 };

@@ -43,7 +43,7 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 
 	// Ujian yang sedang dikerjakan
 	const activeAttempt = await db.prepare(`
-		SELECT sa.id, e.title as exam_title, e.duration_minutes, sa.created_at
+		SELECT sa.id, e.id as exam_id, e.title as exam_title, e.duration_minutes, sa.created_at
 		FROM student_attempts sa JOIN exams e ON sa.exam_id = e.id
 		WHERE sa.student_id = ? AND sa.status = 'mengerjakan'
 		LIMIT 1

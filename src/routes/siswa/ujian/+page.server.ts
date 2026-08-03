@@ -5,15 +5,7 @@ import { getDB } from '$lib/server/db';
 export const load: PageServerLoad = async ({ platform, locals, url }) => {
 	const db = getDB(platform);
 
-	// Cek apakah ada ujian yang sedang dikerjakan
-	const activeAttempt = await db.prepare(`
-		SELECT sa.id FROM student_attempts sa
-		WHERE sa.student_id = ? AND sa.status = 'mengerjakan' LIMIT 1
-	`).bind(locals.user!.id).first<{ id: number }>();
 
-	if (activeAttempt) {
-		throw redirect(302, `/siswa/ujian/${activeAttempt.id}`);
-	}
 
 	const examId = url.searchParams.get('exam_id');
 	if (!examId) throw redirect(302, '/siswa/jadwal');
@@ -43,7 +35,7 @@ export const load: PageServerLoad = async ({ platform, locals, url }) => {
 };
 
 export const actions: Actions = {
-	validateToken: async ({ request, platform, locals }) => {
+	validateToken: async ({ request, platform, locals, cookies }) => {
 		const db = getDB(platform);
 		const form = await request.formData();
 		const tokenCode = form.get('token')?.toString().trim().toUpperCase();
@@ -72,14 +64,17 @@ export const actions: Actions = {
 			.bind(locals.user!.id, token.exam_id).first<{ id: number; status: string }>();
 
 		if (existingAttempt) {
-			if (existingAttempt.status === 'mengerjakan') throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
+			if (existingAttempt.status === 'mengerjakan') {
+				cookies.set('exam_token_verified_' + existingAttempt.id, 'true', { path: '/' });
+				throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
+			}
 			return fail(400, { error: 'Anda sudah pernah mengerjakan ujian ini.' });
 		}
 
 		return { success: true, tokenCode, examId };
 	},
 
-	startExam: async ({ request, platform, locals }) => {
+	startExam: async ({ request, platform, locals, cookies }) => {
 		const db = getDB(platform);
 		const form = await request.formData();
 		const tokenCode = form.get('token')?.toString().trim().toUpperCase();
@@ -123,6 +118,8 @@ export const actions: Actions = {
 			const stmts = questions.results.map(q => db.prepare('INSERT INTO student_answers (attempt_id, question_id) VALUES (?, ?)').bind(attemptId, q.id));
 			await db.batch(stmts);
 		}
+		
+		cookies.set('exam_token_verified_' + attemptId, 'true', { path: '/' });
 		throw redirect(302, `/siswa/ujian/${attemptId}`);
 	}
 };

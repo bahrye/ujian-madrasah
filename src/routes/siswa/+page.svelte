@@ -146,7 +146,7 @@
 					<h3 class="font-bold text-amber-800">Ujian Sedang Berlangsung</h3>
 					<p class="text-sm text-amber-600">{activeAttempt.exam_title}</p>
 				</div>
-				<a href="/siswa/ujian/{activeAttempt.id}" class="btn-warning">
+				<a href="/siswa/ujian?exam_id={activeAttempt.exam_id}" class="btn-warning">
 					Lanjutkan
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.chevronRight} />

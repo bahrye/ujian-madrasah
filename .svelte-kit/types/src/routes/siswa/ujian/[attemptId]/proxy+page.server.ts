@@ -3,7 +3,7 @@ import { fail, redirect, error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 
-export const load = async ({ platform, locals, params }: Parameters<PageServerLoad>[0]) => {
+export const load = async ({ platform, locals, params, cookies }: Parameters<PageServerLoad>[0]) => {
 	const db = getDB(platform);
 	const attemptId = params.attemptId;
 
@@ -20,6 +20,11 @@ export const load = async ({ platform, locals, params }: Parameters<PageServerLo
 
 	if (attempt.status !== 'mengerjakan') {
 		throw redirect(302, '/siswa');
+	}
+
+	const isVerified = cookies.get('exam_token_verified_' + attemptId);
+	if (!isVerified) {
+		throw redirect(302, `/siswa/ujian?exam_id=${attempt.exam_id}`);
 	}
 
 	// Ambil soal
