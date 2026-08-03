@@ -77,8 +77,29 @@ export const actions = {
 
 		if (!id) return fail(400, { error: 'ID tidak valid.' });
 
-		await db.prepare('DELETE FROM exams WHERE id = ? AND school_id = ?').bind(id, locals.user!.school_id).run();
-		return { success: 'Ujian berhasil dihapus.' };
+		try {
+			const attempts = await db.prepare('SELECT id FROM student_attempts WHERE exam_id = ?').bind(id).all<{ id: number }>();
+			const attemptIds = attempts.results.map((a: any) => a.id);
+			
+			const batch = [
+				db.prepare('DELETE FROM exam_participants WHERE exam_id = ?').bind(id),
+				db.prepare('DELETE FROM exam_proctors WHERE exam_id = ?').bind(id),
+				db.prepare('DELETE FROM tokens WHERE exam_id = ?').bind(id),
+				db.prepare('DELETE FROM questions WHERE exam_id = ?').bind(id)
+			];
+			if (attemptIds.length > 0) {
+				const placeholders = attemptIds.map(() => '?').join(',');
+				batch.push(db.prepare(`DELETE FROM student_answers WHERE attempt_id IN (${placeholders})`).bind(...attemptIds));
+				batch.push(db.prepare('DELETE FROM student_attempts WHERE exam_id = ?').bind(id));
+			}
+			batch.push(db.prepare('DELETE FROM exams WHERE id = ? AND school_id = ?').bind(id, locals.user!.school_id));
+
+			await db.batch(batch);
+			return { success: 'Ujian berhasil dihapus.' };
+		} catch (e: any) {
+			console.error('Delete error:', e);
+			return fail(500, { error: 'Gagal menghapus ujian. Mungkin masih ada data terkait.' });
+		}
 	},
 
 	toggleActive: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
