@@ -18,11 +18,7 @@
 			msg = `Konfirmasi Penghapusan\n\nFile ini adalah File Yatim Piatu (tidak terhubung dengan soal manapun). Yakin ingin membersihkannya dari Cloudinary?`;
 		}
 		
-		if (confirm(msg)) {
-			isDeleting = true;
-			return true;
-		}
-		return false;
+		return confirm(msg);
 	}
 </script>
 
@@ -115,7 +111,12 @@
 						</div>
 
 						<div class="pt-3 border-t {item.question_id ? 'border-slate-100' : 'border-amber-200'}">
-							<form method="POST" action="?/deleteMedia" use:enhance={() => {
+							<form method="POST" action="?/deleteMedia" use:enhance={({ cancel }) => {
+								if (!confirmDelete(item)) {
+									cancel();
+									return;
+								}
+								isDeleting = true;
 								return async ({ update }) => {
 									isDeleting = false;
 									await update();
@@ -125,9 +126,6 @@
 								<button 
 									type="submit" 
 									class="btn {item.question_id ? 'btn-danger' : 'bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-lg'} w-full py-2 flex items-center justify-center gap-2"
-									on:click={(e) => {
-										if (!confirmDelete(item)) e.preventDefault();
-									}}
 									disabled={isDeleting}
 								>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
