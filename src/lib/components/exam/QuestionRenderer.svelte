@@ -70,9 +70,18 @@
 	}
 
 	$: directMediaUrl = getDirectUrl(question.media_url);
+
+	// Image Lightbox
+	let lightboxImage: string | null = null;
+	function handleContentClick(event: MouseEvent) {
+		const target = event.target as HTMLElement;
+		if (target.tagName === 'IMG') {
+			lightboxImage = (target as HTMLImageElement).src;
+		}
+	}
 </script>
 
-<div class="space-y-5 animate-in">
+<div class="space-y-5 animate-in" on:click={handleContentClick} on:keydown={(e) => e.key === 'Enter' && handleContentClick(e as any)} role="presentation">
 	<!-- Header -->
 	<div class="flex items-center justify-between flex-wrap gap-2">
 		<div class="flex items-center gap-3">
@@ -121,12 +130,20 @@
 		{#if question.type === 'pilihan_ganda'}
 			<!-- Multiple Choice -->
 			{#each options as option, i}
-				<button
-					class="w-full flex items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-all duration-200
+				<div
+					role="button"
+					tabindex="0"
+					class="w-full flex items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer
 						   {answer === optionLetters[i]
 							? 'border-indigo-500 bg-indigo-50 shadow-md shadow-indigo-500/10'
 							: 'border-slate-200 hover:border-indigo-300 hover:bg-slate-50'}"
-					on:click={() => handleAnswer(optionLetters[i])}
+					on:click={(e) => {
+						const target = e.target;
+						if (target.tagName === 'AUDIO' || target.closest('audio')) return;
+						if (target.tagName === 'IMG') return; // let the lightbox handle it
+						handleAnswer(optionLetters[i]);
+					}}
+					on:keydown={(e) => e.key === 'Enter' && handleAnswer(optionLetters[i])}
 				>
 					<span
 						class="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0 transition-colors
@@ -136,8 +153,8 @@
 					>
 						{optionLetters[i]}
 					</span>
-					<span class="text-sm prose prose-sm max-w-none {answer === optionLetters[i] ? 'text-indigo-700 font-medium' : 'text-slate-700'}">{@html option}</span>
-				</button>
+					<div class="text-sm prose prose-sm max-w-none flex-1 {answer === optionLetters[i] ? 'text-indigo-700 font-medium' : 'text-slate-700'}">{@html option}</div>
+				</div>
 			{/each}
 
 		{:else if question.type === 'benar_salah'}
@@ -201,3 +218,24 @@
 		{/if}
 	</div>
 </div>
+
+<!-- Fullscreen Image Lightbox -->
+{#if lightboxImage}
+	<div 
+		class="fixed inset-0 z-[99999] bg-slate-900/95 flex items-center justify-center p-4 backdrop-blur-sm transition-all duration-300"
+		on:click={() => lightboxImage = null}
+		on:keydown={(e) => e.key === 'Escape' && (lightboxImage = null)}
+		tabindex="-1"
+		role="dialog"
+	>
+		<button type="button" class="absolute top-4 right-4 md:top-6 md:right-6 text-white/50 hover:text-white p-2 bg-white/10 hover:bg-white/20 rounded-full transition-all z-10" on:click={() => lightboxImage = null} title="Tutup">
+			<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+		</button>
+		<img 
+			src={lightboxImage} 
+			alt="Gambar Layar Penuh" 
+			class="max-w-full max-h-[95vh] object-contain cursor-zoom-out shadow-2xl rounded-lg transform transition-transform"
+			on:click|stopPropagation={() => lightboxImage = null}
+		/>
+	</div>
+{/if}
