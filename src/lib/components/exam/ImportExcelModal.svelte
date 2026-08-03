@@ -176,7 +176,40 @@
       { wch: 12 }
     ];
 
+    // Buat Sheet Petunjuk
+    const instructionData = [
+      ["PETUNJUK PENGISIAN SOAL"],
+      [],
+      ["1. TIPE SOAL", "Harus diisi dengan ejaan persis: Pilihan Ganda, Benar Salah, Isian Singkat, atau Essay"],
+      ["2. TEKS SOAL", "Isi dengan pertanyaan soal Anda"],
+      ["3. OPSI A - E", "Khusus untuk tipe Pilihan Ganda. Minimal isi Opsi A dan B."],
+      ["4. JAWABAN BENAR", "Untuk Pilihan Ganda: A, B, C, D, atau E. \nUntuk Benar Salah: Benar atau Salah. \nUntuk Isian Singkat: Kata kuncinya."],
+      ["5. BOBOT NILAI", "Angka (misal: 1, 2, 5). Default adalah 1."],
+      [],
+      ["CONTOH PENGISIAN BENAR:"],
+      ["Pilihan Ganda", "Siapakah penemu bola lampu?", "Thomas Edison", "Albert Einstein", "Nikola Tesla", "Isaac Newton", "", "A", 1],
+      [],
+      ["CONTOH PENGISIAN SALAH (AKAN DITOLAK SISTEM):"],
+      ["Pilihan Ganda", "Siapakah penemu bola lampu?", "Thomas Edison", "Albert Einstein", "", "", "", "Thomas Edison", 1, "<- SALAH! Jawaban benar harus berupa huruf A, B, C, D, atau E"],
+      ["Esai", "Jelaskan hujan!", "", "", "", "", "", "", 1, "<- SALAH! Tipe soal harus 'Essay', bukan 'Esai'"]
+    ];
+
+    const wsInstructions = XLSX.utils.aoa_to_sheet(instructionData);
+    wsInstructions['!cols'] = [
+      { wch: 25 },
+      { wch: 60 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 12 },
+      { wch: 60 }
+    ];
+
     const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, wsInstructions, "Petunjuk Penggunaan");
     XLSX.utils.book_append_sheet(wb, ws, "Template Soal");
     XLSX.writeFile(wb, "Template_Import_Soal.xlsx");
   }
