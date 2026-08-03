@@ -1,10 +1,10 @@
-import * as server from '../entries/pages/siswa/jadwal/_page.server.ts.js';
+import * as server from '../entries/pages/pengawas/tokens/_page.server.ts.js';
 
 export const index = 32;
 let component_cache;
-export const component = async () => component_cache ??= (await import('../entries/pages/siswa/jadwal/_page.svelte.js')).default;
+export const component = async () => component_cache ??= (await import('../entries/pages/pengawas/tokens/_page.svelte.js')).default;
 export { server };
-export const server_id = "src/routes/siswa/jadwal/+page.server.ts";
-export const imports = ["_app/immutable/nodes/32.Cp2cAiNW.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/DTI0Se7w.js","_app/immutable/chunks/B-m1hCzt.js","_app/immutable/chunks/DbD9IbZI.js","_app/immutable/chunks/CQCwlsVV.js","_app/immutable/chunks/MtbvIQbS.js","_app/immutable/chunks/DA7HkAFo.js","_app/immutable/chunks/wHeWtbPT.js","_app/immutable/chunks/CqUTEu1o.js"];
+export const server_id = "src/routes/pengawas/tokens/+page.server.ts";
+export const imports = ["_app/immutable/nodes/32.CG4yLRGT.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/D7kfP2VJ.js","_app/immutable/chunks/UXPBhQu2.js","_app/immutable/chunks/D5ire4jW.js","_app/immutable/chunks/CjRowugn.js","_app/immutable/chunks/tn2TxHaz.js","_app/immutable/chunks/Te0C24lc.js","_app/immutable/chunks/XjEmyE9H.js","_app/immutable/chunks/oSPAKHEQ.js","_app/immutable/chunks/CPUB8hZh.js","_app/immutable/chunks/BbkU5XNJ.js","_app/immutable/chunks/BQHbywm_.js","_app/immutable/chunks/BmGB27ZV.js","_app/immutable/chunks/vbBCqoRC.js","_app/immutable/chunks/CqUTEu1o.js","_app/immutable/chunks/BcQYu49t.js","_app/immutable/chunks/C9JodmjZ.js"];
 export const stylesheets = [];
 export const fonts = [];

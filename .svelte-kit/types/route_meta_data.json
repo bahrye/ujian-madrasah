@@ -21,6 +21,10 @@
 		"src/routes/admin/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/admin/bank-soal/[examId]/preview": [
+		"src/routes/admin/bank-soal/[examId]/preview/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/admin/classes": [
 		"src/routes/admin/classes/+page.server.ts",
 		"src/routes/admin/+layout.server.ts",
@@ -85,6 +89,10 @@
 	"/guru/bank-soal/[examId]": [
 		"src/routes/guru/bank-soal/[examId]/+page.server.ts",
 		"src/routes/guru/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/guru/bank-soal/[examId]/preview": [
+		"src/routes/guru/bank-soal/[examId]/preview/+page.server.ts",
 		"src/routes/+layout.server.ts"
 	],
 	"/guru/penilaian": [
