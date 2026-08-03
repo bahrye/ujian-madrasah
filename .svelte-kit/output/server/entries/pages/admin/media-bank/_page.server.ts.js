@@ -2,16 +2,16 @@ import { fail } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
 import { d as deleteFromCloudinary } from "../../../../chunks/cloudinary.js";
 import { b as private_env } from "../../../../chunks/shared-server.js";
-const load = async ({ platform }) => {
+const load = async ({ platform, locals }) => {
   const db = getDB(platform);
   try {
     await db.prepare(`
-			INSERT INTO uploaded_media (url, media_type)
-			SELECT media_url, media_type FROM questions 
+			INSERT INTO uploaded_media (url, media_type, school_id)
+			SELECT media_url, media_type, ? FROM questions 
 			WHERE media_url LIKE '%res.cloudinary.com%' 
 			AND media_url NOT IN (SELECT url FROM uploaded_media)
 			GROUP BY media_url
-		`).run();
+		`).bind(locals.user?.school_id || -1).run();
   } catch (e) {
     console.error("Sync uploaded_media error:", e);
   }
@@ -32,10 +32,11 @@ const load = async ({ platform }) => {
 		LEFT JOIN exams e ON q.exam_id = e.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		LEFT JOIN users usr ON u.uploaded_by = usr.id
+		WHERE u.school_id = ? OR ? = 'superadmin'
 		ORDER BY q.id IS NULL DESC, s.name ASC, e.title ASC, q.question_number ASC
 	`;
   try {
-    const result = await db.prepare(query).all();
+    const result = await db.prepare(query).bind(locals.user?.school_id || -1, locals.user?.role).all();
     return { mediaItems: result.results };
   } catch (e) {
     console.error("Fetch uploaded_media error:", e);

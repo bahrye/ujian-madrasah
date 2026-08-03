@@ -18,12 +18,12 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 		// Insert ignore (or handle conflict)
 		// SQLite UPSERT (ON CONFLICT DO NOTHING)
 		const query = `
-			INSERT INTO uploaded_media (url, media_type, uploaded_by, is_public)
-			VALUES (?, ?, ?, ?)
+			INSERT INTO uploaded_media (url, media_type, uploaded_by, is_public, school_id)
+			VALUES (?, ?, ?, ?, ?)
 			ON CONFLICT(url) DO NOTHING
 		`;
 
-		await dbRun(db, query, url, media_type, locals.user?.id || null, 0);
+		await dbRun(db, query, url, media_type, locals.user?.id || null, 0, locals.user?.school_id || null);
 
 		return json({ success: true });
 	} catch (error) {
