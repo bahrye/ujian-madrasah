@@ -86,6 +86,7 @@ const actions = {
   // ===================== TOKENS =====================
   generateToken: async ({ request, platform, params, locals }) => {
     const db = getDB(platform);
+    await request.formData();
     const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND created_by = ?").bind(params.examId, locals.user.id).first();
     if (!exam) return fail(403, { error: "Akses ditolak." });
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -95,11 +96,10 @@ const actions = {
     }
     const now = Date.now();
     const expiresAt = new Date(now + 15 * 60 * 1e3).toISOString();
-    const releasedAt = new Date(now).toISOString();
     await db.prepare(`
-			INSERT INTO tokens (school_id, exam_id, created_by, token_code, expires_at, released_at)
-			VALUES (?, ?, ?, ?, ?, ?)
-		`).bind(locals.user.school_id, params.examId, locals.user.id, token, expiresAt, releasedAt).run();
+			INSERT INTO tokens (school_id, exam_id, created_by, token_code, is_released, expires_at, released_at)
+			VALUES (?, ?, ?, ?, 1, ?, datetime('now'))
+		`).bind(locals.user.school_id, params.examId, locals.user.id, token, expiresAt).run();
     return { success: "Token berhasil dibuat.", token };
   },
   deleteToken: async ({ request, platform, locals }) => {
