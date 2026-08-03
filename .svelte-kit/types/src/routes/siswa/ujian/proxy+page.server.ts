@@ -20,7 +20,19 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 	if (!examId) throw redirect(302, '/siswa/jadwal');
 
 	const exam = await db.prepare(`
-		SELECT e.id, e.title, s.name as subject 
+		SELECT e.id, e.title, e.duration_minutes, e.start_time, e.end_time, s.name as subject,
+			COALESCE(
+				(
+					SELECT GROUP_CONCAT(u.name, ', ')
+					FROM exam_proctors epr
+					JOIN users u ON epr.proctor_id = u.id
+					WHERE epr.exam_id = e.id
+				),
+				(
+					SELECT u.name FROM users u WHERE u.id = e.created_by AND u.role = 'guru'
+				)
+			) as proctors,
+			(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count
 		FROM exams e 
 		LEFT JOIN subjects s ON e.subject_id = s.id 
 		WHERE e.id = ? AND e.school_id = ?
@@ -32,82 +44,86 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 };
 
 export const actions = {
-	default: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+	validateToken: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
 		const form = await request.formData();
 		const tokenCode = form.get('token')?.toString().trim().toUpperCase();
 		const examId = form.get('exam_id')?.toString();
 
-		if (!tokenCode || !examId) {
-			return fail(400, { error: 'Data tidak lengkap.' });
-		}
+		if (!tokenCode || !examId) return fail(400, { error: 'Data tidak lengkap.' });
 
-		// Validasi token
 		const token = await db.prepare(`
 			SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
 			FROM tokens t JOIN exams e ON t.exam_id = e.id
 			WHERE t.token_code = ? AND t.is_released = 1 AND t.exam_id = ?
 		`).bind(tokenCode, examId).first<any>();
 
-		if (!token) {
-			return fail(400, { error: 'Token tidak valid untuk ujian ini atau belum dirilis.' });
-		}
-
-		if (!token.is_active) {
-			return fail(400, { error: 'Ujian tidak aktif.' });
-		}
-
-		// Validasi apakah token dirilis kurang dari 15 menit yang lalu
+		if (!token) return fail(400, { error: 'Token tidak valid untuk ujian ini atau belum dirilis.' });
+		if (!token.is_active) return fail(400, { error: 'Ujian tidak aktif.' });
 		if (token.released_at) {
 			const releasedAt = new Date(token.released_at + 'Z').getTime();
 			const now = new Date().getTime();
-			if (now - releasedAt > 15 * 60 * 1000) {
-				return fail(400, { error: 'Token sudah ditarik otomatis (melewati batas 15 menit).' });
-			}
+			if (now - releasedAt > 15 * 60 * 1000) return fail(400, { error: 'Token sudah ditarik otomatis (melewati batas 15 menit).' });
 		} else {
-			// Fail-safe if released_at is somehow null but is_released is 1
 			return fail(400, { error: 'Status rilis token tidak valid.' });
 		}
+		if (new Date(token.expires_at) < new Date()) return fail(400, { error: 'Token sudah kedaluwarsa.' });
 
-		if (new Date(token.expires_at) < new Date()) {
-			return fail(400, { error: 'Token sudah kedaluwarsa.' });
-		}
-
-		// Cek apakah sudah pernah mengerjakan
-		const existingAttempt = await db.prepare(`
-			SELECT id, status FROM student_attempts
-			WHERE student_id = ? AND exam_id = ?
-		`).bind(locals.user!.id, token.exam_id).first<{ id: number; status: string }>();
+		const existingAttempt = await db.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`)
+			.bind(locals.user!.id, token.exam_id).first<{ id: number; status: string }>();
 
 		if (existingAttempt) {
-			if (existingAttempt.status === 'mengerjakan') {
-				throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
-			}
+			if (existingAttempt.status === 'mengerjakan') throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
 			return fail(400, { error: 'Anda sudah pernah mengerjakan ujian ini.' });
 		}
 
-		// Hitung waktu selesai
-		const endTime = new Date(Date.now() + token.duration_minutes * 60 * 1000).toISOString();
+		return { success: true, tokenCode, examId };
+	},
 
-		// Buat attempt baru
-		const result = await db.prepare(`
-			INSERT INTO student_attempts (student_id, exam_id, token_id, end_time, status)
-			VALUES (?, ?, ?, ?, 'mengerjakan')
-		`).bind(locals.user!.id, token.exam_id, token.id, endTime).run();
+	startExam: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+		const db = getDB(platform);
+		const form = await request.formData();
+		const tokenCode = form.get('token')?.toString().trim().toUpperCase();
+		const examId = form.get('exam_id')?.toString();
 
-		const attemptId = result.meta.last_row_id;
+		if (!tokenCode || !examId) return fail(400, { error: 'Data tidak lengkap.' });
 
-		// Buat record jawaban kosong untuk semua soal
-		const questions = await db.prepare('SELECT id FROM questions WHERE exam_id = ? ORDER BY question_number')
-			.bind(token.exam_id).all<{ id: number }>();
+		const token = await db.prepare(`
+			SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
+			FROM tokens t JOIN exams e ON t.exam_id = e.id
+			WHERE t.token_code = ? AND t.is_released = 1 AND t.exam_id = ?
+		`).bind(tokenCode, examId).first<any>();
 
-		if (questions.results.length > 0) {
-			const stmts = questions.results.map(q =>
-				db.prepare('INSERT INTO student_answers (attempt_id, question_id) VALUES (?, ?)').bind(attemptId, q.id)
-			);
-			await db.batch(stmts);
+		if (!token) return fail(400, { error: 'Token tidak valid untuk ujian ini atau belum dirilis.' });
+		if (!token.is_active) return fail(400, { error: 'Ujian tidak aktif.' });
+		if (token.released_at) {
+			const releasedAt = new Date(token.released_at + 'Z').getTime();
+			const now = new Date().getTime();
+			if (now - releasedAt > 15 * 60 * 1000) return fail(400, { error: 'Token sudah ditarik otomatis.' });
+		} else {
+			return fail(400, { error: 'Status rilis token tidak valid.' });
+		}
+		if (new Date(token.expires_at) < new Date()) return fail(400, { error: 'Token sudah kedaluwarsa.' });
+
+		const existingAttempt = await db.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`)
+			.bind(locals.user!.id, token.exam_id).first<{ id: number; status: string }>();
+
+		if (existingAttempt) {
+			if (existingAttempt.status === 'mengerjakan') throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
+			return fail(400, { error: 'Anda sudah pernah mengerjakan ujian ini.' });
 		}
 
+		const endTime = new Date(Date.now() + token.duration_minutes * 60 * 1000).toISOString();
+
+		const result = await db.prepare(`INSERT INTO student_attempts (student_id, exam_id, token_id, end_time, status) VALUES (?, ?, ?, ?, 'mengerjakan')`)
+			.bind(locals.user!.id, token.exam_id, token.id, endTime).run();
+
+		const attemptId = result.meta.last_row_id;
+		const questions = await db.prepare('SELECT id FROM questions WHERE exam_id = ? ORDER BY question_number').bind(token.exam_id).all<{ id: number }>();
+		if (questions.results.length > 0) {
+			const stmts = questions.results.map(q => db.prepare('INSERT INTO student_answers (attempt_id, question_id) VALUES (?, ?)').bind(attemptId, q.id));
+			await db.batch(stmts);
+		}
 		throw redirect(302, `/siswa/ujian/${attemptId}`);
 	}
 };

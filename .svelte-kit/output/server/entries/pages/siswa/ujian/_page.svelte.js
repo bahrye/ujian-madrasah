@@ -23,12 +23,16 @@ function _page($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--> <form method="POST" class="space-y-4"><input name="token" type="text" required="" class="input text-center text-2xl font-mono tracking-[0.3em] uppercase py-4" placeholder="_ _ _ _ _ _" maxlength="10" autocomplete="off"/> <input type="hidden" name="exam_id"${attr("value", data.exam.id)}/> <button type="submit"${attr("disabled", loading, true)} class="btn-primary w-full py-3 text-base justify-center">`);
+    $$renderer2.push(`<!--]--> <form method="POST" action="?/validateToken" class="space-y-4"><input name="token" type="text" required="" class="input text-center text-2xl font-mono tracking-[0.3em] uppercase py-4" placeholder="_ _ _ _ _ _" maxlength="10" autocomplete="off"/> <input type="hidden" name="exam_id"${attr("value", data.exam.id)}/> <button type="submit"${attr("disabled", loading, true)} class="btn-primary w-full py-3 text-base justify-center">`);
     {
       $$renderer2.push("<!--[-1-->");
       $$renderer2.push(`Mulai Ujian`);
     }
-    $$renderer2.push(`<!--]--></button></form> <p class="text-xs text-slate-400 mt-4">Token bersifat sekali pakai dan memiliki batas waktu.</p></div></div>`);
+    $$renderer2.push(`<!--]--></button></form> <p class="text-xs text-slate-400 mt-4">Token bersifat sekali pakai dan memiliki batas waktu.</p></div></div> `);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]-->`);
     bind_props($$props, { data, form });
   });
 }

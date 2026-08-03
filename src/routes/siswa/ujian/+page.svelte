@@ -3,9 +3,13 @@
 	import { ICONS } from '$lib/utils/constants';
 
 	export let data;
-	export let form: { error?: string } | null;
+	export let form: { error?: string, success?: boolean, tokenCode?: string } | null;
 
 	let loading = false;
+	let starting = false;
+	let showModal = false;
+	let tokenCode = '';
+	let agreed = false;
 </script>
 
 <svelte:head><title>Mulai Ujian — Ujian Online Madrasah</title></svelte:head>
@@ -36,9 +40,18 @@
 
 		<form
 			method="POST"
+			action="?/validateToken"
 			use:enhance={() => {
 				loading = true;
-				return async ({ update }) => { loading = false; await update(); };
+				return async ({ result, update }) => { 
+					loading = false;
+					if (result.type === 'success' && result.data?.success) {
+						tokenCode = result.data.tokenCode;
+						showModal = true;
+					} else {
+						await update();
+					}
+				};
 			}}
 			class="space-y-4"
 		>
@@ -69,3 +82,78 @@
 		<p class="text-xs text-slate-400 mt-4">Token bersifat sekali pakai dan memiliki batas waktu.</p>
 	</div>
 </div>
+
+<!-- Pre-Exam Modal -->
+{#if showModal}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" on:click={() => (showModal = false)}>
+		<div class="max-h-[90vh] overflow-y-auto card p-6 w-full max-w-lg animate-in fade-in zoom-in duration-200" on:click|stopPropagation>
+			<div class="w-14 h-14 mx-auto rounded-full bg-indigo-100 flex items-center justify-center mb-4">
+				<svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.exam} />
+				</svg>
+			</div>
+			
+			<h2 class="text-xl font-bold text-slate-800 text-center mb-2">Konfirmasi Ujian</h2>
+			<p class="text-slate-500 text-sm text-center mb-6">Harap baca informasi dan tata tertib ujian berikut sebelum memulai.</p>
+			
+			<div class="bg-slate-50 rounded-xl p-4 border border-slate-100 space-y-3 mb-6">
+				<div class="flex justify-between">
+					<span class="text-sm text-slate-500">Mata Pelajaran</span>
+					<span class="text-sm font-semibold text-slate-800">{data.exam.subject || 'Umum'}</span>
+				</div>
+				<div class="flex justify-between">
+					<span class="text-sm text-slate-500">Jumlah Soal</span>
+					<span class="text-sm font-semibold text-slate-800">{data.exam.question_count} Soal</span>
+				</div>
+				<div class="flex justify-between">
+					<span class="text-sm text-slate-500">Durasi</span>
+					<span class="text-sm font-semibold text-slate-800">{data.exam.duration_minutes} Menit</span>
+				</div>
+				<div class="flex justify-between">
+					<span class="text-sm text-slate-500">Pengawas</span>
+					<span class="text-sm font-semibold text-slate-800 text-right max-w-[200px]">{data.exam.proctors || '-'}</span>
+				</div>
+			</div>
+
+			<div class="bg-rose-50 border border-rose-200 rounded-xl p-4 mb-6">
+				<h3 class="text-sm font-bold text-rose-800 mb-2 flex items-center gap-2">
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.warning} />
+					</svg>
+					Peringatan Keras Pengawasan Ketat
+				</h3>
+				<ul class="text-sm text-rose-700 space-y-2 list-disc pl-5">
+					<li>Ujian ini menggunakan <strong>Sistem Anti-Kecurangan Otomatis</strong>.</li>
+					<li>Dilarang keras <strong class="bg-rose-200 px-1 rounded">Membuka Tab Lain</strong> atau <strong class="bg-rose-200 px-1 rounded">Keluar dari Halaman Ujian</strong>.</li>
+					<li>Dilarang <strong class="bg-rose-200 px-1 rounded">Memperkecil Layar / Membuka Aplikasi Lain</strong>.</li>
+					<li>Jika Anda melakukan pelanggaran batas maksimum, ujian akan <strong>Dihentikan Paksa</strong> dan jawaban otomatis dikirim!</li>
+				</ul>
+			</div>
+
+			<label class="flex items-start gap-3 p-3 mb-6 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
+				<input type="checkbox" bind:checked={agreed} class="mt-1 w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500" />
+				<span class="text-sm font-medium text-slate-700 leading-tight">
+					Saya telah membaca peraturan ujian dan paham bahwa segala bentuk kecurangan akan tercatat secara otomatis.
+				</span>
+			</label>
+
+			<form method="POST" action="?/startExam" use:enhance={() => { starting = true; return async ({ update }) => { starting = false; await update(); }; }}>
+				<input type="hidden" name="token" value={tokenCode} />
+				<input type="hidden" name="exam_id" value={data.exam.id} />
+				
+				<div class="flex gap-3">
+					<button type="button" class="btn-ghost flex-1 justify-center" on:click={() => (showModal = false)} disabled={starting}>Batal</button>
+					<button type="submit" class="btn-primary flex-1 justify-center" disabled={!agreed || starting}>
+						{#if starting}
+							Memulai...
+						{:else}
+							Mulai Ujian
+						{/if}
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+{/if}
