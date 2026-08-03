@@ -46,9 +46,9 @@ const actions = {
     if (!mediaUrl || !mediaUrl.includes("res.cloudinary.com")) {
       return fail(400, { error: "URL Media tidak valid." });
     }
-    const deleted = await deleteFromCloudinary(mediaUrl, private_env);
-    if (!deleted) {
-      return fail(500, { error: "Gagal menghapus dari Cloudinary. Pastikan API Key & Secret sudah diatur di Cloudflare." });
+    const deleteResult = await deleteFromCloudinary(mediaUrl, private_env);
+    if (!deleteResult.success) {
+      return fail(500, { error: `Gagal menghapus dari Cloudinary. Pesan: ${deleteResult.error}` });
     }
     await db.prepare("DELETE FROM uploaded_media WHERE url = ?").bind(mediaUrl).run();
     await db.prepare("UPDATE questions SET media_url = NULL, media_type = NULL WHERE media_url = ?").bind(mediaUrl).run();

@@ -10,11 +10,11 @@ const POST = async ({ request }) => {
     if (!url.includes("res.cloudinary.com")) {
       return json({ success: true, message: "Not a Cloudinary URL, skipped." });
     }
-    const deleted = await deleteFromCloudinary(url, private_env);
-    if (deleted) {
+    const deleteResult = await deleteFromCloudinary(url, private_env);
+    if (deleteResult.success) {
       return json({ success: true });
     } else {
-      return json({ success: false, error: "Failed to delete or credentials missing" }, { status: 500 });
+      return json({ success: false, error: deleteResult.error || "Failed to delete" }, { status: 500 });
     }
   } catch (error) {
     console.error("API /delete-media error:", error);

@@ -1,11 +1,14 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { ActionData, PageData } from './$types';
+	import MediaUploader from '$lib/components/admin/MediaUploader.svelte';
 
 	export let data: PageData;
 	export let form: ActionData;
 
 	let isDeleting = false;
+	let showUploadModal = false;
+	let tempUploadedUrl = '';
 
 	function confirmDelete(item: any) {
 		let msg = '';
@@ -28,12 +31,18 @@
 </svelte:head>
 
 <div class="max-w-6xl mx-auto">
-	<div class="mb-8">
-		<h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
-			<svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
-			Bank Berkas (Cloudinary)
-		</h1>
-		<p class="text-slate-500 mt-1">Kelola semua file gambar dan audio yang telah diunggah ke Cloudinary dan terhubung dengan soal ujian.</p>
+	<div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+		<div>
+			<h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+				<svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
+				Bank Berkas (Cloudinary)
+			</h1>
+			<p class="text-slate-500 mt-1">Kelola semua file gambar dan audio yang telah diunggah ke Cloudinary dan terhubung dengan soal ujian.</p>
+		</div>
+		<button class="btn btn-primary whitespace-nowrap shadow-sm" on:click={() => showUploadModal = true}>
+			<svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+			Unggah Media Baru
+		</button>
 	</div>
 
 	{#if form?.error}
@@ -132,3 +141,40 @@
 		</div>
 	{/if}
 </div>
+
+<!-- Upload Modal -->
+{#if showUploadModal}
+	<div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+		<div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+			<div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+				<h3 class="text-lg font-bold text-slate-800">Unggah Media ke Cloudinary</h3>
+				<button class="text-slate-400 hover:text-slate-600 transition-colors" on:click={() => showUploadModal = false}>
+					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+				</button>
+			</div>
+			
+			<div class="p-6 overflow-y-auto">
+				<div class="mb-6 p-4 bg-indigo-50 border border-indigo-100 rounded-lg text-sm text-indigo-700">
+					<p>Media yang diunggah di sini akan otomatis masuk ke Cloudinary dan tercatat sebagai <strong>File Yatim Piatu</strong> sampai Anda menghubungkannya ke sebuah soal saat proses pembuatan soal.</p>
+				</div>
+				
+				<MediaUploader 
+					label="Pilih File Gambar atau Audio"
+					bind:value={tempUploadedUrl}
+				/>
+			</div>
+			
+			<div class="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+				<button class="btn bg-slate-200 hover:bg-slate-300 text-slate-700" on:click={() => showUploadModal = false}>
+					Tutup
+				</button>
+				<button class="btn btn-primary" on:click={() => {
+					showUploadModal = false;
+					window.location.reload();
+				}}>
+					Selesai & Muat Ulang
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}

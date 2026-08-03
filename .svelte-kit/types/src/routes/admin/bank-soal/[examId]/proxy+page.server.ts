@@ -159,7 +159,7 @@ export const actions = {
 		// Delete media from Cloudinary if it exists
 		const q = await db.prepare('SELECT media_url FROM questions WHERE id = ?').bind(id).first<{media_url: string}>();
 		if (q && q.media_url && q.media_url.includes('res.cloudinary.com')) {
-			await deleteFromCloudinary(q.media_url, env);
+					await deleteFromCloudinary(q.media_url, env);
 		}
 
 		await db.prepare('DELETE FROM questions WHERE id = ?').bind(id).run();

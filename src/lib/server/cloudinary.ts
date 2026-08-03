@@ -1,5 +1,5 @@
-export async function deleteFromCloudinary(url: string | null, env: Record<string, string | undefined> | any): Promise<boolean> {
-	if (!url || !url.includes('res.cloudinary.com')) return false;
+export async function deleteFromCloudinary(url: string | null, env: Record<string, string | undefined> | any): Promise<{success: boolean, error?: string}> {
+	if (!url || !url.includes('res.cloudinary.com')) return { success: false, error: 'Bukan URL Cloudinary valid' };
 
 	const cloudName = env.PUBLIC_CLOUDINARY_CLOUD_NAME || env.CLOUDINARY_CLOUD_NAME || 'dfhtjgwcz';
 	const apiKey = env.CLOUDINARY_API_KEY;
@@ -7,13 +7,13 @@ export async function deleteFromCloudinary(url: string | null, env: Record<strin
 
 	if (!apiKey || !apiSecret) {
 		console.warn('Cloudinary API credentials missing. Skipping automatic deletion.');
-		return false;
+		return { success: false, error: 'API Key atau Secret Cloudinary belum diatur di Cloudflare Pages (Environment Variables)' };
 	}
 
 	try {
 		// Extract public_id correctly handling versions (v123456789) and folders
 		const uploadSplit = url.split('/upload/');
-		if (uploadSplit.length < 2) return false;
+		if (uploadSplit.length < 2) return { success: false, error: 'Format URL tidak dikenali' };
 		
 		let afterUpload = uploadSplit[1];
 		// Remove version prefix if exists (e.g. v1722666666/)
@@ -26,7 +26,7 @@ export async function deleteFromCloudinary(url: string | null, env: Record<strin
 		const publicId = lastDotIndex !== -1 ? afterUpload.substring(0, lastDotIndex) : afterUpload;
 
 		// Cloudinary treats audio files as 'video' resource type for their API
-		const resourceType = url.match(/\.(mp3|wav|ogg|m4a)$/i) ? 'video' : 'image';
+		const resourceType = url.includes('/video/') ? 'video' : 'image';
 
 		const timestamp = Math.round(new Date().getTime() / 1000).toString();
 		const strToSign = `public_id=${publicId}&timestamp=${timestamp}${apiSecret}`;
@@ -49,11 +49,16 @@ export async function deleteFromCloudinary(url: string | null, env: Record<strin
 			body: formData
 		});
 		
-		const result = (await res.json()) as { result: string };
+		const result = (await res.json()) as any;
 		console.log('Cloudinary Destroy Result:', result);
-		return result.result === 'ok' || result.result === 'not found';
-	} catch (err) {
+		
+		if (result.result === 'ok' || result.result === 'not found') {
+			return { success: true };
+		} else {
+			return { success: false, error: result.error?.message || result.result || 'Unknown error' };
+		}
+	} catch (err: any) {
 		console.error('Failed to delete from Cloudinary:', err);
-		return false;
+		return { success: false, error: err.message || 'Kesalahan koneksi ke Cloudinary API' };
 	}
 }

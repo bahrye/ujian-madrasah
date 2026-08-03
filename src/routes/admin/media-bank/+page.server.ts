@@ -57,10 +57,10 @@ export const actions: Actions = {
 		}
 
 		// Delete from Cloudinary
-		const deleted = await deleteFromCloudinary(mediaUrl, env);
+		const deleteResult = await deleteFromCloudinary(mediaUrl, env);
 
-		if (!deleted) {
-			return fail(500, { error: 'Gagal menghapus dari Cloudinary. Pastikan API Key & Secret sudah diatur di Cloudflare.' });
+		if (!deleteResult.success) {
+			return fail(500, { error: `Gagal menghapus dari Cloudinary. Pesan: ${deleteResult.error}` });
 		}
 
 		// Delete from uploaded_media tracker
