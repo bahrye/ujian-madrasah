@@ -197,6 +197,7 @@ export const actions: Actions = {
 			}
 
 			let isCorrect = false;
+			let partialScore: number | null = null;
 
 			if (ans.type === 'pilihan_ganda' || ans.type === 'benar_salah') {
 				isCorrect = ans.answer_given === correctAnswer;
@@ -204,13 +205,23 @@ export const actions: Actions = {
 				try {
 					const givenMap = JSON.parse(ans.answer_given);
 					const correctMap = typeof correctAnswer === 'string' ? JSON.parse(correctAnswer) : correctAnswer;
-					isCorrect = JSON.stringify(givenMap) === JSON.stringify(correctMap);
+					
+					const keys = Object.keys(correctMap);
+					const totalPairs = keys.length;
+					if (totalPairs > 0) {
+						let correctCount = 0;
+						for (const key of keys) {
+							if (givenMap[key] === correctMap[key]) correctCount++;
+						}
+						isCorrect = correctCount === totalPairs;
+						partialScore = Math.round((correctCount / totalPairs) * ans.points * 100) / 100;
+					}
 				} catch {
 					isCorrect = false;
 				}
 			}
 
-			const scoreGiven = isCorrect ? ans.points : 0;
+			const scoreGiven = partialScore !== null ? partialScore : (isCorrect ? ans.points : 0);
 			totalScore += scoreGiven;
 
 			objectivePoints += ans.points;
