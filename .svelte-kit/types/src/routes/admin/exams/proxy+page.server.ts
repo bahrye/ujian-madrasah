@@ -84,6 +84,7 @@ export const actions = {
 			const batch = [
 				db.prepare('DELETE FROM exam_participants WHERE exam_id = ?').bind(id),
 				db.prepare('DELETE FROM exam_proctors WHERE exam_id = ?').bind(id),
+				db.prepare('DELETE FROM exam_teachers WHERE exam_id = ?').bind(id),
 				db.prepare('DELETE FROM tokens WHERE exam_id = ?').bind(id),
 				db.prepare('DELETE FROM questions WHERE exam_id = ?').bind(id)
 			];
