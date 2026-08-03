@@ -1,10 +1,10 @@
-import * as server from '../entries/pages/pengawas/tokens/_page.server.ts.js';
+import * as server from '../entries/pages/pengawas/monitor/_page.server.ts.js';
 
 export const index = 33;
 let component_cache;
-export const component = async () => component_cache ??= (await import('../entries/pages/pengawas/tokens/_page.svelte.js')).default;
+export const component = async () => component_cache ??= (await import('../entries/pages/pengawas/monitor/_page.svelte.js')).default;
 export { server };
-export const server_id = "src/routes/pengawas/tokens/+page.server.ts";
-export const imports = ["_app/immutable/nodes/33.Htbsqbuy.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/BV1hr-UK.js","_app/immutable/chunks/BxH7Qk13.js","_app/immutable/chunks/CSCmeJqC.js","_app/immutable/chunks/DIMz4J0V.js","_app/immutable/chunks/DHon3iv8.js","_app/immutable/chunks/B-vHU7aS.js","_app/immutable/chunks/CJVAUuBs.js","_app/immutable/chunks/DUwNe_OI.js","_app/immutable/chunks/Zee0eR3e.js","_app/immutable/chunks/BrU0cvcn.js","_app/immutable/chunks/DUFUeTgQ.js","_app/immutable/chunks/sHRz0Lil.js","_app/immutable/chunks/BiSM0t2o.js","_app/immutable/chunks/C3TyuUHs.js","_app/immutable/chunks/RHhvIjaC.js","_app/immutable/chunks/DMBmrML1.js"];
+export const server_id = "src/routes/pengawas/monitor/+page.server.ts";
+export const imports = ["_app/immutable/nodes/33.nqv24MDX.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/Qo4WinPi.js","_app/immutable/chunks/DuRu0Cwg.js","_app/immutable/chunks/CajJ7RZp.js","_app/immutable/chunks/49jLYmn9.js","_app/immutable/chunks/BWT6d7X8.js","_app/immutable/chunks/DmlZE70N.js","_app/immutable/chunks/DsOXAt_Q.js","_app/immutable/chunks/C-YzJrTz.js","_app/immutable/chunks/4drL41Yi.js","_app/immutable/chunks/oH8PtMh8.js","_app/immutable/chunks/d_Kyr9Ln.js","_app/immutable/chunks/Di_ZoS8s.js","_app/immutable/chunks/UOt-RVu5.js","_app/immutable/chunks/Bfc47y5P.js","_app/immutable/chunks/KIzjWQRD.js","_app/immutable/chunks/fKeFOqVQ.js","_app/immutable/chunks/k0KhTsjR.js"];
 export const stylesheets = [];
 export const fonts = [];

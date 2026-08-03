@@ -235,7 +235,7 @@
       "_index.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.Cmm73x5O.css"
+      "_app/immutable/assets/_layout.BAujTNLA.css"
     ]
   },
   "src/routes/+page.server.ts": {
@@ -746,6 +746,30 @@
       "_index.js",
       "_QuestionRenderer.js",
       "_constants.js"
+    ]
+  },
+  "src/routes/guru/media-bank/+page.server.ts": {
+    "file": "entries/pages/guru/media-bank/_page.server.ts.js",
+    "name": "entries/pages/guru/media-bank/_page.server.ts",
+    "src": "src/routes/guru/media-bank/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js",
+      "_cloudinary.js",
+      "_shared-server.js"
+    ]
+  },
+  "src/routes/guru/media-bank/+page.svelte": {
+    "file": "entries/pages/guru/media-bank/_page.svelte.js",
+    "name": "entries/pages/guru/media-bank/_page.svelte",
+    "src": "src/routes/guru/media-bank/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_exports.js",
+      "_utils2.js",
+      "_root.js",
+      "_state.svelte.js"
     ]
   },
   "src/routes/guru/penilaian/+page.server.ts": {

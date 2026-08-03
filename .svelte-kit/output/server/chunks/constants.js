@@ -50,6 +50,7 @@ const SIDEBAR_MENUS = {
     { label: "Dashboard", href: "/guru", icon: "dashboard" },
     { label: "Ujian Remedial", href: "/guru/remedial", icon: "exam" },
     { label: "Bank Soal", href: "/guru/bank-soal", icon: "questions" },
+    { label: "Bank Media", href: "/guru/media-bank", icon: "folder" },
     { label: "Penilaian", href: "/guru/penilaian", icon: "grading" },
     { label: "Hasil Ujian", href: "/guru/results", icon: "results" }
   ],

@@ -91,8 +91,11 @@
 								<span class="text-xs font-medium text-slate-500 uppercase tracking-wider">File Audio</span>
 							</div>
 						{/if}
-						<div class="absolute top-2 left-2">
+						<div class="absolute top-2 left-2 flex flex-col gap-1 items-start">
 							<span class="badge badge-primary shadow-sm">{item.media_type}</span>
+							<span class="badge {item.is_public ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'} shadow-sm text-[10px] border">
+								{item.is_public ? '🌐 Publik' : '🔒 Privat'}
+							</span>
 						</div>
 					</div>
 
@@ -122,6 +125,14 @@
 									</div>
 								</div>
 							{/if}
+						</div>
+						
+						<div class="mt-3 mb-3 text-[11px] text-slate-500 bg-white p-2 rounded-lg flex justify-between items-center border border-slate-200 shadow-sm">
+							<span class="flex items-center gap-1">
+								<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+								Pengunggah:
+							</span>
+							<span class="font-bold text-slate-700">{item.uploader_name || 'Sistem'}</span>
 						</div>
 
 						<div class="pt-3 border-t {item.question_id ? 'border-slate-100' : 'border-amber-200'}">

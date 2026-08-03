@@ -112,6 +112,11 @@
 		"src/routes/guru/bank-soal/[examId]/preview/+page.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/guru/media-bank": [
+		"src/routes/guru/media-bank/+page.server.ts",
+		"src/routes/guru/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/guru/penilaian": [
 		"src/routes/guru/penilaian/+page.server.ts",
 		"src/routes/guru/+layout.server.ts",

@@ -1,10 +1,10 @@
-import * as server from '../entries/pages/guru/results/_attemptId_/_page.server.ts.js';
+import * as server from '../entries/pages/guru/results/_page.server.ts.js';
 
 export const index = 29;
 let component_cache;
-export const component = async () => component_cache ??= (await import('../entries/pages/guru/results/_attemptId_/_page.svelte.js')).default;
+export const component = async () => component_cache ??= (await import('../entries/pages/guru/results/_page.svelte.js')).default;
 export { server };
-export const server_id = "src/routes/guru/results/[attemptId]/+page.server.ts";
-export const imports = ["_app/immutable/nodes/29.md41FjLy.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/BV1hr-UK.js","_app/immutable/chunks/BxH7Qk13.js","_app/immutable/chunks/DIMz4J0V.js","_app/immutable/chunks/DHon3iv8.js","_app/immutable/chunks/B-vHU7aS.js","_app/immutable/chunks/nOaBnUdr.js","_app/immutable/chunks/CJVAUuBs.js","_app/immutable/chunks/DUFUeTgQ.js","_app/immutable/chunks/sHRz0Lil.js","_app/immutable/chunks/C3TyuUHs.js"];
+export const server_id = "src/routes/guru/results/+page.server.ts";
+export const imports = ["_app/immutable/nodes/29.BZYiA9YZ.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/Qo4WinPi.js","_app/immutable/chunks/DuRu0Cwg.js","_app/immutable/chunks/49jLYmn9.js","_app/immutable/chunks/BWT6d7X8.js","_app/immutable/chunks/DmlZE70N.js","_app/immutable/chunks/DsOXAt_Q.js","_app/immutable/chunks/d_Kyr9Ln.js","_app/immutable/chunks/Di_ZoS8s.js","_app/immutable/chunks/4drL41Yi.js","_app/immutable/chunks/CajJ7RZp.js","_app/immutable/chunks/fKeFOqVQ.js"];
 export const stylesheets = [];
 export const fonts = [];

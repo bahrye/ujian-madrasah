@@ -27,6 +27,8 @@ export const load = async ({ platform }: Parameters<PageServerLoad>[0]) => {
 			u.id as log_id,
 			u.url as media_url,
 			u.media_type,
+			u.is_public,
+			usr.name as uploader_name,
 			q.id as question_id,
 			q.question_number,
 			e.title as exam_title,
@@ -35,6 +37,7 @@ export const load = async ({ platform }: Parameters<PageServerLoad>[0]) => {
 		LEFT JOIN questions q ON u.url = q.media_url
 		LEFT JOIN exams e ON q.exam_id = e.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
+		LEFT JOIN users usr ON u.uploaded_by = usr.id
 		ORDER BY q.id IS NULL DESC, s.name ASC, e.title ASC, q.question_number ASC
 	`;
 

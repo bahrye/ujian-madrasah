@@ -183,6 +183,8 @@ CREATE TABLE IF NOT EXISTS uploaded_media (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     url TEXT NOT NULL UNIQUE,
     media_type TEXT NOT NULL CHECK(media_type IN ('image', 'audio')),
+    uploaded_by INTEGER REFERENCES users(id),
+    is_public INTEGER NOT NULL DEFAULT 0,
     uploaded_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_uploaded_media_url ON uploaded_media(url);

@@ -49,7 +49,8 @@ export const nodes = [
 	() => import('./nodes/37'),
 	() => import('./nodes/38'),
 	() => import('./nodes/39'),
-	() => import('./nodes/40')
+	() => import('./nodes/40'),
+	() => import('./nodes/41')
 ];
 
 export const server_loads = [0,2,3,4,5,6];
@@ -73,22 +74,23 @@ export const dictionary = {
 		"/guru/bank-soal": [~22,[3]],
 		"/guru/bank-soal/[examId]": [~23,[3]],
 		"/guru/bank-soal/[examId]/preview": [~24],
-		"/guru/penilaian": [~25,[3]],
-		"/guru/remedial": [~26,[3]],
-		"/guru/remedial/[examId]": [~27,[3]],
-		"/guru/results": [~28,[3]],
-		"/guru/results/[attemptId]": [~29,[3]],
-		"/login": [~30],
-		"/pengawas": [~31,[4]],
-		"/pengawas/monitor": [~32,[4]],
-		"/pengawas/tokens": [~33,[4]],
-		"/siswa": [~34,[5]],
-		"/siswa/jadwal": [~35,[5]],
-		"/siswa/ujian": [~36,[5]],
-		"/siswa/ujian/[attemptId]": [~37],
-		"/superadmin": [~38,[6]],
-		"/superadmin/admins": [~39,[6]],
-		"/superadmin/schools": [~40,[6]]
+		"/guru/media-bank": [~25,[3]],
+		"/guru/penilaian": [~26,[3]],
+		"/guru/remedial": [~27,[3]],
+		"/guru/remedial/[examId]": [~28,[3]],
+		"/guru/results": [~29,[3]],
+		"/guru/results/[attemptId]": [~30,[3]],
+		"/login": [~31],
+		"/pengawas": [~32,[4]],
+		"/pengawas/monitor": [~33,[4]],
+		"/pengawas/tokens": [~34,[4]],
+		"/siswa": [~35,[5]],
+		"/siswa/jadwal": [~36,[5]],
+		"/siswa/ujian": [~37,[5]],
+		"/siswa/ujian/[attemptId]": [~38],
+		"/superadmin": [~39,[6]],
+		"/superadmin/admins": [~40,[6]],
+		"/superadmin/schools": [~41,[6]]
 	};
 
 export const hooks = {
