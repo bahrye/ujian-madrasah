@@ -2,7 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 
-export const load: PageServerLoad = async ({ platform, locals }) => {
+export const load: PageServerLoad = async ({ platform, locals, url }) => {
 	const db = getDB(platform);
 
 	// Cek apakah ada ujian yang sedang dikerjakan
@@ -15,7 +15,19 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		throw redirect(302, `/siswa/ujian/${activeAttempt.id}`);
 	}
 
-	return {};
+	const examId = url.searchParams.get('exam_id');
+	if (!examId) throw redirect(302, '/siswa/jadwal');
+
+	const exam = await db.prepare(`
+		SELECT e.id, e.title, s.name as subject 
+		FROM exams e 
+		LEFT JOIN subjects s ON e.subject_id = s.id 
+		WHERE e.id = ? AND e.school_id = ?
+	`).bind(examId, locals.user!.school_id).first();
+
+	if (!exam) throw redirect(302, '/siswa/jadwal');
+
+	return { exam };
 };
 
 export const actions: Actions = {
@@ -23,20 +35,21 @@ export const actions: Actions = {
 		const db = getDB(platform);
 		const form = await request.formData();
 		const tokenCode = form.get('token')?.toString().trim().toUpperCase();
+		const examId = form.get('exam_id')?.toString();
 
-		if (!tokenCode) {
-			return fail(400, { error: 'Token ujian wajib diisi.' });
+		if (!tokenCode || !examId) {
+			return fail(400, { error: 'Data tidak lengkap.' });
 		}
 
 		// Validasi token
 		const token = await db.prepare(`
 			SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
 			FROM tokens t JOIN exams e ON t.exam_id = e.id
-			WHERE t.token_code = ? AND t.is_released = 1
-		`).bind(tokenCode).first<any>();
+			WHERE t.token_code = ? AND t.is_released = 1 AND t.exam_id = ?
+		`).bind(tokenCode, examId).first<any>();
 
 		if (!token) {
-			return fail(400, { error: 'Token tidak valid atau belum dirilis oleh pengawas.' });
+			return fail(400, { error: 'Token tidak valid untuk ujian ini atau belum dirilis.' });
 		}
 
 		if (!token.is_active) {

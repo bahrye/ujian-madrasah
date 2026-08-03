@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { ICONS } from '$lib/utils/constants';
 
+	export let data;
 	export let form: { error?: string } | null;
 
 	let loading = false;
@@ -18,6 +19,10 @@
 		</div>
 
 		<h1 class="text-2xl font-bold text-slate-800 mb-2">Masukkan Token Ujian</h1>
+		<div class="mb-6 p-4 rounded-xl bg-slate-50 border border-slate-100">
+			<p class="font-bold text-slate-700 text-lg">{data.exam.title}</p>
+			<p class="text-sm text-slate-500">{data.exam.subject || 'Umum'}</p>
+		</div>
 		<p class="text-sm text-slate-500 mb-6">Dapatkan token dari pengawas ujian Anda untuk memulai</p>
 
 		{#if form?.error}
@@ -46,6 +51,7 @@
 				maxlength="10"
 				autocomplete="off"
 			/>
+			<input type="hidden" name="exam_id" value={data.exam.id} />
 
 			<button type="submit" disabled={loading} class="btn-primary w-full py-3 text-base justify-center">
 				{#if loading}

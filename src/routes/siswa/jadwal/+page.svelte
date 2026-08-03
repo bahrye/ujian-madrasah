@@ -135,7 +135,7 @@
 							Belum Dimulai
 						</button>
 					{:else}
-						<a href="/siswa/ujian" class="btn btn-primary w-full justify-center">Buka Halaman Ujian</a>
+						<a href="/siswa/ujian?exam_id={exam.id}" class="btn btn-primary w-full justify-center">Buka Halaman Ujian</a>
 					{/if}
 				</div>
 			</div>

@@ -1,4 +1,4 @@
-import { h as head, c as ensure_array_like, i as attr, e as escape_html, b as bind_props } from "../../../../chunks/index.js";
+import { h as head, c as ensure_array_like, i as attr, e as escape_html, a as stringify, b as bind_props } from "../../../../chunks/index.js";
 import { I as ICONS } from "../../../../chunks/constants.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
@@ -66,7 +66,7 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<button disabled="" class="btn w-full justify-center bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed">Belum Dimulai</button>`);
         } else {
           $$renderer2.push("<!--[-1-->");
-          $$renderer2.push(`<a href="/siswa/ujian" class="btn btn-primary w-full justify-center">Buka Halaman Ujian</a>`);
+          $$renderer2.push(`<a${attr("href", `/siswa/ujian?exam_id=${stringify(exam.id)}`)} class="btn btn-primary w-full justify-center">Buka Halaman Ujian</a>`);
         }
         $$renderer2.push(`<!--]--></div></div>`);
       }
