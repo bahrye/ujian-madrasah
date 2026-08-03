@@ -254,11 +254,11 @@
 						</div>
 						<div>
 							<label class="label" for="eq-points">Poin</label>
-							<input id="eq-points" name="points" type="number" min="1" class="input" bind:value={editingQuestion.points} />
+							<input id="eq-points" name="points" type="number" min="1" class="input" value={editingQuestion.points} />
 						</div>
 						<div>
 							<label class="label" for="eq-media">Media</label>
-							<select id="eq-media" name="media_type" class="select" bind:value={editingQuestion.media_type}>
+							<select id="eq-media" name="media_type" class="select" value={editingQuestion.media_type}>
 								<option value={null}>Tanpa Media</option>
 								<option value="image">Gambar</option>
 								<option value="audio">Audio</option>
@@ -268,12 +268,12 @@
 
 					<div>
 						<label class="label" for="eq-text">Teks Soal</label>
-						<textarea id="eq-text" name="question_text" required class="input min-h-[100px]" rows="3" bind:value={editingQuestion.question_text}></textarea>
+						<textarea id="eq-text" name="question_text" required class="input min-h-[100px]" rows="3" value={editingQuestion.question_text}></textarea>
 					</div>
 
 					<div>
 						<label class="label" for="eq-media-url">URL Media</label>
-						<input id="eq-media-url" name="media_url" type="url" class="input" bind:value={editingQuestion.media_url} />
+						<input id="eq-media-url" name="media_url" type="url" class="input" value={editingQuestion.media_url} />
 						<p class="text-[11px] text-slate-500 mt-1.5 leading-relaxed">💡 <b>Tips:</b> Anda dapat mengunggah gambar secara gratis ke <a href="https://id.imgbb.com/" target="_blank" class="text-indigo-500 hover:underline font-medium">ImgBB</a>, lalu tempel <i>Direct Link</i> (akhiran .jpg/.png) ke kolom ini. Untuk audio, gunakan tautan Google Drive.</p>
 					</div>
 
