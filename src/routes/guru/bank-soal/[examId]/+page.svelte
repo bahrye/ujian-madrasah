@@ -76,26 +76,30 @@
 <svelte:head><title>Soal - {exam.title} — Ujian Online Madrasah</title></svelte:head>
 
 <div class="space-y-6 animate-in">
-	<div class="flex items-center gap-3">
-		<a href="/guru/bank-soal" class="btn-ghost btn-sm">
-			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-				<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.chevronLeft} />
-			</svg>
-		</a>
-		<div class="flex-1">
-			<h1 class="text-2xl font-bold text-slate-800">{exam.title}</h1>
-			<p class="text-sm text-slate-500">{exam.subject || 'Umum'} · {questions.length} soal</p>
+	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+		<div class="flex items-start sm:items-center gap-3">
+			<a href="/guru/bank-soal" class="btn-ghost btn-sm mt-1 sm:mt-0">
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.chevronLeft} />
+				</svg>
+			</a>
+			<div>
+				<h1 class="text-2xl font-bold text-slate-800 leading-tight">{exam.title}</h1>
+				<p class="text-sm text-slate-500 mt-1">{exam.subject || 'Umum'} · {questions.length} soal</p>
+			</div>
 		</div>
-		<button class="btn-ghost" on:click={() => (showImportModal = true)}>
-			<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-			Import Excel
-		</button>
-		<button class="btn-primary" on:click={() => (showCreateForm = !showCreateForm)}>
-			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-				<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
-			</svg>
-			Tambah Soal
-		</button>
+		<div class="flex flex-wrap items-center gap-2 pl-12 sm:pl-0">
+			<button class="btn-ghost btn-sm" on:click={() => (showImportModal = true)}>
+				<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+				Import Excel
+			</button>
+			<button class="btn-primary btn-sm" on:click={() => (showCreateForm = !showCreateForm)}>
+				<svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
+				</svg>
+				Tambah Soal
+			</button>
+		</div>
 	</div>
 
 	<!-- Import Modal -->
