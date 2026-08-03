@@ -80,6 +80,7 @@
 				<div>
 					<label class="label" for="q-media-url">URL Media <span class="text-slate-400 font-normal">(opsional)</span></label>
 					<input id="q-media-url" name="media_url" type="url" class="input" placeholder="https://example.com/gambar.jpg" />
+					<p class="text-[11px] text-slate-500 mt-1.5 leading-relaxed">💡 <b>Tips:</b> Anda dapat mengunggah gambar secara gratis ke <a href="https://id.imgbb.com/" target="_blank" class="text-indigo-500 hover:underline font-medium">ImgBB</a>, lalu tempel <i>Direct Link</i> (akhiran .jpg/.png) ke kolom ini. Untuk audio, gunakan tautan Google Drive.</p>
 				</div>
 
 				<div>
@@ -273,6 +274,7 @@
 					<div>
 						<label class="label" for="eq-media-url">URL Media</label>
 						<input id="eq-media-url" name="media_url" type="url" class="input" bind:value={editingQuestion.media_url} />
+						<p class="text-[11px] text-slate-500 mt-1.5 leading-relaxed">💡 <b>Tips:</b> Anda dapat mengunggah gambar secara gratis ke <a href="https://id.imgbb.com/" target="_blank" class="text-indigo-500 hover:underline font-medium">ImgBB</a>, lalu tempel <i>Direct Link</i> (akhiran .jpg/.png) ke kolom ini. Untuk audio, gunakan tautan Google Drive.</p>
 					</div>
 
 					<!-- Type-specific fields for edit -->
