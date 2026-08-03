@@ -19,6 +19,7 @@ const load = async ({ platform }) => {
 		SELECT 
 			u.id as log_id,
 			u.url as media_url,
+			u.name,
 			u.media_type,
 			u.is_public,
 			usr.name as uploader_name,
@@ -65,6 +66,15 @@ const actions = {
     if (!mediaUrl) return fail(400, { error: "URL Media tidak valid." });
     await db.prepare("UPDATE uploaded_media SET is_public = ? WHERE url = ?").bind(isPublic, mediaUrl).run();
     return { success: isPublic ? "Media berhasil ditampilkan untuk semua guru." : "Media berhasil disembunyikan (Privat)." };
+  },
+  updateName: async ({ request, platform }) => {
+    const db = getDB(platform);
+    const form = await request.formData();
+    const mediaUrl = form.get("media_url")?.toString();
+    const name = form.get("name")?.toString() || null;
+    if (!mediaUrl) return fail(400, { error: "URL Media tidak valid." });
+    await db.prepare("UPDATE uploaded_media SET name = ? WHERE url = ?").bind(name, mediaUrl).run();
+    return { success: "Nama berkas berhasil diperbarui." };
   }
 };
 export {

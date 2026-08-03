@@ -115,6 +115,20 @@
 
 					<!-- Details Area -->
 					<div class="p-4 flex-1 flex flex-col {item.question_id ? '' : 'bg-amber-50/50'}">
+						<form method="POST" action="?/updateName" use:enhance class="mb-4">
+							<input type="hidden" name="media_url" value={item.media_url} />
+							<p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Nama File</p>
+							<div class="flex gap-2">
+								<input 
+									type="text" 
+									name="name" 
+									value={item.name || ''} 
+									placeholder="Belum ada nama" 
+									class="input py-1.5 px-2.5 text-sm flex-1 h-8"
+								/>
+								<button type="submit" class="btn btn-primary py-1.5 px-3 text-xs h-8">Simpan</button>
+							</div>
+						</form>
 						<div class="flex-1 space-y-2 mb-4">
 							{#if item.question_id}
 								<div>
@@ -306,7 +320,7 @@
 					<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" /></svg>
 				</div>
 				<h3 class="text-lg font-bold text-slate-800 text-center mb-6">Pemutar Audio</h3>
-				<audio controls class="w-full" autoplay>
+				<audio controls class="w-full">
 					<source src={previewMedia.url} type="audio/mpeg">
 					Browser Anda tidak mendukung elemen audio.
 				</audio>

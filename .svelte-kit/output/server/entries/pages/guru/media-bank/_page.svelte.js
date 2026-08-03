@@ -70,7 +70,14 @@ function _page($$renderer, $$props) {
             $$renderer3.push("<!--[-1-->");
             $$renderer3.push(`<span class="badge bg-emerald-100 text-emerald-700 border-emerald-200 shadow-sm text-[10px] border px-2.5 py-1">🌐 Publik</span>`);
           }
-          $$renderer3.push(`<!--]--></div></div> <div${attr_class(`p-4 flex-1 flex flex-col ${item.question_id ? "" : "bg-amber-50/50"}`)}><div class="flex-1 space-y-2 mb-4">`);
+          $$renderer3.push(`<!--]--></div></div> <div${attr_class(`p-4 flex-1 flex flex-col ${item.question_id ? "" : "bg-amber-50/50"}`)}><form method="POST" action="?/updateName" class="mb-4"><input type="hidden" name="media_url"${attr("value", item.media_url)}/> <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Nama File</p> <div class="flex gap-2"><input type="text" name="name"${attr("value", item.name || "")} placeholder="Belum ada nama" class="input py-1.5 px-2.5 text-sm flex-1 h-8"${attr("disabled", item.uploaded_by !== data.user?.id, true)}/> `);
+          if (item.uploaded_by === data.user?.id) {
+            $$renderer3.push("<!--[0-->");
+            $$renderer3.push(`<button type="submit" class="btn btn-primary py-1.5 px-3 text-xs h-8">Simpan</button>`);
+          } else {
+            $$renderer3.push("<!--[-1-->");
+          }
+          $$renderer3.push(`<!--]--></div></form> <div class="flex-1 space-y-2 mb-4">`);
           if (item.question_id) {
             $$renderer3.push("<!--[0-->");
             $$renderer3.push(`<div><p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Mata Pelajaran</p> <p class="text-sm font-medium text-slate-700 line-clamp-1">${escape_html(item.subject_name || "Tidak ada")}</p></div> <div><p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Ujian &amp; Posisi</p> <p class="text-sm text-slate-600 line-clamp-2"><span class="font-medium">${escape_html(item.exam_title)}</span> <br/> <span class="text-indigo-600 font-medium">Soal Nomor ${escape_html(item.question_number)}</span></p></div>`);

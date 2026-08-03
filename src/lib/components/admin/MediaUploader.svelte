@@ -299,7 +299,7 @@
 									{/if}
 								</div>
 								<div class="p-2 bg-white">
-									<p class="text-[10px] text-slate-500 truncate" title={media.url.split('/').pop()}>{media.url.split('/').pop()}</p>
+									<p class="text-[10px] text-slate-500 truncate" title={media.name || media.url.split('/').pop()}>{media.name || media.url.split('/').pop()}</p>
 								</div>
 								
 								<!-- Overlay on hover -->
