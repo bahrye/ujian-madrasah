@@ -1,4 +1,4 @@
-import { h as head, i as attr, e as escape_html, a as stringify, c as ensure_array_like, d as attr_class, b as bind_props } from "../../../../../chunks/index.js";
+import { h as head, i as attr, e as escape_html, a as stringify, c as ensure_array_like, d as attr_class, f as attr_style, b as bind_props } from "../../../../../chunks/index.js";
 import "@sveltejs/kit/internal";
 import "../../../../../chunks/exports.js";
 import "../../../../../chunks/utils2.js";
@@ -69,11 +69,36 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<div class="h-full flex flex-col items-center justify-center text-slate-400 p-8"><svg class="w-12 h-12 mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"${attr("d", ICONS.monitor)}></path></svg> <p class="text-sm">Belum ada siswa yang sedang/sudah mengerjakan ujian ini.</p></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<table class="table w-full"><thead class="sticky top-0 bg-white shadow-sm z-10"><tr><th class="pl-5">Siswa</th><th>Waktu Mulai</th><th>Status</th><th class="text-right pr-5">Aksi</th></tr></thead><tbody><!--[-->`);
+      $$renderer2.push(`<table class="table w-full"><thead class="sticky top-0 bg-white shadow-sm z-10"><tr><th class="pl-5">Siswa</th><th>Waktu Mulai</th><th>Status</th><th class="text-center">Pelanggaran</th><th>Progres</th><th class="text-right pr-5">Aksi</th></tr></thead><tbody><!--[-->`);
       const each_array = ensure_array_like(attempts);
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
         let attempt = each_array[$$index];
-        $$renderer2.push(`<tr class="hover:bg-slate-50"><td class="pl-5"><div class="font-bold text-slate-800">${escape_html(attempt.student_name)}</div> <div class="text-xs text-slate-500">${escape_html(attempt.class_name || "-")}</div></td><td class="text-xs font-mono text-slate-600">${escape_html(new Date(attempt.start_time).toLocaleTimeString("id-ID"))}</td><td><span${attr_class(`badge ${stringify(ATTEMPT_STATUS_COLORS[attempt.status] || "badge-slate")}`)}>${escape_html(ATTEMPT_STATUS_LABELS[attempt.status] || attempt.status)}</span></td><td class="text-right pr-5">`);
+        $$renderer2.push(`<tr class="hover:bg-slate-50"><td class="pl-5"><div class="font-bold text-slate-800">${escape_html(attempt.student_name)}</div> <div class="text-xs text-slate-500">${escape_html(attempt.class_name || "-")}</div></td><td class="text-xs font-mono text-slate-600">${escape_html(new Date(attempt.start_time).toLocaleTimeString("id-ID"))}</td><td><span${attr_class(`badge ${stringify(ATTEMPT_STATUS_COLORS[attempt.status] || "badge-slate")}`)}>${escape_html(ATTEMPT_STATUS_LABELS[attempt.status] || attempt.status)}</span></td><td class="text-center">`);
+        if (attempt.warnings > 0) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<div class="flex items-center justify-center gap-1"><span class="px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-bold text-xs">${escape_html(attempt.warnings)} kali</span> `);
+          if (attempt.warningLogs && attempt.warningLogs.length > 0) {
+            $$renderer2.push("<!--[0-->");
+            $$renderer2.push(`<button class="btn-ghost btn-sm p-1 rounded-full text-slate-400 hover:text-slate-600"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></button>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+          }
+          $$renderer2.push(`<!--]--></div>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<span class="text-slate-400 text-xs">-</span>`);
+        }
+        $$renderer2.push(`<!--]--></td><td class="w-32">`);
+        if (attempt.question_count > 0) {
+          $$renderer2.push("<!--[0-->");
+          const pct = Math.round(attempt.answeredCount / attempt.question_count * 100);
+          const color = pct < 30 ? "bg-slate-300" : pct < 60 ? "bg-rose-400" : pct < 90 ? "bg-amber-400" : "bg-emerald-500";
+          $$renderer2.push(`<div class="flex items-center gap-2"><div class="h-2 flex-1 bg-slate-100 rounded-full overflow-hidden"><div${attr_class(`h-full ${color} transition-all duration-500`)}${attr_style(`width: ${stringify(pct)}%`)}></div></div> <span class="text-xs font-semibold text-slate-600 w-8 text-right">${escape_html(pct)}%</span></div>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<span class="text-xs text-slate-400">0%</span>`);
+        }
+        $$renderer2.push(`<!--]--></td><td class="text-right pr-5">`);
         if (attempt.status === "mengerjakan") {
           $$renderer2.push("<!--[0-->");
           ConfirmForm($$renderer2, {
@@ -138,6 +163,10 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<!--]--></tbody></table></div>`);
     }
     $$renderer2.push(`<!--]--></div></div></div> `);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--> `);
     {
       $$renderer2.push("<!--[-1-->");
     }

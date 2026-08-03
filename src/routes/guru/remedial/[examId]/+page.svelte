@@ -17,6 +17,7 @@
 	let searchTerm = '';
 	let currentTime = Date.now();
 	let timerInterval: ReturnType<typeof setInterval>;
+	let selectedLogs: any = null;
 
 	$: filteredStudents = allStudents.filter(
 		(s) =>
@@ -174,6 +175,8 @@
 								<th class="pl-5">Siswa</th>
 								<th>Waktu Mulai</th>
 								<th>Status</th>
+								<th class="text-center">Pelanggaran</th>
+								<th>Progres</th>
 								<th class="text-right pr-5">Aksi</th>
 							</tr>
 						</thead>
@@ -191,6 +194,37 @@
 										<span class="badge {ATTEMPT_STATUS_COLORS[attempt.status] || 'badge-slate'}">
 											{ATTEMPT_STATUS_LABELS[attempt.status] || attempt.status}
 										</span>
+									</td>
+									<td class="text-center">
+										{#if attempt.warnings > 0}
+											<div class="flex items-center justify-center gap-1">
+												<span class="px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-bold text-xs">{attempt.warnings} kali</span>
+												{#if attempt.warningLogs && attempt.warningLogs.length > 0}
+													<button class="btn-ghost btn-sm p-1 rounded-full text-slate-400 hover:text-slate-600" on:click={() => selectedLogs = attempt.warningLogs}>
+														<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+															<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+															<path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+														</svg>
+													</button>
+												{/if}
+											</div>
+										{:else}
+											<span class="text-slate-400 text-xs">-</span>
+										{/if}
+									</td>
+									<td class="w-32">
+										{#if attempt.question_count > 0}
+											{@const pct = Math.round((attempt.answeredCount / attempt.question_count) * 100)}
+											{@const color = pct < 30 ? 'bg-slate-300' : pct < 60 ? 'bg-rose-400' : pct < 90 ? 'bg-amber-400' : 'bg-emerald-500'}
+											<div class="flex items-center gap-2">
+												<div class="h-2 flex-1 bg-slate-100 rounded-full overflow-hidden">
+													<div class="h-full {color} transition-all duration-500" style="width: {pct}%"></div>
+												</div>
+												<span class="text-xs font-semibold text-slate-600 w-8 text-right">{pct}%</span>
+											</div>
+										{:else}
+											<span class="text-xs text-slate-400">0%</span>
+										{/if}
 									</td>
 									<td class="text-right pr-5">
 										{#if attempt.status === 'mengerjakan'}
@@ -332,6 +366,41 @@
 					<button type="submit" class="btn btn-primary" disabled={filteredStudents.length === 0}>Tambahkan Terpilih</button>
 				</div>
 			</form>
+		</div>
+	</div>
+{/if}
+
+<!-- Violation Logs Modal -->
+{#if selectedLogs !== null}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => selectedLogs = null}>
+		<div class="max-h-[90vh] overflow-y-auto card p-6 w-full max-w-md animate-bounce-in" on:click|stopPropagation>
+			<div class="flex items-center gap-3 mb-4">
+				<div class="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-500">
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+					</svg>
+				</div>
+				<h3 class="text-lg font-bold text-slate-800">Riwayat Pelanggaran</h3>
+			</div>
+			
+			{#if selectedLogs.length === 0}
+				<p class="text-slate-500 text-sm text-center py-4">Tidak ada riwayat detail pelanggaran.</p>
+			{:else}
+				<ul class="space-y-3 max-h-64 overflow-y-auto pr-2">
+					{#each selectedLogs as log}
+						<li class="flex flex-col border-b border-slate-100 pb-2 last:border-0">
+							<span class="font-medium text-rose-600 text-sm">{log.type}</span>
+							<span class="text-xs text-slate-400">{new Date(log.time).toLocaleString('id-ID')}</span>
+						</li>
+					{/each}
+				</ul>
+			{/if}
+			
+			<div class="mt-5">
+				<button class="btn-primary w-full" on:click={() => selectedLogs = null}>Tutup</button>
+			</div>
 		</div>
 	</div>
 {/if}

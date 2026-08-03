@@ -45,22 +45,46 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 	`).bind(examId).first();
 
 	// 3. Monitoring (Attempts)
-	const attempts = await db.prepare(`
+	const rawAttempts = await db.prepare(`
 		SELECT sa.id, sa.status, sa.created_at as start_time, sa.submit_time,
-			   u.name as student_name, c.name as class_name
+			   u.name as student_name, c.name as class_name,
+			   (SELECT COUNT(*) FROM questions WHERE exam_id = ?) as question_count
 		FROM student_attempts sa
 		JOIN users u ON sa.student_id = u.id
 		LEFT JOIN classes c ON u.class_id = c.id
 		WHERE sa.exam_id = ?
 		ORDER BY sa.created_at DESC
-	`).bind(examId).all();
+	`).bind(examId, examId).all();
+
+	const kv = platform?.env?.EXAM_ANSWERS;
+	const attempts = await Promise.all(rawAttempts.results.map(async (a: any) => {
+		let answeredCount = 0;
+		let warnings = 0;
+		let warningLogs: any[] = [];
+		if (a.status === 'mengerjakan') {
+			if (kv) {
+				const stored = await kv.get(`attempt_${a.id}_answers`);
+				if (stored) {
+					try {
+						const data = JSON.parse(stored);
+						if (data && data.answers) {
+							answeredCount = Object.values(data.answers).filter(val => val !== null && val !== '').length;
+						}
+						if (data && data.warnings) warnings = data.warnings;
+						if (data && data.warningLogs) warningLogs = data.warningLogs;
+					} catch (e) {}
+				}
+			}
+		}
+		return { ...a, answeredCount, warnings, warningLogs };
+	}));
 
 	return {
 		exam,
 		participants: participants.results,
 		allStudents: allStudents.results,
 		activeToken,
-		attempts: attempts.results
+		attempts
 	};
 };
 
