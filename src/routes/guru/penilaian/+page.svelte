@@ -83,8 +83,11 @@
 
 					<p class="text-sm font-medium text-slate-700 mb-2">{a.question_text}</p>
 
-					{#if a.correct_answer_json && a.type === 'isian_singkat'}
-						<p class="text-xs text-emerald-600 mb-2">Kunci: {JSON.parse(a.correct_answer_json)}</p>
+					{#if a.correct_answer_json && (a.type === 'isian_singkat' || a.type === 'essay')}
+						<div class="bg-emerald-50 border border-emerald-100 rounded-lg p-3 mb-3">
+							<p class="text-xs font-semibold text-emerald-700 mb-1">Kunci Jawaban / Penjelasan:</p>
+							<p class="text-sm text-emerald-900 whitespace-pre-wrap">{JSON.parse(a.correct_answer_json)}</p>
+						</div>
 					{/if}
 
 					<div class="bg-slate-50 rounded-xl p-3 mb-3">

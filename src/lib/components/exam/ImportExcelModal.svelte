@@ -119,7 +119,7 @@
           }
           correctAnswer = correctAnswer.toLowerCase() === 'benar' ? 'Benar' : 'Salah';
           q.correct_answer_json = JSON.stringify(correctAnswer);
-        } else if (type === 'isian_singkat') {
+        } else if (type === 'isian_singkat' || type === 'essay') {
           q.correct_answer_json = JSON.stringify(String(row[7] || '').trim());
         }
 

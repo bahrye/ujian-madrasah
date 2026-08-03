@@ -51,7 +51,7 @@ export const actions: Actions = {
 		} else if (type === 'benar_salah') {
 			optionsJson = JSON.stringify(['Benar', 'Salah']);
 			correctAnswerJson = JSON.stringify(form.get('correct_answer')?.toString() || 'Benar');
-		} else if (type === 'isian_singkat') {
+		} else if (type === 'isian_singkat' || type === 'essay') {
 			correctAnswerJson = JSON.stringify(form.get('correct_answer')?.toString().trim() || '');
 		} else if (type === 'menjodohkan') {
 			const leftItems = [];
@@ -111,7 +111,7 @@ export const actions: Actions = {
 		} else if (type === 'benar_salah') {
 			optionsJson = JSON.stringify(['Benar', 'Salah']);
 			correctAnswerJson = JSON.stringify(form.get('correct_answer')?.toString() || 'Benar');
-		} else if (type === 'isian_singkat') {
+		} else if (type === 'isian_singkat' || type === 'essay') {
 			correctAnswerJson = JSON.stringify(form.get('correct_answer')?.toString().trim() || '');
 		} else if (type === 'menjodohkan') {
 			const leftItems = [];

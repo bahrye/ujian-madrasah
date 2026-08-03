@@ -74,9 +74,9 @@ function _page($$renderer, $$props) {
       for (let $$index_2 = 0, $$length = each_array_2.length; $$index_2 < $$length; $$index_2++) {
         let a = each_array_2[$$index_2];
         $$renderer2.push(`<div${attr_class(`card p-5 ${a.score_given != null ? "border-l-4 border-emerald-400" : "border-l-4 border-amber-400"}`)}><div class="flex flex-wrap items-center gap-2 mb-3"><span class="badge-info">${escape_html(a.exam_title)}</span> <span class="badge-primary">${escape_html(QUESTION_TYPE_LABELS[a.type])}</span> <span class="text-sm font-semibold text-slate-700">${escape_html(a.student_name)}</span></div> <p class="text-sm font-medium text-slate-700 mb-2">${escape_html(a.question_text)}</p> `);
-        if (a.correct_answer_json && a.type === "isian_singkat") {
+        if (a.correct_answer_json && (a.type === "isian_singkat" || a.type === "essay")) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<p class="text-xs text-emerald-600 mb-2">Kunci: ${escape_html(JSON.parse(a.correct_answer_json))}</p>`);
+          $$renderer2.push(`<div class="bg-emerald-50 border border-emerald-100 rounded-lg p-3 mb-3"><p class="text-xs font-semibold text-emerald-700 mb-1">Kunci Jawaban / Penjelasan:</p> <p class="text-sm text-emerald-900 whitespace-pre-wrap">${escape_html(JSON.parse(a.correct_answer_json))}</p></div>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }

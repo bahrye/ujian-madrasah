@@ -216,7 +216,11 @@
 						{/each}
 					</div>
 				{:else if selectedType === 'essay'}
-					<p class="text-sm text-slate-500 bg-amber-50 p-3 rounded-xl">Soal essay dinilai secara manual oleh guru di halaman Penilaian.</p>
+					<div>
+						<label class="label" for="q-correct-essay">Kunci Jawaban / Penjelasan</label>
+						<textarea id="q-correct-essay" name="correct_answer" class="input min-h-[100px]" placeholder="Penjelasan atau kunci jawaban untuk panduan saat guru menilai manual..."></textarea>
+					</div>
+					<p class="text-sm text-slate-500 bg-amber-50 p-3 rounded-xl mt-2">Soal essay dinilai secara manual oleh guru di halaman Penilaian. Penjelasan di atas akan membantu saat membandingkan jawaban siswa.</p>
 				{/if}
 
 				<div class="flex gap-3 pt-2">
@@ -436,6 +440,12 @@
 									</div>
 								</div>
 							{/each}
+						</div>
+					{:else if editingQuestion.type === 'essay'}
+						{@const correct = editingQuestion.correct_answer_json ? JSON.parse(editingQuestion.correct_answer_json) : ''}
+						<div>
+							<label class="label" for="eq-correct-essay">Kunci Jawaban / Penjelasan</label>
+							<textarea id="eq-correct-essay" name="correct_answer" class="input min-h-[100px]" value={correct}></textarea>
 						</div>
 					{/if}
 
