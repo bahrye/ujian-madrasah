@@ -300,6 +300,7 @@
 								editingQuestion.media_type = null;
 							}}
 						/>
+						<input type="hidden" name="media_url" value={editingQuestion.media_url || ''} />
 					</div>
 
 					<!-- Type-specific fields for edit -->
