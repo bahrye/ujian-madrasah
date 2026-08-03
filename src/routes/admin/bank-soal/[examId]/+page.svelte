@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import ConfirmForm from '$lib/components/ConfirmForm.svelte';
 	import MediaUploader from '$lib/components/admin/MediaUploader.svelte';
+	import QuestionRenderer from '$lib/components/exam/QuestionRenderer.svelte';
 	import { fade, slide } from 'svelte/transition';
 	import { QUESTION_TYPE_LABELS, ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
@@ -16,6 +17,8 @@
 	let optionCount = 4;
 	let editOptionCount = 4;
 	let options: string[] = ['', '', '', ''];
+	
+	let previewQuestionId: string | null = null;
 
 	// Media picker for options
 	let showOptionMediaPicker = false;
@@ -263,16 +266,24 @@
 					{/if}
 				</div>
 				<div class="flex flex-col gap-2">
-					<button type="button" class="p-2 rounded-xl text-indigo-600 bg-indigo-50 hover:bg-indigo-500 hover:text-white transition-all shadow-sm" title="Edit soal" on:click={() => {
-						editingQuestion = { ...q };
-						if (q.type === 'pilihan_ganda' && q.options_json) {
-							editOptionCount = JSON.parse(q.options_json).length;
-						}
-					}}>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.edit} />
-						</svg>
-					</button>
+					<div class="flex gap-2">
+						<button type="button" class="p-2 rounded-xl text-sky-600 bg-sky-50 hover:bg-sky-500 hover:text-white transition-all shadow-sm" title="Preview soal" on:click={() => previewQuestionId = q.id}>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+								<path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+							</svg>
+						</button>
+						<button type="button" class="p-2 rounded-xl text-indigo-600 bg-indigo-50 hover:bg-indigo-500 hover:text-white transition-all shadow-sm" title="Edit soal" on:click={() => {
+							editingQuestion = { ...q };
+							if (q.type === 'pilihan_ganda' && q.options_json) {
+								editOptionCount = JSON.parse(q.options_json).length;
+							}
+						}}>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.edit} />
+							</svg>
+						</button>
+					</div>
 					<ConfirmForm 
 						action="?/delete"
 						confirmTitle="Hapus Soal"
@@ -427,6 +438,28 @@
 			</div>
 		</div>
 	</div>
+{/if}
+
+<!-- Preview Modal -->
+{#if previewQuestionId}
+	{@const pq = questions.find(q => q.id === previewQuestionId)}
+	{#if pq}
+		<div use:portal class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+			<div class="bg-white rounded-2xl w-full max-w-3xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+				<div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+					<h3 class="font-bold text-slate-800 text-lg">Preview Soal No. {pq.question_number}</h3>
+					<button class="text-slate-400 hover:text-slate-600 p-2 rounded-lg hover:bg-slate-100 transition-colors" on:click={() => previewQuestionId = null}>
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.close} />
+						</svg>
+					</button>
+				</div>
+				<div class="p-6 overflow-y-auto">
+					<QuestionRenderer question={pq} />
+				</div>
+			</div>
+		</div>
+	{/if}
 {/if}
 
 <!-- Media Picker Modal for Options -->
