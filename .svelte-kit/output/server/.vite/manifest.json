@@ -228,7 +228,7 @@
       "_index.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.A8gNHJSI.css"
+      "_app/immutable/assets/_layout.BhHGrydY.css"
     ]
   },
   "src/routes/+page.server.ts": {
@@ -422,6 +422,30 @@
       "_ConfirmForm.js",
       "_constants.js",
       "_toast.js"
+    ]
+  },
+  "src/routes/admin/media-bank/+page.server.ts": {
+    "file": "entries/pages/admin/media-bank/_page.server.ts.js",
+    "name": "entries/pages/admin/media-bank/_page.server.ts",
+    "src": "src/routes/admin/media-bank/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js",
+      "_cloudinary.js",
+      "_shared-server.js"
+    ]
+  },
+  "src/routes/admin/media-bank/+page.svelte": {
+    "file": "entries/pages/admin/media-bank/_page.svelte.js",
+    "name": "entries/pages/admin/media-bank/_page.svelte",
+    "src": "src/routes/admin/media-bank/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_exports.js",
+      "_utils2.js",
+      "_root.js",
+      "_state.svelte.js"
     ]
   },
   "src/routes/admin/results/+page.server.ts": {

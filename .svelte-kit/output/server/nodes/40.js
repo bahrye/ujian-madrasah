@@ -1,0 +1,10 @@
+import * as server from '../entries/pages/superadmin/schools/_page.server.ts.js';
+
+export const index = 40;
+let component_cache;
+export const component = async () => component_cache ??= (await import('../entries/pages/superadmin/schools/_page.svelte.js')).default;
+export { server };
+export const server_id = "src/routes/superadmin/schools/+page.server.ts";
+export const imports = ["_app/immutable/nodes/40.Bsow186t.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/BV1hr-UK.js","_app/immutable/chunks/BxH7Qk13.js","_app/immutable/chunks/DIMz4J0V.js","_app/immutable/chunks/DHon3iv8.js","_app/immutable/chunks/B-vHU7aS.js","_app/immutable/chunks/CJVAUuBs.js","_app/immutable/chunks/ES5ElAgl.js","_app/immutable/chunks/Bs98SJ8b.js","_app/immutable/chunks/CSCmeJqC.js","_app/immutable/chunks/zXDrsk9F.js","_app/immutable/chunks/DUFUeTgQ.js","_app/immutable/chunks/BR9p7IiS.js","_app/immutable/chunks/BE7mqtru.js","_app/immutable/chunks/CzEvOKrl.js","_app/immutable/chunks/DvGlIG5e.js","_app/immutable/chunks/BYaC5aJQ.js","_app/immutable/chunks/RHhvIjaC.js"];
+export const stylesheets = [];
+export const fonts = [];

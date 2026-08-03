@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg"]),
 	mimeTypes: {".svg":"image/svg+xml"},
 	_: {
-		client: {start:"_app/immutable/entry/start.CqgMq-0C.js",app:"_app/immutable/entry/app.DnGuA0IL.js",imports:["_app/immutable/entry/start.CqgMq-0C.js","_app/immutable/chunks/QRE00NdU.js","_app/immutable/chunks/D5ire4jW.js","_app/immutable/chunks/UXPBhQu2.js","_app/immutable/chunks/CjRowugn.js","_app/immutable/chunks/DVKm98Wd.js","_app/immutable/entry/app.DnGuA0IL.js","_app/immutable/chunks/UXPBhQu2.js","_app/immutable/chunks/CjRowugn.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/D5ire4jW.js","_app/immutable/chunks/tn2TxHaz.js","_app/immutable/chunks/DI2LD4bk.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
+		client: {start:"_app/immutable/entry/start.ClMgx101.js",app:"_app/immutable/entry/app.MWa8WFzf.js",imports:["_app/immutable/entry/start.ClMgx101.js","_app/immutable/chunks/zXDrsk9F.js","_app/immutable/chunks/CSCmeJqC.js","_app/immutable/chunks/BxH7Qk13.js","_app/immutable/chunks/DIMz4J0V.js","_app/immutable/chunks/Bs98SJ8b.js","_app/immutable/entry/app.MWa8WFzf.js","_app/immutable/chunks/BxH7Qk13.js","_app/immutable/chunks/DIMz4J0V.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CSCmeJqC.js","_app/immutable/chunks/DHon3iv8.js","_app/immutable/chunks/BYaC5aJQ.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
 		nodes: [
 			__memo(() => import('./nodes/0.js')),
 			__memo(() => import('./nodes/1.js')),
@@ -51,7 +51,8 @@ return {
 			__memo(() => import('./nodes/36.js')),
 			__memo(() => import('./nodes/37.js')),
 			__memo(() => import('./nodes/38.js')),
-			__memo(() => import('./nodes/39.js'))
+			__memo(() => import('./nodes/39.js')),
+			__memo(() => import('./nodes/40.js'))
 		],
 		remotes: {
 			
@@ -114,38 +115,45 @@ return {
 				endpoint: null
 			},
 			{
+				id: "/admin/media-bank",
+				pattern: /^\/admin\/media-bank\/?$/,
+				params: [],
+				page: { layouts: [0,2,], errors: [1,,], leaf: 15 },
+				endpoint: null
+			},
+			{
 				id: "/admin/results",
 				pattern: /^\/admin\/results\/?$/,
 				params: [],
-				page: { layouts: [0,2,], errors: [1,,], leaf: 15 },
+				page: { layouts: [0,2,], errors: [1,,], leaf: 16 },
 				endpoint: null
 			},
 			{
 				id: "/admin/results/[attemptId]",
 				pattern: /^\/admin\/results\/([^/]+?)\/?$/,
 				params: [{"name":"attemptId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,2,], errors: [1,,], leaf: 16 },
+				page: { layouts: [0,2,], errors: [1,,], leaf: 17 },
 				endpoint: null
 			},
 			{
 				id: "/admin/students",
 				pattern: /^\/admin\/students\/?$/,
 				params: [],
-				page: { layouts: [0,2,], errors: [1,,], leaf: 17 },
+				page: { layouts: [0,2,], errors: [1,,], leaf: 18 },
 				endpoint: null
 			},
 			{
 				id: "/admin/subjects",
 				pattern: /^\/admin\/subjects\/?$/,
 				params: [],
-				page: { layouts: [0,2,], errors: [1,,], leaf: 18 },
+				page: { layouts: [0,2,], errors: [1,,], leaf: 19 },
 				endpoint: null
 			},
 			{
 				id: "/admin/users",
 				pattern: /^\/admin\/users\/?$/,
 				params: [],
-				page: { layouts: [0,2,], errors: [1,,], leaf: 19 },
+				page: { layouts: [0,2,], errors: [1,,], leaf: 20 },
 				endpoint: null
 			},
 			{
@@ -187,140 +195,140 @@ return {
 				id: "/guru",
 				pattern: /^\/guru\/?$/,
 				params: [],
-				page: { layouts: [0,3,], errors: [1,,], leaf: 20 },
+				page: { layouts: [0,3,], errors: [1,,], leaf: 21 },
 				endpoint: null
 			},
 			{
 				id: "/guru/bank-soal",
 				pattern: /^\/guru\/bank-soal\/?$/,
 				params: [],
-				page: { layouts: [0,3,], errors: [1,,], leaf: 21 },
+				page: { layouts: [0,3,], errors: [1,,], leaf: 22 },
 				endpoint: null
 			},
 			{
 				id: "/guru/bank-soal/[examId]",
 				pattern: /^\/guru\/bank-soal\/([^/]+?)\/?$/,
 				params: [{"name":"examId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,3,], errors: [1,,], leaf: 22 },
+				page: { layouts: [0,3,], errors: [1,,], leaf: 23 },
 				endpoint: null
 			},
 			{
 				id: "/guru/bank-soal/[examId]/preview",
 				pattern: /^\/guru\/bank-soal\/([^/]+?)\/preview\/?$/,
 				params: [{"name":"examId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,], errors: [1,], leaf: 23 },
+				page: { layouts: [0,], errors: [1,], leaf: 24 },
 				endpoint: null
 			},
 			{
 				id: "/guru/penilaian",
 				pattern: /^\/guru\/penilaian\/?$/,
 				params: [],
-				page: { layouts: [0,3,], errors: [1,,], leaf: 24 },
+				page: { layouts: [0,3,], errors: [1,,], leaf: 25 },
 				endpoint: null
 			},
 			{
 				id: "/guru/remedial",
 				pattern: /^\/guru\/remedial\/?$/,
 				params: [],
-				page: { layouts: [0,3,], errors: [1,,], leaf: 25 },
+				page: { layouts: [0,3,], errors: [1,,], leaf: 26 },
 				endpoint: null
 			},
 			{
 				id: "/guru/remedial/[examId]",
 				pattern: /^\/guru\/remedial\/([^/]+?)\/?$/,
 				params: [{"name":"examId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,3,], errors: [1,,], leaf: 26 },
+				page: { layouts: [0,3,], errors: [1,,], leaf: 27 },
 				endpoint: null
 			},
 			{
 				id: "/guru/results",
 				pattern: /^\/guru\/results\/?$/,
 				params: [],
-				page: { layouts: [0,3,], errors: [1,,], leaf: 27 },
+				page: { layouts: [0,3,], errors: [1,,], leaf: 28 },
 				endpoint: null
 			},
 			{
 				id: "/guru/results/[attemptId]",
 				pattern: /^\/guru\/results\/([^/]+?)\/?$/,
 				params: [{"name":"attemptId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,3,], errors: [1,,], leaf: 28 },
+				page: { layouts: [0,3,], errors: [1,,], leaf: 29 },
 				endpoint: null
 			},
 			{
 				id: "/login",
 				pattern: /^\/login\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 29 },
+				page: { layouts: [0,], errors: [1,], leaf: 30 },
 				endpoint: null
 			},
 			{
 				id: "/pengawas",
 				pattern: /^\/pengawas\/?$/,
 				params: [],
-				page: { layouts: [0,4,], errors: [1,,], leaf: 30 },
+				page: { layouts: [0,4,], errors: [1,,], leaf: 31 },
 				endpoint: null
 			},
 			{
 				id: "/pengawas/monitor",
 				pattern: /^\/pengawas\/monitor\/?$/,
 				params: [],
-				page: { layouts: [0,4,], errors: [1,,], leaf: 31 },
+				page: { layouts: [0,4,], errors: [1,,], leaf: 32 },
 				endpoint: null
 			},
 			{
 				id: "/pengawas/tokens",
 				pattern: /^\/pengawas\/tokens\/?$/,
 				params: [],
-				page: { layouts: [0,4,], errors: [1,,], leaf: 32 },
+				page: { layouts: [0,4,], errors: [1,,], leaf: 33 },
 				endpoint: null
 			},
 			{
 				id: "/siswa",
 				pattern: /^\/siswa\/?$/,
 				params: [],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 33 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 34 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/jadwal",
 				pattern: /^\/siswa\/jadwal\/?$/,
 				params: [],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 34 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 35 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/ujian",
 				pattern: /^\/siswa\/ujian\/?$/,
 				params: [],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 35 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 36 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/ujian/[attemptId]",
 				pattern: /^\/siswa\/ujian\/([^/]+?)\/?$/,
 				params: [{"name":"attemptId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,], errors: [1,], leaf: 36 },
+				page: { layouts: [0,], errors: [1,], leaf: 37 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin",
 				pattern: /^\/superadmin\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 37 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 38 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin/admins",
 				pattern: /^\/superadmin\/admins\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 38 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 39 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin/schools",
 				pattern: /^\/superadmin\/schools\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 39 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 40 },
 				endpoint: null
 			}
 		],
