@@ -3,6 +3,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import ConfirmForm from '$lib/components/ConfirmForm.svelte';
 	import ImportStudentsModal from '$lib/components/admin/ImportStudentsModal.svelte';
+	import LoginCardModal from '$lib/components/admin/LoginCardModal.svelte';
 	import type { PageData, ActionData } from './$types';
 	import { toasts } from '$lib/stores/toast';
 
@@ -11,6 +12,7 @@
 
 	let isAdding = false;
 	let showImportModal = false;
+	let showLoginCardModal = false;
 	let editingUser: any = null;
 	let filterClass = '';
 
@@ -45,15 +47,21 @@
 			<h1 class="text-3xl font-bold text-slate-800 tracking-tight">Manajemen Siswa</h1>
 			<p class="text-slate-500 mt-1">Kelola data siswa dan kelasnya.</p>
 		</div>
-		<div class="flex items-center gap-3">
-			<button class="btn btn-secondary" on:click={() => (showImportModal = true)}>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+		<div class="flex flex-wrap items-center gap-3">
+			<button class="btn flex-1 sm:flex-none" style="background: linear-gradient(135deg,#f59e0b,#f97316); color:#fff; box-shadow: 0 4px 15px rgba(245,158,11,.3);" on:click={() => (showLoginCardModal = true)}>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0" />
+				</svg>
+				Kartu Login
+			</button>
+			<button class="btn btn-secondary flex-1 sm:flex-none" on:click={() => (showImportModal = true)}>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
 				</svg>
 				Import Excel
 			</button>
-			<button class="btn btn-primary" on:click={() => (isAdding = !isAdding)}>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+			<button class="btn btn-primary flex-1 sm:flex-none" on:click={() => (isAdding = !isAdding)}>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
 				</svg>
 				Tambah Siswa
@@ -240,4 +248,10 @@
 <ImportStudentsModal 
 	bind:show={showImportModal} 
 	classes={data.classes}
+/>
+
+<LoginCardModal
+	bind:show={showLoginCardModal}
+	classes={data.classes}
+	students={data.users as any[]}
 />
