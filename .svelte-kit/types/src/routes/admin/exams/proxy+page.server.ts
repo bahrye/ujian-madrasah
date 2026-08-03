@@ -81,18 +81,24 @@ export const actions = {
 			const attempts = await db.prepare('SELECT id FROM student_attempts WHERE exam_id = ?').bind(id).all<{ id: number }>();
 			const attemptIds = attempts.results.map((a: any) => a.id);
 			
-			const batch = [
-				db.prepare('DELETE FROM exam_participants WHERE exam_id = ?').bind(id),
-				db.prepare('DELETE FROM exam_proctors WHERE exam_id = ?').bind(id),
-				db.prepare('DELETE FROM exam_teachers WHERE exam_id = ?').bind(id),
-				db.prepare('DELETE FROM tokens WHERE exam_id = ?').bind(id),
-				db.prepare('DELETE FROM questions WHERE exam_id = ?').bind(id)
-			];
+			const batch = [];
+			
+			// 1. Child paling bawah: student_answers
 			if (attemptIds.length > 0) {
 				const placeholders = attemptIds.map(() => '?').join(',');
 				batch.push(db.prepare(`DELETE FROM student_answers WHERE attempt_id IN (${placeholders})`).bind(...attemptIds));
+				// 2. Parent dari student_answers: student_attempts
 				batch.push(db.prepare('DELETE FROM student_attempts WHERE exam_id = ?').bind(id));
 			}
+
+			// 3. Child lainnya dari exams
+			batch.push(db.prepare('DELETE FROM questions WHERE exam_id = ?').bind(id));
+			batch.push(db.prepare('DELETE FROM tokens WHERE exam_id = ?').bind(id));
+			batch.push(db.prepare('DELETE FROM exam_participants WHERE exam_id = ?').bind(id));
+			batch.push(db.prepare('DELETE FROM exam_proctors WHERE exam_id = ?').bind(id));
+			batch.push(db.prepare('DELETE FROM exam_teachers WHERE exam_id = ?').bind(id));
+
+			// 4. Tabel utama: exams
 			batch.push(db.prepare('DELETE FROM exams WHERE id = ? AND school_id = ?').bind(id, locals.user!.school_id));
 
 			await db.batch(batch);

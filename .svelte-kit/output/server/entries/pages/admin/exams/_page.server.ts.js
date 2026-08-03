@@ -58,18 +58,17 @@ const actions = {
     try {
       const attempts = await db.prepare("SELECT id FROM student_attempts WHERE exam_id = ?").bind(id).all();
       const attemptIds = attempts.results.map((a) => a.id);
-      const batch = [
-        db.prepare("DELETE FROM exam_participants WHERE exam_id = ?").bind(id),
-        db.prepare("DELETE FROM exam_proctors WHERE exam_id = ?").bind(id),
-        db.prepare("DELETE FROM exam_teachers WHERE exam_id = ?").bind(id),
-        db.prepare("DELETE FROM tokens WHERE exam_id = ?").bind(id),
-        db.prepare("DELETE FROM questions WHERE exam_id = ?").bind(id)
-      ];
+      const batch = [];
       if (attemptIds.length > 0) {
         const placeholders = attemptIds.map(() => "?").join(",");
         batch.push(db.prepare(`DELETE FROM student_answers WHERE attempt_id IN (${placeholders})`).bind(...attemptIds));
         batch.push(db.prepare("DELETE FROM student_attempts WHERE exam_id = ?").bind(id));
       }
+      batch.push(db.prepare("DELETE FROM questions WHERE exam_id = ?").bind(id));
+      batch.push(db.prepare("DELETE FROM tokens WHERE exam_id = ?").bind(id));
+      batch.push(db.prepare("DELETE FROM exam_participants WHERE exam_id = ?").bind(id));
+      batch.push(db.prepare("DELETE FROM exam_proctors WHERE exam_id = ?").bind(id));
+      batch.push(db.prepare("DELETE FROM exam_teachers WHERE exam_id = ?").bind(id));
       batch.push(db.prepare("DELETE FROM exams WHERE id = ? AND school_id = ?").bind(id, locals.user.school_id));
       await db.batch(batch);
       return { success: "Ujian berhasil dihapus." };
