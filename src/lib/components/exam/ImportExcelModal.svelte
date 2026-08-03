@@ -49,8 +49,9 @@
       const arrayBuffer = await selectedFile.arrayBuffer();
       const workbook = XLSX.read(arrayBuffer, { type: 'buffer' });
       
-      const firstSheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[firstSheetName];
+      // Cari sheet yang bukan petunjuk penggunaan (biasanya 'Template Soal')
+      let targetSheetName = workbook.SheetNames.find(name => name !== "Petunjuk Penggunaan") || workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[targetSheetName];
       
       // Convert to JSON
       const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
@@ -180,7 +181,7 @@
     const instructionData = [
       ["PETUNJUK PENGISIAN SOAL"],
       [],
-      ["1. TIPE SOAL", "Harus diisi dengan ejaan persis: Pilihan Ganda, Benar Salah, Isian Singkat, atau Essay"],
+      ["1. TIPE SOAL", "Harus diisi dengan ejaan persis: Pilihan Ganda, Benar Salah, Isian Singkat, atau Esai"],
       ["2. TEKS SOAL", "Isi dengan pertanyaan soal Anda"],
       ["3. OPSI A - E", "Khusus untuk tipe Pilihan Ganda. Minimal isi Opsi A dan B."],
       ["4. JAWABAN BENAR", "Untuk Pilihan Ganda: A, B, C, D, atau E. \nUntuk Benar Salah: Benar atau Salah. \nUntuk Isian Singkat: Kata kuncinya."],
@@ -188,10 +189,10 @@
       [],
       ["CONTOH PENGISIAN BENAR:"],
       ["Pilihan Ganda", "Siapakah penemu bola lampu?", "Thomas Edison", "Albert Einstein", "Nikola Tesla", "Isaac Newton", "", "A", 1],
+      ["Esai", "Jelaskan proses terjadinya hujan!", "", "", "", "", "", "", 5],
       [],
       ["CONTOH PENGISIAN SALAH (AKAN DITOLAK SISTEM):"],
-      ["Pilihan Ganda", "Siapakah penemu bola lampu?", "Thomas Edison", "Albert Einstein", "", "", "", "Thomas Edison", 1, "<- SALAH! Jawaban benar harus berupa huruf A, B, C, D, atau E"],
-      ["Esai", "Jelaskan hujan!", "", "", "", "", "", "", 1, "<- SALAH! Tipe soal harus 'Essay', bukan 'Esai'"]
+      ["Pilihan Ganda", "Siapakah penemu bola lampu?", "Thomas Edison", "Albert Einstein", "", "", "", "Thomas Edison", 1, "<- SALAH! Jawaban benar harus berupa huruf A, B, C, D, atau E"]
     ];
 
     const wsInstructions = XLSX.utils.aoa_to_sheet(instructionData);
