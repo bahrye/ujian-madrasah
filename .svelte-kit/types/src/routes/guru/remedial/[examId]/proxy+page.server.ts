@@ -19,7 +19,7 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 
 	// 1. Peserta Remedial
 	const participants = await db.prepare(`
-		SELECT ep.id as participant_id, u.nisn, u.name as student_name, c.name as class_name
+		SELECT ep.id as participant_id, u.username as nisn, u.name as student_name, c.name as class_name
 		FROM exam_participants ep
 		JOIN users u ON ep.student_id = u.id
 		LEFT JOIN classes c ON u.class_id = c.id
@@ -29,7 +29,7 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 
 	// Ambil semua siswa di sekolah (untuk dropdown tambah peserta)
 	const allStudents = await db.prepare(`
-		SELECT u.id, u.nisn, u.name, c.name as class_name
+		SELECT u.id, u.username as nisn, u.name, c.name as class_name
 		FROM users u
 		LEFT JOIN classes c ON u.class_id = c.id
 		WHERE u.school_id = ? AND u.role = 'siswa'
@@ -38,8 +38,8 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 
 	// 2. Token Aktif
 	const activeToken = await db.prepare(`
-		SELECT id, token, expires_at, released_at
-		FROM exam_tokens
+		SELECT id, token_code as token, expires_at, released_at
+		FROM tokens
 		WHERE exam_id = ? AND expires_at > datetime('now')
 		ORDER BY expires_at DESC LIMIT 1
 	`).bind(examId).first();
@@ -114,8 +114,6 @@ export const actions = {
 	// ===================== TOKENS =====================
 	generateToken: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
-		const form = await request.formData();
-		const durationHours = parseFloat(form.get('duration_hours')?.toString() || '2');
 		
 		// Validasi kepemilikan
 		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND created_by = ?').bind(params.examId, locals.user!.id).first();
@@ -128,13 +126,13 @@ export const actions = {
 		}
 
 		const now = Date.now();
-		const expiresAt = new Date(now + durationHours * 60 * 60 * 1000).toISOString();
+		const expiresAt = new Date(now + 15 * 60 * 1000).toISOString(); // 15 minutes
 		const releasedAt = new Date(now).toISOString();
 
 		await db.prepare(`
-			INSERT INTO exam_tokens (exam_id, proctor_id, token, expires_at, released_at)
-			VALUES (?, ?, ?, ?, ?)
-		`).bind(params.examId, locals.user!.id, token, expiresAt, releasedAt).run();
+			INSERT INTO tokens (school_id, exam_id, created_by, token_code, expires_at, released_at)
+			VALUES (?, ?, ?, ?, ?, ?)
+		`).bind(locals.user!.school_id, params.examId, locals.user!.id, token, expiresAt, releasedAt).run();
 
 		return { success: 'Token berhasil dibuat.', token };
 	},
@@ -147,14 +145,14 @@ export const actions = {
 		if (!id) return fail(400, { error: 'ID Token tidak valid.' });
 		
 		const isOwner = await db.prepare(`
-			SELECT 1 FROM exam_tokens et 
-			JOIN exams e ON et.exam_id = e.id 
-			WHERE et.id = ? AND e.created_by = ?
+			SELECT 1 FROM tokens t 
+			JOIN exams e ON t.exam_id = e.id 
+			WHERE t.id = ? AND e.created_by = ?
 		`).bind(id, locals.user!.id).first();
 		
 		if (!isOwner) return fail(403, { error: 'Akses ditolak.' });
 
-		await db.prepare('DELETE FROM exam_tokens WHERE id = ?').bind(id).run();
+		await db.prepare('DELETE FROM tokens WHERE id = ?').bind(id).run();
 		return { success: 'Token berhasil dicabut.' };
 	},
 

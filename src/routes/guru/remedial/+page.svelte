@@ -196,7 +196,7 @@
 				<input type="hidden" name="id" value={editingExam.id} />
 				<div>
 					<label class="label" for="e-title">Judul</label>
-					<input id="e-title" name="title" type="text" required class="input" bind:value={editingExam.title} />
+					<input id="e-title" name="title" type="text" required class="input" value={editingExam.title} />
 				</div>
 				<div class="grid grid-cols-2 gap-3">
 					<div>
@@ -210,12 +210,12 @@
 					</div>
 					<div>
 						<label class="label" for="e-duration">Durasi (menit)</label>
-						<input id="e-duration" name="duration_minutes" type="number" min="1" class="input" bind:value={editingExam.duration_minutes} />
+						<input id="e-duration" name="duration_minutes" type="number" min="1" class="input" value={editingExam.duration_minutes} />
 					</div>
 				</div>
 				<div>
 					<label class="label" for="e-desc">Deskripsi</label>
-					<textarea id="e-desc" name="description" class="input" rows="2" bind:value={editingExam.description}></textarea>
+					<textarea id="e-desc" name="description" class="input" rows="2" value={editingExam.description}></textarea>
 				</div>
 				<div class="grid grid-cols-2 gap-3">
 					<div>

@@ -47,8 +47,8 @@
 		return new Date(expiresAt).getTime() < currentTime;
 	}
 
-	function getCountdownString(expiresAt: string) {
-		const diff = new Date(expiresAt).getTime() - currentTime;
+	function getCountdownString(expiresAt: string, currentMs: number) {
+		const diff = new Date(expiresAt).getTime() - currentMs;
 		if (diff <= 0) return 'Kadaluwarsa';
 		
 		const h = Math.floor(diff / (1000 * 60 * 60));
@@ -91,7 +91,7 @@
 					<div class="text-5xl font-mono font-bold tracking-widest mb-3 relative z-10 drop-shadow-md">{activeToken.token}</div>
 					<div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-medium">
 						<svg class="w-4 h-4 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={ICONS.clock} /></svg>
-						{getCountdownString(activeToken.expires_at)}
+						{getCountdownString(activeToken.expires_at, currentTime)}
 					</div>
 					
 					<div class="mt-6 relative z-10 flex justify-center">
@@ -112,15 +112,8 @@
 					<div class="text-2xl font-bold mb-4 relative z-10 opacity-80 mt-2">Belum Ada Token</div>
 					
 					<form method="POST" action="?/generateToken" use:enhance class="relative z-10 mt-6 bg-white/10 p-4 rounded-xl backdrop-blur-sm">
-						<label class="block text-sm text-indigo-100 mb-2" for="duration_hours">Berlaku Selama:</label>
 						<div class="flex gap-2">
-							<select name="duration_hours" id="duration_hours" class="flex-1 bg-white/20 border-white/20 text-white rounded-lg px-3 py-2 text-sm appearance-none outline-none focus:ring-2 focus:ring-white/50">
-								<option value="1" class="text-slate-800">1 Jam</option>
-								<option value="2" class="text-slate-800" selected>2 Jam</option>
-								<option value="4" class="text-slate-800">4 Jam</option>
-								<option value="24" class="text-slate-800">24 Jam</option>
-							</select>
-							<button type="submit" class="btn bg-white text-indigo-600 hover:bg-indigo-50 border-0 shadow-lg shadow-black/10">Buat Token</button>
+							<button type="submit" class="btn w-full bg-white text-indigo-600 hover:bg-indigo-50 border-0 shadow-lg shadow-black/10">Buat Token (Berlaku 15 Menit)</button>
 						</div>
 					</form>
 				{/if}
