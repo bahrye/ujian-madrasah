@@ -20,6 +20,17 @@
     dispatch('close');
   }
 
+  function portal(node: HTMLElement) {
+    document.body.appendChild(node);
+    return {
+      destroy() {
+        if (node.parentNode) {
+          node.parentNode.removeChild(node);
+        }
+      }
+    };
+  }
+
   function handleFileChange(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
@@ -74,7 +85,7 @@
         if (tipeRaw.toLowerCase() === 'pilihan ganda') type = 'pilihan_ganda';
         else if (tipeRaw.toLowerCase() === 'benar salah') type = 'benar_salah';
         else if (tipeRaw.toLowerCase() === 'isian singkat') type = 'isian_singkat';
-        else if (tipeRaw.toLowerCase() === 'esai') type = 'esai';
+        else if (tipeRaw.toLowerCase() === 'esai') type = 'essay';
         else {
           throw new Error(`Baris ${rowNum}: Tipe soal tidak valid "${tipeRaw}". Gunakan "Pilihan Ganda", "Benar Salah", "Isian Singkat", atau "Esai".`);
         }
@@ -172,7 +183,7 @@
 </script>
 
 {#if show}
-  <div class="fixed inset-0 z-[100] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <div use:portal class="fixed inset-0 z-[100] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
       
       <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" on:click={close}></div>

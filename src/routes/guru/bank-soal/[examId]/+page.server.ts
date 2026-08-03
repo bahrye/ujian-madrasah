@@ -224,8 +224,9 @@ export const actions: Actions = {
 
 		try {
 			await db.batch(statements);
-		} catch (e) {
-			return fail(500, { error: 'Gagal menyimpan soal ke database.' });
+		} catch (e: any) {
+			console.error('Import Excel Error:', e);
+			return fail(500, { error: 'Gagal menyimpan soal ke database: ' + (e.message || String(e)) });
 		}
 
 		return { success: `Berhasil mengimpor ${parsedQuestions.length} soal.` };
