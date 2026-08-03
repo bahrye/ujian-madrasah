@@ -69,7 +69,7 @@
 						directLink += `&resourcekey=${resourceKey}`;
 					}
 				} catch (e) {}
-				return directLink;
+				return `/api/proxy-media?url=${encodeURIComponent(directLink)}`;
 			}
 		}
 		return url;

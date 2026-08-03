@@ -547,6 +547,12 @@
       "_auth.js"
     ]
   },
+  "src/routes/api/proxy-media/+server.ts": {
+    "file": "entries/endpoints/api/proxy-media/_server.ts.js",
+    "name": "entries/endpoints/api/proxy-media/_server.ts",
+    "src": "src/routes/api/proxy-media/+server.ts",
+    "isEntry": true
+  },
   "src/routes/api/setup/+server.ts": {
     "file": "entries/endpoints/api/setup/_server.ts.js",
     "name": "entries/endpoints/api/setup/_server.ts",
