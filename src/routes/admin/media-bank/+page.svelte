@@ -9,16 +9,20 @@
 	let isDeleting = false;
 	let showUploadModal = false;
 	let tempUploadedUrl = '';
+	let itemToDelete: any = null;
 
-	function confirmDelete(item: any) {
-		let msg = '';
-		if (item.question_id) {
-			msg = `Peringatan Keras!\n\nFile ${item.media_type} ini sedang digunakan pada:\n- Mapel: ${item.subject_name || 'Tidak ada mapel'}\n- Ujian: ${item.exam_title}\n- Soal Nomor: ${item.question_number}\n\nYakin ingin menghapus? File akan dimusnahkan dari Cloudinary dan dilepas dari soal tersebut secara permanen.`;
-		} else {
-			msg = `Konfirmasi Penghapusan\n\nFile ini adalah File Yatim Piatu (tidak terhubung dengan soal manapun). Yakin ingin membersihkannya dari Cloudinary?`;
+	let successMsg = '';
+	let errorMsg = '';
+	
+	$: {
+		if (form?.success) {
+			successMsg = form.success;
+			setTimeout(() => successMsg = '', 4000);
 		}
-		
-		return confirm(msg);
+		if (form?.error) {
+			errorMsg = form.error;
+			setTimeout(() => errorMsg = '', 6000);
+		}
 	}
 </script>
 
@@ -41,17 +45,17 @@
 		</button>
 	</div>
 
-	{#if form?.error}
-		<div class="alert alert-danger mb-6">
+	{#if errorMsg}
+		<div class="alert alert-danger mb-6 transition-opacity duration-300">
 			<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-			<span>{form.error}</span>
+			<span>{errorMsg}</span>
 		</div>
 	{/if}
 
-	{#if form?.success}
-		<div class="alert alert-success mb-6">
+	{#if successMsg}
+		<div class="alert alert-success mb-6 transition-opacity duration-300">
 			<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-			<span>{form.success}</span>
+			<span>{successMsg}</span>
 		</div>
 	{/if}
 
@@ -111,27 +115,15 @@
 						</div>
 
 						<div class="pt-3 border-t {item.question_id ? 'border-slate-100' : 'border-amber-200'}">
-							<form method="POST" action="?/deleteMedia" use:enhance={({ cancel }) => {
-								if (!confirmDelete(item)) {
-									cancel();
-									return;
-								}
-								isDeleting = true;
-								return async ({ update }) => {
-									isDeleting = false;
-									await update();
-								};
-							}}>
-								<input type="hidden" name="media_url" value={item.media_url} />
-								<button 
-									type="submit" 
-									class="btn {item.question_id ? 'btn-danger' : 'bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-lg'} w-full py-2 flex items-center justify-center gap-2"
-									disabled={isDeleting}
-								>
-									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-									{item.question_id ? 'Hapus File Permanen' : 'Bersihkan File Ini'}
-								</button>
-							</form>
+							<button 
+								type="button" 
+								class="btn {item.question_id ? 'btn-danger' : 'bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-lg'} w-full py-2 flex items-center justify-center gap-2"
+								on:click={() => itemToDelete = item}
+								disabled={isDeleting}
+							>
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+								{item.question_id ? 'Hapus File Permanen' : 'Bersihkan File Ini'}
+							</button>
 						</div>
 					</div>
 				</div>
@@ -172,6 +164,74 @@
 				}}>
 					Selesai & Muat Ulang
 				</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Confirmation Modal -->
+{#if itemToDelete}
+	<div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 transition-all duration-300">
+		<div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col transform scale-100">
+			<div class="p-6">
+				<div class="w-14 h-14 rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-5 mx-auto">
+					<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+				</div>
+				<h3 class="text-xl font-bold text-slate-800 mb-2 text-center">Peringatan Keras!</h3>
+				
+				{#if itemToDelete.question_id}
+					<p class="text-slate-600 mb-4 text-sm text-center">
+						File <span class="font-semibold px-1.5 py-0.5 bg-slate-100 rounded text-slate-700">{itemToDelete.media_type}</span> ini masih digunakan pada:
+					</p>
+					<div class="space-y-2 text-sm text-slate-600 mb-5 bg-slate-50 p-4 rounded-xl border border-slate-100">
+						<div class="flex justify-between border-b border-slate-100 pb-2">
+							<span class="font-medium text-slate-500">Mata Pelajaran</span>
+							<span class="font-semibold text-slate-800 text-right">{itemToDelete.subject_name || 'Tidak ada'}</span>
+						</div>
+						<div class="flex justify-between border-b border-slate-100 pb-2">
+							<span class="font-medium text-slate-500">Ujian</span>
+							<span class="font-semibold text-slate-800 text-right">{itemToDelete.exam_title}</span>
+						</div>
+						<div class="flex justify-between pt-1">
+							<span class="font-medium text-slate-500">Letak Soal</span>
+							<span class="text-indigo-600 font-bold">Nomor {itemToDelete.question_number}</span>
+						</div>
+					</div>
+					<p class="text-sm text-red-600 font-medium text-center">
+						Yakin ingin menghapus? File akan dimusnahkan dari Cloudinary dan soal akan kehilangan media ini secara permanen.
+					</p>
+				{:else}
+					<p class="text-slate-600 mb-4 text-sm text-center leading-relaxed">
+						File ini adalah <span class="font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded">File Yatim Piatu</span> (tidak terhubung dengan soal manapun).
+					</p>
+					<p class="text-sm text-red-600 font-medium text-center">
+						Yakin ingin membersihkannya dari Cloudinary secara permanen?
+					</p>
+				{/if}
+			</div>
+			
+			<div class="px-6 py-4 bg-slate-50 flex justify-end gap-3 border-t border-slate-100">
+				<button class="btn bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-medium transition-colors" on:click={() => itemToDelete = null} disabled={isDeleting}>
+					Batal
+				</button>
+				<form method="POST" action="?/deleteMedia" use:enhance={() => {
+					isDeleting = true;
+					return async ({ update }) => {
+						isDeleting = false;
+						itemToDelete = null;
+						await update();
+					};
+				}}>
+					<input type="hidden" name="media_url" value={itemToDelete.media_url} />
+					<button type="submit" class="btn btn-danger flex items-center gap-2 shadow-sm transition-all" disabled={isDeleting}>
+						{#if isDeleting}
+							<svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+							Menghapus...
+						{:else}
+							Ya, Hapus Permanen
+						{/if}
+					</button>
+				</form>
 			</div>
 		</div>
 	</div>
