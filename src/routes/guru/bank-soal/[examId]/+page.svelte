@@ -263,14 +263,14 @@
 						</div>
 					{/if}
 				</div>
-				<div class="flex flex-col gap-2">
-					<div class="flex gap-2">
-						<button type="button" class="p-2 rounded-xl text-sky-600 bg-sky-50 hover:bg-sky-500 hover:text-white transition-all shadow-sm" title="Preview soal" on:click={() => previewQuestionId = q.id}>
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-								<path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-							</svg>
-						</button>
+				<div class="flex items-start gap-2">
+					<button type="button" class="p-2 rounded-xl text-sky-600 bg-sky-50 hover:bg-sky-500 hover:text-white transition-all shadow-sm" title="Preview soal" on:click={() => previewQuestionId = q.id}>
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+							<path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+						</svg>
+					</button>
+					<div class="flex flex-col gap-2">
 						<button type="button" class="p-2 rounded-xl text-indigo-600 bg-indigo-50 hover:bg-indigo-500 hover:text-white transition-all shadow-sm" title="Edit soal" on:click={() => {
 							editingQuestion = { ...q };
 							if (q.type === 'pilihan_ganda' && q.options_json) {
@@ -281,23 +281,23 @@
 								<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.edit} />
 							</svg>
 						</button>
+						<ConfirmForm 
+							action="?/delete"
+							confirmTitle="Hapus Soal"
+							confirmMessage="Hapus soal ini?"
+							buttonClass="p-2 rounded-xl text-rose-600 bg-rose-50 hover:bg-rose-500 hover:text-white transition-all shadow-sm flex items-center justify-center"
+							buttonTitle="Hapus soal"
+						>
+							<svelte:fragment slot="inputs">
+								<input type="hidden" name="id" value={q.id} />
+							</svelte:fragment>
+							<svelte:fragment slot="buttonContent">
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
+								</svg>
+							</svelte:fragment>
+						</ConfirmForm>
 					</div>
-					<ConfirmForm 
-						action="?/delete"
-						confirmTitle="Hapus Soal"
-						confirmMessage="Hapus soal ini?"
-						buttonClass="p-2 rounded-xl text-rose-600 bg-rose-50 hover:bg-rose-500 hover:text-white transition-all shadow-sm flex items-center justify-center"
-						buttonTitle="Hapus soal"
-					>
-						<svelte:fragment slot="inputs">
-							<input type="hidden" name="id" value={q.id} />
-						</svelte:fragment>
-						<svelte:fragment slot="buttonContent">
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-								<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
-							</svg>
-						</svelte:fragment>
-					</ConfirmForm>
 				</div>
 			</div>
 		{:else}
