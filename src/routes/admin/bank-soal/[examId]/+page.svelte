@@ -3,6 +3,7 @@
 	import ConfirmForm from '$lib/components/ConfirmForm.svelte';
 	import MediaUploader from '$lib/components/admin/MediaUploader.svelte';
 	import QuestionRenderer from '$lib/components/exam/QuestionRenderer.svelte';
+	import ImportExcelModal from '$lib/components/exam/ImportExcelModal.svelte';
 	import { fade, slide } from 'svelte/transition';
 	import { QUESTION_TYPE_LABELS, ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
@@ -13,6 +14,7 @@
 	export let form: any;
 
 	let showCreateForm = false;
+	let showImportModal = false;
 	let selectedType = 'pilihan_ganda';
 	let optionCount = 4;
 	let editOptionCount = 4;
@@ -86,6 +88,10 @@
 			<h1 class="text-2xl font-bold text-slate-800">{exam.title}</h1>
 			<p class="text-sm text-slate-500">{exam.subject || 'Umum'} · {questions.length} soal</p>
 		</div>
+		<button class="btn-ghost" on:click={() => (showImportModal = true)}>
+			<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+			Import Excel
+		</button>
 		<button class="btn-primary" on:click={() => (showCreateForm = !showCreateForm)}>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 				<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
@@ -93,6 +99,9 @@
 			Tambah Soal
 		</button>
 	</div>
+
+	<!-- Import Modal -->
+	<ImportExcelModal bind:show={showImportModal} on:close={() => showImportModal = false} />
 
 	<!-- Create Form -->
 	{#if showCreateForm}

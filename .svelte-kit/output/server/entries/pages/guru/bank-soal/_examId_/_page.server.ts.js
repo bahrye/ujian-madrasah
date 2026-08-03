@@ -159,6 +159,42 @@ const actions = {
     }
     await db.prepare("DELETE FROM questions WHERE id = ?").bind(id).run();
     return { success: "Soal berhasil dihapus." };
+  },
+  importExcel: async ({ request, platform, params, locals }) => {
+    const db = getDB(platform);
+    const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(params.examId, locals.user.school_id).first();
+    const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(params.examId, locals.user.id).first();
+    if (!exam || exam.created_by !== locals.user.id && !isTeacher) {
+      return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
+    }
+    const form = await request.formData();
+    const questionsJson = form.get("questions_json")?.toString();
+    if (!questionsJson) return fail(400, { error: "Data soal tidak valid." });
+    let parsedQuestions = [];
+    try {
+      parsedQuestions = JSON.parse(questionsJson);
+    } catch (e) {
+      return fail(400, { error: "Format data soal tidak valid." });
+    }
+    if (!Array.isArray(parsedQuestions) || parsedQuestions.length === 0) {
+      return fail(400, { error: "Tidak ada soal yang ditemukan." });
+    }
+    const last = await db.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(params.examId).first();
+    let nextNum = (last?.max_num ?? 0) + 1;
+    const statements = [];
+    const stmt = db.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points, options_json, correct_answer_json) VALUES (?, ?, ?, ?, ?, ?, ?)`);
+    for (const q of parsedQuestions) {
+      statements.push(
+        stmt.bind(params.examId, q.type, q.question_text, nextNum, q.points || 1, q.options_json || null, q.correct_answer_json || null)
+      );
+      nextNum++;
+    }
+    try {
+      await db.batch(statements);
+    } catch (e) {
+      return fail(500, { error: "Gagal menyimpan soal ke database." });
+    }
+    return { success: `Berhasil mengimpor ${parsedQuestions.length} soal.` };
   }
 };
 export {
