@@ -222,7 +222,7 @@
 					{#each selectedLogs as log}
 						<li class="flex flex-col border-b border-slate-100 pb-2 last:border-0">
 							<span class="font-medium text-rose-600 text-sm">{log.type}</span>
-							<span class="text-xs text-slate-400">{new Date(String(log.time).replace(' ', 'T') + (String(log.time).includes('Z') ? '' : 'Z')).toLocaleString('id-ID')}</span>
+							<span class="text-xs text-slate-400">{new Date(log.time).toLocaleString('id-ID')}</span>
 						</li>
 					{/each}
 				</ul>
