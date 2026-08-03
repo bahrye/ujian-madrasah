@@ -56,7 +56,7 @@
 			</div>
 			<div>
 				<p class="text-slate-500 mb-1">Waktu Selesai</p>
-				<p class="font-medium text-slate-800">{attempt.submit_time ? new Date(attempt.submit_time).toLocaleString('id-ID') : '-'}</p>
+				<p class="font-medium text-slate-800">{attempt.submit_time ? new Date(String(attempt.submit_time).replace(' ', 'T') + (String(attempt.submit_time).includes('Z') ? '' : 'Z')).toLocaleString('id-ID') : '-'}</p>
 			</div>
 			<div>
 				<p class="text-slate-500 mb-1">Pelanggaran</p>

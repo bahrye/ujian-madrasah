@@ -136,7 +136,7 @@ function _page($$renderer, $$props) {
           }
           $$renderer2.push(`<!--]-->`);
         }
-        $$renderer2.push(`<!--]--></td><td class="text-xs text-slate-500">${escape_html(new Date(a.created_at).toLocaleDateString("id-ID"))}</td></tr>`);
+        $$renderer2.push(`<!--]--></td><td class="text-xs text-slate-500">${escape_html((/* @__PURE__ */ new Date(String(a.created_at).replace(" ", "T") + (String(a.created_at).includes("Z") ? "" : "Z"))).toLocaleDateString("id-ID"))}</td></tr>`);
       }
       $$renderer2.push(`<!--]--></tbody></table></div></div>`);
     }

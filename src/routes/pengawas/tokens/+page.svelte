@@ -133,7 +133,7 @@
 						</div>
 						<p class="text-sm text-slate-600">{token.exam_title}</p>
 						<p class="text-xs text-slate-400 mt-1">
-							Berlaku hingga: {new Date(token.expires_at).toLocaleString('id-ID')}
+							Berlaku hingga: {new Date(String(token.expires_at).replace(' ', 'T') + (String(token.expires_at).includes('Z') ? '' : 'Z')).toLocaleString('id-ID')}
 						</p>
 					</div>
 					<div class="flex items-center gap-2 flex-shrink-0">

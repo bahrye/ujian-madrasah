@@ -136,7 +136,7 @@ function _page($$renderer, $$props) {
             const totalM = Math.floor(remainingMs / 6e4);
             const h = Math.floor(totalM / 60);
             const m = totalM % 60;
-            $$renderer2.push(`<span class="text-slate-400 font-medium line-through decoration-slate-400 decoration-2 opacity-80" title="Sisa Waktu Saat Selesai">`);
+            $$renderer2.push(`<span class="text-slate-500 font-medium" title="Sisa Waktu Saat Selesai">`);
             if (h > 0) {
               $$renderer2.push("<!--[0-->");
               $$renderer2.push(`${escape_html(h)} jam`);

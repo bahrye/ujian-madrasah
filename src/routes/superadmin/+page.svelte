@@ -50,7 +50,7 @@
 						<tr class="hover:bg-slate-50 transition-colors">
 							<td class="p-4 font-medium text-slate-900">{school.name}</td>
 							<td class="p-4">{school.address || '-'}</td>
-							<td class="p-4">{new Date(school.created_at).toLocaleDateString('id-ID')}</td>
+							<td class="p-4">{new Date(String(school.created_at).replace(' ', 'T') + (String(school.created_at).includes('Z') ? '' : 'Z')).toLocaleDateString('id-ID')}</td>
 							<td class="p-4">
 								{#if school.is_active}
 									<span class="badge badge-success">Aktif</span>

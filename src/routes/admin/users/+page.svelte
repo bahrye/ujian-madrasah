@@ -80,7 +80,7 @@
 									<span class="badge-danger">Nonaktif</span>
 								{/if}
 							</td>
-							<td class="text-xs text-slate-500">{new Date(user.created_at).toLocaleDateString('id-ID')}</td>
+							<td class="text-xs text-slate-500">{new Date(String(user.created_at).replace(' ', 'T') + (String(user.created_at).includes('Z') ? '' : 'Z')).toLocaleDateString('id-ID')}</td>
 							<td class="text-right">
 								<div class="flex items-center justify-end gap-1">
 									<button

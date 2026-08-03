@@ -148,7 +148,7 @@
 								</td>
 								<td class="font-semibold">{attempt.score != null ? attempt.score : '-'}</td>
 								<td class="text-xs text-slate-500">
-									{attempt.created_at ? new Date(attempt.created_at).toLocaleDateString('id-ID') : '-'}
+									{attempt.created_at ? new Date(String(attempt.created_at).replace(' ', 'T') + (String(attempt.created_at).includes('Z') ? '' : 'Z')).toLocaleDateString('id-ID') : '-'}
 								</td>
 							</tr>
 						{/each}

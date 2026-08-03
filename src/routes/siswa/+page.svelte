@@ -274,7 +274,7 @@
 											{/if}
 										{/if}
 									</td>
-									<td class="text-xs text-slate-500">{new Date(a.created_at).toLocaleDateString('id-ID')}</td>
+									<td class="text-xs text-slate-500">{new Date(String(a.created_at).replace(' ', 'T') + (String(a.created_at).includes('Z') ? '' : 'Z')).toLocaleDateString('id-ID')}</td>
 								</tr>
 							{/each}
 						</tbody>

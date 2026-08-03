@@ -82,8 +82,8 @@
 			<p class="mt-3 text-sm text-slate-600">{exam.description}</p>
 		{/if}
 		<div class="mt-4 flex flex-wrap gap-4 text-xs text-slate-500">
-			<span>Mulai: {exam.start_time ? new Date(exam.start_time).toLocaleString('id-ID') : '-'}</span>
-			<span>Selesai: {exam.end_time ? new Date(exam.end_time).toLocaleString('id-ID') : '-'}</span>
+			<span>Mulai: {exam.start_time ? new Date(String(exam.start_time).replace(' ', 'T') + (String(exam.start_time).includes('Z') ? '' : 'Z')).toLocaleString('id-ID') : '-'}</span>
+			<span>Selesai: {exam.end_time ? new Date(String(exam.end_time).replace(' ', 'T') + (String(exam.end_time).includes('Z') ? '' : 'Z')).toLocaleString('id-ID') : '-'}</span>
 		</div>
 	</div>
 
@@ -292,7 +292,7 @@
 								<td class="font-medium">{a.student_name}</td>
 								<td><span class={ATTEMPT_STATUS_COLORS[a.status] || 'badge-info'}>{ATTEMPT_STATUS_LABELS[a.status] || a.status}</span></td>
 								<td class="font-semibold">{a.score != null ? a.score : '-'}</td>
-								<td class="text-xs text-slate-500">{new Date(a.start_time).toLocaleString('id-ID')}</td>
+								<td class="text-xs text-slate-500">{new Date(String(a.start_time).replace(' ', 'T') + (String(a.start_time).includes('Z') ? '' : 'Z')).toLocaleString('id-ID')}</td>
 							</tr>
 						{/each}
 					</tbody>

@@ -47,6 +47,7 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 	// 3. Monitoring (Attempts)
 	const rawAttempts = await db.prepare(`
 		SELECT sa.id, sa.status, sa.created_at as start_time, sa.submit_time,
+			   sa.violation_count, sa.violation_logs,
 			   u.name as student_name, c.name as class_name,
 			   (SELECT COUNT(*) FROM questions WHERE exam_id = ?) as question_count
 		FROM student_attempts sa
@@ -75,6 +76,15 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 					} catch (e) {}
 				}
 			}
+			if (answeredCount === 0) {
+				const dbAnswers = await db.prepare('SELECT COUNT(*) as c FROM student_answers WHERE attempt_id = ? AND answer_given IS NOT NULL AND answer_given != ""').bind(a.id).first() as any;
+				if (dbAnswers && dbAnswers.c) answeredCount = dbAnswers.c;
+			}
+		} else {
+			warnings = a.violation_count || 0;
+			try { warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : []; } catch(e) {}
+			const dbAnswers = await db.prepare('SELECT COUNT(*) as c FROM student_answers WHERE attempt_id = ? AND answer_given IS NOT NULL AND answer_given != ""').bind(a.id).first() as any;
+			if (dbAnswers && dbAnswers.c) answeredCount = dbAnswers.c;
 		}
 		return { ...a, answeredCount, warnings, warningLogs };
 	}));

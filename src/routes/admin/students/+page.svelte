@@ -176,7 +176,7 @@
 								{/if}
 							</td>
 							<td class="p-4 text-sm text-slate-500">
-								{new Date(user.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+								{new Date(String(user.created_at).replace(' ', 'T') + (String(user.created_at).includes('Z') ? '' : 'Z')).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
 							</td>
 							<td class="p-4 text-right">
 								<div class="flex items-center justify-end space-x-2">

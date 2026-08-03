@@ -76,7 +76,7 @@ function _page($$renderer, $$props) {
         } else {
           $$renderer2.push("<!--[-1-->");
         }
-        $$renderer2.push(`<!--]--></div> <p class="text-sm text-slate-600">${escape_html(token.exam_title)}</p> <p class="text-xs text-slate-400 mt-1">Berlaku hingga: ${escape_html(new Date(token.expires_at).toLocaleString("id-ID"))}</p></div> <div class="flex items-center gap-2 flex-shrink-0">`);
+        $$renderer2.push(`<!--]--></div> <p class="text-sm text-slate-600">${escape_html(token.exam_title)}</p> <p class="text-xs text-slate-400 mt-1">Berlaku hingga: ${escape_html((/* @__PURE__ */ new Date(String(token.expires_at).replace(" ", "T") + (String(token.expires_at).includes("Z") ? "" : "Z"))).toLocaleString("id-ID"))}</p></div> <div class="flex items-center gap-2 flex-shrink-0">`);
         if (!expired) {
           $$renderer2.push("<!--[0-->");
           if (status.active) {

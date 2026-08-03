@@ -129,11 +129,11 @@
 			<div class="space-y-3 text-sm">
 				<div class="flex justify-between py-2 border-b border-slate-50">
 					<span class="text-slate-500">Mulai</span>
-					<span class="font-medium text-slate-700">{exam.start_time ? new Date(exam.start_time).toLocaleString('id-ID') : '-'}</span>
+					<span class="font-medium text-slate-700">{exam.start_time ? new Date(String(exam.start_time).replace(' ', 'T') + (String(exam.start_time).includes('Z') ? '' : 'Z')).toLocaleString('id-ID') : '-'}</span>
 				</div>
 				<div class="flex justify-between py-2 border-b border-slate-50">
 					<span class="text-slate-500">Selesai</span>
-					<span class="font-medium text-slate-700">{exam.end_time ? new Date(exam.end_time).toLocaleString('id-ID') : '-'}</span>
+					<span class="font-medium text-slate-700">{exam.end_time ? new Date(String(exam.end_time).replace(' ', 'T') + (String(exam.end_time).includes('Z') ? '' : 'Z')).toLocaleString('id-ID') : '-'}</span>
 				</div>
 				<div class="flex justify-between py-2 border-b border-slate-50">
 					<span class="text-slate-500">Soal Diacak</span>
@@ -177,6 +177,7 @@
 								<th>Status</th>
 								<th class="text-center">Pelanggaran</th>
 								<th>Progres</th>
+								<th class="text-xs">Sisa Waktu</th>
 								<th class="text-right pr-5">Aksi</th>
 							</tr>
 						</thead>
@@ -188,7 +189,7 @@
 										<div class="text-xs text-slate-500">{attempt.class_name || '-'}</div>
 									</td>
 									<td class="text-xs font-mono text-slate-600">
-										{new Date(attempt.start_time).toLocaleTimeString('id-ID')}
+										{new Date(String(attempt.start_time).replace(' ', 'T') + (String(attempt.start_time).includes('Z') ? '' : 'Z')).toLocaleTimeString('id-ID')}
 									</td>
 									<td>
 										<span class="badge {ATTEMPT_STATUS_COLORS[attempt.status] || 'badge-slate'}">
@@ -224,6 +225,41 @@
 											</div>
 										{:else}
 											<span class="text-xs text-slate-400">0%</span>
+										{/if}
+									</td>
+									<td class="text-xs">
+										{#if attempt.status === 'mengerjakan'}
+											{@const startStr = attempt.start_time.replace(' ', 'T') + (attempt.start_time.includes('Z') ? '' : 'Z')}
+											{@const start = new Date(startStr).getTime()}
+											{@const end = start + (exam.duration_minutes * 60 * 1000)}
+											{@const remainingMs = end - currentTime}
+											{#if remainingMs > 0}
+												{@const totalM = Math.floor(remainingMs / 60000)}
+												{@const h = Math.floor(totalM / 60)}
+												{@const m = totalM % 60}
+												<span class="text-slate-600 font-medium">
+													{#if h > 0}{h} jam {/if}{m} mnt
+												</span>
+											{:else}
+												<span class="text-rose-500 font-bold">Habis</span>
+											{/if}
+										{:else}
+											{@const startStr = attempt.start_time.replace(' ', 'T') + (attempt.start_time.includes('Z') ? '' : 'Z')}
+											{@const submitStr = attempt.submit_time ? (attempt.submit_time.replace(' ', 'T') + (attempt.submit_time.includes('Z') ? '' : 'Z')) : startStr}
+											{@const start = new Date(startStr).getTime()}
+											{@const submit = new Date(submitStr).getTime()}
+											{@const end = start + (exam.duration_minutes * 60 * 1000)}
+											{@const remainingMs = end - submit}
+											{#if remainingMs > 0}
+												{@const totalM = Math.floor(remainingMs / 60000)}
+												{@const h = Math.floor(totalM / 60)}
+												{@const m = totalM % 60}
+												<span class="text-slate-500 font-medium" title="Sisa Waktu Saat Selesai">
+													{#if h > 0}{h} jam {/if}{m} mnt
+												</span>
+											{:else}
+												<span class="text-slate-400 font-medium opacity-80">Habis</span>
+											{/if}
 										{/if}
 									</td>
 									<td class="text-right pr-5">
@@ -392,7 +428,7 @@
 					{#each selectedLogs as log}
 						<li class="flex flex-col border-b border-slate-100 pb-2 last:border-0">
 							<span class="font-medium text-rose-600 text-sm">{log.type}</span>
-							<span class="text-xs text-slate-400">{new Date(log.time).toLocaleString('id-ID')}</span>
+							<span class="text-xs text-slate-400">{new Date(String(log.time).replace(' ', 'T') + (String(log.time).includes('Z') ? '' : 'Z')).toLocaleString('id-ID')}</span>
 						</li>
 					{/each}
 				</ul>
