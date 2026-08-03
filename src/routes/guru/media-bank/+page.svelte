@@ -10,6 +10,7 @@
 	let showUploadModal = false;
 	let tempUploadedUrl = '';
 	let itemToDelete: any = null;
+	let previewMedia: { type: 'image' | 'audio', url: string } | null = null;
 
 	let successMsg = '';
 	let errorMsg = '';
@@ -82,19 +83,22 @@
 			{#each data.mediaItems as item}
 				<div class="card overflow-hidden flex flex-col {item.question_id ? '' : 'border-amber-400 ring-2 ring-amber-400/20'}">
 					<!-- Preview Area -->
-					<div class="h-40 {item.question_id ? 'bg-slate-100' : 'bg-amber-50'} relative flex items-center justify-center border-b {item.question_id ? 'border-slate-100' : 'border-amber-200'}">
+					<div class="h-40 {item.question_id ? 'bg-slate-100' : 'bg-amber-50'} relative flex items-center justify-center border-b {item.question_id ? 'border-slate-100' : 'border-amber-200'} cursor-pointer group" on:click={() => previewMedia = { type: item.media_type, url: item.media_url }}>
 						{#if item.media_type === 'image'}
-							<img src={item.media_url} alt="Media Soal {item.question_number}" class="w-full h-full object-contain p-2" loading="lazy" />
+							<img src={item.media_url} alt="Media Soal {item.question_number}" class="w-full h-full object-contain p-2 transition-transform group-hover:scale-105" loading="lazy" />
 						{:else}
-							<div class="text-center p-4">
+							<div class="text-center p-4 transition-transform group-hover:scale-110">
 								<svg class="w-12 h-12 text-indigo-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" /></svg>
 								<span class="text-xs font-medium text-slate-500 uppercase tracking-wider">File Audio</span>
 							</div>
 						{/if}
-						<div class="absolute top-2 left-2 flex flex-col gap-1 items-start">
+						<div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors z-0"></div>
+						
+						<!-- Action Overlays (Z-index ensures they stay above the click overlay) -->
+						<div class="absolute top-2 left-2 flex flex-col gap-1 items-start z-10">
 							<span class="badge badge-primary shadow-sm">{item.media_type}</span>
 						</div>
-						<div class="absolute top-2 right-2">
+						<div class="absolute top-2 right-2 z-10">
 							{#if item.uploaded_by === data.user?.id}
 								<form method="POST" action="?/toggleVisibility" use:enhance>
 									<input type="hidden" name="media_url" value={item.media_url} />
@@ -273,5 +277,48 @@
 				</form>
 			</div>
 		</div>
+	</div>
+{/if}
+
+<!-- Media Preview Modal -->
+{#if previewMedia}
+	<div use:portal class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-[70] flex items-center justify-center p-4 transition-all duration-300" on:click={() => previewMedia = null}>
+		<div class="absolute top-4 right-4 flex gap-3 z-10">
+			<!-- Download Button -->
+			<a 
+				href={previewMedia.url} 
+				download
+				target="_blank"
+				class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors backdrop-blur-md"
+				on:click|stopPropagation
+				title="Unduh File"
+			>
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+			</a>
+			<!-- Close Button -->
+			<button class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors backdrop-blur-md" on:click|stopPropagation={() => previewMedia = null}>
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+			</button>
+		</div>
+
+		{#if previewMedia.type === 'image'}
+			<img 
+				src={previewMedia.url} 
+				alt="Preview Media" 
+				class="max-w-full max-h-full object-contain select-none shadow-2xl rounded-lg"
+				on:click|stopPropagation 
+			/>
+		{:else if previewMedia.type === 'audio'}
+			<div class="bg-white rounded-2xl p-6 shadow-2xl max-w-md w-full" on:click|stopPropagation>
+				<div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+					<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" /></svg>
+				</div>
+				<h3 class="text-lg font-bold text-slate-800 text-center mb-6">Pemutar Audio</h3>
+				<audio controls class="w-full" autoplay>
+					<source src={previewMedia.url} type="audio/mpeg">
+					Browser Anda tidak mendukung elemen audio.
+				</audio>
+			</div>
+		{/if}
 	</div>
 {/if}

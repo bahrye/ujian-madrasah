@@ -54,15 +54,15 @@ function _page($$renderer, $$props) {
         const each_array = ensure_array_like(data.mediaItems);
         for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
           let item = each_array[$$index];
-          $$renderer3.push(`<div${attr_class(`card overflow-hidden flex flex-col ${item.question_id ? "" : "border-amber-400 ring-2 ring-amber-400/20"}`)}><div${attr_class(`h-40 ${item.question_id ? "bg-slate-100" : "bg-amber-50"} relative flex items-center justify-center border-b ${item.question_id ? "border-slate-100" : "border-amber-200"}`)}>`);
+          $$renderer3.push(`<div${attr_class(`card overflow-hidden flex flex-col ${item.question_id ? "" : "border-amber-400 ring-2 ring-amber-400/20"}`)}><div${attr_class(`h-40 ${item.question_id ? "bg-slate-100" : "bg-amber-50"} relative flex items-center justify-center border-b ${item.question_id ? "border-slate-100" : "border-amber-200"} cursor-pointer group`)}>`);
           if (item.media_type === "image") {
             $$renderer3.push("<!--[0-->");
-            $$renderer3.push(`<img${attr("src", item.media_url)}${attr("alt", `Media Soal ${stringify(item.question_number)}`)} class="w-full h-full object-contain p-2" loading="lazy"/>`);
+            $$renderer3.push(`<img${attr("src", item.media_url)}${attr("alt", `Media Soal ${stringify(item.question_number)}`)} class="w-full h-full object-contain p-2 transition-transform group-hover:scale-105" loading="lazy"/>`);
           } else {
             $$renderer3.push("<!--[-1-->");
-            $$renderer3.push(`<div class="text-center p-4"><svg class="w-12 h-12 text-indigo-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg> <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">File Audio</span></div>`);
+            $$renderer3.push(`<div class="text-center p-4 transition-transform group-hover:scale-110"><svg class="w-12 h-12 text-indigo-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg> <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">File Audio</span></div>`);
           }
-          $$renderer3.push(`<!--]--> <div class="absolute top-2 left-2 flex flex-col gap-1 items-start"><span class="badge badge-primary shadow-sm">${escape_html(item.media_type)}</span></div> <div class="absolute top-2 right-2">`);
+          $$renderer3.push(`<!--]--> <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors z-0"></div> <div class="absolute top-2 left-2 flex flex-col gap-1 items-start z-10"><span class="badge badge-primary shadow-sm">${escape_html(item.media_type)}</span></div> <div class="absolute top-2 right-2 z-10">`);
           if (item.uploaded_by === data.user?.id) {
             $$renderer3.push("<!--[0-->");
             $$renderer3.push(`<form method="POST" action="?/toggleVisibility"><input type="hidden" name="media_url"${attr("value", item.media_url)}/> <input type="hidden" name="is_public"${attr("value", item.is_public ? "0" : "1")}/> <button type="submit"${attr_class(`group relative px-2.5 py-1 rounded-full border shadow-sm transition-all flex items-center gap-1.5 ${item.is_public ? "bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100" : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"}`)}><span${attr_class(`w-2 h-2 rounded-full ${item.is_public ? "bg-emerald-500" : "bg-slate-400"} transition-colors`)}></span> <span class="text-[10px] font-semibold tracking-wide">${escape_html(item.is_public ? "PUBLIK" : "PRIVAT")}</span> <div class="absolute inset-0 bg-white/0 group-hover:bg-black/5 rounded-full transition-colors"></div></button></form>`);
@@ -90,6 +90,10 @@ function _page($$renderer, $$props) {
         $$renderer3.push(`<!--]--></div>`);
       }
       $$renderer3.push(`<!--]--></div> `);
+      {
+        $$renderer3.push("<!--[-1-->");
+      }
+      $$renderer3.push(`<!--]--> `);
       {
         $$renderer3.push("<!--[-1-->");
       }
