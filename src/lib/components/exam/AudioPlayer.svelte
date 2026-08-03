@@ -60,8 +60,24 @@
 		progress = 0;
 	}
 
+	let isDragging = false;
+
 	function handleTimeUpdate() {
-		currentTime = audio.currentTime;
+		if (!isDragging) {
+			currentTime = audio.currentTime;
+		}
+	}
+
+	function handleSeek(e: Event) {
+		isDragging = true;
+		const target = e.target as HTMLInputElement;
+		currentTime = parseFloat(target.value);
+	}
+
+	function handleSeekEnd(e: Event) {
+		const target = e.target as HTMLInputElement;
+		audio.currentTime = parseFloat(target.value);
+		isDragging = false;
 	}
 
 	function handleLoadedMetadata() {
@@ -128,16 +144,28 @@
 		</button>
 
 		<!-- Progress Bar -->
-		<div class="flex-1 min-w-0">
-			<div class="h-2 bg-slate-200 rounded-full overflow-hidden">
-				<div
-					class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-150"
-					style="width: {progress}%"
-				></div>
+		<div class="flex-1 min-w-0 relative flex flex-col justify-center group pt-1">
+			<!-- Track Background & Fill (Custom styled) -->
+			<div class="absolute inset-x-0 top-3 h-2 bg-slate-200 rounded-full overflow-hidden pointer-events-none">
+				<div class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 {isDragging ? 'transition-none' : 'transition-all duration-150'}" style="width: {progress}%"></div>
 			</div>
-			<div class="flex justify-between mt-1.5">
+			<!-- Draggable Input Range -->
+			<input 
+				type="range" 
+				min="0" 
+				max={duration || 100}
+				step="0.1"
+				value={currentTime} 
+				on:input={handleSeek}
+				on:change={handleSeekEnd}
+				class="w-full h-4 appearance-none bg-transparent cursor-pointer relative z-10 
+					[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-indigo-300 [&::-webkit-slider-thumb]:transition-transform hover:[&::-webkit-slider-thumb]:scale-125
+					[&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border [&::-moz-range-thumb]:border-indigo-300 [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:transition-transform hover:[&::-moz-range-thumb]:scale-125 focus:outline-none"
+				disabled={!canPlay && playCount >= maxPlays}
+			/>
+			<div class="flex justify-between mt-1">
 				<span class="text-xs text-slate-500 font-medium">{formatTime(currentTime)}</span>
-				<span class="text-xs font-medium text-slate-500 min-w-[36px]">{formatTime(duration)}</span>
+				<span class="text-xs font-medium text-slate-500 min-w-[36px] text-right">{formatTime(duration)}</span>
 			</div>
 		</div>
 
