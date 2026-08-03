@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { fade, scale } from 'svelte/transition';
+	import type { SubmitFunction } from '$app/forms';
 
 	export let action: string;
 	export let confirmMessage: string;
@@ -12,12 +13,15 @@
 	let formElement: HTMLFormElement;
 	let isConfirmed = false;
 
-	function handleSubmit(e: Event) {
+	const handleEnhance: SubmitFunction = ({ cancel }) => {
 		if (!isConfirmed) {
-			e.preventDefault();
+			cancel();
 			showModal = true;
 		}
-	}
+		return async ({ update }) => {
+			await update();
+		};
+	};
 
 	function confirm() {
 		showModal = false;
@@ -37,9 +41,20 @@
 			}, 100);
 		}, 0);
 	}
+
+	function portal(node: HTMLElement) {
+		document.body.appendChild(node);
+		return {
+			destroy() {
+				if (node.parentNode) {
+					node.parentNode.removeChild(node);
+				}
+			}
+		};
+	}
 </script>
 
-<form bind:this={formElement} method="POST" {action} use:enhance on:submit={handleSubmit} class="inline-block">
+<form bind:this={formElement} method="POST" {action} use:enhance={handleEnhance} class="inline-block">
 	<slot name="inputs" />
 	<button type="submit" class={buttonClass} title={buttonTitle}>
 		<slot name="buttonContent" />
@@ -47,7 +62,7 @@
 </form>
 
 {#if showModal}
-	<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" transition:fade={{duration: 200}}>
+	<div use:portal class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" transition:fade={{duration: 200}}>
 		<div class="max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden" transition:scale={{start: 0.95, duration: 200}}>
 			<div class="p-6">
 				<div class="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center mb-4">
