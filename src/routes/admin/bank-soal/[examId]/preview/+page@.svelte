@@ -2,6 +2,7 @@
 	import QuestionRenderer from '$lib/components/exam/QuestionRenderer.svelte';
 	import QuestionNav from '$lib/components/exam/QuestionNav.svelte';
 	import { ICONS } from '$lib/utils/constants';
+	import { page } from '$app/stores';
 
 	export let data;
 
@@ -69,7 +70,7 @@
 				</div>
 			</div>
 			
-			<a href="/admin/bank-soal/{exam.id}" class="btn-sm bg-white/10 hover:bg-white/20 text-white border-0 flex-shrink-0">
+			<a href={$page.url.searchParams.get('from') === 'bank' ? '/admin/bank-soal' : `/admin/bank-soal/${exam.id}`} class="btn-sm bg-white/10 hover:bg-white/20 text-white border-0 flex-shrink-0">
 				<svg class="w-4 h-4 sm:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.close} />
 				</svg>
@@ -97,7 +98,7 @@
 					</div>
 					<h3 class="text-lg font-bold text-slate-800 mb-2">Belum Ada Soal</h3>
 					<p class="text-slate-500 mb-6">Ujian ini belum memiliki soal untuk dipratinjau.</p>
-					<a href="/admin/bank-soal/{exam.id}" class="btn btn-primary w-full">Kembali ke Bank Soal</a>
+					<a href={$page.url.searchParams.get('from') === 'bank' ? '/admin/bank-soal' : `/admin/bank-soal/${exam.id}`} class="btn btn-primary w-full">Kembali ke Bank Soal</a>
 				</div>
 			</div>
 		{/if}

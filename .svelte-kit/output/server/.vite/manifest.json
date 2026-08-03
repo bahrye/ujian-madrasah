@@ -366,7 +366,8 @@
     "imports": [
       "_index.js",
       "_QuestionRenderer.js",
-      "_constants.js"
+      "_constants.js",
+      "_stores.js"
     ]
   },
   "src/routes/admin/classes/+page.server.ts": {
@@ -754,7 +755,8 @@
     "imports": [
       "_index.js",
       "_QuestionRenderer.js",
-      "_constants.js"
+      "_constants.js",
+      "_stores.js"
     ]
   },
   "src/routes/guru/media-bank/+page.server.ts": {

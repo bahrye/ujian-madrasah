@@ -86,7 +86,7 @@
 					{#if exam.question_count > 0}
 						<div class="flex items-center gap-1">
 							<a 
-								href="/admin/bank-soal/{exam.id}/preview" 
+								href="/admin/bank-soal/{exam.id}/preview?from=bank" 
 								class="btn-sm btn-ghost p-2 hover:bg-indigo-50 rounded-lg text-indigo-600 transition-colors z-10 relative"
 								title="Preview Soal"
 							>
