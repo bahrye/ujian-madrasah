@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import ConfirmForm from '$lib/components/ConfirmForm.svelte';
+	import ImportStudentsModal from '$lib/components/admin/ImportStudentsModal.svelte';
 	import type { PageData, ActionData } from './$types';
 	import { toasts } from '$lib/stores/toast';
 
@@ -9,14 +10,16 @@
 	export let form: ActionData;
 
 	let isAdding = false;
+	let showImportModal = false;
 	let editingUser: any = null;
 	let filterClass = '';
 
 	$: if (form?.error) {
 		toasts.error(form.error);
 	} else if (form?.success) {
-		toasts.success('Berhasil menyimpan data siswa');
+		toasts.success(form.message || 'Berhasil menyimpan data siswa');
 		isAdding = false;
+		showImportModal = false;
 		editingUser = null;
 	}
 
@@ -42,12 +45,20 @@
 			<h1 class="text-3xl font-bold text-slate-800 tracking-tight">Manajemen Siswa</h1>
 			<p class="text-slate-500 mt-1">Kelola data siswa dan kelasnya.</p>
 		</div>
-		<button class="btn btn-primary" on:click={() => (isAdding = !isAdding)}>
-			<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-			</svg>
-			Tambah Siswa
-		</button>
+		<div class="flex items-center gap-3">
+			<button class="btn btn-secondary" on:click={() => (showImportModal = true)}>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+				</svg>
+				Import Excel
+			</button>
+			<button class="btn btn-primary" on:click={() => (isAdding = !isAdding)}>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+				</svg>
+				Tambah Siswa
+			</button>
+		</div>
 	</div>
 
 	{#if isAdding}
@@ -225,3 +236,8 @@
 		</div>
 	</div>
 </div>
+
+<ImportStudentsModal 
+	bind:show={showImportModal} 
+	classes={data.classes}
+/>

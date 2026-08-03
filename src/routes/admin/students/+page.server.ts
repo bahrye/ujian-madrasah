@@ -114,6 +114,41 @@ export const actions: Actions = {
 			return fail(500, { error: 'Gagal menghapus siswa' });
 		}
 	},
+	importExcel: async ({ request, locals, platform }) => {
+		const db = getDB(platform);
+		const data = await request.formData();
+		const studentsJson = data.get('students_json')?.toString();
+
+		if (!studentsJson) {
+			return fail(400, { error: 'Data tidak valid' });
+		}
+
+		try {
+			const students = JSON.parse(studentsJson) as any[];
+			if (students.length === 0) return fail(400, { error: 'Tidak ada data siswa' });
+
+			let successCount = 0;
+			
+			// Process sequentially to handle password hashing
+			for (const student of students) {
+				// Cek apakah NISN sudah ada
+				const existing = await db.prepare('SELECT id FROM users WHERE username = ? AND school_id = ?').bind(student.nisn, locals.user!.school_id).first();
+				
+				if (!existing) {
+					const passwordHash = await hashPassword(student.nisn);
+					await db.prepare('INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?, ?)')
+						.bind(locals.user!.school_id, student.class_id, student.nisn, passwordHash, student.name, 'siswa')
+						.run();
+					successCount++;
+				}
+			}
+
+			return { success: true, message: `Berhasil mengimpor ${successCount} siswa dari total ${students.length} data.` };
+		} catch (e) {
+			console.error('Import error:', e);
+			return fail(500, { error: 'Terjadi kesalahan saat memproses data import' });
+		}
+	},
 	toggleStatus: async ({ request, platform, locals }) => {
 		const db = getDB(platform);
 		const data = await request.formData();
