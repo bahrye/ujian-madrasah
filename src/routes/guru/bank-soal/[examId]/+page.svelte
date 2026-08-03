@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import type { ActionData, PageData } from './$types';
 	import ConfirmForm from '$lib/components/ConfirmForm.svelte';
-	import { fade, slide } from 'svelte/transition';
+	import MediaUploader from '$lib/components/admin/MediaUploader.svelte';
 	import { QUESTION_TYPE_LABELS, ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
 
-	export let data;
-	export let form: any;
+	export let data: PageData;
+	export let form: ActionData;
 
 	let showCreateForm = false;
 	let selectedType = 'pilihan_ganda';
@@ -72,13 +73,27 @@
 
 				<div>
 					<label class="label" for="q-text">Teks Soal</label>
-					<textarea id="q-text" name="question_text" required class="input min-h-[100px]" placeholder="Tuliskan soal di sini..." rows="3"></textarea>
+					<textarea id="q-text" name="question_text" required class="input min-h-[100px]" placeholder="Tuliskan pertanyaan di sini..." rows="3"></textarea>
 				</div>
 
-				<div>
-					<label class="label" for="q-media-url">URL Media <span class="text-slate-400 font-normal">(opsional)</span></label>
-					<input id="q-media-url" name="media_url" type="url" class="input" placeholder="https://example.com/gambar.jpg" />
-					<p class="text-[11px] text-slate-500 mt-1.5 leading-relaxed">💡 <b>Tips:</b> Anda dapat mengunggah gambar secara gratis ke <a href="https://id.imgbb.com/" target="_blank" class="text-indigo-500 hover:underline font-medium">ImgBB</a>, lalu tempel <i>Direct Link</i> (akhiran .jpg/.png) ke kolom ini. Untuk audio, gunakan tautan Google Drive.</p>
+				<div class="bg-slate-50 border border-slate-100 rounded-xl p-4">
+					<MediaUploader 
+						label="File Media (Opsional)" 
+						accept="image/*,audio/*"
+						on:upload={(e) => {
+							const mediaUrlInput = document.getElementById('q-media-url');
+							const mediaTypeSelect = document.getElementById('q-media');
+							if (mediaUrlInput) (mediaUrlInput as HTMLInputElement).value = e.detail.url;
+							if (mediaTypeSelect) (mediaTypeSelect as HTMLSelectElement).value = e.detail.type;
+						}}
+						on:remove={() => {
+							const mediaUrlInput = document.getElementById('q-media-url');
+							const mediaTypeSelect = document.getElementById('q-media');
+							if (mediaUrlInput) (mediaUrlInput as HTMLInputElement).value = '';
+							if (mediaTypeSelect) (mediaTypeSelect as HTMLSelectElement).value = 'none';
+						}}
+					/>
+					<input type="hidden" id="q-media-url" name="media_url" />
 				</div>
 
 				<div>
@@ -269,10 +284,20 @@
 						<textarea id="eq-text" name="question_text" required class="input min-h-[100px]" rows="3" value={editingQuestion.question_text}></textarea>
 					</div>
 
-					<div>
-						<label class="label" for="eq-media-url">URL Media</label>
-						<input id="eq-media-url" name="media_url" type="url" class="input" value={editingQuestion.media_url} />
-						<p class="text-[11px] text-slate-500 mt-1.5 leading-relaxed">💡 <b>Tips:</b> Anda dapat mengunggah gambar secara gratis ke <a href="https://id.imgbb.com/" target="_blank" class="text-indigo-500 hover:underline font-medium">ImgBB</a>, lalu tempel <i>Direct Link</i> (akhiran .jpg/.png) ke kolom ini. Untuk audio, gunakan tautan Google Drive.</p>
+					<div class="bg-slate-50 border border-slate-100 rounded-xl p-4">
+						<MediaUploader 
+							label="Ubah/Unggah Media" 
+							accept="image/*,audio/*"
+							value={editingQuestion.media_url || ''}
+							on:upload={(e) => {
+								editingQuestion.media_url = e.detail.url;
+								editingQuestion.media_type = e.detail.type;
+							}}
+							on:remove={() => {
+								editingQuestion.media_url = '';
+								editingQuestion.media_type = null;
+							}}
+						/>
 					</div>
 
 					<!-- Type-specific fields for edit -->
