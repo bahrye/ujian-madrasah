@@ -51,7 +51,7 @@ export async function deleteFromCloudinary(url: string | null, env: Record<strin
 		
 		const result = (await res.json()) as { result: string };
 		console.log('Cloudinary Destroy Result:', result);
-		return result.result === 'ok';
+		return result.result === 'ok' || result.result === 'not found';
 	} catch (err) {
 		console.error('Failed to delete from Cloudinary:', err);
 		return false;

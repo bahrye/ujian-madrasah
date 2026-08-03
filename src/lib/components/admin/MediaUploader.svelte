@@ -70,20 +70,8 @@
 	}
 
 	async function handleRemove() {
-		if (value && value.includes('res.cloudinary.com')) {
-			isUploading = true;
-			try {
-				await fetch('/api/delete-media', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ url: value })
-				});
-			} catch (e) {
-				console.error('Delete error:', e);
-			} finally {
-				isUploading = false;
-			}
-		}
+		// Menghapus langsung dari Cloudinary saat tombol 'X' ditekan ditiadakan.
+		// Penghapusan permanen hanya terjadi saat form 'Simpan' ditekan (ditangani oleh backend).
 		value = '';
 		dispatch('remove');
 	}
