@@ -113,7 +113,23 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<span class="inline-flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> ${escape_html(getAttemptRemainingTime(a.end_time, currentTime))}</span>`);
         } else {
           $$renderer2.push("<!--[-1-->");
-          $$renderer2.push(`<span class="text-slate-400">-</span>`);
+          const startStr = String(a.start_time).replace(" ", "T") + (String(a.start_time).includes("Z") ? "" : "Z");
+          const submitStr = a.submit_time ? String(a.submit_time).replace(" ", "T") + (String(a.submit_time).includes("Z") ? "" : "Z") : a.updated_at ? String(a.updated_at).replace(" ", "T") + (String(a.updated_at).includes("Z") ? "" : "Z") : startStr;
+          const submitMs = new Date(submitStr).getTime();
+          const endMs = (/* @__PURE__ */ new Date(String(a.end_time).replace(" ", "T") + (String(a.end_time).includes("Z") ? "" : "Z"))).getTime();
+          const remainingMs = endMs - submitMs;
+          if (remainingMs > 0) {
+            $$renderer2.push("<!--[0-->");
+            const totalS = Math.floor(remainingMs / 1e3);
+            const h = Math.floor(totalS / 3600);
+            const m = Math.floor(totalS % 3600 / 60);
+            const s = totalS % 60;
+            $$renderer2.push(`<span class="text-slate-400" title="Sisa waktu saat ujian diselesaikan">${escape_html(h.toString().padStart(2, "0"))}:${escape_html(m.toString().padStart(2, "0"))}:${escape_html(s.toString().padStart(2, "0"))}</span>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+            $$renderer2.push(`<span class="text-slate-400">00:00:00</span>`);
+          }
+          $$renderer2.push(`<!--]-->`);
         }
         $$renderer2.push(`<!--]--></td><td class="font-bold">`);
         if (a.status !== "selesai") {
