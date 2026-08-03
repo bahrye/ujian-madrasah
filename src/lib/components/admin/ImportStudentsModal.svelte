@@ -152,7 +152,7 @@
         {/if}
 
         <div class="space-y-6">
-          <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-5">
+          <div class="bg-gradient-to-br from-indigo-50 to-violet-50 border border-indigo-100 rounded-2xl p-5">
             <h3 class="font-bold text-indigo-900 mb-2 flex items-center gap-2">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               Langkah Import
@@ -164,9 +164,28 @@
               <li>Simpan dan unggah kembali file Excel tersebut.</li>
             </ol>
             
-            <button class="mt-4 btn-sm bg-white text-indigo-600 border border-indigo-200 hover:bg-indigo-50 hover:border-indigo-300 w-full justify-center shadow-sm" on:click={downloadTemplate}>
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-              Unduh Template
+            <!-- Download Template Card -->
+            <button
+              on:click={downloadTemplate}
+              class="mt-5 w-full group relative overflow-hidden rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-4 p-4 text-left"
+            >
+              <!-- Icon container -->
+              <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <!-- Text -->
+              <div class="flex-1 min-w-0">
+                <p class="font-bold text-white text-sm">Unduh Template Excel</p>
+                <p class="text-indigo-200 text-xs mt-0.5">Format siap pakai dengan Referensi Kelas</p>
+              </div>
+              <!-- Arrow -->
+              <svg class="w-5 h-5 text-indigo-200 group-hover:text-white group-hover:translate-x-1 transition-all flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <!-- Shine effect -->
+              <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-700 ease-in-out pointer-events-none"></div>
             </button>
           </div>
 
