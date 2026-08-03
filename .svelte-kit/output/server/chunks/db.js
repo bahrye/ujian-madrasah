@@ -6,6 +6,15 @@ function getDB(platform) {
   }
   return platform.env.DB;
 }
+async function dbRun(db, query, ...params) {
+  try {
+    return await db.prepare(query).bind(...params).run();
+  } catch (err) {
+    console.error("DB Error:", err);
+    throw err;
+  }
+}
 export {
+  dbRun as d,
   getDB as g
 };

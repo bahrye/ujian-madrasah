@@ -228,7 +228,7 @@
       "_index.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.BhHGrydY.css"
+      "_app/immutable/assets/_layout.pvt40Fyx.css"
     ]
   },
   "src/routes/+page.server.ts": {
@@ -608,6 +608,15 @@
     "imports": [
       "_db.js",
       "_auth.js"
+    ]
+  },
+  "src/routes/api/track-media/+server.ts": {
+    "file": "entries/endpoints/api/track-media/_server.ts.js",
+    "name": "entries/endpoints/api/track-media/_server.ts",
+    "src": "src/routes/api/track-media/+server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
     ]
   },
   "src/routes/guru/+layout.server.ts": {

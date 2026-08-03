@@ -1,4 +1,4 @@
-import { h as head, e as escape_html, c as ensure_array_like, i as attr, a as stringify, b as bind_props } from "../../../../chunks/index.js";
+import { h as head, e as escape_html, c as ensure_array_like, d as attr_class, i as attr, a as stringify, b as bind_props } from "../../../../chunks/index.js";
 import "@sveltejs/kit/internal";
 import "../../../../chunks/exports.js";
 import "../../../../chunks/utils2.js";
@@ -39,7 +39,7 @@ function _page($$renderer, $$props) {
       const each_array = ensure_array_like(data.mediaItems);
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
         let item = each_array[$$index];
-        $$renderer2.push(`<div class="card overflow-hidden flex flex-col"><div class="h-40 bg-slate-100 relative flex items-center justify-center border-b border-slate-100">`);
+        $$renderer2.push(`<div${attr_class(`card overflow-hidden flex flex-col ${item.question_id ? "" : "border-amber-400 ring-2 ring-amber-400/20"}`)}><div${attr_class(`h-40 ${item.question_id ? "bg-slate-100" : "bg-amber-50"} relative flex items-center justify-center border-b ${item.question_id ? "border-slate-100" : "border-amber-200"}`)}>`);
         if (item.media_type === "image") {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<img${attr("src", item.media_url)}${attr("alt", `Media Soal ${stringify(item.question_number)}`)} class="w-full h-full object-contain p-2" loading="lazy"/>`);
@@ -47,7 +47,15 @@ function _page($$renderer, $$props) {
           $$renderer2.push("<!--[-1-->");
           $$renderer2.push(`<div class="text-center p-4"><svg class="w-12 h-12 text-indigo-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg> <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">File Audio</span></div>`);
         }
-        $$renderer2.push(`<!--]--> <div class="absolute top-2 left-2"><span class="badge badge-primary shadow-sm">${escape_html(item.media_type)}</span></div></div> <div class="p-4 flex-1 flex flex-col"><div class="flex-1 space-y-2 mb-4"><div><p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Mata Pelajaran</p> <p class="text-sm font-medium text-slate-700 line-clamp-1">${escape_html(item.subject_name || "Tidak ada")}</p></div> <div><p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Ujian &amp; Posisi</p> <p class="text-sm text-slate-600 line-clamp-2"><span class="font-medium">${escape_html(item.exam_title)}</span> <br/> <span class="text-indigo-600 font-medium">Soal Nomor ${escape_html(item.question_number)}</span></p></div></div> <div class="pt-3 border-t border-slate-100"><form method="POST" action="?/deleteMedia"><input type="hidden" name="question_id"${attr("value", item.question_id)}/> <button type="submit" class="btn btn-danger w-full py-2 flex items-center justify-center gap-2"${attr("disabled", isDeleting, true)}><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg> Hapus File Permanen</button></form></div></div></div>`);
+        $$renderer2.push(`<!--]--> <div class="absolute top-2 left-2"><span class="badge badge-primary shadow-sm">${escape_html(item.media_type)}</span></div></div> <div${attr_class(`p-4 flex-1 flex flex-col ${item.question_id ? "" : "bg-amber-50/50"}`)}><div class="flex-1 space-y-2 mb-4">`);
+        if (item.question_id) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<div><p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Mata Pelajaran</p> <p class="text-sm font-medium text-slate-700 line-clamp-1">${escape_html(item.subject_name || "Tidak ada")}</p></div> <div><p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Ujian &amp; Posisi</p> <p class="text-sm text-slate-600 line-clamp-2"><span class="font-medium">${escape_html(item.exam_title)}</span> <br/> <span class="text-indigo-600 font-medium">Soal Nomor ${escape_html(item.question_number)}</span></p></div>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<div class="h-full flex flex-col items-center justify-center text-center space-y-2"><div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg></div> <div><p class="text-sm font-bold text-amber-600">Yatim Piatu</p> <p class="text-xs text-amber-700/70 mt-1">File tidak digunakan di soal manapun</p></div></div>`);
+        }
+        $$renderer2.push(`<!--]--></div> <div${attr_class(`pt-3 border-t ${item.question_id ? "border-slate-100" : "border-amber-200"}`)}><form method="POST" action="?/deleteMedia"><input type="hidden" name="media_url"${attr("value", item.media_url)}/> <button type="submit"${attr_class(`btn ${item.question_id ? "btn-danger" : "bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-lg"} w-full py-2 flex items-center justify-center gap-2`)}${attr("disabled", isDeleting, true)}><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg> ${escape_html(item.question_id ? "Hapus File Permanen" : "Bersihkan File Ini")}</button></form></div></div></div>`);
       }
       $$renderer2.push(`<!--]--></div>`);
     }

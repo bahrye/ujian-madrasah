@@ -85,6 +85,9 @@
 	"/api/setup": [
 		"src/routes/api/setup/+server.ts"
 	],
+	"/api/track-media": [
+		"src/routes/api/track-media/+server.ts"
+	],
 	"/guru": [
 		"src/routes/guru/+page.server.ts",
 		"src/routes/guru/+layout.server.ts",

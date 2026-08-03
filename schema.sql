@@ -177,3 +177,12 @@ CREATE TABLE IF NOT EXISTS exam_proctors (
 );
 CREATE INDEX IF NOT EXISTS idx_exam_proctors_exam ON exam_proctors(exam_id);
 CREATE INDEX IF NOT EXISTS idx_exam_proctors_proctor ON exam_proctors(proctor_id);
+
+-- Tabel Pelacak Media (Media Logs / Orphan Tracker)
+CREATE TABLE IF NOT EXISTS uploaded_media (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    url TEXT NOT NULL UNIQUE,
+    media_type TEXT NOT NULL CHECK(media_type IN ('image', 'audio')),
+    uploaded_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_uploaded_media_url ON uploaded_media(url);

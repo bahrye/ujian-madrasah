@@ -8,7 +8,12 @@
 	let isDeleting = false;
 
 	function confirmDelete(item: any) {
-		const msg = `Peringatan Keras!\n\nFile ${item.media_type} ini sedang digunakan pada:\n- Mapel: ${item.subject_name || 'Tidak ada mapel'}\n- Ujian: ${item.exam_title}\n- Soal Nomor: ${item.question_number}\n\nYakin ingin menghapus? File akan dimusnahkan dari Cloudinary dan dilepas dari soal tersebut secara permanen.`;
+		let msg = '';
+		if (item.question_id) {
+			msg = `Peringatan Keras!\n\nFile ${item.media_type} ini sedang digunakan pada:\n- Mapel: ${item.subject_name || 'Tidak ada mapel'}\n- Ujian: ${item.exam_title}\n- Soal Nomor: ${item.question_number}\n\nYakin ingin menghapus? File akan dimusnahkan dari Cloudinary dan dilepas dari soal tersebut secara permanen.`;
+		} else {
+			msg = `Konfirmasi Penghapusan\n\nFile ini adalah File Yatim Piatu (tidak terhubung dengan soal manapun). Yakin ingin membersihkannya dari Cloudinary?`;
+		}
 		
 		if (confirm(msg)) {
 			isDeleting = true;
@@ -56,9 +61,9 @@
 	{:else}
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 			{#each data.mediaItems as item}
-				<div class="card overflow-hidden flex flex-col">
+				<div class="card overflow-hidden flex flex-col {item.question_id ? '' : 'border-amber-400 ring-2 ring-amber-400/20'}">
 					<!-- Preview Area -->
-					<div class="h-40 bg-slate-100 relative flex items-center justify-center border-b border-slate-100">
+					<div class="h-40 {item.question_id ? 'bg-slate-100' : 'bg-amber-50'} relative flex items-center justify-center border-b {item.question_id ? 'border-slate-100' : 'border-amber-200'}">
 						{#if item.media_type === 'image'}
 							<img src={item.media_url} alt="Media Soal {item.question_number}" class="w-full h-full object-contain p-2" loading="lazy" />
 						{:else}
@@ -73,39 +78,51 @@
 					</div>
 
 					<!-- Details Area -->
-					<div class="p-4 flex-1 flex flex-col">
+					<div class="p-4 flex-1 flex flex-col {item.question_id ? '' : 'bg-amber-50/50'}">
 						<div class="flex-1 space-y-2 mb-4">
-							<div>
-								<p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Mata Pelajaran</p>
-								<p class="text-sm font-medium text-slate-700 line-clamp-1">{item.subject_name || 'Tidak ada'}</p>
-							</div>
-							<div>
-								<p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Ujian & Posisi</p>
-								<p class="text-sm text-slate-600 line-clamp-2">
-									<span class="font-medium">{item.exam_title}</span> <br/>
-									<span class="text-indigo-600 font-medium">Soal Nomor {item.question_number}</span>
-								</p>
-							</div>
+							{#if item.question_id}
+								<div>
+									<p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Mata Pelajaran</p>
+									<p class="text-sm font-medium text-slate-700 line-clamp-1">{item.subject_name || 'Tidak ada'}</p>
+								</div>
+								<div>
+									<p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Ujian & Posisi</p>
+									<p class="text-sm text-slate-600 line-clamp-2">
+										<span class="font-medium">{item.exam_title}</span> <br/>
+										<span class="text-indigo-600 font-medium">Soal Nomor {item.question_number}</span>
+									</p>
+								</div>
+							{:else}
+								<div class="h-full flex flex-col items-center justify-center text-center space-y-2">
+									<div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center">
+										<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+									</div>
+									<div>
+										<p class="text-sm font-bold text-amber-600">Yatim Piatu</p>
+										<p class="text-xs text-amber-700/70 mt-1">File tidak digunakan di soal manapun</p>
+									</div>
+								</div>
+							{/if}
 						</div>
 
-						<div class="pt-3 border-t border-slate-100">
+						<div class="pt-3 border-t {item.question_id ? 'border-slate-100' : 'border-amber-200'}">
 							<form method="POST" action="?/deleteMedia" use:enhance={() => {
 								return async ({ update }) => {
 									isDeleting = false;
 									await update();
 								};
 							}}>
-								<input type="hidden" name="question_id" value={item.question_id} />
+								<input type="hidden" name="media_url" value={item.media_url} />
 								<button 
 									type="submit" 
-									class="btn btn-danger w-full py-2 flex items-center justify-center gap-2"
+									class="btn {item.question_id ? 'btn-danger' : 'bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-lg'} w-full py-2 flex items-center justify-center gap-2"
 									on:click={(e) => {
 										if (!confirmDelete(item)) e.preventDefault();
 									}}
 									disabled={isDeleting}
 								>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-									Hapus File Permanen
+									{item.question_id ? 'Hapus File Permanen' : 'Bersihkan File Ini'}
 								</button>
 							</form>
 						</div>

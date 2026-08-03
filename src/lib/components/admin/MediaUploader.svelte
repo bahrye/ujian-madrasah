@@ -56,8 +56,22 @@
 			}
 
 			const data = await response.json();
-			value = data.secure_url;
-			dispatch('upload', { url: data.secure_url, type: file.type.startsWith('image/') ? 'image' : 'audio' });
+			const newUrl = data.secure_url;
+			const newType = file.type.startsWith('image/') ? 'image' : 'audio';
+			
+			// Lacak ke database backend
+			try {
+				await fetch('/api/track-media', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ url: newUrl, media_type: newType })
+				});
+			} catch (e) {
+				console.error('Failed to track media in DB:', e);
+			}
+
+			value = newUrl;
+			dispatch('upload', { url: newUrl, type: newType });
 			progress = 100;
 		} catch (err: any) {
 			console.error('Upload error:', err);
