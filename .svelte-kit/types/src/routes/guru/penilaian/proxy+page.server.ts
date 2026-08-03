@@ -26,7 +26,8 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 			FROM student_attempts st 
 			JOIN users u ON st.student_id = u.id 
 			JOIN exams e ON st.exam_id = e.id 
-			WHERE e.school_id = ? AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))`;
+			WHERE e.school_id = ? AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))
+			AND (st.status IN ('selesai', 'waktu_habis') OR (e.end_time IS NOT NULL AND e.end_time <= datetime('now')))`;
 		const studentParams: any[] = [locals.user!.school_id, locals.user!.id, locals.user!.id];
 		
 		if (examFilter !== '') {
@@ -50,7 +51,8 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 			JOIN exams e ON st.exam_id = e.id
 			WHERE q.type IN ('essay', 'isian_singkat') 
 			AND e.school_id = ?
-			AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))`;
+			AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))
+			AND (st.status IN ('selesai', 'waktu_habis') OR (e.end_time IS NOT NULL AND e.end_time <= datetime('now')))`;
 
 		const params: unknown[] = [locals.user!.school_id, locals.user!.id, locals.user!.id];
 		if (examFilter !== '') {
