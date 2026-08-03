@@ -7,7 +7,11 @@ const load = async ({ platform, url, locals }) => {
   let answers = [];
   let students = [];
   let selectedExam = null;
-  const exams = await db.prepare("SELECT id, title FROM exams WHERE school_id = ? ORDER BY title").bind(locals.user.school_id).all();
+  const exams = await db.prepare(`
+		SELECT id, title FROM exams 
+		WHERE school_id = ? AND (created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = exams.id AND et.teacher_id = ?))
+		ORDER BY title
+	`).bind(locals.user.school_id, locals.user.id, locals.user.id).all();
   if (examParam !== null) {
     const isAllExams = examParam === "all";
     const examFilter = isAllExams ? "" : examParam;
@@ -15,8 +19,8 @@ const load = async ({ platform, url, locals }) => {
 			FROM student_attempts st 
 			JOIN users u ON st.student_id = u.id 
 			JOIN exams e ON st.exam_id = e.id 
-			WHERE e.school_id = ?`;
-    const studentParams = [locals.user.school_id];
+			WHERE e.school_id = ? AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))`;
+    const studentParams = [locals.user.school_id, locals.user.id, locals.user.id];
     if (examFilter !== "") {
       studentQuery += ` AND e.id = ?`;
       studentParams.push(examFilter);
@@ -33,8 +37,10 @@ const load = async ({ platform, url, locals }) => {
 			JOIN student_attempts st ON sa.attempt_id = st.id
 			JOIN users u ON st.student_id = u.id
 			JOIN exams e ON st.exam_id = e.id
-			WHERE q.type IN ('essay', 'isian_singkat') AND e.school_id = ?`;
-    const params = [locals.user.school_id];
+			WHERE q.type IN ('essay', 'isian_singkat') 
+			AND e.school_id = ?
+			AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))`;
+    const params = [locals.user.school_id, locals.user.id, locals.user.id];
     if (examFilter !== "") {
       query += " AND e.id = ?";
       params.push(examFilter);
