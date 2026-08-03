@@ -239,10 +239,11 @@
     "src": "src/routes/+layout.svelte",
     "isEntry": true,
     "imports": [
-      "_index.js"
+      "_index.js",
+      "_stores.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.C5kxMSQ9.css"
+      "_app/immutable/assets/_layout.DYOi_gmo.css"
     ]
   },
   "src/routes/+page.server.ts": {

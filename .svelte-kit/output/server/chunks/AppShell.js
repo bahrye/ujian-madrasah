@@ -1,4 +1,4 @@
-import { l as fallback, k as store_get, c as ensure_array_like, i as attr, d as attr_class, e as escape_html, a as stringify, u as unsubscribe_stores, b as bind_props, s as slot } from "./index.js";
+import { l as fallback, s as store_get, f as ensure_array_like, j as attr, i as attr_class, e as escape_html, b as stringify, u as unsubscribe_stores, d as bind_props, c as slot } from "./index.js";
 import { p as page } from "./stores.js";
 import { I as ICONS, R as ROLE_LABELS } from "./constants.js";
 import { T as Toast } from "./Toast2.js";

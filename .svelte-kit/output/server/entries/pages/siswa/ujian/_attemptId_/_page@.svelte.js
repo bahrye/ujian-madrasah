@@ -1,4 +1,4 @@
-import { l as fallback, d as attr_class, e as escape_html, b as bind_props, h as head, f as attr_style, a as stringify, i as attr } from "../../../../../chunks/index.js";
+import { l as fallback, i as attr_class, e as escape_html, d as bind_props, h as head, a as attr_style, b as stringify, j as attr } from "../../../../../chunks/index.js";
 import { o as onDestroy } from "../../../../../chunks/index-server.js";
 import "@sveltejs/kit/internal";
 import "../../../../../chunks/exports.js";

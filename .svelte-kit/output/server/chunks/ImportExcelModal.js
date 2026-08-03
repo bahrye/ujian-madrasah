@@ -1,4 +1,4 @@
-import { l as fallback, i as attr, b as bind_props } from "./index.js";
+import { l as fallback, j as attr, d as bind_props } from "./index.js";
 function ImportExcelModal($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let show = fallback($$props["show"], false);

@@ -1,4 +1,4 @@
-import { h as head, c as ensure_array_like, e as escape_html, b as bind_props } from "../../../chunks/index.js";
+import { h as head, f as ensure_array_like, e as escape_html, d as bind_props } from "../../../chunks/index.js";
 import { S as StatCard } from "../../../chunks/StatCard.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {

@@ -1,0 +1,1 @@
+import{a as p}from"./DNeMqas3.js";import{aI as i,V as a}from"./DPNwnKeP.js";function o(s,f,t,l,u,c){var e=s[i];if(a||e!==t||e===void 0){var r=p(t,l);(!a||r!==s.getAttribute("class"))&&(r==null?s.removeAttribute("class"):f?s.className=r:s.setAttribute("class",r)),s[i]=t}return c}export{o as s};
