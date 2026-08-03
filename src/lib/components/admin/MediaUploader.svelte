@@ -68,6 +68,26 @@
 			setTimeout(() => { progress = 0; }, 1000);
 		}
 	}
+
+	async function handleRemove() {
+		if (value && value.includes('res.cloudinary.com')) {
+			isUploading = true;
+			try {
+				await fetch('/api/delete-media', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ url: value })
+				});
+			} catch (e) {
+				console.error('Delete error:', e);
+			} finally {
+				isUploading = false;
+			}
+		}
+		value = '';
+		dispatch('remove');
+	}
+
 	function handleManualUrl(event: Event) {
 		const target = event.target as HTMLInputElement;
 		const url = target.value.trim();
@@ -98,13 +118,20 @@
 				placeholder="Tempel URL media (opsional)..."
 				value={value}
 				on:input={handleManualUrl}
+				disabled={isUploading}
 			/>
-			<button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-rose-500 hover:bg-rose-100 rounded-lg transition-colors" title="Hapus URL" on:click={() => { value = ''; dispatch('remove'); }}>
-				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+			<button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-rose-500 hover:bg-rose-100 rounded-lg transition-colors" title="Hapus URL" on:click={handleRemove} disabled={isUploading}>
+				<svg class="w-4 h-4 {isUploading ? 'animate-spin' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					{#if isUploading}
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+					{:else}
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					{/if}
+				</svg>
 			</button>
 		</div>
 	{:else if value}
-		<div class="relative group rounded-xl border border-indigo-100 bg-indigo-50/50 p-2 overflow-hidden">
+		<div class="relative group rounded-xl border border-indigo-100 bg-indigo-50/50 p-2 overflow-hidden {isUploading ? 'opacity-50' : ''}">
 			<div class="flex items-center gap-3">
 				<div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0 text-indigo-600">
 					{#if value.match(/\.(jpeg|jpg|gif|png|webp)$/i)}
@@ -115,10 +142,16 @@
 				</div>
 				<div class="flex-1 min-w-0">
 					<p class="text-xs text-indigo-900 font-medium truncate">{value.split('/').pop()}</p>
-					<p class="text-[10px] text-indigo-500 truncate">Berhasil diunggah</p>
+					<p class="text-[10px] text-indigo-500 truncate">{isUploading ? 'Menghapus...' : 'Berhasil diunggah'}</p>
 				</div>
-				<button type="button" class="p-2 text-rose-500 hover:bg-rose-100 rounded-lg transition-colors flex-shrink-0" title="Hapus file" on:click={() => { value = ''; dispatch('remove'); }}>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+				<button type="button" class="p-2 text-rose-500 hover:bg-rose-100 rounded-lg transition-colors flex-shrink-0" title="Hapus file" on:click={handleRemove} disabled={isUploading}>
+					<svg class="w-4 h-4 {isUploading ? 'animate-spin' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						{#if isUploading}
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+						{:else}
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+						{/if}
+					</svg>
 				</button>
 			</div>
 		</div>

@@ -7,7 +7,8 @@
     "imports": [
       "_root.js",
       "_server.js",
-      "_internal.js"
+      "_internal.js",
+      "_shared-server.js"
     ]
   },
   "_AppShell.js": {
@@ -59,6 +60,10 @@
     "file": "chunks/auth.js",
     "name": "auth"
   },
+  "_cloudinary.js": {
+    "file": "chunks/cloudinary.js",
+    "name": "cloudinary"
+  },
   "_constants.js": {
     "file": "chunks/constants.js",
     "name": "constants"
@@ -98,7 +103,8 @@
     "name": "internal",
     "imports": [
       "_root.js",
-      "_server.js"
+      "_server.js",
+      "_shared-server.js"
     ],
     "dynamicImports": [
       "src/hooks.server.ts"
@@ -114,6 +120,10 @@
   "_server.js": {
     "file": "chunks/server.js",
     "name": "server"
+  },
+  "_shared-server.js": {
+    "file": "chunks/shared-server.js",
+    "name": "shared-server"
   },
   "_state.svelte.js": {
     "file": "chunks/state.svelte.js",
@@ -189,6 +199,7 @@
       "_exports.js",
       "_utils2.js",
       "_index2.js",
+      "_shared-server.js",
       "_internal.js"
     ]
   },
@@ -298,7 +309,9 @@
     "src": "src/routes/admin/bank-soal/[examId]/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_cloudinary.js",
+      "_shared-server.js"
     ]
   },
   "src/routes/admin/bank-soal/[examId]/+page.svelte": {
@@ -529,6 +542,16 @@
       "_toast.js"
     ]
   },
+  "src/routes/api/delete-media/+server.ts": {
+    "file": "entries/endpoints/api/delete-media/_server.ts.js",
+    "name": "entries/endpoints/api/delete-media/_server.ts",
+    "src": "src/routes/api/delete-media/+server.ts",
+    "isEntry": true,
+    "imports": [
+      "_cloudinary.js",
+      "_shared-server.js"
+    ]
+  },
   "src/routes/api/exams/[id]/questions/+server.ts": {
     "file": "entries/endpoints/api/exams/_id_/questions/_server.ts.js",
     "name": "entries/endpoints/api/exams/_id_/questions/_server.ts",
@@ -629,7 +652,9 @@
     "src": "src/routes/guru/bank-soal/[examId]/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_cloudinary.js",
+      "_shared-server.js"
     ]
   },
   "src/routes/guru/bank-soal/[examId]/+page.svelte": {

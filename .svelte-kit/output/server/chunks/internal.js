@@ -1,16 +1,11 @@
 import { r as root } from "./root.js";
 import "./server.js";
+import "./shared-server.js";
 let read_implementation = null;
 function set_read_implementation(fn) {
   read_implementation = fn;
 }
 function set_manifest(_) {
-}
-let public_env = {};
-function set_private_env(environment) {
-}
-function set_public_env(environment) {
-  public_env = environment;
 }
 const error = ({ status, message }) => '<!doctype html>\n<html lang="en">\n	<head>\n		<meta charset="utf-8" />\n		<title>' + message + `</title>
 
@@ -103,7 +98,7 @@ const options = {
     app: ({ head, body, assets, nonce, env }) => '<!DOCTYPE html>\n<html lang="id">\n	<head>\n		<meta charset="utf-8" />\n		<meta name="viewport" content="width=device-width, initial-scale=1.0" />\n		<meta name="description" content="Aplikasi Ujian Online Madrasah — Platform ujian digital modern untuk madrasah" />\n		<meta name="theme-color" content="#4F46E5" />\n		<link rel="icon" href="' + assets + '/favicon.svg" type="image/svg+xml" />\n		<link rel="preconnect" href="https://fonts.googleapis.com" />\n		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />\n		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />\n		<title>Ujian Online Madrasah</title>\n		' + head + '\n	</head>\n	<body data-sveltekit-preload-data="hover">\n		<div style="display: contents">' + body + "</div>\n	</body>\n</html>\n",
     error
   },
-  version_hash: "107za3f"
+  version_hash: "1agnjzq"
 };
 async function get_hooks() {
   let handle;
@@ -125,12 +120,9 @@ async function get_hooks() {
   };
 }
 export {
-  set_public_env as a,
-  set_read_implementation as b,
-  set_manifest as c,
+  set_manifest as a,
   get_hooks as g,
   options as o,
-  public_env as p,
   read_implementation as r,
-  set_private_env as s
+  set_read_implementation as s
 };

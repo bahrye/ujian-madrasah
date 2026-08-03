@@ -1,5 +1,7 @@
 import { fail, error } from "@sveltejs/kit";
 import { g as getDB } from "../../../../../chunks/db.js";
+import { d as deleteFromCloudinary } from "../../../../../chunks/cloudinary.js";
+import { b as private_env } from "../../../../../chunks/shared-server.js";
 const load = async ({ platform, params }) => {
   const db = getDB(platform);
   const exam = await db.prepare("SELECT * FROM exams WHERE id = ?").bind(params.examId).first();
@@ -106,9 +108,9 @@ const actions = {
         }
       }
       optionsJson = JSON.stringify({ left: leftItems, right: rightItems });
-      const prev = await db.prepare("SELECT correct_answer_json FROM questions WHERE id = ?").bind(id).first();
-      if (prev && prev.correct_answer_json) {
-        correctAnswerJson = prev.correct_answer_json;
+      const prevMap = await db.prepare("SELECT correct_answer_json FROM questions WHERE id = ?").bind(id).first();
+      if (prevMap && prevMap.correct_answer_json) {
+        correctAnswerJson = prevMap.correct_answer_json;
       } else {
         const mapping = {};
         leftItems.forEach((_, i) => {
@@ -116,6 +118,10 @@ const actions = {
         });
         correctAnswerJson = JSON.stringify(mapping);
       }
+    }
+    const prevMedia = await db.prepare("SELECT media_url FROM questions WHERE id = ?").bind(id).first();
+    if (prevMedia && prevMedia.media_url && prevMedia.media_url !== mediaUrl && prevMedia.media_url.includes("res.cloudinary.com")) {
+      await deleteFromCloudinary(prevMedia.media_url, private_env);
     }
     await db.prepare(`UPDATE questions SET 
 			question_text = ?, points = ?, media_type = ?, media_url = ?, 
@@ -128,6 +134,10 @@ const actions = {
     const form = await request.formData();
     const id = form.get("id")?.toString();
     if (!id) return fail(400, { error: "ID tidak valid." });
+    const q = await db.prepare("SELECT media_url FROM questions WHERE id = ?").bind(id).first();
+    if (q && q.media_url && q.media_url.includes("res.cloudinary.com")) {
+      await deleteFromCloudinary(q.media_url, private_env);
+    }
     await db.prepare("DELETE FROM questions WHERE id = ?").bind(id).run();
     return { success: "Soal berhasil dihapus." };
   }

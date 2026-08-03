@@ -1,6 +1,8 @@
 import { fail, error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
+import { deleteFromCloudinary } from '$lib/server/cloudinary';
+import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async ({ platform, params }) => {
 	const db = getDB(platform);
@@ -121,14 +123,20 @@ export const actions: Actions = {
 			optionsJson = JSON.stringify({ left: leftItems, right: rightItems });
 			
 			// Get previous correct answer mapping if exists, else regenerate
-			const prev = await db.prepare('SELECT correct_answer_json FROM questions WHERE id = ?').bind(id).first<{correct_answer_json: string}>();
-			if (prev && prev.correct_answer_json) {
-				correctAnswerJson = prev.correct_answer_json; // keeping existing mapping simpler for now
+			const prevMap = await db.prepare('SELECT correct_answer_json FROM questions WHERE id = ?').bind(id).first<{correct_answer_json: string}>();
+			if (prevMap && prevMap.correct_answer_json) {
+				correctAnswerJson = prevMap.correct_answer_json; // keeping existing mapping simpler for now
 			} else {
 				const mapping: Record<string, string> = {};
 				leftItems.forEach((_, i) => { mapping[String(i)] = String(i); });
 				correctAnswerJson = JSON.stringify(mapping);
 			}
+		}
+
+		// Delete old media from Cloudinary if it changed
+		const prevMedia = await db.prepare('SELECT media_url FROM questions WHERE id = ?').bind(id).first<{media_url: string}>();
+		if (prevMedia && prevMedia.media_url && prevMedia.media_url !== mediaUrl && prevMedia.media_url.includes('res.cloudinary.com')) {
+			await deleteFromCloudinary(prevMedia.media_url, env);
 		}
 
 		await db.prepare(`UPDATE questions SET 
@@ -146,6 +154,13 @@ export const actions: Actions = {
 		const form = await request.formData();
 		const id = form.get('id')?.toString();
 		if (!id) return fail(400, { error: 'ID tidak valid.' });
+
+		// Delete media from Cloudinary if it exists
+		const q = await db.prepare('SELECT media_url FROM questions WHERE id = ?').bind(id).first<{media_url: string}>();
+		if (q && q.media_url && q.media_url.includes('res.cloudinary.com')) {
+			await deleteFromCloudinary(q.media_url, env);
+		}
+
 		await db.prepare('DELETE FROM questions WHERE id = ?').bind(id).run();
 		return { success: 'Soal berhasil dihapus.' };
 	}
