@@ -161,7 +161,7 @@
     const sampleRow1 = ["Pilihan Ganda", "Siapakah penemu bola lampu?", "Thomas Edison", "Albert Einstein", "Nikola Tesla", "Isaac Newton", "", "A", 1];
     const sampleRow2 = ["Benar Salah", "Bumi itu bulat", "", "", "", "", "", "Benar", 1];
     const sampleRow3 = ["Isian Singkat", "Ibukota Indonesia adalah...", "", "", "", "", "", "Jakarta", 1];
-    const sampleRow4 = ["Esai", "Jelaskan proses terjadinya hujan!", "", "", "", "", "", "", 5];
+    const sampleRow4 = ["Esai", "Jelaskan proses terjadinya hujan!", "", "", "", "", "", "Hujan terjadi karena penguapan air laut yang mengembun menjadi awan, lalu turun sebagai titik-titik air.", 5];
     
     const ws = XLSX.utils.aoa_to_sheet([headers, sampleRow1, sampleRow2, sampleRow3, sampleRow4]);
     
@@ -184,12 +184,12 @@
       ["1. TIPE SOAL", "Harus diisi dengan ejaan persis: Pilihan Ganda, Benar Salah, Isian Singkat, atau Esai"],
       ["2. TEKS SOAL", "Isi dengan pertanyaan soal Anda"],
       ["3. OPSI A - E", "Khusus untuk tipe Pilihan Ganda. Minimal isi Opsi A dan B."],
-      ["4. JAWABAN BENAR", "Untuk Pilihan Ganda: A, B, C, D, atau E. \nUntuk Benar Salah: Benar atau Salah. \nUntuk Isian Singkat: Kata kuncinya."],
+      ["4. JAWABAN BENAR", "Untuk Pilihan Ganda: A, B, C, D, atau E. \nUntuk Benar Salah: Benar atau Salah. \nUntuk Isian Singkat: Kata kuncinya.\nUntuk Esai: Penjelasan/Kunci Jawabannya."],
       ["5. BOBOT NILAI", "Angka (misal: 1, 2, 5). Default adalah 1."],
       [],
       ["CONTOH PENGISIAN BENAR:"],
       ["Pilihan Ganda", "Siapakah penemu bola lampu?", "Thomas Edison", "Albert Einstein", "Nikola Tesla", "Isaac Newton", "", "A", 1],
-      ["Esai", "Jelaskan proses terjadinya hujan!", "", "", "", "", "", "", 5],
+      ["Esai", "Jelaskan proses terjadinya hujan!", "", "", "", "", "", "Hujan terjadi karena penguapan air laut yang mengembun menjadi awan, lalu turun sebagai titik air.", 5],
       [],
       ["CONTOH PENGISIAN SALAH (AKAN DITOLAK SISTEM):"],
       ["Pilihan Ganda", "Siapakah penemu bola lampu?", "Thomas Edison", "Albert Einstein", "", "", "", "Thomas Edison", 1, "<- SALAH! Jawaban benar harus berupa huruf A, B, C, D, atau E"]
