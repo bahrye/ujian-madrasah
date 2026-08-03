@@ -22,7 +22,6 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		WHERE e.is_active = 1
 		AND e.school_id = ?
 		AND ep.student_id = ?
-		ORDER BY e.start_time
 	`).bind(locals.user!.school_id, userId).all();
 
 	// Riwayat Ujian (dan yang sedang berjalan)

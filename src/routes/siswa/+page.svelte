@@ -4,21 +4,18 @@
 
 	export let data;
 	$: activeExams = (data.activeExams as any[]).filter(exam => {
-		if (!exam.start_time) return true;
-		const start = parseDate(exam.start_time);
-		const end = exam.end_time ? parseDate(exam.end_time) : null;
-		const today = new Date();
+		const now = new Date();
+		const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+		if (exam.end_time && parseDate(exam.end_time) <= now) return false;
 		
-		const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-		const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
-		
-		if (end) {
-			return start <= todayEnd && end >= todayStart;
+		if (exam.start_time) {
+			const start = parseDate(exam.start_time);
+			const startDate = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+			if (startDate > today) return false;
 		}
 		
-		return start.getFullYear() === today.getFullYear() &&
-			start.getMonth() === today.getMonth() &&
-			start.getDate() === today.getDate();
+		return true;
 	});
 	$: myAttempts = data.myAttempts as any[];
 	$: activeAttempt = data.activeAttempt as any;
@@ -206,7 +203,14 @@
 						</div>
 						
 						<div class="pt-4 border-t border-slate-100 mt-auto">
-							{#if exam.start_time && getCountdownString(exam.start_time, currentTime)}
+							{#if myAttempts.some(a => a.exam_id === exam.id && ['selesai', 'waktu_habis'].includes(a.status))}
+								<button disabled class="btn w-full justify-center bg-emerald-50 text-emerald-600 border border-emerald-200 cursor-not-allowed shadow-none">
+									<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+									</svg>
+									Selesai
+								</button>
+							{:else if exam.start_time && getCountdownString(exam.start_time, currentTime)}
 								<button disabled class="btn w-full justify-center bg-slate-800 text-white cursor-not-allowed flex gap-2 border-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),_0_2px_4px_rgba(0,0,0,0.3)]">
 									<svg class="w-5 h-5 animate-spin-slow opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
 										<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} />
@@ -214,7 +218,7 @@
 									<span class="font-mono text-lg tracking-widest font-bold">{getCountdownString(exam.start_time, currentTime)}</span>
 								</button>
 							{:else}
-								<a href="/siswa/ujian" class="btn btn-primary w-full justify-center shadow-lg shadow-indigo-500/30">Mulai Ujian</a>
+								<a href="/siswa/ujian?exam_id={exam.id}" class="btn btn-primary w-full justify-center shadow-lg shadow-indigo-500/30">Buka Halaman Ujian</a>
 							{/if}
 						</div>
 					</div>

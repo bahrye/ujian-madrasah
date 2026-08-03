@@ -48,16 +48,15 @@ function _page($$renderer, $$props) {
       return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
     }
     activeExams = data.activeExams.filter((exam) => {
-      if (!exam.start_time) return true;
-      const start = parseDate(exam.start_time);
-      const end = exam.end_time ? parseDate(exam.end_time) : null;
-      const today = /* @__PURE__ */ new Date();
-      const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
-      if (end) {
-        return start <= todayEnd && end >= todayStart;
+      const now = /* @__PURE__ */ new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      if (exam.end_time && parseDate(exam.end_time) <= now) return false;
+      if (exam.start_time) {
+        const start = parseDate(exam.start_time);
+        const startDate = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+        if (startDate > today) return false;
       }
-      return start.getFullYear() === today.getFullYear() && start.getMonth() === today.getMonth() && start.getDate() === today.getDate();
+      return true;
     });
     myAttempts = data.myAttempts;
     activeAttempt = data.activeAttempt;
@@ -84,12 +83,15 @@ function _page($$renderer, $$props) {
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
         let exam = each_array[$$index];
         $$renderer2.push(`<div class="card-hover p-5 flex flex-col h-full"><div class="flex items-start justify-between mb-3"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg></div> <span class="badge-success">Tersedia</span></div> <h3 class="font-bold text-slate-800">${escape_html(exam.title)}</h3> <p class="text-sm text-slate-500 mt-1 mb-4">${escape_html(exam.subject || "Umum")}</p> <div class="space-y-2 mb-4 mt-auto"><div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> <span>Pukul: ${escape_html(formatTimeRange(exam.start_time, exam.end_time))}</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg> <span>Durasi: ${escape_html(exam.duration_minutes)} menit</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.users)}></path></svg> <span class="line-clamp-1"${attr("title", exam.proctors || "Belum ada pengawas")}>Pengawas: ${escape_html(exam.proctors || "-")}</span></div></div> <div class="pt-4 border-t border-slate-100 mt-auto">`);
-        if (exam.start_time && getCountdownString(exam.start_time, currentTime)) {
+        if (myAttempts.some((a) => a.exam_id === exam.id && ["selesai", "waktu_habis"].includes(a.status))) {
           $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<button disabled="" class="btn w-full justify-center bg-emerald-50 text-emerald-600 border border-emerald-200 cursor-not-allowed shadow-none"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> Selesai</button>`);
+        } else if (exam.start_time && getCountdownString(exam.start_time, currentTime)) {
+          $$renderer2.push("<!--[1-->");
           $$renderer2.push(`<button disabled="" class="btn w-full justify-center bg-slate-800 text-white cursor-not-allowed flex gap-2 border-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),_0_2px_4px_rgba(0,0,0,0.3)]"><svg class="w-5 h-5 animate-spin-slow opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> <span class="font-mono text-lg tracking-widest font-bold">${escape_html(getCountdownString(exam.start_time, currentTime))}</span></button>`);
         } else {
           $$renderer2.push("<!--[-1-->");
-          $$renderer2.push(`<a href="/siswa/ujian" class="btn btn-primary w-full justify-center shadow-lg shadow-indigo-500/30">Mulai Ujian</a>`);
+          $$renderer2.push(`<a${attr("href", `/siswa/ujian?exam_id=${stringify(exam.id)}`)} class="btn btn-primary w-full justify-center shadow-lg shadow-indigo-500/30">Buka Halaman Ujian</a>`);
         }
         $$renderer2.push(`<!--]--></div></div>`);
       }

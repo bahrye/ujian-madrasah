@@ -18,7 +18,6 @@ const load = async ({ platform, locals }) => {
 		WHERE e.is_active = 1
 		AND e.school_id = ?
 		AND ep.student_id = ?
-		ORDER BY e.start_time
 	`).bind(locals.user.school_id, userId).all();
   const myAttempts = await db.prepare(`
 		SELECT sa.*, e.title as exam_title, s.name as subject, e.duration_minutes, e.show_score_type, e.is_score_released, e.end_time as exam_end_time
