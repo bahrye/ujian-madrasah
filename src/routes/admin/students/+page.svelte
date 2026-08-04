@@ -208,7 +208,7 @@
 										{user.name.charAt(0).toUpperCase()}
 									</div>
 									<div>
-										<div class="font-medium text-slate-900">{user.name}</div>
+										<div class="font-medium {user.class_id ? 'text-slate-900' : 'text-red-600 drop-shadow-sm'}">{user.name}</div>
 										<div class="text-sm text-slate-500">{user.username}</div>
 									</div>
 								</div>

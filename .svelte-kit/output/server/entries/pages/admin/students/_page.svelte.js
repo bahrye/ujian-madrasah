@@ -176,7 +176,7 @@ function _page($$renderer, $$props) {
         $$renderer3.push("<!--[-->");
         for (let $$index_3 = 0, $$length = each_array_3.length; $$index_3 < $$length; $$index_3++) {
           let user = each_array_3[$$index_3];
-          $$renderer3.push(`<tr class="hover:bg-slate-50/80 transition-colors"><td class="p-4"><div class="flex items-center space-x-3"><div class="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold">${escape_html(user.name.charAt(0).toUpperCase())}</div> <div><div class="font-medium text-slate-900">${escape_html(user.name)}</div> <div class="text-sm text-slate-500">${escape_html(user.username)}</div></div></div></td><td class="p-4">`);
+          $$renderer3.push(`<tr class="hover:bg-slate-50/80 transition-colors"><td class="p-4"><div class="flex items-center space-x-3"><div class="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold">${escape_html(user.name.charAt(0).toUpperCase())}</div> <div><div${attr_class(`font-medium ${user.class_id ? "text-slate-900" : "text-red-600 drop-shadow-sm"}`)}>${escape_html(user.name)}</div> <div class="text-sm text-slate-500">${escape_html(user.username)}</div></div></div></td><td class="p-4">`);
           if (user.class_name) {
             $$renderer3.push("<!--[0-->");
             $$renderer3.push(`<span${attr_class(`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${stringify(getClassColor(user.class_id))}`)}>${escape_html(user.class_name)}</span>`);
