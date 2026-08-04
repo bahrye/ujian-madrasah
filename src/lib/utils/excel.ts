@@ -14,6 +14,11 @@ export async function exportExamResults(examId: string, examTitle: string) {
 		// Initialize Workbook
 		const wb = XLSX.utils.book_new();
 
+		const stripHtml = (html: string) => {
+			if (!html) return '';
+			return html.replace(/<img[^>]*src="([^"]+)"[^>]*>/gi, '[Gambar]').replace(/<[^>]*>?/gm, '').trim();
+		};
+
 		// ==========================================
 		// SHEET 1: REKAP NILAI
 		// ==========================================
@@ -84,7 +89,32 @@ export async function exportExamResults(examId: string, examTitle: string) {
 		const header2 = ['No', 'Soal', 'Tipe', 'Kunci Jawaban', 'Poin'];
 		const rows2 = questions.map((q: any) => {
 			let kunci = '';
-			if (q.correct_answer_json) {
+			let soalText = stripHtml(q.question_text);
+
+			if (q.type === 'menjodohkan') {
+				let opts: any = { left: [], right: [] };
+				try { opts = JSON.parse(q.options_json); } catch(e) {}
+				
+				if (opts.left && opts.left.length > 0) {
+					const leftTexts = opts.left.map((l: string) => stripHtml(l));
+					soalText += ' { ' + leftTexts.join(' | ') + ' }';
+				}
+
+				if (q.correct_answer_json && opts.right) {
+					try {
+						const mapping = JSON.parse(q.correct_answer_json);
+						const kunciParts = [];
+						for (let i = 0; i < (opts.left ? opts.left.length : 0); i++) {
+							const rightIdx = mapping[String(i)];
+							const rightVal = opts.right[parseInt(rightIdx)];
+							kunciParts.push(rightVal ? stripHtml(rightVal) : '-');
+						}
+						kunci = kunciParts.join(' | ');
+					} catch(e) {
+						kunci = q.correct_answer_json;
+					}
+				}
+			} else if (q.correct_answer_json) {
 				try {
 					const correct = JSON.parse(q.correct_answer_json);
 					if (q.type === 'pilihan_ganda') {
@@ -101,7 +131,7 @@ export async function exportExamResults(examId: string, examTitle: string) {
 
 			return [
 				q.question_number,
-				q.question_text.replace(/<[^>]*>?/gm, ''), // Strip HTML
+				soalText,
 				q.type,
 				kunci,
 				q.points
@@ -122,7 +152,32 @@ export async function exportExamResults(examId: string, examTitle: string) {
 			questions.forEach((q: any, index: number) => {
 				const ans = p.answers[q.id];
 				let ansText = '-';
-				if (ans && ans.answer_given) {
+				let soalText = stripHtml(q.question_text).substring(0, 50) + '...';
+
+				if (q.type === 'menjodohkan') {
+					let opts: any = { left: [], right: [] };
+					try { opts = JSON.parse(q.options_json); } catch(e) {}
+					
+					if (opts.left && opts.left.length > 0) {
+						const leftTexts = opts.left.map((l: string) => stripHtml(l));
+						soalText = stripHtml(q.question_text) + ' { ' + leftTexts.join(' | ') + ' }';
+					}
+
+					if (ans && ans.answer_given && opts.right) {
+						try {
+							const mapping = JSON.parse(ans.answer_given);
+							const ansParts = [];
+							for (let i = 0; i < (opts.left ? opts.left.length : 0); i++) {
+								const rightIdx = mapping[String(i)];
+								const rightVal = opts.right[parseInt(rightIdx)];
+								ansParts.push(rightVal ? stripHtml(rightVal) : '-');
+							}
+							ansText = ansParts.join(' | ');
+						} catch(e) {
+							ansText = ans.answer_given;
+						}
+					}
+				} else if (ans && ans.answer_given) {
 					try {
 						const parsed = JSON.parse(ans.answer_given);
 						if (parsed.answer !== undefined) {
@@ -148,7 +203,7 @@ export async function exportExamResults(examId: string, examTitle: string) {
 				rows3.push([
 					p.student_name,
 					q.question_number,
-					q.question_text.replace(/<[^>]*>?/gm, '').substring(0, 50) + '...', // snippet
+					soalText,
 					ansText,
 					ans ? ans.score_given : 0,
 					convertedScore > 0 ? parseFloat(convertedScore.toFixed(2)) : 0,
