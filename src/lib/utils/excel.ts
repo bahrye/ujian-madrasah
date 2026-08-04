@@ -28,8 +28,10 @@ export async function exportExamResults(examId: string, examTitle: string) {
 		];
 		
 		// Add question columns for points
+		let totalExamPoints = 0;
 		questions.forEach((q: any) => {
 			header1.push(`No.${q.question_number}`);
+			totalExamPoints += q.points || 0;
 		});
 
 		const rows1 = participants.map((p: any) => {
@@ -62,7 +64,11 @@ export async function exportExamResults(examId: string, examTitle: string) {
 
 			questions.forEach((q: any) => {
 				const ans = p.answers[q.id];
-				row.push(ans ? ans.score_given : 0);
+				let convertedScore = 0;
+				if (ans && totalExamPoints > 0) {
+					convertedScore = (ans.score_given / totalExamPoints) * 100;
+				}
+				row.push(convertedScore > 0 ? parseFloat(convertedScore.toFixed(2)) : 0);
 			});
 
 			return row;
