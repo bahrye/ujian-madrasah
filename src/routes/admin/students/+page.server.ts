@@ -2,6 +2,8 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { hashPassword } from '$lib/server/auth';
+import { deleteFromCloudinary } from '$lib/server/cloudinary';
+import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async ({ locals, url, platform }) => {
 	if (!locals.user) throw redirect(302, '/login');
@@ -269,6 +271,26 @@ export const actions: Actions = {
 		if (!id) return fail(400, { error: 'ID tidak valid' });
 
 		try {
+			// Cek apakah siswa sudah punya foto lama
+			const oldUser = await db.prepare('SELECT photo FROM users WHERE id = ? AND school_id = ? AND role = "siswa"')
+				.bind(id, locals.user.school_id)
+				.first();
+
+			const oldPhoto = (oldUser as any)?.photo;
+
+			// Hapus foto lama dari Cloudinary jika ada dan berbeda dengan foto baru
+			if (oldPhoto && oldPhoto.includes('res.cloudinary.com') && oldPhoto !== photo) {
+				try {
+					await deleteFromCloudinary(oldPhoto, env);
+					// Hapus dari uploaded_media agar sinkron
+					await db.prepare('DELETE FROM uploaded_media WHERE url = ? AND school_id = ?')
+						.bind(oldPhoto, locals.user.school_id)
+						.run();
+				} catch (err) {
+					console.error('Failed to delete old photo from Cloudinary:', err);
+				}
+			}
+
 			await db.prepare('UPDATE users SET photo = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ? AND role = "siswa"')
 				.bind(photo, id, locals.user.school_id)
 				.run();

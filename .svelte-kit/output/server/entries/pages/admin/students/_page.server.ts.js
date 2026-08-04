@@ -1,6 +1,8 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
 import { h as hashPassword } from "../../../../chunks/auth.js";
+import { d as deleteFromCloudinary } from "../../../../chunks/cloudinary.js";
+import { b as private_env } from "../../../../chunks/shared-server.js";
 const load = async ({ locals, url, platform }) => {
   if (!locals.user) throw redirect(302, "/login");
   const db = getDB(platform);
@@ -219,6 +221,16 @@ const actions = {
     const photo = data.get("photo")?.toString() || null;
     if (!id) return fail(400, { error: "ID tidak valid" });
     try {
+      const oldUser = await db.prepare('SELECT photo FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(id, locals.user.school_id).first();
+      const oldPhoto = oldUser?.photo;
+      if (oldPhoto && oldPhoto.includes("res.cloudinary.com") && oldPhoto !== photo) {
+        try {
+          await deleteFromCloudinary(oldPhoto, private_env);
+          await db.prepare("DELETE FROM uploaded_media WHERE url = ? AND school_id = ?").bind(oldPhoto, locals.user.school_id).run();
+        } catch (err) {
+          console.error("Failed to delete old photo from Cloudinary:", err);
+        }
+      }
       await db.prepare('UPDATE users SET photo = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ? AND role = "siswa"').bind(photo, id, locals.user.school_id).run();
       if (photo && photo.includes("res.cloudinary.com")) {
         try {
