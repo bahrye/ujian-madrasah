@@ -1,7 +1,7 @@
 <script lang="ts">
   export let show = false;
   export let classes: { id: number | string; name: string }[] = [];
-  export let students: { id: number | string; name: string; username: string; class_id: number | string | null; class_name: string | null; place_of_birth?: string | null; date_of_birth?: string | null }[] = [];
+  export let students: { id: number | string; name: string; username: string; class_id: number | string | null; class_name: string | null; place_of_birth?: string | null; date_of_birth?: string | null; photo?: string | null }[] = [];
   export let schoolName: string = '';
   export let schoolLogo: string = '';
 
@@ -86,7 +86,10 @@
             </div>
           </div>
           <div class="card-body">
-            <div class="avatar">${escapeHtml(s.name.charAt(0).toUpperCase())}</div>
+            ${s.photo 
+              ? `<img src="${escapeHtml(s.photo)}" class="avatar" style="object-fit:cover;padding:0;background:none;border-radius:50%;" alt="" />`
+              : `<div class="avatar">${escapeHtml(s.name.charAt(0).toUpperCase())}</div>`
+            }
             <div class="name">${escapeHtml(s.name)}</div>
             ${ttl ? `<div class="ttl">📍 ${escapeHtml(ttl)}</div>` : ''}
             <div class="divider"></div>
@@ -326,8 +329,12 @@
                 </div>
                 <div class="bg-white px-4 py-3">
                   <div class="flex items-center gap-3 mb-3">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0" style="background: linear-gradient(135deg,#6366f1,#8b5cf6);">
-                      {filteredStudents[0].name.charAt(0).toUpperCase()}
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0 overflow-hidden" style="background: linear-gradient(135deg,#6366f1,#8b5cf6);">
+                      {#if filteredStudents[0].photo}
+                        <img src={filteredStudents[0].photo} class="w-full h-full object-cover" alt="" />
+                      {:else}
+                        {filteredStudents[0].name.charAt(0).toUpperCase()}
+                      {/if}
                     </div>
                     <div class="min-w-0">
                       <p class="text-sm font-bold text-slate-800 leading-tight truncate">{filteredStudents[0].name}</p>

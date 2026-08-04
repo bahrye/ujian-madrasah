@@ -10,16 +10,22 @@ export const load = async ({ locals, url, platform }: Parameters<PageServerLoad>
 	const search = url.searchParams.get('search') || '';
 	const classFilter = url.searchParams.get('class') || '';
 
-	// Auto-migration D1: pastikan kolom place_of_birth dan date_of_birth ada di tabel users
+	// Auto-migration D1: pastikan kolom place_of_birth, date_of_birth, photo ada di tabel users
 	try {
 		await db.prepare('ALTER TABLE users ADD COLUMN place_of_birth TEXT').run();
 	} catch {}
 	try {
 		await db.prepare('ALTER TABLE users ADD COLUMN date_of_birth TEXT').run();
 	} catch {}
+	try {
+		await db.prepare('ALTER TABLE users ADD COLUMN photo TEXT').run();
+	} catch {}
+	try {
+		await db.prepare('ALTER TABLE uploaded_media ADD COLUMN school_id INTEGER').run();
+	} catch {}
 
 	let query = `
-		SELECT u.id, u.username, u.name, u.is_active, u.created_at, u.class_id, c.name as class_name, u.place_of_birth, u.date_of_birth 
+		SELECT u.id, u.username, u.name, u.is_active, u.created_at, u.class_id, c.name as class_name, u.place_of_birth, u.date_of_birth, u.photo 
 		FROM users u 
 		LEFT JOIN classes c ON u.class_id = c.id 
 		WHERE u.school_id = ? AND u.role = 'siswa'
@@ -53,7 +59,7 @@ export const load = async ({ locals, url, platform }: Parameters<PageServerLoad>
 	} catch (err: any) {
 		console.error('Error loading students, attempting fallback query:', err);
 		const fallbackQuery = `
-			SELECT u.id, u.username, u.name, u.is_active, u.created_at, u.class_id, c.name as class_name, NULL as place_of_birth, NULL as date_of_birth 
+			SELECT u.id, u.username, u.name, u.is_active, u.created_at, u.class_id, c.name as class_name, NULL as place_of_birth, NULL as date_of_birth, NULL as photo 
 			FROM users u 
 			LEFT JOIN classes c ON u.class_id = c.id 
 			WHERE u.school_id = ? AND u.role = 'siswa'
@@ -252,6 +258,41 @@ export const actions = {
 			return { success: true };
 		} catch (e) {
 			return fail(500, { error: 'Gagal merubah status' });
+		}
+	},
+	updatePhoto: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
+		const db = getDB(platform);
+		const data = await request.formData();
+		const id = data.get('id')?.toString();
+		const photo = data.get('photo')?.toString() || null;
+
+		if (!id) return fail(400, { error: 'ID tidak valid' });
+
+		try {
+			await db.prepare('UPDATE users SET photo = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ? AND role = "siswa"')
+				.bind(photo, id, locals.user.school_id)
+				.run();
+			
+			// Jika ada foto baru dari cloudinary, masukkan ke uploaded_media agar terdata
+			if (photo && photo.includes('res.cloudinary.com')) {
+				try {
+					await db.prepare(`
+						INSERT INTO uploaded_media (url, media_type, uploaded_by, school_id, is_public) 
+						VALUES (?, 'image', ?, ?, 0)
+					`).bind(photo, locals.user.id, locals.user.school_id).run();
+				} catch (err: any) {
+					// Abaikan jika duplikat (UNIQUE constraint)
+					if (!err.message?.includes('UNIQUE')) {
+						console.error('Failed to log media:', err);
+					}
+				}
+			}
+			
+			return { success: true };
+		} catch (e) {
+			console.error('Update photo error:', e);
+			return fail(500, { error: 'Gagal merubah foto' });
 		}
 	}
 };

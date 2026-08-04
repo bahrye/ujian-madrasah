@@ -4,6 +4,7 @@ import "../../../../chunks/exports.js";
 import "../../../../chunks/utils2.js";
 import "@sveltejs/kit/internal/server";
 import "../../../../chunks/root.js";
+import { p as public_env } from "../../../../chunks/shared-server.js";
 import "../../../../chunks/state.svelte.js";
 import { C as ConfirmForm } from "../../../../chunks/ConfirmForm.js";
 import { t as toasts } from "../../../../chunks/toast.js";
@@ -84,21 +85,23 @@ function _page($$renderer, $$props) {
     let editingUser = null;
     let filterClass = "";
     let selectedIds = [];
-    const classColors = [
-      "bg-emerald-100 text-emerald-800 border border-emerald-200",
-      "bg-sky-100 text-sky-800 border border-sky-200",
-      "bg-amber-100 text-amber-800 border border-amber-200",
-      "bg-rose-100 text-rose-800 border border-rose-200",
-      "bg-violet-100 text-violet-800 border border-violet-200",
-      "bg-fuchsia-100 text-fuchsia-800 border border-fuchsia-200",
-      "bg-indigo-100 text-indigo-800 border border-indigo-200",
-      "bg-teal-100 text-teal-800 border border-teal-200"
-    ];
+    let isUploadingPhotoFor = null;
+    public_env.PUBLIC_CLOUDINARY_CLOUD_NAME || "dfhtjgwcz";
+    public_env.PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ujian-madrasah";
     function getClassColor(classId) {
-      if (classId === null || classId === void 0 || classId === "") return "bg-slate-100 text-slate-700";
-      const strId = String(classId);
-      const hash = strId.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      return classColors[hash % classColors.length];
+      if (!classId) return "bg-slate-100 text-slate-600";
+      const colors = [
+        "bg-blue-100 text-blue-700",
+        "bg-emerald-100 text-emerald-700",
+        "bg-amber-100 text-amber-700",
+        "bg-purple-100 text-purple-700",
+        "bg-pink-100 text-pink-700",
+        "bg-indigo-100 text-indigo-700",
+        "bg-teal-100 text-teal-700",
+        "bg-rose-100 text-rose-700"
+      ];
+      const index = Number(classId) % colors.length;
+      return colors[index];
     }
     function formatBirth(place, dateStr) {
       if (!place && !dateStr) return "-";
@@ -205,7 +208,22 @@ function _page($$renderer, $$props) {
         $$renderer3.push("<!--[-->");
         for (let $$index_3 = 0, $$length = each_array_3.length; $$index_3 < $$length; $$index_3++) {
           let user = each_array_3[$$index_3];
-          $$renderer3.push(`<tr${attr_class(`hover:bg-slate-50/80 transition-colors ${selectedIds.includes(user.id) ? "bg-indigo-50/40" : ""}`)}><td class="p-4 text-center whitespace-nowrap"><input type="checkbox"${attr("checked", selectedIds.includes(user.id), true)} class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer"/></td><td class="p-4 whitespace-nowrap"><div class="flex items-center space-x-3"><div class="h-10 w-10 shrink-0 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold">${escape_html(user.name.charAt(0).toUpperCase())}</div> <div class="whitespace-nowrap"><div${attr_class(`font-medium whitespace-nowrap ${user.class_id ? "text-slate-900" : "text-red-600 drop-shadow-sm"}`)}>${escape_html(user.name)}</div> <div class="text-sm text-slate-500 whitespace-nowrap">@${escape_html(user.username)}</div></div></div></td><td class="p-4 whitespace-nowrap">`);
+          $$renderer3.push(`<tr${attr_class(`hover:bg-slate-50/80 transition-colors ${selectedIds.includes(user.id) ? "bg-indigo-50/40" : ""}`)}><td class="p-4 text-center whitespace-nowrap"><input type="checkbox"${attr("checked", selectedIds.includes(user.id), true)} class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer"/></td><td class="p-4 whitespace-nowrap"><div class="flex items-center space-x-3"><button type="button" class="relative h-10 w-10 shrink-0 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold overflow-hidden group cursor-pointer border border-slate-200 hover:ring-2 hover:ring-indigo-500 hover:ring-offset-1 transition-all" title="Klik untuk mengubah foto">`);
+          if (isUploadingPhotoFor === user.id) {
+            $$renderer3.push("<!--[0-->");
+            $$renderer3.push(`<div class="absolute inset-0 bg-white/80 flex items-center justify-center backdrop-blur-sm z-10"><div class="w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div></div>`);
+          } else {
+            $$renderer3.push("<!--[-1-->");
+          }
+          $$renderer3.push(`<!--]--> `);
+          if (user.photo) {
+            $$renderer3.push("<!--[0-->");
+            $$renderer3.push(`<img${attr("src", user.photo)}${attr("alt", user.name)} class="w-full h-full object-cover"/>`);
+          } else {
+            $$renderer3.push("<!--[-1-->");
+            $$renderer3.push(`${escape_html(user.name.charAt(0).toUpperCase())}`);
+          }
+          $$renderer3.push(`<!--]--> <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div></button> <div class="whitespace-nowrap"><div${attr_class(`font-medium whitespace-nowrap ${user.class_id ? "text-slate-900" : "text-red-600 drop-shadow-sm"}`)}>${escape_html(user.name)}</div> <div class="text-sm text-slate-500 whitespace-nowrap">@${escape_html(user.username)}</div></div></div></td><td class="p-4 whitespace-nowrap">`);
           if (user.class_name) {
             $$renderer3.push("<!--[0-->");
             $$renderer3.push(`<span${attr_class(`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap ${stringify(getClassColor(user.class_id))}`)}>${escape_html(user.class_name)}</span>`);

@@ -7,6 +7,7 @@
 	import type { PageData, ActionData } from './$types';
 	import { toasts } from '$lib/stores/toast';
 	import { ICONS } from '$lib/utils/constants';
+	import { env } from '$env/dynamic/public';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -18,6 +19,13 @@
 	let editingUser: any = null;
 	let filterClass = '';
 	let selectedIds: number[] = [];
+
+	let isUploadingPhotoFor: string | number | null = null;
+	let photoFileInput: HTMLInputElement;
+	let selectedStudentIdForPhoto: string | number | null = null;
+
+	const cloudName = env.PUBLIC_CLOUDINARY_CLOUD_NAME || 'dfhtjgwcz';
+	const uploadPreset = env.PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'ujian-madrasah';
 
 	$: isAllSelected = data.users.length > 0 && selectedIds.length === data.users.length;
 
@@ -59,21 +67,76 @@
 		window.location.href = url.toString();
 	}
 
-	const classColors = [
-		'bg-emerald-100 text-emerald-800 border border-emerald-200',
-		'bg-sky-100 text-sky-800 border border-sky-200',
-		'bg-amber-100 text-amber-800 border border-amber-200',
-		'bg-rose-100 text-rose-800 border border-rose-200',
-		'bg-violet-100 text-violet-800 border border-violet-200',
-		'bg-fuchsia-100 text-fuchsia-800 border border-fuchsia-200',
-		'bg-indigo-100 text-indigo-800 border border-indigo-200',
-		'bg-teal-100 text-teal-800 border border-teal-200'
-	];
-	function getClassColor(classId: any) {
-		if (classId === null || classId === undefined || classId === '') return 'bg-slate-100 text-slate-700';
-		const strId = String(classId);
-		const hash = strId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-		return classColors[hash % classColors.length];
+	function getClassColor(classId: number | string | null) {
+		if (!classId) return 'bg-slate-100 text-slate-600';
+		const colors = [
+			'bg-blue-100 text-blue-700',
+			'bg-emerald-100 text-emerald-700',
+			'bg-amber-100 text-amber-700',
+			'bg-purple-100 text-purple-700',
+			'bg-pink-100 text-pink-700',
+			'bg-indigo-100 text-indigo-700',
+			'bg-teal-100 text-teal-700',
+			'bg-rose-100 text-rose-700'
+		];
+		const index = Number(classId) % colors.length;
+		return colors[index];
+	}
+
+	function triggerPhotoUpload(studentId: number | string) {
+		selectedStudentIdForPhoto = studentId;
+		if (photoFileInput) photoFileInput.click();
+	}
+
+	async function handlePhotoUpload(event: Event) {
+		const target = event.target as HTMLInputElement;
+		const file = target.files?.[0];
+		if (!file || !selectedStudentIdForPhoto) return;
+
+		if (file.size > 3 * 1024 * 1024) {
+			toasts.error('Ukuran foto terlalu besar. Maksimal 3MB.');
+			return;
+		}
+
+		isUploadingPhotoFor = selectedStudentIdForPhoto;
+
+		const fd = new FormData();
+		fd.append('file', file);
+		fd.append('upload_preset', uploadPreset);
+
+		try {
+			const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+				method: 'POST',
+				body: fd
+			});
+
+			if (!res.ok) throw new Error('Upload ke Cloudinary gagal');
+			const result = await res.json();
+			const secureUrl = result.secure_url;
+
+			// Update to database
+			const dbFd = new FormData();
+			dbFd.append('id', String(selectedStudentIdForPhoto));
+			dbFd.append('photo', secureUrl);
+
+			const updateRes = await fetch('?/updatePhoto', {
+				method: 'POST',
+				body: dbFd
+			});
+			
+			if (updateRes.ok) {
+				toasts.success('Foto profil siswa berhasil diperbarui!');
+				await invalidateAll();
+			} else {
+				toasts.error('Gagal menyimpan foto ke database.');
+			}
+		} catch (err: any) {
+			toasts.error(err.message || 'Terjadi kesalahan saat mengunggah foto.');
+		} finally {
+			isUploadingPhotoFor = null;
+			selectedStudentIdForPhoto = null;
+			if (photoFileInput) photoFileInput.value = '';
+		}
 	}
 
 	function formatBirth(place: string | null | undefined, dateStr: string | null | undefined) {
@@ -295,9 +358,28 @@
 							</td>
 							<td class="p-4 whitespace-nowrap">
 								<div class="flex items-center space-x-3">
-									<div class="h-10 w-10 shrink-0 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold">
-										{user.name.charAt(0).toUpperCase()}
-									</div>
+									<button 
+										type="button" 
+										class="relative h-10 w-10 shrink-0 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold overflow-hidden group cursor-pointer border border-slate-200 hover:ring-2 hover:ring-indigo-500 hover:ring-offset-1 transition-all"
+										on:click={() => triggerPhotoUpload(user.id)}
+										title="Klik untuk mengubah foto"
+									>
+										{#if isUploadingPhotoFor === user.id}
+											<div class="absolute inset-0 bg-white/80 flex items-center justify-center backdrop-blur-sm z-10">
+												<div class="w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+											</div>
+										{/if}
+										
+										{#if user.photo}
+											<img src={user.photo} alt={user.name} class="w-full h-full object-cover" />
+										{:else}
+											{user.name.charAt(0).toUpperCase()}
+										{/if}
+										
+										<div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+											<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+										</div>
+									</button>
 									<div class="whitespace-nowrap">
 										<div class="font-medium whitespace-nowrap {user.class_id ? 'text-slate-900' : 'text-red-600 drop-shadow-sm'}">{user.name}</div>
 										<div class="text-sm text-slate-500 whitespace-nowrap">@{user.username}</div>
