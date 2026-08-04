@@ -1,4 +1,4 @@
-import { h as head, f as ensure_array_like, e as escape_html, j as attr, i as attr_class, k as clsx, a as attr_style, d as bind_props, b as stringify } from "../../../../chunks/index.js";
+import { h as head, f as ensure_array_like, e as escape_html, i as attr_class, j as attr, k as clsx, a as attr_style, d as bind_props, b as stringify } from "../../../../chunks/index.js";
 import { o as onDestroy } from "../../../../chunks/index-server.js";
 import "@sveltejs/kit/internal";
 import "../../../../chunks/exports.js";
@@ -10,7 +10,7 @@ import { A as ATTEMPT_STATUS_COLORS, a as ATTEMPT_STATUS_LABELS, I as ICONS } fr
 import { t as toasts } from "../../../../chunks/toast.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
-    let attempts;
+    let attempts, filteredAttempts;
     let data = $$props["data"];
     let form = $$props["form"];
     let currentTime = Date.now();
@@ -19,14 +19,15 @@ function _page($$renderer, $$props) {
     if (form?.success) toasts.success(form.success);
     if (form?.error) toasts.error(form.error);
     attempts = data.attempts;
+    filteredAttempts = attempts;
     head("1lbp9vi", $$renderer2, ($$renderer3) => {
       $$renderer3.title(($$renderer4) => {
         $$renderer4.push(`<title>Monitoring Ujian — Ujian Online Madrasah</title>`);
       });
     });
-    $$renderer2.push(`<div class="space-y-6 animate-in"><div><h1 class="text-2xl font-bold text-slate-800">Monitoring Ujian</h1> <p class="text-sm text-slate-500 mt-1">Pantau siswa yang sedang mengerjakan ujian</p></div> <div class="card p-4"><form method="GET" class="flex gap-3"><select name="exam_id" class="select flex-1">`);
+    $$renderer2.push(`<div class="space-y-6 animate-in"><div><h1 class="text-2xl font-bold text-slate-800">Monitoring Ujian</h1> <p class="text-sm text-slate-500 mt-1">Pantau seluruh siswa yang terdaftar dalam ujian</p></div> <div class="card p-4"><form method="GET" class="flex flex-wrap gap-3 mb-4"><select name="exam_id" class="select flex-1 min-w-[200px]" required="">`);
     $$renderer2.option({ value: "" }, ($$renderer3) => {
-      $$renderer3.push(`Semua (Sedang Mengerjakan)`);
+      $$renderer3.push(`-- Pilih Ujian --`);
     });
     $$renderer2.push(`<!--[-->`);
     const each_array = ensure_array_like(data.exams);
@@ -42,40 +43,39 @@ function _page($$renderer, $$props) {
         }
       );
     }
-    $$renderer2.push(`<!--]--></select> <button type="submit" class="btn-secondary btn-sm">Filter</button></form></div> <div class="card overflow-hidden">`);
-    if (attempts.length === 0) {
+    $$renderer2.push(`<!--]--></select> <button type="submit" class="btn-secondary btn-sm">Tampilkan</button></form> `);
+    if (data.examFilter) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="p-12 text-center text-slate-400"><svg class="w-16 h-16 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.monitor)}></path></svg> <p class="text-lg font-medium">Tidak ada siswa yang sedang mengerjakan</p></div>`);
+      $$renderer2.push(`<div class="flex gap-2 overflow-x-auto pb-1"><button${attr_class(`btn-sm ${"btn-primary"}`)}>Semua</button> <button${attr_class(`btn-sm ${"btn-ghost border border-slate-200 text-slate-600"}`)}>Sedang Mengerjakan</button> <button${attr_class(`btn-sm ${"btn-ghost border border-slate-200 text-slate-600"}`)}>Selesai</button> <button${attr_class(`btn-sm ${"btn-ghost border border-slate-200 text-slate-600"}`)}>Belum Mengerjakan</button></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Siswa</th><th>Username</th>`);
-      if (!data.examFilter) {
-        $$renderer2.push("<!--[0-->");
-        $$renderer2.push(`<th>Ujian</th>`);
-      } else {
-        $$renderer2.push("<!--[-1-->");
-      }
-      $$renderer2.push(`<!--]--><th>Status</th><th class="w-24 text-center">Pelanggaran</th><th class="w-32">Progress</th><th>Sisa Waktu</th><th class="text-right">Aksi</th></tr></thead><tbody><!--[-->`);
-      const each_array_1 = ensure_array_like(attempts);
+    }
+    $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden">`);
+    if (!data.examFilter) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<div class="p-12 text-center text-slate-400"><svg class="w-16 h-16 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg> <p class="text-lg font-medium">Silakan pilih ujian terlebih dahulu</p></div>`);
+    } else if (filteredAttempts.length === 0) {
+      $$renderer2.push("<!--[1-->");
+      $$renderer2.push(`<div class="p-12 text-center text-slate-400"><svg class="w-16 h-16 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.monitor)}></path></svg> <p class="text-lg font-medium">Tidak ada siswa yang sesuai filter</p></div>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+      $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Siswa</th><th>Username</th><th>Status</th><th class="w-24 text-center">Pelanggaran</th><th class="w-32">Progress</th><th>Sisa Waktu</th><th class="text-right">Aksi</th></tr></thead><tbody><!--[-->`);
+      const each_array_1 = ensure_array_like(filteredAttempts);
       for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
         let a = each_array_1[$$index_1];
-        $$renderer2.push(`<tr><td class="font-semibold text-slate-800">${escape_html(a.student_name)}</td><td class="text-slate-500">@${escape_html(a.username)}</td>`);
-        if (!data.examFilter) {
-          $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<td class="text-slate-600">${escape_html(a.exam_title)}</td>`);
-        } else {
-          $$renderer2.push("<!--[-1-->");
-        }
-        $$renderer2.push(`<!--]--><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[a.status] || "badge-info"))}>`);
+        $$renderer2.push(`<tr><td class="font-semibold text-slate-800">${escape_html(a.student_name)}</td><td class="text-slate-500">@${escape_html(a.username)}</td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[a.status] || "badge-secondary"))}>`);
         if (a.status === "mengerjakan") {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<span class="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse mr-1"></span>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
-        $$renderer2.push(`<!--]--> ${escape_html(ATTEMPT_STATUS_LABELS[a.status] || a.status)}</span></td><td class="text-center">`);
-        if (a.warnings > 0) {
+        $$renderer2.push(`<!--]--> ${escape_html(ATTEMPT_STATUS_LABELS[a.status] || "Belum Mengerjakan")}</span></td><td class="text-center">`);
+        if (a.status === "belum_mengerjakan") {
           $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<span class="text-slate-400 text-xs">-</span>`);
+        } else if (a.warnings > 0) {
+          $$renderer2.push("<!--[1-->");
           $$renderer2.push(`<div class="flex items-center justify-center gap-1"><span class="px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-bold text-xs">${escape_html(a.warnings)} kali</span> `);
           if (a.warningLogs && a.warningLogs.length > 0) {
             $$renderer2.push("<!--[0-->");
@@ -89,8 +89,11 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<span class="text-slate-400 text-xs">-</span>`);
         }
         $$renderer2.push(`<!--]--></td><td class="w-32">`);
-        if (a.question_count > 0) {
+        if (a.status === "belum_mengerjakan") {
           $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<span class="text-xs text-slate-400">0%</span>`);
+        } else if (a.question_count > 0) {
+          $$renderer2.push("<!--[1-->");
           const pct = Math.round(a.answeredCount / a.question_count * 100);
           const color = pct < 30 ? "bg-slate-300" : pct < 60 ? "bg-rose-400" : pct < 90 ? "bg-amber-400" : "bg-emerald-500";
           $$renderer2.push(`<div class="flex items-center gap-2"><div class="h-2 flex-1 bg-slate-100 rounded-full overflow-hidden"><div${attr_class(`h-full ${color} transition-all duration-500`)}${attr_style(`width: ${stringify(pct)}%`)}></div></div> <span class="text-xs font-semibold text-slate-600 w-8 text-right">${escape_html(pct)}%</span></div>`);
@@ -99,8 +102,11 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<span class="text-xs text-slate-400">0%</span>`);
         }
         $$renderer2.push(`<!--]--></td><td class="text-xs">`);
-        if (a.status === "mengerjakan") {
+        if (a.status === "belum_mengerjakan") {
           $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<span class="text-slate-400 font-medium opacity-80">-</span>`);
+        } else if (a.status === "mengerjakan") {
+          $$renderer2.push("<!--[1-->");
           const startStr = a.start_time.replace(" ", "T") + (a.start_time.includes("Z") ? "" : "Z");
           const start = new Date(startStr).getTime();
           const end = start + a.duration_minutes * 60 * 1e3;
@@ -156,6 +162,7 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<button class="btn-sm btn-danger"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.refresh)}></path></svg> Reset</button>`);
         } else {
           $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<span class="text-slate-300">-</span>`);
         }
         $$renderer2.push(`<!--]--></td></tr>`);
       }

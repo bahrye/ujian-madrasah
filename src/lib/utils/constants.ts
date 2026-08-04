@@ -41,13 +41,15 @@ export const QUESTION_TYPE_LABELS: Record<string, string> = {
 export const ATTEMPT_STATUS_LABELS: Record<string, string> = {
 	mengerjakan: 'Sedang Mengerjakan',
 	selesai: 'Selesai',
-	waktu_habis: 'Waktu Habis'
+	waktu_habis: 'Waktu Habis',
+	belum_mengerjakan: 'Belum Mengerjakan'
 };
 
 export const ATTEMPT_STATUS_COLORS: Record<string, string> = {
 	mengerjakan: 'badge-warning',
 	selesai: 'badge-success',
-	waktu_habis: 'badge-danger'
+	waktu_habis: 'badge-danger',
+	belum_mengerjakan: 'badge-secondary'
 };
 
 export type MenuItem = {

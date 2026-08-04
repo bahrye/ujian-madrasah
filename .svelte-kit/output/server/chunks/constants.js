@@ -22,12 +22,14 @@ const QUESTION_TYPE_LABELS = {
 const ATTEMPT_STATUS_LABELS = {
   mengerjakan: "Sedang Mengerjakan",
   selesai: "Selesai",
-  waktu_habis: "Waktu Habis"
+  waktu_habis: "Waktu Habis",
+  belum_mengerjakan: "Belum Mengerjakan"
 };
 const ATTEMPT_STATUS_COLORS = {
   mengerjakan: "badge-warning",
   selesai: "badge-success",
-  waktu_habis: "badge-danger"
+  waktu_habis: "badge-danger",
+  belum_mengerjakan: "badge-secondary"
 };
 const SIDEBAR_MENUS = {
   superadmin: [

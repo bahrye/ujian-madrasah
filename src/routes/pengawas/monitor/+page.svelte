@@ -12,7 +12,10 @@
 	$: if (form?.error) toasts.error(form.error);
 	$: attempts = data.attempts as any[];
 
-	let resetConfirm: number | null = null;
+	let statusFilter = 'semua';
+	$: filteredAttempts = statusFilter === 'semua' ? attempts : attempts.filter(a => a.status === statusFilter);
+
+	let resetConfirm: string | null = null;
 	let selectedLogs: { time: number, type: string }[] | null = null;
 	let currentTime = Date.now();
 	let interval: any;
@@ -34,30 +37,46 @@
 <div class="space-y-6 animate-in">
 	<div>
 		<h1 class="text-2xl font-bold text-slate-800">Monitoring Ujian</h1>
-		<p class="text-sm text-slate-500 mt-1">Pantau siswa yang sedang mengerjakan ujian</p>
+		<p class="text-sm text-slate-500 mt-1">Pantau seluruh siswa yang terdaftar dalam ujian</p>
 	</div>
 
 	<!-- Filter -->
 	<div class="card p-4">
-		<form method="GET" class="flex gap-3">
-			<select name="exam_id" class="select flex-1">
-				<option value="">Semua (Sedang Mengerjakan)</option>
+		<form method="GET" class="flex flex-wrap gap-3 mb-4">
+			<select name="exam_id" class="select flex-1 min-w-[200px]" required>
+				<option value="">-- Pilih Ujian --</option>
 				{#each data.exams as exam}
 					<option value={exam.id} selected={data.examFilter === String(exam.id)}>{exam.title}</option>
 				{/each}
 			</select>
-			<button type="submit" class="btn-secondary btn-sm">Filter</button>
+			<button type="submit" class="btn-secondary btn-sm">Tampilkan</button>
 		</form>
+		
+		{#if data.examFilter}
+			<div class="flex gap-2 overflow-x-auto pb-1">
+				<button class="btn-sm {statusFilter === 'semua' ? 'btn-primary' : 'btn-ghost border border-slate-200'}" on:click={() => statusFilter = 'semua'}>Semua</button>
+				<button class="btn-sm {statusFilter === 'mengerjakan' ? 'btn-warning' : 'btn-ghost border border-slate-200 text-slate-600'}" on:click={() => statusFilter = 'mengerjakan'}>Sedang Mengerjakan</button>
+				<button class="btn-sm {statusFilter === 'selesai' ? 'btn-success' : 'btn-ghost border border-slate-200 text-slate-600'}" on:click={() => statusFilter = 'selesai'}>Selesai</button>
+				<button class="btn-sm {statusFilter === 'belum_mengerjakan' ? 'bg-slate-500 text-white' : 'btn-ghost border border-slate-200 text-slate-600'}" on:click={() => statusFilter = 'belum_mengerjakan'}>Belum Mengerjakan</button>
+			</div>
+		{/if}
 	</div>
 
 	<!-- Monitor Table -->
 	<div class="card overflow-hidden">
-		{#if attempts.length === 0}
+		{#if !data.examFilter}
+			<div class="p-12 text-center text-slate-400">
+				<svg class="w-16 h-16 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
+					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.exam} />
+				</svg>
+				<p class="text-lg font-medium">Silakan pilih ujian terlebih dahulu</p>
+			</div>
+		{:else if filteredAttempts.length === 0}
 			<div class="p-12 text-center text-slate-400">
 				<svg class="w-16 h-16 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
 					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.monitor} />
 				</svg>
-				<p class="text-lg font-medium">Tidak ada siswa yang sedang mengerjakan</p>
+				<p class="text-lg font-medium">Tidak ada siswa yang sesuai filter</p>
 			</div>
 		{:else}
 			<div class="table-container border-0 rounded-none">
@@ -66,7 +85,6 @@
 						<tr>
 							<th>Siswa</th>
 							<th>Username</th>
-							{#if !data.examFilter}<th>Ujian</th>{/if}
 							<th>Status</th>
 							<th class="w-24 text-center">Pelanggaran</th>
 							<th class="w-32">Progress</th>
@@ -75,21 +93,22 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each attempts as a (a.id)}
+						{#each filteredAttempts as a (a.id)}
 							<tr>
 								<td class="font-semibold text-slate-800">{a.student_name}</td>
 								<td class="text-slate-500">@{a.username}</td>
-								{#if !data.examFilter}<td class="text-slate-600">{a.exam_title}</td>{/if}
 								<td>
-									<span class={ATTEMPT_STATUS_COLORS[a.status] || 'badge-info'}>
+									<span class={ATTEMPT_STATUS_COLORS[a.status] || 'badge-secondary'}>
 										{#if a.status === 'mengerjakan'}
 											<span class="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse mr-1"></span>
 										{/if}
-										{ATTEMPT_STATUS_LABELS[a.status] || a.status}
+										{ATTEMPT_STATUS_LABELS[a.status] || 'Belum Mengerjakan'}
 									</span>
 								</td>
 								<td class="text-center">
-									{#if a.warnings > 0}
+									{#if a.status === 'belum_mengerjakan'}
+										<span class="text-slate-400 text-xs">-</span>
+									{:else if a.warnings > 0}
 										<div class="flex items-center justify-center gap-1">
 											<span class="px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-bold text-xs">{a.warnings} kali</span>
 											{#if a.warningLogs && a.warningLogs.length > 0}
@@ -106,7 +125,9 @@
 									{/if}
 								</td>
 								<td class="w-32">
-									{#if a.question_count > 0}
+									{#if a.status === 'belum_mengerjakan'}
+										<span class="text-xs text-slate-400">0%</span>
+									{:else if a.question_count > 0}
 										{@const pct = Math.round((a.answeredCount / a.question_count) * 100)}
 										{@const color = pct < 30 ? 'bg-slate-300' : pct < 60 ? 'bg-rose-400' : pct < 90 ? 'bg-amber-400' : 'bg-emerald-500'}
 										<div class="flex items-center gap-2">
@@ -120,7 +141,9 @@
 									{/if}
 								</td>
 								<td class="text-xs">
-									{#if a.status === 'mengerjakan'}
+									{#if a.status === 'belum_mengerjakan'}
+										<span class="text-slate-400 font-medium opacity-80">-</span>
+									{:else if a.status === 'mengerjakan'}
 										{@const startStr = a.start_time.replace(' ', 'T') + (a.start_time.includes('Z') ? '' : 'Z')}
 										{@const start = new Date(startStr).getTime()}
 										{@const end = start + (a.duration_minutes * 60 * 1000)}
@@ -158,13 +181,15 @@
 									{#if a.status === 'mengerjakan'}
 										<button
 											class="btn-sm btn-danger"
-											on:click={() => (resetConfirm = a.id)}
+											on:click={() => (resetConfirm = a.attempt_id)}
 										>
 											<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 												<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.refresh} />
 											</svg>
 											Reset
 										</button>
+									{:else}
+										<span class="text-slate-300">-</span>
 									{/if}
 								</td>
 							</tr>

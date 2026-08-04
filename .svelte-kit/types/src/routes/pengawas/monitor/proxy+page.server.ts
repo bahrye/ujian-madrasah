@@ -19,27 +19,34 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 	let attempts: any[] = [];
 	if (examFilter) {
 		const result = await db.prepare(`
-			SELECT sa.*, u.name as student_name, u.username, e.duration_minutes,
-				(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count
-			FROM student_attempts sa
-			JOIN users u ON sa.student_id = u.id
-			JOIN exams e ON sa.exam_id = e.id
+			SELECT 
+				epart.student_id,
+				u.name as student_name, 
+				u.username, 
+				e.title as exam_title,
+				e.duration_minutes,
+				(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count,
+				sa.id as attempt_id,
+				sa.start_time,
+				sa.end_time,
+				sa.submit_time,
+				sa.score,
+				sa.total_points,
+				sa.status,
+				sa.violation_count,
+				sa.violation_logs
+			FROM exam_participants epart
+			JOIN users u ON epart.student_id = u.id
+			JOIN exams e ON epart.exam_id = e.id
 			JOIN exam_proctors ep ON e.id = ep.exam_id
-			WHERE sa.exam_id = ? AND e.school_id = ? AND ep.proctor_id = ?
-			ORDER BY sa.status DESC, sa.start_time DESC
+			LEFT JOIN student_attempts sa ON sa.student_id = epart.student_id AND sa.exam_id = epart.exam_id
+			WHERE epart.exam_id = ? AND e.school_id = ? AND ep.proctor_id = ?
+			ORDER BY 
+				CASE WHEN sa.status = 'mengerjakan' THEN 1 
+					 WHEN sa.status IS NULL THEN 2 
+					 ELSE 3 END ASC,
+				u.name ASC
 		`).bind(examFilter, locals.user.school_id, locals.user.id).all();
-		attempts = result.results;
-	} else {
-		const result = await db.prepare(`
-			SELECT sa.*, u.name as student_name, u.username, e.title as exam_title, e.duration_minutes,
-				(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count
-			FROM student_attempts sa
-			JOIN users u ON sa.student_id = u.id
-			JOIN exams e ON sa.exam_id = e.id
-			JOIN exam_proctors ep ON e.id = ep.exam_id
-			WHERE sa.status = 'mengerjakan' AND e.school_id = ? AND ep.proctor_id = ?
-			ORDER BY sa.start_time DESC
-		`).bind(locals.user.school_id, locals.user.id).all();
 		attempts = result.results;
 	}
 
@@ -48,9 +55,11 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 		let answeredCount = 0;
 		let warnings = 0;
 		let warningLogs: any[] = [];
-		if (a.status === 'mengerjakan') {
-			if (kv) {
-				const stored = await kv.get(`attempt_${a.id}_answers`);
+		const status = a.status || 'belum_mengerjakan';
+
+		if (status === 'mengerjakan') {
+			if (kv && a.attempt_id) {
+				const stored = await kv.get(`attempt_${a.attempt_id}_answers`);
 				if (stored) {
 					try {
 						const data = JSON.parse(stored);
@@ -62,19 +71,24 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 					} catch (e) {}
 				}
 			}
-			if (answeredCount === 0) {
-				const dbAnswers = await db.prepare('SELECT COUNT(*) as c FROM student_answers WHERE attempt_id = ? AND answer_given IS NOT NULL AND answer_given != ""').bind(a.id).first() as any;
+			if (answeredCount === 0 && a.attempt_id) {
+				const dbAnswers = await db.prepare('SELECT COUNT(*) as c FROM student_answers WHERE attempt_id = ? AND answer_given IS NOT NULL AND answer_given != ""').bind(a.attempt_id).first() as any;
 				if (dbAnswers && dbAnswers.c) answeredCount = dbAnswers.c;
 			}
-		} else {
+		} else if (status === 'selesai' || status === 'waktu_habis') {
 			warnings = a.violation_count || 0;
 			try { warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : []; } catch(e) {}
-			const dbAnswers = await db.prepare('SELECT COUNT(*) as c FROM student_answers WHERE attempt_id = ? AND answer_given IS NOT NULL AND answer_given != ""').bind(a.id).first() as any;
-			if (dbAnswers && dbAnswers.c) answeredCount = dbAnswers.c;
+			if (a.attempt_id) {
+				const dbAnswers = await db.prepare('SELECT COUNT(*) as c FROM student_answers WHERE attempt_id = ? AND answer_given IS NOT NULL AND answer_given != ""').bind(a.attempt_id).first() as any;
+				if (dbAnswers && dbAnswers.c) answeredCount = dbAnswers.c;
+			}
 		}
 
 		return {
 			...a,
+			id: a.attempt_id || `no_attempt_${a.student_id}`,
+			attempt_id: a.attempt_id,
+			status,
 			answeredCount,
 			warnings,
 			warningLogs
