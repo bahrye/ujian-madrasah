@@ -29,8 +29,8 @@
 	// Custom enhance: inject logoUrl into FormData before sending
 	function handleEnhance({ formData }: { formData: FormData }) {
 		formData.set('logo_url', logoUrl);
-		return async ({ update }: { update: () => Promise<void> }) => {
-			await update();
+		return async ({ update }: { update: (options?: any) => Promise<void> }) => {
+			await update({ reset: false });
 		};
 	}
 
@@ -67,7 +67,7 @@
 			logoUrl = result.secure_url;
 			uploadProgress = 100;
 
-			// Simpan ke bank media
+			// 1. Simpan ke bank media
 			try {
 				await fetch('/api/track-media', {
 					method: 'POST',
@@ -78,7 +78,12 @@
 				console.error('Gagal menyimpan logo ke bank media:', e);
 			}
 
-			toasts.success('Logo berhasil diunggah! Klik Simpan untuk menyimpan profil.');
+			// 2. Submit form utama untuk menyimpan logo beserta data lainnya
+			setTimeout(() => {
+				const formElement = document.querySelector('form');
+				if (formElement) formElement.requestSubmit();
+			}, 100);
+
 		} catch (err: any) {
 			uploadError = err.message || 'Terjadi kesalahan saat mengunggah.';
 		} finally {

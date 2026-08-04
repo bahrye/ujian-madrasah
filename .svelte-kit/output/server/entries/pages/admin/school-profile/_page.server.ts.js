@@ -6,6 +6,19 @@ const load = async ({ locals, platform }) => {
   return { school };
 };
 const actions = {
+  // Simpan logo saja — dipanggil segera setelah upload ke Cloudinary berhasil
+  saveLogo: async ({ request, locals, platform }) => {
+    const db = getDB(platform);
+    const data = await request.formData();
+    const logo_url = data.get("logo_url")?.toString().trim() || null;
+    try {
+      await db.prepare(`UPDATE schools SET logo_url = ?, updated_at = datetime('now') WHERE id = ?`).bind(logo_url, locals.user.school_id).run();
+      return { success: true, message: "Logo berhasil disimpan." };
+    } catch (e) {
+      console.error(e);
+      return fail(500, { error: "Gagal menyimpan logo." });
+    }
+  },
   update: async ({ request, locals, platform }) => {
     const db = getDB(platform);
     const data = await request.formData();
