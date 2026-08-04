@@ -53,7 +53,7 @@
 		</form>
 		
 		{#if data.examFilter}
-			<div class="flex gap-2 overflow-x-auto pb-1">
+			<div class="flex gap-2 overflow-x-auto p-1.5 -m-1.5 mb-1 mt-2">
 				<button class="btn-sm {statusFilter === 'semua' ? 'btn-primary' : 'btn-ghost border border-slate-200'}" on:click={() => statusFilter = 'semua'}>Semua</button>
 				<button class="btn-sm {statusFilter === 'mengerjakan' ? 'btn-warning' : 'btn-ghost border border-slate-200 text-slate-600'}" on:click={() => statusFilter = 'mengerjakan'}>Sedang Mengerjakan</button>
 				<button class="btn-sm {statusFilter === 'selesai' ? 'btn-success' : 'btn-ghost border border-slate-200 text-slate-600'}" on:click={() => statusFilter = 'selesai'}>Selesai</button>
