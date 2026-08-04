@@ -154,6 +154,14 @@
 	}
 </script>
 
+<input 
+	type="file" 
+	accept="image/*" 
+	class="hidden" 
+	bind:this={photoFileInput} 
+	on:change={handlePhotoUpload} 
+/>
+
 <svelte:head>
 	<title>Siswa - Admin</title>
 </svelte:head>

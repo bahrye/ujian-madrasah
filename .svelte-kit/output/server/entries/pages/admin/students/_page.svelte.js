@@ -135,7 +135,7 @@ function _page($$renderer, $$props) {
           $$renderer5.push(`<title>Siswa - Admin</title>`);
         });
       });
-      $$renderer3.push(`<div class="space-y-6"><div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4"><div><h1 class="text-3xl font-bold text-slate-800 tracking-tight">Manajemen Siswa</h1> <p class="text-slate-500 mt-1">Kelola data siswa dan kelasnya.</p></div> <div class="flex flex-wrap items-center gap-3">`);
+      $$renderer3.push(`<input type="file" accept="image/*" class="hidden"/> <div class="space-y-6"><div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4"><div><h1 class="text-3xl font-bold text-slate-800 tracking-tight">Manajemen Siswa</h1> <p class="text-slate-500 mt-1">Kelola data siswa dan kelasnya.</p></div> <div class="flex flex-wrap items-center gap-3">`);
       if (selectedIds.length > 0) {
         $$renderer3.push("<!--[0-->");
         $$renderer3.push(`<button class="btn btn-danger flex-1 sm:flex-none animate-bounce-in"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg> Hapus Massal (${escape_html(selectedIds.length)})</button>`);
