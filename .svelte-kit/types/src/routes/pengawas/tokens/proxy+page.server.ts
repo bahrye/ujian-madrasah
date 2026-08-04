@@ -9,7 +9,20 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 	const db = getDB(platform);
 
 	const tokens = await db.prepare(`
-		SELECT t.*, e.title as exam_title
+		SELECT t.*, e.title as exam_title,
+		COALESCE((
+			SELECT json_group_array(
+				json_object(
+					'id', u.id, 
+					'name', u.name, 
+					'username', u.username, 
+					'start_time', sa.start_time
+				)
+			)
+			FROM student_attempts sa
+			JOIN users u ON sa.student_id = u.id
+			WHERE sa.token_id = t.id
+		), '[]') as used_by_students_json
 		FROM tokens t 
 		JOIN exams e ON t.exam_id = e.id
 		JOIN exam_proctors ep ON e.id = ep.exam_id
@@ -25,7 +38,19 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 		ORDER BY e.title
 	`).bind(locals.user.school_id, locals.user.id).all();
 
-	return { tokens: tokens.results, exams: exams.results };
+	const processedTokens = tokens.results.map((t: any) => {
+		let usedBy = [];
+		try {
+			usedBy = t.used_by_students_json ? JSON.parse(t.used_by_students_json) : [];
+			if (usedBy.length === 1 && usedBy[0].id === null) usedBy = [];
+		} catch (e) {}
+		return {
+			...t,
+			used_by_students: usedBy
+		};
+	});
+
+	return { tokens: processedTokens, exams: exams.results };
 };
 
 export const actions = {

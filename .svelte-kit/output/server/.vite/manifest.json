@@ -1025,6 +1025,7 @@
     "isEntry": true,
     "imports": [
       "_index.js",
+      "_index-server.js",
       "_StatCard.js",
       "_constants.js"
     ]

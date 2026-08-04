@@ -1,9 +1,13 @@
 import { h as head, e as escape_html, f as ensure_array_like, j as attr, b as stringify, d as bind_props } from "../../../chunks/index.js";
+import { o as onDestroy } from "../../../chunks/index-server.js";
 import { S as StatCard } from "../../../chunks/StatCard.js";
 import { I as ICONS } from "../../../chunks/constants.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let data = $$props["data"];
+    let currentTime = /* @__PURE__ */ new Date();
+    onDestroy(() => {
+    });
     function formatScheduleDate(dateString) {
       if (!dateString) return "Belum ditentukan";
       const date = new Date(dateString);
@@ -36,6 +40,41 @@ function _page($$renderer, $$props) {
       const startDateFormatted = new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric" }).format(start);
       const endDateFormatted = new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric" }).format(end);
       return `${startDateFormatted} ${startFormatted} - ${endDateFormatted} ${endFormatted}`;
+    }
+    function getScheduleStatus(schedule, now) {
+      if (!schedule.start_time) return { state: "UNKNOWN" };
+      const startTime = new Date(schedule.start_time);
+      const endTime = schedule.end_time ? new Date(schedule.end_time) : null;
+      const tokenOpenTime = new Date(startTime.getTime() - 15 * 60 * 1e3);
+      if (endTime && now > endTime) {
+        return { state: "ENDED" };
+      }
+      if (now >= tokenOpenTime) {
+        if (schedule.token_code) {
+          return { state: "MONITOR" };
+        } else {
+          return { state: "GENERATE_TOKEN" };
+        }
+      }
+      const today = new Date(now);
+      today.setHours(0, 0, 0, 0);
+      const examDay = new Date(startTime);
+      examDay.setHours(0, 0, 0, 0);
+      const diffTime = examDay.getTime() - today.getTime();
+      const diffDays = Math.round(diffTime / (1e3 * 60 * 60 * 24));
+      if (diffDays <= 0) {
+        const diffMs = tokenOpenTime.getTime() - now.getTime();
+        const hours = Math.floor(diffMs / (1e3 * 60 * 60));
+        const minutes = Math.floor(diffMs % (1e3 * 60 * 60) / (1e3 * 60));
+        const seconds = Math.floor(diffMs % (1e3 * 60) / 1e3);
+        const pad = (n) => n.toString().padStart(2, "0");
+        const countdownStr = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+        return { state: "COUNTDOWN", text: countdownStr };
+      } else if (diffDays === 1) {
+        return { state: "WAITING_DAYS", text: "Besok" };
+      } else {
+        return { state: "WAITING_DAYS", text: `${diffDays} hari lagi` };
+      }
     }
     head("9iohvt", $$renderer2, ($$renderer3) => {
       $$renderer3.title(($$renderer4) => {
@@ -79,12 +118,29 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<span class="badge bg-slate-100 text-slate-500 whitespace-nowrap">Selesai/Non-aktif</span>`);
         }
         $$renderer2.push(`<!--]--></div> <div class="space-y-2 mt-4 bg-slate-50/50 p-3 rounded-xl border border-slate-100/50"><div class="flex items-center gap-2.5 text-sm text-slate-600"><div class="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div> <div><p class="text-xs text-slate-400 font-medium leading-none mb-1">Tanggal</p> <p class="font-medium text-slate-700">${escape_html(formatScheduleDate(schedule.start_time))}</p></div></div> <div class="flex items-center gap-2.5 text-sm text-slate-600"><div class="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center text-amber-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div> <div><p class="text-xs text-slate-400 font-medium leading-none mb-1">Waktu &amp; Durasi</p> <p class="font-medium text-slate-700">${escape_html(formatTimeRange(schedule.start_time, schedule.end_time))} <span class="text-slate-400 font-normal">(${escape_html(schedule.duration_minutes)} menit)</span></p></div></div> <div class="flex items-center gap-2.5 text-sm text-slate-600 mt-3 pt-3 border-t border-slate-100"><div class="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></div> <div class="flex-1"><p class="text-xs text-slate-400 font-medium leading-none mb-1">Peserta Ujian</p> <p class="font-medium text-slate-700">${escape_html(schedule.participant_count)} Siswa</p></div> <button class="w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-colors" title="Lihat Daftar Peserta"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></button></div></div> <div class="mt-4">`);
-        if (schedule.token_code) {
+        {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<a${attr("href", `/pengawas/monitor?exam_id=${stringify(schedule.exam_id)}`)} class="btn-primary w-full shadow-md shadow-indigo-500/20 py-2.5 justify-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.monitor)}></path></svg> Monitoring Ujian</a>`);
-        } else {
-          $$renderer2.push("<!--[-1-->");
-          $$renderer2.push(`<a${attr("href", `/pengawas/tokens?exam_id=${stringify(schedule.exam_id)}&generate=1`)} class="btn-secondary w-full py-2.5 justify-center gap-2 hover:bg-slate-100 hover:text-slate-800 border-dashed border-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> Generate Token</a>`);
+          const status = getScheduleStatus(schedule, currentTime);
+          if (status.state === "ENDED") {
+            $$renderer2.push("<!--[0-->");
+            $$renderer2.push(`<div class="w-full py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-semibold bg-red-50 text-red-500 border border-red-200 cursor-not-allowed"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Berakhir</div>`);
+          } else if (status.state === "MONITOR") {
+            $$renderer2.push("<!--[1-->");
+            $$renderer2.push(`<a${attr("href", `/pengawas/monitor?exam_id=${stringify(schedule.exam_id)}`)} class="btn-primary w-full shadow-md shadow-indigo-500/20 py-2.5 justify-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.monitor)}></path></svg> Monitoring Ujian</a>`);
+          } else if (status.state === "GENERATE_TOKEN") {
+            $$renderer2.push("<!--[2-->");
+            $$renderer2.push(`<a${attr("href", `/pengawas/tokens?exam_id=${stringify(schedule.exam_id)}&generate=1`)} class="btn-secondary w-full py-2.5 justify-center gap-2 hover:bg-slate-100 hover:text-slate-800 border-dashed border-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> Generate Token</a>`);
+          } else if (status.state === "COUNTDOWN") {
+            $$renderer2.push("<!--[3-->");
+            $$renderer2.push(`<div class="w-full py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-bold bg-slate-100 text-slate-700 border border-slate-200 font-mono shadow-inner tracking-wider"><svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> ${escape_html(status.text)}</div>`);
+          } else if (status.state === "WAITING_DAYS") {
+            $$renderer2.push("<!--[4-->");
+            $$renderer2.push(`<div class="w-full py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-semibold bg-slate-50 text-slate-500 border border-slate-200 cursor-not-allowed"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> Tersedia ${escape_html(status.text)}</div>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+            $$renderer2.push(`<div class="w-full py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-semibold bg-slate-50 text-slate-400 border border-slate-200 cursor-not-allowed">Jadwal tidak valid</div>`);
+          }
+          $$renderer2.push(`<!--]-->`);
         }
         $$renderer2.push(`<!--]--></div></div>`);
       }

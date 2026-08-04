@@ -90,13 +90,17 @@ function _page($$renderer, $$props) {
         } else {
           $$renderer2.push("<!--[-1-->");
         }
-        $$renderer2.push(`<!--]--> <form method="POST" action="?/delete"><input type="hidden" name="id"${attr("value", token.id)}/> <button type="submit" class="btn-sm btn-ghost text-rose-400 hover:text-rose-600"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.trash)}></path></svg></button></form></div></div></div>`);
+        $$renderer2.push(`<!--]--> <button type="button" class="btn-sm btn-ghost text-indigo-400 hover:text-indigo-600" title="Lihat Penggunaan"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></button> <form method="POST" action="?/delete"><input type="hidden" name="id"${attr("value", token.id)}/> <button type="submit" class="btn-sm btn-ghost text-rose-400 hover:text-rose-600" title="Hapus"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.trash)}></path></svg></button></form></div></div></div>`);
       }
     } else {
       $$renderer2.push("<!--[!-->");
       $$renderer2.push(`<div class="text-center py-12 text-slate-400"><p>Belum ada token. Klik "Generate Token" untuk membuat.</p></div>`);
     }
-    $$renderer2.push(`<!--]--></div></div>`);
+    $$renderer2.push(`<!--]--></div></div> `);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]-->`);
     bind_props($$props, { data, form });
   });
 }

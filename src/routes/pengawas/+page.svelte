@@ -1,10 +1,23 @@
 <script lang="ts">
+	import { onMount, onDestroy } from 'svelte';
 	import StatCard from '$lib/components/dashboard/StatCard.svelte';
 	import { ICONS } from '$lib/utils/constants';
 	export let data;
 
 	let showModal = false;
 	let selectedSchedule: any = null;
+	let currentTime = new Date();
+	let timer: ReturnType<typeof setInterval>;
+
+	onMount(() => {
+		timer = setInterval(() => {
+			currentTime = new Date();
+		}, 1000);
+	});
+
+	onDestroy(() => {
+		if (timer) clearInterval(timer);
+	});
 
 	function showParticipantsModal(schedule: any) {
 		selectedSchedule = schedule;
@@ -73,6 +86,51 @@
 		}).format(end);
 
 		return `${startDateFormatted} ${startFormatted} - ${endDateFormatted} ${endFormatted}`;
+	}
+
+	function getScheduleStatus(schedule: any, now: Date) {
+		if (!schedule.start_time) return { state: 'UNKNOWN' };
+
+		const startTime = new Date(schedule.start_time);
+		const endTime = schedule.end_time ? new Date(schedule.end_time) : null;
+		const tokenOpenTime = new Date(startTime.getTime() - 15 * 60 * 1000);
+
+		if (endTime && now > endTime) {
+			return { state: 'ENDED' };
+		}
+
+		if (now >= tokenOpenTime) {
+			if (schedule.token_code) {
+				return { state: 'MONITOR' };
+			} else {
+				return { state: 'GENERATE_TOKEN' };
+			}
+		}
+
+		const today = new Date(now);
+		today.setHours(0, 0, 0, 0);
+		const examDay = new Date(startTime);
+		examDay.setHours(0, 0, 0, 0);
+
+		const diffTime = examDay.getTime() - today.getTime();
+		const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+		if (diffDays <= 0) {
+			const diffMs = tokenOpenTime.getTime() - now.getTime();
+			
+			const hours = Math.floor(diffMs / (1000 * 60 * 60));
+			const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+			const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+			
+			const pad = (n: number) => n.toString().padStart(2, '0');
+			const countdownStr = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+			
+			return { state: 'COUNTDOWN', text: countdownStr };
+		} else if (diffDays === 1) {
+			return { state: 'WAITING_DAYS', text: 'Besok' };
+		} else {
+			return { state: 'WAITING_DAYS', text: `${diffDays} hari lagi` };
+		}
 	}
 </script>
 
@@ -159,20 +217,48 @@
 						</div>
 
 						<div class="mt-4">
-							{#if schedule.token_code}
-								<a href="/pengawas/monitor?exam_id={schedule.exam_id}" class="btn-primary w-full shadow-md shadow-indigo-500/20 py-2.5 justify-center gap-2">
-									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-										<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.monitor} />
-									</svg>
-									Monitoring Ujian
-								</a>
-							{:else}
-								<a href="/pengawas/tokens?exam_id={schedule.exam_id}&generate=1" class="btn-secondary w-full py-2.5 justify-center gap-2 hover:bg-slate-100 hover:text-slate-800 border-dashed border-2">
-									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-										<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
-									</svg>
-									Generate Token
-								</a>
+							{#if true}
+								{@const status = getScheduleStatus(schedule, currentTime)}
+								{#if status.state === 'ENDED'}
+									<div class="w-full py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-semibold bg-red-50 text-red-500 border border-red-200 cursor-not-allowed">
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+										</svg>
+										Berakhir
+									</div>
+								{:else if status.state === 'MONITOR'}
+									<a href="/pengawas/monitor?exam_id={schedule.exam_id}" class="btn-primary w-full shadow-md shadow-indigo-500/20 py-2.5 justify-center gap-2">
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+											<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.monitor} />
+										</svg>
+										Monitoring Ujian
+									</a>
+								{:else if status.state === 'GENERATE_TOKEN'}
+									<a href="/pengawas/tokens?exam_id={schedule.exam_id}&generate=1" class="btn-secondary w-full py-2.5 justify-center gap-2 hover:bg-slate-100 hover:text-slate-800 border-dashed border-2">
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+											<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
+										</svg>
+										Generate Token
+									</a>
+								{:else if status.state === 'COUNTDOWN'}
+									<div class="w-full py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-bold bg-slate-100 text-slate-700 border border-slate-200 font-mono shadow-inner tracking-wider">
+										<svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+										</svg>
+										{status.text}
+									</div>
+								{:else if status.state === 'WAITING_DAYS'}
+									<div class="w-full py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-semibold bg-slate-50 text-slate-500 border border-slate-200 cursor-not-allowed">
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+										</svg>
+										Tersedia {status.text}
+									</div>
+								{:else}
+									<div class="w-full py-2.5 flex items-center justify-center gap-2 rounded-xl text-sm font-semibold bg-slate-50 text-slate-400 border border-slate-200 cursor-not-allowed">
+										Jadwal tidak valid
+									</div>
+								{/if}
 							{/if}
 						</div>
 					</div>

@@ -9,9 +9,16 @@
 	export let form: any;
 
 	let showGenerate = false;
+	let showStudentsModal = false;
+	let selectedToken: any = null;
 	let selectedExamId: number | '' = '';
 	let currentTime = Date.now();
 	let intervalId: any;
+
+	function openStudentsModal(token: any) {
+		selectedToken = token;
+		showStudentsModal = true;
+	}
 
 	$: if (form?.success) toasts.success(form.success);
 	$: if (form?.error) toasts.error(form.error);
@@ -150,10 +157,16 @@
 								</form>
 							{/if}
 						{/if}
+						<button type="button" class="btn-sm btn-ghost text-indigo-400 hover:text-indigo-600" on:click={() => openStudentsModal(token)} title="Lihat Penggunaan">
+							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+								<path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+							</svg>
+						</button>
 						<form method="POST" action="?/delete" use:enhance>
 							<input type="hidden" name="id" value={token.id} />
-							<button type="submit" class="btn-sm btn-ghost text-rose-400 hover:text-rose-600">
-								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<button type="submit" class="btn-sm btn-ghost text-rose-400 hover:text-rose-600" title="Hapus">
+								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
 									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
 								</svg>
 							</button>
@@ -168,3 +181,61 @@
 		{/each}
 	</div>
 </div>
+
+{#if showStudentsModal && selectedToken}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 transition-all duration-300" on:click={() => showStudentsModal = false}>
+		<div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-xl" on:click|stopPropagation>
+			<div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+				<div>
+					<h3 class="font-bold text-slate-800 text-lg">Penggunaan Token</h3>
+					<p class="text-sm text-slate-500 font-mono tracking-widest">{selectedToken.token_code}</p>
+				</div>
+				<button class="text-slate-400 hover:text-slate-600 p-2 rounded-lg hover:bg-slate-100 transition-colors" on:click={() => showStudentsModal = false}>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+			
+			<div class="p-6 overflow-y-auto flex-1">
+				{#if selectedToken.used_by_students && selectedToken.used_by_students.length > 0}
+					<div class="space-y-3">
+						{#each selectedToken.used_by_students as student, i}
+							<div class="flex items-center gap-3 p-3 rounded-xl border border-slate-100 bg-white hover:border-indigo-100 transition-all">
+								<div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500 font-bold text-xs">
+									{i + 1}
+								</div>
+								<div class="flex-1 min-w-0">
+									<p class="font-medium text-slate-800 truncate">{student.name}</p>
+									<p class="text-xs text-slate-500">
+										NISN: {student.username}
+									</p>
+								</div>
+								<div class="text-right flex-shrink-0">
+									<p class="text-xs font-medium text-slate-700">Waktu Akses</p>
+									<p class="text-[10px] text-slate-500">{new Date(student.start_time.replace(' ', 'T') + (student.start_time.includes('Z') ? '' : 'Z')).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</p>
+								</div>
+							</div>
+						{/each}
+					</div>
+				{:else}
+					<div class="text-center py-10">
+						<div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
+							<svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+							</svg>
+						</div>
+						<p class="text-slate-500 font-medium">Belum ada yang menggunakan</p>
+						<p class="text-sm text-slate-400 mt-1">Token ini belum diakses oleh peserta ujian manapun.</p>
+					</div>
+				{/if}
+			</div>
+			
+			<div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end">
+				<button type="button" class="btn-ghost" on:click={() => showStudentsModal = false}>Tutup</button>
+			</div>
+		</div>
+	</div>
+{/if}
