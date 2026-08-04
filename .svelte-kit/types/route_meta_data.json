@@ -81,6 +81,9 @@
 	"/api/exams/[id]/questions": [
 		"src/routes/api/exams/[id]/questions/+server.ts"
 	],
+	"/api/export-results/[examId]": [
+		"src/routes/api/export-results/[examId]/+server.ts"
+	],
 	"/api/logout": [
 		"src/routes/api/logout/+server.ts"
 	],

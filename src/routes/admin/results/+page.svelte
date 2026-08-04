@@ -1,10 +1,26 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS } from '$lib/utils/constants';
+	import { ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS, ICONS } from '$lib/utils/constants';
 	import ConfirmForm from '$lib/components/ConfirmForm.svelte';
+	import { exportExamResults } from '$lib/utils/excel';
+	import { toasts } from '$lib/stores/toast';
 
 	export let data;
 	$: results = data.results as any[];
+
+	let isExporting = false;
+	async function handleExport() {
+		if (!data.examFilter) {
+			toasts.error('Pilih satu ujian terlebih dahulu untuk dieksport.');
+			return;
+		}
+		isExporting = true;
+		const examTitle = data.exams.find((e: any) => e.id.toString() === data.examFilter)?.title || 'Ujian';
+		const res = await exportExamResults(data.examFilter, examTitle);
+		if (res.error) toasts.error(res.error);
+		else toasts.success('Excel berhasil diunduh!');
+		isExporting = false;
+	}
 </script>
 
 <svelte:head>
@@ -27,6 +43,19 @@
 				{/each}
 			</select>
 			<button type="submit" class="btn-secondary md:w-auto w-full">Tampilkan</button>
+			{#if data.examFilter}
+				<button type="button" class="btn-primary md:w-auto w-full flex items-center justify-center gap-2" on:click={handleExport} disabled={isExporting}>
+					{#if isExporting}
+						<span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+						Mengekspor...
+					{:else}
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+						</svg>
+						Eksport Excel
+					{/if}
+				</button>
+			{/if}
 		</form>
 	</div>
 

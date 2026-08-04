@@ -1,4 +1,4 @@
-import { h as head, f as ensure_array_like, e as escape_html, i as attr_class, k as clsx, j as attr, b as stringify, d as bind_props } from "../../../../chunks/index.js";
+import { h as head, f as ensure_array_like, e as escape_html, j as attr, i as attr_class, k as clsx, b as stringify, d as bind_props } from "../../../../chunks/index.js";
 import "@sveltejs/kit/internal";
 import "../../../../chunks/exports.js";
 import "../../../../chunks/utils2.js";
@@ -7,10 +7,12 @@ import "../../../../chunks/root.js";
 import "../../../../chunks/state.svelte.js";
 import { A as ATTEMPT_STATUS_COLORS, a as ATTEMPT_STATUS_LABELS } from "../../../../chunks/constants.js";
 import { C as ConfirmForm } from "../../../../chunks/ConfirmForm.js";
+import "../../../../chunks/toast.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let results;
     let data = $$props["data"];
+    let isExporting = false;
     results = data.results;
     head("nnpp9p", $$renderer2, ($$renderer3) => {
       $$renderer3.title(($$renderer4) => {
@@ -35,7 +37,19 @@ function _page($$renderer, $$props) {
         }
       );
     }
-    $$renderer2.push(`<!--]--></select> <button type="submit" class="btn-secondary md:w-auto w-full">Tampilkan</button></form></div> <div class="card overflow-hidden">`);
+    $$renderer2.push(`<!--]--></select> <button type="submit" class="btn-secondary md:w-auto w-full">Tampilkan</button> `);
+    if (data.examFilter) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<button type="button" class="btn-primary md:w-auto w-full flex items-center justify-center gap-2"${attr("disabled", isExporting, true)}>`);
+      {
+        $$renderer2.push("<!--[-1-->");
+        $$renderer2.push(`<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg> Eksport Excel`);
+      }
+      $$renderer2.push(`<!--]--></button>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--></form></div> <div class="card overflow-hidden">`);
     if (results.length === 0) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div class="p-12 text-center text-slate-400">Belum ada hasil ujian.</div>`);
