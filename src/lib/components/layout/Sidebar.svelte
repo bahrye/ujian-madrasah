@@ -26,7 +26,7 @@
 
 <!-- Desktop Sidebar -->
 <aside
-	class="hidden lg:flex flex-col w-64 min-h-screen bg-gradient-to-b from-primary-950 to-primary-900 text-white
+	class="hidden lg:flex flex-col w-64 h-screen bg-gradient-to-b from-primary-950 to-primary-900 text-white
 		   border-r border-primary-800/50 fixed left-0 top-0 z-40"
 >
 	<!-- Logo -->
