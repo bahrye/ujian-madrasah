@@ -141,18 +141,25 @@
   .card.size-b2 { width: 79mm; height: 126mm; border-radius: 12px; }
   .card.size-b3 { width: 95mm; height: 126mm; border-radius: 12px; }
   .card.size-b4 { width: 105mm; height: 155mm; border-radius: 12px; }
-  .card.size-b1 .avatar { width: 45px; height: 45px; font-size: 20px; margin-bottom: 5px; }
-  .card.size-b1 .name { font-size: 13px; }
-  .card.size-b1 .ttl { font-size: 9px; margin-top: 1px; }
-  .card.size-b1 .cred-value { font-size: 13px; }
-  .card.size-b1 .url-value { font-size: 10px; }
-  .card.size-b1 .card-header { padding: 10px 12px; }
-  .card.size-b1 .card-body { padding: 10px 12px; }
-  .card.size-b1 .cred-row { padding: 6px 10px; gap: 6px; }
-  .card.size-b1 .url-row { padding: 6px 10px; }
-  .card.size-b1 .card-footer { padding: 6px 10px; font-size: 7.5px; line-height: 1.2; }
-  .card.size-b1 .divider { margin: 10px 0; }
-  .card.size-b1 .credentials { margin-bottom: 10px; gap: 8px; }
+  .card.size-b1 .avatar { width: 38px; height: 38px; font-size: 16px; margin-bottom: 4px; }
+  .card.size-b1 .name { font-size: 11px; }
+  .card.size-b1 .ttl { font-size: 8px; margin-top: 1px; }
+  .card.size-b1 .cred-value { font-size: 11px; }
+  .card.size-b1 .url-value { font-size: 8px; }
+  .card.size-b1 .card-header { padding: 8px 10px; }
+  .card.size-b1 .card-body { padding: 8px 10px; }
+  .card.size-b1 .cred-row { padding: 4px 8px; gap: 4px; }
+  .card.size-b1 .url-row { padding: 4px 8px; }
+  .card.size-b1 .card-footer { padding: 4px 8px; font-size: 6px; line-height: 1.1; }
+  .card.size-b1 .divider { margin: 6px 0; }
+  .card.size-b1 .credentials { margin-bottom: 6px; gap: 6px; }
+
+  /* B2, B3 adjustments for vertical height safety */
+  .card.size-b2 .card-body, .card.size-b3 .card-body { padding: 12px 16px; }
+  .card.size-b2 .avatar, .card.size-b3 .avatar { width: 45px; height: 45px; margin-bottom: 6px; }
+  .card.size-b2 .divider, .card.size-b3 .divider { margin: 8px 0; }
+  .card.size-b2 .credentials, .card.size-b3 .credentials { margin-bottom: 8px; }
+  .card.size-b2 .card-footer, .card.size-b3 .card-footer { font-size: 7.5px; padding: 6px 12px; }
   .card-header{background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);padding:16px 20px;}
   .logo-area{display:flex;align-items:center;gap:12px;}
   .logo-circle{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
@@ -173,7 +180,7 @@
   .url-row{background:linear-gradient(135deg,#eff6ff,#eef2ff);border:1px solid #c7d2fe;border-radius:12px;padding:10px 14px;text-align:center;}
   .url-label{font-size:10px;font-weight:600;color:#6366f1;margin-bottom:3px;letter-spacing:.04em;}
   .url-value{font-size:13px;font-weight:700;color:#4338ca;word-break:break-all;}
-  .card-footer{background:#f8fafc;border-top:1px solid #f1f5f9;padding:8px 16px;font-size:10px;color:#94a3b8;text-align:center;font-weight:500;}
+  .card-footer{background:#f8fafc;border-top:1px solid #f1f5f9;padding:6px 12px;font-size:8px;color:#94a3b8;text-align:center;font-weight:500;}
   @media print{
     *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important;}
     body{background:#ffffff !important;padding:24px;}
