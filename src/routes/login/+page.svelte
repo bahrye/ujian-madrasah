@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import Toast from '$lib/components/ui/Toast.svelte';
+	import PasswordInput from '$lib/components/ui/PasswordInput.svelte';
 
 	export let form: { error?: string } | null;
 
@@ -77,20 +78,14 @@
 
 				<div>
 					<label for="password" class="label">Kata Sandi</label>
-					<div class="relative">
-						<svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-						</svg>
-						<input
-							id="password"
-							name="password"
-							type="password"
-							required
-							class="input pl-10"
-							placeholder="Masukkan kata sandi"
-							autocomplete="current-password"
-						/>
-					</div>
+					<PasswordInput
+						id="password"
+						name="password"
+						required={true}
+						iconLeft={true}
+						placeholder="Masukkan kata sandi"
+						autocomplete="current-password"
+					/>
 				</div>
 
 				<button
@@ -109,13 +104,6 @@
 					{/if}
 				</button>
 			</form>
-
-			<!-- Setup hint -->
-			<div class="mt-6 pt-5 border-t border-slate-200 text-center">
-				<p class="text-xs text-slate-400">
-					Pertama kali? <a href="/api/setup" class="text-indigo-500 hover:text-indigo-600 font-medium">Inisialisasi Database</a>
-				</p>
-			</div>
 		</div>
 
 		<!-- Footer -->

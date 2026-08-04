@@ -3,6 +3,7 @@
 	import { ROLE_LABELS, ROLE_COLORS, ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
 	import ImportUsersModal from '$lib/components/admin/ImportUsersModal.svelte';
+	import PasswordInput from '$lib/components/ui/PasswordInput.svelte';
 
 	export let data;
 	export let form: { error?: string; success?: string } | null;
@@ -142,7 +143,7 @@
 				</div>
 				<div>
 					<label for="create-password" class="label">Kata Sandi</label>
-					<input id="create-password" name="password" type="password" required class="input" placeholder="Kata sandi" />
+					<PasswordInput id="create-password" name="password" required={true} placeholder="Kata sandi" />
 				</div>
 				<div>
 					<label for="create-role" class="label">Role</label>
@@ -185,7 +186,7 @@
 				</div>
 				<div>
 					<label for="edit-password" class="label">Kata Sandi Baru <span class="text-slate-400 font-normal">(kosongkan jika tidak diubah)</span></label>
-					<input id="edit-password" name="password" type="password" class="input" placeholder="Kata sandi baru" />
+					<PasswordInput id="edit-password" name="password" required={false} placeholder="Kata sandi baru" />
 				</div>
 				<div class="flex items-center gap-2">
 					<input id="edit-active" name="is_active" type="checkbox" value="1" checked={editingUser.is_active} class="rounded border-slate-300" />

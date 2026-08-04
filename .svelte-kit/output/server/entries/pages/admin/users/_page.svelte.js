@@ -7,6 +7,7 @@ import "../../../../chunks/root.js";
 import "../../../../chunks/state.svelte.js";
 import { I as ICONS, b as ROLE_COLORS, R as ROLE_LABELS } from "../../../../chunks/constants.js";
 import { t as toasts } from "../../../../chunks/toast.js";
+import { P as PasswordInput } from "../../../../chunks/PasswordInput.js";
 function ImportUsersModal($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let show = fallback($$props["show"], false);
@@ -87,7 +88,14 @@ function _page($$renderer, $$props) {
       $$renderer3.push(`<!--]--></tbody></table></div></div></div> `);
       if (showCreateModal) {
         $$renderer3.push("<!--[0-->");
-        $$renderer3.push(`<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"><div class="max-h-[90vh] overflow-y-auto card p-6 w-full max-w-md animate-bounce-in"><h2 class="text-lg font-bold text-slate-800 mb-4">Tambah Pengguna Baru</h2> <form method="POST" action="?/create" class="space-y-4"><div><label for="create-name" class="label">Nama Lengkap</label> <input id="create-name" name="name" type="text" required="" class="input" placeholder="Nama lengkap"/></div> <div><label for="create-username" class="label">Username</label> <input id="create-username" name="username" type="text" required="" class="input" placeholder="Username untuk login"/></div> <div><label for="create-password" class="label">Kata Sandi</label> <input id="create-password" name="password" type="password" required="" class="input" placeholder="Kata sandi"/></div> <div><label for="create-role" class="label">Role</label> <select id="create-role" name="role" required="" class="select">`);
+        $$renderer3.push(`<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"><div class="max-h-[90vh] overflow-y-auto card p-6 w-full max-w-md animate-bounce-in"><h2 class="text-lg font-bold text-slate-800 mb-4">Tambah Pengguna Baru</h2> <form method="POST" action="?/create" class="space-y-4"><div><label for="create-name" class="label">Nama Lengkap</label> <input id="create-name" name="name" type="text" required="" class="input" placeholder="Nama lengkap"/></div> <div><label for="create-username" class="label">Username</label> <input id="create-username" name="username" type="text" required="" class="input" placeholder="Username untuk login"/></div> <div><label for="create-password" class="label">Kata Sandi</label> `);
+        PasswordInput($$renderer3, {
+          id: "create-password",
+          name: "password",
+          required: true,
+          placeholder: "Kata sandi"
+        });
+        $$renderer3.push(`<!----></div> <div><label for="create-role" class="label">Role</label> <select id="create-role" name="role" required="" class="select">`);
         $$renderer3.option({ value: "" }, ($$renderer4) => {
           $$renderer4.push(`Pilih role`);
         });

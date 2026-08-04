@@ -3,6 +3,7 @@
 	import ConfirmForm from '$lib/components/ConfirmForm.svelte';
 	import type { PageData, ActionData } from './$types';
 	import { toasts } from '$lib/stores/toast';
+	import PasswordInput from '$lib/components/ui/PasswordInput.svelte';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -60,7 +61,7 @@
 				</div>
 				<div>
 					<label for="password" class="block text-sm font-medium text-slate-700 mb-1">Password <span class="text-red-500">*</span></label>
-					<input type="password" id="password" name="password" class="input" required placeholder="Minimal 6 karakter" />
+					<PasswordInput id="password" name="password" required={true} placeholder="Minimal 6 karakter" />
 				</div>
 				<div class="col-span-1 md:col-span-2 flex space-x-3 pt-2">
 					<button type="submit" class="btn btn-primary">Simpan Admin</button>

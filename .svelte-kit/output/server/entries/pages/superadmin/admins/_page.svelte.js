@@ -7,6 +7,7 @@ import "../../../../chunks/root.js";
 import "../../../../chunks/state.svelte.js";
 import { C as ConfirmForm } from "../../../../chunks/ConfirmForm.js";
 import { t as toasts } from "../../../../chunks/toast.js";
+import { P as PasswordInput } from "../../../../chunks/PasswordInput.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let data = $$props["data"];
@@ -44,7 +45,14 @@ function _page($$renderer, $$props) {
           }
         );
       }
-      $$renderer2.push(`<!--]--></select></div></div> <div><label for="name" class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label> <input type="text" id="name" name="name" class="input" required="" placeholder="Nama lengkap admin"${attr("value", form?.name || "")}/></div> <div><label for="username" class="block text-sm font-medium text-slate-700 mb-1">Username <span class="text-red-500">*</span></label> <input type="text" id="username" name="username" class="input" required="" placeholder="username_admin"${attr("value", form?.username || "")}/></div> <div><label for="password" class="block text-sm font-medium text-slate-700 mb-1">Password <span class="text-red-500">*</span></label> <input type="password" id="password" name="password" class="input" required="" placeholder="Minimal 6 karakter"/></div> <div class="col-span-1 md:col-span-2 flex space-x-3 pt-2"><button type="submit" class="btn btn-primary">Simpan Admin</button> <button type="button" class="btn btn-secondary">Batal</button></div></form></div>`);
+      $$renderer2.push(`<!--]--></select></div></div> <div><label for="name" class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label> <input type="text" id="name" name="name" class="input" required="" placeholder="Nama lengkap admin"${attr("value", form?.name || "")}/></div> <div><label for="username" class="block text-sm font-medium text-slate-700 mb-1">Username <span class="text-red-500">*</span></label> <input type="text" id="username" name="username" class="input" required="" placeholder="username_admin"${attr("value", form?.username || "")}/></div> <div><label for="password" class="block text-sm font-medium text-slate-700 mb-1">Password <span class="text-red-500">*</span></label> `);
+      PasswordInput($$renderer2, {
+        id: "password",
+        name: "password",
+        required: true,
+        placeholder: "Minimal 6 karakter"
+      });
+      $$renderer2.push(`<!----></div> <div class="col-span-1 md:col-span-2 flex space-x-3 pt-2"><button type="submit" class="btn btn-primary">Simpan Admin</button> <button type="button" class="btn btn-secondary">Batal</button></div></form></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
