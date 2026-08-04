@@ -180,6 +180,10 @@
 		"src/routes/siswa/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/siswa/tata-tertib": [
+		"src/routes/siswa/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/siswa/ujian": [
 		"src/routes/siswa/ujian/+page.server.ts",
 		"src/routes/siswa/+layout.server.ts",

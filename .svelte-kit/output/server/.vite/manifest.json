@@ -250,7 +250,7 @@
       "_stores.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.PGd6xN02.css"
+      "_app/immutable/assets/_layout.UoSEgfCA.css"
     ]
   },
   "src/routes/+page.server.ts": {
@@ -1105,6 +1105,15 @@
     "imports": [
       "_index.js",
       "_constants.js"
+    ]
+  },
+  "src/routes/siswa/tata-tertib/+page.svelte": {
+    "file": "entries/pages/siswa/tata-tertib/_page.svelte.js",
+    "name": "entries/pages/siswa/tata-tertib/_page.svelte",
+    "src": "src/routes/siswa/tata-tertib/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js"
     ]
   },
   "src/routes/siswa/ujian/+page.server.ts": {

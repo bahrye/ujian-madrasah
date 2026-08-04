@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg"]),
 	mimeTypes: {".svg":"image/svg+xml"},
 	_: {
-		client: {start:"_app/immutable/entry/start.C8QF6hko.js",app:"_app/immutable/entry/app.B_hmpzzM.js",imports:["_app/immutable/entry/start.C8QF6hko.js","_app/immutable/chunks/DRpVg4JV.js","_app/immutable/chunks/D7FvC3v6.js","_app/immutable/chunks/GROjdWtC.js","_app/immutable/chunks/CsadQQqy.js","_app/immutable/chunks/D1GDGeK4.js","_app/immutable/entry/app.B_hmpzzM.js","_app/immutable/chunks/GROjdWtC.js","_app/immutable/chunks/CsadQQqy.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/D7FvC3v6.js","_app/immutable/chunks/C5HAPqUk.js","_app/immutable/chunks/BGnpMMhG.js","_app/immutable/chunks/BaTBMN-4.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
+		client: {start:"_app/immutable/entry/start.hQAOEwxg.js",app:"_app/immutable/entry/app.BmPZYNyi.js",imports:["_app/immutable/entry/start.hQAOEwxg.js","_app/immutable/chunks/CW1QeZkm.js","_app/immutable/chunks/CWhSAF0N.js","_app/immutable/chunks/DEmwldwl.js","_app/immutable/chunks/ImmirkrM.js","_app/immutable/chunks/CkvDeUEG.js","_app/immutable/chunks/B6Zao61k.js","_app/immutable/entry/app.BmPZYNyi.js","_app/immutable/chunks/DEmwldwl.js","_app/immutable/chunks/ImmirkrM.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CWhSAF0N.js","_app/immutable/chunks/D0MExRDy.js","_app/immutable/chunks/DpA0yPAI.js","_app/immutable/chunks/CARY7BSv.js","_app/immutable/chunks/uSL-mgIf.js","_app/immutable/chunks/B6Zao61k.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
 		nodes: [
 			__memo(() => import('../output/server/nodes/0.js')),
 			__memo(() => import('../output/server/nodes/1.js')),
@@ -55,7 +55,8 @@ return {
 			__memo(() => import('../output/server/nodes/40.js')),
 			__memo(() => import('../output/server/nodes/41.js')),
 			__memo(() => import('../output/server/nodes/42.js')),
-			__memo(() => import('../output/server/nodes/43.js'))
+			__memo(() => import('../output/server/nodes/43.js')),
+			__memo(() => import('../output/server/nodes/44.js'))
 		],
 		remotes: {
 			
@@ -328,45 +329,52 @@ return {
 				endpoint: null
 			},
 			{
+				id: "/siswa/tata-tertib",
+				pattern: /^\/siswa\/tata-tertib\/?$/,
+				params: [],
+				page: { layouts: [0,5,], errors: [1,,], leaf: 38 },
+				endpoint: null
+			},
+			{
 				id: "/siswa/ujian",
 				pattern: /^\/siswa\/ujian\/?$/,
 				params: [],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 38 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 39 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/ujian/[attemptId]",
 				pattern: /^\/siswa\/ujian\/([^/]+?)\/?$/,
 				params: [{"name":"attemptId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,], errors: [1,], leaf: 39 },
+				page: { layouts: [0,], errors: [1,], leaf: 40 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin",
 				pattern: /^\/superadmin\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 40 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 41 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin/accounts",
 				pattern: /^\/superadmin\/accounts\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 41 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 42 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin/admins",
 				pattern: /^\/superadmin\/admins\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 42 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 43 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin/schools",
 				pattern: /^\/superadmin\/schools\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 43 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 44 },
 				endpoint: null
 			}
 		],

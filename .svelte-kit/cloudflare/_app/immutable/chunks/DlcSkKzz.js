@@ -1,1 +1,0 @@
-import{t as p}from"./DNeMqas3.js";import{Y as r,W as i}from"./GROjdWtC.js";function n(t,s,y,f){var l=t[r];if(i||l!==s){var e=p(s);(!i||e!==t.getAttribute("style"))&&(e==null?t.removeAttribute("style"):t.style.cssText=e),t[r]=s}return f}export{n as s};
