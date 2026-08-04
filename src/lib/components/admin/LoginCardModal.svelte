@@ -146,10 +146,13 @@
   .card.size-b1 .ttl { font-size: 9px; margin-top: 1px; }
   .card.size-b1 .cred-value { font-size: 13px; }
   .card.size-b1 .url-value { font-size: 10px; }
-  .card.size-b1 .card-header { padding: 12px; }
-  .card.size-b1 .card-body { padding: 12px; }
+  .card.size-b1 .card-header { padding: 10px 12px; }
+  .card.size-b1 .card-body { padding: 10px 12px; }
   .card.size-b1 .cred-row { padding: 6px 10px; gap: 6px; }
   .card.size-b1 .url-row { padding: 6px 10px; }
+  .card.size-b1 .card-footer { padding: 6px 10px; font-size: 7.5px; line-height: 1.2; }
+  .card.size-b1 .divider { margin: 10px 0; }
+  .card.size-b1 .credentials { margin-bottom: 10px; gap: 8px; }
   .card-header{background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);padding:16px 20px;}
   .logo-area{display:flex;align-items:center;gap:12px;}
   .logo-circle{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
