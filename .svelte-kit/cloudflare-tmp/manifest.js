@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg"]),
 	mimeTypes: {".svg":"image/svg+xml"},
 	_: {
-		client: {start:"_app/immutable/entry/start.ZbFYd4np.js",app:"_app/immutable/entry/app.CHCqXX6n.js",imports:["_app/immutable/entry/start.ZbFYd4np.js","_app/immutable/chunks/BHZYn0uo.js","_app/immutable/chunks/CWhSAF0N.js","_app/immutable/chunks/DEmwldwl.js","_app/immutable/chunks/ImmirkrM.js","_app/immutable/chunks/CL19WIRn.js","_app/immutable/chunks/B6Zao61k.js","_app/immutable/entry/app.CHCqXX6n.js","_app/immutable/chunks/DEmwldwl.js","_app/immutable/chunks/ImmirkrM.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CWhSAF0N.js","_app/immutable/chunks/D0MExRDy.js","_app/immutable/chunks/DpA0yPAI.js","_app/immutable/chunks/CARY7BSv.js","_app/immutable/chunks/uSL-mgIf.js","_app/immutable/chunks/B6Zao61k.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
+		client: {start:"_app/immutable/entry/start.DKccxRsn.js",app:"_app/immutable/entry/app.DaqUQRtv.js",imports:["_app/immutable/entry/start.DKccxRsn.js","_app/immutable/chunks/A0i9hDHg.js","_app/immutable/chunks/CWhSAF0N.js","_app/immutable/chunks/DEmwldwl.js","_app/immutable/chunks/ImmirkrM.js","_app/immutable/chunks/DoiA2Xim.js","_app/immutable/chunks/B6Zao61k.js","_app/immutable/entry/app.DaqUQRtv.js","_app/immutable/chunks/DEmwldwl.js","_app/immutable/chunks/ImmirkrM.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CWhSAF0N.js","_app/immutable/chunks/D0MExRDy.js","_app/immutable/chunks/DpA0yPAI.js","_app/immutable/chunks/CARY7BSv.js","_app/immutable/chunks/uSL-mgIf.js","_app/immutable/chunks/B6Zao61k.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
 		nodes: [
 			__memo(() => import('../output/server/nodes/0.js')),
 			__memo(() => import('../output/server/nodes/1.js')),
@@ -202,6 +202,13 @@ return {
 				params: [],
 				page: null,
 				endpoint: __memo(() => import('../output/server/entries/endpoints/api/media/_server.ts.js'))
+			},
+			{
+				id: "/api/profile",
+				pattern: /^\/api\/profile\/?$/,
+				params: [],
+				page: null,
+				endpoint: __memo(() => import('../output/server/entries/endpoints/api/profile/_server.ts.js'))
 			},
 			{
 				id: "/api/proxy-media",

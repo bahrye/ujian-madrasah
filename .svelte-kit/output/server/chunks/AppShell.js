@@ -1,6 +1,13 @@
-import { l as fallback, s as store_get, f as ensure_array_like, j as attr, i as attr_class, e as escape_html, b as stringify, u as unsubscribe_stores, d as bind_props, c as slot } from "./index.js";
+import { l as fallback, s as store_get, u as unsubscribe_stores, d as bind_props, f as ensure_array_like, j as attr, i as attr_class, e as escape_html, b as stringify, c as slot } from "./index.js";
 import { p as page } from "./stores.js";
 import { I as ICONS, R as ROLE_LABELS } from "./constants.js";
+import "./toast.js";
+import "@sveltejs/kit/internal";
+import "./exports.js";
+import "./utils2.js";
+import "@sveltejs/kit/internal/server";
+import "./root.js";
+import "./state.svelte.js";
 import { T as Toast } from "./Toast2.js";
 function Sidebar($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
@@ -22,33 +29,63 @@ function Sidebar($$renderer, $$props) {
       siswa: "from-cyan-500 to-sky-500"
     };
     currentPath = store_get($$store_subs ??= {}, "$page", page).url.pathname;
-    $$renderer2.push(`<aside class="hidden lg:flex flex-col w-64 h-screen bg-gradient-to-b from-primary-950 to-primary-900 text-white border-r border-primary-800/50 fixed left-0 top-0 z-40"><div class="p-6 border-b border-primary-800/50"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-400 to-violet-400 flex items-center justify-center shadow-lg shadow-indigo-500/30"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg></div> <div><h1 class="text-base font-bold tracking-tight">Ujian Madrasah</h1> <p class="text-xs text-primary-300">Sistem Ujian Online</p></div></div></div> <nav class="flex-1 p-4 space-y-1 overflow-y-auto"><!--[-->`);
-    const each_array = ensure_array_like(menuItems);
-    for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
-      let item = each_array[$$index];
-      $$renderer2.push(`<a${attr("href", item.href)}${attr_class(`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${isActive(item.href, currentPath) ? "bg-white/15 text-white shadow-lg shadow-white/5" : "text-primary-300 hover:text-white hover:bg-white/10"}`)}><svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS[item.icon] || "")}></path></svg> <span>${escape_html(item.label)}</span> `);
-      if (isActive(item.href, currentPath)) {
-        $$renderer2.push("<!--[0-->");
-        $$renderer2.push(`<div class="ml-auto w-1.5 h-1.5 rounded-full bg-white shadow-lg shadow-white/50"></div>`);
+    let $$settled = true;
+    let $$inner_renderer;
+    function $$render_inner($$renderer3) {
+      $$renderer3.push(`<aside class="hidden lg:flex flex-col w-64 h-screen bg-gradient-to-b from-primary-950 to-primary-900 text-white border-r border-primary-800/50 fixed left-0 top-0 z-40"><div class="p-6 border-b border-primary-800/50"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-400 to-violet-400 flex items-center justify-center shadow-lg shadow-indigo-500/30"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg></div> <div><h1 class="text-base font-bold tracking-tight">Ujian Madrasah</h1> <p class="text-xs text-primary-300">Sistem Ujian Online</p></div></div></div> <nav class="flex-1 p-4 space-y-1 overflow-y-auto"><!--[-->`);
+      const each_array = ensure_array_like(menuItems);
+      for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
+        let item = each_array[$$index];
+        $$renderer3.push(`<a${attr("href", item.href)}${attr_class(`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${isActive(item.href, currentPath) ? "bg-white/15 text-white shadow-lg shadow-white/5" : "text-primary-300 hover:text-white hover:bg-white/10"}`)}><svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS[item.icon] || "")}></path></svg> <span>${escape_html(item.label)}</span> `);
+        if (isActive(item.href, currentPath)) {
+          $$renderer3.push("<!--[0-->");
+          $$renderer3.push(`<div class="ml-auto w-1.5 h-1.5 rounded-full bg-white shadow-lg shadow-white/50"></div>`);
+        } else {
+          $$renderer3.push("<!--[-1-->");
+        }
+        $$renderer3.push(`<!--]--></a>`);
+      }
+      $$renderer3.push(`<!--]--></nav> <div class="p-4 border-t border-primary-800/50"><div class="flex items-center gap-3 px-3 py-2">`);
+      if (user?.role === "admin") {
+        $$renderer3.push("<!--[0-->");
+        $$renderer3.push(`<button class="flex-1 flex items-center gap-3 min-w-0 hover:bg-white/10 p-1.5 -ml-1.5 rounded-xl transition-colors text-left" title="Edit Profil"><div${attr_class(`w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br ${stringify(roleGradients[user?.role ?? "siswa"])} flex items-center justify-center text-sm font-bold shadow-lg`)}>${escape_html(user?.name?.charAt(0).toUpperCase() ?? "?")}</div> <div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate group-hover:text-white">${escape_html(user?.name ?? "Pengguna")}</p> <div class="flex items-center gap-1 text-xs text-primary-400"><span>${escape_html(ROLE_LABELS[user?.role ?? ""] ?? "")}</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"${attr("d", ICONS.edit)}></path></svg></div></div></button>`);
       } else {
-        $$renderer2.push("<!--[-1-->");
+        $$renderer3.push("<!--[-1-->");
+        $$renderer3.push(`<div${attr_class(`w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br ${stringify(roleGradients[user?.role ?? "siswa"])} flex items-center justify-center text-sm font-bold shadow-lg`)}>${escape_html(user?.name?.charAt(0).toUpperCase() ?? "?")}</div> <div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate">${escape_html(user?.name ?? "Pengguna")}</p> <p class="text-xs text-primary-400">${escape_html(ROLE_LABELS[user?.role ?? ""] ?? "")}</p></div>`);
       }
-      $$renderer2.push(`<!--]--></a>`);
-    }
-    $$renderer2.push(`<!--]--></nav> <div class="p-4 border-t border-primary-800/50"><div class="flex items-center gap-3 px-3 py-2"><div${attr_class(`w-9 h-9 rounded-full bg-gradient-to-br ${stringify(roleGradients[user?.role ?? "siswa"])} flex items-center justify-center text-sm font-bold shadow-lg`)}>${escape_html(user?.name?.charAt(0).toUpperCase() ?? "?")}</div> <div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate">${escape_html(user?.name ?? "Pengguna")}</p> <p class="text-xs text-primary-400">${escape_html(ROLE_LABELS[user?.role ?? ""] ?? "")}</p></div> <a href="/api/logout" class="p-1.5 rounded-lg text-primary-400 hover:text-white hover:bg-white/10 transition-colors" title="Keluar"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.logout)}></path></svg></a></div></div></aside> `);
-    if (isOpen) {
-      $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="lg:hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"><aside class="w-72 h-full bg-gradient-to-b from-primary-950 to-primary-900 text-white shadow-2xl flex flex-col"><div class="p-5 border-b border-primary-800/50 flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-400 to-violet-400 flex items-center justify-center shadow-lg shadow-indigo-500/30"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg></div> <span class="text-base font-bold">Ujian Madrasah</span></div> <button class="p-1.5 rounded-lg hover:bg-white/10 transition-colors" aria-label="Tutup menu"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.close)}></path></svg></button></div> <nav class="flex-1 p-4 space-y-1 overflow-y-auto"><!--[-->`);
-      const each_array_1 = ensure_array_like(menuItems);
-      for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
-        let item = each_array_1[$$index_1];
-        $$renderer2.push(`<a${attr("href", item.href)}${attr_class(`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive(item.href, currentPath) ? "bg-white/15 text-white" : "text-primary-300 hover:text-white hover:bg-white/10"}`)}><svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS[item.icon] || "")}></path></svg> <span>${escape_html(item.label)}</span></a>`);
+      $$renderer3.push(`<!--]--> <a href="/api/logout" class="p-1.5 rounded-lg text-primary-400 hover:text-white hover:bg-white/10 transition-colors" title="Keluar"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.logout)}></path></svg></a></div></div></aside> `);
+      if (isOpen) {
+        $$renderer3.push("<!--[0-->");
+        $$renderer3.push(`<div class="lg:hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"><aside class="w-72 h-full bg-gradient-to-b from-primary-950 to-primary-900 text-white shadow-2xl flex flex-col"><div class="p-5 border-b border-primary-800/50 flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-400 to-violet-400 flex items-center justify-center shadow-lg shadow-indigo-500/30"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg></div> <span class="text-base font-bold">Ujian Madrasah</span></div> <button class="p-1.5 rounded-lg hover:bg-white/10 transition-colors" aria-label="Tutup menu"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.close)}></path></svg></button></div> <nav class="flex-1 p-4 space-y-1 overflow-y-auto"><!--[-->`);
+        const each_array_1 = ensure_array_like(menuItems);
+        for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
+          let item = each_array_1[$$index_1];
+          $$renderer3.push(`<a${attr("href", item.href)}${attr_class(`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive(item.href, currentPath) ? "bg-white/15 text-white" : "text-primary-300 hover:text-white hover:bg-white/10"}`)}><svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS[item.icon] || "")}></path></svg> <span>${escape_html(item.label)}</span></a>`);
+        }
+        $$renderer3.push(`<!--]--></nav> <div class="p-4 border-t border-primary-800/50"><div class="flex items-center gap-3 px-3 py-2">`);
+        if (user?.role === "admin") {
+          $$renderer3.push("<!--[0-->");
+          $$renderer3.push(`<button class="flex-1 flex items-center gap-3 min-w-0 hover:bg-white/10 p-1.5 -ml-1.5 rounded-xl transition-colors text-left" title="Edit Profil"><div${attr_class(`w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br ${stringify(roleGradients[user?.role ?? "siswa"])} flex items-center justify-center text-sm font-bold`)}>${escape_html(user?.name?.charAt(0).toUpperCase() ?? "?")}</div> <div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate">${escape_html(user?.name ?? "Pengguna")}</p> <div class="flex items-center gap-1 text-xs text-primary-400"><span>${escape_html(ROLE_LABELS[user?.role ?? ""] ?? "")}</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"${attr("d", ICONS.edit)}></path></svg></div></div></button>`);
+        } else {
+          $$renderer3.push("<!--[-1-->");
+          $$renderer3.push(`<div${attr_class(`w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br ${stringify(roleGradients[user?.role ?? "siswa"])} flex items-center justify-center text-sm font-bold`)}>${escape_html(user?.name?.charAt(0).toUpperCase() ?? "?")}</div> <div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate">${escape_html(user?.name ?? "Pengguna")}</p> <p class="text-xs text-primary-400">${escape_html(ROLE_LABELS[user?.role ?? ""] ?? "")}</p></div>`);
+        }
+        $$renderer3.push(`<!--]--></div> <a href="/api/logout" class="mt-2 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-primary-300 hover:text-white hover:bg-white/10 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.logout)}></path></svg> Keluar</a></div></aside></div>`);
+      } else {
+        $$renderer3.push("<!--[-1-->");
       }
-      $$renderer2.push(`<!--]--></nav> <div class="p-4 border-t border-primary-800/50"><div class="flex items-center gap-3 px-3 py-2"><div${attr_class(`w-9 h-9 rounded-full bg-gradient-to-br ${stringify(roleGradients[user?.role ?? "siswa"])} flex items-center justify-center text-sm font-bold`)}>${escape_html(user?.name?.charAt(0).toUpperCase() ?? "?")}</div> <div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate">${escape_html(user?.name ?? "Pengguna")}</p> <p class="text-xs text-primary-400">${escape_html(ROLE_LABELS[user?.role ?? ""] ?? "")}</p></div></div> <a href="/api/logout" class="mt-2 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-primary-300 hover:text-white hover:bg-white/10 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.logout)}></path></svg> Keluar</a></div></aside></div>`);
-    } else {
-      $$renderer2.push("<!--[-1-->");
+      $$renderer3.push(`<!--]--> `);
+      {
+        $$renderer3.push("<!--[-1-->");
+      }
+      $$renderer3.push(`<!--]-->`);
     }
-    $$renderer2.push(`<!--]-->`);
+    do {
+      $$settled = true;
+      $$inner_renderer = $$renderer2.copy();
+      $$render_inner($$inner_renderer);
+    } while (!$$settled);
+    $$renderer2.subsume($$inner_renderer);
     if ($$store_subs) unsubscribe_stores($$store_subs);
     bind_props($$props, { menuItems, user, isOpen });
   });

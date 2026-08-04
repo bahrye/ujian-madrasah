@@ -2,6 +2,9 @@
 	import { page } from '$app/stores';
 	import { ICONS, ROLE_LABELS, type MenuItem } from '$lib/utils/constants';
 	import { fly } from 'svelte/transition';
+	import { toasts } from '$lib/stores/toast';
+	import PasswordInput from '$lib/components/ui/PasswordInput.svelte';
+	import { invalidateAll } from '$app/navigation';
 
 	export let menuItems: MenuItem[] = [];
 	export let user: App.Locals['user'];
@@ -22,6 +25,42 @@
 		pengawas: 'from-amber-500 to-orange-500',
 		siswa: 'from-cyan-500 to-sky-500'
 	};
+
+	let showProfileModal = false;
+	let profileName = '';
+	let profileUsername = '';
+	let profilePassword = '';
+	let isUpdatingProfile = false;
+
+	function openProfileModal() {
+		profileName = user?.name || '';
+		profileUsername = user?.username || '';
+		profilePassword = '';
+		showProfileModal = true;
+	}
+
+	async function handleUpdateProfile() {
+		isUpdatingProfile = true;
+		try {
+			const res = await fetch('/api/profile', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ name: profileName, username: profileUsername, password: profilePassword })
+			});
+			const data = await res.json();
+			if (!res.ok) {
+				toasts.error(data.error || 'Terjadi kesalahan.');
+			} else {
+				toasts.success(data.message);
+				showProfileModal = false;
+				await invalidateAll(); // Refresh data to update locals.user
+			}
+		} catch(e: any) {
+			toasts.error(e.message);
+		} finally {
+			isUpdatingProfile = false;
+		}
+	}
 </script>
 
 <!-- Desktop Sidebar -->
@@ -68,13 +107,28 @@
 	<!-- User Info -->
 	<div class="p-4 border-t border-primary-800/50">
 		<div class="flex items-center gap-3 px-3 py-2">
-			<div class="w-9 h-9 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-sm font-bold shadow-lg">
-				{user?.name?.charAt(0).toUpperCase() ?? '?'}
-			</div>
-			<div class="flex-1 min-w-0">
-				<p class="text-sm font-semibold truncate">{user?.name ?? 'Pengguna'}</p>
-				<p class="text-xs text-primary-400">{ROLE_LABELS[user?.role ?? ''] ?? ''}</p>
-			</div>
+			{#if user?.role === 'admin'}
+				<button class="flex-1 flex items-center gap-3 min-w-0 hover:bg-white/10 p-1.5 -ml-1.5 rounded-xl transition-colors text-left" on:click={openProfileModal} title="Edit Profil">
+					<div class="w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-sm font-bold shadow-lg">
+						{user?.name?.charAt(0).toUpperCase() ?? '?'}
+					</div>
+					<div class="flex-1 min-w-0">
+						<p class="text-sm font-semibold truncate group-hover:text-white">{user?.name ?? 'Pengguna'}</p>
+						<div class="flex items-center gap-1 text-xs text-primary-400">
+							<span>{ROLE_LABELS[user?.role ?? ''] ?? ''}</span>
+							<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={ICONS.edit} /></svg>
+						</div>
+					</div>
+				</button>
+			{:else}
+				<div class="w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-sm font-bold shadow-lg">
+					{user?.name?.charAt(0).toUpperCase() ?? '?'}
+				</div>
+				<div class="flex-1 min-w-0">
+					<p class="text-sm font-semibold truncate">{user?.name ?? 'Pengguna'}</p>
+					<p class="text-xs text-primary-400">{ROLE_LABELS[user?.role ?? ''] ?? ''}</p>
+				</div>
+			{/if}
 			<a
 				href="/api/logout"
 				class="p-1.5 rounded-lg text-primary-400 hover:text-white hover:bg-white/10 transition-colors"
@@ -146,13 +200,28 @@
 			<!-- User + Logout -->
 			<div class="p-4 border-t border-primary-800/50">
 				<div class="flex items-center gap-3 px-3 py-2">
-					<div class="w-9 h-9 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-sm font-bold">
-						{user?.name?.charAt(0).toUpperCase() ?? '?'}
-					</div>
-					<div class="flex-1 min-w-0">
-						<p class="text-sm font-semibold truncate">{user?.name ?? 'Pengguna'}</p>
-						<p class="text-xs text-primary-400">{ROLE_LABELS[user?.role ?? ''] ?? ''}</p>
-					</div>
+					{#if user?.role === 'admin'}
+						<button class="flex-1 flex items-center gap-3 min-w-0 hover:bg-white/10 p-1.5 -ml-1.5 rounded-xl transition-colors text-left" on:click={openProfileModal} title="Edit Profil">
+							<div class="w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-sm font-bold">
+								{user?.name?.charAt(0).toUpperCase() ?? '?'}
+							</div>
+							<div class="flex-1 min-w-0">
+								<p class="text-sm font-semibold truncate">{user?.name ?? 'Pengguna'}</p>
+								<div class="flex items-center gap-1 text-xs text-primary-400">
+									<span>{ROLE_LABELS[user?.role ?? ''] ?? ''}</span>
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={ICONS.edit} /></svg>
+								</div>
+							</div>
+						</button>
+					{:else}
+						<div class="w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-sm font-bold">
+							{user?.name?.charAt(0).toUpperCase() ?? '?'}
+						</div>
+						<div class="flex-1 min-w-0">
+							<p class="text-sm font-semibold truncate">{user?.name ?? 'Pengguna'}</p>
+							<p class="text-xs text-primary-400">{ROLE_LABELS[user?.role ?? ''] ?? ''}</p>
+						</div>
+					{/if}
 				</div>
 				<a
 					href="/api/logout"
@@ -165,5 +234,40 @@
 				</a>
 			</div>
 		</aside>
+	</div>
+{/if}
+
+<!-- Profile Modal (Admin Only) -->
+{#if showProfileModal}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => (showProfileModal = false)}>
+		<div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md animate-bounce-in text-slate-800" on:click|stopPropagation>
+			<h2 class="text-lg font-bold text-slate-800 mb-4">Edit Profil Administrator</h2>
+			<form on:submit|preventDefault={handleUpdateProfile} class="space-y-4">
+				<div>
+					<label for="profile-name" class="label">Nama Lengkap</label>
+					<input id="profile-name" type="text" required class="input" bind:value={profileName} />
+				</div>
+				<div>
+					<label for="profile-username" class="label">Username</label>
+					<input id="profile-username" type="text" required class="input" bind:value={profileUsername} />
+				</div>
+				<div>
+					<label for="profile-password" class="label">Kata Sandi Baru <span class="text-slate-400 font-normal">(kosongkan jika tidak diubah)</span></label>
+					<PasswordInput id="profile-password" name="password" required={false} placeholder="Kata sandi baru" bind:value={profilePassword} />
+				</div>
+				<div class="flex gap-3 pt-2">
+					<button type="button" class="btn btn-secondary flex-1" on:click={() => (showProfileModal = false)}>Batal</button>
+					<button type="submit" class="btn btn-primary flex-1" disabled={isUpdatingProfile}>
+						{#if isUpdatingProfile}
+							Menyimpan...
+						{:else}
+							Simpan Perubahan
+						{/if}
+					</button>
+				</div>
+			</form>
+		</div>
 	</div>
 {/if}

@@ -90,6 +90,9 @@
 	"/api/media": [
 		"src/routes/api/media/+server.ts"
 	],
+	"/api/profile": [
+		"src/routes/api/profile/+server.ts"
+	],
 	"/api/proxy-media": [
 		"src/routes/api/proxy-media/+server.ts"
 	],
