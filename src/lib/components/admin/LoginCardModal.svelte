@@ -1,7 +1,7 @@
 <script lang="ts">
   export let show = false;
   export let classes: { id: number | string; name: string }[] = [];
-  export let students: { id: number | string; name: string; username: string; class_id: number | string | null; class_name: string | null }[] = [];
+  export let students: { id: number | string; name: string; username: string; class_id: number | string | null; class_name: string | null; place_of_birth?: string | null; date_of_birth?: string | null }[] = [];
   export let schoolName: string = '';
   export let schoolLogo: string = '';
 
@@ -12,6 +12,20 @@
     : [];
 
   $: selectedClassName = classes.find((c) => String(c.id) === String(selectedClassId))?.name ?? '';
+
+  function formatBirth(place?: string | null, dateStr?: string | null) {
+    if (!place && !dateStr) return '';
+    let formattedDate = '';
+    if (dateStr) {
+      try {
+        formattedDate = new Date(String(dateStr).replace(' ', 'T')).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+      } catch {
+        formattedDate = dateStr;
+      }
+    }
+    if (place && formattedDate) return `${place}, ${formattedDate}`;
+    return place || formattedDate || '';
+  }
 
   function getLoginUrl() {
     if (typeof window !== 'undefined') {
@@ -56,7 +70,9 @@
 
     const cardsHtml = filteredStudents
       .map(
-        (s) => `
+        (s) => {
+          const ttl = formatBirth(s.place_of_birth, s.date_of_birth);
+          return `
         <div class="card">
           <div class="card-header">
             <div class="logo-area">
@@ -71,6 +87,7 @@
           <div class="card-body">
             <div class="avatar">${escapeHtml(s.name.charAt(0).toUpperCase())}</div>
             <div class="name">${escapeHtml(s.name)}</div>
+            ${ttl ? `<div class="ttl">📍 ${escapeHtml(ttl)}</div>` : ''}
             <div class="divider"></div>
             <div class="credentials">
               <div class="cred-row">
@@ -94,7 +111,8 @@
             </div>
           </div>
           <div class="card-footer">Simpan kartu ini baik-baik &#183; Jangan bagikan ke orang lain</div>
-        </div>`
+        </div>`;
+        }
       )
       .join('');
 
@@ -119,6 +137,7 @@
   .card-body{padding:20px;}
   .avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;margin:0 auto 10px;}
   .name{text-align:center;font-size:16px;font-weight:700;color:#1e293b;letter-spacing:-0.01em;line-height:1.3;}
+  .ttl{text-align:center;font-size:11px;font-weight:600;color:#64748b;margin-top:3px;}
   .divider{height:1px;background:linear-gradient(90deg,transparent,#e2e8f0,transparent);margin:14px 0;}
   .credentials{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
   .cred-row{display:flex;align-items:center;gap:10px;background:#f8fafc;border-radius:12px;padding:10px 14px;border:1px solid #e2e8f0;}
@@ -255,6 +274,11 @@
                     <div class="min-w-0">
                       <p class="text-sm font-bold text-slate-800 leading-tight truncate">{filteredStudents[0].name}</p>
                       <p class="text-xs text-slate-400">{selectedClassName}</p>
+                      {#if formatBirth(filteredStudents[0].place_of_birth, filteredStudents[0].date_of_birth)}
+                        <p class="text-[11px] font-semibold text-indigo-600 truncate mt-0.5">
+                          📍 {formatBirth(filteredStudents[0].place_of_birth, filteredStudents[0].date_of_birth)}
+                        </p>
+                      {/if}
                     </div>
                   </div>
                   <div class="space-y-2">
