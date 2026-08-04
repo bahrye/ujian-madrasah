@@ -68,35 +68,36 @@
 		<div class="table-container border-0 rounded-none">
 			<table class="table">
 				<thead>
-					<tr>
-						<th>Nama</th>
-						<th>Username</th>
-						<th>Role</th>
-						<th>Status</th>
-						<th>Dibuat</th>
-						<th class="text-right">Aksi</th>
+					<tr class="bg-slate-50 text-slate-500 text-sm">
+						<th class="p-4 font-semibold whitespace-nowrap">Nama</th>
+						<th class="p-4 font-semibold whitespace-nowrap">Username</th>
+						<th class="p-4 font-semibold whitespace-nowrap">Role</th>
+						<th class="p-4 font-semibold whitespace-nowrap">Status</th>
+						<th class="p-4 font-semibold whitespace-nowrap">Dibuat</th>
+						<th class="p-4 font-semibold text-right whitespace-nowrap">Aksi</th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody class="divide-y divide-slate-100 text-slate-700">
 					{#each data.users as user (user.id)}
-						<tr>
-							<td class="font-semibold text-slate-800">{user.name}</td>
-							<td class="text-slate-600">@{user.username}</td>
-							<td><span class={ROLE_COLORS[user.role] || 'badge-info'}>{ROLE_LABELS[user.role] || user.role}</span></td>
-							<td>
+						<tr class="hover:bg-slate-50/80 transition-colors">
+							<td class="p-4 font-semibold text-slate-800 whitespace-nowrap">{user.name}</td>
+							<td class="p-4 text-slate-600 whitespace-nowrap">@{user.username}</td>
+							<td class="p-4 whitespace-nowrap"><span class="{ROLE_COLORS[user.role] || 'badge-info'} whitespace-nowrap">{ROLE_LABELS[user.role] || user.role}</span></td>
+							<td class="p-4 whitespace-nowrap">
 								{#if user.is_active}
-									<span class="badge-success">Aktif</span>
+									<span class="badge-success whitespace-nowrap">Aktif</span>
 								{:else}
-									<span class="badge-danger">Nonaktif</span>
+									<span class="badge-danger whitespace-nowrap">Nonaktif</span>
 								{/if}
 							</td>
-							<td class="text-xs text-slate-500">{new Date(String(user.created_at).replace(' ', 'T') + (String(user.created_at).includes('Z') ? '' : 'Z')).toLocaleDateString('id-ID')}</td>
-							<td class="text-right">
-								<div class="flex items-center justify-end gap-1">
+							<td class="p-4 text-xs text-slate-500 whitespace-nowrap">{new Date(String(user.created_at).replace(' ', 'T') + (String(user.created_at).includes('Z') ? '' : 'Z')).toLocaleDateString('id-ID')}</td>
+							<td class="p-4 text-right whitespace-nowrap">
+								<div class="flex items-center justify-end gap-1.5 whitespace-nowrap">
 									<button
-										class="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+										type="button"
+										class="p-2 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700 transition-colors shadow-xs"
 										on:click={() => (editingUser = { ...user })}
-										title="Edit"
+										title="Edit Pengguna"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 											<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.edit} />
@@ -104,7 +105,8 @@
 									</button>
 									{#if user.is_active}
 										<button
-											class="p-1.5 rounded-lg text-slate-300 cursor-not-allowed opacity-50"
+											type="button"
+											class="p-2 rounded-xl bg-slate-100 text-slate-300 cursor-not-allowed opacity-60 shadow-xs"
 											disabled
 											title="Nonaktifkan pengguna terlebih dahulu sebelum menghapus"
 										>
@@ -114,7 +116,8 @@
 										</button>
 									{:else}
 										<button
-											class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+											type="button"
+											class="p-2 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700 transition-colors shadow-xs"
 											on:click={() => (deleteConfirm = user.id)}
 											title="Hapus Pengguna Nonaktif"
 										>
@@ -128,7 +131,7 @@
 						</tr>
 					{:else}
 						<tr>
-							<td colspan="6" class="text-center py-8 text-slate-400">Tidak ada pengguna ditemukan.</td>
+							<td colspan="6" class="text-center py-8 text-slate-400 whitespace-nowrap">Tidak ada pengguna ditemukan.</td>
 						</tr>
 					{/each}
 				</tbody>
