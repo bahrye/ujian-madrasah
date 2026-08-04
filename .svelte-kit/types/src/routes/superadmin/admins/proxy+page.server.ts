@@ -76,17 +76,36 @@ export const actions = {
 			return fail(500, { error: 'Gagal merubah status admin' });
 		}
 	},
-	delete: async ({ request, platform }: import('./$types').RequestEvent) => {
+	delete: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+		if (!locals.user || locals.user.role !== 'superadmin') return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const data = await request.formData();
 		const id = data.get('id')?.toString();
 
 		if (!id) return fail(400, { error: 'ID tidak valid' });
 
+		const userToDelete = await db.prepare('SELECT id, is_active FROM users WHERE id = ? AND role = "admin"')
+			.bind(id)
+			.first<{ id: number; is_active: number }>();
+
+		if (!userToDelete) {
+			return fail(404, { error: 'Admin tidak ditemukan' });
+		}
+
+		if (userToDelete.is_active === 1) {
+			return fail(400, { error: 'Gagal dihapus: Admin masih AKTIF. Harap nonaktifkan admin terlebih dahulu!' });
+		}
+
 		try {
-			await db.prepare('DELETE FROM users WHERE id = ? AND role = "admin"').bind(id).run();
+			await db.batch([
+				db.prepare('UPDATE exams SET created_by = NULL WHERE created_by = ?').bind(id),
+				db.prepare('UPDATE tokens SET created_by = NULL WHERE created_by = ?').bind(id),
+				db.prepare('UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?').bind(id),
+				db.prepare('DELETE FROM users WHERE id = ? AND role = "admin"').bind(id)
+			]);
 			return { success: true };
 		} catch (e) {
+			console.error('Delete admin error:', e);
 			return fail(500, { error: 'Gagal menghapus admin' });
 		}
 	}

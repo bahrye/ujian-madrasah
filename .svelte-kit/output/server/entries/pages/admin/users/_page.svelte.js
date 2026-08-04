@@ -79,7 +79,15 @@ function _page($$renderer, $$props) {
             $$renderer3.push("<!--[-1-->");
             $$renderer3.push(`<span class="badge-danger">Nonaktif</span>`);
           }
-          $$renderer3.push(`<!--]--></td><td class="text-xs text-slate-500">${escape_html((/* @__PURE__ */ new Date(String(user.created_at).replace(" ", "T") + (String(user.created_at).includes("Z") ? "" : "Z"))).toLocaleDateString("id-ID"))}</td><td class="text-right"><div class="flex items-center justify-end gap-1"><button class="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.edit)}></path></svg></button> <button class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="Hapus"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.trash)}></path></svg></button></div></td></tr>`);
+          $$renderer3.push(`<!--]--></td><td class="text-xs text-slate-500">${escape_html((/* @__PURE__ */ new Date(String(user.created_at).replace(" ", "T") + (String(user.created_at).includes("Z") ? "" : "Z"))).toLocaleDateString("id-ID"))}</td><td class="text-right"><div class="flex items-center justify-end gap-1"><button class="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.edit)}></path></svg></button> `);
+          if (user.is_active) {
+            $$renderer3.push("<!--[0-->");
+            $$renderer3.push(`<button class="p-1.5 rounded-lg text-slate-300 cursor-not-allowed opacity-50" disabled="" title="Nonaktifkan pengguna terlebih dahulu sebelum menghapus"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.trash)}></path></svg></button>`);
+          } else {
+            $$renderer3.push("<!--[-1-->");
+            $$renderer3.push(`<button class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="Hapus Pengguna Nonaktif"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.trash)}></path></svg></button>`);
+          }
+          $$renderer3.push(`<!--]--></div></td></tr>`);
         }
       } else {
         $$renderer3.push("<!--[!-->");

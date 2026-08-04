@@ -107,15 +107,50 @@ export const actions = {
 	},
 
 	delete: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const form = await request.formData();
 		const id = form.get('id')?.toString();
-		const schoolId = locals.user!.school_id;
+		const schoolId = locals.user.school_id;
 
 		if (!id) return fail(400, { error: 'ID tidak valid.' });
 
-		await db.prepare('DELETE FROM users WHERE id = ? AND school_id = ?').bind(id, schoolId).run();
-		return { success: 'Pengguna berhasil dihapus.' };
+		// Cek pengguna yang akan dihapus
+		const userToDelete = await db.prepare('SELECT id, is_active, role FROM users WHERE id = ? AND school_id = ?')
+			.bind(id, schoolId)
+			.first<{ id: number; is_active: number; role: string }>();
+
+		if (!userToDelete) {
+			return fail(404, { error: 'Pengguna tidak ditemukan.' });
+		}
+
+		if (userToDelete.id === locals.user.id) {
+			return fail(400, { error: 'Anda tidak dapat menghapus akun Anda sendiri.' });
+		}
+
+		if (userToDelete.is_active === 1) {
+			return fail(400, { error: 'Gagal dihapus: Pengguna masih AKTIF. Harap nonaktifkan pengguna terlebih dahulu!' });
+		}
+
+		try {
+			// Bersihkan keterkaitan Foreign Key agar tidak terjadi error 500 (Foreign Key Constraint Failed)
+			await db.batch([
+				db.prepare('UPDATE exams SET created_by = NULL WHERE created_by = ?').bind(id),
+				db.prepare('UPDATE tokens SET created_by = NULL WHERE created_by = ?').bind(id),
+				db.prepare('UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?').bind(id),
+				db.prepare('DELETE FROM exam_teachers WHERE teacher_id = ?').bind(id),
+				db.prepare('DELETE FROM exam_proctors WHERE proctor_id = ?').bind(id),
+				db.prepare('DELETE FROM exam_participants WHERE student_id = ?').bind(id),
+				db.prepare('DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)').bind(id),
+				db.prepare('DELETE FROM student_attempts WHERE student_id = ?').bind(id),
+				db.prepare('DELETE FROM users WHERE id = ? AND school_id = ?').bind(id, schoolId)
+			]);
+
+			return { success: 'Pengguna nonaktif berhasil dihapus.' };
+		} catch (err: any) {
+			console.error('Delete user error:', err);
+			return fail(500, { error: 'Terjadi kesalahan sistem saat menghapus pengguna.' });
+		}
 	},
 
 	importExcel: async ({ request, locals, platform }: import('./$types').RequestEvent) => {

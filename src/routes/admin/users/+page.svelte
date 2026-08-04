@@ -102,15 +102,27 @@
 											<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.edit} />
 										</svg>
 									</button>
-									<button
-										class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-										on:click={() => (deleteConfirm = user.id)}
-										title="Hapus"
-									>
-										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-											<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
-										</svg>
-									</button>
+									{#if user.is_active}
+										<button
+											class="p-1.5 rounded-lg text-slate-300 cursor-not-allowed opacity-50"
+											disabled
+											title="Nonaktifkan pengguna terlebih dahulu sebelum menghapus"
+										>
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+												<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
+											</svg>
+										</button>
+									{:else}
+										<button
+											class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+											on:click={() => (deleteConfirm = user.id)}
+											title="Hapus Pengguna Nonaktif"
+										>
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+												<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
+											</svg>
+										</button>
+									{/if}
 								</div>
 							</td>
 						</tr>
