@@ -12,7 +12,7 @@ function _page($$renderer, $$props) {
     let school;
     let data = $$props["data"];
     let form = $$props["form"];
-    let logoUrl = school?.logo_url || "";
+    let logoUrl = data.school?.logo_url || "";
     let isUploading = false;
     public_env.PUBLIC_CLOUDINARY_CLOUD_NAME || "dfhtjgwcz";
     public_env.PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ujian-madrasah";
