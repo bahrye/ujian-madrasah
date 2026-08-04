@@ -196,6 +196,11 @@
 		"src/routes/superadmin/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/superadmin/accounts": [
+		"src/routes/superadmin/accounts/+page.server.ts",
+		"src/routes/superadmin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/superadmin/admins": [
 		"src/routes/superadmin/admins/+page.server.ts",
 		"src/routes/superadmin/+layout.server.ts",

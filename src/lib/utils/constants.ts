@@ -60,7 +60,8 @@ export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
 	superadmin: [
 		{ label: 'Dashboard', href: '/superadmin', icon: 'dashboard' },
 		{ label: 'Daftar Sekolah', href: '/superadmin/schools', icon: 'school' },
-		{ label: 'Admin Sekolah', href: '/superadmin/admins', icon: 'users' }
+		{ label: 'Admin Sekolah', href: '/superadmin/admins', icon: 'users' },
+		{ label: 'Akun Superadmin', href: '/superadmin/accounts', icon: 'profile' }
 	],
 	admin: [
 		{ label: 'Dashboard', href: '/admin', icon: 'dashboard' },

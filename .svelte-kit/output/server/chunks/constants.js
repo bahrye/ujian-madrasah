@@ -33,7 +33,8 @@ const SIDEBAR_MENUS = {
   superadmin: [
     { label: "Dashboard", href: "/superadmin", icon: "dashboard" },
     { label: "Daftar Sekolah", href: "/superadmin/schools", icon: "school" },
-    { label: "Admin Sekolah", href: "/superadmin/admins", icon: "users" }
+    { label: "Admin Sekolah", href: "/superadmin/admins", icon: "users" },
+    { label: "Akun Superadmin", href: "/superadmin/accounts", icon: "profile" }
   ],
   admin: [
     { label: "Dashboard", href: "/admin", icon: "dashboard" },

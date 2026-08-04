@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg"]),
 	mimeTypes: {".svg":"image/svg+xml"},
 	_: {
-		client: {start:"_app/immutable/entry/start.dA0fRmyX.js",app:"_app/immutable/entry/app.CTBugZht.js",imports:["_app/immutable/entry/start.dA0fRmyX.js","_app/immutable/chunks/CSFZ6qQM.js","_app/immutable/chunks/D7FvC3v6.js","_app/immutable/chunks/GROjdWtC.js","_app/immutable/chunks/CsadQQqy.js","_app/immutable/chunks/CNf4rz13.js","_app/immutable/entry/app.CTBugZht.js","_app/immutable/chunks/GROjdWtC.js","_app/immutable/chunks/CsadQQqy.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/D7FvC3v6.js","_app/immutable/chunks/C5HAPqUk.js","_app/immutable/chunks/BGnpMMhG.js","_app/immutable/chunks/BaTBMN-4.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
+		client: {start:"_app/immutable/entry/start.CC-AMUH4.js",app:"_app/immutable/entry/app.BOw3lfXW.js",imports:["_app/immutable/entry/start.CC-AMUH4.js","_app/immutable/chunks/DNFYlxpO.js","_app/immutable/chunks/D7FvC3v6.js","_app/immutable/chunks/GROjdWtC.js","_app/immutable/chunks/CsadQQqy.js","_app/immutable/chunks/Cc9KSkJx.js","_app/immutable/entry/app.BOw3lfXW.js","_app/immutable/chunks/GROjdWtC.js","_app/immutable/chunks/CsadQQqy.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/D7FvC3v6.js","_app/immutable/chunks/C5HAPqUk.js","_app/immutable/chunks/BGnpMMhG.js","_app/immutable/chunks/BaTBMN-4.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
 		nodes: [
 			__memo(() => import('./nodes/0.js')),
 			__memo(() => import('./nodes/1.js')),
@@ -54,7 +54,8 @@ return {
 			__memo(() => import('./nodes/39.js')),
 			__memo(() => import('./nodes/40.js')),
 			__memo(() => import('./nodes/41.js')),
-			__memo(() => import('./nodes/42.js'))
+			__memo(() => import('./nodes/42.js')),
+			__memo(() => import('./nodes/43.js'))
 		],
 		remotes: {
 			
@@ -348,17 +349,24 @@ return {
 				endpoint: null
 			},
 			{
+				id: "/superadmin/accounts",
+				pattern: /^\/superadmin\/accounts\/?$/,
+				params: [],
+				page: { layouts: [0,6,], errors: [1,,], leaf: 41 },
+				endpoint: null
+			},
+			{
 				id: "/superadmin/admins",
 				pattern: /^\/superadmin\/admins\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 41 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 42 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin/schools",
 				pattern: /^\/superadmin\/schools\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 42 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 43 },
 				endpoint: null
 			}
 		],

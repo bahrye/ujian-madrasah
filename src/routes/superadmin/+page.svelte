@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import StatCard from '$lib/components/dashboard/StatCard.svelte';
+	import { ICONS } from '$lib/utils/constants';
 
 	export let data: PageData;
 	const { totalSchools, totalAdmins, recentSchools } = data;
@@ -18,16 +19,16 @@
 
 	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 		<StatCard
-			title="Total Sekolah"
+			label="Total Sekolah"
 			value={totalSchools.toString()}
-			icon="school"
-			color="badge-primary"
+			icon={ICONS.school}
+			gradient="indigo"
 		/>
 		<StatCard
-			title="Total Admin Sekolah"
+			label="Total Admin Sekolah"
 			value={totalAdmins.toString()}
-			icon="users"
-			color="badge-danger"
+			icon={ICONS.users}
+			gradient="cyan"
 		/>
 	</div>
 

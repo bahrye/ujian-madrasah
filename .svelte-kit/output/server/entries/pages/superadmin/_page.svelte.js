@@ -1,5 +1,6 @@
 import { h as head, f as ensure_array_like, e as escape_html, d as bind_props } from "../../../chunks/index.js";
 import { S as StatCard } from "../../../chunks/StatCard.js";
+import { I as ICONS } from "../../../chunks/constants.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let data = $$props["data"];
@@ -11,17 +12,17 @@ function _page($$renderer, $$props) {
     });
     $$renderer2.push(`<div class="space-y-6"><div><h1 class="text-3xl font-bold text-slate-800 tracking-tight">Superadmin Dashboard</h1> <p class="text-slate-500 mt-1">Ringkasan penggunaan platform ujian multi-sekolah.</p></div> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">`);
     StatCard($$renderer2, {
-      title: "Total Sekolah",
+      label: "Total Sekolah",
       value: totalSchools.toString(),
-      icon: "school",
-      color: "badge-primary"
+      icon: ICONS.school,
+      gradient: "indigo"
     });
     $$renderer2.push(`<!----> `);
     StatCard($$renderer2, {
-      title: "Total Admin Sekolah",
+      label: "Total Admin Sekolah",
       value: totalAdmins.toString(),
-      icon: "users",
-      color: "badge-danger"
+      icon: ICONS.users,
+      gradient: "cyan"
     });
     $$renderer2.push(`<!----></div> <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden"><div class="p-6 border-b border-slate-100"><h2 class="text-xl font-bold text-slate-800">Sekolah Terbaru</h2></div> <div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 text-slate-500 text-sm"><th class="p-4 font-semibold">Nama Sekolah</th><th class="p-4 font-semibold">Alamat</th><th class="p-4 font-semibold">Tanggal Daftar</th><th class="p-4 font-semibold">Status</th></tr></thead><tbody class="divide-y divide-slate-100 text-slate-700">`);
     const each_array = ensure_array_like(recentSchools);
