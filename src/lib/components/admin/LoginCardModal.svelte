@@ -173,9 +173,15 @@
   .card-footer{background:#f8fafc;border-top:1px solid #f1f5f9;padding:8px 16px;font-size:10px;color:#94a3b8;text-align:center;font-weight:500;}
   @media print{
     *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important;}
-    body{background:#ffffff !important;padding:12px;}
-    .grid{gap:15px;}
-    .card{box-shadow:none !important;border:1.5px dashed #94a3b8 !important;}
+    body{background:#ffffff !important;padding:24px;}
+    .grid{gap:24px;}
+    .card{
+      box-shadow:none !important;
+      border: 1px solid #000 !important;
+      outline: 1.5px dashed #94a3b8 !important;
+      outline-offset: 12px !important;
+      margin: 12px;
+    }
     .card-header{background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%) !important;background-color:#4f46e5 !important;}
     .avatar{background:linear-gradient(135deg,#6366f1,#8b5cf6) !important;background-color:#6366f1 !important;}
     .logo-circle{background:rgba(255,255,255,.2) !important;background-color:rgba(255,255,255,.2) !important;}
@@ -340,6 +346,9 @@
                       <p class="text-xs font-bold text-indigo-700 break-all">{getLoginUrl()}</p>
                     </div>
                   </div>
+                </div>
+                <div class="bg-slate-50 px-4 py-2 border-t border-slate-100 text-center">
+                  <p class="text-[9px] font-medium text-slate-400">Simpan kartu ini baik-baik &middot; Jangan bagikan ke orang lain</p>
                 </div>
               </div>
 
