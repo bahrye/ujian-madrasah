@@ -85,6 +85,7 @@ export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
 	],
 	pengawas: [
 		{ label: 'Dashboard', href: '/pengawas', icon: 'dashboard' },
+		{ label: 'Tata Tertib Pengawas', href: '/pengawas/tata-tertib', icon: 'rules' },
 		{ label: 'Token Ujian', href: '/pengawas/tokens', icon: 'token' },
 		{ label: 'Monitoring', href: '/pengawas/monitor', icon: 'monitor' }
 	],

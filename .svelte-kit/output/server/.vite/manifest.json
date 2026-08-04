@@ -250,7 +250,7 @@
       "_stores.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.UoSEgfCA.css"
+      "_app/immutable/assets/_layout.-cMnGdjp.css"
     ]
   },
   "src/routes/+page.server.ts": {
@@ -1023,6 +1023,15 @@
       "_state.svelte.js",
       "_constants.js",
       "_toast.js"
+    ]
+  },
+  "src/routes/pengawas/tata-tertib/+page.svelte": {
+    "file": "entries/pages/pengawas/tata-tertib/_page.svelte.js",
+    "name": "entries/pages/pengawas/tata-tertib/_page.svelte",
+    "src": "src/routes/pengawas/tata-tertib/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js"
     ]
   },
   "src/routes/pengawas/tokens/+page.server.ts": {

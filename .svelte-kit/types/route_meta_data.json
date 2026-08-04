@@ -163,6 +163,10 @@
 		"src/routes/pengawas/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/pengawas/tata-tertib": [
+		"src/routes/pengawas/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/pengawas/tokens": [
 		"src/routes/pengawas/tokens/+page.server.ts",
 		"src/routes/pengawas/+layout.server.ts",

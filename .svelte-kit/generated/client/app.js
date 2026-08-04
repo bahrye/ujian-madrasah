@@ -53,7 +53,8 @@ export const nodes = [
 	() => import('./nodes/41'),
 	() => import('./nodes/42'),
 	() => import('./nodes/43'),
-	() => import('./nodes/44')
+	() => import('./nodes/44'),
+	() => import('./nodes/45')
 ];
 
 export const server_loads = [0,2,3,4,5,6];
@@ -87,16 +88,17 @@ export const dictionary = {
 		"/login": [~32],
 		"/pengawas": [~33,[4]],
 		"/pengawas/monitor": [~34,[4]],
-		"/pengawas/tokens": [~35,[4]],
-		"/siswa": [~36,[5]],
-		"/siswa/jadwal": [~37,[5]],
-		"/siswa/tata-tertib": [38,[5]],
-		"/siswa/ujian": [~39,[5]],
-		"/siswa/ujian/[attemptId]": [~40],
-		"/superadmin": [~41,[6]],
-		"/superadmin/accounts": [~42,[6]],
-		"/superadmin/admins": [~43,[6]],
-		"/superadmin/schools": [~44,[6]]
+		"/pengawas/tata-tertib": [35,[4]],
+		"/pengawas/tokens": [~36,[4]],
+		"/siswa": [~37,[5]],
+		"/siswa/jadwal": [~38,[5]],
+		"/siswa/tata-tertib": [39,[5]],
+		"/siswa/ujian": [~40,[5]],
+		"/siswa/ujian/[attemptId]": [~41],
+		"/superadmin": [~42,[6]],
+		"/superadmin/accounts": [~43,[6]],
+		"/superadmin/admins": [~44,[6]],
+		"/superadmin/schools": [~45,[6]]
 	};
 
 export const hooks = {
