@@ -8,14 +8,6 @@
   let selectedClassId: string = '';
   let cardSize: string = 'default';
 
-  const cardSizes = [
-    { id: 'default', name: 'Standar (Otomatis menyesuaikan)' },
-    { id: 'b1', name: 'ID Card B1 (65 x 102 mm)' },
-    { id: 'b2', name: 'ID Card B2 (79 x 126 mm)' },
-    { id: 'b3', name: 'ID Card B3 (95 x 126 mm)' },
-    { id: 'b4', name: 'ID Card B4 (105 x 155 mm)' }
-  ];
-
   $: filteredStudents = selectedClassId
     ? students.filter((s) => String(s.class_id) === String(selectedClassId))
     : [];
@@ -280,34 +272,19 @@
 
       <!-- Body -->
       <div class="p-5 overflow-y-auto flex-1 space-y-5">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="mb-6">
           <div>
-            <label for="card-class-select" class="block text-sm font-semibold text-slate-700 mb-2">
+            <label for="class-select" class="block text-sm font-semibold text-slate-700 mb-2">
               Pilih Kelas
             </label>
             <select
-              id="card-class-select"
+              id="class-select"
               class="input"
               bind:value={selectedClassId}
             >
               <option value="">-- Pilih kelas --</option>
               {#each classes as cls (cls.id)}
                 <option value={String(cls.id)}>{cls.name}</option>
-              {/each}
-            </select>
-          </div>
-
-          <div>
-            <label for="card-size-select" class="block text-sm font-semibold text-slate-700 mb-2">
-              Ukuran Kartu Cetak
-            </label>
-            <select
-              id="card-size-select"
-              class="input"
-              bind:value={cardSize}
-            >
-              {#each cardSizes as size}
-                <option value={size.id}>{size.name}</option>
               {/each}
             </select>
           </div>
