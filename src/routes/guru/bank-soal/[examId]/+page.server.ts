@@ -65,7 +65,7 @@ export const actions: Actions = {
 		} else if (type === 'menjodohkan') {
 			const leftItems = [];
 			const rightItems = [];
-			for (let i = 0; i < 6; i++) {
+			for (let i = 0; i < 20; i++) {
 				const l = form.get(`left_${i}`)?.toString().trim();
 				const r = form.get(`right_${i}`)?.toString().trim();
 				if (l && r) {
@@ -128,7 +128,7 @@ export const actions: Actions = {
 		} else if (type === 'menjodohkan') {
 			const leftItems = [];
 			const rightItems = [];
-			for (let i = 0; i < 6; i++) {
+			for (let i = 0; i < 20; i++) {
 				const l = form.get(`left_${i}`)?.toString().trim();
 				const r = form.get(`right_${i}`)?.toString().trim();
 				if (l && r) {

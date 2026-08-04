@@ -66,10 +66,18 @@
 	}
 	
 	let editingQuestion: any = null;
+	let createMenjodohkanCount = 4;
+	let editMenjodohkanCount = 4;
 
 	$: if (form?.success) toasts.success(form.success);
 	$: if (form?.error) toasts.error(form.error);
 	$: exam = data.exam as any;
+
+	$: if (editingQuestion && editingQuestion.type === 'menjodohkan') {
+		const opts = editingQuestion.options_json ? JSON.parse(editingQuestion.options_json) : {left:[]};
+		editMenjodohkanCount = Math.max(4, opts.left?.length || 4);
+	}
+
 	$: questions = data.questions as any[];
 </script>
 
@@ -204,7 +212,7 @@
 				{:else if selectedType === 'menjodohkan'}
 					<div class="space-y-2">
 						<label class="label">Pasangan (Kiri → Kanan)</label>
-						{#each [0, 1, 2, 3] as i}
+						{#each Array(createMenjodohkanCount) as _, i}
 							<div class="grid grid-cols-2 gap-2">
 								<div class="flex gap-1">
 									<input id="create_left_{i}" name="left_{i}" type="text" class="input w-full" placeholder="Kiri {i + 1}" />
@@ -216,6 +224,12 @@
 								</div>
 							</div>
 						{/each}
+						<div class="flex items-center gap-2 mt-1">
+							<button type="button" class="btn-ghost btn-sm text-indigo-600 hover:bg-indigo-50" on:click={() => createMenjodohkanCount++}>+ Tambah Baris</button>
+							{#if createMenjodohkanCount > 1}
+								<button type="button" class="btn-ghost btn-sm text-red-600 hover:bg-red-50" on:click={() => createMenjodohkanCount--}>- Kurangi Baris</button>
+							{/if}
+						</div>
 					</div>
 				{:else if selectedType === 'essay'}
 					<div>
@@ -430,7 +444,7 @@
 						{@const opts = editingQuestion.options_json ? JSON.parse(editingQuestion.options_json) : {left:[], right:[]}}
 						<div class="space-y-2">
 							<label class="label">Pasangan (Kiri → Kanan)</label>
-							{#each [0, 1, 2, 3] as i}
+							{#each Array(editMenjodohkanCount) as _, i}
 								<div class="grid grid-cols-2 gap-2">
 									<div class="flex gap-1">
 										<input id="edit_left_{i}" name="left_{i}" type="text" class="input w-full" value={opts.left?.[i] || ''} placeholder="Kiri {i + 1}" />
@@ -442,6 +456,12 @@
 									</div>
 								</div>
 							{/each}
+							<div class="flex items-center gap-2 mt-1">
+								<button type="button" class="btn-ghost btn-sm text-indigo-600 hover:bg-indigo-50" on:click={() => editMenjodohkanCount++}>+ Tambah Baris</button>
+								{#if editMenjodohkanCount > 1}
+									<button type="button" class="btn-ghost btn-sm text-red-600 hover:bg-red-50" on:click={() => editMenjodohkanCount--}>- Kurangi Baris</button>
+								{/if}
+							</div>
 						</div>
 					{:else if editingQuestion.type === 'essay'}
 						{@const correct = editingQuestion.correct_answer_json ? JSON.parse(editingQuestion.correct_answer_json) : ''}
