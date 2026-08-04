@@ -5,8 +5,10 @@
 	import MediaUploader from '$lib/components/admin/MediaUploader.svelte';
 	import QuestionRenderer from '$lib/components/exam/QuestionRenderer.svelte';
 	import ImportExcelModal from '$lib/components/exam/ImportExcelModal.svelte';
+	import { fade, slide } from 'svelte/transition';
 	import { QUESTION_TYPE_LABELS, ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
+	import { tick } from 'svelte';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -76,6 +78,37 @@
 	$: if (editingQuestion && editingQuestion.type === 'menjodohkan') {
 		const opts = editingQuestion.options_json ? JSON.parse(editingQuestion.options_json) : {left:[]};
 		editMenjodohkanCount = Math.max(4, opts.left?.length || 4);
+	}
+
+	async function removeEmptyMenjodohkanRow(mode: 'create' | 'edit') {
+		const count = mode === 'create' ? createMenjodohkanCount : editMenjodohkanCount;
+		if (count <= 1) return;
+
+		let rows = [];
+		for (let i = 0; i < count; i++) {
+			const leftInput = document.getElementById(`${mode}_left_${i}`) as HTMLInputElement;
+			const rightInput = document.getElementById(`${mode}_right_${i}`) as HTMLInputElement;
+			rows.push({ left: leftInput?.value || '', right: rightInput?.value || '' });
+		}
+
+		// Find the last empty row
+		const emptyIndex = rows.findLastIndex(r => !r.left.trim() && !r.right.trim());
+		if (emptyIndex !== -1) {
+			rows.splice(emptyIndex, 1);
+			if (mode === 'create') createMenjodohkanCount--;
+			else editMenjodohkanCount--;
+
+			await tick(); // wait for DOM to remove the last row
+
+			for (let i = 0; i < rows.length; i++) {
+				const leftInput = document.getElementById(`${mode}_left_${i}`) as HTMLInputElement;
+				const rightInput = document.getElementById(`${mode}_right_${i}`) as HTMLInputElement;
+				if (leftInput) leftInput.value = rows[i].left;
+				if (rightInput) rightInput.value = rows[i].right;
+			}
+		} else {
+			toasts.error('Semua baris terisi. Hapus isi baris terlebih dahulu jika ingin menguranginya.');
+		}
 	}
 
 	$: questions = data.questions as any[];
@@ -227,7 +260,7 @@
 						<div class="flex items-center gap-2 mt-1">
 							<button type="button" class="btn-ghost btn-sm text-indigo-600 hover:bg-indigo-50" on:click={() => createMenjodohkanCount++}>+ Tambah Baris</button>
 							{#if createMenjodohkanCount > 1}
-								<button type="button" class="btn-ghost btn-sm text-red-600 hover:bg-red-50" on:click={() => createMenjodohkanCount--}>- Kurangi Baris</button>
+								<button type="button" class="btn-ghost btn-sm text-red-600 hover:bg-red-50" on:click={() => removeEmptyMenjodohkanRow('create')}>- Kurangi Baris</button>
 							{/if}
 						</div>
 					</div>
@@ -459,7 +492,7 @@
 							<div class="flex items-center gap-2 mt-1">
 								<button type="button" class="btn-ghost btn-sm text-indigo-600 hover:bg-indigo-50" on:click={() => editMenjodohkanCount++}>+ Tambah Baris</button>
 								{#if editMenjodohkanCount > 1}
-									<button type="button" class="btn-ghost btn-sm text-red-600 hover:bg-red-50" on:click={() => editMenjodohkanCount--}>- Kurangi Baris</button>
+									<button type="button" class="btn-ghost btn-sm text-red-600 hover:bg-red-50" on:click={() => removeEmptyMenjodohkanRow('edit')}>- Kurangi Baris</button>
 								{/if}
 							</div>
 						</div>
