@@ -35,6 +35,21 @@
 		}
 		window.location.href = url.toString();
 	}
+
+	const classColors = [
+		'bg-emerald-100 text-emerald-800 border border-emerald-200',
+		'bg-sky-100 text-sky-800 border border-sky-200',
+		'bg-amber-100 text-amber-800 border border-amber-200',
+		'bg-rose-100 text-rose-800 border border-rose-200',
+		'bg-violet-100 text-violet-800 border border-violet-200',
+		'bg-fuchsia-100 text-fuchsia-800 border border-fuchsia-200',
+		'bg-indigo-100 text-indigo-800 border border-indigo-200',
+		'bg-teal-100 text-teal-800 border border-teal-200'
+	];
+	function getClassColor(id: number) {
+		if (!id) return 'bg-slate-100 text-slate-800 border border-slate-200';
+		return classColors[id % classColors.length];
+	}
 </script>
 
 <svelte:head>
@@ -84,6 +99,16 @@
 						<p class="text-xs text-slate-500 mt-1">NISN juga akan menjadi Password login.</p>
 					</div>
 				</div>
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+					<div>
+						<label for="place_of_birth" class="block text-sm font-medium text-slate-700 mb-1">Tempat Lahir</label>
+						<input type="text" id="place_of_birth" name="place_of_birth" class="input" placeholder="Kota Kelahiran" />
+					</div>
+					<div>
+						<label for="date_of_birth" class="block text-sm font-medium text-slate-700 mb-1">Tanggal Lahir</label>
+						<input type="date" id="date_of_birth" name="date_of_birth" class="input" />
+					</div>
+				</div>
 				<div>
 					<label for="class_id" class="block text-sm font-medium text-slate-700 mb-1">Kelas</label>
 					<select id="class_id" name="class_id" class="input">
@@ -115,6 +140,16 @@
 						<label for="e-nisn" class="block text-sm font-medium text-slate-700 mb-1">NISN <span class="text-red-500">*</span></label>
 						<input type="text" id="e-nisn" name="nisn" class="input" required value={editingUser.username} />
 						<p class="text-xs text-slate-500 mt-1">Mengubah NISN akan mereset Password.</p>
+					</div>
+				</div>
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+					<div>
+						<label for="e-place_of_birth" class="block text-sm font-medium text-slate-700 mb-1">Tempat Lahir</label>
+						<input type="text" id="e-place_of_birth" name="place_of_birth" class="input" value={editingUser.place_of_birth || ''} />
+					</div>
+					<div>
+						<label for="e-date_of_birth" class="block text-sm font-medium text-slate-700 mb-1">Tanggal Lahir</label>
+						<input type="date" id="e-date_of_birth" name="date_of_birth" class="input" value={editingUser.date_of_birth || ''} />
 					</div>
 				</div>
 				<div>
@@ -180,7 +215,7 @@
 							</td>
 							<td class="p-4">
 								{#if user.class_name}
-									<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+									<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {getClassColor(user.class_id)}">
 										{user.class_name}
 									</span>
 								{:else}

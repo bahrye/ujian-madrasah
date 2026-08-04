@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ locals, url, platform }) => {
 	const classFilter = url.searchParams.get('class') || '';
 
 	let query = `
-		SELECT u.id, u.username, u.name, u.is_active, u.created_at, u.class_id, c.name as class_name 
+		SELECT u.id, u.username, u.name, u.is_active, u.created_at, u.class_id, c.name as class_name, u.place_of_birth, u.date_of_birth 
 		FROM users u 
 		LEFT JOIN classes c ON u.class_id = c.id 
 		WHERE u.school_id = ? AND u.role = 'siswa'
@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ locals, url, platform }) => {
 		params.push(classFilter);
 	}
 
-	query += ' ORDER BY u.name ASC';
+	query += ' ORDER BY c.name ASC, u.name ASC';
 
 	const [usersResult, classesResult, school] = await Promise.all([
 		db.prepare(query).bind(...params).all(),
@@ -48,6 +48,8 @@ export const actions: Actions = {
 		const name = data.get('name')?.toString().trim();
 		const nisn = data.get('nisn')?.toString().trim();
 		const class_id = data.get('class_id')?.toString() || null;
+		const place_of_birth = data.get('place_of_birth')?.toString().trim() || null;
+		const date_of_birth = data.get('date_of_birth')?.toString() || null;
 
 		if (!name || !nisn) {
 			return fail(400, { error: 'Nama dan NISN wajib diisi' });
@@ -63,8 +65,8 @@ export const actions: Actions = {
 			// NISN menjadi username dan password
 			const passwordHash = await hashPassword(nisn);
 			
-			await db.prepare('INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?, ?)')
-				.bind(locals.user!.school_id, class_id, nisn, passwordHash, name, 'siswa')
+			await db.prepare('INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+				.bind(locals.user!.school_id, class_id, nisn, passwordHash, name, 'siswa', place_of_birth, date_of_birth)
 				.run();
 			
 			return { success: true };
@@ -79,6 +81,8 @@ export const actions: Actions = {
 		const name = data.get('name')?.toString().trim();
 		const nisn = data.get('nisn')?.toString().trim();
 		const class_id = data.get('class_id')?.toString() || null;
+		const place_of_birth = data.get('place_of_birth')?.toString().trim() || null;
+		const date_of_birth = data.get('date_of_birth')?.toString() || null;
 
 		if (!id || !name || !nisn) {
 			return fail(400, { error: 'ID, Nama dan NISN wajib diisi' });
@@ -94,8 +98,8 @@ export const actions: Actions = {
 			// Update NISN (sebagai username) dan update password agar sesuai NISN baru
 			const passwordHash = await hashPassword(nisn);
 			
-			await db.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, class_id = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?')
-				.bind(name, nisn, passwordHash, class_id, id, locals.user!.school_id)
+			await db.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, class_id = ?, place_of_birth = ?, date_of_birth = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?')
+				.bind(name, nisn, passwordHash, class_id, place_of_birth, date_of_birth, id, locals.user!.school_id)
 				.run();
 			
 			return { success: true };
@@ -139,8 +143,8 @@ export const actions: Actions = {
 				
 				if (!existing) {
 					const passwordHash = await hashPassword(student.nisn);
-					await db.prepare('INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?, ?)')
-						.bind(locals.user!.school_id, student.class_id, student.nisn, passwordHash, student.name, 'siswa')
+					await db.prepare('INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+						.bind(locals.user!.school_id, student.class_id, student.nisn, passwordHash, student.name, 'siswa', student.place_of_birth || null, student.date_of_birth || null)
 						.run();
 					successCount++;
 				}
