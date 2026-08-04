@@ -93,8 +93,8 @@ export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
 	],
 	siswa: [
 		{ label: 'Dashboard', href: '/siswa', icon: 'dashboard' },
-		{ label: 'Jadwal Ujian', href: '/siswa/jadwal', icon: 'calendar' },
-		{ label: 'Tata Tertib Ujian', href: '/siswa/tata-tertib', icon: 'rules' }
+		{ label: 'Tata Tertib Ujian', href: '/siswa/tata-tertib', icon: 'rules' },
+		{ label: 'Jadwal Ujian', href: '/siswa/jadwal', icon: 'calendar' }
 	]
 };
 
