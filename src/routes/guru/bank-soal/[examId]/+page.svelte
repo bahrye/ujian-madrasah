@@ -89,12 +89,12 @@
 			</div>
 		</div>
 		<div class="flex flex-wrap items-center gap-2 pl-12 sm:pl-0">
-			<button class="btn-ghost btn-sm" on:click={() => (showImportModal = true)}>
-				<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+			<button class="btn bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-all shadow-sm" on:click={() => (showImportModal = true)}>
+				<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
 				Import Excel
 			</button>
-			<button class="btn-primary btn-sm" on:click={() => (showCreateForm = !showCreateForm)}>
-				<svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+			<button class="btn-primary shadow-md shadow-indigo-500/20" on:click={() => (showCreateForm = !showCreateForm)}>
+				<svg class="w-5 h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
 				</svg>
 				Tambah Soal
