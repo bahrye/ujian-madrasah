@@ -177,15 +177,19 @@
   @media print{
     *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important;}
     body{background:#ffffff !important;padding:24px;}
-    .grid{display:block !important; text-align:center;}
+    .grid{
+      display:flex !important;
+      flex-wrap:wrap !important;
+      justify-content:center !important;
+      align-items:flex-start !important;
+      gap:24px !important;
+    }
     .card{
-      display:inline-flex !important;
-      vertical-align:top;
       box-shadow:none !important;
       border: 1px solid #000 !important;
       outline: 1.5px dashed #94a3b8 !important;
       outline-offset: 12px !important;
-      margin: 20px !important;
+      margin: 14px !important;
       break-inside: avoid !important;
       page-break-inside: avoid !important;
       -webkit-column-break-inside: avoid !important;
