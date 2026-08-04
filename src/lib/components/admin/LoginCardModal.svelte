@@ -38,9 +38,9 @@
 
   function getLoginUrl() {
     if (typeof window !== 'undefined') {
-      return window.location.origin + '/login';
+      return window.location.origin;
     }
-    return '/login';
+    return '';
   }
 
   function portal(node: HTMLElement) {
@@ -135,7 +135,7 @@
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:'Inter',sans-serif;background:#f1f5f9;padding:24px;}
   h1{text-align:center;color:#1e293b;font-size:20px;font-weight:800;margin-bottom:20px;letter-spacing:-0.02em;}
-  .grid{display:flex;flex-wrap:wrap;justify-content:center;gap:20px;max-width:1200px;margin:0 auto;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));justify-items:center;gap:20px;max-width:1200px;margin:0 auto;}
   .card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(99,102,241,.13);break-inside:avoid;page-break-inside:avoid;display:flex;flex-direction:column;}
   .card.size-b1 { width: 65mm; height: 102mm; border-radius: 12px; }
   .card.size-b2 { width: 79mm; height: 126mm; border-radius: 12px; }
@@ -178,22 +178,39 @@
     *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important;}
     body{background:#ffffff !important;padding:24px;}
     .grid{
-      display:flex !important;
-      flex-wrap:wrap !important;
-      justify-content:center !important;
-      align-items:flex-start !important;
-      gap:24px !important;
+      display:grid !important;
+      grid-template-columns:repeat(3, 1fr) !important;
+      gap:32px !important;
+      justify-items:center !important;
     }
     .card{
       box-shadow:none !important;
       border: 1px solid #000 !important;
-      outline: 1.5px dashed #94a3b8 !important;
-      outline-offset: 12px !important;
-      margin: 14px !important;
+      margin: 0 !important;
+      outline: none !important;
+      position: relative !important;
       break-inside: avoid !important;
       page-break-inside: avoid !important;
       -webkit-column-break-inside: avoid !important;
+      width: 100% !important; /* Ensure standard cards take full column width */
+      max-width: 85mm !important; /* Prevent them from becoming too massive */
     }
+    .card::before{
+      content: "" !important;
+      position: absolute !important;
+      top: -12px !important;
+      left: -12px !important;
+      right: -12px !important;
+      bottom: -12px !important;
+      border: 1.5px dashed #94a3b8 !important;
+      border-radius: 20px !important;
+      pointer-events: none !important;
+    }
+    /* Specific sizes retain their exact physical width */
+    .card.size-b1 { width: 65mm !important; max-width: none !important; }
+    .card.size-b2 { width: 79mm !important; max-width: none !important; }
+    .card.size-b3 { width: 95mm !important; max-width: none !important; }
+    .card.size-b4 { width: 105mm !important; max-width: none !important; }
     .card-header{background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%) !important;background-color:#4f46e5 !important;}
     .avatar{background:linear-gradient(135deg,#6366f1,#8b5cf6) !important;background-color:#6366f1 !important;}
     .logo-circle{background:rgba(255,255,255,.2) !important;background-color:rgba(255,255,255,.2) !important;}
