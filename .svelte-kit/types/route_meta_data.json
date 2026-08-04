@@ -55,6 +55,11 @@
 		"src/routes/admin/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/admin/school-profile": [
+		"src/routes/admin/school-profile/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/admin/students": [
 		"src/routes/admin/students/+page.server.ts",
 		"src/routes/admin/+layout.server.ts",

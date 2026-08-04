@@ -21,13 +21,16 @@ const load = async ({ locals, url, platform }) => {
     params.push(classFilter);
   }
   query += " ORDER BY u.name ASC";
-  const [usersResult, classesResult] = await Promise.all([
+  const [usersResult, classesResult, school] = await Promise.all([
     db.prepare(query).bind(...params).all(),
-    db.prepare("SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC").bind(locals.user.school_id).all()
+    db.prepare("SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC").bind(locals.user.school_id).all(),
+    db.prepare("SELECT name, logo_url FROM schools WHERE id = ?").bind(locals.user.school_id).first()
   ]);
   return {
     users: usersResult.results,
-    classes: classesResult.results
+    classes: classesResult.results,
+    schoolName: school?.name || "",
+    schoolLogo: school?.logo_url || ""
   };
 };
 const actions = {

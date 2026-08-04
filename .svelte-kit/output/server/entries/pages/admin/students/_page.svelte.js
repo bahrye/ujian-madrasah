@@ -37,6 +37,8 @@ function LoginCardModal($$renderer, $$props) {
     let show = fallback($$props["show"], false);
     let classes = fallback($$props["classes"], () => [], true);
     let students = fallback($$props["students"], () => [], true);
+    let schoolName = fallback($$props["schoolName"], "");
+    let schoolLogo = fallback($$props["schoolLogo"], "");
     let selectedClassId = "";
     classes.find((c) => String(c.id) === String(selectedClassId))?.name ?? "";
     if (show) {
@@ -73,7 +75,7 @@ function LoginCardModal($$renderer, $$props) {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]-->`);
-    bind_props($$props, { show, classes, students });
+    bind_props($$props, { show, classes, students, schoolName, schoolLogo });
   });
 }
 function _page($$renderer, $$props) {
@@ -217,6 +219,8 @@ function _page($$renderer, $$props) {
       LoginCardModal($$renderer3, {
         classes: data.classes,
         students: data.users,
+        schoolName: data.schoolName,
+        schoolLogo: data.schoolLogo,
         get show() {
           return showLoginCardModal;
         },

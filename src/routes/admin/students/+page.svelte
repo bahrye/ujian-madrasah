@@ -254,4 +254,6 @@
 	bind:show={showLoginCardModal}
 	classes={data.classes}
 	students={data.users as any[]}
+	schoolName={data.schoolName}
+	schoolLogo={data.schoolLogo}
 />

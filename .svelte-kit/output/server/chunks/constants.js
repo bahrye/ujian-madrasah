@@ -37,6 +37,7 @@ const SIDEBAR_MENUS = {
   ],
   admin: [
     { label: "Dashboard", href: "/admin", icon: "dashboard" },
+    { label: "Profil Sekolah", href: "/admin/school-profile", icon: "profile" },
     { label: "Pengguna", href: "/admin/users", icon: "users" },
     { label: "Siswa", href: "/admin/students", icon: "users" },
     { label: "Kelas", href: "/admin/classes", icon: "school" },
@@ -89,7 +90,8 @@ const ICONS = {
   warning: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z",
   refresh: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15",
   calendar: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
-  folder: "M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+  folder: "M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z",
+  profile: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
 };
 export {
   ATTEMPT_STATUS_COLORS as A,

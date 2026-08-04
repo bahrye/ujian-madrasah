@@ -2,6 +2,8 @@
   export let show = false;
   export let classes: { id: number | string; name: string }[] = [];
   export let students: { id: number | string; name: string; username: string; class_id: number | string | null; class_name: string | null }[] = [];
+  export let schoolName: string = '';
+  export let schoolLogo: string = '';
 
   let selectedClassId: string = '';
 
@@ -45,6 +47,12 @@
     if (!filteredStudents.length) return;
     const loginUrl = getLoginUrl();
     const cn = selectedClassName;
+    const sn = schoolName;
+    const sl = schoolLogo;
+
+    const logoHtml = sl
+      ? `<img src="${escapeHtml(sl)}" alt="Logo" style="width:40px;height:40px;object-fit:contain;border-radius:8px;background:rgba(255,255,255,.2);padding:3px;" />`
+      : `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>`;
 
     const cardsHtml = filteredStudents
       .map(
@@ -52,13 +60,9 @@
         <div class="card">
           <div class="card-header">
             <div class="logo-area">
-              <div class="logo-circle">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                  <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-                </svg>
-              </div>
+              <div class="logo-circle">${logoHtml}</div>
               <div>
+                ${sn ? `<div class="school-name">${escapeHtml(sn)}</div>` : ''}
                 <div class="school-label">KARTU LOGIN UJIAN</div>
                 <div class="class-label">${escapeHtml(cn)}</div>
               </div>
@@ -98,7 +102,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Kartu Login Siswa - ${escapeHtml(cn)}</title>
+<title>Kartu Login Siswa - ${escapeHtml(cn)}${sn ? ' | ' + escapeHtml(sn) : ''}</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
   *{box-sizing:border-box;margin:0;padding:0;}
@@ -108,8 +112,9 @@
   .card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(99,102,241,.13);break-inside:avoid;page-break-inside:avoid;}
   .card-header{background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);padding:16px 20px;}
   .logo-area{display:flex;align-items:center;gap:12px;}
-  .logo-circle{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .school-label{font-size:10px;font-weight:800;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.08em;}
+  .logo-circle{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
+  .school-name{font-size:13px;font-weight:800;color:#fff;line-height:1.2;}
+  .school-label{font-size:9px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.08em;margin-top:1px;}
   .class-label{font-size:17px;font-weight:800;color:#fff;margin-top:2px;}
   .card-body{padding:20px;}
   .avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;margin:0 auto 10px;}
@@ -224,15 +229,22 @@
               <!-- Card preview -->
               <div class="rounded-xl overflow-hidden shadow-md border border-indigo-200">
                 <div class="flex items-center gap-2.5 px-4 py-3" style="background: linear-gradient(135deg, #4f46e5, #7c3aed);">
-                  <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background: rgba(255,255,255,.2);">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/>
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0121 13c0 5.523-4.477 10-10 10S2 18.523 2 13c0-.97.13-1.91.38-2.8L12 14z"/>
-                    </svg>
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden" style="background: rgba(255,255,255,.15);">
+                    {#if schoolLogo}
+                      <img src={schoolLogo} alt="Logo" class="w-full h-full object-contain p-0.5" />
+                    {:else}
+                      <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0121 13c0 5.523-4.477 10-10 10S2 18.523 2 13c0-.97.13-1.91.38-2.8L12 14z"/>
+                      </svg>
+                    {/if}
                   </div>
-                  <div>
-                    <p class="text-white/70 text-[10px] font-bold uppercase tracking-wider">Kartu Login Ujian</p>
-                    <p class="text-white text-sm font-bold">{selectedClassName}</p>
+                  <div class="min-w-0">
+                    {#if schoolName}
+                      <p class="text-white text-xs font-extrabold leading-tight truncate">{schoolName}</p>
+                    {/if}
+                    <p class="text-white/70 text-[9px] font-bold uppercase tracking-wider">Kartu Login Ujian</p>
+                    <p class="text-white text-sm font-bold truncate">{selectedClassName}</p>
                   </div>
                 </div>
                 <div class="bg-white px-4 py-3">
