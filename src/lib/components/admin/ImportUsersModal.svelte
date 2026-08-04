@@ -60,7 +60,7 @@
 
       // Format: [USERNAME, NAMA LENGKAP, PASSWORD, ROLE]
       const results = [];
-      const allowedRoles = ['admin', 'guru', 'pengawas'];
+      const allowedRoles = ['guru', 'pengawas'];
       
       for (let i = 1; i < rawData.length; i++) {
         const row = rawData[i] as any[];
@@ -117,7 +117,7 @@
       ["USERNAME", "Unik untuk login, jangan ada spasi (cth: guru_budi)"],
       ["NAMA LENGKAP", "Nama lengkap pengguna"],
       ["PASSWORD", "Kata sandi untuk login"],
-      ["ROLE", "Pilih salah satu: admin, guru, atau pengawas"]
+      ["ROLE", "Pilih salah satu: guru atau pengawas"]
     ]);
     wsRef['!cols'] = [{ wch: 15 }, { wch: 50 }];
     XLSX.utils.book_append_sheet(workbook, wsRef, "Petunjuk");
@@ -155,7 +155,7 @@
             <ol class="list-decimal list-inside text-sm text-indigo-800 space-y-2 ml-1">
               <li>Unduh template Excel yang disediakan.</li>
               <li>Isi data pengguna sesuai format (Username, Nama Lengkap, Password, Role).</li>
-              <li>Pastikan Role hanya berisi: <strong>admin</strong>, <strong>guru</strong>, atau <strong>pengawas</strong>.</li>
+              <li>Pastikan Role hanya berisi: <strong>guru</strong> atau <strong>pengawas</strong>.</li>
               <li>Simpan dan unggah kembali file Excel tersebut.</li>
             </ol>
             

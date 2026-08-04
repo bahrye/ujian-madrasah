@@ -55,7 +55,6 @@
 			</div>
 			<select name="role" class="select w-full sm:w-40">
 				<option value="">Semua Role</option>
-				<option value="admin" selected={data.roleFilter === 'admin'}>Admin</option>
 				<option value="guru" selected={data.roleFilter === 'guru'}>Guru</option>
 				<option value="pengawas" selected={data.roleFilter === 'pengawas'}>Pengawas</option>
 			</select>
@@ -164,7 +163,6 @@
 					<label for="create-role" class="label">Role</label>
 					<select id="create-role" name="role" required class="select">
 						<option value="">Pilih role</option>
-						<option value="admin">Administrator</option>
 						<option value="guru">Guru</option>
 						<option value="pengawas">Pengawas</option>
 					</select>
@@ -194,7 +192,6 @@
 				<div>
 					<label for="edit-role" class="label">Role</label>
 					<select id="edit-role" name="role" required class="select" bind:value={editingUser.role}>
-						<option value="admin">Administrator</option>
 						<option value="guru">Guru</option>
 						<option value="pengawas">Pengawas</option>
 					</select>

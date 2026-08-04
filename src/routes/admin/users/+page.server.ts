@@ -8,7 +8,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 	const search = url.searchParams.get('search') || '';
 	const roleFilter = url.searchParams.get('role') || '';
 
-	let query = 'SELECT id, username, name, role, is_active, created_at FROM users WHERE school_id = ? AND role != "siswa" AND role != "superadmin"';
+	let query = 'SELECT id, username, name, role, is_active, created_at FROM users WHERE school_id = ? AND role != "siswa" AND role != "superadmin" AND role != "admin"';
 	const params: unknown[] = [locals.user!.school_id];
 
 	if (search) {
@@ -42,7 +42,7 @@ export const actions: Actions = {
 			return fail(400, { error: 'Semua field wajib diisi.' });
 		}
 
-		if (!['admin', 'guru', 'pengawas', 'siswa'].includes(role)) {
+		if (!['guru', 'pengawas', 'siswa'].includes(role)) {
 			return fail(400, { error: 'Role tidak valid.' });
 		}
 
