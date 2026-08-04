@@ -115,11 +115,11 @@ export async function exportExamResults(examId: string, examTitle: string) {
 		// ==========================================
 		// SHEET 3: DETAIL JAWABAN
 		// ==========================================
-		const header3 = ['Nama Siswa', 'No Soal', 'Soal', 'Jawaban Siswa', 'Poin Didapat'];
+		const header3 = ['Nama Siswa', 'No Soal', 'Soal', 'Jawaban Siswa', 'Poin Didapat', 'Nilai Ujian', 'Nilai Akhir'];
 		const rows3: any[] = [];
 		
 		participants.forEach((p: any) => {
-			questions.forEach((q: any) => {
+			questions.forEach((q: any, index: number) => {
 				const ans = p.answers[q.id];
 				let ansText = '-';
 				if (ans && ans.answer_given) {
@@ -135,12 +135,24 @@ export async function exportExamResults(examId: string, examTitle: string) {
 					}
 				}
 
+				let convertedScore = 0;
+				if (ans && totalExamPoints > 0) {
+					convertedScore = (ans.score_given / totalExamPoints) * 100;
+				}
+				
+				let finalScore: number | string = '';
+				if (index === 0) {
+					finalScore = p.score != null ? p.score : 0;
+				}
+
 				rows3.push([
 					p.student_name,
 					q.question_number,
 					q.question_text.replace(/<[^>]*>?/gm, '').substring(0, 50) + '...', // snippet
 					ansText,
-					ans ? ans.score_given : 0
+					ans ? ans.score_given : 0,
+					convertedScore > 0 ? parseFloat(convertedScore.toFixed(2)) : 0,
+					finalScore
 				]);
 			});
 		});
