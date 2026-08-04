@@ -215,7 +215,7 @@
 								</div>
 								<div class="text-right flex-shrink-0">
 									<p class="text-xs font-medium text-slate-700">Waktu Akses</p>
-									<p class="text-[10px] text-slate-500">{new Date(student.start_time.replace(' ', 'T') + (student.start_time.includes('Z') ? '' : 'Z')).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</p>
+									<p class="text-[10px] text-slate-500">{new Date(student.start_time.replace(' ', 'T') + (student.start_time.includes('Z') ? '' : 'Z')).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
 								</div>
 							</div>
 						{/each}
