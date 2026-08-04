@@ -2,15 +2,17 @@
 	import { enhance } from '$app/forms';
 	import { ROLE_LABELS, ROLE_COLORS, ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
+	import ImportUsersModal from '$lib/components/admin/ImportUsersModal.svelte';
 
 	export let data;
 	export let form: { error?: string; success?: string } | null;
 
 	let showCreateModal = false;
+	let showImportModal = false;
 	let editingUser: any = null;
 	let deleteConfirm: number | null = null;
 
-	$: if (form?.success) toasts.success(form.success);
+	$: if (form?.success) { toasts.success(form.success); showImportModal = false; showCreateModal = false; }
 	$: if (form?.error) toasts.error(form.error);
 </script>
 
@@ -25,12 +27,20 @@
 			<h1 class="text-2xl font-bold text-slate-800">Manajemen Pengguna</h1>
 			<p class="text-sm text-slate-500 mt-1">Kelola data pengguna sistem</p>
 		</div>
-		<button class="btn-primary" on:click={() => (showCreateModal = true)}>
-			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-				<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
-			</svg>
-			Tambah Pengguna
-		</button>
+		<div class="flex gap-2">
+			<button class="btn-secondary" on:click={() => (showImportModal = true)}>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+				</svg>
+				Import Excel
+			</button>
+			<button class="btn-primary" on:click={() => (showCreateModal = true)}>
+				<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
+				</svg>
+				Tambah Pengguna
+			</button>
+		</div>
 	</div>
 
 	<!-- Search & Filter -->
@@ -47,7 +57,6 @@
 				<option value="admin" selected={data.roleFilter === 'admin'}>Admin</option>
 				<option value="guru" selected={data.roleFilter === 'guru'}>Guru</option>
 				<option value="pengawas" selected={data.roleFilter === 'pengawas'}>Pengawas</option>
-				<option value="siswa" selected={data.roleFilter === 'siswa'}>Siswa</option>
 			</select>
 			<button type="submit" class="btn-secondary btn-sm">Cari</button>
 		</form>
@@ -142,7 +151,6 @@
 						<option value="admin">Administrator</option>
 						<option value="guru">Guru</option>
 						<option value="pengawas">Pengawas</option>
-						<option value="siswa">Siswa</option>
 					</select>
 				</div>
 				<div class="flex gap-3 pt-2">
@@ -173,7 +181,6 @@
 						<option value="admin">Administrator</option>
 						<option value="guru">Guru</option>
 						<option value="pengawas">Pengawas</option>
-						<option value="siswa">Siswa</option>
 					</select>
 				</div>
 				<div>
@@ -216,3 +223,5 @@
 		</div>
 	</div>
 {/if}
+
+<ImportUsersModal bind:show={showImportModal} />

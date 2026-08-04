@@ -1,6 +1,6 @@
 import { fail } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
-import { h as hashPassword } from "../../../../chunks/auth.js";
+import { h as hashPassword, c as createToken, C as COOKIE_NAME } from "../../../../chunks/auth.js";
 const load = async ({ platform, url, locals }) => {
   const db = getDB(platform);
   const search = url.searchParams.get("search") || "";
@@ -42,7 +42,7 @@ const actions = {
     await db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(schoolId, username, passwordHash, name, role).run();
     return { success: "Pengguna berhasil ditambahkan." };
   },
-  update: async ({ request, platform, locals }) => {
+  update: async ({ request, platform, locals, cookies }) => {
     const db = getDB(platform);
     const form = await request.formData();
     const schoolId = locals.user.school_id;
@@ -60,6 +60,22 @@ const actions = {
     } else {
       await db.prepare("UPDATE users SET name = ?, role = ?, is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, role, isActive === "1" ? 1 : 0, id, schoolId).run();
     }
+    if (id === locals.user.id.toString()) {
+      const updatedUser = {
+        ...locals.user,
+        name,
+        role
+      };
+      const token = await createToken(updatedUser);
+      cookies.set(COOKIE_NAME, token, {
+        path: "/",
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 60 * 60 * 8
+        // 8 jam
+      });
+    }
     return { success: "Pengguna berhasil diperbarui." };
   },
   delete: async ({ request, platform, locals }) => {
@@ -70,6 +86,31 @@ const actions = {
     if (!id) return fail(400, { error: "ID tidak valid." });
     await db.prepare("DELETE FROM users WHERE id = ? AND school_id = ?").bind(id, schoolId).run();
     return { success: "Pengguna berhasil dihapus." };
+  },
+  importExcel: async ({ request, locals, platform }) => {
+    const db = getDB(platform);
+    const data = await request.formData();
+    const usersJson = data.get("users_json")?.toString();
+    if (!usersJson) {
+      return fail(400, { error: "Data tidak valid" });
+    }
+    try {
+      const users = JSON.parse(usersJson);
+      if (users.length === 0) return fail(400, { error: "Tidak ada data pengguna" });
+      let successCount = 0;
+      for (const user of users) {
+        const existing = await db.prepare("SELECT id FROM users WHERE username = ? AND school_id = ?").bind(user.username, locals.user.school_id).first();
+        if (!existing) {
+          const passwordHash = await hashPassword(user.password);
+          await db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(locals.user.school_id, user.username, passwordHash, user.name, user.role).run();
+          successCount++;
+        }
+      }
+      return { success: `Berhasil mengimpor ${successCount} pengguna dari total ${users.length} data.` };
+    } catch (e) {
+      console.error("Import error:", e);
+      return fail(500, { error: "Terjadi kesalahan saat memproses data import" });
+    }
   }
 };
 export {
