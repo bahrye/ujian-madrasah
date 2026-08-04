@@ -1,8 +1,9 @@
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 
 export const load: PageServerLoad = async ({ platform, url, locals }) => {
+	if (!locals.user) throw redirect(302, '/login');
 	const db = getDB(platform);
 	const examFilter = url.searchParams.get('exam_id') || '';
 
@@ -12,7 +13,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 		JOIN exam_proctors ep ON e.id = ep.exam_id
 		WHERE e.is_active = 1 AND e.school_id = ? AND ep.proctor_id = ?
 		ORDER BY e.title
-	`).bind(locals.user!.school_id, locals.user!.id).all();
+	`).bind(locals.user.school_id, locals.user.id).all();
 
 	let attempts: any[] = [];
 	if (examFilter) {
@@ -25,7 +26,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 			JOIN exam_proctors ep ON e.id = ep.exam_id
 			WHERE sa.exam_id = ? AND e.school_id = ? AND ep.proctor_id = ?
 			ORDER BY sa.status DESC, sa.start_time DESC
-		`).bind(examFilter, locals.user!.school_id, locals.user!.id).all();
+		`).bind(examFilter, locals.user.school_id, locals.user.id).all();
 		attempts = result.results;
 	} else {
 		const result = await db.prepare(`
@@ -37,7 +38,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 			JOIN exam_proctors ep ON e.id = ep.exam_id
 			WHERE sa.status = 'mengerjakan' AND e.school_id = ? AND ep.proctor_id = ?
 			ORDER BY sa.start_time DESC
-		`).bind(locals.user!.school_id, locals.user!.id).all();
+		`).bind(locals.user.school_id, locals.user.id).all();
 		attempts = result.results;
 	}
 
@@ -83,11 +84,23 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 };
 
 export const actions: Actions = {
-	resetAttempt: async ({ request, platform }) => {
+	resetAttempt: async ({ request, platform, locals }) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const form = await request.formData();
 		const attemptId = form.get('attempt_id')?.toString();
 		if (!attemptId) return fail(400, { error: 'ID tidak valid.' });
+
+		// Verify attempt belongs to current user's school
+		const attemptCheck = await db.prepare(`
+			SELECT sa.id FROM student_attempts sa
+			JOIN exams e ON sa.exam_id = e.id
+			WHERE sa.id = ? AND e.school_id = ?
+		`).bind(attemptId, locals.user.school_id).first();
+
+		if (!attemptCheck) {
+			return fail(403, { error: 'Sesi ujian tidak ditemukan atau bukan milik sekolah Anda.' });
+		}
 
 		// Delete all answers and reset attempt
 		await db.batch([

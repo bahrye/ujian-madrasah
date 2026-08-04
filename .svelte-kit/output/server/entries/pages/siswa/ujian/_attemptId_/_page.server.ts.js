@@ -1,6 +1,7 @@
 import { fail, redirect, error } from "@sveltejs/kit";
 import { g as getDB } from "../../../../../chunks/db.js";
 const load = async ({ platform, locals, params, cookies }) => {
+  if (!locals.user) throw redirect(302, "/login");
   const db = getDB(platform);
   const attemptId = params.attemptId;
   const attempt = await db.prepare(`
@@ -101,6 +102,7 @@ const actions = {
     return { saved: true };
   },
   submit: async ({ platform, params, locals }) => {
+    if (!locals.user) return fail(401, { error: "Sesi telah berakhir. Silakan login kembali." });
     const db = getDB(platform);
     const attemptId = params.attemptId;
     const attempt = await db.prepare("SELECT * FROM student_attempts WHERE id = ? AND student_id = ?").bind(attemptId, locals.user.id).first();

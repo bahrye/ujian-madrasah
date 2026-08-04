@@ -1,6 +1,7 @@
-import { fail } from "@sveltejs/kit";
+import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
 const load = async ({ platform, url, locals }) => {
+  if (!locals.user) throw redirect(302, "/login");
   const db = getDB(platform);
   const examFilter = url.searchParams.get("exam_id") || "";
   const exams = await db.prepare(`
@@ -79,11 +80,20 @@ const load = async ({ platform, url, locals }) => {
   return { exams: exams.results, attempts: attemptsWithProgress, examFilter };
 };
 const actions = {
-  resetAttempt: async ({ request, platform }) => {
+  resetAttempt: async ({ request, platform, locals }) => {
+    if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
     const form = await request.formData();
     const attemptId = form.get("attempt_id")?.toString();
     if (!attemptId) return fail(400, { error: "ID tidak valid." });
+    const attemptCheck = await db.prepare(`
+			SELECT sa.id FROM student_attempts sa
+			JOIN exams e ON sa.exam_id = e.id
+			WHERE sa.id = ? AND e.school_id = ?
+		`).bind(attemptId, locals.user.school_id).first();
+    if (!attemptCheck) {
+      return fail(403, { error: "Sesi ujian tidak ditemukan atau bukan milik sekolah Anda." });
+    }
     await db.batch([
       db.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(attemptId),
       db.prepare("DELETE FROM student_attempts WHERE id = ?").bind(attemptId)

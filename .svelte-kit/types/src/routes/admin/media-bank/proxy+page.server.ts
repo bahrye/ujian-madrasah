@@ -53,13 +53,20 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 };
 
 export const actions = {
-	deleteMedia: async ({ request, platform }: import('./$types').RequestEvent) => {
+	deleteMedia: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+		const schoolId = locals.user?.school_id || -1;
 		const db = getDB(platform);
 		const form = await request.formData();
 		const mediaUrl = form.get('media_url')?.toString();
 
 		if (!mediaUrl || !mediaUrl.includes('res.cloudinary.com')) {
 			return fail(400, { error: 'URL Media tidak valid.' });
+		}
+
+		// Verify media belongs to this school or superadmin
+		if (locals.user?.role !== 'superadmin') {
+			const check = await db.prepare('SELECT id FROM uploaded_media WHERE url = ? AND school_id = ?').bind(mediaUrl, schoolId).first();
+			if (!check) return fail(403, { error: 'Media tidak ditemukan atau milik sekolah lain.' });
 		}
 
 		// Delete from Cloudinary
@@ -70,7 +77,11 @@ export const actions = {
 		}
 
 		// Delete from uploaded_media tracker
-		await db.prepare('DELETE FROM uploaded_media WHERE url = ?').bind(mediaUrl).run();
+		if (locals.user?.role === 'superadmin') {
+			await db.prepare('DELETE FROM uploaded_media WHERE url = ?').bind(mediaUrl).run();
+		} else {
+			await db.prepare('DELETE FROM uploaded_media WHERE url = ? AND school_id = ?').bind(mediaUrl, schoolId).run();
+		}
 
 		// Remove link from questions
 		await db.prepare('UPDATE questions SET media_url = NULL, media_type = NULL WHERE media_url = ?').bind(mediaUrl).run();
@@ -78,6 +89,7 @@ export const actions = {
 		return { success: 'Media berhasil dihapus dari Cloudinary dan Database.' };
 	},
 	toggleVisibility: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+		const schoolId = locals.user?.school_id || -1;
 		const db = getDB(platform);
 		const form = await request.formData();
 		const mediaUrl = form.get('media_url')?.toString();
@@ -85,14 +97,20 @@ export const actions = {
 
 		if (!mediaUrl) return fail(400, { error: 'URL Media tidak valid.' });
 
-		// Admin can toggle visibility of any media
-		await db.prepare('UPDATE uploaded_media SET is_public = ? WHERE url = ?')
-			.bind(isPublic, mediaUrl)
-			.run();
+		if (locals.user?.role === 'superadmin') {
+			await db.prepare('UPDATE uploaded_media SET is_public = ? WHERE url = ?')
+				.bind(isPublic, mediaUrl)
+				.run();
+		} else {
+			await db.prepare('UPDATE uploaded_media SET is_public = ? WHERE url = ? AND school_id = ?')
+				.bind(isPublic, mediaUrl, schoolId)
+				.run();
+		}
 
 		return { success: isPublic ? 'Media berhasil ditampilkan untuk semua guru.' : 'Media berhasil disembunyikan (Privat).' };
 	},
-	updateName: async ({ request, platform }: import('./$types').RequestEvent) => {
+	updateName: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+		const schoolId = locals.user?.school_id || -1;
 		const db = getDB(platform);
 		const form = await request.formData();
 		const mediaUrl = form.get('media_url')?.toString();
@@ -100,9 +118,15 @@ export const actions = {
 
 		if (!mediaUrl) return fail(400, { error: 'URL Media tidak valid.' });
 
-		await db.prepare('UPDATE uploaded_media SET name = ? WHERE url = ?')
-			.bind(name, mediaUrl)
-			.run();
+		if (locals.user?.role === 'superadmin') {
+			await db.prepare('UPDATE uploaded_media SET name = ? WHERE url = ?')
+				.bind(name, mediaUrl)
+				.run();
+		} else {
+			await db.prepare('UPDATE uploaded_media SET name = ? WHERE url = ? AND school_id = ?')
+				.bind(name, mediaUrl, schoolId)
+				.run();
+		}
 
 		return { success: 'Nama berkas berhasil diperbarui.' };
 	}

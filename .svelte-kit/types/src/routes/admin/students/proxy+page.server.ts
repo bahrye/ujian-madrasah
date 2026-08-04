@@ -1,10 +1,11 @@
 // @ts-nocheck
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { hashPassword } from '$lib/server/auth';
 
 export const load = async ({ locals, url, platform }: Parameters<PageServerLoad>[0]) => {
+	if (!locals.user) throw redirect(302, '/login');
 	const db = getDB(platform);
 	const search = url.searchParams.get('search') || '';
 	const classFilter = url.searchParams.get('class') || '';
@@ -15,7 +16,7 @@ export const load = async ({ locals, url, platform }: Parameters<PageServerLoad>
 		LEFT JOIN classes c ON u.class_id = c.id 
 		WHERE u.school_id = ? AND u.role = 'siswa'
 	`;
-	const params: unknown[] = [locals.user!.school_id];
+	const params: unknown[] = [locals.user.school_id];
 
 	if (search) {
 		query += ' AND (u.username LIKE ? OR u.name LIKE ?)';
@@ -26,12 +27,12 @@ export const load = async ({ locals, url, platform }: Parameters<PageServerLoad>
 		params.push(classFilter);
 	}
 
-	query += ' ORDER BY c.name ASC, u.name ASC';
+	query += ' ORDER BY c.name ASC, u.name ASC LIMIT 200';
 
 	const [usersResult, classesResult, school] = await Promise.all([
 		db.prepare(query).bind(...params).all(),
-		db.prepare('SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC').bind(locals.user!.school_id).all(),
-		db.prepare('SELECT name, logo_url FROM schools WHERE id = ?').bind(locals.user!.school_id).first()
+		db.prepare('SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC').bind(locals.user.school_id).all(),
+		db.prepare('SELECT name, logo_url FROM schools WHERE id = ?').bind(locals.user.school_id).first()
 	]);
 
 	return { 
@@ -44,6 +45,7 @@ export const load = async ({ locals, url, platform }: Parameters<PageServerLoad>
 
 export const actions = {
 	add: async ({ request, locals, platform }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const data = await request.formData();
 		const name = data.get('name')?.toString().trim();
@@ -67,7 +69,7 @@ export const actions = {
 			const passwordHash = await hashPassword(nisn);
 			
 			await db.prepare('INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
-				.bind(locals.user!.school_id, class_id, nisn, passwordHash, name, 'siswa', place_of_birth, date_of_birth)
+				.bind(locals.user.school_id, class_id, nisn, passwordHash, name, 'siswa', place_of_birth, date_of_birth)
 				.run();
 			
 			return { success: true };
@@ -76,6 +78,7 @@ export const actions = {
 		}
 	},
 	edit: async ({ request, locals, platform }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const data = await request.formData();
 		const id = data.get('id')?.toString();
@@ -100,7 +103,7 @@ export const actions = {
 			const passwordHash = await hashPassword(nisn);
 			
 			await db.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, class_id = ?, place_of_birth = ?, date_of_birth = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?')
-				.bind(name, nisn, passwordHash, class_id, place_of_birth, date_of_birth, id, locals.user!.school_id)
+				.bind(name, nisn, passwordHash, class_id, place_of_birth, date_of_birth, id, locals.user.school_id)
 				.run();
 			
 			return { success: true };
@@ -109,6 +112,7 @@ export const actions = {
 		}
 	},
 	delete: async ({ request, locals, platform }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const data = await request.formData();
 		const id = data.get('id')?.toString();
@@ -116,13 +120,14 @@ export const actions = {
 		if (!id) return fail(400, { error: 'ID tidak valid' });
 
 		try {
-			await db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(id, locals.user!.school_id).run();
+			await db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(id, locals.user.school_id).run();
 			return { success: true };
 		} catch (e) {
 			return fail(500, { error: 'Gagal menghapus siswa' });
 		}
 	},
 	importExcel: async ({ request, locals, platform }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const data = await request.formData();
 		const studentsJson = data.get('students_json')?.toString();
@@ -140,12 +145,12 @@ export const actions = {
 			// Process sequentially to handle password hashing
 			for (const student of students) {
 				// Cek apakah NISN sudah ada
-				const existing = await db.prepare('SELECT id FROM users WHERE username = ? AND school_id = ?').bind(student.nisn, locals.user!.school_id).first();
+				const existing = await db.prepare('SELECT id FROM users WHERE username = ? AND school_id = ?').bind(student.nisn, locals.user.school_id).first();
 				
 				if (!existing) {
 					const passwordHash = await hashPassword(student.nisn);
 					await db.prepare('INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
-						.bind(locals.user!.school_id, student.class_id, student.nisn, passwordHash, student.name, 'siswa', student.place_of_birth || null, student.date_of_birth || null)
+						.bind(locals.user.school_id, student.class_id, student.nisn, passwordHash, student.name, 'siswa', student.place_of_birth || null, student.date_of_birth || null)
 						.run();
 					successCount++;
 				}
@@ -158,6 +163,7 @@ export const actions = {
 		}
 	},
 	toggleStatus: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const data = await request.formData();
 		const id = data.get('id')?.toString();
@@ -169,7 +175,7 @@ export const actions = {
 
 		try {
 			await db.prepare('UPDATE users SET is_active = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ? AND role = "siswa"')
-				.bind(newStatus, id, locals.user!.school_id)
+				.bind(newStatus, id, locals.user.school_id)
 				.run();
 			
 			return { success: true };

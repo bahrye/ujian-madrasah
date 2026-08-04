@@ -1,7 +1,8 @@
-import { fail } from "@sveltejs/kit";
+import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
 import { g as generateTokenCode } from "../../../../chunks/auth.js";
 const load = async ({ platform, locals }) => {
+  if (!locals.user) throw redirect(302, "/login");
   const db = getDB(platform);
   const tokens = await db.prepare(`
 		SELECT t.*, e.title as exam_title
@@ -22,6 +23,7 @@ const load = async ({ platform, locals }) => {
 };
 const actions = {
   generate: async ({ request, platform, locals }) => {
+    if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
     const form = await request.formData();
     const examId = form.get("exam_id")?.toString();
@@ -32,10 +34,11 @@ const actions = {
     const now = Date.now();
     const tokenCode = generateTokenCode(6);
     const expiresAt = new Date(now + durationHours * 60 * 60 * 1e3).toISOString();
-    await db.prepare("INSERT INTO tokens (school_id, exam_id, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?)").bind(locals.user.school_id, examId, tokenCode, locals.user?.id, expiresAt).run();
+    await db.prepare("INSERT INTO tokens (school_id, exam_id, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?)").bind(locals.user.school_id, examId, tokenCode, locals.user.id, expiresAt).run();
     return { success: `Token berhasil dibuat: ${tokenCode}` };
   },
   release: async ({ request, platform, locals }) => {
+    if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
     const form = await request.formData();
     const id = form.get("id")?.toString();
@@ -44,6 +47,7 @@ const actions = {
     return { success: "Token berhasil dirilis ke siswa. Token akan ditarik otomatis dalam 15 menit." };
   },
   revoke: async ({ request, platform, locals }) => {
+    if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
     const form = await request.formData();
     const id = form.get("id")?.toString();
@@ -52,6 +56,7 @@ const actions = {
     return { success: "Token berhasil ditarik." };
   },
   delete: async ({ request, platform, locals }) => {
+    if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
     const form = await request.formData();
     const id = form.get("id")?.toString();

@@ -1,7 +1,8 @@
-import { fail } from "@sveltejs/kit";
+import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
 import { h as hashPassword } from "../../../../chunks/auth.js";
 const load = async ({ locals, url, platform }) => {
+  if (!locals.user) throw redirect(302, "/login");
   const db = getDB(platform);
   const search = url.searchParams.get("search") || "";
   const classFilter = url.searchParams.get("class") || "";
@@ -20,7 +21,7 @@ const load = async ({ locals, url, platform }) => {
     query += " AND u.class_id = ?";
     params.push(classFilter);
   }
-  query += " ORDER BY c.name ASC, u.name ASC";
+  query += " ORDER BY c.name ASC, u.name ASC LIMIT 200";
   const [usersResult, classesResult, school] = await Promise.all([
     db.prepare(query).bind(...params).all(),
     db.prepare("SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC").bind(locals.user.school_id).all(),
@@ -35,6 +36,7 @@ const load = async ({ locals, url, platform }) => {
 };
 const actions = {
   add: async ({ request, locals, platform }) => {
+    if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
     const data = await request.formData();
     const name = data.get("name")?.toString().trim();
@@ -58,6 +60,7 @@ const actions = {
     }
   },
   edit: async ({ request, locals, platform }) => {
+    if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
     const data = await request.formData();
     const id = data.get("id")?.toString();
@@ -82,6 +85,7 @@ const actions = {
     }
   },
   delete: async ({ request, locals, platform }) => {
+    if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
     const data = await request.formData();
     const id = data.get("id")?.toString();
@@ -94,6 +98,7 @@ const actions = {
     }
   },
   importExcel: async ({ request, locals, platform }) => {
+    if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
     const data = await request.formData();
     const studentsJson = data.get("students_json")?.toString();
@@ -119,6 +124,7 @@ const actions = {
     }
   },
   toggleStatus: async ({ request, platform, locals }) => {
+    if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
     const data = await request.formData();
     const id = data.get("id")?.toString();

@@ -3,6 +3,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 
 export const load: PageServerLoad = async ({ platform, locals, params, cookies }) => {
+	if (!locals.user) throw redirect(302, '/login');
 	const db = getDB(platform);
 	const attemptId = params.attemptId;
 
@@ -13,7 +14,7 @@ export const load: PageServerLoad = async ({ platform, locals, params, cookies }
 		JOIN exams e ON sa.exam_id = e.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		WHERE sa.id = ? AND sa.student_id = ?
-	`).bind(attemptId, locals.user!.id).first<any>();
+	`).bind(attemptId, locals.user.id).first<any>();
 
 	if (!attempt) throw error(404, 'Sesi ujian tidak ditemukan.');
 
@@ -122,12 +123,13 @@ export const actions: Actions = {
 	},
 
 	submit: async ({ platform, params, locals }) => {
+		if (!locals.user) return fail(401, { error: 'Sesi telah berakhir. Silakan login kembali.' });
 		const db = getDB(platform);
 		const attemptId = params.attemptId;
 
 		// Ambil attempt
 		const attempt = await db.prepare('SELECT * FROM student_attempts WHERE id = ? AND student_id = ?')
-			.bind(attemptId, locals.user!.id).first<any>();
+			.bind(attemptId, locals.user.id).first<any>();
 
 		if (!attempt || attempt.status !== 'mengerjakan') {
 			return fail(400, { error: 'Sesi ujian tidak valid.' });
