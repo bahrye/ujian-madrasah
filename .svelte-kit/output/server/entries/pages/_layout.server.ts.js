@@ -3,12 +3,17 @@ const load = async ({ locals, platform }) => {
   let userInfo = null;
   if (locals.user && platform) {
     const db = getDB(platform);
-    if (locals.user.role === "admin" && locals.user.school_id) {
+    userInfo = {};
+    if (locals.user.school_id) {
       const school = await db.prepare("SELECT name FROM schools WHERE id = ?").bind(locals.user.school_id).first();
-      userInfo = { school_name: school?.name };
-    } else if (locals.user.role === "siswa") {
+      if (school) userInfo.school_name = school.name;
+    }
+    if (locals.user.role === "siswa") {
       const student = await db.prepare("SELECT place_of_birth, date_of_birth FROM users WHERE id = ?").bind(locals.user.id).first();
-      userInfo = { place_of_birth: student?.place_of_birth, date_of_birth: student?.date_of_birth };
+      if (student) {
+        userInfo.place_of_birth = student.place_of_birth;
+        userInfo.date_of_birth = student.date_of_birth;
+      }
     }
   }
   return {

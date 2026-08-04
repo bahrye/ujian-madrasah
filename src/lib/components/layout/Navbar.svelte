@@ -76,11 +76,13 @@
 					{:else if user?.role === 'siswa'}
 						<p class="text-xs text-slate-500 font-medium">Siswa</p>
 						<p class="font-bold text-slate-800 text-sm mb-1 truncate">{user?.name}</p>
+						<p class="text-xs text-slate-600 truncate mb-1">{userInfo?.school_name ?? '-'}</p>
 						<p class="text-xs text-slate-600">NISN: {user?.username}</p>
 						<p class="text-xs text-slate-600 truncate">TTL: {formatBirth(userInfo?.place_of_birth, userInfo?.date_of_birth)}</p>
 					{:else}
 						<p class="text-xs text-slate-500 font-medium">{ROLE_LABELS[user?.role ?? '']}</p>
 						<p class="font-bold text-slate-800 text-sm mb-1 truncate">{user?.name}</p>
+						<p class="text-xs text-slate-600 truncate">{userInfo?.school_name ?? '-'}</p>
 					{/if}
 					
 					<div class="h-px bg-slate-100 my-3"></div>
