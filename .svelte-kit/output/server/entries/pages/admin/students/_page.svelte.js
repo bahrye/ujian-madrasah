@@ -206,42 +206,42 @@ function _page($$renderer, $$props) {
       } else {
         $$renderer3.push("<!--[-1-->");
       }
-      $$renderer3.push(`<!--]--> <div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 text-slate-500 text-sm"><th class="p-4 w-12 text-center"><input type="checkbox"${attr("checked", isAllSelected, true)} class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer" title="Pilih Semua Siswa"/></th><th class="p-4 font-semibold">Siswa</th><th class="p-4 font-semibold">Kelas</th><th class="p-4 font-semibold">Tempat, Tgl Lahir</th><th class="p-4 font-semibold">Status</th><th class="p-4 font-semibold text-right">Aksi</th></tr></thead><tbody class="divide-y divide-slate-100 text-slate-700">`);
+      $$renderer3.push(`<!--]--> <div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 text-slate-500 text-sm"><th class="p-4 w-12 text-center whitespace-nowrap"><input type="checkbox"${attr("checked", isAllSelected, true)} class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer" title="Pilih Semua Siswa"/></th><th class="p-4 font-semibold whitespace-nowrap">Siswa</th><th class="p-4 font-semibold whitespace-nowrap">Kelas</th><th class="p-4 font-semibold whitespace-nowrap">Tempat, Tgl Lahir</th><th class="p-4 font-semibold whitespace-nowrap">Status</th><th class="p-4 font-semibold text-right whitespace-nowrap">Aksi</th></tr></thead><tbody class="divide-y divide-slate-100 text-slate-700">`);
       const each_array_3 = ensure_array_like(data.users);
       if (each_array_3.length !== 0) {
         $$renderer3.push("<!--[-->");
         for (let $$index_3 = 0, $$length = each_array_3.length; $$index_3 < $$length; $$index_3++) {
           let user = each_array_3[$$index_3];
-          $$renderer3.push(`<tr${attr_class(`hover:bg-slate-50/80 transition-colors ${selectedIds.includes(user.id) ? "bg-indigo-50/40" : ""}`)}><td class="p-4 text-center"><input type="checkbox"${attr("checked", selectedIds.includes(user.id), true)} class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer"/></td><td class="p-4"><div class="flex items-center space-x-3"><div class="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold">${escape_html(user.name.charAt(0).toUpperCase())}</div> <div><div${attr_class(`font-medium ${user.class_id ? "text-slate-900" : "text-red-600 drop-shadow-sm"}`)}>${escape_html(user.name)}</div> <div class="text-sm text-slate-500">${escape_html(user.username)}</div></div></div></td><td class="p-4">`);
+          $$renderer3.push(`<tr${attr_class(`hover:bg-slate-50/80 transition-colors ${selectedIds.includes(user.id) ? "bg-indigo-50/40" : ""}`)}><td class="p-4 text-center whitespace-nowrap"><input type="checkbox"${attr("checked", selectedIds.includes(user.id), true)} class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer"/></td><td class="p-4 whitespace-nowrap"><div class="flex items-center space-x-3"><div class="h-10 w-10 shrink-0 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold">${escape_html(user.name.charAt(0).toUpperCase())}</div> <div class="whitespace-nowrap"><div${attr_class(`font-medium whitespace-nowrap ${user.class_id ? "text-slate-900" : "text-red-600 drop-shadow-sm"}`)}>${escape_html(user.name)}</div> <div class="text-sm text-slate-500 whitespace-nowrap">@${escape_html(user.username)}</div></div></div></td><td class="p-4 whitespace-nowrap">`);
           if (user.class_name) {
             $$renderer3.push("<!--[0-->");
-            $$renderer3.push(`<span${attr_class(`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${stringify(getClassColor(user.class_id))}`)}>${escape_html(user.class_name)}</span>`);
+            $$renderer3.push(`<span${attr_class(`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap ${stringify(getClassColor(user.class_id))}`)}>${escape_html(user.class_name)}</span>`);
           } else {
             $$renderer3.push("<!--[-1-->");
-            $$renderer3.push(`<span class="text-sm text-slate-400">-</span>`);
+            $$renderer3.push(`<span class="text-sm text-slate-400 whitespace-nowrap">-</span>`);
           }
-          $$renderer3.push(`<!--]--></td><td class="p-4 text-sm text-slate-600">${escape_html(formatBirth(user.place_of_birth, user.date_of_birth))}</td><td class="p-4">`);
+          $$renderer3.push(`<!--]--></td><td class="p-4 text-sm text-slate-600 whitespace-nowrap">${escape_html(formatBirth(user.place_of_birth, user.date_of_birth))}</td><td class="p-4 whitespace-nowrap">`);
           if (user.is_active) {
             $$renderer3.push("<!--[0-->");
-            $$renderer3.push(`<span class="badge badge-success">Aktif</span>`);
+            $$renderer3.push(`<span class="badge badge-success whitespace-nowrap">Aktif</span>`);
           } else {
             $$renderer3.push("<!--[-1-->");
-            $$renderer3.push(`<span class="badge badge-danger">Nonaktif</span>`);
+            $$renderer3.push(`<span class="badge badge-danger whitespace-nowrap">Nonaktif</span>`);
           }
-          $$renderer3.push(`<!--]--></td><td class="p-4 text-right"><div class="flex items-center justify-end gap-1"><button type="button" class="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors" title="Edit Siswa"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.edit)}></path></svg></button> <form method="POST" action="?/toggleStatus" class="inline-block"><input type="hidden" name="id"${attr("value", user.id)}/> <input type="hidden" name="is_active"${attr("value", user.is_active)}/> `);
+          $$renderer3.push(`<!--]--></td><td class="p-4 text-right whitespace-nowrap"><div class="flex items-center justify-end gap-1.5 whitespace-nowrap"><button type="button" class="p-2 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700 transition-colors shadow-xs" title="Edit Siswa"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.edit)}></path></svg></button> <form method="POST" action="?/toggleStatus" class="inline-block"><input type="hidden" name="id"${attr("value", user.id)}/> <input type="hidden" name="is_active"${attr("value", user.is_active)}/> `);
           if (user.is_active) {
             $$renderer3.push("<!--[0-->");
-            $$renderer3.push(`<button type="submit" class="p-1.5 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-colors" title="Nonaktifkan Siswa"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg></button>`);
+            $$renderer3.push(`<button type="submit" class="p-2 rounded-xl bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 transition-colors shadow-xs" title="Nonaktifkan Siswa"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg></button>`);
           } else {
             $$renderer3.push("<!--[-1-->");
-            $$renderer3.push(`<button type="submit" class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors" title="Aktifkan Siswa"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></button>`);
+            $$renderer3.push(`<button type="submit" class="p-2 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 transition-colors shadow-xs" title="Aktifkan Siswa"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></button>`);
           }
           $$renderer3.push(`<!--]--></form> `);
           ConfirmForm($$renderer3, {
             action: "?/delete",
             confirmTitle: "Hapus Siswa",
             confirmMessage: "Hapus siswa ini? Semua rekam jejak ujiannya akan ikut terhapus permanen!",
-            buttonClass: "p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors",
+            buttonClass: "p-2 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700 transition-colors shadow-xs",
             buttonTitle: "Hapus Siswa",
             $$slots: {
               inputs: ($$renderer4) => {

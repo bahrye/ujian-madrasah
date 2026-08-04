@@ -266,7 +266,7 @@
 			<table class="w-full text-left border-collapse">
 				<thead>
 					<tr class="bg-slate-50 text-slate-500 text-sm">
-						<th class="p-4 w-12 text-center">
+						<th class="p-4 w-12 text-center whitespace-nowrap">
 							<input
 								type="checkbox"
 								checked={isAllSelected}
@@ -275,17 +275,17 @@
 								title="Pilih Semua Siswa"
 							/>
 						</th>
-						<th class="p-4 font-semibold">Siswa</th>
-						<th class="p-4 font-semibold">Kelas</th>
-						<th class="p-4 font-semibold">Tempat, Tgl Lahir</th>
-						<th class="p-4 font-semibold">Status</th>
-						<th class="p-4 font-semibold text-right">Aksi</th>
+						<th class="p-4 font-semibold whitespace-nowrap">Siswa</th>
+						<th class="p-4 font-semibold whitespace-nowrap">Kelas</th>
+						<th class="p-4 font-semibold whitespace-nowrap">Tempat, Tgl Lahir</th>
+						<th class="p-4 font-semibold whitespace-nowrap">Status</th>
+						<th class="p-4 font-semibold text-right whitespace-nowrap">Aksi</th>
 					</tr>
 				</thead>
 				<tbody class="divide-y divide-slate-100 text-slate-700">
 					{#each data.users as user (user.id)}
 						<tr class="hover:bg-slate-50/80 transition-colors {selectedIds.includes(user.id) ? 'bg-indigo-50/40' : ''}">
-							<td class="p-4 text-center">
+							<td class="p-4 text-center whitespace-nowrap">
 								<input
 									type="checkbox"
 									checked={selectedIds.includes(user.id)}
@@ -293,41 +293,41 @@
 									class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer"
 								/>
 							</td>
-							<td class="p-4">
+							<td class="p-4 whitespace-nowrap">
 								<div class="flex items-center space-x-3">
-									<div class="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold">
+									<div class="h-10 w-10 shrink-0 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold">
 										{user.name.charAt(0).toUpperCase()}
 									</div>
-									<div>
-										<div class="font-medium {user.class_id ? 'text-slate-900' : 'text-red-600 drop-shadow-sm'}">{user.name}</div>
-										<div class="text-sm text-slate-500">{user.username}</div>
+									<div class="whitespace-nowrap">
+										<div class="font-medium whitespace-nowrap {user.class_id ? 'text-slate-900' : 'text-red-600 drop-shadow-sm'}">{user.name}</div>
+										<div class="text-sm text-slate-500 whitespace-nowrap">@{user.username}</div>
 									</div>
 								</div>
 							</td>
-							<td class="p-4">
+							<td class="p-4 whitespace-nowrap">
 								{#if user.class_name}
-									<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {getClassColor(user.class_id)}">
+									<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap {getClassColor(user.class_id)}">
 										{user.class_name}
 									</span>
 								{:else}
-									<span class="text-sm text-slate-400">-</span>
+									<span class="text-sm text-slate-400 whitespace-nowrap">-</span>
 								{/if}
 							</td>
-							<td class="p-4 text-sm text-slate-600">
+							<td class="p-4 text-sm text-slate-600 whitespace-nowrap">
 								{formatBirth(user.place_of_birth, user.date_of_birth)}
 							</td>
-							<td class="p-4">
+							<td class="p-4 whitespace-nowrap">
 								{#if user.is_active}
-									<span class="badge badge-success">Aktif</span>
+									<span class="badge badge-success whitespace-nowrap">Aktif</span>
 								{:else}
-									<span class="badge badge-danger">Nonaktif</span>
+									<span class="badge badge-danger whitespace-nowrap">Nonaktif</span>
 								{/if}
 							</td>
-							<td class="p-4 text-right">
-								<div class="flex items-center justify-end gap-1">
+							<td class="p-4 text-right whitespace-nowrap">
+								<div class="flex items-center justify-end gap-1.5 whitespace-nowrap">
 									<button
 										type="button"
-										class="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+										class="p-2 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700 transition-colors shadow-xs"
 										on:click={() => { editingUser = user; }}
 										title="Edit Siswa"
 									>
@@ -341,7 +341,7 @@
 										{#if user.is_active}
 											<button
 												type="submit"
-												class="p-1.5 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
+												class="p-2 rounded-xl bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 transition-colors shadow-xs"
 												title="Nonaktifkan Siswa"
 											>
 												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -351,7 +351,7 @@
 										{:else}
 											<button
 												type="submit"
-												class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
+												class="p-2 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 transition-colors shadow-xs"
 												title="Aktifkan Siswa"
 											>
 												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -364,7 +364,7 @@
 										action="?/delete"
 										confirmTitle="Hapus Siswa"
 										confirmMessage="Hapus siswa ini? Semua rekam jejak ujiannya akan ikut terhapus permanen!"
-										buttonClass="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+										buttonClass="p-2 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700 transition-colors shadow-xs"
 										buttonTitle="Hapus Siswa"
 									>
 										<svelte:fragment slot="inputs">
