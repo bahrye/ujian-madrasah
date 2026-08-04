@@ -6,6 +6,14 @@ const load = async ({ locals, url, platform }) => {
   const db = getDB(platform);
   const search = url.searchParams.get("search") || "";
   const classFilter = url.searchParams.get("class") || "";
+  try {
+    await db.prepare("ALTER TABLE users ADD COLUMN place_of_birth TEXT").run();
+  } catch {
+  }
+  try {
+    await db.prepare("ALTER TABLE users ADD COLUMN date_of_birth TEXT").run();
+  } catch {
+  }
   let query = `
 		SELECT u.id, u.username, u.name, u.is_active, u.created_at, u.class_id, c.name as class_name, u.place_of_birth, u.date_of_birth 
 		FROM users u 
@@ -22,17 +30,39 @@ const load = async ({ locals, url, platform }) => {
     params.push(classFilter);
   }
   query += " ORDER BY c.name ASC, u.name ASC LIMIT 200";
-  const [usersResult, classesResult, school] = await Promise.all([
-    db.prepare(query).bind(...params).all(),
-    db.prepare("SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC").bind(locals.user.school_id).all(),
-    db.prepare("SELECT name, logo_url FROM schools WHERE id = ?").bind(locals.user.school_id).first()
-  ]);
-  return {
-    users: usersResult.results,
-    classes: classesResult.results,
-    schoolName: school?.name || "",
-    schoolLogo: school?.logo_url || ""
-  };
+  try {
+    const [usersResult, classesResult, school] = await Promise.all([
+      db.prepare(query).bind(...params).all(),
+      db.prepare("SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC").bind(locals.user.school_id).all(),
+      db.prepare("SELECT name, logo_url FROM schools WHERE id = ?").bind(locals.user.school_id).first()
+    ]);
+    return {
+      users: usersResult.results || [],
+      classes: classesResult.results || [],
+      schoolName: school?.name || "",
+      schoolLogo: school?.logo_url || ""
+    };
+  } catch (err) {
+    console.error("Error loading students, attempting fallback query:", err);
+    const fallbackQuery = `
+			SELECT u.id, u.username, u.name, u.is_active, u.created_at, u.class_id, c.name as class_name, NULL as place_of_birth, NULL as date_of_birth 
+			FROM users u 
+			LEFT JOIN classes c ON u.class_id = c.id 
+			WHERE u.school_id = ? AND u.role = 'siswa'
+			ORDER BY c.name ASC, u.name ASC LIMIT 200
+		`;
+    const [usersResult, classesResult, school] = await Promise.all([
+      db.prepare(fallbackQuery).bind(locals.user.school_id).all(),
+      db.prepare("SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC").bind(locals.user.school_id).all(),
+      db.prepare("SELECT name, logo_url FROM schools WHERE id = ?").bind(locals.user.school_id).first()
+    ]);
+    return {
+      users: usersResult.results || [],
+      classes: classesResult.results || [],
+      schoolName: school?.name || "",
+      schoolLogo: school?.logo_url || ""
+    };
+  }
 };
 const actions = {
   add: async ({ request, locals, platform }) => {
@@ -91,10 +121,45 @@ const actions = {
     const id = data.get("id")?.toString();
     if (!id) return fail(400, { error: "ID tidak valid" });
     try {
-      await db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(id, locals.user.school_id).run();
-      return { success: true };
+      await db.batch([
+        db.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)").bind(id),
+        db.prepare("DELETE FROM student_attempts WHERE student_id = ?").bind(id),
+        db.prepare("DELETE FROM exam_participants WHERE student_id = ?").bind(id),
+        db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(id, locals.user.school_id)
+      ]);
+      return { success: true, message: "Berhasil menghapus data siswa." };
     } catch (e) {
+      console.error("Delete student error:", e);
       return fail(500, { error: "Gagal menghapus siswa" });
+    }
+  },
+  deleteBulk: async ({ request, locals, platform }) => {
+    if (!locals.user) return fail(401, { error: "Unauthorized" });
+    const db = getDB(platform);
+    const data = await request.formData();
+    const idsJson = data.get("ids")?.toString();
+    if (!idsJson) return fail(400, { error: "Pilih minimal satu siswa." });
+    try {
+      const ids = JSON.parse(idsJson);
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return fail(400, { error: "Pilih minimal satu siswa." });
+      }
+      const stmts = [];
+      for (const id of ids) {
+        stmts.push(
+          db.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)").bind(id),
+          db.prepare("DELETE FROM student_attempts WHERE student_id = ?").bind(id),
+          db.prepare("DELETE FROM exam_participants WHERE student_id = ?").bind(id),
+          db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(id, locals.user.school_id)
+        );
+      }
+      if (stmts.length > 0) {
+        await db.batch(stmts);
+      }
+      return { success: true, message: `Berhasil menghapus ${ids.length} siswa terpilih.` };
+    } catch (e) {
+      console.error("Delete bulk students error:", e);
+      return fail(500, { error: "Gagal menghapus siswa terpilih" });
     }
   },
   importExcel: async ({ request, locals, platform }) => {
