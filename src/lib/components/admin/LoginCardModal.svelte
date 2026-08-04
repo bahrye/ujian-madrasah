@@ -177,13 +177,18 @@
   @media print{
     *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important;}
     body{background:#ffffff !important;padding:24px;}
-    .grid{gap:24px;}
+    .grid{display:block !important; text-align:center;}
     .card{
+      display:inline-flex !important;
+      vertical-align:top;
       box-shadow:none !important;
       border: 1px solid #000 !important;
       outline: 1.5px dashed #94a3b8 !important;
       outline-offset: 12px !important;
-      margin: 12px;
+      margin: 20px !important;
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+      -webkit-column-break-inside: avoid !important;
     }
     .card-header{background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%) !important;background-color:#4f46e5 !important;}
     .avatar{background:linear-gradient(135deg,#6366f1,#8b5cf6) !important;background-color:#6366f1 !important;}
