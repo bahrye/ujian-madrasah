@@ -7,6 +7,7 @@ import "../../../../chunks/root.js";
 import "../../../../chunks/state.svelte.js";
 import { C as ConfirmForm } from "../../../../chunks/ConfirmForm.js";
 import { t as toasts } from "../../../../chunks/toast.js";
+import { I as ICONS } from "../../../../chunks/constants.js";
 function ImportStudentsModal($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let show = fallback($$props["show"], false);
@@ -227,13 +228,21 @@ function _page($$renderer, $$props) {
             $$renderer3.push("<!--[-1-->");
             $$renderer3.push(`<span class="badge badge-danger">Nonaktif</span>`);
           }
-          $$renderer3.push(`<!--]--></td><td class="p-4 text-right"><div class="flex items-center justify-end space-x-2"><button class="btn-ghost btn-sm">Edit</button> <form method="POST" action="?/toggleStatus" class="inline-block"><input type="hidden" name="id"${attr("value", user.id)}/> <input type="hidden" name="is_active"${attr("value", user.is_active)}/> <button type="submit"${attr_class(`btn-ghost btn-sm ${user.is_active ? "text-amber-600" : "text-green-600"}`)}>${escape_html(user.is_active ? "Nonaktif" : "Aktif")}</button></form> `);
+          $$renderer3.push(`<!--]--></td><td class="p-4 text-right"><div class="flex items-center justify-end gap-1"><button type="button" class="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors" title="Edit Siswa"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.edit)}></path></svg></button> <form method="POST" action="?/toggleStatus" class="inline-block"><input type="hidden" name="id"${attr("value", user.id)}/> <input type="hidden" name="is_active"${attr("value", user.is_active)}/> `);
+          if (user.is_active) {
+            $$renderer3.push("<!--[0-->");
+            $$renderer3.push(`<button type="submit" class="p-1.5 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-colors" title="Nonaktifkan Siswa"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg></button>`);
+          } else {
+            $$renderer3.push("<!--[-1-->");
+            $$renderer3.push(`<button type="submit" class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors" title="Aktifkan Siswa"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></button>`);
+          }
+          $$renderer3.push(`<!--]--></form> `);
           ConfirmForm($$renderer3, {
             action: "?/delete",
             confirmTitle: "Hapus Siswa",
             confirmMessage: "Hapus siswa ini? Semua rekam jejak ujiannya akan ikut terhapus permanen!",
-            buttonClass: "btn-ghost btn-sm text-red-600",
-            buttonTitle: "Hapus",
+            buttonClass: "p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors",
+            buttonTitle: "Hapus Siswa",
             $$slots: {
               inputs: ($$renderer4) => {
                 {
@@ -242,7 +251,7 @@ function _page($$renderer, $$props) {
               },
               buttonContent: ($$renderer4) => {
                 {
-                  $$renderer4.push(`Hapus`);
+                  $$renderer4.push(`<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.trash)}></path></svg>`);
                 }
               }
             }

@@ -6,6 +6,7 @@
 	import LoginCardModal from '$lib/components/admin/LoginCardModal.svelte';
 	import type { PageData, ActionData } from './$types';
 	import { toasts } from '$lib/stores/toast';
+	import { ICONS } from '$lib/utils/constants';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -323,29 +324,56 @@
 								{/if}
 							</td>
 							<td class="p-4 text-right">
-								<div class="flex items-center justify-end space-x-2">
-									<button class="btn-ghost btn-sm" on:click={() => { editingUser = user; }}>
-										Edit
+								<div class="flex items-center justify-end gap-1">
+									<button
+										type="button"
+										class="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+										on:click={() => { editingUser = user; }}
+										title="Edit Siswa"
+									>
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+											<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.edit} />
+										</svg>
 									</button>
 									<form method="POST" action="?/toggleStatus" use:enhance class="inline-block">
 										<input type="hidden" name="id" value={user.id} />
 										<input type="hidden" name="is_active" value={user.is_active} />
-										<button type="submit" class="btn-ghost btn-sm {user.is_active ? 'text-amber-600' : 'text-green-600'}">
-											{user.is_active ? 'Nonaktif' : 'Aktif'}
-										</button>
+										{#if user.is_active}
+											<button
+												type="submit"
+												class="p-1.5 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
+												title="Nonaktifkan Siswa"
+											>
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+													<path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+												</svg>
+											</button>
+										{:else}
+											<button
+												type="submit"
+												class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
+												title="Aktifkan Siswa"
+											>
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+													<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+												</svg>
+											</button>
+										{/if}
 									</form>
 									<ConfirmForm 
 										action="?/delete"
 										confirmTitle="Hapus Siswa"
 										confirmMessage="Hapus siswa ini? Semua rekam jejak ujiannya akan ikut terhapus permanen!"
-										buttonClass="btn-ghost btn-sm text-red-600"
-										buttonTitle="Hapus"
+										buttonClass="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+										buttonTitle="Hapus Siswa"
 									>
 										<svelte:fragment slot="inputs">
 											<input type="hidden" name="id" value={user.id} />
 										</svelte:fragment>
 										<svelte:fragment slot="buttonContent">
-											Hapus
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+												<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
+											</svg>
 										</svelte:fragment>
 									</ConfirmForm>
 								</div>
