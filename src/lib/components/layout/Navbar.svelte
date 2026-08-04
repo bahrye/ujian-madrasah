@@ -3,8 +3,25 @@
 	import { createEventDispatcher } from 'svelte';
 
 	export let user: App.Locals['user'];
+	export let userInfo: any = null;
+
+	let showProfileMenu = false;
 
 	const dispatch = createEventDispatcher();
+
+	function formatBirth(place: string, dateStr: string) {
+		if (!place && !dateStr) return '-';
+		let formattedDate = '';
+		if (dateStr) {
+			try {
+				formattedDate = new Date(String(dateStr).replace(' ', 'T')).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+			} catch {
+				formattedDate = dateStr;
+			}
+		}
+		if (place && formattedDate) return `${place}, ${formattedDate}`;
+		return place || formattedDate || '-';
+	}
 
 	const roleGradients: Record<string, string> = {
 		admin: 'from-rose-500 to-pink-500',
@@ -35,13 +52,47 @@
 				<span class="font-bold text-sm text-slate-800">Ujian Madrasah</span>
 			</div>
 		</div>
-		<div class="flex items-center gap-2">
+		<div class="flex items-center gap-2 relative">
 			<span class="text-xs font-medium text-slate-500 hidden sm:block">
 				{ROLE_LABELS[user?.role ?? ''] ?? ''}
 			</span>
-			<div class="w-8 h-8 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-xs font-bold text-white shadow-md">
+			<button
+				class="w-8 h-8 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-xs font-bold text-white shadow-md hover:ring-2 ring-offset-1 ring-indigo-500 transition-all focus:outline-none"
+				on:click={() => (showProfileMenu = !showProfileMenu)}
+				aria-label="Toggle profile menu"
+			>
 				{user?.name?.charAt(0).toUpperCase() ?? '?'}
-			</div>
+			</button>
+
+			{#if showProfileMenu}
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<!-- svelte-ignore a11y-no-static-element-interactions -->
+				<div class="fixed inset-0 z-40" on:click={() => (showProfileMenu = false)}></div>
+				<div class="absolute right-0 top-full mt-3 w-64 bg-white rounded-xl shadow-xl z-50 p-4 border border-slate-100 animate-in fade-in slide-in-from-top-2">
+					{#if user?.role === 'admin'}
+						<p class="text-xs text-slate-500 font-medium">Administrator Sekolah</p>
+						<p class="font-bold text-slate-800 text-sm mb-1 truncate">{user?.name}</p>
+						<p class="text-xs text-slate-600 truncate">{userInfo?.school_name ?? '-'}</p>
+					{:else if user?.role === 'siswa'}
+						<p class="text-xs text-slate-500 font-medium">Siswa</p>
+						<p class="font-bold text-slate-800 text-sm mb-1 truncate">{user?.name}</p>
+						<p class="text-xs text-slate-600">NISN: {user?.username}</p>
+						<p class="text-xs text-slate-600 truncate">TTL: {formatBirth(userInfo?.place_of_birth, userInfo?.date_of_birth)}</p>
+					{:else}
+						<p class="text-xs text-slate-500 font-medium">{ROLE_LABELS[user?.role ?? '']}</p>
+						<p class="font-bold text-slate-800 text-sm mb-1 truncate">{user?.name}</p>
+					{/if}
+					
+					<div class="h-px bg-slate-100 my-3"></div>
+					
+					<a href="/api/logout" class="flex items-center gap-2 text-rose-600 hover:bg-rose-50 p-2 rounded-lg transition-colors text-sm font-medium">
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.logout} />
+						</svg>
+						Keluar
+					</a>
+				</div>
+			{/if}
 		</div>
 	</div>
 </header>

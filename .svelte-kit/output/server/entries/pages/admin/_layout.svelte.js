@@ -6,6 +6,7 @@ function _layout($$renderer, $$props) {
     let data = $$props["data"];
     AppShell($$renderer2, {
       user: data.user,
+      userInfo: data.userInfo,
       menuItems: SIDEBAR_MENUS.admin,
       children: ($$renderer3) => {
         $$renderer3.push(`<!--[-->`);

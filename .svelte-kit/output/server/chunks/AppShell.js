@@ -93,18 +93,24 @@ function Sidebar($$renderer, $$props) {
 function Navbar($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let user = $$props["user"];
+    let userInfo = fallback($$props["userInfo"], null);
     const roleGradients = {
       admin: "from-rose-500 to-pink-500",
       guru: "from-indigo-500 to-violet-500",
       pengawas: "from-amber-500 to-orange-500",
       siswa: "from-cyan-500 to-sky-500"
     };
-    $$renderer2.push(`<header class="lg:hidden sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 px-4 py-3"><div class="flex items-center justify-between"><div class="flex items-center gap-3"><button class="p-2 -ml-1 rounded-xl hover:bg-slate-100 transition-colors" aria-label="Buka menu"><svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.menu)}></path></svg></button> <div class="flex items-center gap-2"><div class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-md shadow-indigo-500/20"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg></div> <span class="font-bold text-sm text-slate-800">Ujian Madrasah</span></div></div> <div class="flex items-center gap-2"><span class="text-xs font-medium text-slate-500 hidden sm:block">${escape_html(ROLE_LABELS[user?.role ?? ""] ?? "")}</span> <div${attr_class(`w-8 h-8 rounded-full bg-gradient-to-br ${stringify(roleGradients[user?.role ?? "siswa"])} flex items-center justify-center text-xs font-bold text-white shadow-md`)}>${escape_html(user?.name?.charAt(0).toUpperCase() ?? "?")}</div></div></div></header>`);
-    bind_props($$props, { user });
+    $$renderer2.push(`<header class="lg:hidden sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 px-4 py-3"><div class="flex items-center justify-between"><div class="flex items-center gap-3"><button class="p-2 -ml-1 rounded-xl hover:bg-slate-100 transition-colors" aria-label="Buka menu"><svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.menu)}></path></svg></button> <div class="flex items-center gap-2"><div class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-md shadow-indigo-500/20"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg></div> <span class="font-bold text-sm text-slate-800">Ujian Madrasah</span></div></div> <div class="flex items-center gap-2 relative"><span class="text-xs font-medium text-slate-500 hidden sm:block">${escape_html(ROLE_LABELS[user?.role ?? ""] ?? "")}</span> <button${attr_class(`w-8 h-8 rounded-full bg-gradient-to-br ${stringify(roleGradients[user?.role ?? "siswa"])} flex items-center justify-center text-xs font-bold text-white shadow-md hover:ring-2 ring-offset-1 ring-indigo-500 transition-all focus:outline-none`)} aria-label="Toggle profile menu">${escape_html(user?.name?.charAt(0).toUpperCase() ?? "?")}</button> `);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--></div></div></header>`);
+    bind_props($$props, { user, userInfo });
   });
 }
 function AppShell($$renderer, $$props) {
   let user = $$props["user"];
+  let userInfo = fallback($$props["userInfo"], null);
   let menuItems = fallback($$props["menuItems"], () => [], true);
   let sidebarOpen = false;
   let $$settled = true;
@@ -123,7 +129,7 @@ function AppShell($$renderer, $$props) {
       }
     });
     $$renderer2.push(`<!----> `);
-    Navbar($$renderer2, { user });
+    Navbar($$renderer2, { user, userInfo });
     $$renderer2.push(`<!----> <main class="lg:ml-64 min-h-screen"><div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto"><!--[-->`);
     slot($$renderer2, $$props, "default", {});
     $$renderer2.push(`<!--]--></div></main> `);
@@ -136,7 +142,7 @@ function AppShell($$renderer, $$props) {
     $$render_inner($$inner_renderer);
   } while (!$$settled);
   $$renderer.subsume($$inner_renderer);
-  bind_props($$props, { user, menuItems });
+  bind_props($$props, { user, userInfo, menuItems });
 }
 export {
   AppShell as A

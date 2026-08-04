@@ -243,7 +243,10 @@
     "file": "entries/pages/_layout.server.ts.js",
     "name": "entries/pages/_layout.server.ts",
     "src": "src/routes/+layout.server.ts",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
   },
   "src/routes/+layout.svelte": {
     "file": "entries/pages/_layout.svelte.js",
@@ -255,7 +258,7 @@
       "_stores.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.DmGGcerw.css"
+      "_app/immutable/assets/_layout.BwFs3sxd.css"
     ]
   },
   "src/routes/+page.server.ts": {

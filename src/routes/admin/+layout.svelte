@@ -5,6 +5,6 @@
 	export let data;
 </script>
 
-<AppShell user={data.user} menuItems={SIDEBAR_MENUS.admin}>
+<AppShell user={data.user} userInfo={data.userInfo} menuItems={SIDEBAR_MENUS.admin}>
 	<slot />
 </AppShell>

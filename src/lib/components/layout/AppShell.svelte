@@ -5,6 +5,7 @@
 	import type { MenuItem } from '$lib/utils/constants';
 
 	export let user: App.Locals['user'];
+	export let userInfo: any = null;
 	export let menuItems: MenuItem[] = [];
 
 	let sidebarOpen = false;
@@ -12,7 +13,7 @@
 
 <div class="min-h-screen bg-slate-50">
 	<Sidebar {menuItems} {user} bind:isOpen={sidebarOpen} />
-	<Navbar {user} on:toggle={() => (sidebarOpen = !sidebarOpen)} />
+	<Navbar {user} {userInfo} on:toggle={() => (sidebarOpen = !sidebarOpen)} />
 
 	<main class="lg:ml-64 min-h-screen">
 		<div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
