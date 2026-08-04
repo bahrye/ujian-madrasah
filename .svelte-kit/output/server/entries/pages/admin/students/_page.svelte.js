@@ -41,10 +41,18 @@ function LoginCardModal($$renderer, $$props) {
     let schoolName = fallback($$props["schoolName"], "");
     let schoolLogo = fallback($$props["schoolLogo"], "");
     let selectedClassId = "";
+    let cardSize = "default";
+    const cardSizes = [
+      { id: "default", name: "Standar (Otomatis menyesuaikan)" },
+      { id: "b1", name: "ID Card B1 (65 x 102 mm)" },
+      { id: "b2", name: "ID Card B2 (79 x 126 mm)" },
+      { id: "b3", name: "ID Card B3 (95 x 126 mm)" },
+      { id: "b4", name: "ID Card B4 (105 x 155 mm)" }
+    ];
     classes.find((c) => String(c.id) === String(selectedClassId))?.name ?? "";
     if (show) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="fixed inset-0 z-[100] flex items-center justify-center p-4"><div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" role="button" tabindex="-1" aria-label="Tutup modal"></div> <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl relative z-10 flex flex-col max-h-[90vh] overflow-hidden login-card-modal svelte-5515a0"><div class="p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-indigo-50 to-violet-50"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 flex-shrink-0"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"></path></svg></div> <div><h2 class="text-lg font-bold text-slate-800">Kartu Login Siswa</h2> <p class="text-xs text-slate-500">Cetak kartu login per kelas</p></div></div> <button class="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-100 rounded-xl transition-colors" aria-label="Tutup"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div> <div class="p-5 overflow-y-auto flex-1 space-y-5"><div><label for="card-class-select" class="block text-sm font-semibold text-slate-700 mb-2">Pilih Kelas</label> `);
+      $$renderer2.push(`<div class="fixed inset-0 z-[100] flex items-center justify-center p-4"><div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" role="button" tabindex="-1" aria-label="Tutup modal"></div> <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl relative z-10 flex flex-col max-h-[90vh] overflow-hidden login-card-modal svelte-5515a0"><div class="p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-indigo-50 to-violet-50"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 flex-shrink-0"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"></path></svg></div> <div><h2 class="text-lg font-bold text-slate-800">Kartu Login Siswa</h2> <p class="text-xs text-slate-500">Cetak kartu login per kelas</p></div></div> <button class="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-100 rounded-xl transition-colors" aria-label="Tutup"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div> <div class="p-5 overflow-y-auto flex-1 space-y-5"><div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label for="card-class-select" class="block text-sm font-semibold text-slate-700 mb-2">Pilih Kelas</label> `);
       $$renderer2.select(
         {
           id: "card-class-select",
@@ -66,7 +74,19 @@ function LoginCardModal($$renderer, $$props) {
           $$renderer3.push(`<!--]-->`);
         }
       );
-      $$renderer2.push(`</div> `);
+      $$renderer2.push(`</div> <div><label for="card-size-select" class="block text-sm font-semibold text-slate-700 mb-2">Ukuran Kartu Cetak</label> `);
+      $$renderer2.select({ id: "card-size-select", class: "input", value: cardSize }, ($$renderer3) => {
+        $$renderer3.push(`<!--[-->`);
+        const each_array_1 = ensure_array_like(cardSizes);
+        for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
+          let size = each_array_1[$$index_1];
+          $$renderer3.option({ value: size.id }, ($$renderer4) => {
+            $$renderer4.push(`${escape_html(size.name)}`);
+          });
+        }
+        $$renderer3.push(`<!--]-->`);
+      });
+      $$renderer2.push(`</div></div> `);
       {
         $$renderer2.push("<!--[-1-->");
         $$renderer2.push(`<div class="bg-slate-50 border border-slate-200 border-dashed rounded-2xl p-6 text-center"><div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3"><svg class="w-7 h-7 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"></path></svg></div> <p class="text-sm font-medium text-slate-400">Pilih kelas untuk melihat pratinjau kartu login siswa</p></div>`);

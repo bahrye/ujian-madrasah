@@ -6,6 +6,15 @@
   export let schoolLogo: string = '';
 
   let selectedClassId: string = '';
+  let cardSize: string = 'default';
+
+  const cardSizes = [
+    { id: 'default', name: 'Standar (Otomatis menyesuaikan)' },
+    { id: 'b1', name: 'ID Card B1 (65 x 102 mm)' },
+    { id: 'b2', name: 'ID Card B2 (79 x 126 mm)' },
+    { id: 'b3', name: 'ID Card B3 (95 x 126 mm)' },
+    { id: 'b4', name: 'ID Card B4 (105 x 155 mm)' }
+  ];
 
   $: filteredStudents = selectedClassId
     ? students.filter((s) => String(s.class_id) === String(selectedClassId))
@@ -73,7 +82,7 @@
         (s) => {
           const ttl = formatBirth(s.place_of_birth, s.date_of_birth);
           return `
-        <div class="card">
+        <div class="card ${cardSize !== 'default' ? 'size-' + cardSize : ''}">
           <div class="card-header">
             <div class="logo-area">
               <div class="logo-circle">${logoHtml}</div>
@@ -126,15 +135,28 @@
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:'Inter',sans-serif;background:#f1f5f9;padding:24px;}
   h1{text-align:center;color:#1e293b;font-size:20px;font-weight:800;margin-bottom:20px;letter-spacing:-0.02em;}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;max-width:1200px;margin:0 auto;}
-  .card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(99,102,241,.13);break-inside:avoid;page-break-inside:avoid;}
+  .grid{display:flex;flex-wrap:wrap;justify-content:center;gap:20px;max-width:1200px;margin:0 auto;}
+  .card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(99,102,241,.13);break-inside:avoid;page-break-inside:avoid;display:flex;flex-direction:column;}
+  .card.size-b1 { width: 65mm; height: 102mm; border-radius: 12px; }
+  .card.size-b2 { width: 79mm; height: 126mm; border-radius: 12px; }
+  .card.size-b3 { width: 95mm; height: 126mm; border-radius: 12px; }
+  .card.size-b4 { width: 105mm; height: 155mm; border-radius: 12px; }
+  .card.size-b1 .avatar { width: 45px; height: 45px; font-size: 20px; margin-bottom: 5px; }
+  .card.size-b1 .name { font-size: 13px; }
+  .card.size-b1 .ttl { font-size: 9px; margin-top: 1px; }
+  .card.size-b1 .cred-value { font-size: 13px; }
+  .card.size-b1 .url-value { font-size: 10px; }
+  .card.size-b1 .card-header { padding: 12px; }
+  .card.size-b1 .card-body { padding: 12px; }
+  .card.size-b1 .cred-row { padding: 6px 10px; gap: 6px; }
+  .card.size-b1 .url-row { padding: 6px 10px; }
   .card-header{background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);padding:16px 20px;}
   .logo-area{display:flex;align-items:center;gap:12px;}
   .logo-circle{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
   .school-name{font-size:13px;font-weight:800;color:#fff;line-height:1.2;}
   .school-label{font-size:9px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.08em;margin-top:1px;}
   .class-label{font-size:17px;font-weight:800;color:#fff;margin-top:2px;}
-  .card-body{padding:20px;}
+  .card-body{padding:20px;flex:1;display:flex;flex-direction:column;justify-content:center;}
   .avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;margin:0 auto 10px;}
   .name{text-align:center;font-size:16px;font-weight:700;color:#1e293b;letter-spacing:-0.01em;line-height:1.3;}
   .ttl{text-align:center;font-size:11px;font-weight:600;color:#64748b;margin-top:3px;}
@@ -151,9 +173,9 @@
   .card-footer{background:#f8fafc;border-top:1px solid #f1f5f9;padding:8px 16px;font-size:10px;color:#94a3b8;text-align:center;font-weight:500;}
   @media print{
     *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important;}
-    body{background:#f1f5f9 !important;padding:8px;}
-    .grid{gap:10px;}
-    .card{box-shadow:0 2px 8px rgba(99,102,241,.15);border:1px solid #e2e8f0;}
+    body{background:#ffffff !important;padding:12px;}
+    .grid{gap:15px;}
+    .card{box-shadow:none !important;border:1.5px dashed #94a3b8 !important;}
     .card-header{background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%) !important;background-color:#4f46e5 !important;}
     .avatar{background:linear-gradient(135deg,#6366f1,#8b5cf6) !important;background-color:#6366f1 !important;}
     .logo-circle{background:rgba(255,255,255,.2) !important;background-color:rgba(255,255,255,.2) !important;}
@@ -216,20 +238,37 @@
 
       <!-- Body -->
       <div class="p-5 overflow-y-auto flex-1 space-y-5">
-        <div>
-          <label for="card-class-select" class="block text-sm font-semibold text-slate-700 mb-2">
-            Pilih Kelas
-          </label>
-          <select
-            id="card-class-select"
-            class="input"
-            bind:value={selectedClassId}
-          >
-            <option value="">-- Pilih kelas --</option>
-            {#each classes as cls (cls.id)}
-              <option value={String(cls.id)}>{cls.name}</option>
-            {/each}
-          </select>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="card-class-select" class="block text-sm font-semibold text-slate-700 mb-2">
+              Pilih Kelas
+            </label>
+            <select
+              id="card-class-select"
+              class="input"
+              bind:value={selectedClassId}
+            >
+              <option value="">-- Pilih kelas --</option>
+              {#each classes as cls (cls.id)}
+                <option value={String(cls.id)}>{cls.name}</option>
+              {/each}
+            </select>
+          </div>
+
+          <div>
+            <label for="card-size-select" class="block text-sm font-semibold text-slate-700 mb-2">
+              Ukuran Kartu Cetak
+            </label>
+            <select
+              id="card-size-select"
+              class="input"
+              bind:value={cardSize}
+            >
+              {#each cardSizes as size}
+                <option value={size.id}>{size.name}</option>
+              {/each}
+            </select>
+          </div>
         </div>
 
         {#if selectedClassId}
