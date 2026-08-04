@@ -85,9 +85,12 @@
 	</div>
 
 	{#if isAdding}
-		<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 animate-fade-in">
-			<h2 class="text-xl font-bold text-slate-800 mb-4">Tambah Siswa Baru</h2>
-			<form method="POST" action="?/add" use:enhance class="space-y-4 max-w-lg">
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
+		<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => (isAdding = false)}>
+			<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 max-h-[90vh] overflow-y-auto w-full max-w-lg animate-bounce-in" on:click|stopPropagation>
+				<h2 class="text-xl font-bold text-slate-800 mb-4">Tambah Siswa Baru</h2>
+			<form method="POST" action="?/add" use:enhance={() => { return async ({ update }) => { isAdding = false; await update(); }; }} class="space-y-4 max-w-lg">
 				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 					<div>
 						<label for="name" class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
@@ -123,13 +126,17 @@
 					<button type="button" class="btn btn-secondary" on:click={() => (isAdding = false)}>Batal</button>
 				</div>
 			</form>
+			</div>
 		</div>
 	{/if}
 
 	{#if editingUser}
-		<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 animate-fade-in mb-6">
-			<h2 class="text-xl font-bold text-slate-800 mb-4">Edit Siswa</h2>
-			<form method="POST" action="?/edit" use:enhance class="space-y-4 max-w-lg">
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
+		<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => (editingUser = null)}>
+			<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 max-h-[90vh] overflow-y-auto w-full max-w-lg animate-bounce-in" on:click|stopPropagation>
+				<h2 class="text-xl font-bold text-slate-800 mb-4">Edit Siswa</h2>
+			<form method="POST" action="?/edit" use:enhance={() => { return async ({ update }) => { editingUser = null; await update(); }; }} class="space-y-4 max-w-lg">
 				<input type="hidden" name="id" value={editingUser.id} />
 				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 					<div>
@@ -166,6 +173,7 @@
 					<button type="button" class="btn btn-secondary" on:click={() => (editingUser = null)}>Batal</button>
 				</div>
 			</form>
+			</div>
 		</div>
 	{/if}
 
@@ -234,7 +242,7 @@
 							</td>
 							<td class="p-4 text-right">
 								<div class="flex items-center justify-end space-x-2">
-									<button class="btn-ghost btn-sm" on:click={() => { editingUser = user; window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+									<button class="btn-ghost btn-sm" on:click={() => { editingUser = user; }}>
 										Edit
 									</button>
 									<form method="POST" action="?/toggleStatus" use:enhance class="inline-block">
