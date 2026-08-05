@@ -50,6 +50,21 @@
 		"src/routes/admin/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/admin/papan-peringkat": [
+		"src/routes/admin/papan-peringkat/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/papan-peringkat/type/[typeId]": [
+		"src/routes/admin/papan-peringkat/type/[typeId]/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/papan-peringkat/[examId]": [
+		"src/routes/admin/papan-peringkat/[examId]/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/admin/results": [
 		"src/routes/admin/results/+page.server.ts",
 		"src/routes/admin/+layout.server.ts",
@@ -130,6 +145,21 @@
 	],
 	"/guru/media-bank": [
 		"src/routes/guru/media-bank/+page.server.ts",
+		"src/routes/guru/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/guru/papan-peringkat": [
+		"src/routes/guru/papan-peringkat/+page.server.ts",
+		"src/routes/guru/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/guru/papan-peringkat/type/[typeId]": [
+		"src/routes/guru/papan-peringkat/type/[typeId]/+page.server.ts",
+		"src/routes/guru/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/guru/papan-peringkat/[examId]": [
+		"src/routes/guru/papan-peringkat/[examId]/+page.server.ts",
 		"src/routes/guru/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
