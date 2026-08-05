@@ -250,19 +250,57 @@
 			<!-- Navigation -->
 			<nav class="flex-1 p-4 space-y-1 overflow-y-auto">
 				{#each menuItems as item}
-					<a
-						href={item.href}
-						class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200
-							   {isActive(item.href, currentPath)
-								? 'bg-white/15 text-white'
-								: 'text-primary-300 hover:text-white hover:bg-white/10'}"
-						on:click={() => (isOpen = false)}
-					>
-						<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS[item.icon] || ''} />
-						</svg>
-						<span>{item.label}</span>
-					</a>
+					{#if item.subItems}
+						<div class="space-y-1">
+							<button
+								class="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200
+									   {isGroupActive(item, currentPath)
+										? 'bg-white/10 text-white'
+										: 'text-primary-300 hover:text-white hover:bg-white/5'}"
+								on:click={() => openDropdowns[item.label] = !openDropdowns[item.label]}
+							>
+								<div class="flex items-center gap-3">
+									<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+										<path stroke-linecap="round" stroke-linejoin="round" d={ICONS[item.icon] || ''} />
+									</svg>
+									<span>{item.label}</span>
+								</div>
+								<svg class="w-4 h-4 transition-transform duration-200 {openDropdowns[item.label] ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.chevronDown} />
+								</svg>
+							</button>
+							{#if openDropdowns[item.label]}
+								<div class="pl-12 pr-4 py-1 space-y-1 animate-in slide-in-from-top-2 fade-in duration-200">
+									{#each item.subItems as subItem}
+										<a
+											href={subItem.href}
+											class="block px-3 py-2.5 rounded-lg text-sm transition-colors duration-200
+												   {isActive(subItem.href, currentPath)
+													? 'text-white bg-white/10 font-semibold'
+													: 'text-primary-300/80 hover:text-white hover:bg-white/5'}"
+											on:click={() => (isOpen = false)}
+										>
+											{subItem.label}
+										</a>
+									{/each}
+								</div>
+							{/if}
+						</div>
+					{:else}
+						<a
+							href={item.href}
+							class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200
+								   {isActive(item.href, currentPath)
+									? 'bg-white/15 text-white'
+									: 'text-primary-300 hover:text-white hover:bg-white/10'}"
+							on:click={() => (isOpen = false)}
+						>
+							<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d={ICONS[item.icon] || ''} />
+							</svg>
+							<span>{item.label}</span>
+						</a>
+					{/if}
 				{/each}
 			</nav>
 

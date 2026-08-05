@@ -28,7 +28,7 @@ const load = async ({ locals, platform }) => {
 		LEFT JOIN exam_types et ON e.exam_type_id = et.id
 		WHERE e.school_id = ? AND e.is_active = 1
 		ORDER BY e.start_time ASC
-	`).bind(locals.user.id, locals.user.school_id).all();
+	`).bind(locals.user.school_id).all();
   const { results: classes } = await db.prepare(`
 		SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC
 	`).bind(locals.user.school_id).all();
