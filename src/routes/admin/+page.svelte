@@ -100,13 +100,13 @@
 					</div>
 					<span class="text-xs font-semibold text-slate-700">Hasil Ujian</span>
 				</a>
-				<a href="/api/setup" class="card-hover p-4 text-center group" target="_blank">
-					<div class="w-10 h-10 mx-auto rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+				<a href="/admin/bank-soal" class="card-hover p-4 text-center group">
+					<div class="w-10 h-10 mx-auto rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
 						<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.refresh} />
+							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.questions} />
 						</svg>
 					</div>
-					<span class="text-xs font-semibold text-slate-700">Setup Data</span>
+					<span class="text-xs font-semibold text-slate-700">Bank Soal</span>
 				</a>
 			</div>
 		</div>
