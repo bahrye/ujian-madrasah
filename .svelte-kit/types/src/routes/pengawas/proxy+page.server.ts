@@ -16,7 +16,7 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 			JOIN exam_proctors ep ON e.id = ep.exam_id
 			LEFT JOIN subjects s ON e.subject_id = s.id
 			JOIN exam_types et ON e.exam_type_id = et.id
-			WHERE ep.proctor_id = ? AND e.school_id = ? AND et.is_active = 1
+			WHERE ep.proctor_id = ? AND e.school_id = ? AND et.is_active = 1 AND e.is_active = 1
 			ORDER BY e.start_time ASC
 		`).bind(locals.user!.id, locals.user!.school_id).all()
 	]);
