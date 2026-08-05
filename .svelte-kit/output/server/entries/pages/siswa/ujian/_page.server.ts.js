@@ -1,5 +1,6 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
+import { s as signExamToken } from "../../../../chunks/auth.js";
 const load = async ({ platform, locals, url }) => {
   const db = getDB(platform);
   const examId = url.searchParams.get("exam_id");
@@ -52,7 +53,8 @@ const actions = {
     const existingAttempt = await db.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`).bind(locals.user.id, token.exam_id).first();
     if (existingAttempt) {
       if (existingAttempt.status === "mengerjakan") {
-        cookies.set("exam_token_verified_" + existingAttempt.id, "true", { path: "/" });
+        const signedCookie = await signExamToken(existingAttempt.id, locals.user.id);
+        cookies.set("exam_token_verified_" + existingAttempt.id, signedCookie, { path: "/", httpOnly: true, sameSite: "lax" });
         throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
       }
       return fail(400, { error: "Anda sudah pernah mengerjakan ujian ini." });
@@ -83,18 +85,18 @@ const actions = {
     if (new Date(token.expires_at) < /* @__PURE__ */ new Date()) return fail(400, { error: "Token sudah kedaluwarsa." });
     const existingAttempt = await db.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`).bind(locals.user.id, token.exam_id).first();
     if (existingAttempt) {
-      if (existingAttempt.status === "mengerjakan") throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
+      if (existingAttempt.status === "mengerjakan") {
+        const signedCookie2 = await signExamToken(existingAttempt.id, locals.user.id);
+        cookies.set("exam_token_verified_" + existingAttempt.id, signedCookie2, { path: "/", httpOnly: true, sameSite: "lax" });
+        throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
+      }
       return fail(400, { error: "Anda sudah pernah mengerjakan ujian ini." });
     }
     const endTime = new Date(Date.now() + token.duration_minutes * 60 * 1e3).toISOString();
     const result = await db.prepare(`INSERT INTO student_attempts (student_id, exam_id, token_id, end_time, status) VALUES (?, ?, ?, ?, 'mengerjakan')`).bind(locals.user.id, token.exam_id, token.id, endTime).run();
     const attemptId = result.meta.last_row_id;
-    const questions = await db.prepare("SELECT id FROM questions WHERE exam_id = ? ORDER BY question_number").bind(token.exam_id).all();
-    if (questions.results.length > 0) {
-      const stmts = questions.results.map((q) => db.prepare("INSERT INTO student_answers (attempt_id, question_id) VALUES (?, ?)").bind(attemptId, q.id));
-      await db.batch(stmts);
-    }
-    cookies.set("exam_token_verified_" + attemptId, "true", { path: "/" });
+    const signedCookie = await signExamToken(attemptId, locals.user.id);
+    cookies.set("exam_token_verified_" + attemptId, signedCookie, { path: "/", httpOnly: true, sameSite: "lax" });
     throw redirect(302, `/siswa/ujian/${attemptId}`);
   }
 };

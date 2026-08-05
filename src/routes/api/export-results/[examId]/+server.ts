@@ -10,12 +10,22 @@ export const GET = async ({ params, platform, locals }: any) => {
 	const examId = params.examId;
 
 	// 1. Get Exam Details
-	const exam = await db.prepare(`
-		SELECT e.*, s.name as subject_name 
-		FROM exams e
-		LEFT JOIN subjects s ON e.subject_id = s.id
-		WHERE e.id = ? AND e.school_id = ?
-	`).bind(examId, locals.user.school_id).first();
+	let exam;
+	if (locals.user.role === 'superadmin') {
+		exam = await db.prepare(`
+			SELECT e.*, s.name as subject_name 
+			FROM exams e
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			WHERE e.id = ?
+		`).bind(examId).first();
+	} else {
+		exam = await db.prepare(`
+			SELECT e.*, s.name as subject_name 
+			FROM exams e
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			WHERE e.id = ? AND e.school_id = ?
+		`).bind(examId, locals.user.school_id).first();
+	}
 
 	if (!exam) {
 		return json({ error: 'Ujian tidak ditemukan.' }, { status: 404 });

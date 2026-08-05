@@ -2,6 +2,18 @@ import type { PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { redirect } from '@sveltejs/kit';
 
+export interface StudentScheduleItem {
+	id: number;
+	title: string;
+	duration_minutes: number;
+	start_time: string | null;
+	end_time: string | null;
+	is_active: number;
+	subject: string | null;
+	proctors: string | null;
+	question_count: number;
+}
+
 export const load: PageServerLoad = async ({ platform, locals }) => {
 	if (locals.user?.role !== 'siswa') throw redirect(302, '/');
 
@@ -31,7 +43,7 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		JOIN exam_types et ON e.exam_type_id = et.id
 		WHERE ep.student_id = ? AND e.school_id = ? AND e.is_active = 1 AND et.is_active = 1
 		ORDER BY CASE WHEN e.start_time IS NULL THEN 1 ELSE 0 END, e.start_time ASC, e.created_at DESC
-	`).bind(locals.user.id, locals.user.school_id).all();
+	`).bind(locals.user.id, locals.user.school_id).all<StudentScheduleItem>();
 
 	return {
 		schedules: examsQuery.results || []

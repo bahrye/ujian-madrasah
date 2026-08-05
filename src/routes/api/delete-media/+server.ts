@@ -3,7 +3,11 @@ import type { RequestHandler } from './$types';
 import { deleteFromCloudinary } from '$lib/server/cloudinary';
 import { env } from '$env/dynamic/private';
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user || !['superadmin', 'admin', 'guru'].includes(locals.user.role)) {
+		return json({ success: false, error: 'Unauthorized' }, { status: 401 });
+	}
+
 	try {
 		const { url } = (await request.json()) as { url: string };
 

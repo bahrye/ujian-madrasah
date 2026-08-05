@@ -156,6 +156,10 @@
 		submitting = true;
 		await saveCurrentAnswer();
 		
+		// Random jitter (0 - 2500ms) untuk meratakan trafik POST submit ratusan siswa
+		const jitter = Math.floor(Math.random() * 2500);
+		await new Promise((resolve) => setTimeout(resolve, jitter));
+		
 		const form = document.createElement('form');
 		form.method = 'POST';
 		form.action = '?/submit';

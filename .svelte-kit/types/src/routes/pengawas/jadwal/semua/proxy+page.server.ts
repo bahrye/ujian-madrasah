@@ -3,6 +3,25 @@ import { redirect } from '@sveltejs/kit';
 import type { ServerLoad } from '@sveltejs/kit';
 import { getDB } from '$lib/server/db';
 
+export interface ScheduleItem {
+	id: number;
+	title: string;
+	duration_minutes: number;
+	start_time: string | null;
+	end_time: string | null;
+	is_active: number;
+	subject_name: string | null;
+	exam_type_name: string | null;
+	proctor_names: string | null;
+	participant_count: number;
+	class_names: string | null;
+}
+
+export interface ClassItem {
+	id: number;
+	name: string;
+}
+
 export const load = async ({ locals, platform }: Parameters<ServerLoad>[0]) => {
 	if (!locals.user || locals.user.role !== 'pengawas') {
 		throw redirect(302, '/login');
@@ -39,12 +58,12 @@ export const load = async ({ locals, platform }: Parameters<ServerLoad>[0]) => {
 		LEFT JOIN exam_types et ON e.exam_type_id = et.id
 		WHERE e.school_id = ? AND e.is_active = 1
 		ORDER BY e.start_time ASC
-	`).bind(locals.user.school_id).all();
+	`).bind(locals.user.school_id).all<ScheduleItem>();
 
 	// Ambil daftar kelas untuk filter
 	const { results: classes } = await db.prepare(`
 		SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC
-	`).bind(locals.user.school_id).all();
+	`).bind(locals.user.school_id).all<ClassItem>();
 
 	return {
 		schedules,

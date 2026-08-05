@@ -90,8 +90,8 @@
 						<select id="t-exam" name="exam_id" required class="select" bind:value={selectedExamId}>
 							<option value="">Pilih ujian</option>
 							{#each data.exams as exam}
-								{@const start = exam.start_time ? new Date(exam.start_time).getTime() : 0}
-								{@const end = exam.end_time ? new Date(exam.end_time).getTime() : Infinity}
+								{@const start = exam.start_time ? new Date(String(exam.start_time)).getTime() : 0}
+								{@const end = exam.end_time ? new Date(String(exam.end_time)).getTime() : Infinity}
 								{@const isPastEnd = currentTime > end}
 								{@const isAllowed = (!exam.start_time || currentTime >= start - 15 * 60 * 1000) && !isPastEnd}
 								<option value={exam.id} disabled={!isAllowed}>
@@ -192,7 +192,7 @@
 					<h3 class="font-bold text-slate-800 text-lg">Penggunaan Token</h3>
 					<p class="text-sm text-slate-500 font-mono tracking-widest">{selectedToken.token_code}</p>
 				</div>
-				<button class="text-slate-400 hover:text-slate-600 p-2 rounded-lg hover:bg-slate-100 transition-colors" on:click={() => showStudentsModal = false}>
+				<button class="text-slate-400 hover:text-slate-600 p-2 rounded-lg hover:bg-slate-100 transition-colors" aria-label="Tutup" on:click={() => showStudentsModal = false}>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 					</svg>

@@ -1,6 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
+import { signExamToken } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ platform, locals, url }) => {
 	const db = getDB(platform);
@@ -67,7 +68,8 @@ export const actions: Actions = {
 
 		if (existingAttempt) {
 			if (existingAttempt.status === 'mengerjakan') {
-				cookies.set('exam_token_verified_' + existingAttempt.id, 'true', { path: '/' });
+				const signedCookie = await signExamToken(existingAttempt.id, locals.user!.id);
+				cookies.set('exam_token_verified_' + existingAttempt.id, signedCookie, { path: '/', httpOnly: true, sameSite: 'lax' });
 				throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
 			}
 			return fail(400, { error: 'Anda sudah pernah mengerjakan ujian ini.' });
@@ -106,7 +108,11 @@ export const actions: Actions = {
 			.bind(locals.user!.id, token.exam_id).first<{ id: number; status: string }>();
 
 		if (existingAttempt) {
-			if (existingAttempt.status === 'mengerjakan') throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
+			if (existingAttempt.status === 'mengerjakan') {
+				const signedCookie = await signExamToken(existingAttempt.id, locals.user!.id);
+				cookies.set('exam_token_verified_' + existingAttempt.id, signedCookie, { path: '/', httpOnly: true, sameSite: 'lax' });
+				throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
+			}
 			return fail(400, { error: 'Anda sudah pernah mengerjakan ujian ini.' });
 		}
 
@@ -116,13 +122,9 @@ export const actions: Actions = {
 			.bind(locals.user!.id, token.exam_id, token.id, endTime).run();
 
 		const attemptId = result.meta.last_row_id;
-		const questions = await db.prepare('SELECT id FROM questions WHERE exam_id = ? ORDER BY question_number').bind(token.exam_id).all<{ id: number }>();
-		if (questions.results.length > 0) {
-			const stmts = questions.results.map(q => db.prepare('INSERT INTO student_answers (attempt_id, question_id) VALUES (?, ?)').bind(attemptId, q.id));
-			await db.batch(stmts);
-		}
 		
-		cookies.set('exam_token_verified_' + attemptId, 'true', { path: '/' });
+		const signedCookie = await signExamToken(attemptId, locals.user!.id);
+		cookies.set('exam_token_verified_' + attemptId, signedCookie, { path: '/', httpOnly: true, sameSite: 'lax' });
 		throw redirect(302, `/siswa/ujian/${attemptId}`);
 	}
 };

@@ -84,21 +84,21 @@ function _page($$renderer, $$props) {
     $$renderer2.push(`<div class="space-y-6 animate-in"><div><h1 class="text-2xl font-bold text-slate-800">Dashboard Pengawas</h1> <p class="text-sm text-slate-500 mt-1">Selamat datang, ${escape_html(data.user.name)}.</p></div> <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">`);
     StatCard($$renderer2, {
       label: "Ujian Aktif",
-      value: data.stats.activeExams,
+      value: String(data.stats.activeExams),
       icon: ICONS.exam,
       gradient: "indigo"
     });
     $$renderer2.push(`<!----> `);
     StatCard($$renderer2, {
       label: "Total Token",
-      value: data.stats.totalTokens,
+      value: String(data.stats.totalTokens),
       icon: ICONS.token,
       gradient: "amber"
     });
     $$renderer2.push(`<!----> `);
     StatCard($$renderer2, {
       label: "Sedang Mengerjakan",
-      value: data.stats.activeAttempts,
+      value: String(data.stats.activeAttempts),
       icon: ICONS.monitor,
       gradient: "cyan"
     });

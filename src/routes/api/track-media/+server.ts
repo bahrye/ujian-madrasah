@@ -5,7 +5,7 @@ import { getDB, dbRun } from '$lib/server/db';
 export const POST: RequestHandler = async ({ request, platform, locals }) => {
 	try {
 		const db = getDB(platform);
-		const { url, media_type } = await request.json() as { url: string; media_type: string };
+		const { url, media_type, name } = await request.json() as { url: string; media_type: string; name?: string };
 
 		if (!url || !media_type) {
 			return json({ success: false, error: 'URL dan media_type wajib diisi' }, { status: 400 });
@@ -15,15 +15,17 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 			return json({ success: false, error: 'media_type tidak valid' }, { status: 400 });
 		}
 
+		const fileName = name || url.split('/').pop() || 'Media File';
+
 		// Insert ignore (or handle conflict)
 		// SQLite UPSERT (ON CONFLICT DO NOTHING)
 		const query = `
-			INSERT INTO uploaded_media (url, media_type, uploaded_by, is_public, school_id)
-			VALUES (?, ?, ?, ?, ?)
+			INSERT INTO uploaded_media (school_id, name, url, media_type, uploaded_by, is_public)
+			VALUES (?, ?, ?, ?, ?, ?)
 			ON CONFLICT(url) DO NOTHING
 		`;
 
-		await dbRun(db, query, url, media_type, locals.user?.id || null, 0, locals.user?.school_id || null);
+		await dbRun(db, query, locals.user?.school_id || null, fileName, url, media_type, locals.user?.id || null, 0);
 
 		return json({ success: true });
 	} catch (error) {

@@ -143,9 +143,9 @@
 	</div>
 
 	<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-		<StatCard label="Ujian Aktif" value={data.stats.activeExams} icon={ICONS.exam} gradient="indigo" />
-		<StatCard label="Total Token" value={data.stats.totalTokens} icon={ICONS.token} gradient="amber" />
-		<StatCard label="Sedang Mengerjakan" value={data.stats.activeAttempts} icon={ICONS.monitor} gradient="cyan" />
+		<StatCard label="Ujian Aktif" value={String(data.stats.activeExams)} icon={ICONS.exam} gradient="indigo" />
+		<StatCard label="Total Token" value={String(data.stats.totalTokens)} icon={ICONS.token} gradient="amber" />
+		<StatCard label="Sedang Mengerjakan" value={String(data.stats.activeAttempts)} icon={ICONS.monitor} gradient="cyan" />
 	</div>	<!-- Jadwal Mengawas -->
 	<div class="mt-8">
 		<h2 class="text-xl font-bold text-slate-800 mb-4">Jadwal Mengawas</h2>

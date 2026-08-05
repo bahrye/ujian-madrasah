@@ -46,7 +46,7 @@
 				return async ({ result, update }) => { 
 					loading = false;
 					if (result.type === 'success' && result.data?.success) {
-						tokenCode = result.data.tokenCode;
+						tokenCode = String(result.data.tokenCode);
 						showModal = true;
 					} else {
 						await update();

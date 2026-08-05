@@ -2,6 +2,11 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 
+export interface ExamFilterOption {
+	id: number;
+	title: string;
+}
+
 export const load: PageServerLoad = async ({ platform, url, locals }) => {
 	if (!locals.user) throw redirect(302, '/login');
 	const db = getDB(platform);
@@ -13,7 +18,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 		JOIN exam_proctors ep ON e.id = ep.exam_id
 		WHERE e.is_active = 1 AND e.school_id = ? AND ep.proctor_id = ?
 		ORDER BY e.title
-	`).bind(locals.user.school_id, locals.user.id).all();
+	`).bind(locals.user.school_id, locals.user.id).all<ExamFilterOption>();
 
 	let attempts: any[] = [];
 	if (examFilter) {

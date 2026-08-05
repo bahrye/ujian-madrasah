@@ -1,7 +1,10 @@
 import { json } from "@sveltejs/kit";
 import { d as deleteFromCloudinary } from "../../../../chunks/cloudinary.js";
 import { b as private_env } from "../../../../chunks/shared-server.js";
-const POST = async ({ request }) => {
+const POST = async ({ request, locals }) => {
+  if (!locals.user || !["superadmin", "admin", "guru"].includes(locals.user.role)) {
+    return json({ success: false, error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { url } = await request.json();
     if (!url) {

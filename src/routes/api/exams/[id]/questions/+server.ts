@@ -4,7 +4,7 @@ import { getDB } from '$lib/server/db';
 
 export const GET: RequestHandler = async ({ params, platform, locals }) => {
 	const user = locals.user;
-	if (!user) {
+	if (!user || !['admin', 'superadmin', 'guru', 'pengawas'].includes(user.role)) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 

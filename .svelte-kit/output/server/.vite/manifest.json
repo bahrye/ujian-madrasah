@@ -84,7 +84,10 @@
   },
   "_auth.js": {
     "file": "chunks/auth.js",
-    "name": "auth"
+    "name": "auth",
+    "imports": [
+      "_shared-server.js"
+    ]
   },
   "_cloudinary.js": {
     "file": "chunks/cloudinary.js",
@@ -1402,7 +1405,8 @@
     "src": "src/routes/siswa/ujian/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_auth.js"
     ]
   },
   "src/routes/siswa/ujian/+page.svelte": {
@@ -1425,7 +1429,8 @@
     "src": "src/routes/siswa/ujian/[attemptId]/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_auth.js"
     ]
   },
   "src/routes/siswa/ujian/[attemptId]/+page@.svelte": {

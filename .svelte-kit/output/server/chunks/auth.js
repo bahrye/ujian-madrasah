@@ -1,5 +1,9 @@
 import { jwtVerify, SignJWT } from "jose";
-const JWT_SECRET = new TextEncoder().encode("ujian-madrasah-jwt-secret-2024-ganti-di-production");
+import { b as private_env } from "./shared-server.js";
+function getJwtSecret() {
+  const secret = private_env.JWT_SECRET || process?.env?.JWT_SECRET || "ujian-madrasah-jwt-secret-2024-ganti-di-production";
+  return new TextEncoder().encode(secret);
+}
 const COOKIE_NAME = "ujian_auth_token";
 async function hashPassword(password) {
   const salt = crypto.getRandomValues(new Uint8Array(16));
@@ -51,11 +55,11 @@ async function verifyPassword(password, storedHash) {
   return computedHex === expectedHashHex;
 }
 async function createToken(user) {
-  return new SignJWT({ ...user }).setProtectedHeader({ alg: "HS256" }).setIssuedAt().setExpirationTime("8h").sign(JWT_SECRET);
+  return new SignJWT({ ...user }).setProtectedHeader({ alg: "HS256" }).setIssuedAt().setExpirationTime("8h").sign(getJwtSecret());
 }
 async function verifyToken(token) {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, getJwtSecret());
     return {
       id: payload.id,
       school_id: payload.school_id,
@@ -69,6 +73,18 @@ async function verifyToken(token) {
     return null;
   }
 }
+async function signExamToken(attemptId, studentId) {
+  const data = new TextEncoder().encode(`exam_attempt_${attemptId}_student_${studentId}`);
+  const key = await crypto.subtle.importKey("raw", getJwtSecret(), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const signature = await crypto.subtle.sign("HMAC", key, data);
+  const sigHex = Array.from(new Uint8Array(signature)).map((b) => b.toString(16).padStart(2, "0")).join("");
+  return `${attemptId}:${sigHex}`;
+}
+async function verifyExamTokenSignature(signedValue, attemptId, studentId) {
+  if (!signedValue) return false;
+  const expected = await signExamToken(attemptId, studentId);
+  return signedValue === expected;
+}
 function generateTokenCode(length = 6) {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let result = "";
@@ -81,8 +97,10 @@ function generateTokenCode(length = 6) {
 export {
   COOKIE_NAME as C,
   verifyPassword as a,
+  verifyExamTokenSignature as b,
   createToken as c,
   generateTokenCode as g,
   hashPassword as h,
+  signExamToken as s,
   verifyToken as v
 };

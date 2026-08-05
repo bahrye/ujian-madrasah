@@ -1,10 +1,21 @@
 import { error } from "@sveltejs/kit";
-const GET = async ({ url, fetch }) => {
+const GET = async ({ url, fetch, locals }) => {
+  if (!locals.user) {
+    throw error(401, "Unauthorized");
+  }
   const targetUrl = url.searchParams.get("url");
   if (!targetUrl) {
     throw error(400, "Missing url parameter");
   }
   try {
+    const parsedUrl = new URL(targetUrl);
+    if (parsedUrl.protocol !== "https:" && parsedUrl.protocol !== "http:") {
+      throw error(400, "Invalid protocol");
+    }
+    const hostname = parsedUrl.hostname.toLowerCase();
+    if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1" || hostname.startsWith("10.") || hostname.startsWith("192.168.") || hostname.startsWith("169.254.") || hostname.endsWith(".internal") || hostname.endsWith(".local")) {
+      throw error(403, "Access to internal network is forbidden");
+    }
     const response = await fetch(targetUrl, {
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"

@@ -4,6 +4,13 @@ import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { generateTokenCode } from '$lib/server/auth';
 
+export interface ExamSelectItem {
+	id: number;
+	title: string;
+	start_time: string | null;
+	end_time: string | null;
+}
+
 export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) => {
 	if (!locals.user) throw redirect(302, '/login');
 	const db = getDB(platform);
@@ -37,7 +44,7 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 		JOIN exam_types et ON e.exam_type_id = et.id
 		WHERE e.is_active = 1 AND et.is_active = 1 AND e.school_id = ? AND ep.proctor_id = ?
 		ORDER BY e.title
-	`).bind(locals.user.school_id, locals.user.id).all();
+	`).bind(locals.user.school_id, locals.user.id).all<ExamSelectItem>();
 
 	const processedTokens = tokens.results.map((t: any) => {
 		let usedBy = [];

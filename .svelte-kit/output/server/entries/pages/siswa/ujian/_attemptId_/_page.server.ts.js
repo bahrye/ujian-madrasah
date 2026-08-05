@@ -1,5 +1,6 @@
 import { fail, redirect, error } from "@sveltejs/kit";
 import { g as getDB } from "../../../../../chunks/db.js";
+import { b as verifyExamTokenSignature } from "../../../../../chunks/auth.js";
 const load = async ({ platform, locals, params, cookies }) => {
   if (!locals.user) throw redirect(302, "/login");
   const db = getDB(platform);
@@ -15,7 +16,8 @@ const load = async ({ platform, locals, params, cookies }) => {
   if (attempt.status !== "mengerjakan") {
     throw redirect(302, "/siswa");
   }
-  const isVerified = cookies.get("exam_token_verified_" + attemptId);
+  const cookieVal = cookies.get("exam_token_verified_" + attemptId);
+  const isVerified = await verifyExamTokenSignature(cookieVal, attemptId, locals.user.id);
   if (!isVerified) {
     throw redirect(302, `/siswa/ujian?exam_id=${attempt.exam_id}`);
   }
@@ -111,6 +113,8 @@ const actions = {
     }
     let warnings = 0;
     let warningLogs = "[]";
+    let kvAnswers = {};
+    let kvDoubts = {};
     const kv = platform?.env?.EXAM_ANSWERS;
     if (kv) {
       const stored = await kv.get(`attempt_${attemptId}_answers`);
@@ -119,23 +123,34 @@ const actions = {
           const kvData = JSON.parse(stored);
           if (kvData && kvData.warnings) warnings = kvData.warnings;
           if (kvData && kvData.warningLogs) warningLogs = JSON.stringify(kvData.warningLogs);
-          if (kvData && kvData.answers) {
-            const kvUpdateStmts = [];
-            for (const [qIdStr, ansVal] of Object.entries(kvData.answers)) {
-              const qId = parseInt(qIdStr, 10);
-              const isDoubted = kvData.doubts && kvData.doubts[qId] ? 1 : 0;
-              kvUpdateStmts.push(
-                db.prepare(`UPDATE student_answers SET answer_given = ?, is_doubted = ?, answered_at = datetime('now') WHERE attempt_id = ? AND question_id = ?`).bind(String(ansVal), isDoubted, attemptId, qId)
-              );
-            }
-            if (kvUpdateStmts.length > 0) {
-              await db.batch(kvUpdateStmts);
-            }
-          }
+          if (kvData && kvData.answers) kvAnswers = kvData.answers;
+          if (kvData && kvData.doubts) kvDoubts = kvData.doubts;
           await kv.delete(`attempt_${attemptId}_answers`);
         } catch (e) {
         }
       }
+    }
+    const examQuestions = await db.prepare("SELECT id FROM questions WHERE exam_id = ?").bind(attempt.exam_id).all();
+    const existingAnswers = await db.prepare("SELECT question_id, id FROM student_answers WHERE attempt_id = ?").bind(attemptId).all();
+    const existingMap = new Map(existingAnswers.results.map((a) => [a.question_id, a.id]));
+    const syncStmts = [];
+    for (const q of examQuestions.results) {
+      const ansVal = typeof kvAnswers[q.id] !== "undefined" ? String(kvAnswers[q.id]) : null;
+      const isDoubted = kvDoubts[q.id] ? 1 : 0;
+      if (existingMap.has(q.id)) {
+        if (ansVal !== null) {
+          syncStmts.push(
+            db.prepare(`UPDATE student_answers SET answer_given = ?, is_doubted = ?, answered_at = datetime('now') WHERE attempt_id = ? AND question_id = ?`).bind(ansVal, isDoubted, attemptId, q.id)
+          );
+        }
+      } else {
+        syncStmts.push(
+          db.prepare(`INSERT INTO student_answers (attempt_id, question_id, answer_given, is_doubted, answered_at) VALUES (?, ?, ?, ?, datetime('now'))`).bind(attemptId, q.id, ansVal, isDoubted)
+        );
+      }
+    }
+    if (syncStmts.length > 0) {
+      await db.batch(syncStmts);
     }
     const answers = await db.prepare(`
 			SELECT sa.*, q.type, q.correct_answer_json, q.points

@@ -2,7 +2,7 @@ import { json } from "@sveltejs/kit";
 import { g as getDB } from "../../../../../../chunks/db.js";
 const GET = async ({ params, platform, locals }) => {
   const user = locals.user;
-  if (!user) {
+  if (!user || !["admin", "superadmin", "guru", "pengawas"].includes(user.role)) {
     return json({ error: "Unauthorized" }, { status: 401 });
   }
   const db = getDB(platform);

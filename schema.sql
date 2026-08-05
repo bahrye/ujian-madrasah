@@ -200,6 +200,8 @@ CREATE INDEX IF NOT EXISTS idx_exam_proctors_proctor ON exam_proctors(proctor_id
 -- Tabel Pelacak Media (Media Logs / Orphan Tracker)
 CREATE TABLE IF NOT EXISTS uploaded_media (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    school_id INTEGER REFERENCES schools(id) ON DELETE CASCADE,
+    name TEXT,
     url TEXT NOT NULL UNIQUE,
     media_type TEXT NOT NULL CHECK(media_type IN ('image', 'audio')),
     uploaded_by INTEGER REFERENCES users(id),
@@ -207,6 +209,7 @@ CREATE TABLE IF NOT EXISTS uploaded_media (
     uploaded_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_uploaded_media_url ON uploaded_media(url);
+CREATE INDEX IF NOT EXISTS idx_uploaded_media_school ON uploaded_media(school_id);
 
 -- Tabel Peserta Default per Tipe Ujian
 CREATE TABLE IF NOT EXISTS exam_type_participants (

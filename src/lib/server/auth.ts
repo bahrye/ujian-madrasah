@@ -1,7 +1,11 @@
 import { SignJWT, jwtVerify } from 'jose';
+import { env } from '$env/dynamic/private';
 
-// Secret key untuk JWT — di production, gunakan environment variable
-const JWT_SECRET = new TextEncoder().encode('ujian-madrasah-jwt-secret-2024-ganti-di-production');
+// Secret key untuk JWT — gunakan environment variable JWT_SECRET jika tersedia
+export function getJwtSecret(): Uint8Array {
+	const secret = env.JWT_SECRET || process?.env?.JWT_SECRET || 'ujian-madrasah-jwt-secret-2024-ganti-di-production';
+	return new TextEncoder().encode(secret);
+}
 
 export const COOKIE_NAME = 'ujian_auth_token';
 
@@ -95,7 +99,7 @@ export async function createToken(user: UserPayload): Promise<string> {
 		.setProtectedHeader({ alg: 'HS256' })
 		.setIssuedAt()
 		.setExpirationTime('8h')
-		.sign(JWT_SECRET);
+		.sign(getJwtSecret());
 }
 
 /**
@@ -103,7 +107,7 @@ export async function createToken(user: UserPayload): Promise<string> {
  */
 export async function verifyToken(token: string): Promise<UserPayload | null> {
 	try {
-		const { payload } = await jwtVerify(token, JWT_SECRET);
+		const { payload } = await jwtVerify(token, getJwtSecret());
 		return {
 			id: payload.id as number,
 			school_id: payload.school_id as number | null,
@@ -116,6 +120,23 @@ export async function verifyToken(token: string): Promise<UserPayload | null> {
 	} catch {
 		return null;
 	}
+}
+
+/**
+ * Tanda tangani cookie verifikasi token ujian untuk mencegah bypass manual dari konsol browser
+ */
+export async function signExamToken(attemptId: number | string, studentId: number): Promise<string> {
+	const data = new TextEncoder().encode(`exam_attempt_${attemptId}_student_${studentId}`);
+	const key = await crypto.subtle.importKey('raw', getJwtSecret(), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+	const signature = await crypto.subtle.sign('HMAC', key, data);
+	const sigHex = Array.from(new Uint8Array(signature)).map(b => b.toString(16).padStart(2, '0')).join('');
+	return `${attemptId}:${sigHex}`;
+}
+
+export async function verifyExamTokenSignature(signedValue: string | undefined, attemptId: number | string, studentId: number): Promise<boolean> {
+	if (!signedValue) return false;
+	const expected = await signExamToken(attemptId, studentId);
+	return signedValue === expected;
 }
 
 /**

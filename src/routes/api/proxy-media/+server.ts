@@ -1,13 +1,36 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
-export const GET: RequestHandler = async ({ url, fetch }) => {
+export const GET: RequestHandler = async ({ url, fetch, locals }) => {
+	if (!locals.user) {
+		throw error(401, 'Unauthorized');
+	}
+
 	const targetUrl = url.searchParams.get('url');
 	if (!targetUrl) {
 		throw error(400, 'Missing url parameter');
 	}
 
 	try {
+		const parsedUrl = new URL(targetUrl);
+		if (parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:') {
+			throw error(400, 'Invalid protocol');
+		}
+
+		// Prevent SSRF against private IP ranges / localhost
+		const hostname = parsedUrl.hostname.toLowerCase();
+		if (
+			hostname === 'localhost' ||
+			hostname === '127.0.0.1' ||
+			hostname === '::1' ||
+			hostname.startsWith('10.') ||
+			hostname.startsWith('192.168.') ||
+			hostname.startsWith('169.254.') ||
+			hostname.endsWith('.internal') ||
+			hostname.endsWith('.local')
+		) {
+			throw error(403, 'Access to internal network is forbidden');
+		}
 		// Fetch target URL. Cloudflare fetch follows redirects automatically up to a limit.
 		const response = await fetch(targetUrl, {
 			headers: {

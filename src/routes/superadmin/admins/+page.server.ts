@@ -3,11 +3,26 @@ import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { hashPassword } from '$lib/server/auth';
 
+export interface SchoolOption {
+	id: number;
+	name: string;
+}
+
+export interface AdminUser {
+	id: number;
+	username: string;
+	name: string;
+	is_active: number;
+	created_at: string;
+	school_name: string | null;
+	school_id: number | null;
+}
+
 export const load: PageServerLoad = async ({ platform }) => {
 	const db = getDB(platform);
 	
 	// Get all schools for the dropdown
-	const { results: schools } = await db.prepare('SELECT id, name FROM schools ORDER BY name ASC').all();
+	const { results: schools } = await db.prepare('SELECT id, name FROM schools ORDER BY name ASC').all<SchoolOption>();
 
 	// Get all admins with their school names
 	const { results: admins } = await db.prepare(`
@@ -16,7 +31,7 @@ export const load: PageServerLoad = async ({ platform }) => {
 		LEFT JOIN schools s ON u.school_id = s.id
 		WHERE u.role = 'admin'
 		ORDER BY u.created_at DESC
-	`).all();
+	`).all<AdminUser>();
 
 	return { schools, admins };
 };

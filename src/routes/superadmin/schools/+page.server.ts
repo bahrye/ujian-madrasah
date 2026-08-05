@@ -2,9 +2,18 @@ import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 
+export interface SchoolItem {
+	id: number;
+	name: string;
+	address: string | null;
+	is_active: number;
+	created_at: string;
+	updated_at: string;
+}
+
 export const load: PageServerLoad = async ({ platform }) => {
 	const db = getDB(platform);
-	const { results: schools } = await db.prepare('SELECT * FROM schools ORDER BY name ASC').all();
+	const { results: schools } = await db.prepare('SELECT * FROM schools ORDER BY name ASC').all<SchoolItem>();
 
 	return { schools };
 };

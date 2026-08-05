@@ -3,6 +3,14 @@ import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { hashPassword, createToken, COOKIE_NAME } from '$lib/server/auth';
 
+export interface SuperadminUser {
+	id: number;
+	username: string;
+	name: string;
+	is_active: number;
+	created_at: string;
+}
+
 export const load: PageServerLoad = async ({ platform, locals }) => {
 	if (!locals.user || locals.user.role !== 'superadmin') {
 		throw redirect(302, '/login');
@@ -15,7 +23,7 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		FROM users
 		WHERE role = 'superadmin'
 		ORDER BY created_at DESC
-	`).all();
+	`).all<SuperadminUser>();
 
 	return {
 		superadmins: superadmins || [],
