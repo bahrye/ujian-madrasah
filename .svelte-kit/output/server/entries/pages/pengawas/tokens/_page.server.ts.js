@@ -60,6 +60,11 @@ const actions = {
     const now = Date.now();
     const tokenCode = generateTokenCode(6);
     const expiresAt = new Date(now + durationHours * 60 * 60 * 1e3).toISOString();
+    await db.prepare(`
+			DELETE FROM tokens 
+			WHERE exam_id = ? AND school_id = ? 
+			  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
+		`).bind(examId, locals.user.school_id, examId).run();
     await db.prepare("INSERT INTO tokens (school_id, exam_id, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?)").bind(locals.user.school_id, examId, tokenCode, locals.user.id, expiresAt).run();
     return { success: `Token berhasil dibuat: ${tokenCode}` };
   },

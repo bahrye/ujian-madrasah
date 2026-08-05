@@ -134,6 +134,11 @@ const actions = {
     const now = Date.now();
     const expiresAt = new Date(now + 15 * 60 * 1e3).toISOString();
     await db.prepare(`
+			DELETE FROM tokens 
+			WHERE exam_id = ? AND school_id = ? 
+			  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
+		`).bind(params.examId, locals.user.school_id, params.examId).run();
+    await db.prepare(`
 			INSERT INTO tokens (school_id, exam_id, created_by, token_code, is_released, expires_at, released_at)
 			VALUES (?, ?, ?, ?, 1, ?, datetime('now'))
 		`).bind(locals.user.school_id, params.examId, locals.user.id, token, expiresAt).run();
