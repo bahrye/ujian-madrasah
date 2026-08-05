@@ -12,6 +12,7 @@ export interface UserPayload {
 	name: string;
 	role: 'superadmin' | 'admin' | 'guru' | 'pengawas' | 'siswa';
 	class_id?: number | null;
+	photo?: string | null;
 }
 
 /**
@@ -109,7 +110,8 @@ export async function verifyToken(token: string): Promise<UserPayload | null> {
 			username: payload.username as string,
 			name: payload.name as string,
 			role: payload.role as UserPayload['role'],
-			class_id: payload.class_id as number | null | undefined
+			class_id: payload.class_id as number | null | undefined,
+			photo: payload.photo as string | null | undefined
 		};
 	} catch {
 		return null;

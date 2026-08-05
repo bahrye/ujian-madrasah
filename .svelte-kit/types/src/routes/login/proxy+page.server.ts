@@ -32,6 +32,7 @@ export const actions = {
 					password_hash: string;
 					name: string;
 					role: string;
+					photo: string | null;
 				}>();
 
 			if (!user) {
@@ -49,7 +50,8 @@ export const actions = {
 				class_id: user.class_id,
 				username: user.username,
 				name: user.name,
-				role: user.role as 'superadmin' | 'admin' | 'guru' | 'pengawas' | 'siswa'
+				role: user.role as 'superadmin' | 'admin' | 'guru' | 'pengawas' | 'siswa',
+				photo: user.photo
 			});
 
 			cookies.set(COOKIE_NAME, token, {

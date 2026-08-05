@@ -109,8 +109,12 @@
 		<div class="flex items-center gap-3 px-3 py-2">
 			{#if user?.role === 'admin'}
 				<button class="flex-1 flex items-center gap-3 min-w-0 hover:bg-white/10 p-1.5 -ml-1.5 rounded-xl transition-colors text-left" on:click={openProfileModal} title="Edit Profil">
-					<div class="w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-sm font-bold shadow-lg">
-						{user?.name?.charAt(0).toUpperCase() ?? '?'}
+					<div class="w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-sm font-bold shadow-lg overflow-hidden">
+						{#if user?.photo}
+							<img src={user.photo} alt={user.name} class="w-full h-full object-cover" />
+						{:else}
+							{user?.name?.charAt(0).toUpperCase() ?? '?'}
+						{/if}
 					</div>
 					<div class="flex-1 min-w-0">
 						<p class="text-sm font-semibold truncate group-hover:text-white">{user?.name ?? 'Pengguna'}</p>
@@ -121,8 +125,12 @@
 					</div>
 				</button>
 			{:else}
-				<div class="w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-sm font-bold shadow-lg">
-					{user?.name?.charAt(0).toUpperCase() ?? '?'}
+				<div class="w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-sm font-bold shadow-lg overflow-hidden">
+					{#if user?.photo}
+						<img src={user.photo} alt={user.name} class="w-full h-full object-cover" />
+					{:else}
+						{user?.name?.charAt(0).toUpperCase() ?? '?'}
+					{/if}
 				</div>
 				<div class="flex-1 min-w-0">
 					<p class="text-sm font-semibold truncate">{user?.name ?? 'Pengguna'}</p>
@@ -207,8 +215,12 @@
 				<div class="flex items-center gap-3 px-3 py-2">
 					{#if user?.role === 'admin'}
 						<button class="flex-1 flex items-center gap-3 min-w-0 hover:bg-white/10 p-1.5 -ml-1.5 rounded-xl transition-colors text-left" on:click={openProfileModal} title="Edit Profil">
-							<div class="w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-sm font-bold">
-								{user?.name?.charAt(0).toUpperCase() ?? '?'}
+							<div class="w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-sm font-bold overflow-hidden">
+								{#if user?.photo}
+									<img src={user.photo} alt={user.name} class="w-full h-full object-cover" />
+								{:else}
+									{user?.name?.charAt(0).toUpperCase() ?? '?'}
+								{/if}
 							</div>
 							<div class="flex-1 min-w-0">
 								<p class="text-sm font-semibold truncate">{user?.name ?? 'Pengguna'}</p>
@@ -219,8 +231,12 @@
 							</div>
 						</button>
 					{:else}
-						<div class="w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-sm font-bold">
-							{user?.name?.charAt(0).toUpperCase() ?? '?'}
+						<div class="w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-sm font-bold overflow-hidden">
+							{#if user?.photo}
+								<img src={user.photo} alt={user.name} class="w-full h-full object-cover" />
+							{:else}
+								{user?.name?.charAt(0).toUpperCase() ?? '?'}
+							{/if}
 						</div>
 						<div class="flex-1 min-w-0">
 							<p class="text-sm font-semibold truncate">{user?.name ?? 'Pengguna'}</p>

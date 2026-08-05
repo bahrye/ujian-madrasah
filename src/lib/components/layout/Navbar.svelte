@@ -57,11 +57,15 @@
 				{ROLE_LABELS[user?.role ?? ''] ?? ''}
 			</span>
 			<button
-				class="w-8 h-8 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-xs font-bold text-white shadow-md hover:ring-2 ring-offset-1 ring-indigo-500 transition-all focus:outline-none"
+				class="w-8 h-8 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-xs font-bold text-white shadow-md hover:ring-2 ring-offset-1 ring-indigo-500 transition-all focus:outline-none overflow-hidden"
 				on:click={() => (showProfileMenu = !showProfileMenu)}
 				aria-label="Toggle profile menu"
 			>
-				{user?.name?.charAt(0).toUpperCase() ?? '?'}
+				{#if user?.photo}
+					<img src={user.photo} alt={user.name} class="w-full h-full object-cover" />
+				{:else}
+					{user?.name?.charAt(0).toUpperCase() ?? '?'}
+				{/if}
 			</button>
 
 			{#if showProfileMenu}
@@ -76,8 +80,12 @@
 						<div class="absolute -bottom-6 -left-6 w-20 h-20 bg-black/10 rounded-full blur-lg"></div>
 						
 						<div class="relative z-10 flex items-center gap-4">
-							<div class="w-14 h-14 rounded-full bg-white/20 backdrop-blur-md border border-white/40 flex items-center justify-center text-xl font-bold shadow-inner">
-								{user?.name?.charAt(0).toUpperCase() ?? '?'}
+							<div class="w-14 h-14 rounded-full bg-white/20 backdrop-blur-md border border-white/40 flex items-center justify-center text-xl font-bold shadow-inner overflow-hidden">
+								{#if user?.photo}
+									<img src={user.photo} alt={user.name} class="w-full h-full object-cover" />
+								{:else}
+									{user?.name?.charAt(0).toUpperCase() ?? '?'}
+								{/if}
 							</div>
 							<div class="flex-1 min-w-0">
 								<p class="text-[10px] font-bold text-white/90 uppercase tracking-widest mb-0.5">{ROLE_LABELS[user?.role ?? '']}</p>

@@ -30,7 +30,8 @@ const actions = {
         class_id: user.class_id,
         username: user.username,
         name: user.name,
-        role: user.role
+        role: user.role,
+        photo: user.photo
       });
       cookies.set(COOKIE_NAME, token, {
         path: "/",
