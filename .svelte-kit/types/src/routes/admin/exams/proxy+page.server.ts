@@ -56,9 +56,34 @@ export const actions = {
 		if (!id || !code || !name) return fail(400, { error: 'Data tidak lengkap.' });
 
 		try {
+			// Ambil kode lama untuk cek apakah berubah
+			const oldType = await db.prepare('SELECT code FROM exam_types WHERE id = ? AND school_id = ?')
+				.bind(id, locals.user!.school_id)
+				.first<{ code: string }>();
+
 			await db.prepare(`UPDATE exam_types SET code=?, name=?, description=?, start_time=?, end_time=?, is_active=? WHERE id=? AND school_id=?`)
 				.bind(code, name, description, startTime, endTime, isActive, id, locals.user!.school_id)
 				.run();
+
+			// Otomatis perbarui title semua ujian yang terhubung jika code berubah
+			if (oldType && oldType.code !== code) {
+				// Ambil semua ujian terkait beserta nama mata pelajarannya
+				const linkedExams = await db.prepare(`
+					SELECT e.id, s.name as subject_name
+					FROM exams e
+					LEFT JOIN subjects s ON e.subject_id = s.id
+					WHERE e.exam_type_id = ?
+				`).bind(id).all<{ id: number; subject_name: string | null }>();
+
+				// Update title setiap ujian dengan kode baru
+				if (linkedExams.results.length > 0) {
+					const updateBatch = linkedExams.results.map(exam =>
+						db.prepare(`UPDATE exams SET title = ?, updated_at = datetime('now') WHERE id = ?`)
+							.bind(`${code} - ${exam.subject_name || 'Ujian'}`, exam.id)
+					);
+					await db.batch(updateBatch);
+				}
+			}
 
 			// Otomatis nonaktifkan ujian yang rentang waktunya keluar dari tipe ujian yang baru
 			if (startTime && endTime) {
@@ -72,11 +97,12 @@ export const actions = {
 					)
 				`).bind(id, startTime, endTime).run();
 			}
-			return { success: 'Tipe Ujian berhasil diperbarui.' };
+			return { success: 'Tipe Ujian berhasil diperbarui. Nama ujian yang terhubung telah diperbarui otomatis.' };
 		} catch (e) {
 			return fail(500, { error: 'Gagal memperbarui tipe ujian.' });
 		}
 	},
+
 
 	delete: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);

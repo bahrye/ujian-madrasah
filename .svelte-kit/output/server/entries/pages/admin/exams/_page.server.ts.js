@@ -42,7 +42,22 @@ const actions = {
     const isActive = form.get("is_active")?.toString() === "1" ? 1 : 0;
     if (!id || !code || !name) return fail(400, { error: "Data tidak lengkap." });
     try {
+      const oldType = await db.prepare("SELECT code FROM exam_types WHERE id = ? AND school_id = ?").bind(id, locals.user.school_id).first();
       await db.prepare(`UPDATE exam_types SET code=?, name=?, description=?, start_time=?, end_time=?, is_active=? WHERE id=? AND school_id=?`).bind(code, name, description, startTime, endTime, isActive, id, locals.user.school_id).run();
+      if (oldType && oldType.code !== code) {
+        const linkedExams = await db.prepare(`
+					SELECT e.id, s.name as subject_name
+					FROM exams e
+					LEFT JOIN subjects s ON e.subject_id = s.id
+					WHERE e.exam_type_id = ?
+				`).bind(id).all();
+        if (linkedExams.results.length > 0) {
+          const updateBatch = linkedExams.results.map(
+            (exam) => db.prepare(`UPDATE exams SET title = ?, updated_at = datetime('now') WHERE id = ?`).bind(`${code} - ${exam.subject_name || "Ujian"}`, exam.id)
+          );
+          await db.batch(updateBatch);
+        }
+      }
       if (startTime && endTime) {
         await db.prepare(`
 					UPDATE exams 
@@ -54,7 +69,7 @@ const actions = {
 					)
 				`).bind(id, startTime, endTime).run();
       }
-      return { success: "Tipe Ujian berhasil diperbarui." };
+      return { success: "Tipe Ujian berhasil diperbarui. Nama ujian yang terhubung telah diperbarui otomatis." };
     } catch (e) {
       return fail(500, { error: "Gagal memperbarui tipe ujian." });
     }
