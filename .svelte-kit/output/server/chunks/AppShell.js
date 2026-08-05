@@ -51,7 +51,14 @@ function Sidebar($$renderer, $$props) {
         $$renderer3.push(`<button class="flex-1 flex items-center gap-3 min-w-0 hover:bg-white/10 p-1.5 -ml-1.5 rounded-xl transition-colors text-left" title="Edit Profil"><div${attr_class(`w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br ${stringify(roleGradients[user?.role ?? "siswa"])} flex items-center justify-center text-sm font-bold shadow-lg`)}>${escape_html(user?.name?.charAt(0).toUpperCase() ?? "?")}</div> <div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate group-hover:text-white">${escape_html(user?.name ?? "Pengguna")}</p> <div class="flex items-center gap-1 text-xs text-primary-400"><span>${escape_html(ROLE_LABELS[user?.role ?? ""] ?? "")}</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"${attr("d", ICONS.edit)}></path></svg></div></div></button>`);
       } else {
         $$renderer3.push("<!--[-1-->");
-        $$renderer3.push(`<div${attr_class(`w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br ${stringify(roleGradients[user?.role ?? "siswa"])} flex items-center justify-center text-sm font-bold shadow-lg`)}>${escape_html(user?.name?.charAt(0).toUpperCase() ?? "?")}</div> <div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate">${escape_html(user?.name ?? "Pengguna")}</p> <p class="text-xs text-primary-400">${escape_html(ROLE_LABELS[user?.role ?? ""] ?? "")}</p></div>`);
+        $$renderer3.push(`<div${attr_class(`w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br ${stringify(roleGradients[user?.role ?? "siswa"])} flex items-center justify-center text-sm font-bold shadow-lg`)}>${escape_html(user?.name?.charAt(0).toUpperCase() ?? "?")}</div> <div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate">${escape_html(user?.name ?? "Pengguna")}</p> <div class="flex flex-col gap-0.5 mt-0.5">`);
+        if (user?.role === "siswa") {
+          $$renderer3.push("<!--[0-->");
+          $$renderer3.push(`<p class="text-[11px] text-primary-300 font-mono leading-none">${escape_html(user?.username)}</p>`);
+        } else {
+          $$renderer3.push("<!--[-1-->");
+        }
+        $$renderer3.push(`<!--]--> <p class="text-xs text-primary-400 leading-none">${escape_html(ROLE_LABELS[user?.role ?? ""] ?? "")}</p></div></div>`);
       }
       $$renderer3.push(`<!--]--> <a href="/api/logout" class="p-1.5 rounded-lg text-primary-400 hover:text-white hover:bg-white/10 transition-colors" title="Keluar"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.logout)}></path></svg></a></div></div></aside> `);
       if (isOpen) {
@@ -68,7 +75,14 @@ function Sidebar($$renderer, $$props) {
           $$renderer3.push(`<button class="flex-1 flex items-center gap-3 min-w-0 hover:bg-white/10 p-1.5 -ml-1.5 rounded-xl transition-colors text-left" title="Edit Profil"><div${attr_class(`w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br ${stringify(roleGradients[user?.role ?? "siswa"])} flex items-center justify-center text-sm font-bold`)}>${escape_html(user?.name?.charAt(0).toUpperCase() ?? "?")}</div> <div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate">${escape_html(user?.name ?? "Pengguna")}</p> <div class="flex items-center gap-1 text-xs text-primary-400"><span>${escape_html(ROLE_LABELS[user?.role ?? ""] ?? "")}</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"${attr("d", ICONS.edit)}></path></svg></div></div></button>`);
         } else {
           $$renderer3.push("<!--[-1-->");
-          $$renderer3.push(`<div${attr_class(`w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br ${stringify(roleGradients[user?.role ?? "siswa"])} flex items-center justify-center text-sm font-bold`)}>${escape_html(user?.name?.charAt(0).toUpperCase() ?? "?")}</div> <div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate">${escape_html(user?.name ?? "Pengguna")}</p> <p class="text-xs text-primary-400">${escape_html(ROLE_LABELS[user?.role ?? ""] ?? "")}</p></div>`);
+          $$renderer3.push(`<div${attr_class(`w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br ${stringify(roleGradients[user?.role ?? "siswa"])} flex items-center justify-center text-sm font-bold`)}>${escape_html(user?.name?.charAt(0).toUpperCase() ?? "?")}</div> <div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate">${escape_html(user?.name ?? "Pengguna")}</p> <div class="flex flex-col gap-0.5 mt-0.5">`);
+          if (user?.role === "siswa") {
+            $$renderer3.push("<!--[0-->");
+            $$renderer3.push(`<p class="text-[11px] text-primary-300 font-mono leading-none">${escape_html(user?.username)}</p>`);
+          } else {
+            $$renderer3.push("<!--[-1-->");
+          }
+          $$renderer3.push(`<!--]--> <p class="text-xs text-primary-400 leading-none">${escape_html(ROLE_LABELS[user?.role ?? ""] ?? "")}</p></div></div>`);
         }
         $$renderer3.push(`<!--]--></div> <a href="/api/logout" class="mt-2 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-primary-300 hover:text-white hover:bg-white/10 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.logout)}></path></svg> Keluar</a></div></aside></div>`);
       } else {

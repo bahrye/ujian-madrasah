@@ -126,7 +126,12 @@
 				</div>
 				<div class="flex-1 min-w-0">
 					<p class="text-sm font-semibold truncate">{user?.name ?? 'Pengguna'}</p>
-					<p class="text-xs text-primary-400">{ROLE_LABELS[user?.role ?? ''] ?? ''}</p>
+					<div class="flex flex-col gap-0.5 mt-0.5">
+						{#if user?.role === 'siswa'}
+							<p class="text-[11px] text-primary-300 font-mono leading-none">{user?.username}</p>
+						{/if}
+						<p class="text-xs text-primary-400 leading-none">{ROLE_LABELS[user?.role ?? ''] ?? ''}</p>
+					</div>
 				</div>
 			{/if}
 			<a
@@ -219,7 +224,12 @@
 						</div>
 						<div class="flex-1 min-w-0">
 							<p class="text-sm font-semibold truncate">{user?.name ?? 'Pengguna'}</p>
-							<p class="text-xs text-primary-400">{ROLE_LABELS[user?.role ?? ''] ?? ''}</p>
+							<div class="flex flex-col gap-0.5 mt-0.5">
+								{#if user?.role === 'siswa'}
+									<p class="text-[11px] text-primary-300 font-mono leading-none">{user?.username}</p>
+								{/if}
+								<p class="text-xs text-primary-400 leading-none">{ROLE_LABELS[user?.role ?? ''] ?? ''}</p>
+							</div>
 						</div>
 					{/if}
 				</div>
