@@ -2,12 +2,13 @@ import type { PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { redirect, error } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ platform, locals, params }) => {
+export const load: PageServerLoad = async ({ platform, locals, params, url }) => {
 	if (locals.user?.role !== 'admin') throw redirect(302, '/');
 
 	const db = getDB(platform);
 	const typeId = params.typeId;
 	const schoolId = locals.user.school_id;
+	const classFilter = url.searchParams.get('class_id') || '';
 
 	const examType = await db.prepare(`
 		SELECT id, name, code FROM exam_types WHERE id = ? AND school_id = ?
@@ -17,8 +18,19 @@ export const load: PageServerLoad = async ({ platform, locals, params }) => {
 		throw error(404, 'Tipe ujian tidak ditemukan.');
 	}
 
-	// Agregasi nilai berdasarkan tipe ujian untuk semua siswa
-	const leaderboardQuery = await db.prepare(`
+	// Ambil daftar kelas yang ada pesertanya pada tipe ujian ini
+	const classesQuery = await db.prepare(`
+		SELECT DISTINCT c.id, c.name
+		FROM classes c
+		JOIN users u ON u.class_id = c.id
+		JOIN student_attempts sa ON sa.student_id = u.id
+		JOIN exams e ON sa.exam_id = e.id
+		WHERE e.exam_type_id = ? AND sa.status = 'selesai' AND c.school_id = ?
+		ORDER BY c.name ASC
+	`).bind(typeId, schoolId).all<{ id: number; name: string }>();
+
+	// Agregasi nilai — dengan filter kelas jika ada
+	let leaderboardSQL = `
 		SELECT 
 			u.id as student_id,
 			u.name as student_name,
@@ -34,12 +46,20 @@ export const load: PageServerLoad = async ({ platform, locals, params }) => {
 		LEFT JOIN classes c ON u.class_id = c.id
 		JOIN exams e ON sa.exam_id = e.id
 		WHERE e.exam_type_id = ? AND sa.status = 'selesai'
-		GROUP BY u.id
-		ORDER BY total_score DESC, avg_score DESC, total_time ASC
-	`).bind(typeId).all<{ student_id: number; student_name: string; photo: string | null; class_name: string | null; total_points: number; total_score: number; avg_score: number; total_time: number; exams_completed: number }>();
+	`;
+	const leaderboardParams: unknown[] = [typeId];
+	if (classFilter) {
+		leaderboardSQL += ' AND u.class_id = ?';
+		leaderboardParams.push(classFilter);
+	}
+	leaderboardSQL += ' GROUP BY u.id ORDER BY total_score DESC, avg_score DESC, total_time ASC';
 
-	// Detail per-ujian per-siswa untuk dropdown
-	const detailQuery = await db.prepare(`
+	const leaderboardQuery = await db.prepare(leaderboardSQL)
+		.bind(...leaderboardParams)
+		.all<{ student_id: number; student_name: string; photo: string | null; class_name: string | null; total_points: number; total_score: number; avg_score: number; total_time: number; exams_completed: number }>();
+
+	// Detail per-ujian per-siswa untuk dropdown — juga difilter kelas jika ada
+	let detailSQL = `
 		SELECT 
 			u.id as student_id,
 			e.title as exam_title,
@@ -49,8 +69,17 @@ export const load: PageServerLoad = async ({ platform, locals, params }) => {
 		JOIN users u ON sa.student_id = u.id
 		JOIN exams e ON sa.exam_id = e.id
 		WHERE e.exam_type_id = ? AND sa.status = 'selesai'
-		ORDER BY u.id, e.title ASC
-	`).bind(typeId).all<{ student_id: number; exam_title: string; total_points: number; score: number }>();
+	`;
+	const detailParams: unknown[] = [typeId];
+	if (classFilter) {
+		detailSQL += ' AND u.class_id = ?';
+		detailParams.push(classFilter);
+	}
+	detailSQL += ' ORDER BY u.id, e.title ASC';
+
+	const detailQuery = await db.prepare(detailSQL)
+		.bind(...detailParams)
+		.all<{ student_id: number; exam_title: string; total_points: number; score: number }>();
 
 	// Kelompokkan detail berdasarkan student_id
 	const detailMap: Record<number, { exam_title: string; total_points: number; score: number }[]> = {};
@@ -61,6 +90,8 @@ export const load: PageServerLoad = async ({ platform, locals, params }) => {
 
 	return {
 		examType,
+		classes: classesQuery.results || [],
+		classFilter,
 		leaderboard: leaderboardQuery.results || [],
 		detailMap
 	};

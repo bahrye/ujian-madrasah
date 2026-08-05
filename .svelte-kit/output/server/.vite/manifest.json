@@ -258,7 +258,7 @@
       "_stores.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.CWvQCmIV.css"
+      "_app/immutable/assets/_layout.loIfO4Z3.css"
     ]
   },
   "src/routes/+page.server.ts": {
@@ -558,7 +558,11 @@
     "src": "src/routes/admin/papan-peringkat/type/[typeId]/+page.svelte",
     "isEntry": true,
     "imports": [
-      "_index.js"
+      "_index.js",
+      "_exports.js",
+      "_utils2.js",
+      "_root.js",
+      "_state.svelte.js"
     ]
   },
   "src/routes/admin/results/+page.server.ts": {
@@ -980,7 +984,11 @@
     "src": "src/routes/guru/papan-peringkat/type/[typeId]/+page.svelte",
     "isEntry": true,
     "imports": [
-      "_index.js"
+      "_index.js",
+      "_exports.js",
+      "_utils2.js",
+      "_root.js",
+      "_state.svelte.js"
     ]
   },
   "src/routes/guru/penilaian/+page.server.ts": {

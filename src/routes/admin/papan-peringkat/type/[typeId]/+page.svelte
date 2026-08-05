@@ -1,5 +1,8 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+
 	export let data: PageData;
 
 	let expanded = new Set<number>();
@@ -10,7 +13,20 @@
 		} else {
 			expanded.add(studentId);
 		}
-		expanded = expanded; // trigger reactivity
+		expanded = expanded;
+	}
+
+	function onClassChange(e: Event) {
+		const val = (e.target as HTMLSelectElement).value;
+		const url = new URL($page.url);
+		if (val) {
+			url.searchParams.set('class_id', val);
+		} else {
+			url.searchParams.delete('class_id');
+		}
+		// Reset expanded saat ganti filter
+		expanded = new Set();
+		goto(url.toString(), { replaceState: true });
 	}
 </script>
 
@@ -28,7 +44,33 @@
 			Kembali ke Papan Peringkat
 		</a>
 		<h1 class="text-3xl font-bold text-slate-800 tracking-tight">Akumulasi: {data.examType.name}</h1>
-		<p class="text-slate-500 mt-1">Papan Peringkat Seluruh Kelas berdasarkan total nilai seluruh ujian tipe {data.examType.code}. Klik nama siswa untuk melihat detail per ujian.</p>
+		<p class="text-slate-500 mt-1">Papan Peringkat berdasarkan total nilai seluruh ujian tipe {data.examType.code}. Klik nama siswa untuk melihat detail per ujian.</p>
+	</div>
+
+	<!-- Filter Kelas -->
+	<div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-6 flex flex-wrap items-center gap-3">
+		<div class="flex items-center gap-2 text-slate-600 font-medium text-sm">
+			<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
+			</svg>
+			Filter Kelas:
+		</div>
+		<select
+			id="class-filter"
+			class="form-input py-2 px-3 pr-8 text-sm rounded-lg border border-slate-200 bg-slate-50 focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
+			value={data.classFilter}
+			on:change={onClassChange}
+		>
+			<option value="">Semua Kelas</option>
+			{#each data.classes as cls}
+				<option value={cls.id}>{cls.name}</option>
+			{/each}
+		</select>
+		{#if data.classFilter}
+			<span class="text-xs text-primary-600 font-semibold bg-primary-50 border border-primary-200 px-2.5 py-1 rounded-full">
+				Menampilkan {data.leaderboard.length} siswa
+			</span>
+		{/if}
 	</div>
 
 	<!-- Leaderboard -->
@@ -37,12 +79,12 @@
 			<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
 			</svg>
-			<h2 class="text-lg font-bold text-slate-800">Daftar Peringkat (Seluruh Siswa)</h2>
+			<h2 class="text-lg font-bold text-slate-800">Daftar Peringkat (Akumulasi Nilai)</h2>
 		</div>
 
 		{#if data.leaderboard.length === 0}
 			<div class="p-10 text-center text-slate-500">
-				<p>Belum ada rekapan ujian untuk tipe ini.</p>
+				<p>{data.classFilter ? 'Tidak ada siswa dari kelas ini yang menyelesaikan ujian.' : 'Belum ada rekapan ujian untuk tipe ini.'}</p>
 			</div>
 		{:else}
 			<div class="overflow-x-auto">
@@ -67,7 +109,6 @@
 								class:bg-indigo-50={isOpen}
 								on:click={() => toggleExpand(student.student_id)}
 							>
-								<!-- Rank -->
 								<td class="p-4 text-center align-middle">
 									{#if index === 0}
 										<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 font-bold text-lg shadow-sm">1</span>
@@ -80,7 +121,6 @@
 									{/if}
 								</td>
 
-								<!-- Student Info -->
 								<td class="p-4">
 									<div class="flex items-center gap-3">
 										{#if student.photo}
@@ -102,25 +142,16 @@
 									</div>
 								</td>
 
-								<!-- Total Poin -->
-								<td class="p-4 text-center text-slate-600 font-medium">
-									{student.total_points}
-								</td>
+								<td class="p-4 text-center text-slate-600 font-medium">{student.total_points}</td>
 
-								<!-- Total Nilai -->
 								<td class="p-4 text-center">
-									<span class="inline-block px-3 py-1 bg-green-100 text-green-700 font-bold rounded-lg">
-										{student.total_score}
-									</span>
+									<span class="inline-block px-3 py-1 bg-green-100 text-green-700 font-bold rounded-lg">{student.total_score}</span>
 								</td>
 
-								<!-- Rata-rata -->
-								<td class="p-4 text-center text-slate-600 font-medium">
-									{student.avg_score.toFixed(2)}
-								</td>
+								<td class="p-4 text-center text-slate-600 font-medium">{student.avg_score.toFixed(2)}</td>
 							</tr>
 
-							<!-- Baris Detail (Dropdown) -->
+							<!-- Baris Detail Dropdown -->
 							{#if isOpen && details.length > 0}
 								<tr class="bg-indigo-50/60 border-b border-indigo-100">
 									<td></td>
@@ -140,9 +171,7 @@
 															<td class="px-4 py-2.5 text-slate-700 font-medium">{detail.exam_title}</td>
 															<td class="px-4 py-2.5 text-center text-slate-600">{detail.total_points}</td>
 															<td class="px-4 py-2.5 text-center">
-																<span class="inline-block px-2.5 py-0.5 bg-green-100 text-green-700 font-semibold rounded-md">
-																	{detail.score}
-																</span>
+																<span class="inline-block px-2.5 py-0.5 bg-green-100 text-green-700 font-semibold rounded-md">{detail.score}</span>
 															</td>
 														</tr>
 													{/each}
