@@ -53,15 +53,16 @@
 				{/if}
 
 				<div class="flex flex-col gap-1 text-xs text-slate-500 mb-4 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-					<div class="flex items-center gap-2">
-						<svg class="w-3.5 h-3.5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<div class="flex items-start gap-2">
+						<svg class="w-3.5 h-3.5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
 						</svg>
-						<span class="truncate">
-							{type.start_time ? new Date(type.start_time.replace(' ', 'T') + (type.start_time.includes(' ') && !type.start_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : 'Belum diatur'} 
-							- 
-							{type.end_time ? new Date(type.end_time.replace(' ', 'T') + (type.end_time.includes(' ') && !type.end_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : 'Belum diatur'}
-						</span>
+						<div class="flex flex-col gap-0.5 min-w-0">
+							<span class="text-slate-400 font-medium">Mulai:</span>
+							<span class="truncate font-medium">{type.start_time ? new Date(type.start_time.replace(' ', 'T') + (type.start_time.includes(' ') && !type.start_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : 'Belum diatur'}</span>
+							<span class="text-slate-400 font-medium mt-1">Berakhir:</span>
+							<span class="truncate font-medium">{type.end_time ? new Date(type.end_time.replace(' ', 'T') + (type.end_time.includes(' ') && !type.end_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : 'Belum diatur'}</span>
+						</div>
 					</div>
 					<div class="flex items-center gap-2 mt-1">
 						<svg class="w-3.5 h-3.5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">

@@ -82,23 +82,24 @@
 						</svg>
 						{exam.participant_count} peserta
 					</span>
-					<div class="flex items-center gap-1 w-full mt-0.5 {isOutOfBounds ? 'text-rose-500 font-medium' : 'text-slate-500'}" title={isOutOfBounds ? 'Waktu ujian berada di luar rentang tipe ujian, sehingga otomatis nonaktif' : 'Rentang Waktu Ujian'}>
-						<svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.calendar} />
-						</svg>
-						{#if exam.start_time || exam.end_time}
-							<span class="truncate">
-								{exam.start_time ? new Date(exam.start_time.replace(' ', 'T') + (exam.start_time.includes(' ') && !exam.start_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'} 
-								s/d 
-								{exam.end_time ? new Date(exam.end_time.replace(' ', 'T') + (exam.end_time.includes(' ') && !exam.end_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'}
-							</span>
+					<div class="flex items-start gap-1 w-full mt-0.5 {isOutOfBounds ? 'text-rose-500 font-medium' : 'text-slate-500'}" title={isOutOfBounds ? 'Waktu ujian berada di luar rentang tipe ujian, sehingga otomatis nonaktif' : 'Rentang Waktu Ujian'}>
+					<svg class="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.calendar} />
+					</svg>
+					{#if exam.start_time || exam.end_time}
+						<div class="flex flex-col gap-0.5 min-w-0 flex-1">
+							<span class="text-slate-400 text-[10px] font-medium">Mulai:</span>
+							<span class="truncate text-xs">{exam.start_time ? new Date(exam.start_time.replace(' ', 'T') + (exam.start_time.includes(' ') && !exam.start_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'}</span>
+							<span class="text-slate-400 text-[10px] font-medium mt-0.5">Berakhir:</span>
+							<span class="truncate text-xs">{exam.end_time ? new Date(exam.end_time.replace(' ', 'T') + (exam.end_time.includes(' ') && !exam.end_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'}</span>
 							{#if isOutOfBounds}
-								<span class="ml-1 shrink-0 px-1.5 py-0.5 rounded bg-rose-100 text-[9px] text-rose-600 font-bold tracking-wide">NONAKTIF</span>
+								<span class="mt-0.5 px-1.5 py-0.5 rounded bg-rose-100 text-[9px] text-rose-600 font-bold tracking-wide w-fit">NONAKTIF</span>
 							{/if}
-						{:else}
-							<span>Belum diatur</span>
-						{/if}
-					</div>
+						</div>
+					{:else}
+						<span>Belum diatur</span>
+					{/if}
+				</div>
 				</div>
 
 				<div class="mt-auto flex items-center gap-2 pt-3 border-t border-slate-100">
