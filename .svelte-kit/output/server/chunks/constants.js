@@ -63,6 +63,14 @@ const SIDEBAR_MENUS = {
   pengawas: [
     { label: "Dashboard", href: "/pengawas", icon: "dashboard" },
     { label: "Tata Tertib Pengawas", href: "/pengawas/tata-tertib", icon: "rules" },
+    {
+      label: "Jadwal Mengawas",
+      icon: "calendar",
+      subItems: [
+        { label: "Jadwal Saya", href: "/pengawas/jadwal/saya" },
+        { label: "Jadwal Semua", href: "/pengawas/jadwal/semua" }
+      ]
+    },
     { label: "Token Ujian", href: "/pengawas/tokens", icon: "token" },
     { label: "Monitoring", href: "/pengawas/monitor", icon: "monitor" }
   ],

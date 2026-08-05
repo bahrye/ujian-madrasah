@@ -202,6 +202,16 @@
 		"src/routes/pengawas/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/pengawas/jadwal/saya": [
+		"src/routes/pengawas/jadwal/saya/+page.server.ts",
+		"src/routes/pengawas/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/pengawas/jadwal/semua": [
+		"src/routes/pengawas/jadwal/semua/+page.server.ts",
+		"src/routes/pengawas/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/pengawas/monitor": [
 		"src/routes/pengawas/monitor/+page.server.ts",
 		"src/routes/pengawas/+layout.server.ts",

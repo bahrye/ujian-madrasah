@@ -1,4 +1,4 @@
-import { l as fallback, s as store_get, u as unsubscribe_stores, d as bind_props, f as ensure_array_like, j as attr, i as attr_class, e as escape_html, b as stringify, c as slot } from "./index.js";
+import { l as fallback, s as store_get, u as unsubscribe_stores, d as bind_props, f as ensure_array_like, i as attr_class, j as attr, e as escape_html, b as stringify, c as slot } from "./index.js";
 import { p as page } from "./stores.js";
 import { I as ICONS, R as ROLE_LABELS } from "./constants.js";
 import "./toast.js";
@@ -17,11 +17,20 @@ function Sidebar($$renderer, $$props) {
     let user = $$props["user"];
     let isOpen = fallback($$props["isOpen"], false);
     function isActive(href, path) {
+      if (!href) return false;
       if (href === `/${user?.role}`) {
         return path === href;
       }
       return path.startsWith(href);
     }
+    function isGroupActive(item, path) {
+      if (item.href && isActive(item.href, path)) return true;
+      if (item.subItems) {
+        return item.subItems.some((sub) => isActive(sub.href, path));
+      }
+      return false;
+    }
+    let openDropdowns = {};
     const roleGradients = {
       admin: "from-rose-500 to-pink-500",
       guru: "from-indigo-500 to-violet-500",
@@ -29,21 +38,48 @@ function Sidebar($$renderer, $$props) {
       siswa: "from-cyan-500 to-sky-500"
     };
     currentPath = store_get($$store_subs ??= {}, "$page", page).url.pathname;
+    {
+      menuItems.forEach((item) => {
+        if (item.subItems && isGroupActive(item, currentPath)) {
+          openDropdowns[item.label] = true;
+        }
+      });
+    }
     let $$settled = true;
     let $$inner_renderer;
     function $$render_inner($$renderer3) {
       $$renderer3.push(`<aside class="hidden lg:flex flex-col w-64 h-screen bg-gradient-to-b from-primary-950 to-primary-900 text-white border-r border-primary-800/50 fixed left-0 top-0 z-40"><div class="p-6 border-b border-primary-800/50"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-400 to-violet-400 flex items-center justify-center shadow-lg shadow-indigo-500/30"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg></div> <div><h1 class="text-base font-bold tracking-tight">Ujian Madrasah</h1> <p class="text-xs text-primary-300">Sistem Ujian Online</p></div></div></div> <nav class="flex-1 p-4 space-y-1 overflow-y-auto"><!--[-->`);
       const each_array = ensure_array_like(menuItems);
-      for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
-        let item = each_array[$$index];
-        $$renderer3.push(`<a${attr("href", item.href)}${attr_class(`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${isActive(item.href, currentPath) ? "bg-white/15 text-white shadow-lg shadow-white/5" : "text-primary-300 hover:text-white hover:bg-white/10"}`)}><svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS[item.icon] || "")}></path></svg> <span>${escape_html(item.label)}</span> `);
-        if (isActive(item.href, currentPath)) {
+      for (let $$index_1 = 0, $$length = each_array.length; $$index_1 < $$length; $$index_1++) {
+        let item = each_array[$$index_1];
+        if (item.subItems) {
           $$renderer3.push("<!--[0-->");
-          $$renderer3.push(`<div class="ml-auto w-1.5 h-1.5 rounded-full bg-white shadow-lg shadow-white/50"></div>`);
+          $$renderer3.push(`<div class="space-y-1"><button${attr_class(`w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${isGroupActive(item, currentPath) ? "bg-white/10 text-white shadow-lg shadow-white/5" : "text-primary-300 hover:text-white hover:bg-white/5"}`)}><div class="flex items-center gap-3"><svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS[item.icon] || "")}></path></svg> <span>${escape_html(item.label)}</span></div> <svg${attr_class(`w-4 h-4 transition-transform duration-200 ${openDropdowns[item.label] ? "rotate-180" : ""}`)} fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.chevronDown)}></path></svg></button> `);
+          if (openDropdowns[item.label]) {
+            $$renderer3.push("<!--[0-->");
+            $$renderer3.push(`<div class="pl-12 pr-4 py-1 space-y-1 animate-in slide-in-from-top-2 fade-in duration-200"><!--[-->`);
+            const each_array_1 = ensure_array_like(item.subItems);
+            for (let $$index = 0, $$length2 = each_array_1.length; $$index < $$length2; $$index++) {
+              let subItem = each_array_1[$$index];
+              $$renderer3.push(`<a${attr("href", subItem.href)}${attr_class(`block px-3 py-2 rounded-lg text-sm transition-colors duration-200 ${isActive(subItem.href, currentPath) ? "text-white bg-white/10 font-semibold" : "text-primary-300/80 hover:text-white hover:bg-white/5"}`)}>${escape_html(subItem.label)}</a>`);
+            }
+            $$renderer3.push(`<!--]--></div>`);
+          } else {
+            $$renderer3.push("<!--[-1-->");
+          }
+          $$renderer3.push(`<!--]--></div>`);
         } else {
           $$renderer3.push("<!--[-1-->");
+          $$renderer3.push(`<a${attr("href", item.href)}${attr_class(`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${isActive(item.href, currentPath) ? "bg-white/15 text-white shadow-lg shadow-white/5" : "text-primary-300 hover:text-white hover:bg-white/10"}`)}><svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS[item.icon] || "")}></path></svg> <span>${escape_html(item.label)}</span> `);
+          if (isActive(item.href, currentPath)) {
+            $$renderer3.push("<!--[0-->");
+            $$renderer3.push(`<div class="ml-auto w-1.5 h-1.5 rounded-full bg-white shadow-lg shadow-white/50"></div>`);
+          } else {
+            $$renderer3.push("<!--[-1-->");
+          }
+          $$renderer3.push(`<!--]--></a>`);
         }
-        $$renderer3.push(`<!--]--></a>`);
+        $$renderer3.push(`<!--]-->`);
       }
       $$renderer3.push(`<!--]--></nav> <div class="p-4 border-t border-primary-800/50"><div class="flex items-center gap-3 px-3 py-2">`);
       if (user?.role === "admin") {
@@ -80,9 +116,9 @@ function Sidebar($$renderer, $$props) {
       if (isOpen) {
         $$renderer3.push("<!--[0-->");
         $$renderer3.push(`<div class="lg:hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"><aside class="w-72 h-full bg-gradient-to-b from-primary-950 to-primary-900 text-white shadow-2xl flex flex-col"><div class="p-5 border-b border-primary-800/50 flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-400 to-violet-400 flex items-center justify-center shadow-lg shadow-indigo-500/30"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg></div> <span class="text-base font-bold">Ujian Madrasah</span></div> <button class="p-1.5 rounded-lg hover:bg-white/10 transition-colors" aria-label="Tutup menu"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.close)}></path></svg></button></div> <nav class="flex-1 p-4 space-y-1 overflow-y-auto"><!--[-->`);
-        const each_array_1 = ensure_array_like(menuItems);
-        for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
-          let item = each_array_1[$$index_1];
+        const each_array_2 = ensure_array_like(menuItems);
+        for (let $$index_2 = 0, $$length = each_array_2.length; $$index_2 < $$length; $$index_2++) {
+          let item = each_array_2[$$index_2];
           $$renderer3.push(`<a${attr("href", item.href)}${attr_class(`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive(item.href, currentPath) ? "bg-white/15 text-white" : "text-primary-300 hover:text-white hover:bg-white/10"}`)}><svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS[item.icon] || "")}></path></svg> <span>${escape_html(item.label)}</span></a>`);
         }
         $$renderer3.push(`<!--]--></nav> <div class="p-4 border-t border-primary-800/50"><div class="flex items-center gap-3 px-3 py-2">`);

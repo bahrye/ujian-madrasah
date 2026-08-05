@@ -54,8 +54,9 @@ export const ATTEMPT_STATUS_COLORS: Record<string, string> = {
 
 export type MenuItem = {
 	label: string;
-	href: string;
+	href?: string;
 	icon: string;
+	subItems?: { label: string; href: string }[];
 };
 
 export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
@@ -90,6 +91,14 @@ export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
 	pengawas: [
 		{ label: 'Dashboard', href: '/pengawas', icon: 'dashboard' },
 		{ label: 'Tata Tertib Pengawas', href: '/pengawas/tata-tertib', icon: 'rules' },
+		{ 
+			label: 'Jadwal Mengawas', 
+			icon: 'calendar',
+			subItems: [
+				{ label: 'Jadwal Saya', href: '/pengawas/jadwal/saya' },
+				{ label: 'Jadwal Semua', href: '/pengawas/jadwal/semua' }
+			]
+		},
 		{ label: 'Token Ujian', href: '/pengawas/tokens', icon: 'token' },
 		{ label: 'Monitoring', href: '/pengawas/monitor', icon: 'monitor' }
 	],
