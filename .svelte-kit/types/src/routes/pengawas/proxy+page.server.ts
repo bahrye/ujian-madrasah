@@ -32,14 +32,24 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 
 	const participants = participantsDb.results as any[];
 
-	const schedulesWithParticipants = schedules.results.map((schedule: any) => {
-		const examParticipants = participants.filter(p => p.exam_id === schedule.exam_id);
-		return {
-			...schedule,
-			participant_count: examParticipants.length,
-			participants: examParticipants
-		};
-	});
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
+
+	const schedulesWithParticipants = schedules.results
+		.filter((schedule: any) => {
+			if (!schedule.start_time) return false;
+			const examDate = new Date(schedule.start_time);
+			examDate.setHours(0, 0, 0, 0);
+			return examDate.getTime() === today.getTime();
+		})
+		.map((schedule: any) => {
+			const examParticipants = participants.filter(p => p.exam_id === schedule.exam_id);
+			return {
+				...schedule,
+				participant_count: examParticipants.length,
+				participants: examParticipants
+			};
+		});
 
 	return {
 		stats: {

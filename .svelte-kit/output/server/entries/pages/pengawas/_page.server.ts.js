@@ -25,7 +25,14 @@ const load = async ({ platform, locals }) => {
 		ORDER BY c.name, u.name
 	`).bind(locals.user.id).all();
   const participants = participantsDb.results;
-  const schedulesWithParticipants = schedules.results.map((schedule) => {
+  const today = /* @__PURE__ */ new Date();
+  today.setHours(0, 0, 0, 0);
+  const schedulesWithParticipants = schedules.results.filter((schedule) => {
+    if (!schedule.start_time) return false;
+    const examDate = new Date(schedule.start_time);
+    examDate.setHours(0, 0, 0, 0);
+    return examDate.getTime() === today.getTime();
+  }).map((schedule) => {
     const examParticipants = participants.filter((p) => p.exam_id === schedule.exam_id);
     return {
       ...schedule,
