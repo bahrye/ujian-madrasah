@@ -14,7 +14,7 @@
 	<title>Papan Peringkat - {data.exam.title}</title>
 </svelte:head>
 
-<div class="px-5 py-6 sm:px-8 max-w-5xl mx-auto">
+<div class="space-y-6 animate-in">
 	<!-- Header -->
 	<div class="mb-8">
 		<a href="/admin/papan-peringkat" class="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-700 mb-4 transition-colors">

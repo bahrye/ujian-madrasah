@@ -8,7 +8,7 @@
 	<title>Papan Peringkat - Siswa</title>
 </svelte:head>
 
-<div class="px-5 py-6 sm:px-8 max-w-6xl mx-auto">
+<div class="space-y-6 animate-in">
 	<div class="mb-8">
 		<h1 class="text-3xl font-bold text-slate-800 tracking-tight">Papan Peringkat</h1>
 		<p class="text-slate-500 mt-1">Lihat peringkatmu dibandingkan dengan teman sekelas.</p>
