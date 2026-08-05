@@ -34,22 +34,24 @@
 </svelte:head>
 
 <div class="space-y-6 animate-in">
-	<div class="flex items-center gap-3">
-		<a href="/admin/exams" class="btn-ghost p-2 rounded-lg text-slate-500 hover:text-slate-800" title="Kembali ke Tipe Ujian">
-			<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-				<path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-			</svg>
-		</a>
-		<div>
-			<div class="flex items-center gap-2">
-				<span class="text-xs font-mono font-bold tracking-wider text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded">{data.examType.code}</span>
-				<h1 class="text-2xl font-bold text-slate-800">{data.examType.name}</h1>
+	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+		<div class="flex items-start sm:items-center gap-3">
+			<a href="/admin/exams" class="btn-ghost p-2 rounded-lg text-slate-500 hover:text-slate-800 mt-1 sm:mt-0" title="Kembali ke Tipe Ujian">
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+				</svg>
+			</a>
+			<div>
+				<div class="flex flex-wrap items-center gap-2">
+					<span class="text-xs font-mono font-bold tracking-wider text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded">{data.examType.code}</span>
+					<h1 class="text-2xl font-bold text-slate-800">{data.examType.name}</h1>
+				</div>
+				<p class="text-sm text-slate-500 mt-1">Daftar mata pelajaran yang diujikan pada tipe ini</p>
 			</div>
-			<p class="text-sm text-slate-500 mt-1">Daftar mata pelajaran yang diujikan pada tipe ini</p>
 		</div>
-		<div class="ml-auto">
-			<button class="btn-primary" on:click={() => (showCreateModal = true)}>
-				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+		<div class="w-full sm:w-auto sm:ml-auto">
+			<button class="btn-primary w-full sm:w-auto justify-center" on:click={() => (showCreateModal = true)}>
+				<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
 				</svg>
 				Buat Ujian Baru
