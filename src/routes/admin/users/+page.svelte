@@ -89,7 +89,7 @@
 									<span class="badge-danger whitespace-nowrap">Nonaktif</span>
 								{/if}
 							</td>
-							<td class="p-4 text-xs text-slate-500 whitespace-nowrap">{new Date(String(user.created_at).replace(' ', 'T') + (String(user.created_at).includes('Z') ? '' : 'Z')).toLocaleDateString('id-ID')}</td>
+							<td class="p-4 text-xs text-slate-500 whitespace-nowrap">{new Date(String(user.created_at).replace(' ', 'T') + (String(user.created_at).includes(' ') && !String(user.created_at).includes('Z') ? 'Z' : '')).toLocaleDateString('id-ID')}</td>
 							<td class="p-4 text-right whitespace-nowrap">
 								<div class="flex items-center justify-end gap-1.5 whitespace-nowrap">
 									<button

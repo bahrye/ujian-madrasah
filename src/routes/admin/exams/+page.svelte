@@ -58,9 +58,9 @@
 							<path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
 						</svg>
 						<span class="truncate">
-							{type.start_time ? new Date(type.start_time.replace(' ', 'T') + (type.start_time.includes('Z') ? '' : 'Z')).toLocaleString('id-ID') : 'Belum diatur'} 
+							{type.start_time ? new Date(type.start_time.replace(' ', 'T') + (type.start_time.includes(' ') && !type.start_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : 'Belum diatur'} 
 							- 
-							{type.end_time ? new Date(type.end_time.replace(' ', 'T') + (type.end_time.includes('Z') ? '' : 'Z')).toLocaleString('id-ID') : 'Belum diatur'}
+							{type.end_time ? new Date(type.end_time.replace(' ', 'T') + (type.end_time.includes(' ') && !type.end_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : 'Belum diatur'}
 						</span>
 					</div>
 					<div class="flex items-center gap-2 mt-1">

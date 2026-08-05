@@ -106,7 +106,7 @@
 								</td>
 								<td class="p-4 text-sm text-slate-600">@{sa.username}</td>
 								<td class="p-4 text-xs text-slate-500">
-									{new Date(String(sa.created_at).replace(' ', 'T') + (String(sa.created_at).includes('Z') ? '' : 'Z')).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+									{new Date(String(sa.created_at).replace(' ', 'T') + (String(sa.created_at).includes(' ') && !String(sa.created_at).includes('Z') ? 'Z' : '')).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
 								</td>
 								<td class="p-4 text-right">
 									{#if sa.id === data.currentUser.id}

@@ -88,9 +88,9 @@
 						</svg>
 						{#if exam.start_time || exam.end_time}
 							<span class="truncate">
-								{exam.start_time ? new Date(exam.start_time.replace(' ', 'T') + (exam.start_time.includes('Z') ? '' : 'Z')).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'} 
+								{exam.start_time ? new Date(exam.start_time.replace(' ', 'T') + (exam.start_time.includes(' ') && !exam.start_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'} 
 								s/d 
-								{exam.end_time ? new Date(exam.end_time.replace(' ', 'T') + (exam.end_time.includes('Z') ? '' : 'Z')).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'}
+								{exam.end_time ? new Date(exam.end_time.replace(' ', 'T') + (exam.end_time.includes(' ') && !exam.end_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'}
 							</span>
 							{#if isOutOfBounds}
 								<span class="ml-1 shrink-0 px-1.5 py-0.5 rounded bg-rose-100 text-[9px] text-rose-600 font-bold tracking-wide">NONAKTIF</span>
@@ -183,8 +183,8 @@
 					</div>
 					<div class="col-span-2 text-xs text-slate-500 mt-1">
 						Pastikan waktu berada di dalam rentang: <br/> 
-						{data.examType.start_time ? new Date(data.examType.start_time.replace(' ', 'T') + (data.examType.start_time.includes('Z') ? '' : 'Z')).toLocaleString('id-ID') : '-'} s.d. 
-						{data.examType.end_time ? new Date(data.examType.end_time.replace(' ', 'T') + (data.examType.end_time.includes('Z') ? '' : 'Z')).toLocaleString('id-ID') : '-'}
+						{data.examType.start_time ? new Date(data.examType.start_time.replace(' ', 'T') + (data.examType.start_time.includes(' ') && !data.examType.start_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : '-'} s.d. 
+						{data.examType.end_time ? new Date(data.examType.end_time.replace(' ', 'T') + (data.examType.end_time.includes(' ') && !data.examType.end_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : '-'}
 					</div>
 				</div>
 				<div>

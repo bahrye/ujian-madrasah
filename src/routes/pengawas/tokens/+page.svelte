@@ -140,7 +140,7 @@
 						</div>
 						<p class="text-sm text-slate-600">{token.exam_title}</p>
 						<p class="text-xs text-slate-400 mt-1">
-							Berlaku hingga: {new Date(String(token.expires_at).replace(' ', 'T') + (String(token.expires_at).includes('Z') ? '' : 'Z')).toLocaleString('id-ID')}
+							Berlaku hingga: {new Date(String(token.expires_at).replace(' ', 'T') + (String(token.expires_at).includes(' ') && !String(token.expires_at).includes('Z') ? 'Z' : '')).toLocaleString('id-ID')}
 						</p>
 					</div>
 					<div class="flex items-center gap-2 flex-shrink-0">
@@ -215,7 +215,7 @@
 								</div>
 								<div class="text-right flex-shrink-0">
 									<p class="text-xs font-medium text-slate-700">Waktu Akses</p>
-									<p class="text-[10px] text-slate-500">{new Date(student.start_time.replace(' ', 'T') + (student.start_time.includes('Z') ? '' : 'Z')).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+									<p class="text-[10px] text-slate-500">{new Date(student.start_time.replace(' ', 'T') + (student.start_time.includes(' ') && !student.start_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
 								</div>
 							</div>
 						{/each}

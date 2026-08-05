@@ -62,7 +62,7 @@ function _page($$renderer, $$props) {
       $$renderer2.push("<!--[-->");
       for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
         let admin = each_array_1[$$index_1];
-        $$renderer2.push(`<tr class="hover:bg-slate-50 transition-colors"><td class="p-4"><div class="font-medium text-slate-900">${escape_html(admin.name)}</div> <div class="text-sm text-slate-500">@${escape_html(admin.username)}</div></td><td class="p-4 font-medium text-indigo-600">${escape_html(admin.school_name || "Tidak diketahui")}</td><td class="p-4 text-sm">${escape_html((/* @__PURE__ */ new Date(String(admin.created_at).replace(" ", "T") + (String(admin.created_at).includes("Z") ? "" : "Z"))).toLocaleDateString("id-ID"))}</td><td class="p-4">`);
+        $$renderer2.push(`<tr class="hover:bg-slate-50 transition-colors"><td class="p-4"><div class="font-medium text-slate-900">${escape_html(admin.name)}</div> <div class="text-sm text-slate-500">@${escape_html(admin.username)}</div></td><td class="p-4 font-medium text-indigo-600">${escape_html(admin.school_name || "Tidak diketahui")}</td><td class="p-4 text-sm">${escape_html((/* @__PURE__ */ new Date(String(admin.created_at).replace(" ", "T") + (String(admin.created_at).includes(" ") && !String(admin.created_at).includes("Z") ? "Z" : ""))).toLocaleDateString("id-ID"))}</td><td class="p-4">`);
         if (admin.is_active) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<span class="badge badge-success">Aktif</span>`);

@@ -144,7 +144,7 @@
 									{#if a.status === 'belum_mengerjakan'}
 										<span class="text-slate-400 font-medium opacity-80">-</span>
 									{:else if a.status === 'mengerjakan'}
-										{@const startStr = a.start_time.replace(' ', 'T') + (a.start_time.includes('Z') ? '' : 'Z')}
+										{@const startStr = a.start_time.replace(' ', 'T') + (a.start_time.includes(' ') && !a.start_time.includes('Z') ? 'Z' : '')}
 										{@const start = new Date(startStr).getTime()}
 										{@const end = start + (a.duration_minutes * 60 * 1000)}
 										{@const remainingMs = end - currentTime}
@@ -159,8 +159,8 @@
 											<span class="text-rose-500 font-bold">Habis</span>
 										{/if}
 									{:else}
-										{@const startStr = a.start_time.replace(' ', 'T') + (a.start_time.includes('Z') ? '' : 'Z')}
-										{@const submitStr = a.submit_time ? (a.submit_time.replace(' ', 'T') + (a.submit_time.includes('Z') ? '' : 'Z')) : startStr}
+										{@const startStr = a.start_time.replace(' ', 'T') + (a.start_time.includes(' ') && !a.start_time.includes('Z') ? 'Z' : '')}
+										{@const submitStr = a.submit_time ? (a.submit_time.replace(' ', 'T') + (a.submit_time.includes(' ') && !a.submit_time.includes('Z') ? 'Z' : '')) : startStr}
 										{@const start = new Date(startStr).getTime()}
 										{@const submit = new Date(submitStr).getTime()}
 										{@const end = start + (a.duration_minutes * 60 * 1000)}

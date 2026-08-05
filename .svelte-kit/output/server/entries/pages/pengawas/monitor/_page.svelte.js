@@ -107,7 +107,7 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<span class="text-slate-400 font-medium opacity-80">-</span>`);
         } else if (a.status === "mengerjakan") {
           $$renderer2.push("<!--[1-->");
-          const startStr = a.start_time.replace(" ", "T") + (a.start_time.includes("Z") ? "" : "Z");
+          const startStr = a.start_time.replace(" ", "T") + (a.start_time.includes(" ") && !a.start_time.includes("Z") ? "Z" : "");
           const start = new Date(startStr).getTime();
           const end = start + a.duration_minutes * 60 * 1e3;
           const remainingMs = end - currentTime;
@@ -131,8 +131,8 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<!--]-->`);
         } else {
           $$renderer2.push("<!--[-1-->");
-          const startStr = a.start_time.replace(" ", "T") + (a.start_time.includes("Z") ? "" : "Z");
-          const submitStr = a.submit_time ? a.submit_time.replace(" ", "T") + (a.submit_time.includes("Z") ? "" : "Z") : startStr;
+          const startStr = a.start_time.replace(" ", "T") + (a.start_time.includes(" ") && !a.start_time.includes("Z") ? "Z" : "");
+          const submitStr = a.submit_time ? a.submit_time.replace(" ", "T") + (a.submit_time.includes(" ") && !a.submit_time.includes("Z") ? "Z" : "") : startStr;
           const start = new Date(startStr).getTime();
           const submit = new Date(submitStr).getTime();
           const end = start + a.duration_minutes * 60 * 1e3;
