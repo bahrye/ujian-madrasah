@@ -26,7 +26,7 @@ export const actions = {
 		const description = form.get('description')?.toString().trim() || '';
 		const startTime = form.get('start_time')?.toString() || null;
 		const endTime = form.get('end_time')?.toString() || null;
-		const isActive = form.get('is_active')?.toString() === '1' ? 1 : 0;
+		const isActive = 1; // Tipe ujian selalu aktif
 
 		if (!code || !name) return fail(400, { error: 'Kode dan Nama Tipe Ujian wajib diisi.' });
 
@@ -51,7 +51,7 @@ export const actions = {
 		const description = form.get('description')?.toString().trim() || '';
 		const startTime = form.get('start_time')?.toString() || null;
 		const endTime = form.get('end_time')?.toString() || null;
-		const isActive = form.get('is_active')?.toString() === '1' ? 1 : 0;
+		const isActive = 1; // Tipe ujian selalu aktif
 
 		if (!id || !code || !name) return fail(400, { error: 'Data tidak lengkap.' });
 

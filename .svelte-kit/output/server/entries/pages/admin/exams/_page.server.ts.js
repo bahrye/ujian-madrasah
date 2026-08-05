@@ -20,7 +20,7 @@ const actions = {
     const description = form.get("description")?.toString().trim() || "";
     const startTime = form.get("start_time")?.toString() || null;
     const endTime = form.get("end_time")?.toString() || null;
-    const isActive = form.get("is_active")?.toString() === "1" ? 1 : 0;
+    const isActive = 1;
     if (!code || !name) return fail(400, { error: "Kode dan Nama Tipe Ujian wajib diisi." });
     try {
       await db.prepare(`INSERT INTO exam_types (school_id, code, name, description, start_time, end_time, is_active)
@@ -39,7 +39,7 @@ const actions = {
     const description = form.get("description")?.toString().trim() || "";
     const startTime = form.get("start_time")?.toString() || null;
     const endTime = form.get("end_time")?.toString() || null;
-    const isActive = form.get("is_active")?.toString() === "1" ? 1 : 0;
+    const isActive = 1;
     if (!id || !code || !name) return fail(400, { error: "Data tidak lengkap." });
     try {
       const oldType = await db.prepare("SELECT code FROM exam_types WHERE id = ? AND school_id = ?").bind(id, locals.user.school_id).first();

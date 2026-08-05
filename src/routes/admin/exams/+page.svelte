@@ -35,17 +35,12 @@
 	<!-- Exam Types Cards -->
 	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 		{#each data.examTypes as type (type.id)}
-			<div class="card-hover p-5 flex flex-col border-t-4 {type.is_active ? 'border-t-indigo-500' : 'border-t-slate-300'}">
+			<div class="card-hover p-5 flex flex-col border-t-4 border-t-indigo-500">
 				<div class="flex items-start justify-between mb-3">
 					<div class="flex-1 min-w-0">
 						<h3 class="font-bold text-slate-800 truncate">{type.name}</h3>
 						<p class="text-xs text-indigo-500 font-mono font-semibold tracking-wider mt-0.5">{type.code}</p>
 					</div>
-					{#if type.is_active}
-						<span class="badge-success ml-2 flex-shrink-0">Aktif</span>
-					{:else}
-						<span class="badge bg-slate-100 text-slate-500 ml-2 flex-shrink-0">Nonaktif</span>
-					{/if}
 				</div>
 
 				{#if type.description}
@@ -79,20 +74,7 @@
 							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.edit} />
 						</svg>
 					</button>
-					<form method="POST" action="?/toggleActive" use:enhance>
-						<input type="hidden" name="id" value={type.id} />
-						<button type="submit" class="btn-sm btn-ghost" title={type.is_active ? 'Nonaktifkan' : 'Aktifkan'}>
-							{#if type.is_active}
-								<svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.check} />
-								</svg>
-							{:else}
-								<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-								</svg>
-							{/if}
-						</button>
-					</form>
+
 					<button class="btn-sm btn-ghost text-rose-400 hover:text-rose-600" on:click={() => (deleteConfirm = type.id)} title="Hapus">
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
@@ -122,7 +104,7 @@
 				<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
 					<div class="sm:col-span-1">
 						<label class="label" for="c-code">Kode / Singkatan</label>
-						<input id="c-code" name="code" type="text" required class="input uppercase font-mono" placeholder="Contoh: UAS" />
+						<input id="c-code" name="code" type="text" required class="input font-mono" placeholder="Contoh: UAS" />
 					</div>
 					<div class="sm:col-span-2">
 						<label class="label" for="c-name">Nama Tipe Ujian</label>
@@ -150,10 +132,7 @@
 					</div>
 				</div>
 
-				<div class="flex items-center gap-2">
-					<input id="c-active" name="is_active" type="checkbox" value="1" checked class="rounded border-slate-300" />
-					<label for="c-active" class="text-sm font-medium text-slate-700">Langsung Aktifkan Tipe Ujian Ini</label>
-				</div>
+
 				
 				<div class="flex gap-3 pt-2">
 					<button type="button" class="btn-ghost flex-1" on:click={() => (showCreateModal = false)}>Batal</button>
@@ -176,7 +155,7 @@
 				<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
 					<div class="sm:col-span-1">
 						<label class="label" for="e-code">Kode</label>
-						<input id="e-code" name="code" type="text" required class="input uppercase font-mono" value={editingType.code} />
+						<input id="e-code" name="code" type="text" required class="input font-mono" value={editingType.code} />
 					</div>
 					<div class="sm:col-span-2">
 						<label class="label" for="e-name">Nama</label>
@@ -203,10 +182,7 @@
 					</div>
 				</div>
 
-				<div class="flex items-center gap-2">
-					<input id="e-active" name="is_active" type="checkbox" value="1" checked={editingType.is_active === 1} class="rounded border-slate-300" />
-					<label for="e-active" class="text-sm font-medium text-slate-700">Tipe Ujian Aktif</label>
-				</div>
+
 				
 				<div class="flex gap-3 pt-2">
 					<button type="button" class="btn-ghost flex-1" on:click={() => (editingType = null)}>Batal</button>
