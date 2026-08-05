@@ -95,7 +95,6 @@
 			<table class="w-full text-left border-collapse">
 				<thead>
 					<tr class="bg-slate-50 text-slate-500 text-sm">
-						<th class="p-4 font-semibold">ID</th>
 						<th class="p-4 font-semibold">Kode</th>
 						<th class="p-4 font-semibold">Nama Mata Pelajaran</th>
 						<th class="p-4 font-semibold text-right">Aksi</th>
@@ -104,7 +103,6 @@
 				<tbody class="divide-y divide-slate-100 text-slate-700">
 					{#each data.subjects as subject (subject.id)}
 						<tr class="hover:bg-slate-50 transition-colors">
-							<td class="p-4 text-sm text-slate-400">#{subject.id}</td>
 							<td class="p-4 font-medium text-slate-900">{subject.code || '-'}</td>
 							<td class="p-4 font-medium text-slate-900">{subject.name}</td>
 							<td class="p-4 text-right">
@@ -131,7 +129,7 @@
 						</tr>
 					{:else}
 						<tr>
-							<td colspan="4" class="p-12 text-center text-slate-500">
+							<td colspan="3" class="p-12 text-center text-slate-500">
 								Belum ada data mata pelajaran. Silakan tambahkan.
 							</td>
 						</tr>

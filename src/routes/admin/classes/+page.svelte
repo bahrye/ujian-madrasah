@@ -95,7 +95,6 @@
 			<table class="w-full text-left border-collapse">
 				<thead>
 					<tr class="bg-slate-50 text-slate-500 text-sm">
-						<th class="p-4 font-semibold">ID</th>
 						<th class="p-4 font-semibold">Tingkat</th>
 						<th class="p-4 font-semibold">Nama Kelas</th>
 						<th class="p-4 font-semibold">Jumlah Siswa</th>
@@ -105,7 +104,6 @@
 				<tbody class="divide-y divide-slate-100 text-slate-700">
 					{#each data.classes as cls (cls.id)}
 						<tr class="hover:bg-slate-50 transition-colors">
-							<td class="p-4 text-sm text-slate-400">#{cls.id}</td>
 							<td class="p-4 font-medium text-slate-900">{cls.level || '-'}</td>
 							<td class="p-4 font-medium text-slate-900">{cls.name}</td>
 							<td class="p-4">
@@ -137,7 +135,7 @@
 						</tr>
 					{:else}
 						<tr>
-							<td colspan="5" class="p-12 text-center text-slate-500">
+							<td colspan="4" class="p-12 text-center text-slate-500">
 								Belum ada data kelas. Silakan tambahkan.
 							</td>
 						</tr>

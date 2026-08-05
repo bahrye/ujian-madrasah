@@ -39,13 +39,13 @@ function _page($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--> <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden"><div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 text-slate-500 text-sm"><th class="p-4 font-semibold">ID</th><th class="p-4 font-semibold">Kode</th><th class="p-4 font-semibold">Nama Mata Pelajaran</th><th class="p-4 font-semibold text-right">Aksi</th></tr></thead><tbody class="divide-y divide-slate-100 text-slate-700">`);
+    $$renderer2.push(`<!--]--> <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden"><div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 text-slate-500 text-sm"><th class="p-4 font-semibold">Kode</th><th class="p-4 font-semibold">Nama Mata Pelajaran</th><th class="p-4 font-semibold text-right">Aksi</th></tr></thead><tbody class="divide-y divide-slate-100 text-slate-700">`);
     const each_array = ensure_array_like(data.subjects);
     if (each_array.length !== 0) {
       $$renderer2.push("<!--[-->");
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
         let subject = each_array[$$index];
-        $$renderer2.push(`<tr class="hover:bg-slate-50 transition-colors"><td class="p-4 text-sm text-slate-400">#${escape_html(subject.id)}</td><td class="p-4 font-medium text-slate-900">${escape_html(subject.code || "-")}</td><td class="p-4 font-medium text-slate-900">${escape_html(subject.name)}</td><td class="p-4 text-right"><div class="flex items-center justify-end space-x-2"><button class="btn-ghost btn-sm">Edit</button> `);
+        $$renderer2.push(`<tr class="hover:bg-slate-50 transition-colors"><td class="p-4 font-medium text-slate-900">${escape_html(subject.code || "-")}</td><td class="p-4 font-medium text-slate-900">${escape_html(subject.name)}</td><td class="p-4 text-right"><div class="flex items-center justify-end space-x-2"><button class="btn-ghost btn-sm">Edit</button> `);
         ConfirmForm($$renderer2, {
           action: "?/delete",
           confirmTitle: "Hapus Mata Pelajaran",
@@ -69,7 +69,7 @@ function _page($$renderer, $$props) {
       }
     } else {
       $$renderer2.push("<!--[!-->");
-      $$renderer2.push(`<tr><td colspan="4" class="p-12 text-center text-slate-500">Belum ada data mata pelajaran. Silakan tambahkan.</td></tr>`);
+      $$renderer2.push(`<tr><td colspan="3" class="p-12 text-center text-slate-500">Belum ada data mata pelajaran. Silakan tambahkan.</td></tr>`);
     }
     $$renderer2.push(`<!--]--></tbody></table></div></div></div>`);
     bind_props($$props, { data, form });
