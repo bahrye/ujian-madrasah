@@ -43,6 +43,17 @@ const actions = {
     if (!id || !code || !name) return fail(400, { error: "Data tidak lengkap." });
     try {
       await db.prepare(`UPDATE exam_types SET code=?, name=?, description=?, start_time=?, end_time=?, is_active=? WHERE id=? AND school_id=?`).bind(code, name, description, startTime, endTime, isActive, id, locals.user.school_id).run();
+      if (startTime && endTime) {
+        await db.prepare(`
+					UPDATE exams 
+					SET is_active = 0 
+					WHERE exam_type_id = ? 
+					AND (
+						(start_time IS NOT NULL AND start_time < ?) OR 
+						(end_time IS NOT NULL AND end_time > ?)
+					)
+				`).bind(id, startTime, endTime).run();
+      }
       return { success: "Tipe Ujian berhasil diperbarui." };
     } catch (e) {
       return fail(500, { error: "Gagal memperbarui tipe ujian." });

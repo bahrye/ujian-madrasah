@@ -45,6 +45,7 @@
 	<!-- Exam Cards -->
 	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 		{#each data.exams as exam (exam.id)}
+			{@const isOutOfBounds = (exam.start_time && exam.start_time < data.examType.start_time) || (exam.end_time && exam.end_time > data.examType.end_time)}
 			<div class="card-hover p-5 flex flex-col">
 				<div class="flex items-start justify-between mb-3">
 					<div class="flex-1 min-w-0">
@@ -81,6 +82,23 @@
 						</svg>
 						{exam.participant_count} peserta
 					</span>
+					<div class="flex items-center gap-1 w-full mt-0.5 {isOutOfBounds ? 'text-rose-500 font-medium' : 'text-slate-500'}" title={isOutOfBounds ? 'Waktu ujian berada di luar rentang tipe ujian, sehingga otomatis nonaktif' : 'Rentang Waktu Ujian'}>
+						<svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.calendar} />
+						</svg>
+						{#if exam.start_time || exam.end_time}
+							<span class="truncate">
+								{exam.start_time ? new Date(exam.start_time.replace(' ', 'T') + (exam.start_time.includes('Z') ? '' : 'Z')).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'} 
+								s/d 
+								{exam.end_time ? new Date(exam.end_time.replace(' ', 'T') + (exam.end_time.includes('Z') ? '' : 'Z')).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'}
+							</span>
+							{#if isOutOfBounds}
+								<span class="ml-1 shrink-0 px-1.5 py-0.5 rounded bg-rose-100 text-[9px] text-rose-600 font-bold tracking-wide">NONAKTIF</span>
+							{/if}
+						{:else}
+							<span>Belum diatur</span>
+						{/if}
+					</div>
 				</div>
 
 				<div class="mt-auto flex items-center gap-2 pt-3 border-t border-slate-100">
@@ -157,11 +175,11 @@
 				<div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
 					<div>
 						<label class="label" for="c-start">Waktu Mulai</label>
-						<input id="c-start" name="start_time" type="datetime-local" class="input" value={data.examType.start_time?.slice(0, 16) || ''} />
+						<input id="c-start" name="start_time" type="datetime-local" class="input" value={data.examType.start_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
 					</div>
 					<div>
 						<label class="label" for="c-end">Waktu Selesai</label>
-						<input id="c-end" name="end_time" type="datetime-local" class="input" value={data.examType.end_time?.slice(0, 16) || ''} />
+						<input id="c-end" name="end_time" type="datetime-local" class="input" value={data.examType.end_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
 					</div>
 					<div class="col-span-2 text-xs text-slate-500 mt-1">
 						Pastikan waktu berada di dalam rentang: <br/> 
@@ -226,11 +244,11 @@
 				<div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
 					<div>
 						<label class="label" for="e-start">Waktu Mulai</label>
-						<input id="e-start" name="start_time" type="datetime-local" class="input" value={editingExam.start_time?.slice(0, 16) || ''} />
+						<input id="e-start" name="start_time" type="datetime-local" class="input" value={editingExam.start_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
 					</div>
 					<div>
 						<label class="label" for="e-end">Waktu Selesai</label>
-						<input id="e-end" name="end_time" type="datetime-local" class="input" value={editingExam.end_time?.slice(0, 16) || ''} />
+						<input id="e-end" name="end_time" type="datetime-local" class="input" value={editingExam.end_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
 					</div>
 				</div>
 				<div>

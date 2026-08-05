@@ -1,4 +1,4 @@
-import { h as head, e as escape_html, j as attr, f as ensure_array_like, b as stringify, d as bind_props } from "../../../../../../chunks/index.js";
+import { h as head, e as escape_html, j as attr, f as ensure_array_like, i as attr_class, b as stringify, d as bind_props } from "../../../../../../chunks/index.js";
 import "@sveltejs/kit/internal";
 import "../../../../../../chunks/exports.js";
 import "../../../../../../chunks/utils2.js";
@@ -24,6 +24,7 @@ function _page($$renderer, $$props) {
       $$renderer2.push("<!--[-->");
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
         let exam = each_array[$$index];
+        const isOutOfBounds = exam.start_time && exam.start_time < data.examType.start_time || exam.end_time && exam.end_time > data.examType.end_time;
         $$renderer2.push(`<div class="card-hover p-5 flex flex-col"><div class="flex items-start justify-between mb-3"><div class="flex-1 min-w-0"><h3 class="font-bold text-slate-800 truncate">${escape_html(exam.title)}</h3> <p class="text-xs text-slate-500 mt-0.5">${escape_html(exam.subject_name || "Tanpa Mapel")}</p></div> `);
         if (exam.is_active) {
           $$renderer2.push("<!--[0-->");
@@ -39,7 +40,24 @@ function _page($$renderer, $$props) {
         } else {
           $$renderer2.push("<!--[-1-->");
         }
-        $$renderer2.push(`<!--]--> <div class="flex flex-wrap gap-3 text-xs text-slate-500 mb-4"><span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> ${escape_html(exam.duration_minutes)} menit</span> <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.questions)}></path></svg> ${escape_html(exam.question_count)} soal</span> <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.users)}></path></svg> ${escape_html(exam.participant_count)} peserta</span></div> <div class="mt-auto flex items-center gap-2 pt-3 border-t border-slate-100"><a${attr("href", `/admin/exams/${stringify(exam.id)}`)} class="btn-sm btn-outline flex-1 text-center">Detail</a> <button class="btn-sm btn-ghost" title="Edit"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.edit)}></path></svg></button> <form method="POST" action="?/toggleActive"><input type="hidden" name="id"${attr("value", exam.id)}/> <button type="submit" class="btn-sm btn-ghost"${attr("title", exam.is_active ? "Nonaktifkan" : "Aktifkan")}>`);
+        $$renderer2.push(`<!--]--> <div class="flex flex-wrap gap-3 text-xs text-slate-500 mb-4"><span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> ${escape_html(exam.duration_minutes)} menit</span> <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.questions)}></path></svg> ${escape_html(exam.question_count)} soal</span> <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.users)}></path></svg> ${escape_html(exam.participant_count)} peserta</span> <div${attr_class(`flex items-center gap-1 w-full mt-0.5 ${isOutOfBounds ? "text-rose-500 font-medium" : "text-slate-500"}`)}${attr("title", isOutOfBounds ? "Waktu ujian berada di luar rentang tipe ujian, sehingga otomatis nonaktif" : "Rentang Waktu Ujian")}><svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.calendar)}></path></svg> `);
+        if (exam.start_time || exam.end_time) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<span class="truncate">${escape_html(exam.start_time ? (/* @__PURE__ */ new Date(exam.start_time.replace(" ", "T") + (exam.start_time.includes("Z") ? "" : "Z"))).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : "-")} 
+								s/d 
+								${escape_html(exam.end_time ? (/* @__PURE__ */ new Date(exam.end_time.replace(" ", "T") + (exam.end_time.includes("Z") ? "" : "Z"))).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : "-")}</span> `);
+          if (isOutOfBounds) {
+            $$renderer2.push("<!--[0-->");
+            $$renderer2.push(`<span class="ml-1 shrink-0 px-1.5 py-0.5 rounded bg-rose-100 text-[9px] text-rose-600 font-bold tracking-wide">NONAKTIF</span>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+          }
+          $$renderer2.push(`<!--]-->`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<span>Belum diatur</span>`);
+        }
+        $$renderer2.push(`<!--]--></div></div> <div class="mt-auto flex items-center gap-2 pt-3 border-t border-slate-100"><a${attr("href", `/admin/exams/${stringify(exam.id)}`)} class="btn-sm btn-outline flex-1 text-center">Detail</a> <button class="btn-sm btn-ghost" title="Edit"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.edit)}></path></svg></button> <form method="POST" action="?/toggleActive"><input type="hidden" name="id"${attr("value", exam.id)}/> <button type="submit" class="btn-sm btn-ghost"${attr("title", exam.is_active ? "Nonaktifkan" : "Aktifkan")}>`);
         if (exam.is_active) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.check)}></path></svg>`);
