@@ -45,7 +45,11 @@ export const actions = {
 		if (!subjectId) return fail(400, { error: 'Mata Pelajaran wajib dipilih.' });
 
 		const subject = await db.prepare('SELECT name FROM subjects WHERE id = ?').bind(subjectId).first() as any;
-		const title = `${examType.code} - ${subject.name}`;
+		const roomName = form.get('room_name')?.toString().trim();
+		let title = `${examType.code} - ${subject.name}`;
+		if (roomName) {
+			title += ` - ${roomName}`;
+		}
 
 		const description = form.get('description')?.toString().trim() || '';
 		const durationMinutes = parseInt(form.get('duration_minutes')?.toString() || '60');
@@ -108,7 +112,11 @@ export const actions = {
 		if (!subjectId) return fail(400, { error: 'Mata pelajaran wajib diisi.' });
 
 		const subject = await db.prepare('SELECT name FROM subjects WHERE id = ?').bind(subjectId).first() as any;
-		const title = subject ? `${examType.code} - ${subject.name}` : undefined;
+		const roomName = form.get('room_name')?.toString().trim();
+		let title = subject ? `${examType.code} - ${subject.name}` : undefined;
+		if (title && roomName) {
+			title += ` - ${roomName}`;
+		}
 
 		const description = form.get('description')?.toString().trim() || '';
 		const durationMinutes = parseInt(form.get('duration_minutes')?.toString() || '60');

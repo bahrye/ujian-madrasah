@@ -30,7 +30,11 @@ const actions = {
     const subjectId = form.get("subject_id")?.toString() || null;
     if (!subjectId) return fail(400, { error: "Mata Pelajaran wajib dipilih." });
     const subject = await db.prepare("SELECT name FROM subjects WHERE id = ?").bind(subjectId).first();
-    const title = `${examType.code} - ${subject.name}`;
+    const roomName = form.get("room_name")?.toString().trim();
+    let title = `${examType.code} - ${subject.name}`;
+    if (roomName) {
+      title += ` - ${roomName}`;
+    }
     const description = form.get("description")?.toString().trim() || "";
     const durationMinutes = parseInt(form.get("duration_minutes")?.toString() || "60");
     const startTime = form.get("start_time")?.toString() || null;
@@ -75,7 +79,11 @@ const actions = {
     if (!id) return fail(400, { error: "Data tidak lengkap." });
     if (!subjectId) return fail(400, { error: "Mata pelajaran wajib diisi." });
     const subject = await db.prepare("SELECT name FROM subjects WHERE id = ?").bind(subjectId).first();
-    const title = subject ? `${examType.code} - ${subject.name}` : void 0;
+    const roomName = form.get("room_name")?.toString().trim();
+    let title = subject ? `${examType.code} - ${subject.name}` : void 0;
+    if (title && roomName) {
+      title += ` - ${roomName}`;
+    }
     const description = form.get("description")?.toString().trim() || "";
     const durationMinutes = parseInt(form.get("duration_minutes")?.toString() || "60");
     const startTime = form.get("start_time")?.toString() || null;
