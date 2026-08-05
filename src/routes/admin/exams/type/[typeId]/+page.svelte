@@ -191,13 +191,14 @@
 				<div>
 					<label class="label" for="c-shuffle">Pengaturan Soal</label>
 					<select id="c-shuffle" name="shuffle_questions" class="input">
+						<option value="1" selected>Acak Soal (Berbeda tiap siswa)</option>
 						<option value="0">Tidak Acak (Sesuai Urutan)</option>
-						<option value="1">Acak Soal (Berbeda tiap siswa)</option>
 					</select>
 				</div>
 				<div>
 					<label class="label" for="c-score-type">Tampilkan Nilai ke Siswa</label>
 					<select id="c-score-type" name="show_score_type" class="input">
+						<option value="after_type_end_time" selected>Setelah Waktu Jadwal Tipe Ujian Berakhir</option>
 						<option value="after_submit">Setelah Ujian Selesai (Otomatis)</option>
 						<option value="after_end_time">Setelah Waktu Jadwal Ujian Berakhir</option>
 						<option value="objective_only">Tampilkan Nilai Selain Isian & Essay Saja</option>
@@ -255,13 +256,14 @@
 				<div>
 					<label class="label" for="e-shuffle">Pengaturan Soal</label>
 					<select id="e-shuffle" name="shuffle_questions" class="input" value={String(editingExam.shuffle_questions || 0)}>
-						<option value="0">Tidak Acak (Sesuai Urutan)</option>
 						<option value="1">Acak Soal (Berbeda tiap siswa)</option>
+						<option value="0">Tidak Acak (Sesuai Urutan)</option>
 					</select>
 				</div>
 				<div>
 					<label class="label" for="e-score-type">Tampilkan Nilai ke Siswa</label>
-					<select id="e-score-type" name="show_score_type" class="input" value={editingExam.show_score_type || 'after_submit'}>
+					<select id="e-score-type" name="show_score_type" class="input" value={editingExam.show_score_type || 'after_type_end_time'}>
+						<option value="after_type_end_time">Setelah Waktu Jadwal Tipe Ujian Berakhir</option>
 						<option value="after_submit">Setelah Ujian Selesai (Otomatis)</option>
 						<option value="after_end_time">Setelah Waktu Jadwal Ujian Berakhir</option>
 						<option value="objective_only">Tampilkan Nilai Selain Isian & Essay Saja</option>
