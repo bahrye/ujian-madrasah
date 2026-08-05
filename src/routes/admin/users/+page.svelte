@@ -25,25 +25,25 @@
 
 <div class="space-y-6 animate-in">
 	<!-- Header -->
-	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+	<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
 		<div>
 			<h1 class="text-2xl font-bold text-slate-800">Manajemen Pengguna</h1>
 			<p class="text-sm text-slate-500 mt-1">Kelola data pengguna sistem</p>
 		</div>
-		<div class="flex flex-wrap gap-2">
-			<button class="btn" style="background: linear-gradient(135deg,#0ea5e9,#3b82f6); color:#fff; box-shadow: 0 4px 15px rgba(14,165,233,.3);" on:click={() => (showLoginCardModal = true)}>
+		<div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+			<button class="btn flex-1 sm:flex-none" style="background: linear-gradient(135deg,#0ea5e9,#3b82f6); color:#fff; box-shadow: 0 4px 15px rgba(14,165,233,.3);" on:click={() => (showLoginCardModal = true)}>
 				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0" />
 				</svg>
 				Kartu Login
 			</button>
-			<button class="btn-secondary" on:click={() => (showImportModal = true)}>
+			<button class="btn-secondary flex-1 sm:flex-none" on:click={() => (showImportModal = true)}>
 				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
 				</svg>
 				Import Excel
 			</button>
-			<button class="btn-primary" on:click={() => (showCreateModal = true)}>
+			<button class="btn-primary flex-1 sm:flex-none" on:click={() => (showCreateModal = true)}>
 				<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
 				</svg>
