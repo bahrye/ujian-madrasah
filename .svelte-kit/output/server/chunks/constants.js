@@ -48,8 +48,8 @@ const SIDEBAR_MENUS = {
     { label: "Bank Soal", href: "/admin/bank-soal", icon: "questions" },
     { label: "Bank Media", href: "/admin/media-bank", icon: "folder" },
     { label: "Ujian", href: "/admin/exams", icon: "exam" },
-    { label: "Papan Peringkat", href: "/admin/papan-peringkat", icon: "results" },
-    { label: "Hasil Ujian", href: "/admin/results", icon: "results" }
+    { label: "Hasil Ujian", href: "/admin/results", icon: "results" },
+    { label: "Papan Peringkat", href: "/admin/papan-peringkat", icon: "results" }
   ],
   guru: [
     { label: "Dashboard", href: "/guru", icon: "dashboard" },
@@ -57,8 +57,8 @@ const SIDEBAR_MENUS = {
     { label: "Bank Soal", href: "/guru/bank-soal", icon: "questions" },
     { label: "Bank Media", href: "/guru/media-bank", icon: "folder" },
     { label: "Penilaian", href: "/guru/penilaian", icon: "grading" },
-    { label: "Papan Peringkat", href: "/guru/papan-peringkat", icon: "results" },
-    { label: "Hasil Ujian", href: "/guru/results", icon: "results" }
+    { label: "Hasil Ujian", href: "/guru/results", icon: "results" },
+    { label: "Papan Peringkat", href: "/guru/papan-peringkat", icon: "results" }
   ],
   pengawas: [
     { label: "Dashboard", href: "/pengawas", icon: "dashboard" },
