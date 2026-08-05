@@ -26,6 +26,7 @@ export const load: PageServerLoad = async ({ platform, locals, params }) => {
 	// Agregasi nilai berdasarkan tipe ujian, terbatas pada ujian guru tersebut
 	const leaderboardQuery = await db.prepare(`
 		SELECT 
+			u.id as student_id,
 			u.name as student_name,
 			u.photo,
 			c.name as class_name,
@@ -42,6 +43,7 @@ export const load: PageServerLoad = async ({ platform, locals, params }) => {
 		GROUP BY u.id
 		ORDER BY total_score DESC, avg_score DESC
 	`).bind(typeId, userId, userId).all<{ 
+		student_id: number;
 		student_name: string; 
 		photo: string | null; 
 		class_name: string | null; 
@@ -51,8 +53,31 @@ export const load: PageServerLoad = async ({ platform, locals, params }) => {
 		exams_completed: number 
 	}>();
 
+	// Detail per-ujian per-siswa untuk dropdown
+	const detailQuery = await db.prepare(`
+		SELECT 
+			u.id as student_id,
+			e.title as exam_title,
+			sa.total_points,
+			sa.score
+		FROM student_attempts sa
+		JOIN users u ON sa.student_id = u.id
+		JOIN exams e ON sa.exam_id = e.id
+		WHERE e.exam_type_id = ? AND sa.status = 'selesai'
+		AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers teacher_join WHERE teacher_join.exam_id = e.id AND teacher_join.teacher_id = ?))
+		ORDER BY u.id, e.title ASC
+	`).bind(typeId, userId, userId).all<{ student_id: number; exam_title: string; total_points: number; score: number }>();
+
+	// Kelompokkan detail berdasarkan student_id
+	const detailMap: Record<number, { exam_title: string; total_points: number; score: number }[]> = {};
+	for (const row of detailQuery.results || []) {
+		if (!detailMap[row.student_id]) detailMap[row.student_id] = [];
+		detailMap[row.student_id].push({ exam_title: row.exam_title, total_points: row.total_points, score: row.score });
+	}
+
 	return {
 		examType,
-		leaderboard: leaderboardQuery.results || []
+		leaderboard: leaderboardQuery.results || [],
+		detailMap
 	};
 };

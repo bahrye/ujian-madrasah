@@ -1,6 +1,17 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	export let data: PageData;
+
+	let expanded = new Set<number>();
+
+	function toggleExpand(studentId: number) {
+		if (expanded.has(studentId)) {
+			expanded.delete(studentId);
+		} else {
+			expanded.add(studentId);
+		}
+		expanded = expanded; // trigger reactivity
+	}
 </script>
 
 <svelte:head>
@@ -17,7 +28,7 @@
 			Kembali ke Papan Peringkat
 		</a>
 		<h1 class="text-3xl font-bold text-slate-800 tracking-tight">Akumulasi: {data.examType.name}</h1>
-		<p class="text-slate-500 mt-1">Papan Peringkat berdasarkan total nilai seluruh ujian tipe {data.examType.code}</p>
+		<p class="text-slate-500 mt-1">Papan Peringkat berdasarkan total nilai seluruh ujian tipe {data.examType.code}. Klik nama siswa untuk melihat detail per ujian.</p>
 	</div>
 
 	<!-- Leaderboard -->
@@ -45,9 +56,17 @@
 							<th class="p-4 text-center">Rata-rata</th>
 						</tr>
 					</thead>
-					<tbody class="divide-y divide-slate-100">
+					<tbody>
 						{#each data.leaderboard as student, index}
-							<tr class="hover:bg-slate-50 transition-colors">
+							{@const isOpen = expanded.has(student.student_id)}
+							{@const details = data.detailMap[student.student_id] || []}
+
+							<!-- Baris Utama Siswa -->
+							<tr
+								class="border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer select-none"
+								class:bg-indigo-50={isOpen}
+								on:click={() => toggleExpand(student.student_id)}
+							>
 								<!-- Rank -->
 								<td class="p-4 text-center align-middle">
 									{#if index === 0}
@@ -67,12 +86,17 @@
 										{#if student.photo}
 											<img src={student.photo} alt={student.student_name} class="w-10 h-10 rounded-full object-cover border border-slate-200" />
 										{:else}
-											<div class="w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold">
+											<div class="w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold flex-shrink-0">
 												{student.student_name.charAt(0).toUpperCase()}
 											</div>
 										{/if}
-										<div>
-											<p class="font-bold text-slate-800">{student.student_name}</p>
+										<div class="min-w-0">
+											<p class="font-bold text-slate-800 flex items-center gap-1.5">
+												{student.student_name}
+												<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 transition-transform duration-200 {isOpen ? 'rotate-180' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+												</svg>
+											</p>
 											<p class="text-xs text-slate-500">{student.class_name || 'Tidak ada kelas'} • {student.exams_completed} Ujian</p>
 										</div>
 									</div>
@@ -95,6 +119,39 @@
 									{student.avg_score.toFixed(2)}
 								</td>
 							</tr>
+
+							<!-- Baris Detail (Dropdown) -->
+							{#if isOpen && details.length > 0}
+								<tr class="bg-indigo-50/60 border-b border-indigo-100">
+									<td></td>
+									<td colspan="4" class="px-4 pb-4 pt-2">
+										<div class="rounded-xl border border-indigo-100 overflow-hidden shadow-sm">
+											<table class="w-full text-sm text-left border-collapse">
+												<thead>
+													<tr class="bg-indigo-100 text-indigo-700 font-semibold">
+														<th class="px-4 py-2.5">Nama Ujian</th>
+														<th class="px-4 py-2.5 text-center">Total Poin (Maks)</th>
+														<th class="px-4 py-2.5 text-center">Nilai</th>
+													</tr>
+												</thead>
+												<tbody class="divide-y divide-indigo-50 bg-white">
+													{#each details as detail}
+														<tr class="hover:bg-indigo-50/50 transition-colors">
+															<td class="px-4 py-2.5 text-slate-700 font-medium">{detail.exam_title}</td>
+															<td class="px-4 py-2.5 text-center text-slate-600">{detail.total_points}</td>
+															<td class="px-4 py-2.5 text-center">
+																<span class="inline-block px-2.5 py-0.5 bg-green-100 text-green-700 font-semibold rounded-md">
+																	{detail.score}
+																</span>
+															</td>
+														</tr>
+													{/each}
+												</tbody>
+											</table>
+										</div>
+									</td>
+								</tr>
+							{/if}
 						{/each}
 					</tbody>
 				</table>
