@@ -29,10 +29,11 @@ declare module "$app/types" {
 	type MatcherParam<M> = M extends (param : string) => param is (infer U extends string) ? U : string;
 
 	export interface AppTypes {
-		RouteId(): "/" | "/admin" | "/admin/bank-soal" | "/admin/bank-soal/[examId]" | "/admin/bank-soal/[examId]/preview" | "/admin/classes" | "/admin/exams" | "/admin/exams/[id]" | "/admin/media-bank" | "/admin/results" | "/admin/results/[attemptId]" | "/admin/school-profile" | "/admin/students" | "/admin/subjects" | "/admin/users" | "/api" | "/api/delete-media" | "/api/exams" | "/api/exams/[id]" | "/api/exams/[id]/questions" | "/api/export-results" | "/api/export-results/[examId]" | "/api/logout" | "/api/media" | "/api/profile" | "/api/proxy-media" | "/api/setup" | "/api/track-media" | "/guru" | "/guru/bank-soal" | "/guru/bank-soal/[examId]" | "/guru/bank-soal/[examId]/preview" | "/guru/media-bank" | "/guru/penilaian" | "/guru/remedial" | "/guru/remedial/[examId]" | "/guru/results" | "/guru/results/[attemptId]" | "/login" | "/pengawas" | "/pengawas/monitor" | "/pengawas/tata-tertib" | "/pengawas/tokens" | "/siswa" | "/siswa/jadwal" | "/siswa/tata-tertib" | "/siswa/ujian" | "/siswa/ujian/[attemptId]" | "/superadmin" | "/superadmin/accounts" | "/superadmin/admins" | "/superadmin/schools";
+		RouteId(): "/" | "/admin" | "/admin/bank-soal" | "/admin/bank-soal/[examId]" | "/admin/bank-soal/[examId]/preview" | "/admin/classes" | "/admin/exams" | "/admin/exams/type" | "/admin/exams/type/[typeId]" | "/admin/exams/[id]" | "/admin/media-bank" | "/admin/results" | "/admin/results/[attemptId]" | "/admin/school-profile" | "/admin/students" | "/admin/subjects" | "/admin/users" | "/api" | "/api/delete-media" | "/api/exams" | "/api/exams/[id]" | "/api/exams/[id]/questions" | "/api/export-results" | "/api/export-results/[examId]" | "/api/logout" | "/api/media" | "/api/profile" | "/api/proxy-media" | "/api/setup" | "/api/track-media" | "/guru" | "/guru/bank-soal" | "/guru/bank-soal/[examId]" | "/guru/bank-soal/[examId]/preview" | "/guru/media-bank" | "/guru/penilaian" | "/guru/remedial" | "/guru/remedial/[examId]" | "/guru/results" | "/guru/results/[attemptId]" | "/login" | "/pengawas" | "/pengawas/monitor" | "/pengawas/tata-tertib" | "/pengawas/tokens" | "/siswa" | "/siswa/jadwal" | "/siswa/tata-tertib" | "/siswa/ujian" | "/siswa/ujian/[attemptId]" | "/superadmin" | "/superadmin/accounts" | "/superadmin/admins" | "/superadmin/schools";
 		RouteParams(): {
 			"/admin/bank-soal/[examId]": { examId: string };
 			"/admin/bank-soal/[examId]/preview": { examId: string };
+			"/admin/exams/type/[typeId]": { typeId: string };
 			"/admin/exams/[id]": { id: string };
 			"/admin/results/[attemptId]": { attemptId: string };
 			"/api/exams/[id]": { id: string };
@@ -45,13 +46,15 @@ declare module "$app/types" {
 			"/siswa/ujian/[attemptId]": { attemptId: string }
 		};
 		LayoutParams(): {
-			"/": { examId?: string | undefined; id?: string | undefined; attemptId?: string | undefined };
-			"/admin": { examId?: string | undefined; id?: string | undefined; attemptId?: string | undefined };
+			"/": { examId?: string | undefined; typeId?: string | undefined; id?: string | undefined; attemptId?: string | undefined };
+			"/admin": { examId?: string | undefined; typeId?: string | undefined; id?: string | undefined; attemptId?: string | undefined };
 			"/admin/bank-soal": { examId?: string | undefined };
 			"/admin/bank-soal/[examId]": { examId: string };
 			"/admin/bank-soal/[examId]/preview": { examId: string };
 			"/admin/classes": Record<string, never>;
-			"/admin/exams": { id?: string | undefined };
+			"/admin/exams": { typeId?: string | undefined; id?: string | undefined };
+			"/admin/exams/type": { typeId?: string | undefined };
+			"/admin/exams/type/[typeId]": { typeId: string };
 			"/admin/exams/[id]": { id: string };
 			"/admin/media-bank": Record<string, never>;
 			"/admin/results": { attemptId?: string | undefined };
@@ -98,7 +101,7 @@ declare module "$app/types" {
 			"/superadmin/admins": Record<string, never>;
 			"/superadmin/schools": Record<string, never>
 		};
-		Pathname(): "/" | "/admin" | "/admin/bank-soal" | `/admin/bank-soal/${string}` & {} | `/admin/bank-soal/${string}/preview` & {} | "/admin/classes" | "/admin/exams" | `/admin/exams/${string}` & {} | "/admin/media-bank" | "/admin/results" | `/admin/results/${string}` & {} | "/admin/school-profile" | "/admin/students" | "/admin/subjects" | "/admin/users" | "/api/delete-media" | `/api/exams/${string}/questions` & {} | `/api/export-results/${string}` & {} | "/api/logout" | "/api/media" | "/api/profile" | "/api/proxy-media" | "/api/setup" | "/api/track-media" | "/guru" | "/guru/bank-soal" | `/guru/bank-soal/${string}` & {} | `/guru/bank-soal/${string}/preview` & {} | "/guru/media-bank" | "/guru/penilaian" | "/guru/remedial" | `/guru/remedial/${string}` & {} | "/guru/results" | `/guru/results/${string}` & {} | "/login" | "/pengawas" | "/pengawas/monitor" | "/pengawas/tata-tertib" | "/pengawas/tokens" | "/siswa" | "/siswa/jadwal" | "/siswa/tata-tertib" | "/siswa/ujian" | `/siswa/ujian/${string}` & {} | "/superadmin" | "/superadmin/accounts" | "/superadmin/admins" | "/superadmin/schools";
+		Pathname(): "/" | "/admin" | "/admin/bank-soal" | `/admin/bank-soal/${string}` & {} | `/admin/bank-soal/${string}/preview` & {} | "/admin/classes" | "/admin/exams" | `/admin/exams/type/${string}` & {} | `/admin/exams/${string}` & {} | "/admin/media-bank" | "/admin/results" | `/admin/results/${string}` & {} | "/admin/school-profile" | "/admin/students" | "/admin/subjects" | "/admin/users" | "/api/delete-media" | `/api/exams/${string}/questions` & {} | `/api/export-results/${string}` & {} | "/api/logout" | "/api/media" | "/api/profile" | "/api/proxy-media" | "/api/setup" | "/api/track-media" | "/guru" | "/guru/bank-soal" | `/guru/bank-soal/${string}` & {} | `/guru/bank-soal/${string}/preview` & {} | "/guru/media-bank" | "/guru/penilaian" | "/guru/remedial" | `/guru/remedial/${string}` & {} | "/guru/results" | `/guru/results/${string}` & {} | "/login" | "/pengawas" | "/pengawas/monitor" | "/pengawas/tata-tertib" | "/pengawas/tokens" | "/siswa" | "/siswa/jadwal" | "/siswa/tata-tertib" | "/siswa/ujian" | `/siswa/ujian/${string}` & {} | "/superadmin" | "/superadmin/accounts" | "/superadmin/admins" | "/superadmin/schools";
 		ResolvedPathname(): `${"" | `/${string}`}${ReturnType<AppTypes['Pathname']>}`;
 		Asset(): "/favicon.svg" | string & {};
 	}

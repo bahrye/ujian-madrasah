@@ -35,6 +35,11 @@
 		"src/routes/admin/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/admin/exams/type/[typeId]": [
+		"src/routes/admin/exams/type/[typeId]/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/admin/exams/[id]": [
 		"src/routes/admin/exams/[id]/+page.server.ts",
 		"src/routes/admin/+layout.server.ts",

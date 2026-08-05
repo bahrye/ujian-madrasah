@@ -45,7 +45,7 @@
 
 <div class="space-y-6 animate-in">
 	<div class="flex items-center gap-3">
-		<a href="/admin/exams" class="btn-ghost btn-sm">
+		<a href="/admin/exams/type/{exam.exam_type_id}" class="btn-ghost btn-sm">
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 				<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.chevronLeft} />
 			</svg>
@@ -57,6 +57,11 @@
 	<div class="card p-6">
 		<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 			<div>
+				{#if exam.exam_type_code}
+					<div class="flex items-center gap-2 mb-1">
+						<span class="text-xs font-mono font-bold tracking-wider text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded">{exam.exam_type_code}</span>
+					</div>
+				{/if}
 				<h1 class="text-2xl font-bold text-slate-800">{exam.title}</h1>
 				<p class="text-sm text-slate-500 mt-1">{exam.subject_name || exam.subject || 'Umum'} · {exam.duration_minutes} menit</p>
 			</div>

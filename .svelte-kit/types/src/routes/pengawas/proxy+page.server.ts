@@ -6,7 +6,7 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 	const db = getDB(platform);
 
 	const [activeExams, tokenCount, activeAttempts, schedules] = await Promise.all([
-		db.prepare('SELECT COUNT(*) as c FROM exams WHERE is_active = 1 AND school_id = ?').bind(locals.user!.school_id).first<{ c: number }>(),
+		db.prepare('SELECT COUNT(*) as c FROM exams JOIN exam_types ON exams.exam_type_id = exam_types.id WHERE exams.is_active = 1 AND exam_types.is_active = 1 AND exams.school_id = ?').bind(locals.user!.school_id).first<{ c: number }>(),
 		db.prepare('SELECT COUNT(*) as c FROM tokens WHERE school_id = ?').bind(locals.user!.school_id).first<{ c: number }>(),
 		db.prepare("SELECT COUNT(*) as c FROM student_attempts sa JOIN exams e ON sa.exam_id = e.id WHERE sa.status = 'mengerjakan' AND e.school_id = ?").bind(locals.user!.school_id).first<{ c: number }>(),
 		db.prepare(`
@@ -15,7 +15,8 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 			FROM exams e
 			JOIN exam_proctors ep ON e.id = ep.exam_id
 			LEFT JOIN subjects s ON e.subject_id = s.id
-			WHERE ep.proctor_id = ? AND e.school_id = ?
+			JOIN exam_types et ON e.exam_type_id = et.id
+			WHERE ep.proctor_id = ? AND e.school_id = ? AND et.is_active = 1
 			ORDER BY e.start_time ASC
 		`).bind(locals.user!.id, locals.user!.school_id).all()
 	]);

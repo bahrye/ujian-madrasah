@@ -50,10 +50,26 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Tabel Tipe Ujian
+CREATE TABLE IF NOT EXISTS exam_types (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    school_id INTEGER NOT NULL REFERENCES schools(id) ON DELETE CASCADE,
+    code TEXT NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT DEFAULT '',
+    start_time TEXT,
+    end_time TEXT,
+    is_active INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_exam_types_school ON exam_types(school_id);
+CREATE INDEX IF NOT EXISTS idx_exam_types_active ON exam_types(is_active);
+
 -- Tabel Ujian
 CREATE TABLE IF NOT EXISTS exams (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     school_id INTEGER NOT NULL REFERENCES schools(id) ON DELETE CASCADE,
+    exam_type_id INTEGER REFERENCES exam_types(id) ON DELETE SET NULL,
     subject_id INTEGER REFERENCES subjects(id) ON DELETE SET NULL,
     title TEXT NOT NULL,
     description TEXT DEFAULT '',

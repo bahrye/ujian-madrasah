@@ -26,7 +26,8 @@ export const load: PageServerLoad = async ({ platform, locals, url }) => {
 			(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count
 		FROM exams e 
 		LEFT JOIN subjects s ON e.subject_id = s.id 
-		WHERE e.id = ? AND e.school_id = ?
+		JOIN exam_types et ON e.exam_type_id = et.id
+		WHERE e.id = ? AND e.school_id = ? AND et.is_active = 1
 	`).bind(examId, locals.user!.school_id).first();
 
 	if (!exam) throw redirect(302, '/siswa/jadwal');
@@ -46,7 +47,8 @@ export const actions: Actions = {
 		const token = await db.prepare(`
 			SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
 			FROM tokens t JOIN exams e ON t.exam_id = e.id
-			WHERE t.token_code = ? AND t.is_released = 1 AND t.exam_id = ?
+			JOIN exam_types et ON e.exam_type_id = et.id
+			WHERE t.token_code = ? AND t.is_released = 1 AND t.exam_id = ? AND et.is_active = 1
 		`).bind(tokenCode, examId).first<any>();
 
 		if (!token) return fail(400, { error: 'Token tidak valid untuk ujian ini atau belum dirilis.' });
@@ -85,7 +87,8 @@ export const actions: Actions = {
 		const token = await db.prepare(`
 			SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
 			FROM tokens t JOIN exams e ON t.exam_id = e.id
-			WHERE t.token_code = ? AND t.is_released = 1 AND t.exam_id = ?
+			JOIN exam_types et ON e.exam_type_id = et.id
+			WHERE t.token_code = ? AND t.is_released = 1 AND t.exam_id = ? AND et.is_active = 1
 		`).bind(tokenCode, examId).first<any>();
 
 		if (!token) return fail(400, { error: 'Token tidak valid untuk ujian ini atau belum dirilis.' });

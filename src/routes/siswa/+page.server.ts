@@ -25,7 +25,8 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		FROM exams e
 		JOIN exam_participants ep ON ep.exam_id = e.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
-		WHERE e.is_active = 1
+		JOIN exam_types et ON e.exam_type_id = et.id
+		WHERE e.is_active = 1 AND et.is_active = 1
 		AND e.school_id = ?
 		AND ep.student_id = ?
 	`).bind(locals.user!.school_id, userId).all();

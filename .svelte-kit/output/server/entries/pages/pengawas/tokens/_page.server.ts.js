@@ -29,7 +29,8 @@ const load = async ({ platform, locals }) => {
 		SELECT e.id, e.title, e.start_time, e.end_time
 		FROM exams e
 		JOIN exam_proctors ep ON e.id = ep.exam_id
-		WHERE e.is_active = 1 AND e.school_id = ? AND ep.proctor_id = ?
+		JOIN exam_types et ON e.exam_type_id = et.id
+		WHERE e.is_active = 1 AND et.is_active = 1 AND e.school_id = ? AND ep.proctor_id = ?
 		ORDER BY e.title
 	`).bind(locals.user.school_id, locals.user.id).all();
   const processedTokens = tokens.results.map((t) => {
