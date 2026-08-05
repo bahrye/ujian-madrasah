@@ -44,15 +44,40 @@ export const actions = {
 		if (!id || !name) return fail(400, { error: 'ID dan Nama wajib diisi' });
 
 		try {
+			// Ambil nama lama untuk cek apakah berubah
+			const oldSubject = await db.prepare('SELECT name FROM subjects WHERE id = ? AND school_id = ?')
+				.bind(id, locals.user!.school_id)
+				.first<{ name: string }>();
+
 			await db.prepare('UPDATE subjects SET name = ?, code = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?')
 				.bind(name, code, id, locals.user!.school_id)
 				.run();
-			
+
+			// Otomatis perbarui title semua ujian yang terhubung jika nama mapel berubah
+			if (oldSubject && oldSubject.name !== name) {
+				// Ambil semua ujian yang memakai mapel ini beserta kode tipe ujiannya
+				const linkedExams = await db.prepare(`
+					SELECT e.id, et.code as type_code
+					FROM exams e
+					LEFT JOIN exam_types et ON e.exam_type_id = et.id
+					WHERE e.subject_id = ?
+				`).bind(id).all<{ id: number; type_code: string | null }>();
+
+				if (linkedExams.results.length > 0) {
+					const updateBatch = linkedExams.results.map(exam =>
+						db.prepare(`UPDATE exams SET title = ?, updated_at = datetime('now') WHERE id = ?`)
+							.bind(`${exam.type_code || 'Ujian'} - ${name}`, exam.id)
+					);
+					await db.batch(updateBatch);
+				}
+			}
+
 			return { success: true };
 		} catch (e) {
 			return fail(500, { error: 'Gagal mengupdate mata pelajaran' });
 		}
 	},
+
 	delete: async ({ request, locals, platform }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
 		const data = await request.formData();
