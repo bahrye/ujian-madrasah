@@ -27,6 +27,7 @@ export const actions = {
 				.first<{
 					id: number;
 					school_id: number | null;
+					class_id: number | null;
 					username: string;
 					password_hash: string;
 					name: string;
@@ -45,6 +46,7 @@ export const actions = {
 			const token = await createToken({
 				id: user.id,
 				school_id: user.school_id,
+				class_id: user.class_id,
 				username: user.username,
 				name: user.name,
 				role: user.role as 'superadmin' | 'admin' | 'guru' | 'pengawas' | 'siswa'

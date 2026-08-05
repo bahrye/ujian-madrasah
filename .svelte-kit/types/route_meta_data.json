@@ -195,6 +195,21 @@
 		"src/routes/siswa/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/siswa/papan-peringkat": [
+		"src/routes/siswa/papan-peringkat/+page.server.ts",
+		"src/routes/siswa/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/siswa/papan-peringkat/type/[typeId]": [
+		"src/routes/siswa/papan-peringkat/type/[typeId]/+page.server.ts",
+		"src/routes/siswa/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/siswa/papan-peringkat/[examId]": [
+		"src/routes/siswa/papan-peringkat/[examId]/+page.server.ts",
+		"src/routes/siswa/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/siswa/tata-tertib": [
 		"src/routes/siswa/+layout.server.ts",
 		"src/routes/+layout.server.ts"

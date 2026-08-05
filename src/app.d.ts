@@ -21,6 +21,7 @@ declare global {
 				username: string;
 				name: string;
 				role: 'superadmin' | 'admin' | 'guru' | 'pengawas' | 'siswa';
+				class_id?: number | null;
 			} | null;
 		}
 

@@ -258,7 +258,7 @@
       "_stores.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.DYX_M1ZT.css"
+      "_app/immutable/assets/_layout.pc40s1wZ.css"
     ]
   },
   "src/routes/+page.server.ts": {
@@ -1168,6 +1168,60 @@
     "imports": [
       "_index.js",
       "_constants.js"
+    ]
+  },
+  "src/routes/siswa/papan-peringkat/+page.server.ts": {
+    "file": "entries/pages/siswa/papan-peringkat/_page.server.ts.js",
+    "name": "entries/pages/siswa/papan-peringkat/_page.server.ts",
+    "src": "src/routes/siswa/papan-peringkat/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/siswa/papan-peringkat/+page.svelte": {
+    "file": "entries/pages/siswa/papan-peringkat/_page.svelte.js",
+    "name": "entries/pages/siswa/papan-peringkat/_page.svelte",
+    "src": "src/routes/siswa/papan-peringkat/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js"
+    ]
+  },
+  "src/routes/siswa/papan-peringkat/[examId]/+page.server.ts": {
+    "file": "entries/pages/siswa/papan-peringkat/_examId_/_page.server.ts.js",
+    "name": "entries/pages/siswa/papan-peringkat/_examId_/_page.server.ts",
+    "src": "src/routes/siswa/papan-peringkat/[examId]/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/siswa/papan-peringkat/[examId]/+page.svelte": {
+    "file": "entries/pages/siswa/papan-peringkat/_examId_/_page.svelte.js",
+    "name": "entries/pages/siswa/papan-peringkat/_examId_/_page.svelte",
+    "src": "src/routes/siswa/papan-peringkat/[examId]/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js"
+    ]
+  },
+  "src/routes/siswa/papan-peringkat/type/[typeId]/+page.server.ts": {
+    "file": "entries/pages/siswa/papan-peringkat/type/_typeId_/_page.server.ts.js",
+    "name": "entries/pages/siswa/papan-peringkat/type/_typeId_/_page.server.ts",
+    "src": "src/routes/siswa/papan-peringkat/type/[typeId]/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/siswa/papan-peringkat/type/[typeId]/+page.svelte": {
+    "file": "entries/pages/siswa/papan-peringkat/type/_typeId_/_page.svelte.js",
+    "name": "entries/pages/siswa/papan-peringkat/type/_typeId_/_page.svelte",
+    "src": "src/routes/siswa/papan-peringkat/type/[typeId]/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js"
     ]
   },
   "src/routes/siswa/tata-tertib/+page.svelte": {

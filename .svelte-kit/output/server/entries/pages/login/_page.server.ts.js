@@ -27,6 +27,7 @@ const actions = {
       const token = await createToken({
         id: user.id,
         school_id: user.school_id,
+        class_id: user.class_id,
         username: user.username,
         name: user.name,
         role: user.role
