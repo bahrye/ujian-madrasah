@@ -23,6 +23,11 @@ export const load = async ({ locals, platform }: Parameters<ServerLoad>[0]) => {
 				WHERE ep2.exam_id = e.id
 			) as proctor_names,
 			(
+				SELECT COUNT(*)
+				FROM exam_participants ep
+				WHERE ep.exam_id = e.id
+			) as participant_count,
+			(
 				SELECT GROUP_CONCAT(DISTINCT c.name)
 				FROM exam_participants ep
 				JOIN users u3 ON ep.student_id = u3.id

@@ -144,7 +144,10 @@
 								<svg class="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={ICONS.school} />
 								</svg>
-								<span class="font-medium line-clamp-2" title={exam.class_names}>{exam.class_names}</span>
+								<div class="flex flex-col">
+									<span class="font-medium line-clamp-2" title={exam.class_names}>{exam.class_names}</span>
+									<span class="text-xs text-slate-500 mt-0.5">{exam.participant_count || 0} Siswa</span>
+								</div>
 							</div>
 						{/if}
 						<div class="flex items-start gap-2 text-sm text-slate-600">
