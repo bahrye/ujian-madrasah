@@ -32,12 +32,54 @@ function ImportUsersModal($$renderer, $$props) {
     bind_props($$props, { show });
   });
 }
+function AdminLoginCardModal($$renderer, $$props) {
+  $$renderer.component(($$renderer2) => {
+    let show = fallback($$props["show"], false);
+    let users = fallback($$props["users"], () => [], true);
+    let schoolName = fallback($$props["schoolName"], "");
+    let schoolLogo = fallback($$props["schoolLogo"], "");
+    let selectedRole = "";
+    if (show) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<div class="fixed inset-0 z-[100] flex items-center justify-center p-4"><div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" role="button" tabindex="-1" aria-label="Tutup modal"></div> <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl relative z-10 flex flex-col max-h-[90vh] overflow-hidden login-card-modal svelte-fxef8b"><div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20"><svg class="w-6 h-6 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"></path></svg></div> <div><h2 class="text-xl font-bold">Kartu Login Petugas</h2> <p class="text-sm text-slate-400 font-medium">Cetak kartu akses sistem</p></div></div> <button class="text-slate-400 hover:text-white p-2 hover:bg-white/10 rounded-xl transition-colors" aria-label="Tutup"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div> <div class="p-6 overflow-y-auto flex-1 space-y-6 bg-slate-50"><div><label for="role-select" class="block text-sm font-bold text-slate-700 mb-2">Pilih Role Petugas</label> `);
+      $$renderer2.select(
+        {
+          id: "role-select",
+          class: "input bg-white shadow-sm border-slate-200",
+          value: selectedRole
+        },
+        ($$renderer3) => {
+          $$renderer3.option({ value: "" }, ($$renderer4) => {
+            $$renderer4.push(`-- Pilih role --`);
+          });
+          $$renderer3.option({ value: "guru" }, ($$renderer4) => {
+            $$renderer4.push(`Guru`);
+          });
+          $$renderer3.option({ value: "pengawas" }, ($$renderer4) => {
+            $$renderer4.push(`Pengawas`);
+          });
+        }
+      );
+      $$renderer2.push(`</div> `);
+      {
+        $$renderer2.push("<!--[-1-->");
+        $$renderer2.push(`<div class="bg-slate-100 border border-slate-200 border-dashed rounded-3xl p-8 text-center"><div class="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mx-auto mb-4 border border-slate-200"><svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"></path></svg></div> <p class="text-sm font-bold text-slate-500">Pilih role untuk melihat pratinjau kartu</p></div>`);
+      }
+      $$renderer2.push(`<!--]--></div> <div class="p-6 border-t border-slate-100 bg-white flex items-center justify-end gap-3"><button class="btn btn-secondary shadow-sm">Batal</button> <button class="btn bg-slate-900 text-white hover:bg-slate-800 shadow-md shadow-slate-900/20 gap-2 font-bold px-5"${attr("disabled", !selectedRole, true)}><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg> Cetak Kartu Login</button></div></div></div>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]-->`);
+    bind_props($$props, { show, users, schoolName, schoolLogo });
+  });
+}
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let data = $$props["data"];
     let form = $$props["form"];
     let showCreateModal = false;
     let showImportModal = false;
+    let showLoginCardModal = false;
     if (form?.success) {
       toasts.success(form.success);
       showImportModal = false;
@@ -52,7 +94,7 @@ function _page($$renderer, $$props) {
           $$renderer5.push(`<title>Manajemen Pengguna — Ujian Online Madrasah</title>`);
         });
       });
-      $$renderer3.push(`<div class="space-y-6 animate-in"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div><h1 class="text-2xl font-bold text-slate-800">Manajemen Pengguna</h1> <p class="text-sm text-slate-500 mt-1">Kelola data pengguna sistem</p></div> <div class="flex gap-2"><button class="btn-secondary"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg> Import Excel</button> <button class="btn-primary"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> Tambah Pengguna</button></div></div> <div class="card p-4"><form method="GET" class="flex flex-col sm:flex-row gap-3"><div class="relative flex-1"><svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.search)}></path></svg> <input name="search" type="text" class="input pl-9" placeholder="Cari pengguna..."${attr("value", data.search)}/></div> <select name="role" class="select w-full sm:w-40">`);
+      $$renderer3.push(`<div class="space-y-6 animate-in"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div><h1 class="text-2xl font-bold text-slate-800">Manajemen Pengguna</h1> <p class="text-sm text-slate-500 mt-1">Kelola data pengguna sistem</p></div> <div class="flex gap-2"><button class="btn" style="background: linear-gradient(135deg,#0ea5e9,#3b82f6); color:#fff; box-shadow: 0 4px 15px rgba(14,165,233,.3);"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"></path></svg> Kartu Login</button> <button class="btn-secondary"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg> Import Excel</button> <button class="btn-primary"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> Tambah Pengguna</button></div></div> <div class="card p-4"><form method="GET" class="flex flex-col sm:flex-row gap-3"><div class="relative flex-1"><svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.search)}></path></svg> <input name="search" type="text" class="input pl-9" placeholder="Cari pengguna..."${attr("value", data.search)}/></div> <select name="role" class="select w-full sm:w-40">`);
       $$renderer3.option({ value: "" }, ($$renderer4) => {
         $$renderer4.push(`Semua Role`);
       });
@@ -129,6 +171,19 @@ function _page($$renderer, $$props) {
         },
         set show($$value) {
           showImportModal = $$value;
+          $$settled = false;
+        }
+      });
+      $$renderer3.push(`<!----> `);
+      AdminLoginCardModal($$renderer3, {
+        users: data.users,
+        schoolName: data.schoolName,
+        schoolLogo: data.schoolLogo,
+        get show() {
+          return showLoginCardModal;
+        },
+        set show($$value) {
+          showLoginCardModal = $$value;
           $$settled = false;
         }
       });

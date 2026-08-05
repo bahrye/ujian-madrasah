@@ -8,7 +8,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 	const search = url.searchParams.get('search') || '';
 	const roleFilter = url.searchParams.get('role') || '';
 
-	let query = 'SELECT id, username, name, role, is_active, created_at FROM users WHERE school_id = ? AND role != "siswa" AND role != "superadmin" AND role != "admin"';
+	let query = 'SELECT id, username, name, role, is_active, created_at, photo FROM users WHERE school_id = ? AND role != "siswa" AND role != "superadmin" AND role != "admin"';
 	const params: unknown[] = [locals.user!.school_id];
 
 	if (search) {
@@ -22,9 +22,18 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 
 	query += ' ORDER BY created_at DESC';
 
-	const users = await db.prepare(query).bind(...params).all();
+	const [usersResult, school] = await Promise.all([
+		db.prepare(query).bind(...params).all(),
+		db.prepare('SELECT name, logo_url FROM schools WHERE id = ?').bind(locals.user!.school_id).first()
+	]);
 
-	return { users: users.results, search, roleFilter };
+	return { 
+		users: usersResult.results || [], 
+		search, 
+		roleFilter,
+		schoolName: (school as any)?.name || '',
+		schoolLogo: (school as any)?.logo_url || ''
+	};
 };
 
 export const actions: Actions = {

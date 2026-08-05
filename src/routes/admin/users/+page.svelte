@@ -3,6 +3,7 @@
 	import { ROLE_LABELS, ROLE_COLORS, ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
 	import ImportUsersModal from '$lib/components/admin/ImportUsersModal.svelte';
+	import AdminLoginCardModal from '$lib/components/admin/AdminLoginCardModal.svelte';
 	import PasswordInput from '$lib/components/ui/PasswordInput.svelte';
 
 	export let data;
@@ -10,6 +11,7 @@
 
 	let showCreateModal = false;
 	let showImportModal = false;
+	let showLoginCardModal = false;
 	let editingUser: any = null;
 	let deleteConfirm: number | null = null;
 
@@ -29,6 +31,12 @@
 			<p class="text-sm text-slate-500 mt-1">Kelola data pengguna sistem</p>
 		</div>
 		<div class="flex gap-2">
+			<button class="btn" style="background: linear-gradient(135deg,#0ea5e9,#3b82f6); color:#fff; box-shadow: 0 4px 15px rgba(14,165,233,.3);" on:click={() => (showLoginCardModal = true)}>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0" />
+				</svg>
+				Kartu Login
+			</button>
 			<button class="btn-secondary" on:click={() => (showImportModal = true)}>
 				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -238,3 +246,10 @@
 {/if}
 
 <ImportUsersModal bind:show={showImportModal} />
+
+<AdminLoginCardModal
+	bind:show={showLoginCardModal}
+	users={data.users}
+	schoolName={data.schoolName}
+	schoolLogo={data.schoolLogo}
+/>
