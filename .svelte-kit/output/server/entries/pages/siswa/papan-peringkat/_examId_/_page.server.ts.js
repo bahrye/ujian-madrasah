@@ -10,10 +10,13 @@ const load = async ({ platform, locals, params }) => {
     throw error(400, "Anda belum terdaftar dalam kelas mana pun.");
   }
   const exam = await db.prepare(`
-		SELECT id, title, subject_id FROM exams WHERE id = ? AND school_id = ?
-	`).bind(examId, schoolId).first();
+		SELECT e.id, e.title, e.subject_id 
+		FROM exams e
+		JOIN exam_participants ep ON e.id = ep.exam_id
+		WHERE e.id = ? AND e.school_id = ? AND ep.student_id = ?
+	`).bind(examId, schoolId, locals.user.id).first();
   if (!exam) {
-    throw error(404, "Ujian tidak ditemukan.");
+    throw error(404, "Ujian tidak ditemukan atau Anda bukan peserta ujian ini.");
   }
   const subject = await db.prepare(`
 		SELECT name FROM subjects WHERE id = ?

@@ -15,11 +15,14 @@ export const load: PageServerLoad = async ({ platform, locals, params }) => {
 	}
 
 	const exam = await db.prepare(`
-		SELECT id, title, subject_id FROM exams WHERE id = ? AND school_id = ?
-	`).bind(examId, schoolId).first<{ id: number; title: string; subject_id: number }>();
+		SELECT e.id, e.title, e.subject_id 
+		FROM exams e
+		JOIN exam_participants ep ON e.id = ep.exam_id
+		WHERE e.id = ? AND e.school_id = ? AND ep.student_id = ?
+	`).bind(examId, schoolId, locals.user.id).first<{ id: number; title: string; subject_id: number }>();
 
 	if (!exam) {
-		throw error(404, 'Ujian tidak ditemukan.');
+		throw error(404, 'Ujian tidak ditemukan atau Anda bukan peserta ujian ini.');
 	}
 
 	// Ambil subject name

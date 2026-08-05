@@ -10,10 +10,14 @@ const load = async ({ platform, locals, params }) => {
     throw error(400, "Anda belum terdaftar dalam kelas mana pun.");
   }
   const examType = await db.prepare(`
-		SELECT id, name, code FROM exam_types WHERE id = ? AND school_id = ?
-	`).bind(typeId, schoolId).first();
+		SELECT DISTINCT et.id, et.name, et.code 
+		FROM exam_types et
+		JOIN exams e ON et.id = e.exam_type_id
+		JOIN exam_participants ep ON e.id = ep.exam_id
+		WHERE et.id = ? AND et.school_id = ? AND ep.student_id = ?
+	`).bind(typeId, schoolId, locals.user.id).first();
   if (!examType) {
-    throw error(404, "Tipe ujian tidak ditemukan.");
+    throw error(404, "Tipe ujian tidak ditemukan atau Anda tidak terdaftar pada ujian jenis ini.");
   }
   const leaderboardQuery = await db.prepare(`
 		SELECT 
