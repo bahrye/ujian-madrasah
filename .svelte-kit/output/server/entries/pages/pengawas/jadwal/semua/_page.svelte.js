@@ -1,4 +1,4 @@
-import { h as head, f as ensure_array_like, e as escape_html, j as attr, b as stringify, d as bind_props } from "../../../../../chunks/index.js";
+import { h as head, f as ensure_array_like, e as escape_html, j as attr, d as bind_props } from "../../../../../chunks/index.js";
 import { I as ICONS } from "../../../../../chunks/constants.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
@@ -101,7 +101,7 @@ function _page($$renderer, $$props) {
         } else {
           $$renderer2.push("<!--[-1-->");
         }
-        $$renderer2.push(`<!--]--> <div class="flex items-start gap-2 text-sm text-slate-600"><svg class="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"${attr("d", ICONS.users)}></path></svg> <span class="font-medium line-clamp-2 text-indigo-600"${attr("title", exam.proctor_names || "Tidak ada pengawas")}>${escape_html(exam.proctor_names || "Tidak ada pengawas")}</span></div></div> <a${attr("href", `/pengawas/monitor?exam_id=${stringify(exam.id)}`)} class="btn-primary w-full py-2.5 text-sm font-semibold mt-2 group relative overflow-hidden flex items-center justify-center gap-2"><span>Monitoring Ujian</span> <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg></a></div></div>`);
+        $$renderer2.push(`<!--]--> <div class="flex items-start gap-2 text-sm text-slate-600"><svg class="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"${attr("d", ICONS.users)}></path></svg> <span class="font-medium line-clamp-2 text-indigo-600"${attr("title", exam.proctor_names || "Tidak ada pengawas")}>${escape_html(exam.proctor_names || "Tidak ada pengawas")}</span></div></div></div></div>`);
       }
     } else {
       $$renderer2.push("<!--[!-->");

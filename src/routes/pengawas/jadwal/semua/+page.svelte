@@ -157,12 +157,6 @@
 						</div>
 					</div>
 
-					<a href="/pengawas/monitor?exam_id={exam.id}" class="btn-primary w-full py-2.5 text-sm font-semibold mt-2 group relative overflow-hidden flex items-center justify-center gap-2">
-						<span>Monitoring Ujian</span>
-						<svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-						</svg>
-					</a>
 				</div>
 			</div>
 		{:else}
