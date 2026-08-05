@@ -17,7 +17,7 @@ const load = async ({ locals, platform }) => {
 				WHERE ep2.exam_id = e.id
 			) as proctor_names,
 			(
-				SELECT GROUP_CONCAT(DISTINCT c.name, ', ')
+				SELECT GROUP_CONCAT(DISTINCT c.name)
 				FROM exam_participants ep
 				JOIN users u3 ON ep.student_id = u3.id
 				JOIN classes c ON u3.class_id = c.id
