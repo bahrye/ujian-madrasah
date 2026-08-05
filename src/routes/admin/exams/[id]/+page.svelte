@@ -207,32 +207,8 @@
 		{/if}
 	</div>
 
-	<!-- Questions List -->
-	<div class="card overflow-hidden mb-6">
-		<div class="p-5 border-b border-slate-100 flex items-center justify-between">
-			<h2 class="text-lg font-bold text-slate-800">Daftar Soal</h2>
-			<a href="/admin/bank-soal/{exam.id}" class="btn-sm btn-outline">Kelola Soal</a>
-		</div>
-		{#if questions.length === 0}
-			<div class="p-8 text-center text-slate-400 text-sm">Belum ada soal untuk ujian ini.</div>
-		{:else}
-			<div class="divide-y divide-slate-100">
-				{#each questions as q}
-					<div class="p-4 flex items-center gap-3">
-						<span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold flex-shrink-0">{q.question_number}</span>
-						<div class="flex-1 min-w-0">
-							<p class="text-sm text-slate-700 truncate">{q.question_text}</p>
-							<span class="text-[10px] badge-primary mt-0.5">{QUESTION_TYPE_LABELS[q.type] || q.type}</span>
-						</div>
-						<span class="text-xs text-slate-400">{q.points} poin</span>
-					</div>
-				{/each}
-			</div>
-		{/if}
-	</div>
-
 	<!-- Participants Table -->
-	<div class="card overflow-hidden">
+	<div class="card overflow-hidden mb-6">
 		<div class="p-5 border-b border-slate-100 flex items-center justify-between">
 			<h2 class="text-lg font-bold text-slate-800">Daftar Peserta Ujian</h2>
 			<button class="btn-sm btn-primary" on:click={() => (showAddParticipantModal = true)}>
@@ -276,6 +252,30 @@
 						{/each}
 					</tbody>
 				</table>
+			</div>
+		{/if}
+	</div>
+
+	<!-- Questions List -->
+	<div class="card overflow-hidden mb-6">
+		<div class="p-5 border-b border-slate-100 flex items-center justify-between">
+			<h2 class="text-lg font-bold text-slate-800">Daftar Soal</h2>
+			<a href="/admin/bank-soal/{exam.id}" class="btn-sm btn-outline">Kelola Soal</a>
+		</div>
+		{#if questions.length === 0}
+			<div class="p-8 text-center text-slate-400 text-sm">Belum ada soal untuk ujian ini.</div>
+		{:else}
+			<div class="divide-y divide-slate-100">
+				{#each questions as q}
+					<div class="p-4 flex items-center gap-3">
+						<span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold flex-shrink-0">{q.question_number}</span>
+						<div class="flex-1 min-w-0">
+							<p class="text-sm text-slate-700 truncate">{q.question_text}</p>
+							<span class="text-[10px] badge-primary mt-0.5">{QUESTION_TYPE_LABELS[q.type] || q.type}</span>
+						</div>
+						<span class="text-xs text-slate-400">{q.points} poin</span>
+					</div>
+				{/each}
 			</div>
 		{/if}
 	</div>

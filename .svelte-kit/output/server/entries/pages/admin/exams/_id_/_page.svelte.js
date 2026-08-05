@@ -131,30 +131,16 @@ function _page($$renderer, $$props) {
       }
       $$renderer2.push(`<!--]--></tbody></table></div>`);
     }
-    $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden mb-6"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><h2 class="text-lg font-bold text-slate-800">Daftar Soal</h2> <a${attr("href", `/admin/bank-soal/${stringify(exam.id)}`)} class="btn-sm btn-outline">Kelola Soal</a></div> `);
-    if (questions.length === 0) {
-      $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="p-8 text-center text-slate-400 text-sm">Belum ada soal untuk ujian ini.</div>`);
-    } else {
-      $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="divide-y divide-slate-100"><!--[-->`);
-      const each_array_2 = ensure_array_like(questions);
-      for (let $$index_2 = 0, $$length = each_array_2.length; $$index_2 < $$length; $$index_2++) {
-        let q = each_array_2[$$index_2];
-        $$renderer2.push(`<div class="p-4 flex items-center gap-3"><span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold flex-shrink-0">${escape_html(q.question_number)}</span> <div class="flex-1 min-w-0"><p class="text-sm text-slate-700 truncate">${escape_html(q.question_text)}</p> <span class="text-[10px] badge-primary mt-0.5">${escape_html(QUESTION_TYPE_LABELS[q.type] || q.type)}</span></div> <span class="text-xs text-slate-400">${escape_html(q.points)} poin</span></div>`);
-      }
-      $$renderer2.push(`<!--]--></div>`);
-    }
-    $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><h2 class="text-lg font-bold text-slate-800">Daftar Peserta Ujian</h2> <button class="btn-sm btn-primary"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> Tambah Peserta</button></div> `);
+    $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden mb-6"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><h2 class="text-lg font-bold text-slate-800">Daftar Peserta Ujian</h2> <button class="btn-sm btn-primary"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> Tambah Peserta</button></div> `);
     if (participants.length === 0) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div class="p-8 text-center text-slate-400 text-sm">Belum ada peserta yang ditambahkan ke ujian ini. Ujian tidak bisa diakses siswa.</div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
       $$renderer2.push(`<div class="table-container border-0 rounded-none max-h-96 overflow-y-auto"><table class="table"><thead class="sticky top-0 bg-white"><tr><th>NISN</th><th>Nama Siswa</th><th>Kelas</th><th>Aksi</th></tr></thead><tbody><!--[-->`);
-      const each_array_3 = ensure_array_like(participants);
-      for (let $$index_3 = 0, $$length = each_array_3.length; $$index_3 < $$length; $$index_3++) {
-        let p = each_array_3[$$index_3];
+      const each_array_2 = ensure_array_like(participants);
+      for (let $$index_2 = 0, $$length = each_array_2.length; $$index_2 < $$length; $$index_2++) {
+        let p = each_array_2[$$index_2];
         $$renderer2.push(`<tr><td class="text-xs font-mono">${escape_html(p.nisn)}</td><td class="font-medium">${escape_html(p.student_name)}</td><td>${escape_html(p.class_name || "-")}</td><td>`);
         ConfirmForm($$renderer2, {
           action: "?/removeParticipant",
@@ -178,6 +164,20 @@ function _page($$renderer, $$props) {
         $$renderer2.push(`<!----></td></tr>`);
       }
       $$renderer2.push(`<!--]--></tbody></table></div>`);
+    }
+    $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden mb-6"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><h2 class="text-lg font-bold text-slate-800">Daftar Soal</h2> <a${attr("href", `/admin/bank-soal/${stringify(exam.id)}`)} class="btn-sm btn-outline">Kelola Soal</a></div> `);
+    if (questions.length === 0) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<div class="p-8 text-center text-slate-400 text-sm">Belum ada soal untuk ujian ini.</div>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+      $$renderer2.push(`<div class="divide-y divide-slate-100"><!--[-->`);
+      const each_array_3 = ensure_array_like(questions);
+      for (let $$index_3 = 0, $$length = each_array_3.length; $$index_3 < $$length; $$index_3++) {
+        let q = each_array_3[$$index_3];
+        $$renderer2.push(`<div class="p-4 flex items-center gap-3"><span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold flex-shrink-0">${escape_html(q.question_number)}</span> <div class="flex-1 min-w-0"><p class="text-sm text-slate-700 truncate">${escape_html(q.question_text)}</p> <span class="text-[10px] badge-primary mt-0.5">${escape_html(QUESTION_TYPE_LABELS[q.type] || q.type)}</span></div> <span class="text-xs text-slate-400">${escape_html(q.points)} poin</span></div>`);
+      }
+      $$renderer2.push(`<!--]--></div>`);
     }
     $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden"><div class="p-5 border-b border-slate-100"><h2 class="text-lg font-bold text-slate-800">Riwayat Pengerjaan</h2></div> `);
     if (attempts.length === 0) {
