@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg"]),
 	mimeTypes: {".svg":"image/svg+xml"},
 	_: {
-		client: {start:"_app/immutable/entry/start.C7eIYQel.js",app:"_app/immutable/entry/app.DQeZx8fK.js",imports:["_app/immutable/entry/start.C7eIYQel.js","_app/immutable/chunks/DHIq--s4.js","_app/immutable/chunks/CWhSAF0N.js","_app/immutable/chunks/DEmwldwl.js","_app/immutable/chunks/ImmirkrM.js","_app/immutable/chunks/CxpPNxMP.js","_app/immutable/chunks/B6Zao61k.js","_app/immutable/entry/app.DQeZx8fK.js","_app/immutable/chunks/DEmwldwl.js","_app/immutable/chunks/ImmirkrM.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CWhSAF0N.js","_app/immutable/chunks/D0MExRDy.js","_app/immutable/chunks/DpA0yPAI.js","_app/immutable/chunks/CARY7BSv.js","_app/immutable/chunks/uSL-mgIf.js","_app/immutable/chunks/B6Zao61k.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
+		client: {start:"_app/immutable/entry/start.BZmtyHLO.js",app:"_app/immutable/entry/app.CVadcphk.js",imports:["_app/immutable/entry/start.BZmtyHLO.js","_app/immutable/chunks/Cg1VrEn1.js","_app/immutable/chunks/CWhSAF0N.js","_app/immutable/chunks/DEmwldwl.js","_app/immutable/chunks/ImmirkrM.js","_app/immutable/chunks/UVNolwQm.js","_app/immutable/chunks/B6Zao61k.js","_app/immutable/entry/app.CVadcphk.js","_app/immutable/chunks/DEmwldwl.js","_app/immutable/chunks/ImmirkrM.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CWhSAF0N.js","_app/immutable/chunks/D0MExRDy.js","_app/immutable/chunks/DpA0yPAI.js","_app/immutable/chunks/CARY7BSv.js","_app/immutable/chunks/uSL-mgIf.js","_app/immutable/chunks/B6Zao61k.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
 		nodes: [
 			__memo(() => import('./nodes/0.js')),
 			__memo(() => import('./nodes/1.js')),
@@ -212,6 +212,13 @@ return {
 				params: [],
 				page: null,
 				endpoint: __memo(() => import('./entries/endpoints/api/delete-media/_server.ts.js'))
+			},
+			{
+				id: "/api/exam-type-participants",
+				pattern: /^\/api\/exam-type-participants\/?$/,
+				params: [],
+				page: null,
+				endpoint: __memo(() => import('./entries/endpoints/api/exam-type-participants/_server.ts.js'))
 			},
 			{
 				id: "/api/exams/[id]/questions",

@@ -98,6 +98,9 @@
 	"/api/delete-media": [
 		"src/routes/api/delete-media/+server.ts"
 	],
+	"/api/exam-type-participants": [
+		"src/routes/api/exam-type-participants/+server.ts"
+	],
 	"/api/exams/[id]/questions": [
 		"src/routes/api/exams/[id]/questions/+server.ts"
 	],

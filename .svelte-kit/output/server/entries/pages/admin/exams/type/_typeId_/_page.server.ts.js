@@ -48,8 +48,20 @@ const actions = {
         return fail(400, { error: "Waktu selesai tidak boleh melebihi rentang waktu Tipe Ujian." });
       }
     }
-    await db.prepare(`INSERT INTO exams (school_id, exam_type_id, title, description, subject_id, duration_minutes, start_time, end_time, is_active, shuffle_questions, show_score_type, created_by)
+    const result = await db.prepare(`INSERT INTO exams (school_id, exam_type_id, title, description, subject_id, duration_minutes, start_time, end_time, is_active, shuffle_questions, show_score_type, created_by)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(locals.user.school_id, typeId, title, description, subjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, showScoreType, locals.user?.id).run();
+    const newExamId = result.meta?.last_row_id;
+    if (newExamId) {
+      const typeParticipants = await db.prepare(
+        "SELECT student_id FROM exam_type_participants WHERE exam_type_id = ?"
+      ).bind(typeId).all();
+      if (typeParticipants.results.length > 0) {
+        const insertBatch = typeParticipants.results.map(
+          (p) => db.prepare("INSERT OR IGNORE INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(newExamId, p.student_id)
+        );
+        await db.batch(insertBatch);
+      }
+    }
     return { success: "Ujian berhasil dibuat." };
   },
   update: async ({ request, platform, locals, params }) => {

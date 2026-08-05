@@ -5,15 +5,41 @@ import { getDB } from '$lib/server/db';
 
 export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) => {
 	const db = getDB(platform);
+
+	// Auto-migrate: create exam_type_participants table if not exists
+	try {
+		await db.prepare(`
+			CREATE TABLE IF NOT EXISTS exam_type_participants (
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				exam_type_id INTEGER NOT NULL REFERENCES exam_types(id) ON DELETE CASCADE,
+				student_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+				created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+				UNIQUE(exam_type_id, student_id)
+			)
+		`).run();
+	} catch {}
+
 	const examTypes = await db.prepare(`
 		SELECT et.*, 
-			(SELECT COUNT(*) FROM exams WHERE exam_type_id = et.id) as exam_count
+			(SELECT COUNT(*) FROM exams WHERE exam_type_id = et.id) as exam_count,
+			(SELECT COUNT(*) FROM exam_type_participants WHERE exam_type_id = et.id) as participant_count
 		FROM exam_types et
 		WHERE et.school_id = ?
 		ORDER BY et.created_at DESC
 	`).bind(locals.user!.school_id).all();
 
-	return { examTypes: examTypes.results };
+	const classes = await db.prepare('SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC')
+		.bind(locals.user!.school_id).all<{ id: number; name: string }>();
+
+	const students = await db.prepare(
+		'SELECT id, name, username, class_id FROM users WHERE school_id = ? AND role = "siswa" ORDER BY name ASC'
+	).bind(locals.user!.school_id).all<{ id: number; name: string; username: string; class_id: number | null }>();
+
+	return {
+		examTypes: examTypes.results,
+		classes: classes.results,
+		students: students.results
+	};
 };
 
 export const actions = {
@@ -67,7 +93,6 @@ export const actions = {
 
 			// Otomatis perbarui title semua ujian yang terhubung jika code berubah
 			if (oldType && oldType.code !== code) {
-				// Ambil semua ujian terkait beserta nama mata pelajarannya
 				const linkedExams = await db.prepare(`
 					SELECT e.id, s.name as subject_name
 					FROM exams e
@@ -75,7 +100,6 @@ export const actions = {
 					WHERE e.exam_type_id = ?
 				`).bind(id).all<{ id: number; subject_name: string | null }>();
 
-				// Update title setiap ujian dengan kode baru
 				if (linkedExams.results.length > 0) {
 					const updateBatch = linkedExams.results.map(exam =>
 						db.prepare(`UPDATE exams SET title = ?, updated_at = datetime('now') WHERE id = ?`)
@@ -103,7 +127,6 @@ export const actions = {
 		}
 	},
 
-
 	delete: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
 		const form = await request.formData();
@@ -124,17 +147,103 @@ export const actions = {
 		}
 	},
 
-	toggleActive: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+	// ── Peserta Default Tipe Ujian ──────────────────────────────────────────
+
+	addTypeParticipantClass: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+		const db = getDB(platform);
+		const form = await request.formData();
+		const examTypeId = form.get('exam_type_id')?.toString();
+		const classId = form.get('class_id')?.toString();
+
+		if (!examTypeId || !classId) return fail(400, { error: 'Data tidak lengkap.' });
+
+		// Verifikasi tipe ujian milik sekolah ini
+		const examType = await db.prepare('SELECT id FROM exam_types WHERE id = ? AND school_id = ?')
+			.bind(examTypeId, locals.user!.school_id).first();
+		if (!examType) return fail(404, { error: 'Tipe ujian tidak ditemukan.' });
+
+		const students = await db.prepare('SELECT id FROM users WHERE class_id = ? AND role = "siswa"')
+			.bind(classId).all<{ id: number }>();
+
+		let added = 0;
+		for (const student of students.results) {
+			try {
+				await db.prepare('INSERT INTO exam_type_participants (exam_type_id, student_id) VALUES (?, ?)')
+					.bind(examTypeId, student.id).run();
+				added++;
+			} catch {}
+		}
+
+		return { success: `Berhasil menambahkan ${added} siswa dari kelas sebagai peserta default.` };
+	},
+
+	addTypeParticipantStudent: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+		const db = getDB(platform);
+		const form = await request.formData();
+		const examTypeId = form.get('exam_type_id')?.toString();
+		const studentIds = form.getAll('student_ids').map(id => id.toString());
+
+		if (!examTypeId || studentIds.length === 0) return fail(400, { error: 'Data tidak lengkap.' });
+
+		const examType = await db.prepare('SELECT id FROM exam_types WHERE id = ? AND school_id = ?')
+			.bind(examTypeId, locals.user!.school_id).first();
+		if (!examType) return fail(404, { error: 'Tipe ujian tidak ditemukan.' });
+
+		let added = 0;
+		for (const studentId of studentIds) {
+			try {
+				await db.prepare('INSERT INTO exam_type_participants (exam_type_id, student_id) VALUES (?, ?)')
+					.bind(examTypeId, studentId).run();
+				added++;
+			} catch {}
+		}
+
+		return { success: `Berhasil menambahkan ${added} siswa sebagai peserta default.` };
+	},
+
+	removeTypeParticipant: async ({ request, platform }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
 		const form = await request.formData();
 		const id = form.get('id')?.toString();
 
 		if (!id) return fail(400, { error: 'ID tidak valid.' });
 
-		await db.prepare(`UPDATE exam_types SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END WHERE id = ? AND school_id = ?`)
-			.bind(id, locals.user!.school_id).run();
+		await db.prepare('DELETE FROM exam_type_participants WHERE id = ?').bind(id).run();
+		return { success: 'Peserta default berhasil dihapus.' };
+	},
 
-		return { success: 'Status tipe ujian berhasil diperbarui.' };
+	clearTypeParticipants: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+		const db = getDB(platform);
+		const form = await request.formData();
+		const examTypeId = form.get('exam_type_id')?.toString();
+
+		if (!examTypeId) return fail(400, { error: 'ID tidak valid.' });
+
+		const examType = await db.prepare('SELECT id FROM exam_types WHERE id = ? AND school_id = ?')
+			.bind(examTypeId, locals.user!.school_id).first();
+		if (!examType) return fail(404, { error: 'Tipe ujian tidak ditemukan.' });
+
+		await db.prepare('DELETE FROM exam_type_participants WHERE exam_type_id = ?').bind(examTypeId).run();
+		return { success: 'Semua peserta default berhasil dihapus.' };
+	},
+
+	getTypeParticipants: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+		const db = getDB(platform);
+		const form = await request.formData();
+		const examTypeId = form.get('exam_type_id')?.toString();
+
+		if (!examTypeId) return fail(400, { error: 'ID tidak valid.' });
+
+		const participants = await db.prepare(`
+			SELECT etp.id, u.name as student_name, u.username as nisn, c.name as class_name
+			FROM exam_type_participants etp
+			JOIN users u ON etp.student_id = u.id
+			LEFT JOIN classes c ON u.class_id = c.id
+			WHERE etp.exam_type_id = ?
+			ORDER BY c.name, u.name
+		`).bind(examTypeId).all();
+
+		return { participants: participants.results };
 	}
 };
 ;null as any as Actions;

@@ -207,3 +207,15 @@ CREATE TABLE IF NOT EXISTS uploaded_media (
     uploaded_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_uploaded_media_url ON uploaded_media(url);
+
+-- Tabel Peserta Default per Tipe Ujian
+CREATE TABLE IF NOT EXISTS exam_type_participants (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    exam_type_id INTEGER NOT NULL REFERENCES exam_types(id) ON DELETE CASCADE,
+    student_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(exam_type_id, student_id)
+);
+CREATE INDEX IF NOT EXISTS idx_exam_type_participants_type ON exam_type_participants(exam_type_id);
+CREATE INDEX IF NOT EXISTS idx_exam_type_participants_student ON exam_type_participants(student_id);
+

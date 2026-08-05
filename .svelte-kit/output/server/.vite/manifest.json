@@ -258,7 +258,7 @@
       "_stores.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.CfOCIil9.css"
+      "_app/immutable/assets/_layout.CQZh8mYH.css"
     ]
   },
   "src/routes/+page.server.ts": {
@@ -724,6 +724,15 @@
     "imports": [
       "_cloudinary.js",
       "_shared-server.js"
+    ]
+  },
+  "src/routes/api/exam-type-participants/+server.ts": {
+    "file": "entries/endpoints/api/exam-type-participants/_server.ts.js",
+    "name": "entries/endpoints/api/exam-type-participants/_server.ts",
+    "src": "src/routes/api/exam-type-participants/+server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
     ]
   },
   "src/routes/api/exams/[id]/questions/+server.ts": {

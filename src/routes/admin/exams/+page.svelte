@@ -3,15 +3,56 @@
 	import { ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
 
-	export let data;
-	export let form: { error?: string; success?: string } | null;
+	export let data: any;
+	export let form: { error?: string; success?: string; participants?: any[] } | null;
 
 	let showCreateModal = false;
 	let editingType: any = null;
 	let deleteConfirm: number | null = null;
 
+	// Peserta modal state
+	let participantsModal: any = null; // the exam type object
+	let participantsLoaded: any[] = [];
+	let participantsLoading = false;
+	let addMode: 'class' | 'student' | null = null;
+	let selectedStudentIds: Set<number> = new Set();
+	let classFilterModal = '';
+
 	$: if (form?.success) toasts.success(form.success);
 	$: if (form?.error) toasts.error(form.error);
+
+	async function openParticipantsModal(type: any) {
+		participantsModal = type;
+		addMode = null;
+		selectedStudentIds = new Set();
+		classFilterModal = '';
+		await loadParticipants(type.id);
+	}
+
+	async function loadParticipants(examTypeId: number) {
+		participantsLoading = true;
+		try {
+			const resp = await fetch(`/api/exam-type-participants?exam_type_id=${examTypeId}`);
+			if (resp.ok) {
+				const json = await resp.json();
+				participantsLoaded = json.participants || [];
+			}
+		} catch {}
+		participantsLoading = false;
+	}
+
+	function toggleStudentSelect(id: number) {
+		if (selectedStudentIds.has(id)) {
+			selectedStudentIds.delete(id);
+		} else {
+			selectedStudentIds.add(id);
+		}
+		selectedStudentIds = selectedStudentIds;
+	}
+
+	$: filteredModalStudents = classFilterModal
+		? data.students.filter((s: any) => String(s.class_id) === classFilterModal)
+		: data.students;
 </script>
 
 <svelte:head>
@@ -59,16 +100,32 @@
 							<span class="truncate font-medium">{type.end_time ? new Date(type.end_time.replace(' ', 'T') + (type.end_time.includes(' ') && !type.end_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : 'Belum diatur'}</span>
 						</div>
 					</div>
-					<div class="flex items-center gap-2 mt-1">
-						<svg class="w-3.5 h-3.5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.exam} />
-						</svg>
-						<span>{type.exam_count} Ujian terdaftar</span>
+					<div class="flex items-center gap-3 mt-1">
+						<div class="flex items-center gap-1.5">
+							<svg class="w-3.5 h-3.5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.exam} />
+							</svg>
+							<span>{type.exam_count} Ujian</span>
+						</div>
+						<div class="flex items-center gap-1.5">
+							<svg class="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+							</svg>
+							<span class="text-indigo-600 font-semibold">{type.participant_count} Peserta</span>
+						</div>
 					</div>
 				</div>
 
 				<div class="mt-auto flex items-center gap-2 pt-3 border-t border-slate-100">
 					<a href="/admin/exams/type/{type.id}" class="btn-sm btn-outline flex-1 text-center">Lihat Ujian</a>
+					
+					<!-- Tombol Peserta -->
+					<button class="btn-sm btn-ghost text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50" on:click={() => openParticipantsModal(type)} title="Kelola Peserta Default">
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+						</svg>
+					</button>
+
 					<button class="btn-sm btn-ghost" on:click={() => (editingType = { ...type })} title="Edit Tipe">
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.edit} />
@@ -92,6 +149,149 @@
 		{/each}
 	</div>
 </div>
+
+<!-- ── Participants Modal ─────────────────────────────────────────────── -->
+{#if participantsModal}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => { participantsModal = null; addMode = null; }}>
+		<div class="max-h-[90vh] overflow-y-auto card p-6 w-full max-w-2xl animate-bounce-in" on:click|stopPropagation>
+			<div class="flex items-center justify-between mb-5">
+				<div>
+					<h2 class="text-lg font-bold text-slate-800">Peserta Default — {participantsModal.name}</h2>
+					<p class="text-xs text-slate-500 mt-0.5">Peserta ini akan otomatis ditambahkan saat ujian baru dibuat di tipe ini.</p>
+				</div>
+				<button class="text-slate-400 hover:text-slate-600" on:click={() => { participantsModal = null; addMode = null; }}>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+				</button>
+			</div>
+
+			<!-- Pilih mode tambah -->
+			{#if addMode === null}
+				<div class="grid grid-cols-2 gap-3 mb-5">
+					<button class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-dashed border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50 transition-colors text-slate-600 hover:text-indigo-700"
+						on:click={() => { addMode = 'class'; classFilterModal = ''; }}>
+						<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+						</svg>
+						<span class="font-semibold text-sm">Tambah per Kelas</span>
+					</button>
+					<button class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-dashed border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50 transition-colors text-slate-600 hover:text-indigo-700"
+						on:click={() => { addMode = 'student'; selectedStudentIds = new Set(); classFilterModal = ''; }}>
+						<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+						</svg>
+						<span class="font-semibold text-sm">Tambah per Siswa</span>
+					</button>
+				</div>
+			{/if}
+
+			<!-- Form tambah per kelas -->
+			{#if addMode === 'class'}
+				<form method="POST" action="?/addTypeParticipantClass"
+					use:enhance={() => { return async ({ update }) => { addMode = null; await update(); await loadParticipants(participantsModal.id); }; }}
+					class="bg-indigo-50 rounded-xl p-4 mb-4 space-y-3 border border-indigo-100">
+					<input type="hidden" name="exam_type_id" value={participantsModal.id} />
+					<p class="text-sm font-semibold text-slate-700">Pilih Kelas</p>
+					<select name="class_id" required class="input w-full">
+						<option value="">-- Pilih kelas --</option>
+						{#each data.classes as cls}
+							<option value={cls.id}>{cls.name}</option>
+						{/each}
+					</select>
+					<div class="flex gap-2">
+						<button type="button" class="btn-ghost flex-1" on:click={() => (addMode = null)}>Batal</button>
+						<button type="submit" class="btn-primary flex-1">Tambahkan Kelas</button>
+					</div>
+				</form>
+			{/if}
+
+			<!-- Form tambah per siswa -->
+			{#if addMode === 'student'}
+				<form method="POST" action="?/addTypeParticipantStudent"
+					use:enhance={() => { return async ({ update }) => { addMode = null; selectedStudentIds = new Set(); await update(); await loadParticipants(participantsModal.id); }; }}
+					class="bg-indigo-50 rounded-xl p-4 mb-4 border border-indigo-100 space-y-3">
+					<input type="hidden" name="exam_type_id" value={participantsModal.id} />
+					<div class="flex items-center justify-between">
+						<p class="text-sm font-semibold text-slate-700">Pilih Siswa ({selectedStudentIds.size} dipilih)</p>
+						<select class="input py-1 text-xs" bind:value={classFilterModal}>
+							<option value="">Semua Kelas</option>
+							{#each data.classes as cls}
+								<option value={String(cls.id)}>{cls.name}</option>
+							{/each}
+						</select>
+					</div>
+					<div class="max-h-52 overflow-y-auto space-y-1 bg-white rounded-lg p-2 border border-indigo-100">
+						{#each filteredModalStudents as student}
+							{@const isSelected = selectedStudentIds.has(student.id)}
+							<label class="flex items-center gap-2 p-2 rounded-lg hover:bg-indigo-50 cursor-pointer transition-colors {isSelected ? 'bg-indigo-50' : ''}">
+								<input type="checkbox" name="student_ids" value={student.id}
+									checked={isSelected}
+									on:change={() => toggleStudentSelect(student.id)}
+									class="rounded border-slate-300 text-indigo-600" />
+								<span class="text-sm font-medium text-slate-700">{student.name}</span>
+								<span class="text-xs text-slate-400 ml-auto">{student.username}</span>
+							</label>
+						{/each}
+						{#if filteredModalStudents.length === 0}
+							<p class="text-xs text-slate-400 text-center py-4">Tidak ada siswa.</p>
+						{/if}
+					</div>
+					<div class="flex gap-2">
+						<button type="button" class="btn-ghost flex-1" on:click={() => (addMode = null)}>Batal</button>
+						<button type="submit" class="btn-primary flex-1" disabled={selectedStudentIds.size === 0}>
+							Tambah {selectedStudentIds.size} Siswa
+						</button>
+					</div>
+				</form>
+			{/if}
+
+			<!-- Daftar peserta saat ini -->
+			<div>
+				<div class="flex items-center justify-between mb-2">
+					<p class="text-sm font-semibold text-slate-700">Peserta Saat Ini ({participantsLoaded.length})</p>
+					{#if participantsLoaded.length > 0}
+						<form method="POST" action="?/clearTypeParticipants"
+							use:enhance={() => { return async ({ update }) => { await update(); await loadParticipants(participantsModal.id); }; }}>
+							<input type="hidden" name="exam_type_id" value={participantsModal.id} />
+							<button type="submit" class="text-xs text-rose-500 hover:text-rose-700 font-medium">
+								Hapus Semua
+							</button>
+						</form>
+					{/if}
+				</div>
+
+				{#if participantsLoading}
+					<div class="text-center py-6 text-slate-400 text-sm">Memuat...</div>
+				{:else if participantsLoaded.length === 0}
+					<div class="text-center py-6 text-slate-400 text-sm bg-slate-50 rounded-xl border border-slate-100">
+						Belum ada peserta default. Tambahkan peserta di atas.
+					</div>
+				{:else}
+					<div class="max-h-64 overflow-y-auto space-y-1 border border-slate-100 rounded-xl">
+						{#each participantsLoaded as p}
+							<div class="flex items-center justify-between px-3 py-2 hover:bg-slate-50 transition-colors">
+								<div>
+									<p class="text-sm font-medium text-slate-800">{p.student_name}</p>
+									<p class="text-xs text-slate-500">{p.class_name || 'Tanpa kelas'} · {p.nisn}</p>
+								</div>
+								<form method="POST" action="?/removeTypeParticipant"
+									use:enhance={() => { return async ({ update }) => { await update(); await loadParticipants(participantsModal.id); }; }}>
+									<input type="hidden" name="id" value={p.id} />
+									<button type="submit" class="text-rose-400 hover:text-rose-600 p-1" title="Hapus">
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+										</svg>
+									</button>
+								</form>
+							</div>
+						{/each}
+					</div>
+				{/if}
+			</div>
+		</div>
+	</div>
+{/if}
 
 <!-- Create Modal -->
 {#if showCreateModal}
@@ -132,8 +332,6 @@
 					</div>
 				</div>
 
-
-				
 				<div class="flex gap-3 pt-2">
 					<button type="button" class="btn-ghost flex-1" on:click={() => (showCreateModal = false)}>Batal</button>
 					<button type="submit" class="btn-primary flex-1">Buat Tipe Ujian</button>
@@ -182,8 +380,6 @@
 					</div>
 				</div>
 
-
-				
 				<div class="flex gap-3 pt-2">
 					<button type="button" class="btn-ghost flex-1" on:click={() => (editingType = null)}>Batal</button>
 					<button type="submit" class="btn-primary flex-1">Perbarui</button>
