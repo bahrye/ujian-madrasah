@@ -1,3 +1,5 @@
+@import 'katex/dist/katex.min.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,6 +7,11 @@
 @layer base {
 	* {
 		@apply border-slate-200;
+	}
+
+	/* Fix KaTeX border colors inheriting Tailwind's global border color */
+	.katex * {
+		border-color: currentColor;
 	}
 
 	body {
