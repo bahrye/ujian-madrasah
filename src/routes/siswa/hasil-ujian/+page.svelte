@@ -80,7 +80,9 @@
 	{:else}
 		<div class="grid grid-cols-1 gap-4">
 			{#each finishedAttempts as attempt}
-				<div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center gap-6 hover:shadow-md transition-shadow">
+				{@const manual_earned = ((attempt.score ?? 0)/100 * (attempt.total_points || 1)) - (attempt.objective_earned_points ?? 0)}
+				<div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+					<div class="flex flex-col md:flex-row md:items-center gap-6">
 					<div class="flex-1 space-y-3">
 						<div>
 							<div class="flex items-center gap-2 mb-1">
@@ -160,7 +162,66 @@
 								<ScoreDisplay {attempt} {currentTime} type="akhir" />
 							</div>
 						</div>
+						</div>
 					</div>
+
+					<div class="mt-5 pt-4 border-t border-slate-100">
+					<details class="group">
+						<summary class="flex justify-between items-center font-medium cursor-pointer list-none text-xs text-slate-500 hover:text-indigo-600 transition-colors">
+							<span>Lihat Rincian Perhitungan Nilai</span>
+							<span class="transition group-open:rotate-180">
+								<svg fill="none" height="16" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16"><path d="M6 9l6 6 6-6"></path></svg>
+							</span>
+						</summary>
+						<div class="text-xs text-slate-600 mt-3 bg-slate-50/70 rounded-xl p-4 space-y-3">
+							<p>Nilai ujian selalu dihitung dan ditampilkan dalam <strong>skala persentase (0-100)</strong>.</p>
+							
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+								<div class="bg-white p-3 rounded-lg border border-slate-200">
+									<p class="font-semibold text-slate-800 mb-1.5 border-b border-slate-100 pb-1.5">Poin Otomatis</p>
+									<ul class="space-y-1">
+										<li class="flex justify-between"><span>Poin Mentah Didapat:</span> <strong>{attempt.objective_earned_points ?? 0}</strong></li>
+										<li class="flex justify-between text-slate-400"><span>Poin Mentah Maks:</span> <strong>{attempt.objective_max_points ?? 0}</strong></li>
+										<li class="mt-2 pt-2 border-t border-slate-100 flex justify-between text-indigo-600 font-semibold">
+											<span>Kontribusi ke Nilai Akhir:</span>
+											<span>{(((attempt.objective_earned_points ?? 0) / (attempt.total_points || 1)) * 100).toFixed(1).replace(/\.0$/, '')}</span>
+										</li>
+									</ul>
+								</div>
+
+								<div class="bg-white p-3 rounded-lg border border-slate-200">
+									<p class="font-semibold text-slate-800 mb-1.5 border-b border-slate-100 pb-1.5">Poin Manual (Essay/Isian)</p>
+									<ul class="space-y-1">
+										{#if attempt.show_score_type === 'objective_only'}
+											<li class="text-center text-slate-400 italic py-2">Disembunyikan</li>
+										{:else}
+											<li class="flex justify-between"><span>Poin Mentah Didapat:</span> <strong>{manual_earned.toFixed(1).replace(/\.0$/, '')}</strong></li>
+											<li class="flex justify-between text-slate-400"><span>Poin Mentah Maks:</span> <strong>{(attempt.total_points || 1) - (attempt.objective_max_points ?? 0)}</strong></li>
+											<li class="mt-2 pt-2 border-t border-slate-100 flex justify-between text-indigo-600 font-semibold">
+												<span>Kontribusi ke Nilai Akhir:</span>
+												<span>{((manual_earned / (attempt.total_points || 1)) * 100).toFixed(1).replace(/\.0$/, '')}</span>
+											</li>
+										{/if}
+									</ul>
+								</div>
+							</div>
+
+							<div class="bg-indigo-50/50 border border-indigo-100 p-3 rounded-lg text-indigo-800 flex justify-between items-center">
+								<div>
+									<p class="font-semibold text-sm">Rumus Total Nilai Akhir</p>
+									<p class="mt-0.5 text-indigo-600/80">(Total Poin Mentah Didapat &divide; Total Semua Poin Maksimal) &times; 100</p>
+								</div>
+								<div class="text-2xl font-black">
+									{#if attempt.show_score_type === 'objective_only'}
+										{(((attempt.objective_earned_points ?? 0) / (attempt.total_points || 1)) * 100).toFixed(1).replace(/\.0$/, '')}
+									{:else}
+										{attempt.score ?? 0}
+									{/if}
+								</div>
+							</div>
+						</div>
+					</details>
+				</div>
 				</div>
 			{/each}
 		</div>
