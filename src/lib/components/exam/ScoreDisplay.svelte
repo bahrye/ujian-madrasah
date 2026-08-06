@@ -34,9 +34,16 @@
 		return '';
 	})();
 
-	$: otomatis = attempt.objective_score ?? 0;
+	$: total_points = attempt.total_points || 1;
+	$: objective_max = attempt.objective_max_points || 0;
+	
+	$: objective_raw = ((attempt.objective_score ?? 0) / 100) * objective_max;
+	$: akhir_raw = ((attempt.score ?? 0) / 100) * total_points;
+	$: manual_raw = akhir_raw - objective_raw;
+
+	$: otomatis = (objective_raw / total_points) * 100;
 	$: akhir = attempt.score ?? 0;
-	$: manual = isObjectiveOnly ? null : (akhir - otomatis);
+	$: manual = isObjectiveOnly ? null : (manual_raw / total_points) * 100;
 
 	function formatScore(score: number | null) {
 		if (score == null) return '-';
