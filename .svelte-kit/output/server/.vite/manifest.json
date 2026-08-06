@@ -722,6 +722,15 @@
       "_app/immutable/assets/_page.DfiktKiO.css"
     ]
   },
+  "src/routes/api/attempt-status/[id]/+server.ts": {
+    "file": "entries/endpoints/api/attempt-status/_id_/_server.ts.js",
+    "name": "entries/endpoints/api/attempt-status/_id_/_server.ts",
+    "src": "src/routes/api/attempt-status/[id]/+server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
   "src/routes/api/delete-media/+server.ts": {
     "file": "entries/endpoints/api/delete-media/_server.ts.js",
     "name": "entries/endpoints/api/delete-media/_server.ts",

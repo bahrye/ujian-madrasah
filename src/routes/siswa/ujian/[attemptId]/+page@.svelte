@@ -21,6 +21,9 @@
 	let submitting = false;
 
 	// Anti-cheat state
+	let isPausedByProctor = false;
+	let statusPollingInterval: any;
+	
 	let warnings = 0;
 	let showWarningModal = false;
 	let showDisqualifiedModal = false;
@@ -83,6 +86,23 @@
 				triggerDisqualification();
 			}
 		}
+
+		statusPollingInterval = setInterval(async () => {
+			if (isUnloading || submitting || showSubmitConfirm) return;
+			try {
+				const res = await fetch(`/api/attempt-status/${attempt.id}`);
+				if (res.ok) {
+					const data = await res.json() as any;
+					isPausedByProctor = data.is_paused;
+					if (data.end_time && data.end_time !== attempt.end_time) {
+						attempt.end_time = data.end_time;
+					}
+					if (data.status !== 'mengerjakan' && data.status !== attempt.status) {
+						window.location.reload();
+					}
+				}
+			} catch (e) {}
+		}, 10000);
 	});
 
 	onDestroy(() => {
@@ -90,6 +110,7 @@
 			wakeLock.release();
 			wakeLock = null;
 		}
+		if (statusPollingInterval) clearInterval(statusPollingInterval);
 	});
 
 	beforeNavigate(({ cancel, willUnload }) => {
@@ -153,6 +174,7 @@
 	}
 
 	async function handleAutoSubmit() {
+		if (isPausedByProctor) return;
 		submitting = true;
 		await saveCurrentAnswer();
 		
@@ -251,6 +273,7 @@
 	}
 
 	async function saveCurrentAnswer() {
+		if (isPausedByProctor) return;
 		if (saveTimeout) clearTimeout(saveTimeout);
 		isSaving = true;
 		const form = new FormData();
@@ -273,6 +296,7 @@
 	}
 
 	async function handleTimeUp() {
+		if (isPausedByProctor) return;
 		toasts.warning('Waktu habis! Jawaban akan disubmit otomatis.');
 		handleAutoSubmit();
 	}
@@ -338,7 +362,7 @@
 						<span class="text-xs font-bold">{warnings}/{MAX_WARNINGS}</span>
 					</div>
 				{/if}
-				<Timer endTime={attempt.end_time} on:timeup={handleTimeUp} />
+				<Timer endTime={attempt.end_time} isPaused={isPausedByProctor} on:timeup={handleTimeUp} />
 			</div>
 		</div>
 		<!-- Progress Bar -->
@@ -512,6 +536,19 @@
 			<button class="btn-danger w-full" disabled={isDisqualifying} on:click={() => window.location.href = '/siswa'}>
 				{isDisqualifying ? 'Memproses Penghentian...' : 'Kembali ke Dashboard'}
 			</button>
+		</div>
+	</div>
+{/if}
+
+{#if isPausedByProctor}
+	<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/95 backdrop-blur-xl">
+		<div class="text-center text-white max-w-md animate-in fade-in zoom-in duration-300">
+			<svg class="w-20 h-20 mx-auto mb-6 text-amber-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+			</svg>
+			<h2 class="text-3xl font-bold mb-4">Ujian Ditahan</h2>
+			<p class="text-slate-300 text-lg">Waktu ujian Anda sedang dibekukan oleh Pengawas.</p>
+			<p class="text-slate-400 mt-4 text-sm">Silakan hubungi pengawas ujian jika ini adalah sebuah kesalahan. Anda tidak dapat melanjutkan ujian atau melihat soal hingga akses dibuka kembali.</p>
 		</div>
 	</div>
 {/if}

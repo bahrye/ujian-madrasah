@@ -2,6 +2,7 @@
 	import { onDestroy, onMount, createEventDispatcher } from 'svelte';
 
 	export let endTime: string; // ISO datetime string
+	export let isPaused: boolean = false;
 	export let showWarning: boolean = true;
 	export let warningThreshold: number = 300; // 5 menit dalam detik
 
@@ -27,6 +28,7 @@
 	}
 
 	function calculateRemaining() {
+		if (isPaused) return; // Bekukan timer saat ujian ditahan
 		const end = new Date(endTime).getTime();
 		const now = Date.now();
 		const diff = Math.max(0, Math.floor((end - now) / 1000));

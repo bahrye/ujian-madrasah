@@ -39,7 +39,9 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 				sa.total_points,
 				sa.status,
 				sa.violation_count,
-				sa.violation_logs
+				sa.violation_logs,
+				sa.is_paused,
+				sa.paused_at
 			FROM exam_participants epart
 			JOIN users u ON epart.student_id = u.id
 			JOIN exams e ON epart.exam_id = e.id
@@ -96,7 +98,9 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 			status,
 			answeredCount,
 			warnings,
-			warningLogs
+			warningLogs,
+			is_paused: a.is_paused,
+			paused_at: a.paused_at
 		};
 	}));
 
@@ -104,6 +108,45 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 };
 
 export const actions = {
+	togglePause: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
+		const db = getDB(platform);
+		const form = await request.formData();
+		const attemptId = form.get('attempt_id')?.toString();
+		const action = form.get('action')?.toString(); // 'pause' or 'resume'
+		
+		if (!attemptId || !action) return fail(400, { error: 'Data tidak valid.' });
+
+		// Verify attempt belongs to current user's school
+		const attemptData = await db.prepare(`
+			SELECT sa.id, sa.is_paused, sa.paused_at, sa.end_time FROM student_attempts sa
+			JOIN exams e ON sa.exam_id = e.id
+			WHERE sa.id = ? AND e.school_id = ?
+		`).bind(attemptId, locals.user.school_id).first() as any;
+
+		if (!attemptData) return fail(403, { error: 'Sesi ujian tidak ditemukan atau bukan milik sekolah Anda.' });
+
+		if (action === 'pause') {
+			await db.prepare(`UPDATE student_attempts SET is_paused = 1, paused_at = datetime('now') WHERE id = ?`).bind(attemptId).run();
+			return { success: 'Ujian berhasil ditahan.' };
+		} else if (action === 'resume') {
+			if (attemptData.paused_at && attemptData.end_time) {
+				// Calculate paused duration and add to end_time
+				await db.prepare(`
+					UPDATE student_attempts 
+					SET 
+						is_paused = 0, 
+						paused_at = NULL,
+						end_time = datetime(end_time, '+' || cast(round((julianday('now') - julianday(paused_at)) * 86400) as int) || ' seconds')
+					WHERE id = ?
+				`).bind(attemptId).run();
+			} else {
+				await db.prepare(`UPDATE student_attempts SET is_paused = 0, paused_at = NULL WHERE id = ?`).bind(attemptId).run();
+			}
+			return { success: 'Ujian berhasil dilanjutkan.' };
+		}
+		return fail(400, { error: 'Aksi tidak valid.' });
+	},
 	resetAttempt: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);

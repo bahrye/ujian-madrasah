@@ -127,6 +127,8 @@ CREATE TABLE IF NOT EXISTS student_attempts (
     status TEXT NOT NULL DEFAULT 'mengerjakan' CHECK(status IN ('mengerjakan', 'selesai', 'waktu_habis')),
     violation_count INTEGER DEFAULT 0,
     violation_logs TEXT,
+    is_paused INTEGER NOT NULL DEFAULT 0,
+    paused_at TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 

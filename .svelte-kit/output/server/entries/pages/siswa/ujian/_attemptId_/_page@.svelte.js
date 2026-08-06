@@ -14,6 +14,7 @@ function Timer($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let minutes, seconds, formattedTime;
     let endTime = $$props["endTime"];
+    let isPaused = fallback($$props["isPaused"], false);
     let showWarning = fallback($$props["showWarning"], true);
     let warningThreshold = fallback($$props["warningThreshold"], 300);
     let remainingSeconds = 0;
@@ -31,8 +32,9 @@ function Timer($$renderer, $$props) {
       isWarning = remainingSeconds <= warningThreshold && remainingSeconds > 60;
       isCritical = remainingSeconds > 0;
     }
-    $$renderer2.push(`<div${attr_class(`inline-flex items-center gap-2 px-4 py-2 rounded-xl font-mono text-lg font-bold transition-all duration-500 ${isCritical ? "bg-rose-100 text-rose-700 animate-pulse" : isWarning ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-700"}`)}><svg${attr_class(`w-5 h-5 ${isCritical ? "text-rose-500" : isWarning ? "text-amber-500" : "text-slate-500"}`)} fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <span>${escape_html(formattedTime)}</span></div>`);
-    bind_props($$props, { endTime, showWarning, warningThreshold });
+    $$renderer2.push(`<div${attr_class(`inline-flex items-center gap-2 px-4 py-2 rounded-xl font-mono text-lg font-bold transition-all duration-500 ${// Bekukan timer saat ujian ditahan
+    isCritical ? "bg-rose-100 text-rose-700 animate-pulse" : isWarning ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-700"}`)}><svg${attr_class(`w-5 h-5 ${isCritical ? "text-rose-500" : isWarning ? "text-amber-500" : "text-slate-500"}`)} fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <span>${escape_html(formattedTime)}</span></div>`);
+    bind_props($$props, { endTime, isPaused, showWarning, warningThreshold });
   });
 }
 function _page_($$renderer, $$props) {
@@ -40,6 +42,7 @@ function _page_($$renderer, $$props) {
     let attempt, questions, answerMap, currentQuestion, answeredCount, doubtedCount, unansweredCount;
     let data = $$props["data"];
     let currentIndex = 0;
+    let isPausedByProctor = false;
     onDestroy(() => {
     });
     let localAnswers = {};
@@ -90,7 +93,7 @@ function _page_($$renderer, $$props) {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]--> `);
-    Timer($$renderer2, { endTime: attempt.end_time });
+    Timer($$renderer2, { endTime: attempt.end_time, isPaused: isPausedByProctor });
     $$renderer2.push(`<!----></div></div> <div class="max-w-4xl mx-auto mt-2"><div class="h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-500"${attr_style(`width: ${stringify(answeredCount / questions.length * 100)}%`)}></div></div></div></header> <main class="flex-1 max-w-4xl mx-auto w-full px-4 py-6">`);
     if (currentQuestion) {
       $$renderer2.push("<!--[0-->");
@@ -122,6 +125,10 @@ function _page_($$renderer, $$props) {
       $$renderer2.push(`<button class="btn-success flex-1 justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.check)}></path></svg> Selesai &amp; Kumpulkan</button>`);
     }
     $$renderer2.push(`<!--]--></div></div></footer></div> `);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--> `);
     {
       $$renderer2.push("<!--[-1-->");
     }

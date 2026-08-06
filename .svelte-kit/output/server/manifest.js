@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg"]),
 	mimeTypes: {".svg":"image/svg+xml"},
 	_: {
-		client: {start:"_app/immutable/entry/start.BCJ8Ju90.js",app:"_app/immutable/entry/app.pY_CmoTm.js",imports:["_app/immutable/entry/start.BCJ8Ju90.js","_app/immutable/chunks/TnqyH5GP.js","_app/immutable/chunks/CWhSAF0N.js","_app/immutable/chunks/DEmwldwl.js","_app/immutable/chunks/ImmirkrM.js","_app/immutable/chunks/DWGyVREu.js","_app/immutable/chunks/B6Zao61k.js","_app/immutable/entry/app.pY_CmoTm.js","_app/immutable/chunks/DEmwldwl.js","_app/immutable/chunks/ImmirkrM.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CWhSAF0N.js","_app/immutable/chunks/D0MExRDy.js","_app/immutable/chunks/DpA0yPAI.js","_app/immutable/chunks/CARY7BSv.js","_app/immutable/chunks/uSL-mgIf.js","_app/immutable/chunks/B6Zao61k.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
+		client: {start:"_app/immutable/entry/start.Du91PTiF.js",app:"_app/immutable/entry/app.uPFcBJES.js",imports:["_app/immutable/entry/start.Du91PTiF.js","_app/immutable/chunks/BiNrbji4.js","_app/immutable/chunks/CWhSAF0N.js","_app/immutable/chunks/DEmwldwl.js","_app/immutable/chunks/ImmirkrM.js","_app/immutable/chunks/C5IwYa14.js","_app/immutable/chunks/B6Zao61k.js","_app/immutable/entry/app.uPFcBJES.js","_app/immutable/chunks/DEmwldwl.js","_app/immutable/chunks/ImmirkrM.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CWhSAF0N.js","_app/immutable/chunks/D0MExRDy.js","_app/immutable/chunks/DpA0yPAI.js","_app/immutable/chunks/CARY7BSv.js","_app/immutable/chunks/uSL-mgIf.js","_app/immutable/chunks/B6Zao61k.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
 		nodes: [
 			__memo(() => import('./nodes/0.js')),
 			__memo(() => import('./nodes/1.js')),
@@ -207,6 +207,13 @@ return {
 				params: [],
 				page: { layouts: [0,2,], errors: [1,,], leaf: 25 },
 				endpoint: null
+			},
+			{
+				id: "/api/attempt-status/[id]",
+				pattern: /^\/api\/attempt-status\/([^/]+?)\/?$/,
+				params: [{"name":"id","optional":false,"rest":false,"chained":false}],
+				page: null,
+				endpoint: __memo(() => import('./entries/endpoints/api/attempt-status/_id_/_server.ts.js'))
 			},
 			{
 				id: "/api/delete-media",
