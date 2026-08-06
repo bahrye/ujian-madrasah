@@ -1,8 +1,10 @@
-import { fail } from "@sveltejs/kit";
+import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
 const load = async ({ platform, url, locals }) => {
+  if (!locals.user) throw redirect(302, "/login");
   const db = getDB(platform);
-  const examFilter = url.searchParams.get("exam_id") || "";
+  const examFilterStr = url.searchParams.get("exam_id") || "";
+  const examFilter = parseInt(examFilterStr, 10);
   const exams = await db.prepare("SELECT id, title FROM exams WHERE school_id = ? ORDER BY title").bind(locals.user.school_id).all();
   let query = `
 		SELECT sa.*, u.name as student_name, e.title as exam_title, s.name as subject
@@ -13,7 +15,7 @@ const load = async ({ platform, url, locals }) => {
 		WHERE sa.status IN ('selesai', 'waktu_habis') AND e.school_id = ?
 	`;
   const params = [locals.user.school_id];
-  if (examFilter !== "") {
+  if (!isNaN(examFilter)) {
     query += " AND e.id = ?";
     params.push(examFilter);
   }
@@ -23,13 +25,11 @@ const load = async ({ platform, url, locals }) => {
 };
 const actions = {
   delete: async ({ request, platform, locals }) => {
+    if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
     const form = await request.formData();
-    const attemptId = form.get("attempt_id")?.toString();
-    if (!attemptId) {
-      return { success: false, error: "ID tidak valid" };
-    }
-    const parsedId = parseInt(attemptId, 10);
+    const attemptIdStr = form.get("attempt_id")?.toString();
+    const parsedId = parseInt(attemptIdStr || "", 10);
     if (isNaN(parsedId)) {
       return fail(400, { error: "ID tidak valid" });
     }

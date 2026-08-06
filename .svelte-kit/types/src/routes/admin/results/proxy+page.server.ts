@@ -1,13 +1,15 @@
 // @ts-nocheck
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { getDB } from '$lib/server/db';
 
 export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>[0]) => {
+	if (!locals.user) throw redirect(302, '/login');
 	const db = getDB(platform);
-	const examFilter = url.searchParams.get('exam_id') || '';
+	const examFilterStr = url.searchParams.get('exam_id') || '';
+	const examFilter = parseInt(examFilterStr, 10);
 
-	const exams = await db.prepare('SELECT id, title FROM exams WHERE school_id = ? ORDER BY title').bind(locals.user!.school_id).all();
+	const exams = await db.prepare('SELECT id, title FROM exams WHERE school_id = ? ORDER BY title').bind(locals.user.school_id).all();
 
 	let query = `
 		SELECT sa.*, u.name as student_name, e.title as exam_title, s.name as subject
@@ -17,9 +19,9 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		WHERE sa.status IN ('selesai', 'waktu_habis') AND e.school_id = ?
 	`;
-	const params: any[] = [locals.user!.school_id];
+	const params: any[] = [locals.user.school_id];
 
-	if (examFilter !== '') {
+	if (!isNaN(examFilter)) {
 		query += ' AND e.id = ?';
 		params.push(examFilter);
 	}
@@ -33,15 +35,12 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 
 export const actions = {
 	delete: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const form = await request.formData();
-		const attemptId = form.get('attempt_id')?.toString();
+		const attemptIdStr = form.get('attempt_id')?.toString();
+		const parsedId = parseInt(attemptIdStr || '', 10);
 
-		if (!attemptId) {
-			return { success: false, error: 'ID tidak valid' };
-		}
-
-		const parsedId = parseInt(attemptId, 10);
 		if (isNaN(parsedId)) {
 			return fail(400, { error: 'ID tidak valid' });
 		}

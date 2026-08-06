@@ -9,10 +9,12 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 
 
 
-	const examId = url.searchParams.get('exam_id');
-	if (!examId) throw redirect(302, '/siswa/jadwal');
+	const examIdStr = url.searchParams.get('exam_id');
+	const parsedExamId = parseInt(examIdStr || '', 10);
+	if (isNaN(parsedExamId)) throw redirect(302, '/siswa/jadwal');
 
-	const exam = await db.prepare(`
+	try {
+		const exam = await db.prepare(`
 		SELECT e.id, e.title, e.duration_minutes, e.start_time, e.end_time, s.name as subject,
 			COALESCE(
 				(
@@ -30,11 +32,15 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 		LEFT JOIN subjects s ON e.subject_id = s.id 
 		JOIN exam_types et ON e.exam_type_id = et.id
 		WHERE e.id = ? AND e.school_id = ? AND et.is_active = 1
-	`).bind(examId, locals.user!.school_id).first();
+	`).bind(parsedExamId, locals.user!.school_id).first();
 
-	if (!exam) throw redirect(302, '/siswa/jadwal');
+		if (!exam) throw redirect(302, '/siswa/jadwal');
 
-	return { exam };
+		return { exam };
+	} catch (e: any) {
+		console.error("Load Error in siswa ujian:", e);
+		throw redirect(302, '/siswa/jadwal');
+	}
 };
 
 export const actions = {
@@ -42,9 +48,12 @@ export const actions = {
 		const db = getDB(platform);
 		const form = await request.formData();
 		const tokenCode = form.get('token')?.toString().trim().toUpperCase();
-		const examId = form.get('exam_id')?.toString();
+		const examIdStr = form.get('exam_id')?.toString();
+		const parsedExamId = parseInt(examIdStr || '', 10);
 
-		if (!tokenCode || !examId) return fail(400, { error: 'Data tidak lengkap.' });
+		if (!tokenCode || isNaN(parsedExamId)) return fail(400, { error: 'Data tidak lengkap.' });
+
+		try {
 
 		const token = await db.prepare(`
 			SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
@@ -76,16 +85,23 @@ export const actions = {
 			return fail(400, { error: 'Anda sudah pernah mengerjakan ujian ini.' });
 		}
 
-		return { success: true, tokenCode, examId };
+		return { success: true, tokenCode, examId: parsedExamId };
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal memvalidasi token.' });
+		}
 	},
 
 	startExam: async ({ request, platform, locals, cookies }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
 		const form = await request.formData();
 		const tokenCode = form.get('token')?.toString().trim().toUpperCase();
-		const examId = form.get('exam_id')?.toString();
+		const examIdStr = form.get('exam_id')?.toString();
+		const parsedExamId = parseInt(examIdStr || '', 10);
 
-		if (!tokenCode || !examId) return fail(400, { error: 'Data tidak lengkap.' });
+		if (!tokenCode || isNaN(parsedExamId)) return fail(400, { error: 'Data tidak lengkap.' });
+
+		try {
 
 		const token = await db.prepare(`
 			SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
@@ -127,6 +143,11 @@ export const actions = {
 		const signedCookie = await signExamToken(attemptId, locals.user!.id);
 		cookies.set('exam_token_verified_' + attemptId, signedCookie, { path: '/', httpOnly: true, sameSite: 'lax' });
 		throw redirect(302, `/siswa/ujian/${attemptId}`);
+		} catch (e: any) {
+			if (e.status === 302) throw e;
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal memulai ujian.' });
+		}
 	}
 };
 ;null as any as Actions;

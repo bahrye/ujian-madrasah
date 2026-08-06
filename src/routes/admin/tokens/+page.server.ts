@@ -64,12 +64,13 @@ export const actions: Actions = {
 		const db = getDB(platform);
 		const form = await request.formData();
 
-		const examId = form.get('exam_id')?.toString();
+		const examIdStr = form.get('exam_id')?.toString();
 		const durationHours = parseInt(form.get('duration_hours')?.toString() || '2');
+		const parsedExamId = parseInt(examIdStr || '', 10);
 
-		if (!examId) return fail(400, { error: 'Pilih ujian terlebih dahulu.' });
+		if (isNaN(parsedExamId)) return fail(400, { error: 'Pilih ujian terlebih dahulu.' });
 
-		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(examId, locals.user.school_id).first() as any;
+		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(parsedExamId, locals.user.school_id).first() as any;
 		if (!exam) return fail(400, { error: 'Ujian tidak ditemukan.' });
 
 		const now = Date.now();
@@ -79,7 +80,7 @@ export const actions: Actions = {
 		const activeToken = await db.prepare(`
 			SELECT token_code FROM tokens 
 			WHERE exam_id = ? AND school_id = ? AND expires_at > ?
-		`).bind(examId, locals.user.school_id, nowIso).first() as { token_code: string } | null;
+		`).bind(parsedExamId, locals.user.school_id, nowIso).first() as { token_code: string } | null;
 
 		if (activeToken) {
 			return fail(400, { error: `Gagal: Masih ada token aktif untuk ujian ini (${activeToken.token_code}). Harap hapus token tersebut dahulu jika ingin membuat yang baru.` });
@@ -88,59 +89,77 @@ export const actions: Actions = {
 		const tokenCode = generateTokenCode(6);
 		const expiresAt = new Date(now + durationHours * 60 * 60 * 1000).toISOString();
 
-		// Hapus token lama yang kadaluwarsa dan tidak pernah digunakan oleh siswa
-		await db.prepare(`
-			DELETE FROM tokens 
-			WHERE exam_id = ? AND school_id = ? 
-			  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
-		`).bind(examId, locals.user.school_id, examId).run();
+		try {
+			// Hapus token lama yang kadaluwarsa dan tidak pernah digunakan oleh siswa
+			await db.prepare(`
+				DELETE FROM tokens 
+				WHERE exam_id = ? AND school_id = ? 
+				  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
+			`).bind(parsedExamId, locals.user.school_id, parsedExamId).run();
 
-		await db.prepare('INSERT INTO tokens (school_id, exam_id, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?)')
-			.bind(locals.user.school_id, examId, tokenCode, locals.user.id, expiresAt).run();
+			await db.prepare('INSERT INTO tokens (school_id, exam_id, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?)')
+				.bind(locals.user.school_id, parsedExamId, tokenCode, locals.user.id, expiresAt).run();
 
-		return { success: `Token berhasil dibuat: ${tokenCode}` };
+			return { success: `Token berhasil dibuat: ${tokenCode}` };
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal membuat token' });
+		}
 	},
 
 	release: async ({ request, platform, locals }) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const form = await request.formData();
-		const id = form.get('id')?.toString();
-		if (!id) return fail(400, { error: 'ID tidak valid.' });
+		const idStr = form.get('id')?.toString();
+		const parsedId = parseInt(idStr || '', 10);
+		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid.' });
 
-		await db.prepare('UPDATE tokens SET is_released = 1, released_at = datetime("now") WHERE id = ? AND school_id = ?').bind(id, locals.user.school_id).run();
-		return { success: 'Token berhasil dirilis ke siswa. Token akan ditarik otomatis dalam 15 menit.' };
+		try {
+			await db.prepare('UPDATE tokens SET is_released = 1, released_at = datetime("now") WHERE id = ? AND school_id = ?').bind(parsedId, locals.user.school_id).run();
+			return { success: 'Token berhasil dirilis ke siswa. Token akan ditarik otomatis dalam 15 menit.' };
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal merilis token' });
+		}
 	},
 
 	revoke: async ({ request, platform, locals }) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const form = await request.formData();
-		const id = form.get('id')?.toString();
-		if (!id) return fail(400, { error: 'ID tidak valid.' });
+		const idStr = form.get('id')?.toString();
+		const parsedId = parseInt(idStr || '', 10);
+		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid.' });
 
-		await db.prepare('UPDATE tokens SET is_released = 0 WHERE id = ? AND school_id = ?').bind(id, locals.user.school_id).run();
-		return { success: 'Token berhasil ditarik.' };
+		try {
+			await db.prepare('UPDATE tokens SET is_released = 0 WHERE id = ? AND school_id = ?').bind(parsedId, locals.user.school_id).run();
+			return { success: 'Token berhasil ditarik.' };
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal menarik token' });
+		}
 	},
 
 	delete: async ({ request, platform, locals }) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const form = await request.formData();
-		const id = form.get('id')?.toString();
-		if (!id) return fail(400, { error: 'ID tidak valid.' });
+		const idStr = form.get('id')?.toString();
+		const parsedId = parseInt(idStr || '', 10);
+		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid.' });
 
 		try {
-			const usage = await db.prepare('SELECT COUNT(*) as count FROM student_attempts WHERE token_id = ?').bind(id).first() as {count: number};
+			const usage = await db.prepare('SELECT COUNT(*) as count FROM student_attempts WHERE token_id = ?').bind(parsedId).first() as {count: number};
 			if (usage && usage.count > 0) {
 				return fail(400, { error: 'Gagal dihapus: Token ini telah digunakan oleh peserta ujian.' });
 			}
 			
-			await db.prepare('DELETE FROM tokens WHERE id = ? AND school_id = ?').bind(id, locals.user.school_id).run();
+			await db.prepare('DELETE FROM tokens WHERE id = ? AND school_id = ?').bind(parsedId, locals.user.school_id).run();
 			return { success: 'Token berhasil dihapus.' };
 		} catch (err: any) {
 			console.error('Delete token error:', err);
-			return fail(500, { error: 'Terjadi kesalahan sistem saat menghapus token.' });
+			return fail(500, { error: err.message || 'Terjadi kesalahan sistem saat menghapus token.' });
 		}
 	}
 };

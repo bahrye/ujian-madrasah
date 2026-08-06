@@ -7,11 +7,15 @@ import { env } from '$env/dynamic/private';
 
 export const load = async ({ platform, params, locals }: Parameters<PageServerLoad>[0]) => {
 	const db = getDB(platform);
-	const exam = await db.prepare('SELECT * FROM exams WHERE id = ? AND school_id = ?').bind(params.examId, locals.user!.school_id).first();
+	const examIdStr = params.examId;
+	const parsedExamId = parseInt(examIdStr, 10);
+	if (isNaN(parsedExamId)) throw error(400, 'ID Ujian tidak valid');
+
+	const exam = await db.prepare('SELECT * FROM exams WHERE id = ? AND school_id = ?').bind(parsedExamId, locals.user!.school_id).first();
 	if (!exam) throw error(404, 'Ujian tidak ditemukan');
 
 	const questions = await db.prepare('SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number')
-		.bind(params.examId).all();
+		.bind(parsedExamId).all();
 
 	return { exam, questions: questions.results };
 };
@@ -19,7 +23,11 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 export const actions = {
 	create: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
-		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(params.examId, locals.user!.school_id).first();
+		const examIdStr = params.examId;
+		const parsedExamId = parseInt(examIdStr, 10);
+		if (isNaN(parsedExamId)) return fail(400, { error: 'ID Ujian tidak valid' });
+
+		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(parsedExamId, locals.user!.school_id).first();
 		if (!exam) return fail(403, { error: 'Anda tidak memiliki akses ke ujian ini.' });
 		const form = await request.formData();
 
@@ -34,7 +42,7 @@ export const actions = {
 
 		// Get next question number
 		const last = await db.prepare('SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?')
-			.bind(params.examId).first<{ max_num: number | null }>();
+			.bind(parsedExamId).first<{ max_num: number | null }>();
 		const nextNum = (last?.max_num ?? 0) + 1;
 
 		// Build options and correct answer based on type
@@ -87,30 +95,40 @@ export const actions = {
 		}
 		// essay: no options or correct answer
 
-		await db.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points,
-			media_type, media_url, audio_max_plays, options_json, correct_answer_json)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-			.bind(params.examId, type, questionText, nextNum, points,
-				mediaType === 'none' ? null : mediaType, mediaUrl, audioMaxPlays, optionsJson, correctAnswerJson)
-			.run();
+		try {
+			await db.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points,
+				media_type, media_url, audio_max_plays, options_json, correct_answer_json)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+				.bind(parsedExamId, type, questionText, nextNum, points,
+					mediaType === 'none' ? null : mediaType, mediaUrl, audioMaxPlays, optionsJson, correctAnswerJson)
+				.run();
 
-		return { success: 'Soal berhasil ditambahkan.' };
+			return { success: 'Soal berhasil ditambahkan.' };
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal menambahkan soal' });
+		}
 	},
 
 	edit: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
-		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(params.examId, locals.user!.school_id).first();
+		const examIdStr = params.examId;
+		const parsedExamId = parseInt(examIdStr, 10);
+		if (isNaN(parsedExamId)) return fail(400, { error: 'ID Ujian tidak valid' });
+
+		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(parsedExamId, locals.user!.school_id).first();
 		if (!exam) return fail(403, { error: 'Anda tidak memiliki akses ke ujian ini.' });
 		const form = await request.formData();
 
-		const id = form.get('id')?.toString();
+		const idStr = form.get('id')?.toString();
+		const parsedId = parseInt(idStr || '', 10);
 		const type = form.get('type')?.toString();
 		const questionText = form.get('question_text')?.toString().trim();
 		const points = parseInt(form.get('points')?.toString() || '1');
 		const mediaType = form.get('media_type')?.toString() || null;
 		const mediaUrl = form.get('media_url')?.toString().trim() || null;
 
-		if (!id || !type || !questionText) return fail(400, { error: 'ID, tipe, dan teks soal wajib diisi.' });
+		if (isNaN(parsedId) || !type || !questionText) return fail(400, { error: 'ID, tipe, dan teks soal wajib diisi.' });
 
 		let optionsJson: string | null = null;
 		let correctAnswerJson: string | null = null;
@@ -156,7 +174,7 @@ export const actions = {
 			optionsJson = JSON.stringify({ left: leftItems, right: rightItems });
 			
 			// Get previous correct answer mapping if exists, else regenerate
-			const prevMap = await db.prepare('SELECT correct_answer_json FROM questions WHERE id = ?').bind(id).first<{correct_answer_json: string}>();
+			const prevMap = await db.prepare('SELECT correct_answer_json FROM questions WHERE id = ?').bind(parsedId).first<{correct_answer_json: string}>();
 			if (prevMap && prevMap.correct_answer_json) {
 				correctAnswerJson = prevMap.correct_answer_json; // keeping existing mapping simpler for now
 			} else {
@@ -166,43 +184,62 @@ export const actions = {
 			}
 		}
 
-		// Delete old media from Cloudinary if it changed
-		const prevMedia = await db.prepare('SELECT media_url FROM questions WHERE id = ?').bind(id).first<{media_url: string}>();
-		if (prevMedia && prevMedia.media_url && prevMedia.media_url !== mediaUrl && prevMedia.media_url.includes('res.cloudinary.com')) {
-			await deleteFromCloudinary(prevMedia.media_url, env);
+		try {
+			// Delete old media from Cloudinary if it changed
+			const prevMedia = await db.prepare('SELECT media_url FROM questions WHERE id = ?').bind(parsedId).first<{media_url: string}>();
+			if (prevMedia && prevMedia.media_url && prevMedia.media_url !== mediaUrl && prevMedia.media_url.includes('res.cloudinary.com')) {
+				await deleteFromCloudinary(prevMedia.media_url, env);
+			}
+
+			await db.prepare(`UPDATE questions SET 
+				question_text = ?, points = ?, media_type = ?, media_url = ?, 
+				options_json = ?, correct_answer_json = ? 
+				WHERE id = ?`)
+				.bind(questionText, points, mediaType === 'none' ? null : mediaType, mediaUrl, optionsJson, correctAnswerJson, parsedId)
+				.run();
+
+			return { success: 'Soal berhasil diubah.' };
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal mengubah soal' });
 		}
-
-		await db.prepare(`UPDATE questions SET 
-			question_text = ?, points = ?, media_type = ?, media_url = ?, 
-			options_json = ?, correct_answer_json = ? 
-			WHERE id = ?`)
-			.bind(questionText, points, mediaType === 'none' ? null : mediaType, mediaUrl, optionsJson, correctAnswerJson, id)
-			.run();
-
-		return { success: 'Soal berhasil diubah.' };
 	},
 
 	delete: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
-		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(params.examId, locals.user!.school_id).first();
+		const examIdStr = params.examId;
+		const parsedExamId = parseInt(examIdStr, 10);
+		if (isNaN(parsedExamId)) return fail(400, { error: 'ID Ujian tidak valid' });
+
+		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(parsedExamId, locals.user!.school_id).first();
 		if (!exam) return fail(403, { error: 'Anda tidak memiliki akses ke ujian ini.' });
 		const form = await request.formData();
-		const id = form.get('id')?.toString();
-		if (!id) return fail(400, { error: 'ID tidak valid.' });
+		const idStr = form.get('id')?.toString();
+		const parsedId = parseInt(idStr || '', 10);
+		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid.' });
 
-		// Delete media from Cloudinary if it exists
-		const q = await db.prepare('SELECT media_url FROM questions WHERE id = ?').bind(id).first<{media_url: string}>();
-		if (q && q.media_url && q.media_url.includes('res.cloudinary.com')) {
-					await deleteFromCloudinary(q.media_url, env);
+		try {
+			// Delete media from Cloudinary if it exists
+			const q = await db.prepare('SELECT media_url FROM questions WHERE id = ?').bind(parsedId).first<{media_url: string}>();
+			if (q && q.media_url && q.media_url.includes('res.cloudinary.com')) {
+						await deleteFromCloudinary(q.media_url, env);
+			}
+
+			await db.prepare('DELETE FROM questions WHERE id = ?').bind(parsedId).run();
+			return { success: 'Soal berhasil dihapus.' };
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal menghapus soal' });
 		}
-
-		await db.prepare('DELETE FROM questions WHERE id = ?').bind(id).run();
-		return { success: 'Soal berhasil dihapus.' };
 	},
 
 	importExcel: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
-		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(params.examId, locals.user!.school_id).first();
+		const examIdStr = params.examId;
+		const parsedExamId = parseInt(examIdStr, 10);
+		if (isNaN(parsedExamId)) return fail(400, { error: 'ID Ujian tidak valid' });
+
+		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(parsedExamId, locals.user!.school_id).first();
 		if (!exam) return fail(403, { error: 'Anda tidak memiliki akses ke ujian ini.' });
 
 		const form = await request.formData();
@@ -220,7 +257,7 @@ export const actions = {
 			return fail(400, { error: 'Tidak ada soal yang ditemukan.' });
 		}
 
-		const last = await db.prepare('SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?').bind(params.examId).first<{ max_num: number | null }>();
+		const last = await db.prepare('SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?').bind(parsedExamId).first<{ max_num: number | null }>();
 		let nextNum = (last?.max_num ?? 0) + 1;
 
 		const statements = [];
@@ -228,7 +265,7 @@ export const actions = {
 
 		for (const q of parsedQuestions) {
 			statements.push(
-				stmt.bind(params.examId, q.type, q.question_text, nextNum, q.points || 1, q.options_json || null, q.correct_answer_json || null)
+				stmt.bind(parsedExamId, q.type, q.question_text, nextNum, q.points || 1, q.options_json || null, q.correct_answer_json || null)
 			);
 			nextNum++;
 		}

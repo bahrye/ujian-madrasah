@@ -2,7 +2,9 @@ import { g as getDB } from "../../../../../chunks/db.js";
 import { fail, error } from "@sveltejs/kit";
 const load = async ({ platform, params, locals }) => {
   const db = getDB(platform);
-  const examId = params.id;
+  const examIdStr = params.id;
+  const examId = parseInt(examIdStr, 10);
+  if (isNaN(examId)) throw error(400, "ID Ujian tidak valid");
   const exam = await db.prepare("SELECT e.*, s.name as subject_name, et.code as exam_type_code, et.name as exam_type_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id LEFT JOIN exam_types et ON e.exam_type_id = et.id WHERE e.id = ? AND e.school_id = ?").bind(examId, locals.user.school_id).first();
   if (!exam) throw error(404, "Ujian tidak ditemukan");
   const questions = await db.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number").bind(examId).all();
@@ -55,13 +57,15 @@ const actions = {
   addParticipantClass: async ({ request, platform, params }) => {
     const db = getDB(platform);
     const form = await request.formData();
-    const classId = form.get("class_id")?.toString();
-    if (!classId) return fail(400, { error: "Pilih kelas terlebih dahulu" });
-    const students = await db.prepare('SELECT id FROM users WHERE class_id = ? AND role = "siswa"').bind(classId).all();
+    const classIdStr = form.get("class_id")?.toString();
+    const parsedClassId = parseInt(classIdStr || "", 10);
+    const parsedExamId = parseInt(params.id, 10);
+    if (isNaN(parsedClassId) || isNaN(parsedExamId)) return fail(400, { error: "Data tidak valid" });
+    const students = await db.prepare('SELECT id FROM users WHERE class_id = ? AND role = "siswa"').bind(parsedClassId).all();
     let added = 0;
     for (const student of students.results) {
       try {
-        await db.prepare("INSERT INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(params.id, student.id).run();
+        await db.prepare("INSERT INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(parsedExamId, student.id).run();
         added++;
       } catch (e) {
       }
@@ -71,12 +75,14 @@ const actions = {
   addParticipantStudent: async ({ request, platform, params }) => {
     const db = getDB(platform);
     const form = await request.formData();
-    const studentIds = form.getAll("student_ids").map((id) => id.toString());
-    if (studentIds.length === 0) return fail(400, { error: "Pilih minimal satu siswa" });
+    const studentIdsStr = form.getAll("student_ids").map((id) => id.toString());
+    const parsedStudentIds = studentIdsStr.map((id) => parseInt(id, 10)).filter((id) => !isNaN(id));
+    const parsedExamId = parseInt(params.id, 10);
+    if (parsedStudentIds.length === 0 || isNaN(parsedExamId)) return fail(400, { error: "Data tidak valid" });
     let added = 0;
-    for (const studentId of studentIds) {
+    for (const studentId of parsedStudentIds) {
       try {
-        await db.prepare("INSERT INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(params.id, studentId).run();
+        await db.prepare("INSERT INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(parsedExamId, studentId).run();
         added++;
       } catch (e) {
       }
@@ -86,20 +92,23 @@ const actions = {
   removeParticipant: async ({ request, platform, params }) => {
     const db = getDB(platform);
     const form = await request.formData();
-    const participantId = form.get("participant_id")?.toString();
-    if (!participantId) return fail(400, { error: "ID peserta tidak valid" });
-    await db.prepare("DELETE FROM exam_participants WHERE id = ?").bind(participantId).run();
+    const participantIdStr = form.get("participant_id")?.toString();
+    const parsedParticipantId = parseInt(participantIdStr || "", 10);
+    if (isNaN(parsedParticipantId)) return fail(400, { error: "ID peserta tidak valid" });
+    await db.prepare("DELETE FROM exam_participants WHERE id = ?").bind(parsedParticipantId).run();
     return { success: "Peserta berhasil dihapus dari ujian." };
   },
   addTeacher: async ({ request, platform, params }) => {
     const db = getDB(platform);
     const form = await request.formData();
-    const teacherIds = form.getAll("teacher_ids").map((id) => id.toString());
-    if (teacherIds.length === 0) return fail(400, { error: "Pilih minimal satu guru" });
+    const teacherIdsStr = form.getAll("teacher_ids").map((id) => id.toString());
+    const parsedTeacherIds = teacherIdsStr.map((id) => parseInt(id, 10)).filter((id) => !isNaN(id));
+    const parsedExamId = parseInt(params.id, 10);
+    if (parsedTeacherIds.length === 0 || isNaN(parsedExamId)) return fail(400, { error: "Data tidak valid" });
     let added = 0;
-    for (const teacherId of teacherIds) {
+    for (const teacherId of parsedTeacherIds) {
       try {
-        await db.prepare("INSERT INTO exam_teachers (exam_id, teacher_id) VALUES (?, ?)").bind(params.id, teacherId).run();
+        await db.prepare("INSERT INTO exam_teachers (exam_id, teacher_id) VALUES (?, ?)").bind(parsedExamId, teacherId).run();
         added++;
       } catch (e) {
       }
@@ -109,20 +118,23 @@ const actions = {
   removeTeacher: async ({ request, platform, params }) => {
     const db = getDB(platform);
     const form = await request.formData();
-    const examTeacherId = form.get("exam_teacher_id")?.toString();
-    if (!examTeacherId) return fail(400, { error: "ID pengajar tidak valid" });
-    await db.prepare("DELETE FROM exam_teachers WHERE id = ?").bind(examTeacherId).run();
+    const examTeacherIdStr = form.get("exam_teacher_id")?.toString();
+    const parsedExamTeacherId = parseInt(examTeacherIdStr || "", 10);
+    if (isNaN(parsedExamTeacherId)) return fail(400, { error: "ID pengajar tidak valid" });
+    await db.prepare("DELETE FROM exam_teachers WHERE id = ?").bind(parsedExamTeacherId).run();
     return { success: "Pengajar berhasil dihapus." };
   },
   addProctor: async ({ request, platform, params }) => {
     const db = getDB(platform);
     const form = await request.formData();
-    const proctorIds = form.getAll("proctor_ids").map((id) => id.toString());
-    if (proctorIds.length === 0) return fail(400, { error: "Pilih minimal satu pengawas" });
+    const proctorIdsStr = form.getAll("proctor_ids").map((id) => id.toString());
+    const parsedProctorIds = proctorIdsStr.map((id) => parseInt(id, 10)).filter((id) => !isNaN(id));
+    const parsedExamId = parseInt(params.id, 10);
+    if (parsedProctorIds.length === 0 || isNaN(parsedExamId)) return fail(400, { error: "Data tidak valid" });
     let added = 0;
-    for (const proctorId of proctorIds) {
+    for (const proctorId of parsedProctorIds) {
       try {
-        await db.prepare("INSERT INTO exam_proctors (exam_id, proctor_id) VALUES (?, ?)").bind(params.id, proctorId).run();
+        await db.prepare("INSERT INTO exam_proctors (exam_id, proctor_id) VALUES (?, ?)").bind(parsedExamId, proctorId).run();
         added++;
       } catch (e) {
       }
@@ -132,14 +144,17 @@ const actions = {
   removeProctor: async ({ request, platform, params }) => {
     const db = getDB(platform);
     const form = await request.formData();
-    const examProctorId = form.get("exam_proctor_id")?.toString();
-    if (!examProctorId) return fail(400, { error: "ID pengawas tidak valid" });
-    await db.prepare("DELETE FROM exam_proctors WHERE id = ?").bind(examProctorId).run();
+    const examProctorIdStr = form.get("exam_proctor_id")?.toString();
+    const parsedExamProctorId = parseInt(examProctorIdStr || "", 10);
+    if (isNaN(parsedExamProctorId)) return fail(400, { error: "ID pengawas tidak valid" });
+    await db.prepare("DELETE FROM exam_proctors WHERE id = ?").bind(parsedExamProctorId).run();
     return { success: "Pengawas berhasil dihapus." };
   },
   toggleScoreRelease: async ({ request, platform, params }) => {
     const db = getDB(platform);
-    await db.prepare(`UPDATE exams SET is_score_released = CASE WHEN is_score_released = 1 THEN 0 ELSE 1 END, updated_at = datetime('now') WHERE id = ?`).bind(params.id).run();
+    const parsedId = parseInt(params.id, 10);
+    if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid" });
+    await db.prepare(`UPDATE exams SET is_score_released = CASE WHEN is_score_released = 1 THEN 0 ELSE 1 END, updated_at = datetime('now') WHERE id = ?`).bind(parsedId).run();
     return { success: "Status rilis nilai berhasil diperbarui." };
   }
 };

@@ -139,11 +139,12 @@ export const actions = {
 
 		const db = getDB(platform);
 		const form = await request.formData();
-		const id = form.get('id')?.toString();
+		const idStr = form.get('id')?.toString();
+		const parsedId = parseInt(idStr || '', 10);
 
-		if (!id) return fail(400, { error: 'ID tidak valid.' });
+		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid.' });
 
-		if (id === locals.user.id.toString()) {
+		if (parsedId === locals.user.id) {
 			return fail(400, { error: 'Anda tidak dapat menghapus akun Anda sendiri yang sedang aktif.' });
 		}
 
@@ -154,7 +155,12 @@ export const actions = {
 		}
 
 		try {
-			await db.prepare('DELETE FROM users WHERE id = ? AND role = "superadmin"').bind(id).run();
+			await db.batch([
+				db.prepare('UPDATE exams SET created_by = NULL WHERE created_by = ?').bind(parsedId),
+				db.prepare('UPDATE tokens SET created_by = NULL WHERE created_by = ?').bind(parsedId),
+				db.prepare('UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?').bind(parsedId),
+				db.prepare('DELETE FROM users WHERE id = ? AND role = "superadmin"').bind(parsedId)
+			]);
 			return { success: 'Akun Superadmin berhasil dihapus.' };
 		} catch (err: any) {
 			console.error('Delete superadmin error:', err);

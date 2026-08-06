@@ -4,7 +4,9 @@ import { getDB } from '$lib/server/db';
 
 export const load: PageServerLoad = async ({ platform, params, locals }) => {
 	const db = getDB(platform);
-	const examId = params.examId;
+	const examIdStr = params.examId;
+	const parsedExamId = parseInt(examIdStr, 10);
+	if (isNaN(parsedExamId)) throw redirect(302, '/guru/remedial');
 
 	// Validasi kepemilikan ujian
 	const exam = await db.prepare(`
@@ -12,7 +14,7 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 		FROM exams e
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		WHERE e.id = ? AND e.school_id = ? AND e.created_by = ?
-	`).bind(examId, locals.user!.school_id, locals.user!.id).first();
+	`).bind(parsedExamId, locals.user!.school_id, locals.user!.id).first();
 
 	if (!exam) throw redirect(302, '/guru/remedial');
 
@@ -24,7 +26,7 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 		LEFT JOIN classes c ON u.class_id = c.id
 		WHERE ep.exam_id = ?
 		ORDER BY c.name, u.name
-	`).bind(examId).all();
+	`).bind(parsedExamId).all();
 
 	// Ambil semua siswa di sekolah (untuk dropdown tambah peserta)
 	const allStudents = await db.prepare(`
@@ -41,7 +43,7 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 		FROM tokens
 		WHERE exam_id = ? AND expires_at > datetime('now')
 		ORDER BY expires_at DESC LIMIT 1
-	`).bind(examId).first();
+	`).bind(parsedExamId).first();
 
 	// 3. Monitoring (Attempts)
 	const rawAttempts = await db.prepare(`
@@ -54,7 +56,7 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 		LEFT JOIN classes c ON u.class_id = c.id
 		WHERE sa.exam_id = ?
 		ORDER BY sa.created_at DESC
-	`).bind(examId, examId).all();
+	`).bind(parsedExamId, parsedExamId).all();
 
 	const kv = platform?.env?.EXAM_ANSWERS;
 	const attempts = await Promise.all(rawAttempts.results.map(async (a: any) => {
@@ -106,12 +108,16 @@ export const actions: Actions = {
 
 		if (!studentIds.length) return fail(400, { error: 'Pilih minimal satu siswa.' });
 
+		const examIdStr = params.examId;
+		const parsedExamId = parseInt(examIdStr, 10);
+		if (isNaN(parsedExamId)) return fail(400, { error: 'ID Ujian tidak valid.' });
+
 		// Validasi kepemilikan
-		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND created_by = ?').bind(params.examId, locals.user!.id).first();
+		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND created_by = ?').bind(parsedExamId, locals.user!.id).first();
 		if (!exam) return fail(403, { error: 'Akses ditolak.' });
 
 		const stmt = db.prepare('INSERT INTO exam_participants (exam_id, student_id) VALUES (?, ?)');
-		const batch = studentIds.map(id => stmt.bind(params.examId, id.toString()));
+		const batch = studentIds.map(id => stmt.bind(parsedExamId, id.toString()));
 
 		try {
 			await db.batch(batch);
@@ -127,30 +133,39 @@ export const actions: Actions = {
 	removeParticipant: async ({ request, platform, locals }) => {
 		const db = getDB(platform);
 		const form = await request.formData();
-		const participantId = form.get('participant_id')?.toString();
+		const participantIdStr = form.get('participant_id')?.toString();
+		const parsedParticipantId = parseInt(participantIdStr || '', 10);
 
-		if (!participantId) return fail(400, { error: 'ID tidak valid.' });
+		if (isNaN(parsedParticipantId)) return fail(400, { error: 'ID tidak valid.' });
 		
 		// Verifikasi kepemilikan ujian terkait participant ini
 		const isOwner = await db.prepare(`
 			SELECT 1 FROM exam_participants ep 
 			JOIN exams e ON ep.exam_id = e.id 
 			WHERE ep.id = ? AND e.created_by = ?
-		`).bind(participantId, locals.user!.id).first();
+		`).bind(parsedParticipantId, locals.user!.id).first();
 		
 		if (!isOwner) return fail(403, { error: 'Akses ditolak.' });
 
-		await db.prepare('DELETE FROM exam_participants WHERE id = ?').bind(participantId).run();
-		return { success: 'Peserta berhasil dihapus.' };
+		try {
+			await db.prepare('DELETE FROM exam_participants WHERE id = ?').bind(parsedParticipantId).run();
+			return { success: 'Peserta berhasil dihapus.' };
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal menghapus peserta.' });
+		}
 	},
 
 	// ===================== TOKENS =====================
 	generateToken: async ({ request, platform, params, locals }) => {
 		const db = getDB(platform);
 		await request.formData(); // Consume body to prevent Cloudflare Worker error
+		const examIdStr = params.examId;
+		const parsedExamId = parseInt(examIdStr, 10);
+		if (isNaN(parsedExamId)) return fail(400, { error: 'ID Ujian tidak valid.' });
 		
 		// Validasi kepemilikan
-		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND created_by = ?').bind(params.examId, locals.user!.id).first();
+		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND created_by = ?').bind(parsedExamId, locals.user!.id).first();
 		if (!exam) return fail(403, { error: 'Akses ditolak.' });
 
 		const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -163,61 +178,78 @@ export const actions: Actions = {
 		const expiresAt = new Date(now + 15 * 60 * 1000).toISOString();
 
 		// Hapus token lama yang tidak pernah digunakan oleh siswa (agar tidak menumpuk)
-		await db.prepare(`
-			DELETE FROM tokens 
-			WHERE exam_id = ? AND school_id = ? 
-			  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
-		`).bind(params.examId, locals.user!.school_id, params.examId).run();
+		try {
+			await db.prepare(`
+				DELETE FROM tokens 
+				WHERE exam_id = ? AND school_id = ? 
+				  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
+			`).bind(parsedExamId, locals.user!.school_id, parsedExamId).run();
 
-		await db.prepare(`
-			INSERT INTO tokens (school_id, exam_id, created_by, token_code, is_released, expires_at, released_at)
-			VALUES (?, ?, ?, ?, 1, ?, datetime('now'))
-		`).bind(locals.user!.school_id, params.examId, locals.user!.id, token, expiresAt).run();
+			await db.prepare(`
+				INSERT INTO tokens (school_id, exam_id, created_by, token_code, is_released, expires_at, released_at)
+				VALUES (?, ?, ?, ?, 1, ?, datetime('now'))
+			`).bind(locals.user!.school_id, parsedExamId, locals.user!.id, token, expiresAt).run();
 
-		return { success: 'Token berhasil dibuat.', token };
+			return { success: 'Token berhasil dibuat.', token };
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal membuat token' });
+		}
 	},
 
 	deleteToken: async ({ request, platform, locals }) => {
 		const db = getDB(platform);
 		const form = await request.formData();
-		const id = form.get('id')?.toString();
+		const idStr = form.get('id')?.toString();
+		const parsedId = parseInt(idStr || '', 10);
 
-		if (!id) return fail(400, { error: 'ID Token tidak valid.' });
+		if (isNaN(parsedId)) return fail(400, { error: 'ID Token tidak valid.' });
 		
 		const isOwner = await db.prepare(`
 			SELECT 1 FROM tokens t 
 			JOIN exams e ON t.exam_id = e.id 
 			WHERE t.id = ? AND e.created_by = ?
-		`).bind(id, locals.user!.id).first();
+		`).bind(parsedId, locals.user!.id).first();
 		
 		if (!isOwner) return fail(403, { error: 'Akses ditolak.' });
 
-		await db.prepare('DELETE FROM tokens WHERE id = ?').bind(id).run();
-		return { success: 'Token berhasil dicabut.' };
+		try {
+			await db.prepare('DELETE FROM tokens WHERE id = ?').bind(parsedId).run();
+			return { success: 'Token berhasil dicabut.' };
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal menghapus token.' });
+		}
 	},
 
 	// ===================== MONITORING =====================
 	forceSubmit: async ({ request, platform, locals }) => {
 		const db = getDB(platform);
 		const form = await request.formData();
-		const attemptId = form.get('attempt_id')?.toString();
+		const attemptIdStr = form.get('attempt_id')?.toString();
+		const parsedAttemptId = parseInt(attemptIdStr || '', 10);
 
-		if (!attemptId) return fail(400, { error: 'ID Attempt tidak valid.' });
+		if (isNaN(parsedAttemptId)) return fail(400, { error: 'ID Attempt tidak valid.' });
 		
 		const isOwner = await db.prepare(`
 			SELECT 1 FROM student_attempts sa 
 			JOIN exams e ON sa.exam_id = e.id 
 			WHERE sa.id = ? AND e.created_by = ?
-		`).bind(attemptId, locals.user!.id).first();
+		`).bind(parsedAttemptId, locals.user!.id).first();
 		
 		if (!isOwner) return fail(403, { error: 'Akses ditolak.' });
 
-		await db.prepare(`
-			UPDATE student_attempts 
-			SET status = 'waktu_habis', submit_time = datetime('now')
-			WHERE id = ? AND status = 'mengerjakan'
-		`).bind(attemptId).run();
+		try {
+			await db.prepare(`
+				UPDATE student_attempts 
+				SET status = 'waktu_habis', submit_time = datetime('now')
+				WHERE id = ? AND status = 'mengerjakan'
+			`).bind(parsedAttemptId).run();
 
-		return { success: 'Ujian siswa berhasil diakhiri secara paksa.' };
+			return { success: 'Ujian siswa berhasil diakhiri secara paksa.' };
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal mengakhiri ujian' });
+		}
 	}
 };

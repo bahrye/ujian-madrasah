@@ -47,7 +47,8 @@ export const actions: Actions = {
 		const db = getDB(platform);
 		const form = await request.formData();
 
-		const id = form.get('id')?.toString();
+		const idStr = form.get('id')?.toString();
+		const parsedId = parseInt(idStr || '', 10);
 		const title = form.get('title')?.toString().trim();
 		const description = form.get('description')?.toString().trim() || '';
 		const subjectId = form.get('subject_id')?.toString() || null;
@@ -58,37 +59,62 @@ export const actions: Actions = {
 		const shuffleQuestions = parseInt(form.get('shuffle_questions')?.toString() || '0');
 		const showScoreType = form.get('show_score_type')?.toString() || 'after_submit';
 
-		if (!id || !title) return fail(400, { error: 'Data tidak lengkap.' });
+		if (isNaN(parsedId) || !title) return fail(400, { error: 'Data tidak lengkap.' });
 
-		await db.prepare(`UPDATE exams SET title=?, description=?, subject_id=?, duration_minutes=?,
-			start_time=?, end_time=?, is_active=?, shuffle_questions=?, show_score_type=?, updated_at=datetime('now') WHERE id=? AND school_id=? AND created_by=?`)
-			.bind(title, description, subjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, showScoreType, id, locals.user!.school_id, locals.user!.id)
-			.run();
+		try {
+			await db.prepare(`UPDATE exams SET title=?, description=?, subject_id=?, duration_minutes=?,
+				start_time=?, end_time=?, is_active=?, shuffle_questions=?, show_score_type=?, updated_at=datetime('now') WHERE id=? AND school_id=? AND created_by=?`)
+				.bind(title, description, subjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, showScoreType, parsedId, locals.user!.school_id, locals.user!.id)
+				.run();
 
-		return { success: 'Ujian Remedial berhasil diperbarui.' };
+			return { success: 'Ujian Remedial berhasil diperbarui.' };
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal memperbarui ujian remedial.' });
+		}
 	},
 
 	delete: async ({ request, platform, locals }) => {
 		const db = getDB(platform);
 		const form = await request.formData();
-		const id = form.get('id')?.toString();
+		const idStr = form.get('id')?.toString();
+		const parsedId = parseInt(idStr || '', 10);
 
-		if (!id) return fail(400, { error: 'ID tidak valid.' });
+		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid.' });
 
-		await db.prepare('DELETE FROM exams WHERE id = ? AND school_id = ? AND created_by = ?').bind(id, locals.user!.school_id, locals.user!.id).run();
-		return { success: 'Ujian Remedial berhasil dihapus.' };
+		try {
+			// Manually cascade deletes to prevent constraint errors
+			await db.batch([
+				db.prepare('DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE exam_id = ?)').bind(parsedId),
+				db.prepare('DELETE FROM student_attempts WHERE exam_id = ?').bind(parsedId),
+				db.prepare('DELETE FROM exam_participants WHERE exam_id = ?').bind(parsedId),
+				db.prepare('DELETE FROM tokens WHERE exam_id = ?').bind(parsedId),
+				db.prepare('DELETE FROM questions WHERE exam_id = ?').bind(parsedId),
+				db.prepare('DELETE FROM exams WHERE id = ? AND school_id = ? AND created_by = ?').bind(parsedId, locals.user!.school_id, locals.user!.id)
+			]);
+			return { success: 'Ujian Remedial berhasil dihapus.' };
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal menghapus ujian remedial.' });
+		}
 	},
 
 	toggleActive: async ({ request, platform, locals }) => {
 		const db = getDB(platform);
 		const form = await request.formData();
-		const id = form.get('id')?.toString();
+		const idStr = form.get('id')?.toString();
+		const parsedId = parseInt(idStr || '', 10);
 
-		if (!id) return fail(400, { error: 'ID tidak valid.' });
+		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid.' });
 
-		await db.prepare(`UPDATE exams SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END, updated_at=datetime('now') WHERE id = ? AND school_id = ? AND created_by = ?`)
-			.bind(id, locals.user!.school_id, locals.user!.id).run();
+		try {
+			await db.prepare(`UPDATE exams SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END, updated_at=datetime('now') WHERE id = ? AND school_id = ? AND created_by = ?`)
+				.bind(parsedId, locals.user!.school_id, locals.user!.id).run();
 
-		return { success: 'Status ujian berhasil diperbarui.' };
+			return { success: 'Status ujian berhasil diperbarui.' };
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal memperbarui status.' });
+		}
 	}
 };

@@ -18,49 +18,72 @@ const actions = {
       await db.prepare("INSERT INTO schools (name, address) VALUES (?, ?)").bind(name, address).run();
       return { success: true };
     } catch (e) {
-      return fail(500, { error: "Gagal menambahkan sekolah", name, address });
+      console.error(e);
+      return fail(500, { error: e.message || "Gagal menambahkan sekolah", name, address });
     }
   },
   toggleStatus: async ({ request, platform }) => {
     const db = getDB(platform);
     const data = await request.formData();
-    const id = data.get("id")?.toString();
+    const idStr = data.get("id")?.toString();
     const currentStatus = data.get("is_active")?.toString();
-    if (!id || !currentStatus) return fail(400, { error: "Data tidak valid" });
+    const parsedId = parseInt(idStr || "", 10);
+    if (isNaN(parsedId) || !currentStatus) return fail(400, { error: "Data tidak valid" });
     const newStatus = currentStatus === "1" ? 0 : 1;
     try {
-      await db.prepare('UPDATE schools SET is_active = ?, updated_at = datetime("now") WHERE id = ?').bind(newStatus, id).run();
+      await db.prepare('UPDATE schools SET is_active = ?, updated_at = datetime("now") WHERE id = ?').bind(newStatus, parsedId).run();
       return { success: true };
     } catch (e) {
-      return fail(500, { error: "Gagal merubah status sekolah" });
+      console.error(e);
+      return fail(500, { error: e.message || "Gagal merubah status sekolah" });
     }
   },
   edit: async ({ request, platform }) => {
     const db = getDB(platform);
     const data = await request.formData();
-    const id = data.get("id")?.toString();
+    const idStr = data.get("id")?.toString();
     const name = data.get("name")?.toString().trim();
     const address = data.get("address")?.toString().trim() || null;
-    if (!id || !name) {
+    const parsedId = parseInt(idStr || "", 10);
+    if (isNaN(parsedId) || !name) {
       return fail(400, { error: "ID dan Nama sekolah wajib diisi", name, address });
     }
     try {
-      await db.prepare('UPDATE schools SET name = ?, address = ?, updated_at = datetime("now") WHERE id = ?').bind(name, address, id).run();
+      await db.prepare('UPDATE schools SET name = ?, address = ?, updated_at = datetime("now") WHERE id = ?').bind(name, address, parsedId).run();
       return { success: true };
     } catch (e) {
-      return fail(500, { error: "Gagal mengupdate sekolah", name, address });
+      console.error(e);
+      return fail(500, { error: e.message || "Gagal mengupdate sekolah", name, address });
     }
   },
   delete: async ({ request, platform }) => {
     const db = getDB(platform);
     const data = await request.formData();
-    const id = data.get("id")?.toString();
-    if (!id) return fail(400, { error: "ID tidak valid" });
+    const idStr = data.get("id")?.toString();
+    const parsedId = parseInt(idStr || "", 10);
+    if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid" });
     try {
-      await db.prepare("DELETE FROM schools WHERE id = ?").bind(id).run();
+      await db.batch([
+        db.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?))").bind(parsedId),
+        db.prepare("DELETE FROM student_attempts WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
+        db.prepare("DELETE FROM questions WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
+        db.prepare("DELETE FROM tokens WHERE school_id = ?").bind(parsedId),
+        db.prepare("DELETE FROM exam_participants WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
+        db.prepare("DELETE FROM exam_teachers WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
+        db.prepare("DELETE FROM exam_proctors WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
+        db.prepare("DELETE FROM exams WHERE school_id = ?").bind(parsedId),
+        db.prepare("DELETE FROM exam_type_participants WHERE exam_type_id IN (SELECT id FROM exam_types WHERE school_id = ?)").bind(parsedId),
+        db.prepare("DELETE FROM exam_types WHERE school_id = ?").bind(parsedId),
+        db.prepare("DELETE FROM users WHERE school_id = ?").bind(parsedId),
+        db.prepare("DELETE FROM subjects WHERE school_id = ?").bind(parsedId),
+        db.prepare("DELETE FROM classes WHERE school_id = ?").bind(parsedId),
+        db.prepare("DELETE FROM uploaded_media WHERE school_id = ?").bind(parsedId),
+        db.prepare("DELETE FROM schools WHERE id = ?").bind(parsedId)
+      ]);
       return { success: true };
     } catch (e) {
-      return fail(500, { error: "Gagal menghapus sekolah" });
+      console.error(e);
+      return fail(500, { error: e.message || "Gagal menghapus sekolah" });
     }
   }
 };

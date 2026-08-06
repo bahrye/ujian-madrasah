@@ -6,7 +6,10 @@ import { getDB } from '$lib/server/db';
 export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>[0]) => {
 	const db = getDB(platform);
 	const examParam = url.searchParams.get('exam_id');
-	const studentFilter = url.searchParams.get('student_id') || '';
+	const studentFilterStr = url.searchParams.get('student_id') || '';
+	const studentFilter = parseInt(studentFilterStr, 10);
+
+	try {
 
 	let answers: any[] = [];
 	let students: any[] = [];
@@ -20,7 +23,7 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 
 	if (examParam !== null) {
 		const isAllExams = examParam === 'all';
-		const examFilter = isAllExams ? '' : examParam;
+		const examFilter = isAllExams ? '' : parseInt(examParam, 10);
 		
 		let studentQuery = `SELECT DISTINCT u.id, u.name 
 			FROM student_attempts st 
@@ -55,11 +58,11 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 			AND (st.status IN ('selesai', 'waktu_habis') OR (e.end_time IS NOT NULL AND e.end_time <= datetime('now')))`;
 
 		const params: unknown[] = [locals.user!.school_id, locals.user!.id, locals.user!.id];
-		if (examFilter !== '') {
+		if (!isAllExams && !isNaN(examFilter as number)) {
 			query += ' AND e.id = ?';
 			params.push(examFilter);
 		}
-		if (studentFilter !== '') {
+		if (!isNaN(studentFilter)) {
 			query += ' AND u.id = ?';
 			params.push(studentFilter);
 		}
@@ -69,7 +72,11 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 		answers = answersResult.results;
 	}
 
-	return { answers, exams: exams.results, students, examParam, studentFilter, selectedExam };
+		return { answers, exams: exams.results, students, examParam, studentFilter: isNaN(studentFilter) ? '' : studentFilter, selectedExam };
+	} catch (e: any) {
+		console.error("Load Error in guru penilaian:", e);
+		return { answers: [], exams: [], students: [], examParam: '', studentFilter: '', selectedExam: null, loadError: e.message || String(e) };
+	}
 };
 
 export const actions = {
@@ -77,48 +84,60 @@ export const actions = {
 		const db = getDB(platform);
 		const form = await request.formData();
 
-		const answerId = form.get('answer_id')?.toString();
+		const answerIdStr = form.get('answer_id')?.toString();
+		const parsedAnswerId = parseInt(answerIdStr || '', 10);
 		const scoreStr = form.get('score_given')?.toString();
 		const maxPoints = parseInt(form.get('max_points')?.toString() || '1');
 
-		if (!answerId) return fail(400, { error: 'ID jawaban tidak valid.' });
+		if (isNaN(parsedAnswerId)) return fail(400, { error: 'ID jawaban tidak valid.' });
 		if (!scoreStr || scoreStr.trim() === '') return fail(400, { error: 'Nilai tidak boleh kosong.' });
 
-		const scoreGiven = parseFloat(scoreStr);
-		const isCorrect = scoreGiven >= maxPoints ? 1 : (scoreGiven > 0 ? 0 : 0);
+		try {
+			const scoreGiven = parseFloat(scoreStr);
+			const isCorrect = scoreGiven >= maxPoints ? 1 : (scoreGiven > 0 ? 0 : 0);
 
-		await db.prepare('UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?')
-			.bind(scoreGiven, isCorrect, answerId).run();
+			await db.prepare('UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?')
+				.bind(scoreGiven, isCorrect, parsedAnswerId).run();
 
-		// Recalculate total score for the attempt
-		const answer = await db.prepare('SELECT attempt_id FROM student_answers WHERE id = ?').bind(answerId).first<{ attempt_id: number }>();
-		if (answer) {
-			const totalResult = await db.prepare(`
-				SELECT SUM(COALESCE(sa.score_given, 0)) as total_score, SUM(q.points) as total_points
-				FROM student_answers sa JOIN questions q ON sa.question_id = q.id
-				WHERE sa.attempt_id = ?
-			`).bind(answer.attempt_id).first<{ total_score: number; total_points: number }>();
+			// Recalculate total score for the attempt
+			const answer = await db.prepare('SELECT attempt_id FROM student_answers WHERE id = ?').bind(parsedAnswerId).first<{ attempt_id: number }>();
+			if (answer) {
+				const totalResult = await db.prepare(`
+					SELECT SUM(COALESCE(sa.score_given, 0)) as total_score, SUM(q.points) as total_points
+					FROM student_answers sa JOIN questions q ON sa.question_id = q.id
+					WHERE sa.attempt_id = ?
+				`).bind(answer.attempt_id).first<{ total_score: number; total_points: number }>();
 
-			if (totalResult && totalResult.total_points > 0) {
-				const score = (totalResult.total_score / totalResult.total_points) * 100;
-				await db.prepare('UPDATE student_attempts SET score = ? WHERE id = ?')
-					.bind(Math.round(score * 10) / 10, answer.attempt_id).run();
+				if (totalResult && totalResult.total_points > 0) {
+					const score = (totalResult.total_score / totalResult.total_points) * 100;
+					await db.prepare('UPDATE student_attempts SET score = ? WHERE id = ?')
+						.bind(Math.round(score * 10) / 10, answer.attempt_id).run();
+				}
 			}
-		}
 
-		return { success: 'Nilai berhasil disimpan.' };
+			return { success: 'Nilai berhasil disimpan.' };
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal menyimpan nilai.' });
+		}
 	},
 
 	toggleScoreRelease: async ({ request, platform }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
 		const form = await request.formData();
-		const examId = form.get('exam_id')?.toString();
+		const examIdStr = form.get('exam_id')?.toString();
+		const parsedExamId = parseInt(examIdStr || '', 10);
 
-		if (!examId) return fail(400, { error: 'ID ujian tidak valid.' });
+		if (isNaN(parsedExamId)) return fail(400, { error: 'ID ujian tidak valid.' });
 
-		await db.prepare(`UPDATE exams SET is_score_released = CASE WHEN is_score_released = 1 THEN 0 ELSE 1 END, updated_at = datetime('now') WHERE id = ?`).bind(examId).run();
-		
-		return { success: 'Status rilis nilai berhasil diperbarui.' };
+		try {
+			await db.prepare(`UPDATE exams SET is_score_released = CASE WHEN is_score_released = 1 THEN 0 ELSE 1 END, updated_at = datetime('now') WHERE id = ?`).bind(parsedExamId).run();
+			
+			return { success: 'Status rilis nilai berhasil diperbarui.' };
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal memperbarui status rilis nilai.' });
+		}
 	}
 };
 ;null as any as Actions;

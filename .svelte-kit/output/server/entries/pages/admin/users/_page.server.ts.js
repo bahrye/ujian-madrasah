@@ -47,29 +47,40 @@ const actions = {
     if (existing) {
       return fail(400, { error: "Username sudah digunakan." });
     }
-    const passwordHash = await hashPassword(password);
-    await db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(schoolId, username, passwordHash, name, role).run();
-    return { success: "Pengguna berhasil ditambahkan." };
+    try {
+      const passwordHash = await hashPassword(password);
+      await db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(schoolId, username, passwordHash, name, role).run();
+      return { success: "Pengguna berhasil ditambahkan." };
+    } catch (e) {
+      console.error(e);
+      return fail(500, { error: e.message || "Gagal menambahkan pengguna." });
+    }
   },
   update: async ({ request, platform, locals, cookies }) => {
     const db = getDB(platform);
     const form = await request.formData();
     const schoolId = locals.user.school_id;
-    const id = form.get("id")?.toString();
+    const idStr = form.get("id")?.toString();
     const name = form.get("name")?.toString().trim();
     const role = form.get("role")?.toString();
     const password = form.get("password")?.toString();
     const isActive = form.get("is_active")?.toString();
-    if (!id || !name || !role) {
+    const parsedId = parseInt(idStr || "", 10);
+    if (isNaN(parsedId) || !name || !role) {
       return fail(400, { error: "Data tidak lengkap." });
     }
-    if (password) {
-      const passwordHash = await hashPassword(password);
-      await db.prepare("UPDATE users SET name = ?, role = ?, password_hash = ?, is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, role, passwordHash, isActive === "1" ? 1 : 0, id, schoolId).run();
-    } else {
-      await db.prepare("UPDATE users SET name = ?, role = ?, is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, role, isActive === "1" ? 1 : 0, id, schoolId).run();
+    try {
+      if (password) {
+        const passwordHash = await hashPassword(password);
+        await db.prepare("UPDATE users SET name = ?, role = ?, password_hash = ?, is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, role, passwordHash, isActive === "1" ? 1 : 0, parsedId, schoolId).run();
+      } else {
+        await db.prepare("UPDATE users SET name = ?, role = ?, is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, role, isActive === "1" ? 1 : 0, parsedId, schoolId).run();
+      }
+    } catch (e) {
+      console.error(e);
+      return fail(500, { error: e.message || "Gagal memperbarui pengguna." });
     }
-    if (id === locals.user.id.toString()) {
+    if (parsedId === locals.user.id) {
       const updatedUser = {
         ...locals.user,
         name,
@@ -91,10 +102,11 @@ const actions = {
     if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
     const form = await request.formData();
-    const id = form.get("id")?.toString();
+    const idStr = form.get("id")?.toString();
     const schoolId = locals.user.school_id;
-    if (!id) return fail(400, { error: "ID tidak valid." });
-    const userToDelete = await db.prepare("SELECT id, is_active, role FROM users WHERE id = ? AND school_id = ?").bind(id, schoolId).first();
+    const parsedId = parseInt(idStr || "", 10);
+    if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
+    const userToDelete = await db.prepare("SELECT id, is_active, role FROM users WHERE id = ? AND school_id = ?").bind(parsedId, schoolId).first();
     if (!userToDelete) {
       return fail(404, { error: "Pengguna tidak ditemukan." });
     }
@@ -106,15 +118,15 @@ const actions = {
     }
     try {
       await db.batch([
-        db.prepare("UPDATE exams SET created_by = NULL WHERE created_by = ?").bind(id),
-        db.prepare("UPDATE tokens SET created_by = NULL WHERE created_by = ?").bind(id),
-        db.prepare("UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?").bind(id),
-        db.prepare("DELETE FROM exam_teachers WHERE teacher_id = ?").bind(id),
-        db.prepare("DELETE FROM exam_proctors WHERE proctor_id = ?").bind(id),
-        db.prepare("DELETE FROM exam_participants WHERE student_id = ?").bind(id),
-        db.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)").bind(id),
-        db.prepare("DELETE FROM student_attempts WHERE student_id = ?").bind(id),
-        db.prepare("DELETE FROM users WHERE id = ? AND school_id = ?").bind(id, schoolId)
+        db.prepare("UPDATE exams SET created_by = NULL WHERE created_by = ?").bind(parsedId),
+        db.prepare("UPDATE tokens SET created_by = NULL WHERE created_by = ?").bind(parsedId),
+        db.prepare("UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?").bind(parsedId),
+        db.prepare("DELETE FROM exam_teachers WHERE teacher_id = ?").bind(parsedId),
+        db.prepare("DELETE FROM exam_proctors WHERE proctor_id = ?").bind(parsedId),
+        db.prepare("DELETE FROM exam_participants WHERE student_id = ?").bind(parsedId),
+        db.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)").bind(parsedId),
+        db.prepare("DELETE FROM student_attempts WHERE student_id = ?").bind(parsedId),
+        db.prepare("DELETE FROM users WHERE id = ? AND school_id = ?").bind(parsedId, schoolId)
       ]);
       return { success: "Pengguna nonaktif berhasil dihapus." };
     } catch (err) {
@@ -144,7 +156,7 @@ const actions = {
       return { success: `Berhasil mengimpor ${successCount} pengguna dari total ${users.length} data.` };
     } catch (e) {
       console.error("Import error:", e);
-      return fail(500, { error: "Terjadi kesalahan saat memproses data import" });
+      return fail(500, { error: e.message || "Terjadi kesalahan saat memproses data import" });
     }
   }
 };

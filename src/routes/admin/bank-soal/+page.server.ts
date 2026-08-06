@@ -17,18 +17,19 @@ export const actions: Actions = {
 	copyQuestions: async ({ request, locals, platform }) => {
 		const db = getDB(platform);
 		const data = await request.formData();
-		const targetExamId = data.get('target_exam_id')?.toString();
+		const targetExamIdStr = data.get('target_exam_id')?.toString();
 		const questionIdsStr = data.get('question_ids')?.toString();
+		const parsedTargetExamId = parseInt(targetExamIdStr || '', 10);
 		
-		if (!targetExamId || !questionIdsStr) return fail(400, { error: 'Data tidak lengkap' });
+		if (isNaN(parsedTargetExamId) || !questionIdsStr) return fail(400, { error: 'Data tidak lengkap' });
 		
 		const questionIds = questionIdsStr.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
 		if (questionIds.length === 0) return fail(400, { error: 'Tidak ada soal yang dipilih' });
 
-		const target = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(targetExamId, locals.user!.school_id).first();
+		const target = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(parsedTargetExamId, locals.user!.school_id).first();
 		if (!target) return fail(403, { error: 'Ujian tujuan tidak valid' });
 
-		const maxQ = await db.prepare('SELECT MAX(question_number) as m FROM questions WHERE exam_id = ?').bind(targetExamId).first();
+		const maxQ = await db.prepare('SELECT MAX(question_number) as m FROM questions WHERE exam_id = ?').bind(parsedTargetExamId).first();
 		let nextNumber = ((maxQ?.m as number) || 0) + 1;
 
 		const placeholders = questionIds.map(() => '?').join(',');
@@ -48,15 +49,16 @@ export const actions: Actions = {
 				INSERT INTO questions (exam_id, type, question_text, question_number, points, media_type, media_url, audio_max_plays, options_json, correct_answer_json)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			`).bind(
-				targetExamId, q.type, q.question_text, nextNumber++, q.points, q.media_type, q.media_url, q.audio_max_plays, q.options_json, q.correct_answer_json
+				parsedTargetExamId, q.type, q.question_text, nextNumber++, q.points, q.media_type, q.media_url, q.audio_max_plays, q.options_json, q.correct_answer_json
 			);
 		});
 
 		try {
 			await db.batch(stmts);
 			return { success: true };
-		} catch (e) {
-			return fail(500, { error: 'Gagal menyalin soal' });
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal menyalin soal' });
 		}
 	}
 };

@@ -6,8 +6,11 @@ import { verifyExamTokenSignature } from '$lib/server/auth';
 export const load: PageServerLoad = async ({ platform, locals, params, cookies }) => {
 	if (!locals.user) throw redirect(302, '/login');
 	const db = getDB(platform);
-	const attemptId = params.attemptId;
+	const attemptIdStr = params.attemptId;
+	const parsedAttemptId = parseInt(attemptIdStr, 10);
+	if (isNaN(parsedAttemptId)) throw error(400, 'ID Ujian tidak valid');
 
+	try {
 	// Ambil data attempt
 	const attempt = await db.prepare(`
 		SELECT sa.*, e.title as exam_title, s.name as subject, e.duration_minutes, e.shuffle_questions
@@ -15,7 +18,7 @@ export const load: PageServerLoad = async ({ platform, locals, params, cookies }
 		JOIN exams e ON sa.exam_id = e.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		WHERE sa.id = ? AND sa.student_id = ?
-	`).bind(attemptId, locals.user.id).first<any>();
+	`).bind(parsedAttemptId, locals.user.id).first<any>();
 
 	if (!attempt) throw error(404, 'Sesi ujian tidak ditemukan.');
 
@@ -23,8 +26,8 @@ export const load: PageServerLoad = async ({ platform, locals, params, cookies }
 		throw redirect(302, '/siswa');
 	}
 
-	const cookieVal = cookies.get('exam_token_verified_' + attemptId);
-	const isVerified = await verifyExamTokenSignature(cookieVal, attemptId, locals.user.id);
+	const cookieVal = cookies.get('exam_token_verified_' + parsedAttemptId);
+	const isVerified = await verifyExamTokenSignature(cookieVal, parsedAttemptId, locals.user.id);
 	if (!isVerified) {
 		throw redirect(302, `/siswa/ujian?exam_id=${attempt.exam_id}`);
 	}
@@ -58,7 +61,7 @@ export const load: PageServerLoad = async ({ platform, locals, params, cookies }
 	const answers = await db.prepare(`
 		SELECT sa.* FROM student_answers sa
 		WHERE sa.attempt_id = ?
-	`).bind(attemptId).all();
+	`).bind(parsedAttemptId).all();
 
 	// Map answers by question_id
 	const answerMap: Record<number, any> = {};
@@ -69,7 +72,7 @@ export const load: PageServerLoad = async ({ platform, locals, params, cookies }
 	const kv = platform?.env?.EXAM_ANSWERS;
 	let kvData: any = null;
 	if (kv) {
-		const stored = await kv.get(`attempt_${attemptId}_answers`);
+		const stored = await kv.get(`attempt_${parsedAttemptId}_answers`);
 		if (stored) {
 			try { kvData = JSON.parse(stored); } catch {}
 		}
@@ -94,6 +97,11 @@ export const load: PageServerLoad = async ({ platform, locals, params, cookies }
 		questions: questionsList,
 		answerMap
 	};
+	} catch (e: any) {
+		if (e.status === 302 || e.status === 404) throw e;
+		console.error("Load error in siswa ujian attempt:", e);
+		throw redirect(302, '/siswa');
+	}
 };
 
 export const actions: Actions = {
@@ -115,7 +123,11 @@ export const actions: Actions = {
 					warnings: warningsStr ? parseInt(warningsStr, 10) : 0,
 					warningLogs: warningLogsStr ? JSON.parse(warningLogsStr) : []
 				};
-				await kv.put(`attempt_${params.attemptId}_answers`, JSON.stringify(payload));
+				const attemptIdStr = params.attemptId;
+				const parsedAttemptId = parseInt(attemptIdStr, 10);
+				if (isNaN(parsedAttemptId)) return fail(400, { error: 'ID tidak valid' });
+
+				await kv.put(`attempt_${parsedAttemptId}_answers`, JSON.stringify(payload));
 			} catch (e) {
 				return fail(400, { error: 'Invalid JSON payload' });
 			}
@@ -127,11 +139,14 @@ export const actions: Actions = {
 	submit: async ({ platform, params, locals }) => {
 		if (!locals.user) return fail(401, { error: 'Sesi telah berakhir. Silakan login kembali.' });
 		const db = getDB(platform);
-		const attemptId = params.attemptId;
+		const attemptIdStr = params.attemptId;
+		const parsedAttemptId = parseInt(attemptIdStr, 10);
+		if (isNaN(parsedAttemptId)) return fail(400, { error: 'ID tidak valid' });
 
+		try {
 		// Ambil attempt
 		const attempt = await db.prepare('SELECT * FROM student_attempts WHERE id = ? AND student_id = ?')
-			.bind(attemptId, locals.user.id).first<any>();
+			.bind(parsedAttemptId, locals.user.id).first<any>();
 
 		if (!attempt || attempt.status !== 'mengerjakan') {
 			return fail(400, { error: 'Sesi ujian tidak valid.' });
@@ -144,7 +159,7 @@ export const actions: Actions = {
 
 		const kv = platform?.env?.EXAM_ANSWERS;
 		if (kv) {
-			const stored = await kv.get(`attempt_${attemptId}_answers`);
+			const stored = await kv.get(`attempt_${parsedAttemptId}_answers`);
 			if (stored) {
 				try {
 					const kvData = JSON.parse(stored);
@@ -152,14 +167,14 @@ export const actions: Actions = {
 					if (kvData && kvData.warningLogs) warningLogs = JSON.stringify(kvData.warningLogs);
 					if (kvData && kvData.answers) kvAnswers = kvData.answers;
 					if (kvData && kvData.doubts) kvDoubts = kvData.doubts;
-					await kv.delete(`attempt_${attemptId}_answers`);
+					await kv.delete(`attempt_${parsedAttemptId}_answers`);
 				} catch (e) {}
 			}
 		}
 
 		// Sync answers to student_answers database
 		const examQuestions = await db.prepare('SELECT id FROM questions WHERE exam_id = ?').bind(attempt.exam_id).all<{ id: number }>();
-		const existingAnswers = await db.prepare('SELECT question_id, id FROM student_answers WHERE attempt_id = ?').bind(attemptId).all<{ question_id: number; id: number }>();
+		const existingAnswers = await db.prepare('SELECT question_id, id FROM student_answers WHERE attempt_id = ?').bind(parsedAttemptId).all<{ question_id: number; id: number }>();
 		const existingMap = new Map<number, number>(existingAnswers.results.map(a => [a.question_id, a.id]));
 
 		const syncStmts = [];
@@ -171,13 +186,13 @@ export const actions: Actions = {
 				if (ansVal !== null) {
 					syncStmts.push(
 						db.prepare(`UPDATE student_answers SET answer_given = ?, is_doubted = ?, answered_at = datetime('now') WHERE attempt_id = ? AND question_id = ?`)
-							.bind(ansVal, isDoubted, attemptId, q.id)
+							.bind(ansVal, isDoubted, parsedAttemptId, q.id)
 					);
 				}
 			} else {
 				syncStmts.push(
 					db.prepare(`INSERT INTO student_answers (attempt_id, question_id, answer_given, is_doubted, answered_at) VALUES (?, ?, ?, ?, datetime('now'))`)
-						.bind(attemptId, q.id, ansVal, isDoubted)
+						.bind(parsedAttemptId, q.id, ansVal, isDoubted)
 				);
 			}
 		}
@@ -192,7 +207,7 @@ export const actions: Actions = {
 			FROM student_answers sa
 			JOIN questions q ON sa.question_id = q.id
 			WHERE sa.attempt_id = ?
-		`).bind(attemptId).all();
+		`).bind(parsedAttemptId).all();
 
 		let totalScore = 0;
 		let totalPoints = 0;
@@ -296,11 +311,16 @@ export const actions: Actions = {
 		updateStmts.push(
 			db.prepare(`UPDATE student_attempts SET status = 'selesai', submit_time = datetime('now'),
 				score = ?, objective_score = ?, total_points = ?, violation_count = ?, violation_logs = ? WHERE id = ?`)
-				.bind(finalScore, finalObjectiveScore, totalPoints, warnings, warningLogs, attemptId)
+				.bind(finalScore, finalObjectiveScore, totalPoints, warnings, warningLogs, parsedAttemptId)
 		);
 
 		await db.batch(updateStmts);
 
 		throw redirect(302, '/siswa');
+		} catch (e: any) {
+			if (e.status === 302) throw e;
+			console.error("Submit error:", e);
+			return fail(500, { error: e.message || 'Gagal mengirim ujian.' });
+		}
 	}
 };

@@ -112,28 +112,30 @@ export const actions = {
 				.run();
 			
 			return { success: true };
-		} catch (e) {
-			return fail(500, { error: 'Gagal menambahkan siswa' });
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal menambahkan siswa' });
 		}
 	},
 	edit: async ({ request, locals, platform }: import('./$types').RequestEvent) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const data = await request.formData();
-		const id = data.get('id')?.toString();
+		const idStr = data.get('id')?.toString();
 		const name = data.get('name')?.toString().trim();
 		const nisn = data.get('nisn')?.toString().trim();
 		const class_id = data.get('class_id')?.toString() || null;
 		const place_of_birth = data.get('place_of_birth')?.toString().trim() || null;
 		const date_of_birth = data.get('date_of_birth')?.toString() || null;
+		const parsedId = parseInt(idStr || '', 10);
 
-		if (!id || !name || !nisn) {
+		if (isNaN(parsedId) || !name || !nisn) {
 			return fail(400, { error: 'ID, Nama dan NISN wajib diisi' });
 		}
 
 		try {
 			// Cek username lain
-			const existing = await db.prepare('SELECT id FROM users WHERE username = ? AND id != ?').bind(nisn, id).first();
+			const existing = await db.prepare('SELECT id FROM users WHERE username = ? AND id != ?').bind(nisn, parsedId).first();
 			if (existing) {
 				return fail(400, { error: 'NISN sudah digunakan siswa lain' });
 			}
@@ -142,33 +144,35 @@ export const actions = {
 			const passwordHash = await hashPassword(nisn);
 			
 			await db.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, class_id = ?, place_of_birth = ?, date_of_birth = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?')
-				.bind(name, nisn, passwordHash, class_id, place_of_birth, date_of_birth, id, locals.user.school_id)
+				.bind(name, nisn, passwordHash, class_id, place_of_birth, date_of_birth, parsedId, locals.user.school_id)
 				.run();
 			
 			return { success: true };
-		} catch (e) {
-			return fail(500, { error: 'Gagal mengupdate siswa' });
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal mengupdate siswa' });
 		}
 	},
 	delete: async ({ request, locals, platform }: import('./$types').RequestEvent) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const data = await request.formData();
-		const id = data.get('id')?.toString();
+		const idStr = data.get('id')?.toString();
+		const parsedId = parseInt(idStr || '', 10);
 
-		if (!id) return fail(400, { error: 'ID tidak valid' });
+		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid' });
 
 		try {
 			await db.batch([
-				db.prepare('DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)').bind(id),
-				db.prepare('DELETE FROM student_attempts WHERE student_id = ?').bind(id),
-				db.prepare('DELETE FROM exam_participants WHERE student_id = ?').bind(id),
-				db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(id, locals.user.school_id)
+				db.prepare('DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)').bind(parsedId),
+				db.prepare('DELETE FROM student_attempts WHERE student_id = ?').bind(parsedId),
+				db.prepare('DELETE FROM exam_participants WHERE student_id = ?').bind(parsedId),
+				db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(parsedId, locals.user.school_id)
 			]);
 			return { success: true, message: 'Berhasil menghapus data siswa.' };
-		} catch (e) {
+		} catch (e: any) {
 			console.error('Delete student error:', e);
-			return fail(500, { error: 'Gagal menghapus siswa' });
+			return fail(500, { error: e.message || 'Gagal menghapus siswa' });
 		}
 	},
 	deleteBulk: async ({ request, locals, platform }: import('./$types').RequestEvent) => {
@@ -200,9 +204,9 @@ export const actions = {
 			}
 
 			return { success: true, message: `Berhasil menghapus ${ids.length} siswa terpilih.` };
-		} catch (e) {
+		} catch (e: any) {
 			console.error('Delete bulk students error:', e);
-			return fail(500, { error: 'Gagal menghapus siswa terpilih' });
+			return fail(500, { error: e.message || 'Gagal menghapus siswa terpilih' });
 		}
 	},
 	importExcel: async ({ request, locals, platform }: import('./$types').RequestEvent) => {
@@ -236,45 +240,48 @@ export const actions = {
 			}
 
 			return { success: true, message: `Berhasil mengimpor ${successCount} siswa dari total ${students.length} data.` };
-		} catch (e) {
+		} catch (e: any) {
 			console.error('Import error:', e);
-			return fail(500, { error: 'Terjadi kesalahan saat memproses data import' });
+			return fail(500, { error: e.message || 'Terjadi kesalahan saat memproses data import' });
 		}
 	},
 	toggleStatus: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const data = await request.formData();
-		const id = data.get('id')?.toString();
+		const idStr = data.get('id')?.toString();
 		const currentStatus = data.get('is_active')?.toString();
+		const parsedId = parseInt(idStr || '', 10);
 
-		if (!id || !currentStatus) return fail(400, { error: 'Data tidak valid' });
+		if (isNaN(parsedId) || !currentStatus) return fail(400, { error: 'Data tidak valid' });
 
 		const newStatus = currentStatus === '1' ? 0 : 1;
 
 		try {
 			await db.prepare('UPDATE users SET is_active = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ? AND role = "siswa"')
-				.bind(newStatus, id, locals.user.school_id)
+				.bind(newStatus, parsedId, locals.user.school_id)
 				.run();
 			
 			return { success: true };
-		} catch (e) {
-			return fail(500, { error: 'Gagal merubah status' });
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal merubah status' });
 		}
 	},
 	updatePhoto: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const data = await request.formData();
-		const id = data.get('id')?.toString();
+		const idStr = data.get('id')?.toString();
 		const photo = data.get('photo')?.toString() || null;
+		const parsedId = parseInt(idStr || '', 10);
 
-		if (!id) return fail(400, { error: 'ID tidak valid' });
+		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid' });
 
 		try {
 			// Cek apakah siswa sudah punya foto lama
 			const oldUser = await db.prepare('SELECT photo FROM users WHERE id = ? AND school_id = ? AND role = "siswa"')
-				.bind(id, locals.user.school_id)
+				.bind(parsedId, locals.user.school_id)
 				.first();
 
 			const oldPhoto = (oldUser as any)?.photo;
@@ -293,7 +300,7 @@ export const actions = {
 			}
 
 			await db.prepare('UPDATE users SET photo = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ? AND role = "siswa"')
-				.bind(photo, id, locals.user.school_id)
+				.bind(photo, parsedId, locals.user.school_id)
 				.run();
 			
 			// Jika ada foto baru dari cloudinary, masukkan ke uploaded_media agar terdata
@@ -312,9 +319,9 @@ export const actions = {
 			}
 			
 			return { success: true };
-		} catch (e) {
+		} catch (e: any) {
 			console.error('Update photo error:', e);
-			return fail(500, { error: 'Gagal merubah foto' });
+			return fail(500, { error: e.message || 'Gagal merubah foto' });
 		}
 	}
 };

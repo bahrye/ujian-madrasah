@@ -97,9 +97,10 @@ const actions = {
     }
     const db = getDB(platform);
     const form = await request.formData();
-    const id = form.get("id")?.toString();
-    if (!id) return fail(400, { error: "ID tidak valid." });
-    if (id === locals.user.id.toString()) {
+    const idStr = form.get("id")?.toString();
+    const parsedId = parseInt(idStr || "", 10);
+    if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
+    if (parsedId === locals.user.id) {
       return fail(400, { error: "Anda tidak dapat menghapus akun Anda sendiri yang sedang aktif." });
     }
     const countRes = await db.prepare('SELECT COUNT(*) as c FROM users WHERE role = "superadmin"').first();
@@ -107,7 +108,12 @@ const actions = {
       return fail(400, { error: "Tidak dapat menghapus. Harus tersisa minimal 1 akun Superadmin di sistem." });
     }
     try {
-      await db.prepare('DELETE FROM users WHERE id = ? AND role = "superadmin"').bind(id).run();
+      await db.batch([
+        db.prepare("UPDATE exams SET created_by = NULL WHERE created_by = ?").bind(parsedId),
+        db.prepare("UPDATE tokens SET created_by = NULL WHERE created_by = ?").bind(parsedId),
+        db.prepare("UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?").bind(parsedId),
+        db.prepare('DELETE FROM users WHERE id = ? AND role = "superadmin"').bind(parsedId)
+      ]);
       return { success: "Akun Superadmin berhasil dihapus." };
     } catch (err) {
       console.error("Delete superadmin error:", err);

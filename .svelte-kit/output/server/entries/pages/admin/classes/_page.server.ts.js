@@ -20,33 +20,41 @@ const actions = {
       await db.prepare("INSERT INTO classes (school_id, name, level) VALUES (?, ?, ?)").bind(locals.user.school_id, name, level).run();
       return { success: true };
     } catch (e) {
-      return fail(500, { error: "Gagal menambahkan kelas" });
+      console.error(e);
+      return fail(500, { error: e.message || "Gagal menambahkan kelas" });
     }
   },
   edit: async ({ request, locals, platform }) => {
     const db = getDB(platform);
     const data = await request.formData();
-    const id = data.get("id")?.toString();
+    const idStr = data.get("id")?.toString();
     const name = data.get("name")?.toString().trim();
     const level = data.get("level")?.toString().trim() || null;
-    if (!id || !name) return fail(400, { error: "ID dan Nama kelas wajib diisi" });
+    const parsedId = parseInt(idStr || "", 10);
+    if (isNaN(parsedId) || !name) return fail(400, { error: "ID dan Nama kelas wajib diisi" });
     try {
-      await db.prepare('UPDATE classes SET name = ?, level = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, level, id, locals.user.school_id).run();
+      await db.prepare('UPDATE classes SET name = ?, level = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, level, parsedId, locals.user.school_id).run();
       return { success: true };
     } catch (e) {
-      return fail(500, { error: "Gagal mengupdate kelas" });
+      console.error(e);
+      return fail(500, { error: e.message || "Gagal mengupdate kelas" });
     }
   },
   delete: async ({ request, locals, platform }) => {
     const db = getDB(platform);
     const data = await request.formData();
-    const id = data.get("id")?.toString();
-    if (!id) return fail(400, { error: "ID tidak valid" });
+    const idStr = data.get("id")?.toString();
+    const parsedId = parseInt(idStr || "", 10);
+    if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid" });
     try {
-      await db.prepare("DELETE FROM classes WHERE id = ? AND school_id = ?").bind(id, locals.user.school_id).run();
+      await db.batch([
+        db.prepare("UPDATE users SET class_id = NULL WHERE class_id = ? AND school_id = ?").bind(parsedId, locals.user.school_id),
+        db.prepare("DELETE FROM classes WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id)
+      ]);
       return { success: true };
     } catch (e) {
-      return fail(500, { error: "Gagal menghapus kelas" });
+      console.error(e);
+      return fail(500, { error: e.message || "Gagal menghapus kelas" });
     }
   }
 };

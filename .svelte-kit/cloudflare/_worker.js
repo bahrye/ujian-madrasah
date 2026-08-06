@@ -7938,7 +7938,7 @@ var init__ = __esm({
     index = 0;
     component = async () => component_cache ??= (await Promise.resolve().then(() => (init_layout_svelte(), layout_svelte_exports))).default;
     server_id = "src/routes/+layout.server.ts";
-    imports = ["_app/immutable/nodes/0.CbcwEgHH.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/D6nLZD03.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/Bvn7BXEI.js"];
+    imports = ["_app/immutable/nodes/0.DpnoUTtl.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/hQVTFjhf.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/BSCiMgoh.js"];
     stylesheets = ["_app/immutable/assets/0.DGkYayd9.css"];
     fonts = ["_app/immutable/assets/KaTeX_AMS-Regular.BQhdFMY1.woff2", "_app/immutable/assets/KaTeX_AMS-Regular.DMm9YOAa.woff", "_app/immutable/assets/KaTeX_AMS-Regular.DRggAlZN.ttf", "_app/immutable/assets/KaTeX_Caligraphic-Bold.Dq_IR9rO.woff2", "_app/immutable/assets/KaTeX_Caligraphic-Bold.BEiXGLvX.woff", "_app/immutable/assets/KaTeX_Caligraphic-Bold.ATXxdsX0.ttf", "_app/immutable/assets/KaTeX_Caligraphic-Regular.Di6jR-x-.woff2", "_app/immutable/assets/KaTeX_Caligraphic-Regular.CTRA-rTL.woff", "_app/immutable/assets/KaTeX_Caligraphic-Regular.wX97UBjC.ttf", "_app/immutable/assets/KaTeX_Fraktur-Bold.CL6g_b3V.woff2", "_app/immutable/assets/KaTeX_Fraktur-Bold.BsDP51OF.woff", "_app/immutable/assets/KaTeX_Fraktur-Bold.BdnERNNW.ttf", "_app/immutable/assets/KaTeX_Fraktur-Regular.CTYiF6lA.woff2", "_app/immutable/assets/KaTeX_Fraktur-Regular.Dxdc4cR9.woff", "_app/immutable/assets/KaTeX_Fraktur-Regular.CB_wures.ttf", "_app/immutable/assets/KaTeX_Main-Bold.Cx986IdX.woff2", "_app/immutable/assets/KaTeX_Main-Bold.Jm3AIy58.woff", "_app/immutable/assets/KaTeX_Main-Bold.waoOVXN0.ttf", "_app/immutable/assets/KaTeX_Main-BoldItalic.DxDJ3AOS.woff2", "_app/immutable/assets/KaTeX_Main-BoldItalic.SpSLRI95.woff", "_app/immutable/assets/KaTeX_Main-BoldItalic.DzxPMmG6.ttf", "_app/immutable/assets/KaTeX_Main-Italic.NWA7e6Wa.woff2", "_app/immutable/assets/KaTeX_Main-Italic.BMLOBm91.woff", "_app/immutable/assets/KaTeX_Main-Italic.3WenGoN9.ttf", "_app/immutable/assets/KaTeX_Main-Regular.B22Nviop.woff2", "_app/immutable/assets/KaTeX_Main-Regular.Dr94JaBh.woff", "_app/immutable/assets/KaTeX_Main-Regular.ypZvNtVU.ttf", "_app/immutable/assets/KaTeX_Math-BoldItalic.CZnvNsCZ.woff2", "_app/immutable/assets/KaTeX_Math-BoldItalic.iY-2wyZ7.woff", "_app/immutable/assets/KaTeX_Math-BoldItalic.B3XSjfu4.ttf", "_app/immutable/assets/KaTeX_Math-Italic.t53AETM-.woff2", "_app/immutable/assets/KaTeX_Math-Italic.DA0__PXp.woff", "_app/immutable/assets/KaTeX_Math-Italic.flOr_0UB.ttf", "_app/immutable/assets/KaTeX_SansSerif-Bold.D1sUS0GD.woff2", "_app/immutable/assets/KaTeX_SansSerif-Bold.DbIhKOiC.woff", "_app/immutable/assets/KaTeX_SansSerif-Bold.CFMepnvq.ttf", "_app/immutable/assets/KaTeX_SansSerif-Italic.C3H0VqGB.woff2", "_app/immutable/assets/KaTeX_SansSerif-Italic.DN2j7dab.woff", "_app/immutable/assets/KaTeX_SansSerif-Italic.YYjJ1zSn.ttf", "_app/immutable/assets/KaTeX_SansSerif-Regular.DDBCnlJ7.woff2", "_app/immutable/assets/KaTeX_SansSerif-Regular.CS6fqUqJ.woff", "_app/immutable/assets/KaTeX_SansSerif-Regular.BNo7hRIc.ttf", "_app/immutable/assets/KaTeX_Script-Regular.D3wIWfF6.woff2", "_app/immutable/assets/KaTeX_Script-Regular.D5yQViql.woff", "_app/immutable/assets/KaTeX_Script-Regular.C5JkGWo-.ttf", "_app/immutable/assets/KaTeX_Size1-Regular.mCD8mA8B.woff2", "_app/immutable/assets/KaTeX_Size1-Regular.C195tn64.woff", "_app/immutable/assets/KaTeX_Size1-Regular.Dbsnue_I.ttf", "_app/immutable/assets/KaTeX_Size2-Regular.Dy4dx90m.woff2", "_app/immutable/assets/KaTeX_Size2-Regular.oD1tc_U0.woff", "_app/immutable/assets/KaTeX_Size2-Regular.B7gKUWhC.ttf", "_app/immutable/assets/KaTeX_Size3-Regular.CTq5MqoE.woff", "_app/immutable/assets/KaTeX_Size3-Regular.DgpXs0kz.ttf", "_app/immutable/assets/KaTeX_Size4-Regular.Dl5lxZxV.woff2", "_app/immutable/assets/KaTeX_Size4-Regular.BF-4gkZK.woff", "_app/immutable/assets/KaTeX_Size4-Regular.DWFBv043.ttf", "_app/immutable/assets/KaTeX_Typewriter-Regular.CO6r4hn1.woff2", "_app/immutable/assets/KaTeX_Typewriter-Regular.C0xS9mPB.woff", "_app/immutable/assets/KaTeX_Typewriter-Regular.D3Ib7_Hf.ttf"];
   }
@@ -8011,7 +8011,7 @@ var init__2 = __esm({
   ".svelte-kit/output/server/nodes/1.js"() {
     index2 = 1;
     component2 = async () => component_cache2 ??= (await Promise.resolve().then(() => (init_error_svelte(), error_svelte_exports))).default;
-    imports2 = ["_app/immutable/nodes/1.D1GRlYm2.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/20K8sQQj.js"];
+    imports2 = ["_app/immutable/nodes/1.Ca_VxJQz.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CSa4iHQq.js"];
     stylesheets2 = [];
     fonts2 = [];
   }
@@ -8556,7 +8556,7 @@ var init__3 = __esm({
     index3 = 2;
     component3 = async () => component_cache3 ??= (await Promise.resolve().then(() => (init_layout_svelte2(), layout_svelte_exports2))).default;
     server_id2 = "src/routes/admin/+layout.server.ts";
-    imports3 = ["_app/immutable/nodes/2.FhGeeKMz.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/DREPtSFn.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/D6nLZD03.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/DHL7zaVF.js", "_app/immutable/chunks/BLrBSU9N.js"];
+    imports3 = ["_app/immutable/nodes/2.OXmOI0Kt.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/DaOI-HiA.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/hQVTFjhf.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/DHL7zaVF.js", "_app/immutable/chunks/BLrBSU9N.js"];
     stylesheets3 = [];
     fonts3 = [];
   }
@@ -8628,7 +8628,7 @@ var init__4 = __esm({
     index4 = 3;
     component4 = async () => component_cache4 ??= (await Promise.resolve().then(() => (init_layout_svelte3(), layout_svelte_exports3))).default;
     server_id3 = "src/routes/guru/+layout.server.ts";
-    imports4 = ["_app/immutable/nodes/3.Da7dTuDs.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/DREPtSFn.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/D6nLZD03.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/DHL7zaVF.js", "_app/immutable/chunks/BLrBSU9N.js"];
+    imports4 = ["_app/immutable/nodes/3.CPp57R4e.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/DaOI-HiA.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/hQVTFjhf.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/DHL7zaVF.js", "_app/immutable/chunks/BLrBSU9N.js"];
     stylesheets4 = [];
     fonts4 = [];
   }
@@ -8698,7 +8698,7 @@ var init__5 = __esm({
     index5 = 4;
     component5 = async () => component_cache5 ??= (await Promise.resolve().then(() => (init_layout_svelte4(), layout_svelte_exports4))).default;
     server_id4 = "src/routes/pengawas/+layout.server.ts";
-    imports5 = ["_app/immutable/nodes/4.D0Q_VUrP.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/DREPtSFn.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/D6nLZD03.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/DHL7zaVF.js", "_app/immutable/chunks/BLrBSU9N.js"];
+    imports5 = ["_app/immutable/nodes/4.DdCZptp7.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/DaOI-HiA.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/hQVTFjhf.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/DHL7zaVF.js", "_app/immutable/chunks/BLrBSU9N.js"];
     stylesheets5 = [];
     fonts5 = [];
   }
@@ -8768,7 +8768,7 @@ var init__6 = __esm({
     index6 = 5;
     component6 = async () => component_cache6 ??= (await Promise.resolve().then(() => (init_layout_svelte5(), layout_svelte_exports5))).default;
     server_id5 = "src/routes/siswa/+layout.server.ts";
-    imports6 = ["_app/immutable/nodes/5.B1nOs2uL.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/DREPtSFn.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/D6nLZD03.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/DHL7zaVF.js", "_app/immutable/chunks/BLrBSU9N.js"];
+    imports6 = ["_app/immutable/nodes/5.BbIXDYCq.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/DaOI-HiA.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/hQVTFjhf.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/DHL7zaVF.js", "_app/immutable/chunks/BLrBSU9N.js"];
     stylesheets6 = [];
     fonts6 = [];
   }
@@ -8844,7 +8844,7 @@ var init__7 = __esm({
     index7 = 6;
     component7 = async () => component_cache7 ??= (await Promise.resolve().then(() => (init_layout_svelte6(), layout_svelte_exports6))).default;
     server_id6 = "src/routes/superadmin/+layout.server.ts";
-    imports7 = ["_app/immutable/nodes/6.DHDk8CEl.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/DREPtSFn.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/D6nLZD03.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/DHL7zaVF.js", "_app/immutable/chunks/BLrBSU9N.js"];
+    imports7 = ["_app/immutable/nodes/6.CO-70OtX.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/DaOI-HiA.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/hQVTFjhf.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/DHL7zaVF.js", "_app/immutable/chunks/BLrBSU9N.js"];
     stylesheets7 = [];
     fonts7 = [];
   }
@@ -9153,14 +9153,15 @@ var init_page_server_ts3 = __esm({
       copyQuestions: async ({ request, locals, platform }) => {
         const db = getDB(platform);
         const data = await request.formData();
-        const targetExamId = data.get("target_exam_id")?.toString();
+        const targetExamIdStr = data.get("target_exam_id")?.toString();
         const questionIdsStr = data.get("question_ids")?.toString();
-        if (!targetExamId || !questionIdsStr) return fail(400, { error: "Data tidak lengkap" });
+        const parsedTargetExamId = parseInt(targetExamIdStr || "", 10);
+        if (isNaN(parsedTargetExamId) || !questionIdsStr) return fail(400, { error: "Data tidak lengkap" });
         const questionIds = questionIdsStr.split(",").map((id) => parseInt(id.trim())).filter((id) => !isNaN(id));
         if (questionIds.length === 0) return fail(400, { error: "Tidak ada soal yang dipilih" });
-        const target = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(targetExamId, locals.user.school_id).first();
+        const target = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedTargetExamId, locals.user.school_id).first();
         if (!target) return fail(403, { error: "Ujian tujuan tidak valid" });
-        const maxQ = await db.prepare("SELECT MAX(question_number) as m FROM questions WHERE exam_id = ?").bind(targetExamId).first();
+        const maxQ = await db.prepare("SELECT MAX(question_number) as m FROM questions WHERE exam_id = ?").bind(parsedTargetExamId).first();
         let nextNumber = (maxQ?.m || 0) + 1;
         const placeholders = questionIds.map(() => "?").join(",");
         const questionsToCopy = await db.prepare(`
@@ -9177,7 +9178,7 @@ var init_page_server_ts3 = __esm({
 				INSERT INTO questions (exam_id, type, question_text, question_number, points, media_type, media_url, audio_max_plays, options_json, correct_answer_json)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			`).bind(
-            targetExamId,
+            parsedTargetExamId,
             q.type,
             q.question_text,
             nextNumber++,
@@ -9193,7 +9194,8 @@ var init_page_server_ts3 = __esm({
           await db.batch(stmts);
           return { success: true };
         } catch (e3) {
-          return fail(500, { error: "Gagal menyalin soal" });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menyalin soal" });
         }
       }
     };
@@ -9278,7 +9280,7 @@ var init__10 = __esm({
     index10 = 9;
     component10 = async () => component_cache10 ??= (await Promise.resolve().then(() => (init_page_svelte3(), page_svelte_exports3))).default;
     server_id9 = "src/routes/admin/bank-soal/+page.server.ts";
-    imports10 = ["_app/immutable/nodes/9.BGK_g6ye.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js"];
+    imports10 = ["_app/immutable/nodes/9.BiOAMYDk.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js"];
     stylesheets10 = [];
     fonts10 = [];
   }
@@ -9352,15 +9354,21 @@ var init_page_server_ts4 = __esm({
     init_shared_server();
     load10 = async ({ platform, params, locals }) => {
       const db = getDB(platform);
-      const exam = await db.prepare("SELECT * FROM exams WHERE id = ? AND school_id = ?").bind(params.examId, locals.user.school_id).first();
+      const examIdStr = params.examId;
+      const parsedExamId = parseInt(examIdStr, 10);
+      if (isNaN(parsedExamId)) throw error(400, "ID Ujian tidak valid");
+      const exam = await db.prepare("SELECT * FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
       if (!exam) throw error(404, "Ujian tidak ditemukan");
-      const questions = await db.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number").bind(params.examId).all();
+      const questions = await db.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number").bind(parsedExamId).all();
       return { exam, questions: questions.results };
     };
     actions2 = {
       create: async ({ request, platform, params, locals }) => {
         const db = getDB(platform);
-        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(params.examId, locals.user.school_id).first();
+        const examIdStr = params.examId;
+        const parsedExamId = parseInt(examIdStr, 10);
+        if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid" });
+        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
         if (!exam) return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         const form = await request.formData();
         const type = form.get("type")?.toString();
@@ -9370,7 +9378,7 @@ var init_page_server_ts4 = __esm({
         const mediaUrl = form.get("media_url")?.toString().trim() || null;
         const audioMaxPlays = parseInt(form.get("audio_max_plays")?.toString() || "3");
         if (!type || !questionText) return fail(400, { error: "Tipe dan teks soal wajib diisi." });
-        const last = await db.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(params.examId).first();
+        const last = await db.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(parsedExamId).first();
         const nextNum = (last?.max_num ?? 0) + 1;
         let optionsJson = null;
         let correctAnswerJson = null;
@@ -9419,34 +9427,43 @@ var init_page_server_ts4 = __esm({
           });
           correctAnswerJson = JSON.stringify(mapping);
         }
-        await db.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points,
-			media_type, media_url, audio_max_plays, options_json, correct_answer_json)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
-          params.examId,
-          type,
-          questionText,
-          nextNum,
-          points,
-          mediaType === "none" ? null : mediaType,
-          mediaUrl,
-          audioMaxPlays,
-          optionsJson,
-          correctAnswerJson
-        ).run();
-        return { success: "Soal berhasil ditambahkan." };
+        try {
+          await db.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points,
+				media_type, media_url, audio_max_plays, options_json, correct_answer_json)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
+            parsedExamId,
+            type,
+            questionText,
+            nextNum,
+            points,
+            mediaType === "none" ? null : mediaType,
+            mediaUrl,
+            audioMaxPlays,
+            optionsJson,
+            correctAnswerJson
+          ).run();
+          return { success: "Soal berhasil ditambahkan." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menambahkan soal" });
+        }
       },
       edit: async ({ request, platform, params, locals }) => {
         const db = getDB(platform);
-        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(params.examId, locals.user.school_id).first();
+        const examIdStr = params.examId;
+        const parsedExamId = parseInt(examIdStr, 10);
+        if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid" });
+        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
         if (!exam) return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         const form = await request.formData();
-        const id = form.get("id")?.toString();
+        const idStr = form.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
         const type = form.get("type")?.toString();
         const questionText = form.get("question_text")?.toString().trim();
         const points = parseInt(form.get("points")?.toString() || "1");
         const mediaType = form.get("media_type")?.toString() || null;
         const mediaUrl = form.get("media_url")?.toString().trim() || null;
-        if (!id || !type || !questionText) return fail(400, { error: "ID, tipe, dan teks soal wajib diisi." });
+        if (isNaN(parsedId) || !type || !questionText) return fail(400, { error: "ID, tipe, dan teks soal wajib diisi." });
         let optionsJson = null;
         let correctAnswerJson = null;
         if (type === "pilihan_ganda") {
@@ -9488,7 +9505,7 @@ var init_page_server_ts4 = __esm({
             }
           }
           optionsJson = JSON.stringify({ left: leftItems, right: rightItems });
-          const prevMap = await db.prepare("SELECT correct_answer_json FROM questions WHERE id = ?").bind(id).first();
+          const prevMap = await db.prepare("SELECT correct_answer_json FROM questions WHERE id = ?").bind(parsedId).first();
           if (prevMap && prevMap.correct_answer_json) {
             correctAnswerJson = prevMap.correct_answer_json;
           } else {
@@ -9499,33 +9516,50 @@ var init_page_server_ts4 = __esm({
             correctAnswerJson = JSON.stringify(mapping);
           }
         }
-        const prevMedia = await db.prepare("SELECT media_url FROM questions WHERE id = ?").bind(id).first();
-        if (prevMedia && prevMedia.media_url && prevMedia.media_url !== mediaUrl && prevMedia.media_url.includes("res.cloudinary.com")) {
-          await deleteFromCloudinary(prevMedia.media_url, private_env);
+        try {
+          const prevMedia = await db.prepare("SELECT media_url FROM questions WHERE id = ?").bind(parsedId).first();
+          if (prevMedia && prevMedia.media_url && prevMedia.media_url !== mediaUrl && prevMedia.media_url.includes("res.cloudinary.com")) {
+            await deleteFromCloudinary(prevMedia.media_url, private_env);
+          }
+          await db.prepare(`UPDATE questions SET 
+				question_text = ?, points = ?, media_type = ?, media_url = ?, 
+				options_json = ?, correct_answer_json = ? 
+				WHERE id = ?`).bind(questionText, points, mediaType === "none" ? null : mediaType, mediaUrl, optionsJson, correctAnswerJson, parsedId).run();
+          return { success: "Soal berhasil diubah." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal mengubah soal" });
         }
-        await db.prepare(`UPDATE questions SET 
-			question_text = ?, points = ?, media_type = ?, media_url = ?, 
-			options_json = ?, correct_answer_json = ? 
-			WHERE id = ?`).bind(questionText, points, mediaType === "none" ? null : mediaType, mediaUrl, optionsJson, correctAnswerJson, id).run();
-        return { success: "Soal berhasil diubah." };
       },
       delete: async ({ request, platform, params, locals }) => {
         const db = getDB(platform);
-        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(params.examId, locals.user.school_id).first();
+        const examIdStr = params.examId;
+        const parsedExamId = parseInt(examIdStr, 10);
+        if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid" });
+        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
         if (!exam) return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         const form = await request.formData();
-        const id = form.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid." });
-        const q = await db.prepare("SELECT media_url FROM questions WHERE id = ?").bind(id).first();
-        if (q && q.media_url && q.media_url.includes("res.cloudinary.com")) {
-          await deleteFromCloudinary(q.media_url, private_env);
+        const idStr = form.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
+        try {
+          const q = await db.prepare("SELECT media_url FROM questions WHERE id = ?").bind(parsedId).first();
+          if (q && q.media_url && q.media_url.includes("res.cloudinary.com")) {
+            await deleteFromCloudinary(q.media_url, private_env);
+          }
+          await db.prepare("DELETE FROM questions WHERE id = ?").bind(parsedId).run();
+          return { success: "Soal berhasil dihapus." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menghapus soal" });
         }
-        await db.prepare("DELETE FROM questions WHERE id = ?").bind(id).run();
-        return { success: "Soal berhasil dihapus." };
       },
       importExcel: async ({ request, platform, params, locals }) => {
         const db = getDB(platform);
-        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(params.examId, locals.user.school_id).first();
+        const examIdStr = params.examId;
+        const parsedExamId = parseInt(examIdStr, 10);
+        if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid" });
+        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
         if (!exam) return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         const form = await request.formData();
         const questionsJson = form.get("questions_json")?.toString();
@@ -9539,13 +9573,13 @@ var init_page_server_ts4 = __esm({
         if (!Array.isArray(parsedQuestions) || parsedQuestions.length === 0) {
           return fail(400, { error: "Tidak ada soal yang ditemukan." });
         }
-        const last = await db.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(params.examId).first();
+        const last = await db.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(parsedExamId).first();
         let nextNum = (last?.max_num ?? 0) + 1;
         const statements = [];
         const stmt = db.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points, options_json, correct_answer_json) VALUES (?, ?, ?, ?, ?, ?, ?)`);
         for (const q of parsedQuestions) {
           statements.push(
-            stmt.bind(params.examId, q.type, q.question_text, nextNum, q.points || 1, q.options_json || null, q.correct_answer_json || null)
+            stmt.bind(parsedExamId, q.type, q.question_text, nextNum, q.points || 1, q.options_json || null, q.correct_answer_json || null)
           );
           nextNum++;
         }
@@ -23794,7 +23828,7 @@ var init__11 = __esm({
     index11 = 10;
     component11 = async () => component_cache11 ??= (await Promise.resolve().then(() => (init_page_svelte4(), page_svelte_exports4))).default;
     server_id10 = "src/routes/admin/bank-soal/[examId]/+page.server.ts";
-    imports11 = ["_app/immutable/nodes/10.CVdDUM3Q.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BM9tHWcC.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/BCVrPYcV.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/DY0DacbH.js", "_app/immutable/chunks/BbXmhjXd.js", "_app/immutable/chunks/BXqDtUsa.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/WOw1egtm.js", "_app/immutable/chunks/DVE3zHhg.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/D6nLZD03.js"];
+    imports11 = ["_app/immutable/nodes/10.DzJpbbk5.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/u0A-Skss.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/CwoVIbtH.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/BOZ7mAnh.js", "_app/immutable/chunks/BbXmhjXd.js", "_app/immutable/chunks/BXqDtUsa.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/WOw1egtm.js", "_app/immutable/chunks/DVE3zHhg.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/hQVTFjhf.js"];
     stylesheets11 = ["_app/immutable/assets/QuestionRenderer.CwYmYea-.css"];
     fonts11 = [];
   }
@@ -23812,12 +23846,12 @@ var init_page_server_ts5 = __esm({
     init_db();
     load11 = async ({ platform, locals, params }) => {
       const db = getDB(platform);
-      const examId = params.examId;
-      const exam = await db.prepare("SELECT id, title, duration_minutes FROM exams WHERE id = ? AND school_id = ?").bind(examId, locals.user.school_id).first();
+      const examId2 = params.examId;
+      const exam = await db.prepare("SELECT id, title, duration_minutes FROM exams WHERE id = ? AND school_id = ?").bind(examId2, locals.user.school_id).first();
       if (!exam) {
         throw redirect(302, "/admin/bank-soal");
       }
-      const questions = await db.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number ASC").bind(examId).all();
+      const questions = await db.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number ASC").bind(examId2).all();
       return {
         exam,
         questions: questions.results
@@ -24148,7 +24182,7 @@ var init__12 = __esm({
     index12 = 11;
     component12 = async () => component_cache12 ??= (await Promise.resolve().then(() => (init_page_svelte5(), page_svelte_exports5))).default;
     server_id11 = "src/routes/admin/bank-soal/[examId]/preview/+page.server.ts";
-    imports12 = ["_app/immutable/nodes/11.i_YWMR96.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/BbXmhjXd.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/BXqDtUsa.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/WOw1egtm.js", "_app/immutable/chunks/BoUxGHkI.js", "_app/immutable/chunks/D6nLZD03.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/Bvn7BXEI.js"];
+    imports12 = ["_app/immutable/nodes/11.CReeraDY.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/BbXmhjXd.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/BXqDtUsa.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/WOw1egtm.js", "_app/immutable/chunks/BoUxGHkI.js", "_app/immutable/chunks/hQVTFjhf.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/BSCiMgoh.js"];
     stylesheets12 = ["_app/immutable/assets/QuestionRenderer.CwYmYea-.css"];
     fonts12 = [];
   }
@@ -24185,33 +24219,41 @@ var init_page_server_ts6 = __esm({
           await db.prepare("INSERT INTO classes (school_id, name, level) VALUES (?, ?, ?)").bind(locals.user.school_id, name, level).run();
           return { success: true };
         } catch (e3) {
-          return fail(500, { error: "Gagal menambahkan kelas" });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menambahkan kelas" });
         }
       },
       edit: async ({ request, locals, platform }) => {
         const db = getDB(platform);
         const data = await request.formData();
-        const id = data.get("id")?.toString();
+        const idStr = data.get("id")?.toString();
         const name = data.get("name")?.toString().trim();
         const level = data.get("level")?.toString().trim() || null;
-        if (!id || !name) return fail(400, { error: "ID dan Nama kelas wajib diisi" });
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId) || !name) return fail(400, { error: "ID dan Nama kelas wajib diisi" });
         try {
-          await db.prepare('UPDATE classes SET name = ?, level = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, level, id, locals.user.school_id).run();
+          await db.prepare('UPDATE classes SET name = ?, level = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, level, parsedId, locals.user.school_id).run();
           return { success: true };
         } catch (e3) {
-          return fail(500, { error: "Gagal mengupdate kelas" });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal mengupdate kelas" });
         }
       },
       delete: async ({ request, locals, platform }) => {
         const db = getDB(platform);
         const data = await request.formData();
-        const id = data.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid" });
+        const idStr = data.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid" });
         try {
-          await db.prepare("DELETE FROM classes WHERE id = ? AND school_id = ?").bind(id, locals.user.school_id).run();
+          await db.batch([
+            db.prepare("UPDATE users SET class_id = NULL WHERE class_id = ? AND school_id = ?").bind(parsedId, locals.user.school_id),
+            db.prepare("DELETE FROM classes WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id)
+          ]);
           return { success: true };
         } catch (e3) {
-          return fail(500, { error: "Gagal menghapus kelas" });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menghapus kelas" });
         }
       }
     };
@@ -24323,7 +24365,7 @@ var init__13 = __esm({
     index13 = 12;
     component13 = async () => component_cache13 ??= (await Promise.resolve().then(() => (init_page_svelte6(), page_svelte_exports6))).default;
     server_id12 = "src/routes/admin/classes/+page.server.ts";
-    imports13 = ["_app/immutable/nodes/12.DtgHcseL.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BM9tHWcC.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/BlACJPux.js"];
+    imports13 = ["_app/immutable/nodes/12.DN1mSz8i.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/u0A-Skss.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/BlACJPux.js"];
     stylesheets13 = [];
     fonts13 = [];
   }
@@ -24388,30 +24430,32 @@ var init_page_server_ts7 = __esm({
 				VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(locals.user.school_id, code, name, description, startTime, endTime, isActive).run();
           return { success: "Tipe Ujian berhasil dibuat." };
         } catch (e3) {
-          return fail(500, { error: "Gagal membuat tipe ujian. Mungkin kode sudah digunakan." });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal membuat tipe ujian. Mungkin kode sudah digunakan." });
         }
       },
       update: async ({ request, platform, locals }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const id = form.get("id")?.toString();
+        const idStr = form.get("id")?.toString();
         const code = form.get("code")?.toString().trim();
         const name = form.get("name")?.toString().trim();
         const description = form.get("description")?.toString().trim() || "";
         const startTime = form.get("start_time")?.toString() || null;
         const endTime = form.get("end_time")?.toString() || null;
         const isActive = 1;
-        if (!id || !code || !name) return fail(400, { error: "Data tidak lengkap." });
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId) || !code || !name) return fail(400, { error: "Data tidak lengkap." });
         try {
-          const oldType = await db.prepare("SELECT code FROM exam_types WHERE id = ? AND school_id = ?").bind(id, locals.user.school_id).first();
-          await db.prepare(`UPDATE exam_types SET code=?, name=?, description=?, start_time=?, end_time=?, is_active=? WHERE id=? AND school_id=?`).bind(code, name, description, startTime, endTime, isActive, id, locals.user.school_id).run();
+          const oldType = await db.prepare("SELECT code FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).first();
+          await db.prepare(`UPDATE exam_types SET code=?, name=?, description=?, start_time=?, end_time=?, is_active=? WHERE id=? AND school_id=?`).bind(code, name, description, startTime, endTime, isActive, parsedId, locals.user.school_id).run();
           if (oldType && oldType.code !== code) {
             const linkedExams = await db.prepare(`
 					SELECT e.id, s.name as subject_name
 					FROM exams e
 					LEFT JOIN subjects s ON e.subject_id = s.id
 					WHERE e.exam_type_id = ?
-				`).bind(id).all();
+				`).bind(parsedId).all();
             if (linkedExams.results.length > 0) {
               const updateBatch = linkedExams.results.map(
                 (exam) => db.prepare(`UPDATE exams SET title = ?, updated_at = datetime('now') WHERE id = ?`).bind(`${code} - ${exam.subject_name || "Ujian"}`, exam.id)
@@ -24428,43 +24472,48 @@ var init_page_server_ts7 = __esm({
 						(start_time IS NOT NULL AND start_time < ?) OR 
 						(end_time IS NOT NULL AND end_time > ?)
 					)
-				`).bind(id, startTime, endTime).run();
+				`).bind(parsedId, startTime, endTime).run();
           }
           return { success: "Tipe Ujian berhasil diperbarui. Nama ujian yang terhubung telah diperbarui otomatis." };
         } catch (e3) {
-          return fail(500, { error: "Gagal memperbarui tipe ujian." });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal memperbarui tipe ujian." });
         }
       },
       delete: async ({ request, platform, locals }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const id = form.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid." });
+        const idStr = form.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
         try {
-          const exams = await db.prepare("SELECT COUNT(*) as count FROM exams WHERE exam_type_id = ?").bind(id).first();
+          const exams = await db.prepare("SELECT COUNT(*) as count FROM exams WHERE exam_type_id = ?").bind(parsedId).first();
           if (exams && exams.count > 0) {
             return fail(400, { error: "Gagal dihapus: Masih ada ujian yang terikat pada tipe ini." });
           }
-          await db.prepare("DELETE FROM exam_types WHERE id = ? AND school_id = ?").bind(id, locals.user.school_id).run();
+          await db.prepare("DELETE FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).run();
           return { success: "Tipe Ujian berhasil dihapus." };
         } catch (e3) {
-          return fail(500, { error: "Gagal menghapus tipe ujian." });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menghapus tipe ujian." });
         }
       },
       // ── Peserta Default Tipe Ujian ──────────────────────────────────────────
       addTypeParticipantClass: async ({ request, platform, locals }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const examTypeId = form.get("exam_type_id")?.toString();
-        const classId = form.get("class_id")?.toString();
-        if (!examTypeId || !classId) return fail(400, { error: "Data tidak lengkap." });
-        const examType = await db.prepare("SELECT id FROM exam_types WHERE id = ? AND school_id = ?").bind(examTypeId, locals.user.school_id).first();
+        const examTypeIdStr = form.get("exam_type_id")?.toString();
+        const classIdStr = form.get("class_id")?.toString();
+        const parsedExamTypeId = parseInt(examTypeIdStr || "", 10);
+        const parsedClassId = parseInt(classIdStr || "", 10);
+        if (isNaN(parsedExamTypeId) || isNaN(parsedClassId)) return fail(400, { error: "Data tidak lengkap." });
+        const examType = await db.prepare("SELECT id FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedExamTypeId, locals.user.school_id).first();
         if (!examType) return fail(404, { error: "Tipe ujian tidak ditemukan." });
-        const students = await db.prepare('SELECT id FROM users WHERE class_id = ? AND role = "siswa"').bind(classId).all();
+        const students = await db.prepare('SELECT id FROM users WHERE class_id = ? AND role = "siswa"').bind(parsedClassId).all();
         let added = 0;
         for (const student of students.results) {
           try {
-            await db.prepare("INSERT INTO exam_type_participants (exam_type_id, student_id) VALUES (?, ?)").bind(examTypeId, student.id).run();
+            await db.prepare("INSERT INTO exam_type_participants (exam_type_id, student_id) VALUES (?, ?)").bind(parsedExamTypeId, student.id).run();
             added++;
           } catch {
           }
@@ -24474,15 +24523,17 @@ var init_page_server_ts7 = __esm({
       addTypeParticipantStudent: async ({ request, platform, locals }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const examTypeId = form.get("exam_type_id")?.toString();
-        const studentIds = form.getAll("student_ids").map((id) => id.toString());
-        if (!examTypeId || studentIds.length === 0) return fail(400, { error: "Data tidak lengkap." });
-        const examType = await db.prepare("SELECT id FROM exam_types WHERE id = ? AND school_id = ?").bind(examTypeId, locals.user.school_id).first();
+        const examTypeIdStr = form.get("exam_type_id")?.toString();
+        const studentIdsStr = form.getAll("student_ids").map((id) => id.toString());
+        const parsedExamTypeId = parseInt(examTypeIdStr || "", 10);
+        const parsedStudentIds = studentIdsStr.map((id) => parseInt(id, 10)).filter((id) => !isNaN(id));
+        if (isNaN(parsedExamTypeId) || parsedStudentIds.length === 0) return fail(400, { error: "Data tidak lengkap." });
+        const examType = await db.prepare("SELECT id FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedExamTypeId, locals.user.school_id).first();
         if (!examType) return fail(404, { error: "Tipe ujian tidak ditemukan." });
         let added = 0;
-        for (const studentId of studentIds) {
+        for (const studentId of parsedStudentIds) {
           try {
-            await db.prepare("INSERT INTO exam_type_participants (exam_type_id, student_id) VALUES (?, ?)").bind(examTypeId, studentId).run();
+            await db.prepare("INSERT INTO exam_type_participants (exam_type_id, student_id) VALUES (?, ?)").bind(parsedExamTypeId, studentId).run();
             added++;
           } catch {
           }
@@ -24492,26 +24543,29 @@ var init_page_server_ts7 = __esm({
       removeTypeParticipant: async ({ request, platform }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const id = form.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid." });
-        await db.prepare("DELETE FROM exam_type_participants WHERE id = ?").bind(id).run();
+        const idStr = form.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
+        await db.prepare("DELETE FROM exam_type_participants WHERE id = ?").bind(parsedId).run();
         return { success: "Peserta default berhasil dihapus." };
       },
       clearTypeParticipants: async ({ request, platform, locals }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const examTypeId = form.get("exam_type_id")?.toString();
-        if (!examTypeId) return fail(400, { error: "ID tidak valid." });
-        const examType = await db.prepare("SELECT id FROM exam_types WHERE id = ? AND school_id = ?").bind(examTypeId, locals.user.school_id).first();
+        const examTypeIdStr = form.get("exam_type_id")?.toString();
+        const parsedExamTypeId = parseInt(examTypeIdStr || "", 10);
+        if (isNaN(parsedExamTypeId)) return fail(400, { error: "ID tidak valid." });
+        const examType = await db.prepare("SELECT id FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedExamTypeId, locals.user.school_id).first();
         if (!examType) return fail(404, { error: "Tipe ujian tidak ditemukan." });
-        await db.prepare("DELETE FROM exam_type_participants WHERE exam_type_id = ?").bind(examTypeId).run();
+        await db.prepare("DELETE FROM exam_type_participants WHERE exam_type_id = ?").bind(parsedExamTypeId).run();
         return { success: "Semua peserta default berhasil dihapus." };
       },
       getTypeParticipants: async ({ request, platform, locals }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const examTypeId = form.get("exam_type_id")?.toString();
-        if (!examTypeId) return fail(400, { error: "ID tidak valid." });
+        const examTypeIdStr = form.get("exam_type_id")?.toString();
+        const parsedExamTypeId = parseInt(examTypeIdStr || "", 10);
+        if (isNaN(parsedExamTypeId)) return fail(400, { error: "ID tidak valid." });
         const participants = await db.prepare(`
 			SELECT etp.id, u.name as student_name, u.username as nisn, c.name as class_name
 			FROM exam_type_participants etp
@@ -24519,7 +24573,7 @@ var init_page_server_ts7 = __esm({
 			LEFT JOIN classes c ON u.class_id = c.id
 			WHERE etp.exam_type_id = ?
 			ORDER BY c.name, u.name
-		`).bind(examTypeId).all();
+		`).bind(parsedExamTypeId).all();
         return { participants: participants.results };
       }
     };
@@ -24614,7 +24668,7 @@ var init__14 = __esm({
     index14 = 13;
     component14 = async () => component_cache14 ??= (await Promise.resolve().then(() => (init_page_svelte7(), page_svelte_exports7))).default;
     server_id13 = "src/routes/admin/exams/+page.server.ts";
-    imports14 = ["_app/immutable/nodes/13.DIiGK8zs.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js"];
+    imports14 = ["_app/immutable/nodes/13.CZJuN1Dv.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js"];
     stylesheets14 = [];
     fonts14 = [];
   }
@@ -24633,7 +24687,9 @@ var init_page_server_ts8 = __esm({
     init_db();
     load14 = async ({ params, platform, locals }) => {
       const db = getDB(platform);
-      const typeId = params.typeId;
+      const typeIdStr = params.typeId;
+      const typeId = parseInt(typeIdStr, 10);
+      if (isNaN(typeId)) throw new Error("ID Tipe Ujian tidak valid");
       const examType = await db.prepare("SELECT * FROM exam_types WHERE id = ? AND school_id = ?").bind(typeId, locals.user.school_id).first();
       if (!examType) {
         throw new Error("Tipe Ujian tidak ditemukan");
@@ -24655,12 +24711,15 @@ var init_page_server_ts8 = __esm({
       create: async ({ request, params, platform, locals }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const typeId = params.typeId;
-        const examType = await db.prepare("SELECT * FROM exam_types WHERE id = ? AND school_id = ?").bind(typeId, locals.user.school_id).first();
+        const typeIdStr = params.typeId;
+        const parsedTypeId = parseInt(typeIdStr, 10);
+        if (isNaN(parsedTypeId)) return fail(400, { error: "ID Tipe Ujian tidak valid" });
+        const examType = await db.prepare("SELECT * FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedTypeId, locals.user.school_id).first();
         if (!examType) return fail(400, { error: "Tipe Ujian tidak valid." });
-        const subjectId = form.get("subject_id")?.toString() || null;
-        if (!subjectId) return fail(400, { error: "Mata Pelajaran wajib dipilih." });
-        const subject = await db.prepare("SELECT name FROM subjects WHERE id = ?").bind(subjectId).first();
+        const subjectIdStr = form.get("subject_id")?.toString() || null;
+        const parsedSubjectId = parseInt(subjectIdStr || "", 10);
+        if (isNaN(parsedSubjectId)) return fail(400, { error: "Mata Pelajaran wajib dipilih." });
+        const subject = await db.prepare("SELECT name FROM subjects WHERE id = ?").bind(parsedSubjectId).first();
         const roomName = form.get("room_name")?.toString().trim();
         let title = `${examType.code} - ${subject.name}`;
         if (roomName) {
@@ -24683,33 +24742,42 @@ var init_page_server_ts8 = __esm({
             return fail(400, { error: "Waktu selesai tidak boleh melebihi rentang waktu Tipe Ujian." });
           }
         }
-        const result = await db.prepare(`INSERT INTO exams (school_id, exam_type_id, title, description, subject_id, duration_minutes, start_time, end_time, is_active, shuffle_questions, show_score_type, created_by)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(locals.user.school_id, typeId, title, description, subjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, showScoreType, locals.user?.id).run();
-        const newExamId = result.meta?.last_row_id;
-        if (newExamId) {
-          const typeParticipants = await db.prepare(
-            "SELECT student_id FROM exam_type_participants WHERE exam_type_id = ?"
-          ).bind(typeId).all();
-          if (typeParticipants.results.length > 0) {
-            const insertBatch = typeParticipants.results.map(
-              (p) => db.prepare("INSERT OR IGNORE INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(newExamId, p.student_id)
-            );
-            await db.batch(insertBatch);
+        try {
+          const result = await db.prepare(`INSERT INTO exams (school_id, exam_type_id, title, description, subject_id, duration_minutes, start_time, end_time, is_active, shuffle_questions, show_score_type, created_by)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(locals.user.school_id, parsedTypeId, title, description, parsedSubjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, showScoreType, locals.user?.id).run();
+          const newExamId = result.meta?.last_row_id;
+          if (newExamId) {
+            const typeParticipants = await db.prepare(
+              "SELECT student_id FROM exam_type_participants WHERE exam_type_id = ?"
+            ).bind(parsedTypeId).all();
+            if (typeParticipants.results.length > 0) {
+              const insertBatch = typeParticipants.results.map(
+                (p) => db.prepare("INSERT OR IGNORE INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(newExamId, p.student_id)
+              );
+              await db.batch(insertBatch);
+            }
           }
+          return { success: "Ujian berhasil dibuat." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal membuat ujian" });
         }
-        return { success: "Ujian berhasil dibuat." };
       },
       update: async ({ request, platform, locals, params }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const typeId = params.typeId;
-        const examType = await db.prepare("SELECT * FROM exam_types WHERE id = ? AND school_id = ?").bind(typeId, locals.user.school_id).first();
+        const typeIdStr = params.typeId;
+        const parsedTypeId = parseInt(typeIdStr, 10);
+        if (isNaN(parsedTypeId)) return fail(400, { error: "ID Tipe Ujian tidak valid." });
+        const examType = await db.prepare("SELECT * FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedTypeId, locals.user.school_id).first();
         if (!examType) return fail(400, { error: "Tipe Ujian tidak valid." });
-        const id = form.get("id")?.toString();
-        const subjectId = form.get("subject_id")?.toString() || null;
-        if (!id) return fail(400, { error: "Data tidak lengkap." });
-        if (!subjectId) return fail(400, { error: "Mata pelajaran wajib diisi." });
-        const subject = await db.prepare("SELECT name FROM subjects WHERE id = ?").bind(subjectId).first();
+        const idStr = form.get("id")?.toString();
+        const subjectIdStr = form.get("subject_id")?.toString() || null;
+        const parsedId = parseInt(idStr || "", 10);
+        const parsedSubjectId = parseInt(subjectIdStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "Data tidak lengkap." });
+        if (isNaN(parsedSubjectId)) return fail(400, { error: "Mata pelajaran wajib diisi." });
+        const subject = await db.prepare("SELECT name FROM subjects WHERE id = ?").bind(parsedSubjectId).first();
         const roomName = form.get("room_name")?.toString().trim();
         let title = subject ? `${examType.code} - ${subject.name}` : void 0;
         if (title && roomName) {
@@ -24732,30 +24800,36 @@ var init_page_server_ts8 = __esm({
             return fail(400, { error: "Waktu selesai tidak boleh melebihi rentang waktu Tipe Ujian." });
           }
         }
-        await db.prepare(`UPDATE exams SET title=?, description=?, subject_id=?, duration_minutes=?,
-			start_time=?, end_time=?, is_active=?, shuffle_questions=?, show_score_type=?, updated_at=datetime('now') WHERE id=? AND school_id=?`).bind(title, description, subjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, showScoreType, id, locals.user.school_id).run();
-        return { success: "Ujian berhasil diperbarui." };
+        try {
+          await db.prepare(`UPDATE exams SET title=?, description=?, subject_id=?, duration_minutes=?,
+				start_time=?, end_time=?, is_active=?, shuffle_questions=?, show_score_type=?, updated_at=datetime('now') WHERE id=? AND school_id=?`).bind(title, description, parsedSubjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, showScoreType, parsedId, locals.user.school_id).run();
+          return { success: "Ujian berhasil diperbarui." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal mengupdate ujian" });
+        }
       },
       delete: async ({ request, platform, locals }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const id = form.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid." });
+        const idStr = form.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
         try {
-          const attempts = await db.prepare("SELECT id FROM student_attempts WHERE exam_id = ?").bind(id).all();
+          const attempts = await db.prepare("SELECT id FROM student_attempts WHERE exam_id = ?").bind(parsedId).all();
           const attemptIds = attempts.results.map((a) => a.id);
           const batch = [];
           if (attemptIds.length > 0) {
             const placeholders = attemptIds.map(() => "?").join(",");
             batch.push(db.prepare(`DELETE FROM student_answers WHERE attempt_id IN (${placeholders})`).bind(...attemptIds));
-            batch.push(db.prepare("DELETE FROM student_attempts WHERE exam_id = ?").bind(id));
+            batch.push(db.prepare("DELETE FROM student_attempts WHERE exam_id = ?").bind(parsedId));
           }
-          batch.push(db.prepare("DELETE FROM questions WHERE exam_id = ?").bind(id));
-          batch.push(db.prepare("DELETE FROM tokens WHERE exam_id = ?").bind(id));
-          batch.push(db.prepare("DELETE FROM exam_participants WHERE exam_id = ?").bind(id));
-          batch.push(db.prepare("DELETE FROM exam_proctors WHERE exam_id = ?").bind(id));
-          batch.push(db.prepare("DELETE FROM exam_teachers WHERE exam_id = ?").bind(id));
-          batch.push(db.prepare("DELETE FROM exams WHERE id = ? AND school_id = ?").bind(id, locals.user.school_id));
+          batch.push(db.prepare("DELETE FROM questions WHERE exam_id = ?").bind(parsedId));
+          batch.push(db.prepare("DELETE FROM tokens WHERE exam_id = ?").bind(parsedId));
+          batch.push(db.prepare("DELETE FROM exam_participants WHERE exam_id = ?").bind(parsedId));
+          batch.push(db.prepare("DELETE FROM exam_proctors WHERE exam_id = ?").bind(parsedId));
+          batch.push(db.prepare("DELETE FROM exam_teachers WHERE exam_id = ?").bind(parsedId));
+          batch.push(db.prepare("DELETE FROM exams WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id));
           await db.batch(batch);
           return { success: "Ujian berhasil dihapus." };
         } catch (e3) {
@@ -24766,10 +24840,16 @@ var init_page_server_ts8 = __esm({
       toggleActive: async ({ request, platform, locals }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const id = form.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid." });
-        await db.prepare(`UPDATE exams SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END, updated_at=datetime('now') WHERE id = ? AND school_id = ?`).bind(id, locals.user.school_id).run();
-        return { success: "Status ujian berhasil diperbarui." };
+        const idStr = form.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
+        try {
+          await db.prepare(`UPDATE exams SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END, updated_at=datetime('now') WHERE id = ? AND school_id = ?`).bind(parsedId, locals.user.school_id).run();
+          return { success: "Status ujian berhasil diperbarui." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal mengubah status ujian" });
+        }
       }
     };
   }
@@ -24890,7 +24970,7 @@ var init__15 = __esm({
     index15 = 14;
     component15 = async () => component_cache15 ??= (await Promise.resolve().then(() => (init_page_svelte8(), page_svelte_exports8))).default;
     server_id14 = "src/routes/admin/exams/type/[typeId]/+page.server.ts";
-    imports15 = ["_app/immutable/nodes/14.DiTvk4uL.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js"];
+    imports15 = ["_app/immutable/nodes/14.sJiapVL2.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js"];
     stylesheets15 = [];
     fonts15 = [];
   }
@@ -24909,15 +24989,17 @@ var init_page_server_ts9 = __esm({
     init_exports();
     load15 = async ({ platform, params, locals }) => {
       const db = getDB(platform);
-      const examId = params.id;
-      const exam = await db.prepare("SELECT e.*, s.name as subject_name, et.code as exam_type_code, et.name as exam_type_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id LEFT JOIN exam_types et ON e.exam_type_id = et.id WHERE e.id = ? AND e.school_id = ?").bind(examId, locals.user.school_id).first();
+      const examIdStr = params.id;
+      const examId2 = parseInt(examIdStr, 10);
+      if (isNaN(examId2)) throw error(400, "ID Ujian tidak valid");
+      const exam = await db.prepare("SELECT e.*, s.name as subject_name, et.code as exam_type_code, et.name as exam_type_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id LEFT JOIN exam_types et ON e.exam_type_id = et.id WHERE e.id = ? AND e.school_id = ?").bind(examId2, locals.user.school_id).first();
       if (!exam) throw error(404, "Ujian tidak ditemukan");
-      const questions = await db.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number").bind(examId).all();
+      const questions = await db.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number").bind(examId2).all();
       const attempts = await db.prepare(`
 		SELECT sa.*, u.name as student_name FROM student_attempts sa
 		JOIN users u ON sa.student_id = u.id WHERE sa.exam_id = ? ORDER BY sa.created_at DESC
-	`).bind(examId).all();
-      const tokens = await db.prepare("SELECT * FROM tokens WHERE exam_id = ? ORDER BY created_at DESC").bind(examId).all();
+	`).bind(examId2).all();
+      const tokens = await db.prepare("SELECT * FROM tokens WHERE exam_id = ? ORDER BY created_at DESC").bind(examId2).all();
       const participants = await db.prepare(`
 		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username as nisn, c.name as class_name
 		FROM exam_participants p
@@ -24925,7 +25007,7 @@ var init_page_server_ts9 = __esm({
 		LEFT JOIN classes c ON u.class_id = c.id
 		WHERE p.exam_id = ?
 		ORDER BY c.name, u.name
-	`).bind(examId).all();
+	`).bind(examId2).all();
       const classes = await db.prepare("SELECT id, name FROM classes WHERE school_id = ? ORDER BY name").bind(locals.user.school_id).all();
       const allStudents = await db.prepare('SELECT id, name, username, class_id FROM users WHERE school_id = ? AND role = "siswa" ORDER BY name').bind(locals.user.school_id).all();
       const allTeachers = await db.prepare('SELECT id, name, username FROM users WHERE school_id = ? AND role = "guru" ORDER BY name').bind(locals.user.school_id).all();
@@ -24935,7 +25017,7 @@ var init_page_server_ts9 = __esm({
 		JOIN users u ON et.teacher_id = u.id
 		WHERE et.exam_id = ?
 		ORDER BY u.name
-	`).bind(examId).all();
+	`).bind(examId2).all();
       const allProctors = await db.prepare('SELECT id, name, username FROM users WHERE school_id = ? AND role = "pengawas" ORDER BY name').bind(locals.user.school_id).all();
       const examProctors = await db.prepare(`
 		SELECT ep.id as exam_proctor_id, u.id as user_id, u.name, u.username
@@ -24943,7 +25025,7 @@ var init_page_server_ts9 = __esm({
 		JOIN users u ON ep.proctor_id = u.id
 		WHERE ep.exam_id = ?
 		ORDER BY u.name
-	`).bind(examId).all();
+	`).bind(examId2).all();
       return {
         exam,
         questions: questions.results,
@@ -24962,13 +25044,15 @@ var init_page_server_ts9 = __esm({
       addParticipantClass: async ({ request, platform, params }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const classId = form.get("class_id")?.toString();
-        if (!classId) return fail(400, { error: "Pilih kelas terlebih dahulu" });
-        const students = await db.prepare('SELECT id FROM users WHERE class_id = ? AND role = "siswa"').bind(classId).all();
+        const classIdStr = form.get("class_id")?.toString();
+        const parsedClassId = parseInt(classIdStr || "", 10);
+        const parsedExamId = parseInt(params.id, 10);
+        if (isNaN(parsedClassId) || isNaN(parsedExamId)) return fail(400, { error: "Data tidak valid" });
+        const students = await db.prepare('SELECT id FROM users WHERE class_id = ? AND role = "siswa"').bind(parsedClassId).all();
         let added = 0;
         for (const student of students.results) {
           try {
-            await db.prepare("INSERT INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(params.id, student.id).run();
+            await db.prepare("INSERT INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(parsedExamId, student.id).run();
             added++;
           } catch (e3) {
           }
@@ -24978,12 +25062,14 @@ var init_page_server_ts9 = __esm({
       addParticipantStudent: async ({ request, platform, params }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const studentIds = form.getAll("student_ids").map((id) => id.toString());
-        if (studentIds.length === 0) return fail(400, { error: "Pilih minimal satu siswa" });
+        const studentIdsStr = form.getAll("student_ids").map((id) => id.toString());
+        const parsedStudentIds = studentIdsStr.map((id) => parseInt(id, 10)).filter((id) => !isNaN(id));
+        const parsedExamId = parseInt(params.id, 10);
+        if (parsedStudentIds.length === 0 || isNaN(parsedExamId)) return fail(400, { error: "Data tidak valid" });
         let added = 0;
-        for (const studentId of studentIds) {
+        for (const studentId of parsedStudentIds) {
           try {
-            await db.prepare("INSERT INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(params.id, studentId).run();
+            await db.prepare("INSERT INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(parsedExamId, studentId).run();
             added++;
           } catch (e3) {
           }
@@ -24993,20 +25079,23 @@ var init_page_server_ts9 = __esm({
       removeParticipant: async ({ request, platform, params }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const participantId = form.get("participant_id")?.toString();
-        if (!participantId) return fail(400, { error: "ID peserta tidak valid" });
-        await db.prepare("DELETE FROM exam_participants WHERE id = ?").bind(participantId).run();
+        const participantIdStr = form.get("participant_id")?.toString();
+        const parsedParticipantId = parseInt(participantIdStr || "", 10);
+        if (isNaN(parsedParticipantId)) return fail(400, { error: "ID peserta tidak valid" });
+        await db.prepare("DELETE FROM exam_participants WHERE id = ?").bind(parsedParticipantId).run();
         return { success: "Peserta berhasil dihapus dari ujian." };
       },
       addTeacher: async ({ request, platform, params }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const teacherIds = form.getAll("teacher_ids").map((id) => id.toString());
-        if (teacherIds.length === 0) return fail(400, { error: "Pilih minimal satu guru" });
+        const teacherIdsStr = form.getAll("teacher_ids").map((id) => id.toString());
+        const parsedTeacherIds = teacherIdsStr.map((id) => parseInt(id, 10)).filter((id) => !isNaN(id));
+        const parsedExamId = parseInt(params.id, 10);
+        if (parsedTeacherIds.length === 0 || isNaN(parsedExamId)) return fail(400, { error: "Data tidak valid" });
         let added = 0;
-        for (const teacherId of teacherIds) {
+        for (const teacherId of parsedTeacherIds) {
           try {
-            await db.prepare("INSERT INTO exam_teachers (exam_id, teacher_id) VALUES (?, ?)").bind(params.id, teacherId).run();
+            await db.prepare("INSERT INTO exam_teachers (exam_id, teacher_id) VALUES (?, ?)").bind(parsedExamId, teacherId).run();
             added++;
           } catch (e3) {
           }
@@ -25016,20 +25105,23 @@ var init_page_server_ts9 = __esm({
       removeTeacher: async ({ request, platform, params }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const examTeacherId = form.get("exam_teacher_id")?.toString();
-        if (!examTeacherId) return fail(400, { error: "ID pengajar tidak valid" });
-        await db.prepare("DELETE FROM exam_teachers WHERE id = ?").bind(examTeacherId).run();
+        const examTeacherIdStr = form.get("exam_teacher_id")?.toString();
+        const parsedExamTeacherId = parseInt(examTeacherIdStr || "", 10);
+        if (isNaN(parsedExamTeacherId)) return fail(400, { error: "ID pengajar tidak valid" });
+        await db.prepare("DELETE FROM exam_teachers WHERE id = ?").bind(parsedExamTeacherId).run();
         return { success: "Pengajar berhasil dihapus." };
       },
       addProctor: async ({ request, platform, params }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const proctorIds = form.getAll("proctor_ids").map((id) => id.toString());
-        if (proctorIds.length === 0) return fail(400, { error: "Pilih minimal satu pengawas" });
+        const proctorIdsStr = form.getAll("proctor_ids").map((id) => id.toString());
+        const parsedProctorIds = proctorIdsStr.map((id) => parseInt(id, 10)).filter((id) => !isNaN(id));
+        const parsedExamId = parseInt(params.id, 10);
+        if (parsedProctorIds.length === 0 || isNaN(parsedExamId)) return fail(400, { error: "Data tidak valid" });
         let added = 0;
-        for (const proctorId of proctorIds) {
+        for (const proctorId of parsedProctorIds) {
           try {
-            await db.prepare("INSERT INTO exam_proctors (exam_id, proctor_id) VALUES (?, ?)").bind(params.id, proctorId).run();
+            await db.prepare("INSERT INTO exam_proctors (exam_id, proctor_id) VALUES (?, ?)").bind(parsedExamId, proctorId).run();
             added++;
           } catch (e3) {
           }
@@ -25039,14 +25131,17 @@ var init_page_server_ts9 = __esm({
       removeProctor: async ({ request, platform, params }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const examProctorId = form.get("exam_proctor_id")?.toString();
-        if (!examProctorId) return fail(400, { error: "ID pengawas tidak valid" });
-        await db.prepare("DELETE FROM exam_proctors WHERE id = ?").bind(examProctorId).run();
+        const examProctorIdStr = form.get("exam_proctor_id")?.toString();
+        const parsedExamProctorId = parseInt(examProctorIdStr || "", 10);
+        if (isNaN(parsedExamProctorId)) return fail(400, { error: "ID pengawas tidak valid" });
+        await db.prepare("DELETE FROM exam_proctors WHERE id = ?").bind(parsedExamProctorId).run();
         return { success: "Pengawas berhasil dihapus." };
       },
       toggleScoreRelease: async ({ request, platform, params }) => {
         const db = getDB(platform);
-        await db.prepare(`UPDATE exams SET is_score_released = CASE WHEN is_score_released = 1 THEN 0 ELSE 1 END, updated_at = datetime('now') WHERE id = ?`).bind(params.id).run();
+        const parsedId = parseInt(params.id, 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid" });
+        await db.prepare(`UPDATE exams SET is_score_released = CASE WHEN is_score_released = 1 THEN 0 ELSE 1 END, updated_at = datetime('now') WHERE id = ?`).bind(parsedId).run();
         return { success: "Status rilis nilai berhasil diperbarui." };
       }
     };
@@ -25293,7 +25388,7 @@ var init__16 = __esm({
     index16 = 15;
     component16 = async () => component_cache16 ??= (await Promise.resolve().then(() => (init_page_svelte9(), page_svelte_exports9))).default;
     server_id15 = "src/routes/admin/exams/[id]/+page.server.ts";
-    imports16 = ["_app/immutable/nodes/15.CkS1jbWS.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BM9tHWcC.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/WOw1egtm.js", "_app/immutable/chunks/BlACJPux.js"];
+    imports16 = ["_app/immutable/nodes/15.D2Xaac3J.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/u0A-Skss.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/WOw1egtm.js", "_app/immutable/chunks/BlACJPux.js"];
     stylesheets16 = [];
     fonts16 = [];
   }
@@ -25537,7 +25632,7 @@ var init__17 = __esm({
     index17 = 16;
     component17 = async () => component_cache17 ??= (await Promise.resolve().then(() => (init_page_svelte10(), page_svelte_exports10))).default;
     server_id16 = "src/routes/admin/media-bank/+page.server.ts";
-    imports17 = ["_app/immutable/nodes/16.Dal9JmE-.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BCVrPYcV.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/DY0DacbH.js"];
+    imports17 = ["_app/immutable/nodes/16.BbE6Pje0.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/CwoVIbtH.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/BOZ7mAnh.js"];
     stylesheets17 = [];
     fonts17 = [];
   }
@@ -25558,7 +25653,8 @@ var init_page_server_ts11 = __esm({
       if (!locals.user) throw redirect(302, "/login");
       try {
         const db = getDB(platform);
-        const examFilter = url.searchParams.get("exam_id") || "";
+        const examFilterStr = url.searchParams.get("exam_id") || "";
+        const examFilter = parseInt(examFilterStr, 10);
         const exams = await db.prepare(`
 		SELECT e.id, e.title 
 		FROM exams e 
@@ -25566,7 +25662,7 @@ var init_page_server_ts11 = __esm({
 		ORDER BY e.title
 	`).bind(locals.user.school_id).all();
         let attempts = [];
-        if (examFilter) {
+        if (!isNaN(examFilter)) {
           const result = await db.prepare(`
 			SELECT 
 				epart.student_id,
@@ -25672,54 +25768,66 @@ var init_page_server_ts11 = __esm({
         if (!locals.user) return fail(401, { error: "Unauthorized" });
         const db = getDB(platform);
         const form = await request.formData();
-        const attemptId = form.get("attempt_id")?.toString();
+        const attemptIdStr = form.get("attempt_id")?.toString();
         const action = form.get("action")?.toString();
-        if (!attemptId || !action) return fail(400, { error: "Data tidak valid." });
-        const attemptData = await db.prepare(`
+        const parsedAttemptId = parseInt(attemptIdStr || "", 10);
+        if (isNaN(parsedAttemptId) || !action) return fail(400, { error: "Data tidak valid." });
+        try {
+          const attemptData = await db.prepare(`
 			SELECT sa.id, sa.is_paused, sa.paused_at, sa.end_time FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
 			WHERE sa.id = ? AND e.school_id = ?
-		`).bind(attemptId, locals.user.school_id).first();
-        if (!attemptData) return fail(403, { error: "Sesi ujian tidak ditemukan atau bukan milik sekolah Anda." });
-        if (action === "pause") {
-          await db.prepare(`UPDATE student_attempts SET is_paused = 1, paused_at = datetime('now') WHERE id = ?`).bind(attemptId).run();
-          return { success: "Ujian berhasil ditahan." };
-        } else if (action === "resume") {
-          if (attemptData.paused_at && attemptData.end_time) {
-            await db.prepare(`
+		`).bind(parsedAttemptId, locals.user.school_id).first();
+          if (!attemptData) return fail(403, { error: "Sesi ujian tidak ditemukan atau bukan milik sekolah Anda." });
+          if (action === "pause") {
+            await db.prepare(`UPDATE student_attempts SET is_paused = 1, paused_at = datetime('now') WHERE id = ?`).bind(parsedAttemptId).run();
+            return { success: "Ujian berhasil ditahan." };
+          } else if (action === "resume") {
+            if (attemptData.paused_at && attemptData.end_time) {
+              await db.prepare(`
 					UPDATE student_attempts 
 					SET 
 						is_paused = 0, 
 						paused_at = NULL,
 						end_time = datetime(end_time, '+' || cast(round((julianday('now') - julianday(paused_at)) * 86400) as int) || ' seconds')
 					WHERE id = ?
-				`).bind(attemptId).run();
-          } else {
-            await db.prepare(`UPDATE student_attempts SET is_paused = 0, paused_at = NULL WHERE id = ?`).bind(attemptId).run();
+				`).bind(parsedAttemptId).run();
+            } else {
+              await db.prepare(`UPDATE student_attempts SET is_paused = 0, paused_at = NULL WHERE id = ?`).bind(parsedAttemptId).run();
+            }
+            return { success: "Ujian berhasil dilanjutkan." };
           }
-          return { success: "Ujian berhasil dilanjutkan." };
+          return fail(400, { error: "Aksi tidak valid." });
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal mengubah status ujian" });
         }
-        return fail(400, { error: "Aksi tidak valid." });
       },
       resetAttempt: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
         const db = getDB(platform);
         const form = await request.formData();
-        const attemptId = form.get("attempt_id")?.toString();
-        if (!attemptId) return fail(400, { error: "ID tidak valid." });
-        const attemptCheck = await db.prepare(`
+        const attemptIdStr = form.get("attempt_id")?.toString();
+        const parsedAttemptId = parseInt(attemptIdStr || "", 10);
+        if (isNaN(parsedAttemptId)) return fail(400, { error: "ID tidak valid." });
+        try {
+          const attemptCheck = await db.prepare(`
 			SELECT sa.id FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
 			WHERE sa.id = ? AND e.school_id = ?
-		`).bind(attemptId, locals.user.school_id).first();
-        if (!attemptCheck) {
-          return fail(403, { error: "Sesi ujian tidak ditemukan atau bukan milik sekolah Anda." });
+		`).bind(parsedAttemptId, locals.user.school_id).first();
+          if (!attemptCheck) {
+            return fail(403, { error: "Sesi ujian tidak ditemukan atau bukan milik sekolah Anda." });
+          }
+          await db.batch([
+            db.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(parsedAttemptId),
+            db.prepare("DELETE FROM student_attempts WHERE id = ?").bind(parsedAttemptId)
+          ]);
+          return { success: "Sesi ujian siswa berhasil direset." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal mereset sesi ujian" });
         }
-        await db.batch([
-          db.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(attemptId),
-          db.prepare("DELETE FROM student_attempts WHERE id = ?").bind(attemptId)
-        ]);
-        return { success: "Sesi ujian siswa berhasil direset." };
       }
     };
   }
@@ -25961,7 +26069,7 @@ var init__18 = __esm({
     index18 = 17;
     component18 = async () => component_cache18 ??= (await Promise.resolve().then(() => (init_page_svelte11(), page_svelte_exports11))).default;
     server_id17 = "src/routes/admin/monitor/+page.server.ts";
-    imports18 = ["_app/immutable/nodes/17.fM4zEgwB.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js"];
+    imports18 = ["_app/immutable/nodes/17.Jfw9Bgfq.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js"];
     stylesheets18 = [];
     fonts18 = [];
   }
@@ -26286,7 +26394,7 @@ var init__20 = __esm({
     index20 = 19;
     component20 = async () => component_cache20 ??= (await Promise.resolve().then(() => (init_page_svelte13(), page_svelte_exports13))).default;
     server_id19 = "src/routes/admin/papan-peringkat/type/[typeId]/+page.server.ts";
-    imports20 = ["_app/immutable/nodes/19.D5iiwDLZ.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/D6nLZD03.js"];
+    imports20 = ["_app/immutable/nodes/19.CLf6jam_.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/hQVTFjhf.js"];
     stylesheets20 = [];
     fonts20 = [];
   }
@@ -26414,11 +26522,11 @@ var init_page_server_ts15 = __esm({
     load21 = async ({ platform, locals, params }) => {
       if (locals.user?.role !== "admin") throw redirect(302, "/");
       const db = getDB(platform);
-      const examId = params.examId;
+      const examId2 = params.examId;
       const schoolId = locals.user.school_id;
       const exam = await db.prepare(`
 		SELECT id, title, subject_id, exam_type_id FROM exams WHERE id = ? AND school_id = ?
-	`).bind(examId, schoolId).first();
+	`).bind(examId2, schoolId).first();
       if (!exam) {
         throw error(404, "Ujian tidak ditemukan.");
       }
@@ -26439,7 +26547,7 @@ var init_page_server_ts15 = __esm({
 		LEFT JOIN classes c ON u.class_id = c.id
 		WHERE sa.exam_id = ? AND sa.status = 'selesai'
 		ORDER BY sa.score DESC, (julianday(sa.submit_time) - julianday(sa.start_time)) ASC
-	`).bind(examId).all();
+	`).bind(examId2).all();
       return {
         exam: {
           ...exam,
@@ -26553,8 +26661,10 @@ var init_page_server_ts16 = __esm({
     init_exports();
     init_db();
     load22 = async ({ platform, url, locals }) => {
+      if (!locals.user) throw redirect(302, "/login");
       const db = getDB(platform);
-      const examFilter = url.searchParams.get("exam_id") || "";
+      const examFilterStr = url.searchParams.get("exam_id") || "";
+      const examFilter = parseInt(examFilterStr, 10);
       const exams = await db.prepare("SELECT id, title FROM exams WHERE school_id = ? ORDER BY title").bind(locals.user.school_id).all();
       let query = `
 		SELECT sa.*, u.name as student_name, e.title as exam_title, s.name as subject
@@ -26565,7 +26675,7 @@ var init_page_server_ts16 = __esm({
 		WHERE sa.status IN ('selesai', 'waktu_habis') AND e.school_id = ?
 	`;
       const params = [locals.user.school_id];
-      if (examFilter !== "") {
+      if (!isNaN(examFilter)) {
         query += " AND e.id = ?";
         params.push(examFilter);
       }
@@ -26575,13 +26685,11 @@ var init_page_server_ts16 = __esm({
     };
     actions9 = {
       delete: async ({ request, platform, locals }) => {
+        if (!locals.user) return fail(401, { error: "Unauthorized" });
         const db = getDB(platform);
         const form = await request.formData();
-        const attemptId = form.get("attempt_id")?.toString();
-        if (!attemptId) {
-          return { success: false, error: "ID tidak valid" };
-        }
-        const parsedId = parseInt(attemptId, 10);
+        const attemptIdStr = form.get("attempt_id")?.toString();
+        const parsedId = parseInt(attemptIdStr || "", 10);
         if (isNaN(parsedId)) {
           return fail(400, { error: "ID tidak valid" });
         }
@@ -26720,7 +26828,7 @@ var init__23 = __esm({
     index23 = 22;
     component23 = async () => component_cache23 ??= (await Promise.resolve().then(() => (init_page_svelte16(), page_svelte_exports16))).default;
     server_id22 = "src/routes/admin/results/+page.server.ts";
-    imports23 = ["_app/immutable/nodes/22.BI6TizcU.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BM9tHWcC.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/DIPBzhqX.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/BlACJPux.js"];
+    imports23 = ["_app/immutable/nodes/22.DwFD8Ty2.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/u0A-Skss.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/DIPBzhqX.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/BlACJPux.js"];
     stylesheets23 = [];
     fonts23 = [];
   }
@@ -27160,7 +27268,7 @@ var init__25 = __esm({
     index25 = 24;
     component25 = async () => component_cache25 ??= (await Promise.resolve().then(() => (init_page_svelte18(), page_svelte_exports18))).default;
     server_id24 = "src/routes/admin/school-profile/+page.server.ts";
-    imports25 = ["_app/immutable/nodes/24.DTQL8jDZ.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/DY0DacbH.js"];
+    imports25 = ["_app/immutable/nodes/24.DIvPvu8J.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/BOZ7mAnh.js"];
     stylesheets25 = [];
     fonts25 = [];
   }
@@ -27273,51 +27381,55 @@ var init_page_server_ts19 = __esm({
           await db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?)").bind(locals.user.school_id, class_id, nisn, passwordHash, name, "siswa", place_of_birth, date_of_birth).run();
           return { success: true };
         } catch (e3) {
-          return fail(500, { error: "Gagal menambahkan siswa" });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menambahkan siswa" });
         }
       },
       edit: async ({ request, locals, platform }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
         const db = getDB(platform);
         const data = await request.formData();
-        const id = data.get("id")?.toString();
+        const idStr = data.get("id")?.toString();
         const name = data.get("name")?.toString().trim();
         const nisn = data.get("nisn")?.toString().trim();
         const class_id = data.get("class_id")?.toString() || null;
         const place_of_birth = data.get("place_of_birth")?.toString().trim() || null;
         const date_of_birth = data.get("date_of_birth")?.toString() || null;
-        if (!id || !name || !nisn) {
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId) || !name || !nisn) {
           return fail(400, { error: "ID, Nama dan NISN wajib diisi" });
         }
         try {
-          const existing = await db.prepare("SELECT id FROM users WHERE username = ? AND id != ?").bind(nisn, id).first();
+          const existing = await db.prepare("SELECT id FROM users WHERE username = ? AND id != ?").bind(nisn, parsedId).first();
           if (existing) {
             return fail(400, { error: "NISN sudah digunakan siswa lain" });
           }
           const passwordHash = await hashPassword(nisn);
-          await db.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, class_id = ?, place_of_birth = ?, date_of_birth = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, nisn, passwordHash, class_id, place_of_birth, date_of_birth, id, locals.user.school_id).run();
+          await db.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, class_id = ?, place_of_birth = ?, date_of_birth = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, nisn, passwordHash, class_id, place_of_birth, date_of_birth, parsedId, locals.user.school_id).run();
           return { success: true };
         } catch (e3) {
-          return fail(500, { error: "Gagal mengupdate siswa" });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal mengupdate siswa" });
         }
       },
       delete: async ({ request, locals, platform }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
         const db = getDB(platform);
         const data = await request.formData();
-        const id = data.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid" });
+        const idStr = data.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid" });
         try {
           await db.batch([
-            db.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)").bind(id),
-            db.prepare("DELETE FROM student_attempts WHERE student_id = ?").bind(id),
-            db.prepare("DELETE FROM exam_participants WHERE student_id = ?").bind(id),
-            db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(id, locals.user.school_id)
+            db.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)").bind(parsedId),
+            db.prepare("DELETE FROM student_attempts WHERE student_id = ?").bind(parsedId),
+            db.prepare("DELETE FROM exam_participants WHERE student_id = ?").bind(parsedId),
+            db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(parsedId, locals.user.school_id)
           ]);
           return { success: true, message: "Berhasil menghapus data siswa." };
         } catch (e3) {
           console.error("Delete student error:", e3);
-          return fail(500, { error: "Gagal menghapus siswa" });
+          return fail(500, { error: e3.message || "Gagal menghapus siswa" });
         }
       },
       deleteBulk: async ({ request, locals, platform }) => {
@@ -27346,7 +27458,7 @@ var init_page_server_ts19 = __esm({
           return { success: true, message: `Berhasil menghapus ${ids.length} siswa terpilih.` };
         } catch (e3) {
           console.error("Delete bulk students error:", e3);
-          return fail(500, { error: "Gagal menghapus siswa terpilih" });
+          return fail(500, { error: e3.message || "Gagal menghapus siswa terpilih" });
         }
       },
       importExcel: async ({ request, locals, platform }) => {
@@ -27372,33 +27484,36 @@ var init_page_server_ts19 = __esm({
           return { success: true, message: `Berhasil mengimpor ${successCount} siswa dari total ${students.length} data.` };
         } catch (e3) {
           console.error("Import error:", e3);
-          return fail(500, { error: "Terjadi kesalahan saat memproses data import" });
+          return fail(500, { error: e3.message || "Terjadi kesalahan saat memproses data import" });
         }
       },
       toggleStatus: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
         const db = getDB(platform);
         const data = await request.formData();
-        const id = data.get("id")?.toString();
+        const idStr = data.get("id")?.toString();
         const currentStatus = data.get("is_active")?.toString();
-        if (!id || !currentStatus) return fail(400, { error: "Data tidak valid" });
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId) || !currentStatus) return fail(400, { error: "Data tidak valid" });
         const newStatus = currentStatus === "1" ? 0 : 1;
         try {
-          await db.prepare('UPDATE users SET is_active = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ? AND role = "siswa"').bind(newStatus, id, locals.user.school_id).run();
+          await db.prepare('UPDATE users SET is_active = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ? AND role = "siswa"').bind(newStatus, parsedId, locals.user.school_id).run();
           return { success: true };
         } catch (e3) {
-          return fail(500, { error: "Gagal merubah status" });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal merubah status" });
         }
       },
       updatePhoto: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
         const db = getDB(platform);
         const data = await request.formData();
-        const id = data.get("id")?.toString();
+        const idStr = data.get("id")?.toString();
         const photo = data.get("photo")?.toString() || null;
-        if (!id) return fail(400, { error: "ID tidak valid" });
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid" });
         try {
-          const oldUser = await db.prepare('SELECT photo FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(id, locals.user.school_id).first();
+          const oldUser = await db.prepare('SELECT photo FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(parsedId, locals.user.school_id).first();
           const oldPhoto = oldUser?.photo;
           if (oldPhoto && oldPhoto.includes("res.cloudinary.com") && oldPhoto !== photo) {
             try {
@@ -27408,7 +27523,7 @@ var init_page_server_ts19 = __esm({
               console.error("Failed to delete old photo from Cloudinary:", err);
             }
           }
-          await db.prepare('UPDATE users SET photo = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ? AND role = "siswa"').bind(photo, id, locals.user.school_id).run();
+          await db.prepare('UPDATE users SET photo = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ? AND role = "siswa"').bind(photo, parsedId, locals.user.school_id).run();
           if (photo && photo.includes("res.cloudinary.com")) {
             try {
               await db.prepare(`
@@ -27424,7 +27539,7 @@ var init_page_server_ts19 = __esm({
           return { success: true };
         } catch (e3) {
           console.error("Update photo error:", e3);
-          return fail(500, { error: "Gagal merubah foto" });
+          return fail(500, { error: e3.message || "Gagal merubah foto" });
         }
       }
     };
@@ -27777,7 +27892,7 @@ var init__26 = __esm({
     index26 = 25;
     component26 = async () => component_cache26 ??= (await Promise.resolve().then(() => (init_page_svelte19(), page_svelte_exports19))).default;
     server_id25 = "src/routes/admin/students/+page.server.ts";
-    imports26 = ["_app/immutable/nodes/25.BTVDJG6C.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BM9tHWcC.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/DY0DacbH.js"];
+    imports26 = ["_app/immutable/nodes/25.Dx68y7m_.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/u0A-Skss.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BOZ7mAnh.js"];
     stylesheets26 = ["_app/immutable/assets/25.VB0kvX3s.css"];
     fonts26 = [];
   }
@@ -27814,26 +27929,28 @@ var init_page_server_ts20 = __esm({
           await db.prepare("INSERT INTO subjects (school_id, name, code) VALUES (?, ?, ?)").bind(locals.user.school_id, name, code).run();
           return { success: true };
         } catch (e3) {
-          return fail(500, { error: "Gagal menambahkan mata pelajaran" });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menambahkan mata pelajaran" });
         }
       },
       edit: async ({ request, locals, platform }) => {
         const db = getDB(platform);
         const data = await request.formData();
-        const id = data.get("id")?.toString();
+        const idStr = data.get("id")?.toString();
         const name = data.get("name")?.toString().trim();
         const code = data.get("code")?.toString().trim() || null;
-        if (!id || !name) return fail(400, { error: "ID dan Nama wajib diisi" });
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId) || !name) return fail(400, { error: "ID dan Nama wajib diisi" });
         try {
-          const oldSubject = await db.prepare("SELECT name FROM subjects WHERE id = ? AND school_id = ?").bind(id, locals.user.school_id).first();
-          await db.prepare('UPDATE subjects SET name = ?, code = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, code, id, locals.user.school_id).run();
+          const oldSubject = await db.prepare("SELECT name FROM subjects WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).first();
+          await db.prepare('UPDATE subjects SET name = ?, code = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, code, parsedId, locals.user.school_id).run();
           if (oldSubject && oldSubject.name !== name) {
             const linkedExams = await db.prepare(`
 					SELECT e.id, et.code as type_code
 					FROM exams e
 					LEFT JOIN exam_types et ON e.exam_type_id = et.id
 					WHERE e.subject_id = ?
-				`).bind(id).all();
+				`).bind(parsedId).all();
             if (linkedExams.results.length > 0) {
               const updateBatch = linkedExams.results.map(
                 (exam) => db.prepare(`UPDATE exams SET title = ?, updated_at = datetime('now') WHERE id = ?`).bind(`${exam.type_code || "Ujian"} - ${name}`, exam.id)
@@ -27843,19 +27960,25 @@ var init_page_server_ts20 = __esm({
           }
           return { success: true };
         } catch (e3) {
-          return fail(500, { error: "Gagal mengupdate mata pelajaran" });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal mengupdate mata pelajaran" });
         }
       },
       delete: async ({ request, locals, platform }) => {
         const db = getDB(platform);
         const data = await request.formData();
-        const id = data.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid" });
+        const idStr = data.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid" });
         try {
-          await db.prepare("DELETE FROM subjects WHERE id = ? AND school_id = ?").bind(id, locals.user.school_id).run();
+          await db.batch([
+            db.prepare("UPDATE exams SET subject_id = NULL WHERE subject_id = ?").bind(parsedId),
+            db.prepare("DELETE FROM subjects WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id)
+          ]);
           return { success: true };
         } catch (e3) {
-          return fail(500, { error: "Gagal menghapus mata pelajaran" });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menghapus mata pelajaran" });
         }
       }
     };
@@ -27967,7 +28090,7 @@ var init__27 = __esm({
     index27 = 26;
     component27 = async () => component_cache27 ??= (await Promise.resolve().then(() => (init_page_svelte20(), page_svelte_exports20))).default;
     server_id26 = "src/routes/admin/subjects/+page.server.ts";
-    imports27 = ["_app/immutable/nodes/26.ByRgbXMe.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BM9tHWcC.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/BlACJPux.js"];
+    imports27 = ["_app/immutable/nodes/26.CW7SUTG1.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/u0A-Skss.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/BlACJPux.js"];
     stylesheets27 = [];
     fonts27 = [];
   }
@@ -28034,64 +28157,83 @@ var init_page_server_ts21 = __esm({
         if (!locals.user) return fail(401, { error: "Unauthorized" });
         const db = getDB(platform);
         const form = await request.formData();
-        const examId = form.get("exam_id")?.toString();
+        const examIdStr = form.get("exam_id")?.toString();
         const durationHours = parseInt(form.get("duration_hours")?.toString() || "2");
-        if (!examId) return fail(400, { error: "Pilih ujian terlebih dahulu." });
-        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(examId, locals.user.school_id).first();
+        const parsedExamId = parseInt(examIdStr || "", 10);
+        if (isNaN(parsedExamId)) return fail(400, { error: "Pilih ujian terlebih dahulu." });
+        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
         if (!exam) return fail(400, { error: "Ujian tidak ditemukan." });
         const now = Date.now();
         const nowIso = new Date(now).toISOString();
         const activeToken = await db.prepare(`
 			SELECT token_code FROM tokens 
 			WHERE exam_id = ? AND school_id = ? AND expires_at > ?
-		`).bind(examId, locals.user.school_id, nowIso).first();
+		`).bind(parsedExamId, locals.user.school_id, nowIso).first();
         if (activeToken) {
           return fail(400, { error: `Gagal: Masih ada token aktif untuk ujian ini (${activeToken.token_code}). Harap hapus token tersebut dahulu jika ingin membuat yang baru.` });
         }
         const tokenCode = generateTokenCode(6);
         const expiresAt = new Date(now + durationHours * 60 * 60 * 1e3).toISOString();
-        await db.prepare(`
-			DELETE FROM tokens 
-			WHERE exam_id = ? AND school_id = ? 
-			  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
-		`).bind(examId, locals.user.school_id, examId).run();
-        await db.prepare("INSERT INTO tokens (school_id, exam_id, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?)").bind(locals.user.school_id, examId, tokenCode, locals.user.id, expiresAt).run();
-        return { success: `Token berhasil dibuat: ${tokenCode}` };
+        try {
+          await db.prepare(`
+				DELETE FROM tokens 
+				WHERE exam_id = ? AND school_id = ? 
+				  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
+			`).bind(parsedExamId, locals.user.school_id, parsedExamId).run();
+          await db.prepare("INSERT INTO tokens (school_id, exam_id, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?)").bind(locals.user.school_id, parsedExamId, tokenCode, locals.user.id, expiresAt).run();
+          return { success: `Token berhasil dibuat: ${tokenCode}` };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal membuat token" });
+        }
       },
       release: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
         const db = getDB(platform);
         const form = await request.formData();
-        const id = form.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid." });
-        await db.prepare('UPDATE tokens SET is_released = 1, released_at = datetime("now") WHERE id = ? AND school_id = ?').bind(id, locals.user.school_id).run();
-        return { success: "Token berhasil dirilis ke siswa. Token akan ditarik otomatis dalam 15 menit." };
+        const idStr = form.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
+        try {
+          await db.prepare('UPDATE tokens SET is_released = 1, released_at = datetime("now") WHERE id = ? AND school_id = ?').bind(parsedId, locals.user.school_id).run();
+          return { success: "Token berhasil dirilis ke siswa. Token akan ditarik otomatis dalam 15 menit." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal merilis token" });
+        }
       },
       revoke: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
         const db = getDB(platform);
         const form = await request.formData();
-        const id = form.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid." });
-        await db.prepare("UPDATE tokens SET is_released = 0 WHERE id = ? AND school_id = ?").bind(id, locals.user.school_id).run();
-        return { success: "Token berhasil ditarik." };
+        const idStr = form.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
+        try {
+          await db.prepare("UPDATE tokens SET is_released = 0 WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).run();
+          return { success: "Token berhasil ditarik." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menarik token" });
+        }
       },
       delete: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
         const db = getDB(platform);
         const form = await request.formData();
-        const id = form.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid." });
+        const idStr = form.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
         try {
-          const usage = await db.prepare("SELECT COUNT(*) as count FROM student_attempts WHERE token_id = ?").bind(id).first();
+          const usage = await db.prepare("SELECT COUNT(*) as count FROM student_attempts WHERE token_id = ?").bind(parsedId).first();
           if (usage && usage.count > 0) {
             return fail(400, { error: "Gagal dihapus: Token ini telah digunakan oleh peserta ujian." });
           }
-          await db.prepare("DELETE FROM tokens WHERE id = ? AND school_id = ?").bind(id, locals.user.school_id).run();
+          await db.prepare("DELETE FROM tokens WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).run();
           return { success: "Token berhasil dihapus." };
         } catch (err) {
           console.error("Delete token error:", err);
-          return fail(500, { error: "Terjadi kesalahan sistem saat menghapus token." });
+          return fail(500, { error: err.message || "Terjadi kesalahan sistem saat menghapus token." });
         }
       }
     };
@@ -28232,7 +28374,7 @@ var init__28 = __esm({
     index28 = 27;
     component28 = async () => component_cache28 ??= (await Promise.resolve().then(() => (init_page_svelte21(), page_svelte_exports21))).default;
     server_id27 = "src/routes/admin/tokens/+page.server.ts";
-    imports28 = ["_app/immutable/nodes/27.BLBOyow7.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/D6nLZD03.js"];
+    imports28 = ["_app/immutable/nodes/27.CSs8BwSu.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/hQVTFjhf.js"];
     stylesheets28 = [];
     fonts28 = [];
   }
@@ -28296,29 +28438,40 @@ var init_page_server_ts22 = __esm({
         if (existing) {
           return fail(400, { error: "Username sudah digunakan." });
         }
-        const passwordHash = await hashPassword(password);
-        await db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(schoolId, username, passwordHash, name, role).run();
-        return { success: "Pengguna berhasil ditambahkan." };
+        try {
+          const passwordHash = await hashPassword(password);
+          await db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(schoolId, username, passwordHash, name, role).run();
+          return { success: "Pengguna berhasil ditambahkan." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menambahkan pengguna." });
+        }
       },
       update: async ({ request, platform, locals, cookies }) => {
         const db = getDB(platform);
         const form = await request.formData();
         const schoolId = locals.user.school_id;
-        const id = form.get("id")?.toString();
+        const idStr = form.get("id")?.toString();
         const name = form.get("name")?.toString().trim();
         const role = form.get("role")?.toString();
         const password = form.get("password")?.toString();
         const isActive = form.get("is_active")?.toString();
-        if (!id || !name || !role) {
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId) || !name || !role) {
           return fail(400, { error: "Data tidak lengkap." });
         }
-        if (password) {
-          const passwordHash = await hashPassword(password);
-          await db.prepare("UPDATE users SET name = ?, role = ?, password_hash = ?, is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, role, passwordHash, isActive === "1" ? 1 : 0, id, schoolId).run();
-        } else {
-          await db.prepare("UPDATE users SET name = ?, role = ?, is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, role, isActive === "1" ? 1 : 0, id, schoolId).run();
+        try {
+          if (password) {
+            const passwordHash = await hashPassword(password);
+            await db.prepare("UPDATE users SET name = ?, role = ?, password_hash = ?, is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, role, passwordHash, isActive === "1" ? 1 : 0, parsedId, schoolId).run();
+          } else {
+            await db.prepare("UPDATE users SET name = ?, role = ?, is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, role, isActive === "1" ? 1 : 0, parsedId, schoolId).run();
+          }
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal memperbarui pengguna." });
         }
-        if (id === locals.user.id.toString()) {
+        if (parsedId === locals.user.id) {
           const updatedUser = {
             ...locals.user,
             name,
@@ -28340,10 +28493,11 @@ var init_page_server_ts22 = __esm({
         if (!locals.user) return fail(401, { error: "Unauthorized" });
         const db = getDB(platform);
         const form = await request.formData();
-        const id = form.get("id")?.toString();
+        const idStr = form.get("id")?.toString();
         const schoolId = locals.user.school_id;
-        if (!id) return fail(400, { error: "ID tidak valid." });
-        const userToDelete = await db.prepare("SELECT id, is_active, role FROM users WHERE id = ? AND school_id = ?").bind(id, schoolId).first();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
+        const userToDelete = await db.prepare("SELECT id, is_active, role FROM users WHERE id = ? AND school_id = ?").bind(parsedId, schoolId).first();
         if (!userToDelete) {
           return fail(404, { error: "Pengguna tidak ditemukan." });
         }
@@ -28355,15 +28509,15 @@ var init_page_server_ts22 = __esm({
         }
         try {
           await db.batch([
-            db.prepare("UPDATE exams SET created_by = NULL WHERE created_by = ?").bind(id),
-            db.prepare("UPDATE tokens SET created_by = NULL WHERE created_by = ?").bind(id),
-            db.prepare("UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?").bind(id),
-            db.prepare("DELETE FROM exam_teachers WHERE teacher_id = ?").bind(id),
-            db.prepare("DELETE FROM exam_proctors WHERE proctor_id = ?").bind(id),
-            db.prepare("DELETE FROM exam_participants WHERE student_id = ?").bind(id),
-            db.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)").bind(id),
-            db.prepare("DELETE FROM student_attempts WHERE student_id = ?").bind(id),
-            db.prepare("DELETE FROM users WHERE id = ? AND school_id = ?").bind(id, schoolId)
+            db.prepare("UPDATE exams SET created_by = NULL WHERE created_by = ?").bind(parsedId),
+            db.prepare("UPDATE tokens SET created_by = NULL WHERE created_by = ?").bind(parsedId),
+            db.prepare("UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?").bind(parsedId),
+            db.prepare("DELETE FROM exam_teachers WHERE teacher_id = ?").bind(parsedId),
+            db.prepare("DELETE FROM exam_proctors WHERE proctor_id = ?").bind(parsedId),
+            db.prepare("DELETE FROM exam_participants WHERE student_id = ?").bind(parsedId),
+            db.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)").bind(parsedId),
+            db.prepare("DELETE FROM student_attempts WHERE student_id = ?").bind(parsedId),
+            db.prepare("DELETE FROM users WHERE id = ? AND school_id = ?").bind(parsedId, schoolId)
           ]);
           return { success: "Pengguna nonaktif berhasil dihapus." };
         } catch (err) {
@@ -28393,7 +28547,7 @@ var init_page_server_ts22 = __esm({
           return { success: `Berhasil mengimpor ${successCount} pengguna dari total ${users.length} data.` };
         } catch (e3) {
           console.error("Import error:", e3);
-          return fail(500, { error: "Terjadi kesalahan saat memproses data import" });
+          return fail(500, { error: e3.message || "Terjadi kesalahan saat memproses data import" });
         }
       }
     };
@@ -28668,7 +28822,7 @@ var init__29 = __esm({
     index29 = 28;
     component29 = async () => component_cache29 ??= (await Promise.resolve().then(() => (init_page_svelte22(), page_svelte_exports22))).default;
     server_id28 = "src/routes/admin/users/+page.server.ts";
-    imports29 = ["_app/immutable/nodes/28.DfhANYI3.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/DHL7zaVF.js"];
+    imports29 = ["_app/immutable/nodes/28.ogRDIqAQ.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/DHL7zaVF.js"];
     stylesheets29 = ["_app/immutable/assets/28.DfiktKiO.css"];
     fonts29 = [];
   }
@@ -28827,18 +28981,19 @@ var init_page_server_ts24 = __esm({
       copyQuestions: async ({ request, locals, platform }) => {
         const db = getDB(platform);
         const data = await request.formData();
-        const targetExamId = data.get("target_exam_id")?.toString();
+        const targetExamIdStr = data.get("target_exam_id")?.toString();
         const questionIdsStr = data.get("question_ids")?.toString();
-        if (!targetExamId || !questionIdsStr) return fail(400, { error: "Data tidak lengkap" });
+        const parsedTargetExamId = parseInt(targetExamIdStr || "", 10);
+        if (isNaN(parsedTargetExamId) || !questionIdsStr) return fail(400, { error: "Data tidak lengkap" });
         const questionIds = questionIdsStr.split(",").map((id) => parseInt(id.trim())).filter((id) => !isNaN(id));
         if (questionIds.length === 0) return fail(400, { error: "Tidak ada soal yang dipilih" });
         const target = await db.prepare(`
 			SELECT id FROM exams 
 			WHERE id = ? AND school_id = ? 
 			AND (created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = exams.id AND et.teacher_id = ?))
-		`).bind(targetExamId, locals.user.school_id, locals.user.id, locals.user.id).first();
+		`).bind(parsedTargetExamId, locals.user.school_id, locals.user.id, locals.user.id).first();
         if (!target) return fail(403, { error: "Ujian tujuan tidak valid atau tidak memiliki akses" });
-        const maxQ = await db.prepare("SELECT MAX(question_number) as m FROM questions WHERE exam_id = ?").bind(targetExamId).first();
+        const maxQ = await db.prepare("SELECT MAX(question_number) as m FROM questions WHERE exam_id = ?").bind(parsedTargetExamId).first();
         let nextNumber = (maxQ?.m || 0) + 1;
         const placeholders = questionIds.map(() => "?").join(",");
         const questionsToCopy = await db.prepare(`
@@ -28855,7 +29010,7 @@ var init_page_server_ts24 = __esm({
 				INSERT INTO questions (exam_id, type, question_text, question_number, points, media_type, media_url, audio_max_plays, options_json, correct_answer_json)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			`).bind(
-            targetExamId,
+            parsedTargetExamId,
             q.type,
             q.question_text,
             nextNumber++,
@@ -28871,7 +29026,8 @@ var init_page_server_ts24 = __esm({
           await db.batch(stmts);
           return { success: true };
         } catch (e3) {
-          return fail(500, { error: "Gagal menyalin soal" });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menyalin soal" });
         }
       }
     };
@@ -28956,7 +29112,7 @@ var init__31 = __esm({
     index31 = 30;
     component31 = async () => component_cache31 ??= (await Promise.resolve().then(() => (init_page_svelte24(), page_svelte_exports24))).default;
     server_id30 = "src/routes/guru/bank-soal/+page.server.ts";
-    imports31 = ["_app/immutable/nodes/30.Rj06tE82.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js"];
+    imports31 = ["_app/immutable/nodes/30.B9PORc5p.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js"];
     stylesheets31 = [];
     fonts31 = [];
   }
@@ -28977,20 +29133,26 @@ var init_page_server_ts25 = __esm({
     init_shared_server();
     load31 = async ({ platform, params, locals }) => {
       const db = getDB(platform);
-      const exam = await db.prepare("SELECT * FROM exams WHERE id = ? AND school_id = ?").bind(params.examId, locals.user.school_id).first();
+      const examIdStr = params.examId;
+      const parsedExamId = parseInt(examIdStr, 10);
+      if (isNaN(parsedExamId)) throw error(400, "ID Ujian tidak valid");
+      const exam = await db.prepare("SELECT * FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
       if (!exam) throw error(404, "Ujian tidak ditemukan");
-      const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(params.examId, locals.user.id).first();
+      const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(parsedExamId, locals.user.id).first();
       if (exam.created_by !== locals.user.id && !isTeacher) {
         throw error(403, "Anda tidak memiliki akses ke ujian ini.");
       }
-      const questions = await db.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number").bind(params.examId).all();
+      const questions = await db.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number").bind(parsedExamId).all();
       return { exam, questions: questions.results };
     };
     actions16 = {
       create: async ({ request, platform, params, locals }) => {
         const db = getDB(platform);
-        const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(params.examId, locals.user.school_id).first();
-        const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(params.examId, locals.user.id).first();
+        const examIdStr = params.examId;
+        const parsedExamId = parseInt(examIdStr, 10);
+        if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid" });
+        const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+        const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(parsedExamId, locals.user.id).first();
         if (!exam || exam.created_by !== locals.user.id && !isTeacher) {
           return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         }
@@ -29002,7 +29164,7 @@ var init_page_server_ts25 = __esm({
         const mediaUrl = form.get("media_url")?.toString().trim() || null;
         const audioMaxPlays = parseInt(form.get("audio_max_plays")?.toString() || "3");
         if (!type || !questionText) return fail(400, { error: "Tipe dan teks soal wajib diisi." });
-        const last = await db.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(params.examId).first();
+        const last = await db.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(parsedExamId).first();
         const nextNum = (last?.max_num ?? 0) + 1;
         let optionsJson = null;
         let correctAnswerJson = null;
@@ -29051,37 +29213,46 @@ var init_page_server_ts25 = __esm({
           });
           correctAnswerJson = JSON.stringify(mapping);
         }
-        await db.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points,
-			media_type, media_url, audio_max_plays, options_json, correct_answer_json)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
-          params.examId,
-          type,
-          questionText,
-          nextNum,
-          points,
-          mediaType === "none" ? null : mediaType,
-          mediaUrl,
-          audioMaxPlays,
-          optionsJson,
-          correctAnswerJson
-        ).run();
-        return { success: "Soal berhasil ditambahkan." };
+        try {
+          await db.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points,
+				media_type, media_url, audio_max_plays, options_json, correct_answer_json)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
+            parsedExamId,
+            type,
+            questionText,
+            nextNum,
+            points,
+            mediaType === "none" ? null : mediaType,
+            mediaUrl,
+            audioMaxPlays,
+            optionsJson,
+            correctAnswerJson
+          ).run();
+          return { success: "Soal berhasil ditambahkan." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menambahkan soal" });
+        }
       },
       edit: async ({ request, platform, params, locals }) => {
         const db = getDB(platform);
-        const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(params.examId, locals.user.school_id).first();
-        const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(params.examId, locals.user.id).first();
+        const examIdStr = params.examId;
+        const parsedExamId = parseInt(examIdStr, 10);
+        if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid" });
+        const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+        const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(parsedExamId, locals.user.id).first();
         if (!exam || exam.created_by !== locals.user.id && !isTeacher) {
           return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         }
         const form = await request.formData();
-        const id = form.get("id")?.toString();
+        const idStr = form.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
         const type = form.get("type")?.toString();
         const questionText = form.get("question_text")?.toString().trim();
         const points = parseInt(form.get("points")?.toString() || "1");
         const mediaType = form.get("media_type")?.toString() || null;
         const mediaUrl = form.get("media_url")?.toString().trim() || null;
-        if (!id || !type || !questionText) return fail(400, { error: "ID, tipe, dan teks soal wajib diisi." });
+        if (isNaN(parsedId) || !type || !questionText) return fail(400, { error: "ID, tipe, dan teks soal wajib diisi." });
         let optionsJson = null;
         let correctAnswerJson = null;
         if (type === "pilihan_ganda") {
@@ -29123,7 +29294,7 @@ var init_page_server_ts25 = __esm({
             }
           }
           optionsJson = JSON.stringify({ left: leftItems, right: rightItems });
-          const prevMap = await db.prepare("SELECT correct_answer_json FROM questions WHERE id = ?").bind(id).first();
+          const prevMap = await db.prepare("SELECT correct_answer_json FROM questions WHERE id = ?").bind(parsedId).first();
           if (prevMap && prevMap.correct_answer_json) {
             correctAnswerJson = prevMap.correct_answer_json;
           } else {
@@ -29134,37 +29305,54 @@ var init_page_server_ts25 = __esm({
             correctAnswerJson = JSON.stringify(mapping);
           }
         }
-        const prevMedia = await db.prepare("SELECT media_url FROM questions WHERE id = ?").bind(id).first();
-        if (prevMedia && prevMedia.media_url && prevMedia.media_url !== mediaUrl && prevMedia.media_url.includes("res.cloudinary.com")) {
-          await deleteFromCloudinary(prevMedia.media_url, private_env);
+        try {
+          const prevMedia = await db.prepare("SELECT media_url FROM questions WHERE id = ?").bind(parsedId).first();
+          if (prevMedia && prevMedia.media_url && prevMedia.media_url !== mediaUrl && prevMedia.media_url.includes("res.cloudinary.com")) {
+            await deleteFromCloudinary(prevMedia.media_url, private_env);
+          }
+          await db.prepare(`UPDATE questions SET 
+				question_text = ?, points = ?, media_type = ?, media_url = ?, 
+				options_json = ?, correct_answer_json = ? 
+				WHERE id = ?`).bind(questionText, points, mediaType === "none" ? null : mediaType, mediaUrl, optionsJson, correctAnswerJson, parsedId).run();
+          return { success: "Soal berhasil diubah." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal mengubah soal" });
         }
-        await db.prepare(`UPDATE questions SET 
-			question_text = ?, points = ?, media_type = ?, media_url = ?, 
-			options_json = ?, correct_answer_json = ? 
-			WHERE id = ?`).bind(questionText, points, mediaType === "none" ? null : mediaType, mediaUrl, optionsJson, correctAnswerJson, id).run();
-        return { success: "Soal berhasil diubah." };
       },
       delete: async ({ request, platform, params, locals }) => {
         const db = getDB(platform);
-        const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(params.examId, locals.user.school_id).first();
-        const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(params.examId, locals.user.id).first();
+        const examIdStr = params.examId;
+        const parsedExamId = parseInt(examIdStr, 10);
+        if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid" });
+        const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+        const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(parsedExamId, locals.user.id).first();
         if (!exam || exam.created_by !== locals.user.id && !isTeacher) {
           return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         }
         const form = await request.formData();
-        const id = form.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid." });
-        const q = await db.prepare("SELECT media_url FROM questions WHERE id = ?").bind(id).first();
-        if (q && q.media_url && q.media_url.includes("res.cloudinary.com")) {
-          await deleteFromCloudinary(q.media_url, private_env);
+        const idStr = form.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
+        try {
+          const q = await db.prepare("SELECT media_url FROM questions WHERE id = ?").bind(parsedId).first();
+          if (q && q.media_url && q.media_url.includes("res.cloudinary.com")) {
+            await deleteFromCloudinary(q.media_url, private_env);
+          }
+          await db.prepare("DELETE FROM questions WHERE id = ?").bind(parsedId).run();
+          return { success: "Soal berhasil dihapus." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menghapus soal" });
         }
-        await db.prepare("DELETE FROM questions WHERE id = ?").bind(id).run();
-        return { success: "Soal berhasil dihapus." };
       },
       importExcel: async ({ request, platform, params, locals }) => {
         const db = getDB(platform);
-        const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(params.examId, locals.user.school_id).first();
-        const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(params.examId, locals.user.id).first();
+        const examIdStr = params.examId;
+        const parsedExamId = parseInt(examIdStr, 10);
+        if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid" });
+        const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+        const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(parsedExamId, locals.user.id).first();
         if (!exam || exam.created_by !== locals.user.id && !isTeacher) {
           return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         }
@@ -29180,13 +29368,13 @@ var init_page_server_ts25 = __esm({
         if (!Array.isArray(parsedQuestions) || parsedQuestions.length === 0) {
           return fail(400, { error: "Tidak ada soal yang ditemukan." });
         }
-        const last = await db.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(params.examId).first();
+        const last = await db.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(parsedExamId).first();
         let nextNum = (last?.max_num ?? 0) + 1;
         const statements = [];
         const stmt = db.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points, options_json, correct_answer_json) VALUES (?, ?, ?, ?, ?, ?, ?)`);
         for (const q of parsedQuestions) {
           statements.push(
-            stmt.bind(params.examId, q.type, q.question_text, nextNum, q.points || 1, q.options_json || null, q.correct_answer_json || null)
+            stmt.bind(parsedExamId, q.type, q.question_text, nextNum, q.points || 1, q.options_json || null, q.correct_answer_json || null)
           );
           nextNum++;
         }
@@ -29374,7 +29562,7 @@ var init__32 = __esm({
     index32 = 31;
     component32 = async () => component_cache32 ??= (await Promise.resolve().then(() => (init_page_svelte25(), page_svelte_exports25))).default;
     server_id31 = "src/routes/guru/bank-soal/[examId]/+page.server.ts";
-    imports32 = ["_app/immutable/nodes/31.Chh3hR5A.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BM9tHWcC.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/BCVrPYcV.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/DY0DacbH.js", "_app/immutable/chunks/BbXmhjXd.js", "_app/immutable/chunks/BXqDtUsa.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/WOw1egtm.js", "_app/immutable/chunks/DVE3zHhg.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/BlACJPux.js"];
+    imports32 = ["_app/immutable/nodes/31.DVlDU3MP.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/u0A-Skss.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/CwoVIbtH.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/BOZ7mAnh.js", "_app/immutable/chunks/BbXmhjXd.js", "_app/immutable/chunks/BXqDtUsa.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/WOw1egtm.js", "_app/immutable/chunks/DVE3zHhg.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/BlACJPux.js"];
     stylesheets32 = ["_app/immutable/assets/QuestionRenderer.CwYmYea-.css"];
     fonts32 = [];
   }
@@ -29392,12 +29580,12 @@ var init_page_server_ts26 = __esm({
     init_db();
     load32 = async ({ platform, locals, params }) => {
       const db = getDB(platform);
-      const examId = params.examId;
-      const exam = await db.prepare("SELECT id, title, duration_minutes FROM exams WHERE id = ? AND school_id = ? AND created_by = ?").bind(examId, locals.user.school_id, locals.user.id).first();
+      const examId2 = params.examId;
+      const exam = await db.prepare("SELECT id, title, duration_minutes FROM exams WHERE id = ? AND school_id = ? AND created_by = ?").bind(examId2, locals.user.school_id, locals.user.id).first();
       if (!exam) {
         throw redirect(302, "/guru/bank-soal");
       }
-      const questions = await db.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number ASC").bind(examId).all();
+      const questions = await db.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number ASC").bind(examId2).all();
       return {
         exam,
         questions: questions.results
@@ -29498,7 +29686,7 @@ var init__33 = __esm({
     index33 = 32;
     component33 = async () => component_cache33 ??= (await Promise.resolve().then(() => (init_page_svelte26(), page_svelte_exports26))).default;
     server_id32 = "src/routes/guru/bank-soal/[examId]/preview/+page.server.ts";
-    imports33 = ["_app/immutable/nodes/32.aXMXPGnJ.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/BbXmhjXd.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/BXqDtUsa.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/WOw1egtm.js", "_app/immutable/chunks/BoUxGHkI.js", "_app/immutable/chunks/D6nLZD03.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/Bvn7BXEI.js"];
+    imports33 = ["_app/immutable/nodes/32.gcxNyyVP.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/BbXmhjXd.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/BXqDtUsa.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/WOw1egtm.js", "_app/immutable/chunks/BoUxGHkI.js", "_app/immutable/chunks/hQVTFjhf.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/BSCiMgoh.js"];
     stylesheets33 = ["_app/immutable/assets/QuestionRenderer.CwYmYea-.css"];
     fonts33 = [];
   }
@@ -29760,7 +29948,7 @@ var init__34 = __esm({
     index34 = 33;
     component34 = async () => component_cache34 ??= (await Promise.resolve().then(() => (init_page_svelte27(), page_svelte_exports27))).default;
     server_id33 = "src/routes/guru/media-bank/+page.server.ts";
-    imports34 = ["_app/immutable/nodes/33.BbqK3CkM.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BCVrPYcV.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/DY0DacbH.js"];
+    imports34 = ["_app/immutable/nodes/33.CxCWuTQc.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/CwoVIbtH.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/BOZ7mAnh.js"];
     stylesheets34 = [];
     fonts34 = [];
   }
@@ -30099,7 +30287,7 @@ var init__36 = __esm({
     index36 = 35;
     component36 = async () => component_cache36 ??= (await Promise.resolve().then(() => (init_page_svelte29(), page_svelte_exports29))).default;
     server_id35 = "src/routes/guru/papan-peringkat/type/[typeId]/+page.server.ts";
-    imports36 = ["_app/immutable/nodes/35.CozFtfjJ.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/D6nLZD03.js"];
+    imports36 = ["_app/immutable/nodes/35.C1-eNI7p.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/hQVTFjhf.js"];
     stylesheets36 = [];
     fonts36 = [];
   }
@@ -30229,14 +30417,14 @@ var init_page_server_ts31 = __esm({
     load37 = async ({ platform, locals, params }) => {
       if (locals.user?.role !== "guru") throw redirect(302, "/");
       const db = getDB(platform);
-      const examId = params.examId;
+      const examId2 = params.examId;
       const schoolId = locals.user.school_id;
       const userId = locals.user.id;
       const exam = await db.prepare(`
 		SELECT id, title, subject_id, exam_type_id FROM exams 
 		WHERE id = ? AND school_id = ? 
 		AND (created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers teacher_join WHERE teacher_join.exam_id = exams.id AND teacher_join.teacher_id = ?))
-	`).bind(examId, schoolId, userId, userId).first();
+	`).bind(examId2, schoolId, userId, userId).first();
       if (!exam) {
         throw error(404, "Ujian tidak ditemukan atau Anda tidak memiliki akses ke ujian ini.");
       }
@@ -30257,7 +30445,7 @@ var init_page_server_ts31 = __esm({
 		LEFT JOIN classes c ON u.class_id = c.id
 		WHERE sa.exam_id = ? AND sa.status = 'selesai'
 		ORDER BY sa.score DESC, (julianday(sa.submit_time) - julianday(sa.start_time)) ASC
-	`).bind(examId).all();
+	`).bind(examId2).all();
       return {
         exam: {
           ...exam,
@@ -30373,34 +30561,36 @@ var init_page_server_ts32 = __esm({
     load38 = async ({ platform, url, locals }) => {
       const db = getDB(platform);
       const examParam = url.searchParams.get("exam_id");
-      const studentFilter = url.searchParams.get("student_id") || "";
-      let answers = [];
-      let students = [];
-      let selectedExam = null;
-      const exams = await db.prepare(`
+      const studentFilterStr = url.searchParams.get("student_id") || "";
+      const studentFilter = parseInt(studentFilterStr, 10);
+      try {
+        let answers = [];
+        let students = [];
+        let selectedExam = null;
+        const exams = await db.prepare(`
 		SELECT id, title FROM exams 
 		WHERE school_id = ? AND (created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = exams.id AND et.teacher_id = ?))
 		ORDER BY title
 	`).bind(locals.user.school_id, locals.user.id, locals.user.id).all();
-      if (examParam !== null) {
-        const isAllExams = examParam === "all";
-        const examFilter = isAllExams ? "" : examParam;
-        let studentQuery = `SELECT DISTINCT u.id, u.name 
+        if (examParam !== null) {
+          const isAllExams = examParam === "all";
+          const examFilter = isAllExams ? "" : parseInt(examParam, 10);
+          let studentQuery = `SELECT DISTINCT u.id, u.name 
 			FROM student_attempts st 
 			JOIN users u ON st.student_id = u.id 
 			JOIN exams e ON st.exam_id = e.id 
 			WHERE e.school_id = ? AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))
 			AND (st.status IN ('selesai', 'waktu_habis') OR (e.end_time IS NOT NULL AND e.end_time <= datetime('now')))`;
-        const studentParams = [locals.user.school_id, locals.user.id, locals.user.id];
-        if (examFilter !== "") {
-          studentQuery += ` AND e.id = ?`;
-          studentParams.push(examFilter);
-          selectedExam = await db.prepare("SELECT id, title, show_score_type, is_score_released FROM exams WHERE id = ?").bind(examFilter).first();
-        }
-        studentQuery += ` ORDER BY u.name`;
-        const studentsResult = await db.prepare(studentQuery).bind(...studentParams).all();
-        students = studentsResult.results;
-        let query = `SELECT sa.id as answer_id, sa.answer_given, sa.score_given, sa.is_correct,
+          const studentParams = [locals.user.school_id, locals.user.id, locals.user.id];
+          if (examFilter !== "") {
+            studentQuery += ` AND e.id = ?`;
+            studentParams.push(examFilter);
+            selectedExam = await db.prepare("SELECT id, title, show_score_type, is_score_released FROM exams WHERE id = ?").bind(examFilter).first();
+          }
+          studentQuery += ` ORDER BY u.name`;
+          const studentsResult = await db.prepare(studentQuery).bind(...studentParams).all();
+          students = studentsResult.results;
+          let query = `SELECT sa.id as answer_id, sa.answer_given, sa.score_given, sa.is_correct,
 			q.id as question_id, q.question_text, q.type, q.points, q.correct_answer_json,
 			st.id as attempt_id, u.name as student_name, e.title as exam_title, e.id as exam_id
 			FROM student_answers sa
@@ -30412,54 +30602,70 @@ var init_page_server_ts32 = __esm({
 			AND e.school_id = ?
 			AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))
 			AND (st.status IN ('selesai', 'waktu_habis') OR (e.end_time IS NOT NULL AND e.end_time <= datetime('now')))`;
-        const params = [locals.user.school_id, locals.user.id, locals.user.id];
-        if (examFilter !== "") {
-          query += " AND e.id = ?";
-          params.push(examFilter);
+          const params = [locals.user.school_id, locals.user.id, locals.user.id];
+          if (!isAllExams && !isNaN(examFilter)) {
+            query += " AND e.id = ?";
+            params.push(examFilter);
+          }
+          if (!isNaN(studentFilter)) {
+            query += " AND u.id = ?";
+            params.push(studentFilter);
+          }
+          query += " ORDER BY e.id, u.name, q.question_number";
+          const answersResult = await db.prepare(query).bind(...params).all();
+          answers = answersResult.results;
         }
-        if (studentFilter !== "") {
-          query += " AND u.id = ?";
-          params.push(studentFilter);
-        }
-        query += " ORDER BY e.id, u.name, q.question_number";
-        const answersResult = await db.prepare(query).bind(...params).all();
-        answers = answersResult.results;
+        return { answers, exams: exams.results, students, examParam, studentFilter: isNaN(studentFilter) ? "" : studentFilter, selectedExam };
+      } catch (e3) {
+        console.error("Load Error in guru penilaian:", e3);
+        return { answers: [], exams: [], students: [], examParam: "", studentFilter: "", selectedExam: null, loadError: e3.message || String(e3) };
       }
-      return { answers, exams: exams.results, students, examParam, studentFilter, selectedExam };
     };
     actions18 = {
       grade: async ({ request, platform }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const answerId = form.get("answer_id")?.toString();
+        const answerIdStr = form.get("answer_id")?.toString();
+        const parsedAnswerId = parseInt(answerIdStr || "", 10);
         const scoreStr = form.get("score_given")?.toString();
         const maxPoints = parseInt(form.get("max_points")?.toString() || "1");
-        if (!answerId) return fail(400, { error: "ID jawaban tidak valid." });
+        if (isNaN(parsedAnswerId)) return fail(400, { error: "ID jawaban tidak valid." });
         if (!scoreStr || scoreStr.trim() === "") return fail(400, { error: "Nilai tidak boleh kosong." });
-        const scoreGiven = parseFloat(scoreStr);
-        const isCorrect = scoreGiven >= maxPoints ? 1 : scoreGiven > 0 ? 0 : 0;
-        await db.prepare("UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?").bind(scoreGiven, isCorrect, answerId).run();
-        const answer = await db.prepare("SELECT attempt_id FROM student_answers WHERE id = ?").bind(answerId).first();
-        if (answer) {
-          const totalResult = await db.prepare(`
-				SELECT SUM(COALESCE(sa.score_given, 0)) as total_score, SUM(q.points) as total_points
-				FROM student_answers sa JOIN questions q ON sa.question_id = q.id
-				WHERE sa.attempt_id = ?
-			`).bind(answer.attempt_id).first();
-          if (totalResult && totalResult.total_points > 0) {
-            const score = totalResult.total_score / totalResult.total_points * 100;
-            await db.prepare("UPDATE student_attempts SET score = ? WHERE id = ?").bind(Math.round(score * 10) / 10, answer.attempt_id).run();
+        try {
+          const scoreGiven = parseFloat(scoreStr);
+          const isCorrect = scoreGiven >= maxPoints ? 1 : scoreGiven > 0 ? 0 : 0;
+          await db.prepare("UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?").bind(scoreGiven, isCorrect, parsedAnswerId).run();
+          const answer = await db.prepare("SELECT attempt_id FROM student_answers WHERE id = ?").bind(parsedAnswerId).first();
+          if (answer) {
+            const totalResult = await db.prepare(`
+					SELECT SUM(COALESCE(sa.score_given, 0)) as total_score, SUM(q.points) as total_points
+					FROM student_answers sa JOIN questions q ON sa.question_id = q.id
+					WHERE sa.attempt_id = ?
+				`).bind(answer.attempt_id).first();
+            if (totalResult && totalResult.total_points > 0) {
+              const score = totalResult.total_score / totalResult.total_points * 100;
+              await db.prepare("UPDATE student_attempts SET score = ? WHERE id = ?").bind(Math.round(score * 10) / 10, answer.attempt_id).run();
+            }
           }
+          return { success: "Nilai berhasil disimpan." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menyimpan nilai." });
         }
-        return { success: "Nilai berhasil disimpan." };
       },
       toggleScoreRelease: async ({ request, platform }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const examId = form.get("exam_id")?.toString();
-        if (!examId) return fail(400, { error: "ID ujian tidak valid." });
-        await db.prepare(`UPDATE exams SET is_score_released = CASE WHEN is_score_released = 1 THEN 0 ELSE 1 END, updated_at = datetime('now') WHERE id = ?`).bind(examId).run();
-        return { success: "Status rilis nilai berhasil diperbarui." };
+        const examIdStr = form.get("exam_id")?.toString();
+        const parsedExamId = parseInt(examIdStr || "", 10);
+        if (isNaN(parsedExamId)) return fail(400, { error: "ID ujian tidak valid." });
+        try {
+          await db.prepare(`UPDATE exams SET is_score_released = CASE WHEN is_score_released = 1 THEN 0 ELSE 1 END, updated_at = datetime('now') WHERE id = ?`).bind(parsedExamId).run();
+          return { success: "Status rilis nilai berhasil diperbarui." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal memperbarui status rilis nilai." });
+        }
       }
     };
   }
@@ -30592,7 +30798,7 @@ var init__39 = __esm({
     index39 = 38;
     component39 = async () => component_cache39 ??= (await Promise.resolve().then(() => (init_page_svelte32(), page_svelte_exports32))).default;
     server_id38 = "src/routes/guru/penilaian/+page.server.ts";
-    imports39 = ["_app/immutable/nodes/38.DvjmPpTa.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/WOw1egtm.js"];
+    imports39 = ["_app/immutable/nodes/38.CU8Rsyxx.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/WOw1egtm.js"];
     stylesheets39 = [];
     fonts39 = [];
   }
@@ -30643,7 +30849,8 @@ var init_page_server_ts33 = __esm({
       update: async ({ request, platform, locals }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const id = form.get("id")?.toString();
+        const idStr = form.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
         const title = form.get("title")?.toString().trim();
         const description = form.get("description")?.toString().trim() || "";
         const subjectId = form.get("subject_id")?.toString() || null;
@@ -30653,26 +30860,50 @@ var init_page_server_ts33 = __esm({
         const isActive = form.get("is_active")?.toString() === "1" ? 1 : 0;
         const shuffleQuestions = parseInt(form.get("shuffle_questions")?.toString() || "0");
         const showScoreType = form.get("show_score_type")?.toString() || "after_submit";
-        if (!id || !title) return fail(400, { error: "Data tidak lengkap." });
-        await db.prepare(`UPDATE exams SET title=?, description=?, subject_id=?, duration_minutes=?,
-			start_time=?, end_time=?, is_active=?, shuffle_questions=?, show_score_type=?, updated_at=datetime('now') WHERE id=? AND school_id=? AND created_by=?`).bind(title, description, subjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, showScoreType, id, locals.user.school_id, locals.user.id).run();
-        return { success: "Ujian Remedial berhasil diperbarui." };
+        if (isNaN(parsedId) || !title) return fail(400, { error: "Data tidak lengkap." });
+        try {
+          await db.prepare(`UPDATE exams SET title=?, description=?, subject_id=?, duration_minutes=?,
+				start_time=?, end_time=?, is_active=?, shuffle_questions=?, show_score_type=?, updated_at=datetime('now') WHERE id=? AND school_id=? AND created_by=?`).bind(title, description, subjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, showScoreType, parsedId, locals.user.school_id, locals.user.id).run();
+          return { success: "Ujian Remedial berhasil diperbarui." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal memperbarui ujian remedial." });
+        }
       },
       delete: async ({ request, platform, locals }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const id = form.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid." });
-        await db.prepare("DELETE FROM exams WHERE id = ? AND school_id = ? AND created_by = ?").bind(id, locals.user.school_id, locals.user.id).run();
-        return { success: "Ujian Remedial berhasil dihapus." };
+        const idStr = form.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
+        try {
+          await db.batch([
+            db.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE exam_id = ?)").bind(parsedId),
+            db.prepare("DELETE FROM student_attempts WHERE exam_id = ?").bind(parsedId),
+            db.prepare("DELETE FROM exam_participants WHERE exam_id = ?").bind(parsedId),
+            db.prepare("DELETE FROM tokens WHERE exam_id = ?").bind(parsedId),
+            db.prepare("DELETE FROM questions WHERE exam_id = ?").bind(parsedId),
+            db.prepare("DELETE FROM exams WHERE id = ? AND school_id = ? AND created_by = ?").bind(parsedId, locals.user.school_id, locals.user.id)
+          ]);
+          return { success: "Ujian Remedial berhasil dihapus." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menghapus ujian remedial." });
+        }
       },
       toggleActive: async ({ request, platform, locals }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const id = form.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid." });
-        await db.prepare(`UPDATE exams SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END, updated_at=datetime('now') WHERE id = ? AND school_id = ? AND created_by = ?`).bind(id, locals.user.school_id, locals.user.id).run();
-        return { success: "Status ujian berhasil diperbarui." };
+        const idStr = form.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
+        try {
+          await db.prepare(`UPDATE exams SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END, updated_at=datetime('now') WHERE id = ? AND school_id = ? AND created_by = ?`).bind(parsedId, locals.user.school_id, locals.user.id).run();
+          return { success: "Status ujian berhasil diperbarui." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal memperbarui status." });
+        }
       }
     };
   }
@@ -30777,7 +31008,7 @@ var init__40 = __esm({
     index40 = 39;
     component40 = async () => component_cache40 ??= (await Promise.resolve().then(() => (init_page_svelte33(), page_svelte_exports33))).default;
     server_id39 = "src/routes/guru/remedial/+page.server.ts";
-    imports40 = ["_app/immutable/nodes/39.CQuvHLes.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BM9tHWcC.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/Dx_inKhY.js"];
+    imports40 = ["_app/immutable/nodes/39.dxd4K3J5.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/u0A-Skss.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/Dx_inKhY.js"];
     stylesheets40 = [];
     fonts40 = [];
   }
@@ -30796,13 +31027,15 @@ var init_page_server_ts34 = __esm({
     init_db();
     load40 = async ({ platform, params, locals }) => {
       const db = getDB(platform);
-      const examId = params.examId;
+      const examIdStr = params.examId;
+      const parsedExamId = parseInt(examIdStr, 10);
+      if (isNaN(parsedExamId)) throw redirect(302, "/guru/remedial");
       const exam = await db.prepare(`
 		SELECT e.*, s.name as subject_name
 		FROM exams e
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		WHERE e.id = ? AND e.school_id = ? AND e.created_by = ?
-	`).bind(examId, locals.user.school_id, locals.user.id).first();
+	`).bind(parsedExamId, locals.user.school_id, locals.user.id).first();
       if (!exam) throw redirect(302, "/guru/remedial");
       const participants = await db.prepare(`
 		SELECT ep.id as participant_id, u.username as nisn, u.name as student_name, c.name as class_name
@@ -30811,7 +31044,7 @@ var init_page_server_ts34 = __esm({
 		LEFT JOIN classes c ON u.class_id = c.id
 		WHERE ep.exam_id = ?
 		ORDER BY c.name, u.name
-	`).bind(examId).all();
+	`).bind(parsedExamId).all();
       const allStudents = await db.prepare(`
 		SELECT u.id, u.username as nisn, u.name, c.name as class_name
 		FROM users u
@@ -30824,7 +31057,7 @@ var init_page_server_ts34 = __esm({
 		FROM tokens
 		WHERE exam_id = ? AND expires_at > datetime('now')
 		ORDER BY expires_at DESC LIMIT 1
-	`).bind(examId).first();
+	`).bind(parsedExamId).first();
       const rawAttempts = await db.prepare(`
 		SELECT sa.id, sa.status, sa.created_at as start_time, sa.submit_time,
 			   sa.violation_count, sa.violation_logs,
@@ -30835,7 +31068,7 @@ var init_page_server_ts34 = __esm({
 		LEFT JOIN classes c ON u.class_id = c.id
 		WHERE sa.exam_id = ?
 		ORDER BY sa.created_at DESC
-	`).bind(examId, examId).all();
+	`).bind(parsedExamId, parsedExamId).all();
       const kv = platform?.env?.EXAM_ANSWERS;
       const attempts = await Promise.all(rawAttempts.results.map(async (a) => {
         let answeredCount = 0;
@@ -30886,10 +31119,13 @@ var init_page_server_ts34 = __esm({
         const form = await request.formData();
         const studentIds = form.getAll("student_ids");
         if (!studentIds.length) return fail(400, { error: "Pilih minimal satu siswa." });
-        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND created_by = ?").bind(params.examId, locals.user.id).first();
+        const examIdStr = params.examId;
+        const parsedExamId = parseInt(examIdStr, 10);
+        if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid." });
+        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND created_by = ?").bind(parsedExamId, locals.user.id).first();
         if (!exam) return fail(403, { error: "Akses ditolak." });
         const stmt = db.prepare("INSERT INTO exam_participants (exam_id, student_id) VALUES (?, ?)");
-        const batch = studentIds.map((id) => stmt.bind(params.examId, id.toString()));
+        const batch = studentIds.map((id) => stmt.bind(parsedExamId, id.toString()));
         try {
           await db.batch(batch);
           return { success: "Peserta berhasil ditambahkan." };
@@ -30903,22 +31139,31 @@ var init_page_server_ts34 = __esm({
       removeParticipant: async ({ request, platform, locals }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const participantId = form.get("participant_id")?.toString();
-        if (!participantId) return fail(400, { error: "ID tidak valid." });
+        const participantIdStr = form.get("participant_id")?.toString();
+        const parsedParticipantId = parseInt(participantIdStr || "", 10);
+        if (isNaN(parsedParticipantId)) return fail(400, { error: "ID tidak valid." });
         const isOwner = await db.prepare(`
 			SELECT 1 FROM exam_participants ep 
 			JOIN exams e ON ep.exam_id = e.id 
 			WHERE ep.id = ? AND e.created_by = ?
-		`).bind(participantId, locals.user.id).first();
+		`).bind(parsedParticipantId, locals.user.id).first();
         if (!isOwner) return fail(403, { error: "Akses ditolak." });
-        await db.prepare("DELETE FROM exam_participants WHERE id = ?").bind(participantId).run();
-        return { success: "Peserta berhasil dihapus." };
+        try {
+          await db.prepare("DELETE FROM exam_participants WHERE id = ?").bind(parsedParticipantId).run();
+          return { success: "Peserta berhasil dihapus." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menghapus peserta." });
+        }
       },
       // ===================== TOKENS =====================
       generateToken: async ({ request, platform, params, locals }) => {
         const db = getDB(platform);
         await request.formData();
-        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND created_by = ?").bind(params.examId, locals.user.id).first();
+        const examIdStr = params.examId;
+        const parsedExamId = parseInt(examIdStr, 10);
+        if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid." });
+        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND created_by = ?").bind(parsedExamId, locals.user.id).first();
         if (!exam) return fail(403, { error: "Akses ditolak." });
         const chars2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         let token = "";
@@ -30927,49 +31172,66 @@ var init_page_server_ts34 = __esm({
         }
         const now = Date.now();
         const expiresAt = new Date(now + 15 * 60 * 1e3).toISOString();
-        await db.prepare(`
-			DELETE FROM tokens 
-			WHERE exam_id = ? AND school_id = ? 
-			  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
-		`).bind(params.examId, locals.user.school_id, params.examId).run();
-        await db.prepare(`
-			INSERT INTO tokens (school_id, exam_id, created_by, token_code, is_released, expires_at, released_at)
-			VALUES (?, ?, ?, ?, 1, ?, datetime('now'))
-		`).bind(locals.user.school_id, params.examId, locals.user.id, token, expiresAt).run();
-        return { success: "Token berhasil dibuat.", token };
+        try {
+          await db.prepare(`
+				DELETE FROM tokens 
+				WHERE exam_id = ? AND school_id = ? 
+				  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
+			`).bind(parsedExamId, locals.user.school_id, parsedExamId).run();
+          await db.prepare(`
+				INSERT INTO tokens (school_id, exam_id, created_by, token_code, is_released, expires_at, released_at)
+				VALUES (?, ?, ?, ?, 1, ?, datetime('now'))
+			`).bind(locals.user.school_id, parsedExamId, locals.user.id, token, expiresAt).run();
+          return { success: "Token berhasil dibuat.", token };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal membuat token" });
+        }
       },
       deleteToken: async ({ request, platform, locals }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const id = form.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID Token tidak valid." });
+        const idStr = form.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID Token tidak valid." });
         const isOwner = await db.prepare(`
 			SELECT 1 FROM tokens t 
 			JOIN exams e ON t.exam_id = e.id 
 			WHERE t.id = ? AND e.created_by = ?
-		`).bind(id, locals.user.id).first();
+		`).bind(parsedId, locals.user.id).first();
         if (!isOwner) return fail(403, { error: "Akses ditolak." });
-        await db.prepare("DELETE FROM tokens WHERE id = ?").bind(id).run();
-        return { success: "Token berhasil dicabut." };
+        try {
+          await db.prepare("DELETE FROM tokens WHERE id = ?").bind(parsedId).run();
+          return { success: "Token berhasil dicabut." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menghapus token." });
+        }
       },
       // ===================== MONITORING =====================
       forceSubmit: async ({ request, platform, locals }) => {
         const db = getDB(platform);
         const form = await request.formData();
-        const attemptId = form.get("attempt_id")?.toString();
-        if (!attemptId) return fail(400, { error: "ID Attempt tidak valid." });
+        const attemptIdStr = form.get("attempt_id")?.toString();
+        const parsedAttemptId = parseInt(attemptIdStr || "", 10);
+        if (isNaN(parsedAttemptId)) return fail(400, { error: "ID Attempt tidak valid." });
         const isOwner = await db.prepare(`
 			SELECT 1 FROM student_attempts sa 
 			JOIN exams e ON sa.exam_id = e.id 
 			WHERE sa.id = ? AND e.created_by = ?
-		`).bind(attemptId, locals.user.id).first();
+		`).bind(parsedAttemptId, locals.user.id).first();
         if (!isOwner) return fail(403, { error: "Akses ditolak." });
-        await db.prepare(`
-			UPDATE student_attempts 
-			SET status = 'waktu_habis', submit_time = datetime('now')
-			WHERE id = ? AND status = 'mengerjakan'
-		`).bind(attemptId).run();
-        return { success: "Ujian siswa berhasil diakhiri secara paksa." };
+        try {
+          await db.prepare(`
+				UPDATE student_attempts 
+				SET status = 'waktu_habis', submit_time = datetime('now')
+				WHERE id = ? AND status = 'mengerjakan'
+			`).bind(parsedAttemptId).run();
+          return { success: "Ujian siswa berhasil diakhiri secara paksa." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal mengakhiri ujian" });
+        }
       }
     };
   }
@@ -31231,7 +31493,7 @@ var init__41 = __esm({
     index41 = 40;
     component41 = async () => component_cache41 ??= (await Promise.resolve().then(() => (init_page_svelte34(), page_svelte_exports34))).default;
     server_id40 = "src/routes/guru/remedial/[examId]/+page.server.ts";
-    imports41 = ["_app/immutable/nodes/40.Dl0Pw-O-.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BM9tHWcC.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/Dx_inKhY.js"];
+    imports41 = ["_app/immutable/nodes/40.mx_Y6BR-.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/u0A-Skss.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/Dx_inKhY.js"];
     stylesheets41 = [];
     fonts41 = [];
   }
@@ -31372,7 +31634,7 @@ var init__42 = __esm({
     index42 = 41;
     component42 = async () => component_cache42 ??= (await Promise.resolve().then(() => (init_page_svelte35(), page_svelte_exports35))).default;
     server_id41 = "src/routes/guru/results/+page.server.ts";
-    imports42 = ["_app/immutable/nodes/41.DqmNivzi.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/DIPBzhqX.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/BlACJPux.js"];
+    imports42 = ["_app/immutable/nodes/41.Z1zK6hWJ.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/DIPBzhqX.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/BlACJPux.js"];
     stylesheets42 = [];
     fonts42 = [];
   }
@@ -31753,7 +32015,7 @@ var init__44 = __esm({
     index44 = 43;
     component44 = async () => component_cache44 ??= (await Promise.resolve().then(() => (init_page_svelte37(), page_svelte_exports37))).default;
     server_id43 = "src/routes/login/+page.server.ts";
-    imports44 = ["_app/immutable/nodes/43.BztFfn2o.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BLrBSU9N.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/DHL7zaVF.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/Bfc47y5P.js"];
+    imports44 = ["_app/immutable/nodes/43.DjauRNOt.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/BLrBSU9N.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/DHL7zaVF.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/Bfc47y5P.js"];
     stylesheets44 = [];
     fonts44 = [];
   }
@@ -32387,7 +32649,8 @@ var init_page_server_ts41 = __esm({
       if (!locals.user) throw redirect(302, "/login");
       try {
         const db = getDB(platform);
-        const examFilter = url.searchParams.get("exam_id") || "";
+        const examFilterStr = url.searchParams.get("exam_id") || "";
+        const examFilter = parseInt(examFilterStr, 10);
         const exams = await db.prepare(`
 		SELECT e.id, e.title 
 		FROM exams e 
@@ -32396,7 +32659,7 @@ var init_page_server_ts41 = __esm({
 		ORDER BY e.title
 	`).bind(locals.user.school_id, locals.user.id).all();
         let attempts = [];
-        if (examFilter) {
+        if (!isNaN(examFilter)) {
           const result = await db.prepare(`
 			SELECT 
 				epart.student_id,
@@ -32492,7 +32755,7 @@ var init_page_server_ts41 = __esm({
             paused_at: a.paused_at
           });
         }
-        return { exams: exams.results, attempts: attemptsWithProgress, examFilter };
+        return { exams: exams.results, attempts: attemptsWithProgress, examFilter: isNaN(examFilter) ? "" : examFilter };
       } catch (err) {
         console.error("Load Error in monitor page:", err);
         return { exams: [], attempts: [], examFilter: "", loadError: err.message || String(err) };
@@ -32503,54 +32766,66 @@ var init_page_server_ts41 = __esm({
         if (!locals.user) return fail(401, { error: "Unauthorized" });
         const db = getDB(platform);
         const form = await request.formData();
-        const attemptId = form.get("attempt_id")?.toString();
+        const attemptIdStr = form.get("attempt_id")?.toString();
+        const parsedAttemptId = parseInt(attemptIdStr || "", 10);
         const action = form.get("action")?.toString();
-        if (!attemptId || !action) return fail(400, { error: "Data tidak valid." });
+        if (isNaN(parsedAttemptId) || !action) return fail(400, { error: "Data tidak valid." });
         const attemptData = await db.prepare(`
 			SELECT sa.id, sa.is_paused, sa.paused_at, sa.end_time FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
 			WHERE sa.id = ? AND e.school_id = ?
-		`).bind(attemptId, locals.user.school_id).first();
+		`).bind(parsedAttemptId, locals.user.school_id).first();
         if (!attemptData) return fail(403, { error: "Sesi ujian tidak ditemukan atau bukan milik sekolah Anda." });
-        if (action === "pause") {
-          await db.prepare(`UPDATE student_attempts SET is_paused = 1, paused_at = datetime('now') WHERE id = ?`).bind(attemptId).run();
-          return { success: "Ujian berhasil ditahan." };
-        } else if (action === "resume") {
-          if (attemptData.paused_at && attemptData.end_time) {
-            await db.prepare(`
-					UPDATE student_attempts 
-					SET 
-						is_paused = 0, 
-						paused_at = NULL,
-						end_time = datetime(end_time, '+' || cast(round((julianday('now') - julianday(paused_at)) * 86400) as int) || ' seconds')
-					WHERE id = ?
-				`).bind(attemptId).run();
-          } else {
-            await db.prepare(`UPDATE student_attempts SET is_paused = 0, paused_at = NULL WHERE id = ?`).bind(attemptId).run();
+        try {
+          if (action === "pause") {
+            await db.prepare(`UPDATE student_attempts SET is_paused = 1, paused_at = datetime('now') WHERE id = ?`).bind(parsedAttemptId).run();
+            return { success: "Ujian berhasil ditahan." };
+          } else if (action === "resume") {
+            if (attemptData.paused_at && attemptData.end_time) {
+              await db.prepare(`
+						UPDATE student_attempts 
+						SET 
+							is_paused = 0, 
+							paused_at = NULL,
+							end_time = datetime(end_time, '+' || cast(round((julianday('now') - julianday(paused_at)) * 86400) as int) || ' seconds')
+						WHERE id = ?
+					`).bind(parsedAttemptId).run();
+            } else {
+              await db.prepare(`UPDATE student_attempts SET is_paused = 0, paused_at = NULL WHERE id = ?`).bind(parsedAttemptId).run();
+            }
+            return { success: "Ujian berhasil dilanjutkan." };
           }
-          return { success: "Ujian berhasil dilanjutkan." };
+          return fail(400, { error: "Aksi tidak valid." });
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal mengubah status ujian." });
         }
-        return fail(400, { error: "Aksi tidak valid." });
       },
       resetAttempt: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
         const db = getDB(platform);
         const form = await request.formData();
-        const attemptId = form.get("attempt_id")?.toString();
-        if (!attemptId) return fail(400, { error: "ID tidak valid." });
+        const attemptIdStr = form.get("attempt_id")?.toString();
+        const parsedAttemptId = parseInt(attemptIdStr || "", 10);
+        if (isNaN(parsedAttemptId)) return fail(400, { error: "ID tidak valid." });
         const attemptCheck = await db.prepare(`
 			SELECT sa.id FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
 			WHERE sa.id = ? AND e.school_id = ?
-		`).bind(attemptId, locals.user.school_id).first();
+		`).bind(parsedAttemptId, locals.user.school_id).first();
         if (!attemptCheck) {
           return fail(403, { error: "Sesi ujian tidak ditemukan atau bukan milik sekolah Anda." });
         }
-        await db.batch([
-          db.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(attemptId),
-          db.prepare("DELETE FROM student_attempts WHERE id = ?").bind(attemptId)
-        ]);
-        return { success: "Sesi ujian siswa berhasil direset." };
+        try {
+          await db.batch([
+            db.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(parsedAttemptId),
+            db.prepare("DELETE FROM student_attempts WHERE id = ?").bind(parsedAttemptId)
+          ]);
+          return { success: "Sesi ujian siswa berhasil direset." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal mereset sesi ujian siswa." });
+        }
       }
     };
   }
@@ -32781,7 +33056,7 @@ var init__48 = __esm({
     index48 = 47;
     component48 = async () => component_cache48 ??= (await Promise.resolve().then(() => (init_page_svelte41(), page_svelte_exports41))).default;
     server_id47 = "src/routes/pengawas/monitor/+page.server.ts";
-    imports48 = ["_app/immutable/nodes/47.BtRGlNFx.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js"];
+    imports48 = ["_app/immutable/nodes/47.B4_JhfOC.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js"];
     stylesheets48 = [];
     fonts48 = [];
   }
@@ -32971,60 +33246,79 @@ var init_page_server_ts42 = __esm({
         if (!locals.user) return fail(401, { error: "Unauthorized" });
         const db = getDB(platform);
         const form = await request.formData();
-        const examId = form.get("exam_id")?.toString();
+        const examIdStr = form.get("exam_id")?.toString();
+        const parsedExamId = parseInt(examIdStr || "", 10);
         const durationHours = parseInt(form.get("duration_hours")?.toString() || "2");
-        if (!examId) return fail(400, { error: "Pilih ujian terlebih dahulu." });
-        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(examId, locals.user.school_id).first();
+        if (isNaN(parsedExamId)) return fail(400, { error: "Pilih ujian terlebih dahulu." });
+        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
         if (!exam) return fail(400, { error: "Ujian tidak ditemukan." });
         const now = Date.now();
         const nowIso = new Date(now).toISOString();
         const activeToken = await db.prepare(`
 			SELECT token_code FROM tokens 
 			WHERE exam_id = ? AND school_id = ? AND expires_at > ?
-		`).bind(examId, locals.user.school_id, nowIso).first();
+		`).bind(parsedExamId, locals.user.school_id, nowIso).first();
         if (activeToken) {
           return fail(400, { error: `Gagal: Masih ada token aktif untuk ujian ini (${activeToken.token_code}). Harap hapus token tersebut dahulu jika ingin membuat yang baru.` });
         }
         const tokenCode = generateTokenCode(6);
         const expiresAt = new Date(now + durationHours * 60 * 60 * 1e3).toISOString();
-        await db.prepare(`
-			DELETE FROM tokens 
-			WHERE exam_id = ? AND school_id = ? 
-			  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
-		`).bind(examId, locals.user.school_id, examId).run();
-        await db.prepare("INSERT INTO tokens (school_id, exam_id, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?)").bind(locals.user.school_id, examId, tokenCode, locals.user.id, expiresAt).run();
-        return { success: `Token berhasil dibuat: ${tokenCode}` };
+        try {
+          await db.prepare(`
+				DELETE FROM tokens 
+				WHERE exam_id = ? AND school_id = ? 
+				  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
+			`).bind(parsedExamId, locals.user.school_id, parsedExamId).run();
+          await db.prepare("INSERT INTO tokens (school_id, exam_id, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?)").bind(locals.user.school_id, parsedExamId, tokenCode, locals.user.id, expiresAt).run();
+          return { success: `Token berhasil dibuat: ${tokenCode}` };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal membuat token." });
+        }
       },
       release: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
         const db = getDB(platform);
         const form = await request.formData();
-        const id = form.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid." });
-        await db.prepare('UPDATE tokens SET is_released = 1, released_at = datetime("now") WHERE id = ? AND school_id = ?').bind(id, locals.user.school_id).run();
-        return { success: "Token berhasil dirilis ke siswa. Token akan ditarik otomatis dalam 15 menit." };
+        const idStr = form.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
+        try {
+          await db.prepare('UPDATE tokens SET is_released = 1, released_at = datetime("now") WHERE id = ? AND school_id = ?').bind(parsedId, locals.user.school_id).run();
+          return { success: "Token berhasil dirilis ke siswa. Token akan ditarik otomatis dalam 15 menit." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal merilis token." });
+        }
       },
       revoke: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
         const db = getDB(platform);
         const form = await request.formData();
-        const id = form.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid." });
-        await db.prepare("UPDATE tokens SET is_released = 0 WHERE id = ? AND school_id = ?").bind(id, locals.user.school_id).run();
-        return { success: "Token berhasil ditarik." };
+        const idStr = form.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
+        try {
+          await db.prepare("UPDATE tokens SET is_released = 0 WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).run();
+          return { success: "Token berhasil ditarik." };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menarik token." });
+        }
       },
       delete: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
         const db = getDB(platform);
         const form = await request.formData();
-        const id = form.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid." });
+        const idStr = form.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
         try {
-          const usage = await db.prepare("SELECT COUNT(*) as count FROM student_attempts WHERE token_id = ?").bind(id).first();
+          const usage = await db.prepare("SELECT COUNT(*) as count FROM student_attempts WHERE token_id = ?").bind(parsedId).first();
           if (usage && usage.count > 0) {
             return fail(400, { error: "Gagal dihapus: Token ini telah digunakan oleh peserta ujian." });
           }
-          await db.prepare("DELETE FROM tokens WHERE id = ? AND school_id = ?").bind(id, locals.user.school_id).run();
+          await db.prepare("DELETE FROM tokens WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).run();
           return { success: "Token berhasil dihapus." };
         } catch (err) {
           console.error("Delete token error:", err);
@@ -33169,7 +33463,7 @@ var init__50 = __esm({
     index50 = 49;
     component50 = async () => component_cache50 ??= (await Promise.resolve().then(() => (init_page_svelte43(), page_svelte_exports43))).default;
     server_id48 = "src/routes/pengawas/tokens/+page.server.ts";
-    imports50 = ["_app/immutable/nodes/49.KCn3zroj.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/D6nLZD03.js"];
+    imports50 = ["_app/immutable/nodes/49.CYq6qb92.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/hQVTFjhf.js"];
     stylesheets50 = [];
     fonts50 = [];
   }
@@ -33971,7 +34265,7 @@ var init_page_server_ts48 = __esm({
     load54 = async ({ platform, locals, params }) => {
       if (locals.user?.role !== "siswa") throw redirect(302, "/");
       const db = getDB(platform);
-      const examId = params.examId;
+      const examId2 = params.examId;
       const classId = locals.user.class_id;
       const schoolId = locals.user.school_id;
       if (!classId) {
@@ -33982,7 +34276,7 @@ var init_page_server_ts48 = __esm({
 		FROM exams e
 		JOIN exam_participants ep ON e.id = ep.exam_id
 		WHERE e.id = ? AND e.school_id = ? AND ep.student_id = ?
-	`).bind(examId, schoolId, locals.user.id).first();
+	`).bind(examId2, schoolId, locals.user.id).first();
       if (!exam) {
         throw error(404, "Ujian tidak ditemukan atau Anda bukan peserta ujian ini.");
       }
@@ -33998,7 +34292,7 @@ var init_page_server_ts48 = __esm({
 		JOIN users u ON sa.student_id = u.id
 		WHERE sa.exam_id = ? AND sa.status = 'selesai' AND u.class_id = ?
 		ORDER BY sa.score DESC, (julianday(sa.submit_time) - julianday(sa.start_time)) ASC
-	`).bind(examId, classId).all();
+	`).bind(examId2, classId).all();
       return {
         exam: {
           ...exam,
@@ -34228,9 +34522,11 @@ var init_page_server_ts49 = __esm({
     init_auth();
     load55 = async ({ platform, locals, url }) => {
       const db = getDB(platform);
-      const examId = url.searchParams.get("exam_id");
-      if (!examId) throw redirect(302, "/siswa/jadwal");
-      const exam = await db.prepare(`
+      const examIdStr = url.searchParams.get("exam_id");
+      const parsedExamId = parseInt(examIdStr || "", 10);
+      if (isNaN(parsedExamId)) throw redirect(302, "/siswa/jadwal");
+      try {
+        const exam = await db.prepare(`
 		SELECT e.id, e.title, e.duration_minutes, e.start_time, e.end_time, s.name as subject,
 			COALESCE(
 				(
@@ -34248,81 +34544,98 @@ var init_page_server_ts49 = __esm({
 		LEFT JOIN subjects s ON e.subject_id = s.id 
 		JOIN exam_types et ON e.exam_type_id = et.id
 		WHERE e.id = ? AND e.school_id = ? AND et.is_active = 1
-	`).bind(examId, locals.user.school_id).first();
-      if (!exam) throw redirect(302, "/siswa/jadwal");
-      return { exam };
+	`).bind(parsedExamId, locals.user.school_id).first();
+        if (!exam) throw redirect(302, "/siswa/jadwal");
+        return { exam };
+      } catch (e3) {
+        console.error("Load Error in siswa ujian:", e3);
+        throw redirect(302, "/siswa/jadwal");
+      }
     };
     actions24 = {
       validateToken: async ({ request, platform, locals, cookies }) => {
         const db = getDB(platform);
         const form = await request.formData();
         const tokenCode = form.get("token")?.toString().trim().toUpperCase();
-        const examId = form.get("exam_id")?.toString();
-        if (!tokenCode || !examId) return fail(400, { error: "Data tidak lengkap." });
-        const token = await db.prepare(`
+        const examIdStr = form.get("exam_id")?.toString();
+        const parsedExamId = parseInt(examIdStr || "", 10);
+        if (!tokenCode || isNaN(parsedExamId)) return fail(400, { error: "Data tidak lengkap." });
+        try {
+          const token = await db.prepare(`
 			SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
 			FROM tokens t JOIN exams e ON t.exam_id = e.id
 			JOIN exam_types et ON e.exam_type_id = et.id
 			WHERE t.token_code = ? AND t.is_released = 1 AND t.exam_id = ? AND et.is_active = 1
 		`).bind(tokenCode, examId).first();
-        if (!token) return fail(400, { error: "Token tidak valid untuk ujian ini atau belum dirilis." });
-        if (!token.is_active) return fail(400, { error: "Ujian tidak aktif." });
-        if (token.released_at) {
-          const releasedAt = (/* @__PURE__ */ new Date(token.released_at + "Z")).getTime();
-          const now = (/* @__PURE__ */ new Date()).getTime();
-          if (now - releasedAt > 15 * 60 * 1e3) return fail(400, { error: "Token sudah ditarik otomatis (melewati batas 15 menit)." });
-        } else {
-          return fail(400, { error: "Status rilis token tidak valid." });
-        }
-        if (new Date(token.expires_at) < /* @__PURE__ */ new Date()) return fail(400, { error: "Token sudah kedaluwarsa." });
-        const existingAttempt = await db.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`).bind(locals.user.id, token.exam_id).first();
-        if (existingAttempt) {
-          if (existingAttempt.status === "mengerjakan") {
-            const signedCookie = await signExamToken(existingAttempt.id, locals.user.id);
-            cookies.set("exam_token_verified_" + existingAttempt.id, signedCookie, { path: "/", httpOnly: true, sameSite: "lax" });
-            throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
+          if (!token) return fail(400, { error: "Token tidak valid untuk ujian ini atau belum dirilis." });
+          if (!token.is_active) return fail(400, { error: "Ujian tidak aktif." });
+          if (token.released_at) {
+            const releasedAt = (/* @__PURE__ */ new Date(token.released_at + "Z")).getTime();
+            const now = (/* @__PURE__ */ new Date()).getTime();
+            if (now - releasedAt > 15 * 60 * 1e3) return fail(400, { error: "Token sudah ditarik otomatis (melewati batas 15 menit)." });
+          } else {
+            return fail(400, { error: "Status rilis token tidak valid." });
           }
-          return fail(400, { error: "Anda sudah pernah mengerjakan ujian ini." });
+          if (new Date(token.expires_at) < /* @__PURE__ */ new Date()) return fail(400, { error: "Token sudah kedaluwarsa." });
+          const existingAttempt = await db.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`).bind(locals.user.id, token.exam_id).first();
+          if (existingAttempt) {
+            if (existingAttempt.status === "mengerjakan") {
+              const signedCookie = await signExamToken(existingAttempt.id, locals.user.id);
+              cookies.set("exam_token_verified_" + existingAttempt.id, signedCookie, { path: "/", httpOnly: true, sameSite: "lax" });
+              throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
+            }
+            return fail(400, { error: "Anda sudah pernah mengerjakan ujian ini." });
+          }
+          return { success: true, tokenCode, examId: parsedExamId };
+        } catch (e3) {
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal memvalidasi token." });
         }
-        return { success: true, tokenCode, examId };
       },
       startExam: async ({ request, platform, locals, cookies }) => {
         const db = getDB(platform);
         const form = await request.formData();
         const tokenCode = form.get("token")?.toString().trim().toUpperCase();
-        const examId = form.get("exam_id")?.toString();
-        if (!tokenCode || !examId) return fail(400, { error: "Data tidak lengkap." });
-        const token = await db.prepare(`
+        const examIdStr = form.get("exam_id")?.toString();
+        const parsedExamId = parseInt(examIdStr || "", 10);
+        if (!tokenCode || isNaN(parsedExamId)) return fail(400, { error: "Data tidak lengkap." });
+        try {
+          const token = await db.prepare(`
 			SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
 			FROM tokens t JOIN exams e ON t.exam_id = e.id
 			JOIN exam_types et ON e.exam_type_id = et.id
 			WHERE t.token_code = ? AND t.is_released = 1 AND t.exam_id = ? AND et.is_active = 1
 		`).bind(tokenCode, examId).first();
-        if (!token) return fail(400, { error: "Token tidak valid untuk ujian ini atau belum dirilis." });
-        if (!token.is_active) return fail(400, { error: "Ujian tidak aktif." });
-        if (token.released_at) {
-          const releasedAt = (/* @__PURE__ */ new Date(token.released_at + "Z")).getTime();
-          const now = (/* @__PURE__ */ new Date()).getTime();
-          if (now - releasedAt > 15 * 60 * 1e3) return fail(400, { error: "Token sudah ditarik otomatis." });
-        } else {
-          return fail(400, { error: "Status rilis token tidak valid." });
-        }
-        if (new Date(token.expires_at) < /* @__PURE__ */ new Date()) return fail(400, { error: "Token sudah kedaluwarsa." });
-        const existingAttempt = await db.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`).bind(locals.user.id, token.exam_id).first();
-        if (existingAttempt) {
-          if (existingAttempt.status === "mengerjakan") {
-            const signedCookie2 = await signExamToken(existingAttempt.id, locals.user.id);
-            cookies.set("exam_token_verified_" + existingAttempt.id, signedCookie2, { path: "/", httpOnly: true, sameSite: "lax" });
-            throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
+          if (!token) return fail(400, { error: "Token tidak valid untuk ujian ini atau belum dirilis." });
+          if (!token.is_active) return fail(400, { error: "Ujian tidak aktif." });
+          if (token.released_at) {
+            const releasedAt = (/* @__PURE__ */ new Date(token.released_at + "Z")).getTime();
+            const now = (/* @__PURE__ */ new Date()).getTime();
+            if (now - releasedAt > 15 * 60 * 1e3) return fail(400, { error: "Token sudah ditarik otomatis." });
+          } else {
+            return fail(400, { error: "Status rilis token tidak valid." });
           }
-          return fail(400, { error: "Anda sudah pernah mengerjakan ujian ini." });
+          if (new Date(token.expires_at) < /* @__PURE__ */ new Date()) return fail(400, { error: "Token sudah kedaluwarsa." });
+          const existingAttempt = await db.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`).bind(locals.user.id, token.exam_id).first();
+          if (existingAttempt) {
+            if (existingAttempt.status === "mengerjakan") {
+              const signedCookie2 = await signExamToken(existingAttempt.id, locals.user.id);
+              cookies.set("exam_token_verified_" + existingAttempt.id, signedCookie2, { path: "/", httpOnly: true, sameSite: "lax" });
+              throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
+            }
+            return fail(400, { error: "Anda sudah pernah mengerjakan ujian ini." });
+          }
+          const endTime = new Date(Date.now() + token.duration_minutes * 60 * 1e3).toISOString();
+          const result = await db.prepare(`INSERT INTO student_attempts (student_id, exam_id, token_id, end_time, status) VALUES (?, ?, ?, ?, 'mengerjakan')`).bind(locals.user.id, token.exam_id, token.id, endTime).run();
+          const attemptId = result.meta.last_row_id;
+          const signedCookie = await signExamToken(attemptId, locals.user.id);
+          cookies.set("exam_token_verified_" + attemptId, signedCookie, { path: "/", httpOnly: true, sameSite: "lax" });
+          throw redirect(302, `/siswa/ujian/${attemptId}`);
+        } catch (e3) {
+          if (e3.status === 302) throw e3;
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal memulai ujian." });
         }
-        const endTime = new Date(Date.now() + token.duration_minutes * 60 * 1e3).toISOString();
-        const result = await db.prepare(`INSERT INTO student_attempts (student_id, exam_id, token_id, end_time, status) VALUES (?, ?, ?, ?, 'mengerjakan')`).bind(locals.user.id, token.exam_id, token.id, endTime).run();
-        const attemptId = result.meta.last_row_id;
-        const signedCookie = await signExamToken(attemptId, locals.user.id);
-        cookies.set("exam_token_verified_" + attemptId, signedCookie, { path: "/", httpOnly: true, sameSite: "lax" });
-        throw redirect(302, `/siswa/ujian/${attemptId}`);
       }
     };
   }
@@ -34394,7 +34707,7 @@ var init__58 = __esm({
     index58 = 57;
     component58 = async () => component_cache58 ??= (await Promise.resolve().then(() => (init_page_svelte51(), page_svelte_exports51))).default;
     server_id55 = "src/routes/siswa/ujian/+page.server.ts";
-    imports58 = ["_app/immutable/nodes/57.Ddnyk7ZA.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/C68tcILF.js"];
+    imports58 = ["_app/immutable/nodes/57.DoiqXsZz.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/C68tcILF.js"];
     stylesheets58 = [];
     fonts58 = [];
   }
@@ -34415,80 +34728,88 @@ var init_page_server_ts50 = __esm({
     load56 = async ({ platform, locals, params, cookies }) => {
       if (!locals.user) throw redirect(302, "/login");
       const db = getDB(platform);
-      const attemptId = params.attemptId;
-      const attempt = await db.prepare(`
+      const attemptIdStr = params.attemptId;
+      const parsedAttemptId = parseInt(attemptIdStr, 10);
+      if (isNaN(parsedAttemptId)) throw error(400, "ID Ujian tidak valid");
+      try {
+        const attempt = await db.prepare(`
 		SELECT sa.*, e.title as exam_title, s.name as subject, e.duration_minutes, e.shuffle_questions
 		FROM student_attempts sa
 		JOIN exams e ON sa.exam_id = e.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		WHERE sa.id = ? AND sa.student_id = ?
-	`).bind(attemptId, locals.user.id).first();
-      if (!attempt) throw error(404, "Sesi ujian tidak ditemukan.");
-      if (attempt.status !== "mengerjakan") {
-        throw redirect(302, "/siswa");
-      }
-      const cookieVal = cookies.get("exam_token_verified_" + attemptId);
-      const isVerified = await verifyExamTokenSignature(cookieVal, attemptId, locals.user.id);
-      if (!isVerified) {
-        throw redirect(302, `/siswa/ujian?exam_id=${attempt.exam_id}`);
-      }
-      let questions = await db.prepare(`
+	`).bind(parsedAttemptId, locals.user.id).first();
+        if (!attempt) throw error(404, "Sesi ujian tidak ditemukan.");
+        if (attempt.status !== "mengerjakan") {
+          throw redirect(302, "/siswa");
+        }
+        const cookieVal = cookies.get("exam_token_verified_" + parsedAttemptId);
+        const isVerified = await verifyExamTokenSignature(cookieVal, parsedAttemptId, locals.user.id);
+        if (!isVerified) {
+          throw redirect(302, `/siswa/ujian?exam_id=${attempt.exam_id}`);
+        }
+        let questions = await db.prepare(`
 		SELECT q.* FROM questions q
 		WHERE q.exam_id = ?
 		ORDER BY q.question_number
 	`).bind(attempt.exam_id).all();
-      let questionsList = questions.results;
-      if (attempt.shuffle_questions === 1) {
-        let seed = attempt.id * 1234567;
-        const random = () => {
-          seed |= 0;
-          seed = seed + 1831565813 | 0;
-          let t2 = Math.imul(seed ^ seed >>> 15, 1 | seed);
-          t2 = t2 + Math.imul(t2 ^ t2 >>> 7, 61 | t2) ^ t2;
-          return ((t2 ^ t2 >>> 14) >>> 0) / 4294967296;
-        };
-        for (let i = questionsList.length - 1; i > 0; i--) {
-          const j = Math.floor(random() * (i + 1));
-          [questionsList[i], questionsList[j]] = [questionsList[j], questionsList[i]];
+        let questionsList = questions.results;
+        if (attempt.shuffle_questions === 1) {
+          let seed = attempt.id * 1234567;
+          const random = () => {
+            seed |= 0;
+            seed = seed + 1831565813 | 0;
+            let t2 = Math.imul(seed ^ seed >>> 15, 1 | seed);
+            t2 = t2 + Math.imul(t2 ^ t2 >>> 7, 61 | t2) ^ t2;
+            return ((t2 ^ t2 >>> 14) >>> 0) / 4294967296;
+          };
+          for (let i = questionsList.length - 1; i > 0; i--) {
+            const j = Math.floor(random() * (i + 1));
+            [questionsList[i], questionsList[j]] = [questionsList[j], questionsList[i]];
+          }
         }
-      }
-      const answers = await db.prepare(`
+        const answers = await db.prepare(`
 		SELECT sa.* FROM student_answers sa
 		WHERE sa.attempt_id = ?
-	`).bind(attemptId).all();
-      const answerMap = {};
-      for (const a of answers.results) {
-        answerMap[a.question_id] = a;
-      }
-      const kv = platform?.env?.EXAM_ANSWERS;
-      let kvData = null;
-      if (kv) {
-        const stored = await kv.get(`attempt_${attemptId}_answers`);
-        if (stored) {
-          try {
-            kvData = JSON.parse(stored);
-          } catch {
+	`).bind(parsedAttemptId).all();
+        const answerMap = {};
+        for (const a of answers.results) {
+          answerMap[a.question_id] = a;
+        }
+        const kv = platform?.env?.EXAM_ANSWERS;
+        let kvData = null;
+        if (kv) {
+          const stored = await kv.get(`attempt_${parsedAttemptId}_answers`);
+          if (stored) {
+            try {
+              kvData = JSON.parse(stored);
+            } catch {
+            }
           }
         }
-      }
-      if (kvData) {
-        for (const q of questionsList) {
-          if (!answerMap[q.id]) {
-            answerMap[q.id] = { answer_given: "", is_doubted: 0 };
-          }
-          if (kvData.answers && typeof kvData.answers[q.id] !== "undefined") {
-            answerMap[q.id].answer_given = kvData.answers[q.id];
-          }
-          if (kvData.doubts && typeof kvData.doubts[q.id] !== "undefined") {
-            answerMap[q.id].is_doubted = kvData.doubts[q.id] ? 1 : 0;
+        if (kvData) {
+          for (const q of questionsList) {
+            if (!answerMap[q.id]) {
+              answerMap[q.id] = { answer_given: "", is_doubted: 0 };
+            }
+            if (kvData.answers && typeof kvData.answers[q.id] !== "undefined") {
+              answerMap[q.id].answer_given = kvData.answers[q.id];
+            }
+            if (kvData.doubts && typeof kvData.doubts[q.id] !== "undefined") {
+              answerMap[q.id].is_doubted = kvData.doubts[q.id] ? 1 : 0;
+            }
           }
         }
+        return {
+          attempt,
+          questions: questionsList,
+          answerMap
+        };
+      } catch (e3) {
+        if (e3.status === 302 || e3.status === 404) throw e3;
+        console.error("Load error in siswa ujian attempt:", e3);
+        throw redirect(302, "/siswa");
       }
-      return {
-        attempt,
-        questions: questionsList,
-        answerMap
-      };
     };
     actions25 = {
       saveAnswer: async ({ request, platform, params }) => {
@@ -34507,7 +34828,10 @@ var init_page_server_ts50 = __esm({
               warnings: warningsStr ? parseInt(warningsStr, 10) : 0,
               warningLogs: warningLogsStr ? JSON.parse(warningLogsStr) : []
             };
-            await kv.put(`attempt_${params.attemptId}_answers`, JSON.stringify(payload2));
+            const attemptIdStr = params.attemptId;
+            const parsedAttemptId = parseInt(attemptIdStr, 10);
+            if (isNaN(parsedAttemptId)) return fail(400, { error: "ID tidak valid" });
+            await kv.put(`attempt_${parsedAttemptId}_answers`, JSON.stringify(payload2));
           } catch (e3) {
             return fail(400, { error: "Invalid JSON payload" });
           }
@@ -34517,143 +34841,151 @@ var init_page_server_ts50 = __esm({
       submit: async ({ platform, params, locals }) => {
         if (!locals.user) return fail(401, { error: "Sesi telah berakhir. Silakan login kembali." });
         const db = getDB(platform);
-        const attemptId = params.attemptId;
-        const attempt = await db.prepare("SELECT * FROM student_attempts WHERE id = ? AND student_id = ?").bind(attemptId, locals.user.id).first();
-        if (!attempt || attempt.status !== "mengerjakan") {
-          return fail(400, { error: "Sesi ujian tidak valid." });
-        }
-        let warnings = 0;
-        let warningLogs = "[]";
-        let kvAnswers = {};
-        let kvDoubts = {};
-        const kv = platform?.env?.EXAM_ANSWERS;
-        if (kv) {
-          const stored = await kv.get(`attempt_${attemptId}_answers`);
-          if (stored) {
-            try {
-              const kvData = JSON.parse(stored);
-              if (kvData && kvData.warnings) warnings = kvData.warnings;
-              if (kvData && kvData.warningLogs) warningLogs = JSON.stringify(kvData.warningLogs);
-              if (kvData && kvData.answers) kvAnswers = kvData.answers;
-              if (kvData && kvData.doubts) kvDoubts = kvData.doubts;
-              await kv.delete(`attempt_${attemptId}_answers`);
-            } catch (e3) {
+        const attemptIdStr = params.attemptId;
+        const parsedAttemptId = parseInt(attemptIdStr, 10);
+        if (isNaN(parsedAttemptId)) return fail(400, { error: "ID tidak valid" });
+        try {
+          const attempt = await db.prepare("SELECT * FROM student_attempts WHERE id = ? AND student_id = ?").bind(parsedAttemptId, locals.user.id).first();
+          if (!attempt || attempt.status !== "mengerjakan") {
+            return fail(400, { error: "Sesi ujian tidak valid." });
+          }
+          let warnings = 0;
+          let warningLogs = "[]";
+          let kvAnswers = {};
+          let kvDoubts = {};
+          const kv = platform?.env?.EXAM_ANSWERS;
+          if (kv) {
+            const stored = await kv.get(`attempt_${parsedAttemptId}_answers`);
+            if (stored) {
+              try {
+                const kvData = JSON.parse(stored);
+                if (kvData && kvData.warnings) warnings = kvData.warnings;
+                if (kvData && kvData.warningLogs) warningLogs = JSON.stringify(kvData.warningLogs);
+                if (kvData && kvData.answers) kvAnswers = kvData.answers;
+                if (kvData && kvData.doubts) kvDoubts = kvData.doubts;
+                await kv.delete(`attempt_${parsedAttemptId}_answers`);
+              } catch (e3) {
+              }
             }
           }
-        }
-        const examQuestions = await db.prepare("SELECT id FROM questions WHERE exam_id = ?").bind(attempt.exam_id).all();
-        const existingAnswers = await db.prepare("SELECT question_id, id FROM student_answers WHERE attempt_id = ?").bind(attemptId).all();
-        const existingMap = new Map(existingAnswers.results.map((a) => [a.question_id, a.id]));
-        const syncStmts = [];
-        for (const q of examQuestions.results) {
-          const ansVal = typeof kvAnswers[q.id] !== "undefined" ? String(kvAnswers[q.id]) : null;
-          const isDoubted = kvDoubts[q.id] ? 1 : 0;
-          if (existingMap.has(q.id)) {
-            if (ansVal !== null) {
+          const examQuestions = await db.prepare("SELECT id FROM questions WHERE exam_id = ?").bind(attempt.exam_id).all();
+          const existingAnswers = await db.prepare("SELECT question_id, id FROM student_answers WHERE attempt_id = ?").bind(parsedAttemptId).all();
+          const existingMap = new Map(existingAnswers.results.map((a) => [a.question_id, a.id]));
+          const syncStmts = [];
+          for (const q of examQuestions.results) {
+            const ansVal = typeof kvAnswers[q.id] !== "undefined" ? String(kvAnswers[q.id]) : null;
+            const isDoubted = kvDoubts[q.id] ? 1 : 0;
+            if (existingMap.has(q.id)) {
+              if (ansVal !== null) {
+                syncStmts.push(
+                  db.prepare(`UPDATE student_answers SET answer_given = ?, is_doubted = ?, answered_at = datetime('now') WHERE attempt_id = ? AND question_id = ?`).bind(ansVal, isDoubted, parsedAttemptId, q.id)
+                );
+              }
+            } else {
               syncStmts.push(
-                db.prepare(`UPDATE student_answers SET answer_given = ?, is_doubted = ?, answered_at = datetime('now') WHERE attempt_id = ? AND question_id = ?`).bind(ansVal, isDoubted, attemptId, q.id)
+                db.prepare(`INSERT INTO student_answers (attempt_id, question_id, answer_given, is_doubted, answered_at) VALUES (?, ?, ?, ?, datetime('now'))`).bind(parsedAttemptId, q.id, ansVal, isDoubted)
               );
             }
-          } else {
-            syncStmts.push(
-              db.prepare(`INSERT INTO student_answers (attempt_id, question_id, answer_given, is_doubted, answered_at) VALUES (?, ?, ?, ?, datetime('now'))`).bind(attemptId, q.id, ansVal, isDoubted)
-            );
           }
-        }
-        if (syncStmts.length > 0) {
-          await db.batch(syncStmts);
-        }
-        const answers = await db.prepare(`
+          if (syncStmts.length > 0) {
+            await db.batch(syncStmts);
+          }
+          const answers = await db.prepare(`
 			SELECT sa.*, q.type, q.correct_answer_json, q.points
 			FROM student_answers sa
 			JOIN questions q ON sa.question_id = q.id
 			WHERE sa.attempt_id = ?
-		`).bind(attemptId).all();
-        let totalScore = 0;
-        let totalPoints = 0;
-        let objectiveScore = 0;
-        let objectivePoints = 0;
-        const updateStmts = [];
-        for (const ans of answers.results) {
-          totalPoints += ans.points;
-          if (ans.type === "essay" || ans.type === "isian_singkat") {
-            continue;
-          }
-          if (!ans.correct_answer_json || !ans.answer_given) {
-            updateStmts.push(
-              db.prepare("UPDATE student_answers SET score_given = 0, is_correct = 0 WHERE id = ?").bind(ans.id)
-            );
-            continue;
-          }
-          let correctAnswer;
-          try {
-            correctAnswer = JSON.parse(ans.correct_answer_json);
-          } catch {
-            continue;
-          }
-          let isCorrect = false;
-          let partialScore = null;
-          if (ans.type === "pilihan_ganda" || ans.type === "benar_salah") {
-            isCorrect = ans.answer_given === correctAnswer;
-          } else if (ans.type === "pilihan_ganda_kompleks") {
+		`).bind(parsedAttemptId).all();
+          let totalScore = 0;
+          let totalPoints = 0;
+          let objectiveScore = 0;
+          let objectivePoints = 0;
+          const updateStmts = [];
+          for (const ans of answers.results) {
+            totalPoints += ans.points;
+            if (ans.type === "essay" || ans.type === "isian_singkat") {
+              continue;
+            }
+            if (!ans.correct_answer_json || !ans.answer_given) {
+              updateStmts.push(
+                db.prepare("UPDATE student_answers SET score_given = 0, is_correct = 0 WHERE id = ?").bind(ans.id)
+              );
+              continue;
+            }
+            let correctAnswer;
             try {
-              const givenAnswers = typeof ans.answer_given === "string" ? JSON.parse(ans.answer_given) : [];
-              const correctAnswers = Array.isArray(correctAnswer) ? correctAnswer : typeof correctAnswer === "string" ? JSON.parse(correctAnswer) : [];
-              if (Array.isArray(givenAnswers) && Array.isArray(correctAnswers)) {
-                let correctPicks = 0;
-                let wrongPicks = 0;
-                for (const g of givenAnswers) {
-                  if (correctAnswers.includes(g)) {
-                    correctPicks++;
-                  } else {
-                    wrongPicks++;
+              correctAnswer = JSON.parse(ans.correct_answer_json);
+            } catch {
+              continue;
+            }
+            let isCorrect = false;
+            let partialScore = null;
+            if (ans.type === "pilihan_ganda" || ans.type === "benar_salah") {
+              isCorrect = ans.answer_given === correctAnswer;
+            } else if (ans.type === "pilihan_ganda_kompleks") {
+              try {
+                const givenAnswers = typeof ans.answer_given === "string" ? JSON.parse(ans.answer_given) : [];
+                const correctAnswers = Array.isArray(correctAnswer) ? correctAnswer : typeof correctAnswer === "string" ? JSON.parse(correctAnswer) : [];
+                if (Array.isArray(givenAnswers) && Array.isArray(correctAnswers)) {
+                  let correctPicks = 0;
+                  let wrongPicks = 0;
+                  for (const g of givenAnswers) {
+                    if (correctAnswers.includes(g)) {
+                      correctPicks++;
+                    } else {
+                      wrongPicks++;
+                    }
+                  }
+                  const totalCorrect = correctAnswers.length;
+                  if (totalCorrect > 0) {
+                    let rawScore = (correctPicks - wrongPicks) / totalCorrect;
+                    if (rawScore < 0) rawScore = 0;
+                    isCorrect = correctPicks === totalCorrect && wrongPicks === 0;
+                    partialScore = Math.round(rawScore * ans.points * 100) / 100;
                   }
                 }
-                const totalCorrect = correctAnswers.length;
-                if (totalCorrect > 0) {
-                  let rawScore = (correctPicks - wrongPicks) / totalCorrect;
-                  if (rawScore < 0) rawScore = 0;
-                  isCorrect = correctPicks === totalCorrect && wrongPicks === 0;
-                  partialScore = Math.round(rawScore * ans.points * 100) / 100;
-                }
+              } catch {
+                isCorrect = false;
               }
-            } catch {
-              isCorrect = false;
-            }
-          } else if (ans.type === "menjodohkan") {
-            try {
-              const givenMap = JSON.parse(ans.answer_given);
-              const correctMap = typeof correctAnswer === "string" ? JSON.parse(correctAnswer) : correctAnswer;
-              const keys = Object.keys(correctMap);
-              const totalPairs = keys.length;
-              if (totalPairs > 0) {
-                let correctCount = 0;
-                for (const key2 of keys) {
-                  if (givenMap[key2] === correctMap[key2]) correctCount++;
+            } else if (ans.type === "menjodohkan") {
+              try {
+                const givenMap = JSON.parse(ans.answer_given);
+                const correctMap = typeof correctAnswer === "string" ? JSON.parse(correctAnswer) : correctAnswer;
+                const keys = Object.keys(correctMap);
+                const totalPairs = keys.length;
+                if (totalPairs > 0) {
+                  let correctCount = 0;
+                  for (const key2 of keys) {
+                    if (givenMap[key2] === correctMap[key2]) correctCount++;
+                  }
+                  isCorrect = correctCount === totalPairs;
+                  partialScore = Math.round(correctCount / totalPairs * ans.points * 100) / 100;
                 }
-                isCorrect = correctCount === totalPairs;
-                partialScore = Math.round(correctCount / totalPairs * ans.points * 100) / 100;
+              } catch {
+                isCorrect = false;
               }
-            } catch {
-              isCorrect = false;
             }
+            const scoreGiven = partialScore !== null ? partialScore : isCorrect ? ans.points : 0;
+            totalScore += scoreGiven;
+            objectivePoints += ans.points;
+            objectiveScore += scoreGiven;
+            updateStmts.push(
+              db.prepare("UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?").bind(scoreGiven, isCorrect ? 1 : 0, ans.id)
+            );
           }
-          const scoreGiven = partialScore !== null ? partialScore : isCorrect ? ans.points : 0;
-          totalScore += scoreGiven;
-          objectivePoints += ans.points;
-          objectiveScore += scoreGiven;
+          const finalScore = totalPoints > 0 ? Math.round(totalScore / totalPoints * 1e3) / 10 : 0;
+          const finalObjectiveScore = objectivePoints > 0 ? Math.round(objectiveScore / objectivePoints * 1e3) / 10 : 0;
           updateStmts.push(
-            db.prepare("UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?").bind(scoreGiven, isCorrect ? 1 : 0, ans.id)
+            db.prepare(`UPDATE student_attempts SET status = 'selesai', submit_time = datetime('now'),
+				score = ?, objective_score = ?, total_points = ?, violation_count = ?, violation_logs = ? WHERE id = ?`).bind(finalScore, finalObjectiveScore, totalPoints, warnings, warningLogs, parsedAttemptId)
           );
+          await db.batch(updateStmts);
+          throw redirect(302, "/siswa");
+        } catch (e3) {
+          if (e3.status === 302) throw e3;
+          console.error("Submit error:", e3);
+          return fail(500, { error: e3.message || "Gagal mengirim ujian." });
         }
-        const finalScore = totalPoints > 0 ? Math.round(totalScore / totalPoints * 1e3) / 10 : 0;
-        const finalObjectiveScore = objectivePoints > 0 ? Math.round(objectiveScore / objectivePoints * 1e3) / 10 : 0;
-        updateStmts.push(
-          db.prepare(`UPDATE student_attempts SET status = 'selesai', submit_time = datetime('now'),
-				score = ?, objective_score = ?, total_points = ?, violation_count = ?, violation_logs = ? WHERE id = ?`).bind(finalScore, finalObjectiveScore, totalPoints, warnings, warningLogs, attemptId)
-        );
-        await db.batch(updateStmts);
-        throw redirect(302, "/siswa");
       }
     };
   }
@@ -34854,7 +35186,7 @@ var init__59 = __esm({
     index59 = 58;
     component59 = async () => component_cache59 ??= (await Promise.resolve().then(() => (init_page_svelte52(), page_svelte_exports52))).default;
     server_id56 = "src/routes/siswa/ujian/[attemptId]/+page.server.ts";
-    imports59 = ["_app/immutable/nodes/58.CoDrgkI8.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BbXmhjXd.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/BXqDtUsa.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/WOw1egtm.js", "_app/immutable/chunks/BoUxGHkI.js", "_app/immutable/chunks/BLrBSU9N.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/BlACJPux.js"];
+    imports59 = ["_app/immutable/nodes/58.BfUexhKh.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/B-B0M5Sb.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/BbXmhjXd.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/BXqDtUsa.js", "_app/immutable/chunks/DkXk1XIR.js", "_app/immutable/chunks/C68tcILF.js", "_app/immutable/chunks/WOw1egtm.js", "_app/immutable/chunks/BoUxGHkI.js", "_app/immutable/chunks/BLrBSU9N.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/BlACJPux.js"];
     stylesheets59 = ["_app/immutable/assets/QuestionRenderer.CwYmYea-.css"];
     fonts59 = [];
   }
@@ -35077,9 +35409,10 @@ var init_page_server_ts52 = __esm({
         }
         const db = getDB(platform);
         const form = await request.formData();
-        const id = form.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid." });
-        if (id === locals.user.id.toString()) {
+        const idStr = form.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
+        if (parsedId === locals.user.id) {
           return fail(400, { error: "Anda tidak dapat menghapus akun Anda sendiri yang sedang aktif." });
         }
         const countRes = await db.prepare('SELECT COUNT(*) as c FROM users WHERE role = "superadmin"').first();
@@ -35087,7 +35420,12 @@ var init_page_server_ts52 = __esm({
           return fail(400, { error: "Tidak dapat menghapus. Harus tersisa minimal 1 akun Superadmin di sistem." });
         }
         try {
-          await db.prepare('DELETE FROM users WHERE id = ? AND role = "superadmin"').bind(id).run();
+          await db.batch([
+            db.prepare("UPDATE exams SET created_by = NULL WHERE created_by = ?").bind(parsedId),
+            db.prepare("UPDATE tokens SET created_by = NULL WHERE created_by = ?").bind(parsedId),
+            db.prepare("UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?").bind(parsedId),
+            db.prepare('DELETE FROM users WHERE id = ? AND role = "superadmin"').bind(parsedId)
+          ]);
           return { success: "Akun Superadmin berhasil dihapus." };
         } catch (err) {
           console.error("Delete superadmin error:", err);
@@ -35222,7 +35560,7 @@ var init__61 = __esm({
     index61 = 60;
     component61 = async () => component_cache61 ??= (await Promise.resolve().then(() => (init_page_svelte54(), page_svelte_exports54))).default;
     server_id58 = "src/routes/superadmin/accounts/+page.server.ts";
-    imports61 = ["_app/immutable/nodes/60.kK3XK7TE.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BM9tHWcC.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/DHL7zaVF.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/BlACJPux.js"];
+    imports61 = ["_app/immutable/nodes/60.DHtyI_el.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/DNY9haof.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/u0A-Skss.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/DHL7zaVF.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/BlACJPux.js"];
     stylesheets61 = [];
     fonts61 = [];
   }
@@ -35256,49 +35594,54 @@ var init_page_server_ts53 = __esm({
       add: async ({ request, platform }) => {
         const db = getDB(platform);
         const data = await request.formData();
-        const school_id = data.get("school_id")?.toString();
+        const schoolIdStr = data.get("school_id")?.toString();
         const username = data.get("username")?.toString().trim();
         const password = data.get("password")?.toString();
         const name = data.get("name")?.toString().trim();
-        if (!school_id || !username || !password || !name) {
-          return fail(400, { error: "Semua field wajib diisi", school_id, username, name });
+        const parsedSchoolId = parseInt(schoolIdStr || "", 10);
+        if (isNaN(parsedSchoolId) || !username || !password || !name) {
+          return fail(400, { error: "Semua field wajib diisi dengan benar", school_id: schoolIdStr, username, name });
         }
         if (password.length < 6) {
           return fail(400, { error: "Password minimal 6 karakter", school_id, username, name });
         }
         const existingUser = await db.prepare("SELECT id FROM users WHERE username = ?").bind(username).first();
         if (existingUser) {
-          return fail(400, { error: "Username sudah digunakan", school_id, username, name });
+          return fail(400, { error: "Username sudah digunakan", school_id: schoolIdStr, username, name });
         }
         try {
           const password_hash = await hashPassword(password);
-          await db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(school_id, username, password_hash, name, "admin").run();
+          await db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(parsedSchoolId, username, password_hash, name, "admin").run();
           return { success: true };
         } catch (e3) {
-          return fail(500, { error: "Gagal menambahkan admin", school_id, username, name });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menambahkan admin", school_id: schoolIdStr, username, name });
         }
       },
       toggleStatus: async ({ request, platform }) => {
         const db = getDB(platform);
         const data = await request.formData();
-        const id = data.get("id")?.toString();
+        const idStr = data.get("id")?.toString();
         const currentStatus = data.get("is_active")?.toString();
-        if (!id || !currentStatus) return fail(400, { error: "Data tidak valid" });
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId) || !currentStatus) return fail(400, { error: "Data tidak valid" });
         const newStatus = currentStatus === "1" ? 0 : 1;
         try {
-          await db.prepare('UPDATE users SET is_active = ?, updated_at = datetime("now") WHERE id = ? AND role = "admin"').bind(newStatus, id).run();
+          await db.prepare('UPDATE users SET is_active = ?, updated_at = datetime("now") WHERE id = ? AND role = "admin"').bind(newStatus, parsedId).run();
           return { success: true };
         } catch (e3) {
-          return fail(500, { error: "Gagal merubah status admin" });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal merubah status admin" });
         }
       },
       delete: async ({ request, platform, locals }) => {
         if (!locals.user || locals.user.role !== "superadmin") return fail(401, { error: "Unauthorized" });
         const db = getDB(platform);
         const data = await request.formData();
-        const id = data.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid" });
-        const userToDelete = await db.prepare('SELECT id, is_active FROM users WHERE id = ? AND role = "admin"').bind(id).first();
+        const idStr = data.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid" });
+        const userToDelete = await db.prepare('SELECT id, is_active FROM users WHERE id = ? AND role = "admin"').bind(parsedId).first();
         if (!userToDelete) {
           return fail(404, { error: "Admin tidak ditemukan" });
         }
@@ -35307,15 +35650,15 @@ var init_page_server_ts53 = __esm({
         }
         try {
           await db.batch([
-            db.prepare("UPDATE exams SET created_by = NULL WHERE created_by = ?").bind(id),
-            db.prepare("UPDATE tokens SET created_by = NULL WHERE created_by = ?").bind(id),
-            db.prepare("UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?").bind(id),
-            db.prepare('DELETE FROM users WHERE id = ? AND role = "admin"').bind(id)
+            db.prepare("UPDATE exams SET created_by = NULL WHERE created_by = ?").bind(parsedId),
+            db.prepare("UPDATE tokens SET created_by = NULL WHERE created_by = ?").bind(parsedId),
+            db.prepare("UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?").bind(parsedId),
+            db.prepare('DELETE FROM users WHERE id = ? AND role = "admin"').bind(parsedId)
           ]);
           return { success: true };
         } catch (e3) {
           console.error("Delete admin error:", e3);
-          return fail(500, { error: "Gagal menghapus admin" });
+          return fail(500, { error: e3.message || "Gagal menghapus admin" });
         }
       }
     };
@@ -35452,7 +35795,7 @@ var init__62 = __esm({
     index62 = 61;
     component62 = async () => component_cache62 ??= (await Promise.resolve().then(() => (init_page_svelte55(), page_svelte_exports55))).default;
     server_id59 = "src/routes/superadmin/admins/+page.server.ts";
-    imports62 = ["_app/immutable/nodes/61.DIVGSZZd.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BM9tHWcC.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/DHL7zaVF.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/Bfc47y5P.js"];
+    imports62 = ["_app/immutable/nodes/61.Bz0mosd0.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/u0A-Skss.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/BlACJPux.js", "_app/immutable/chunks/DHL7zaVF.js", "_app/immutable/chunks/Clo9dMyW.js", "_app/immutable/chunks/Bfc47y5P.js"];
     stylesheets62 = [];
     fonts62 = [];
   }
@@ -35487,49 +35830,72 @@ var init_page_server_ts54 = __esm({
           await db.prepare("INSERT INTO schools (name, address) VALUES (?, ?)").bind(name, address).run();
           return { success: true };
         } catch (e3) {
-          return fail(500, { error: "Gagal menambahkan sekolah", name, address });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menambahkan sekolah", name, address });
         }
       },
       toggleStatus: async ({ request, platform }) => {
         const db = getDB(platform);
         const data = await request.formData();
-        const id = data.get("id")?.toString();
+        const idStr = data.get("id")?.toString();
         const currentStatus = data.get("is_active")?.toString();
-        if (!id || !currentStatus) return fail(400, { error: "Data tidak valid" });
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId) || !currentStatus) return fail(400, { error: "Data tidak valid" });
         const newStatus = currentStatus === "1" ? 0 : 1;
         try {
-          await db.prepare('UPDATE schools SET is_active = ?, updated_at = datetime("now") WHERE id = ?').bind(newStatus, id).run();
+          await db.prepare('UPDATE schools SET is_active = ?, updated_at = datetime("now") WHERE id = ?').bind(newStatus, parsedId).run();
           return { success: true };
         } catch (e3) {
-          return fail(500, { error: "Gagal merubah status sekolah" });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal merubah status sekolah" });
         }
       },
       edit: async ({ request, platform }) => {
         const db = getDB(platform);
         const data = await request.formData();
-        const id = data.get("id")?.toString();
+        const idStr = data.get("id")?.toString();
         const name = data.get("name")?.toString().trim();
         const address = data.get("address")?.toString().trim() || null;
-        if (!id || !name) {
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId) || !name) {
           return fail(400, { error: "ID dan Nama sekolah wajib diisi", name, address });
         }
         try {
-          await db.prepare('UPDATE schools SET name = ?, address = ?, updated_at = datetime("now") WHERE id = ?').bind(name, address, id).run();
+          await db.prepare('UPDATE schools SET name = ?, address = ?, updated_at = datetime("now") WHERE id = ?').bind(name, address, parsedId).run();
           return { success: true };
         } catch (e3) {
-          return fail(500, { error: "Gagal mengupdate sekolah", name, address });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal mengupdate sekolah", name, address });
         }
       },
       delete: async ({ request, platform }) => {
         const db = getDB(platform);
         const data = await request.formData();
-        const id = data.get("id")?.toString();
-        if (!id) return fail(400, { error: "ID tidak valid" });
+        const idStr = data.get("id")?.toString();
+        const parsedId = parseInt(idStr || "", 10);
+        if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid" });
         try {
-          await db.prepare("DELETE FROM schools WHERE id = ?").bind(id).run();
+          await db.batch([
+            db.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?))").bind(parsedId),
+            db.prepare("DELETE FROM student_attempts WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
+            db.prepare("DELETE FROM questions WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
+            db.prepare("DELETE FROM tokens WHERE school_id = ?").bind(parsedId),
+            db.prepare("DELETE FROM exam_participants WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
+            db.prepare("DELETE FROM exam_teachers WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
+            db.prepare("DELETE FROM exam_proctors WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
+            db.prepare("DELETE FROM exams WHERE school_id = ?").bind(parsedId),
+            db.prepare("DELETE FROM exam_type_participants WHERE exam_type_id IN (SELECT id FROM exam_types WHERE school_id = ?)").bind(parsedId),
+            db.prepare("DELETE FROM exam_types WHERE school_id = ?").bind(parsedId),
+            db.prepare("DELETE FROM users WHERE school_id = ?").bind(parsedId),
+            db.prepare("DELETE FROM subjects WHERE school_id = ?").bind(parsedId),
+            db.prepare("DELETE FROM classes WHERE school_id = ?").bind(parsedId),
+            db.prepare("DELETE FROM uploaded_media WHERE school_id = ?").bind(parsedId),
+            db.prepare("DELETE FROM schools WHERE id = ?").bind(parsedId)
+          ]);
           return { success: true };
         } catch (e3) {
-          return fail(500, { error: "Gagal menghapus sekolah" });
+          console.error(e3);
+          return fail(500, { error: e3.message || "Gagal menghapus sekolah" });
         }
       }
     };
@@ -35659,7 +36025,7 @@ var init__63 = __esm({
     index63 = 62;
     component63 = async () => component_cache63 ??= (await Promise.resolve().then(() => (init_page_svelte56(), page_svelte_exports56))).default;
     server_id60 = "src/routes/superadmin/schools/+page.server.ts";
-    imports63 = ["_app/immutable/nodes/62.QDom97Oy.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/Bf-fBV9b.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BM9tHWcC.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/BlACJPux.js"];
+    imports63 = ["_app/immutable/nodes/62.CQdV5xBg.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CD7Sw7Ut.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/D2xMzRQh.js", "_app/immutable/chunks/KK8x-0AI.js", "_app/immutable/chunks/Cimf0Tid.js", "_app/immutable/chunks/mtvdH_ec.js", "_app/immutable/chunks/B4jzVL06.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CkudF3X1.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/chunks/CfCiyyec.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/u0A-Skss.js", "_app/immutable/chunks/DA_5OBP1.js", "_app/immutable/chunks/CZWkpYoF.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/BlACJPux.js"];
     stylesheets63 = [];
     fonts63 = [];
   }
@@ -35779,8 +36145,8 @@ var init_server_ts4 = __esm({
         return json({ error: "Unauthorized" }, { status: 401 });
       }
       const db = getDB(platform);
-      const examId = params.id;
-      const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(examId, user.school_id).first();
+      const examId2 = params.id;
+      const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(examId2, user.school_id).first();
       if (!exam) {
         return json({ error: "Exam not found or unauthorized" }, { status: 404 });
       }
@@ -35789,7 +36155,7 @@ var init_server_ts4 = __esm({
 		FROM questions
 		WHERE exam_id = ?
 		ORDER BY question_number ASC, id ASC
-	`).bind(examId).all();
+	`).bind(examId2).all();
       return json({ questions: questionsResult.results });
     };
   }
@@ -35810,7 +36176,7 @@ var init_server_ts5 = __esm({
         return json({ error: "Unauthorized" }, { status: 401 });
       }
       const db = getDB(platform);
-      const examId = params.examId;
+      const examId2 = params.examId;
       let exam;
       if (locals.user.role === "superadmin") {
         exam = await db.prepare(`
@@ -35818,14 +36184,14 @@ var init_server_ts5 = __esm({
 			FROM exams e
 			LEFT JOIN subjects s ON e.subject_id = s.id
 			WHERE e.id = ?
-		`).bind(examId).first();
+		`).bind(examId2).first();
       } else {
         exam = await db.prepare(`
 			SELECT e.*, s.name as subject_name 
 			FROM exams e
 			LEFT JOIN subjects s ON e.subject_id = s.id
 			WHERE e.id = ? AND e.school_id = ?
-		`).bind(examId, locals.user.school_id).first();
+		`).bind(examId2, locals.user.school_id).first();
       }
       if (!exam) {
         return json({ error: "Ujian tidak ditemukan." }, { status: 404 });
@@ -35834,7 +36200,7 @@ var init_server_ts5 = __esm({
 		SELECT * FROM questions 
 		WHERE exam_id = ? 
 		ORDER BY question_number ASC
-	`).bind(examId).all();
+	`).bind(examId2).all();
       const participants = await db.prepare(`
 		SELECT 
 			epart.student_id,
@@ -35853,13 +36219,13 @@ var init_server_ts5 = __esm({
 		LEFT JOIN student_attempts sa ON sa.student_id = epart.student_id AND sa.exam_id = epart.exam_id
 		WHERE epart.exam_id = ?
 		ORDER BY u.name ASC
-	`).bind(examId).all();
+	`).bind(examId2).all();
       const allAnswersResult = await db.prepare(`
 		SELECT an.attempt_id, an.question_id, an.answer_given, an.score_given, an.is_correct
 		FROM student_answers an
 		JOIN student_attempts sa ON an.attempt_id = sa.id
 		WHERE sa.exam_id = ?
-	`).bind(examId).all();
+	`).bind(examId2).all();
       const allAnswers = allAnswersResult.results;
       const kv = platform?.env?.EXAM_ANSWERS;
       const formattedParticipants = await Promise.all(participants.results.map(async (p) => {
@@ -37242,7 +37608,7 @@ var options = {
     app: ({ head: head2, body, assets: assets2, nonce, env }) => '<!DOCTYPE html>\n<html lang="id">\n	<head>\n		<meta charset="utf-8" />\n		<meta name="viewport" content="width=device-width, initial-scale=1.0" />\n		<meta name="description" content="Aplikasi Ujian Online Madrasah \u2014 Platform ujian digital modern untuk madrasah" />\n		<meta name="theme-color" content="#4F46E5" />\n		<link rel="icon" href="' + assets2 + '/favicon.svg" type="image/svg+xml" />\n		<link rel="preconnect" href="https://fonts.googleapis.com" />\n		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />\n		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />\n		<title>Ujian Online Madrasah</title>\n		' + head2 + '\n	</head>\n	<body data-sveltekit-preload-data="hover">\n		<div style="display: contents">' + body + "</div>\n	</body>\n</html>\n",
     error: error2
   },
-  version_hash: "1gnqat1"
+  version_hash: "1vv498w"
 };
 async function get_hooks() {
   let handle2;
@@ -41226,7 +41592,7 @@ var manifest = (() => {
     assets: /* @__PURE__ */ new Set(["favicon.svg"]),
     mimeTypes: { ".svg": "image/svg+xml" },
     _: {
-      client: { start: "_app/immutable/entry/start.BjMyX_Mv.js", app: "_app/immutable/entry/app.DgOOjBf9.js", imports: ["_app/immutable/entry/start.BjMyX_Mv.js", "_app/immutable/chunks/20K8sQQj.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/Bvn7BXEI.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/entry/app.DgOOjBf9.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js"], stylesheets: [], fonts: [], uses_env_dynamic_public: true },
+      client: { start: "_app/immutable/entry/start.Db90UtjR.js", app: "_app/immutable/entry/app.C-uSX3PY.js", imports: ["_app/immutable/entry/start.Db90UtjR.js", "_app/immutable/chunks/CSa4iHQq.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/BSCiMgoh.js", "_app/immutable/chunks/BCrKnTY_.js", "_app/immutable/entry/app.C-uSX3PY.js", "_app/immutable/chunks/D0O7yx7I.js", "_app/immutable/chunks/onhbUEEH.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/BVdG4OGp.js", "_app/immutable/chunks/BnYE3itn.js", "_app/immutable/chunks/Dx_inKhY.js", "_app/immutable/chunks/CY8zA_BH.js", "_app/immutable/chunks/DcrpamBL.js", "_app/immutable/chunks/BCrKnTY_.js"], stylesheets: [], fonts: [], uses_env_dynamic_public: true },
       nodes: [
         __memo(() => Promise.resolve().then(() => (init__(), __exports))),
         __memo(() => Promise.resolve().then(() => (init__2(), __exports2))),

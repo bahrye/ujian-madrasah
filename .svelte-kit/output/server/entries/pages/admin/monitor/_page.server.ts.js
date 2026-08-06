@@ -4,7 +4,8 @@ const load = async ({ platform, url, locals }) => {
   if (!locals.user) throw redirect(302, "/login");
   try {
     const db = getDB(platform);
-    const examFilter = url.searchParams.get("exam_id") || "";
+    const examFilterStr = url.searchParams.get("exam_id") || "";
+    const examFilter = parseInt(examFilterStr, 10);
     const exams = await db.prepare(`
 		SELECT e.id, e.title 
 		FROM exams e 
@@ -12,7 +13,7 @@ const load = async ({ platform, url, locals }) => {
 		ORDER BY e.title
 	`).bind(locals.user.school_id).all();
     let attempts = [];
-    if (examFilter) {
+    if (!isNaN(examFilter)) {
       const result = await db.prepare(`
 			SELECT 
 				epart.student_id,
@@ -118,54 +119,66 @@ const actions = {
     if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
     const form = await request.formData();
-    const attemptId = form.get("attempt_id")?.toString();
+    const attemptIdStr = form.get("attempt_id")?.toString();
     const action = form.get("action")?.toString();
-    if (!attemptId || !action) return fail(400, { error: "Data tidak valid." });
-    const attemptData = await db.prepare(`
+    const parsedAttemptId = parseInt(attemptIdStr || "", 10);
+    if (isNaN(parsedAttemptId) || !action) return fail(400, { error: "Data tidak valid." });
+    try {
+      const attemptData = await db.prepare(`
 			SELECT sa.id, sa.is_paused, sa.paused_at, sa.end_time FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
 			WHERE sa.id = ? AND e.school_id = ?
-		`).bind(attemptId, locals.user.school_id).first();
-    if (!attemptData) return fail(403, { error: "Sesi ujian tidak ditemukan atau bukan milik sekolah Anda." });
-    if (action === "pause") {
-      await db.prepare(`UPDATE student_attempts SET is_paused = 1, paused_at = datetime('now') WHERE id = ?`).bind(attemptId).run();
-      return { success: "Ujian berhasil ditahan." };
-    } else if (action === "resume") {
-      if (attemptData.paused_at && attemptData.end_time) {
-        await db.prepare(`
+		`).bind(parsedAttemptId, locals.user.school_id).first();
+      if (!attemptData) return fail(403, { error: "Sesi ujian tidak ditemukan atau bukan milik sekolah Anda." });
+      if (action === "pause") {
+        await db.prepare(`UPDATE student_attempts SET is_paused = 1, paused_at = datetime('now') WHERE id = ?`).bind(parsedAttemptId).run();
+        return { success: "Ujian berhasil ditahan." };
+      } else if (action === "resume") {
+        if (attemptData.paused_at && attemptData.end_time) {
+          await db.prepare(`
 					UPDATE student_attempts 
 					SET 
 						is_paused = 0, 
 						paused_at = NULL,
 						end_time = datetime(end_time, '+' || cast(round((julianday('now') - julianday(paused_at)) * 86400) as int) || ' seconds')
 					WHERE id = ?
-				`).bind(attemptId).run();
-      } else {
-        await db.prepare(`UPDATE student_attempts SET is_paused = 0, paused_at = NULL WHERE id = ?`).bind(attemptId).run();
+				`).bind(parsedAttemptId).run();
+        } else {
+          await db.prepare(`UPDATE student_attempts SET is_paused = 0, paused_at = NULL WHERE id = ?`).bind(parsedAttemptId).run();
+        }
+        return { success: "Ujian berhasil dilanjutkan." };
       }
-      return { success: "Ujian berhasil dilanjutkan." };
+      return fail(400, { error: "Aksi tidak valid." });
+    } catch (e) {
+      console.error(e);
+      return fail(500, { error: e.message || "Gagal mengubah status ujian" });
     }
-    return fail(400, { error: "Aksi tidak valid." });
   },
   resetAttempt: async ({ request, platform, locals }) => {
     if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
     const form = await request.formData();
-    const attemptId = form.get("attempt_id")?.toString();
-    if (!attemptId) return fail(400, { error: "ID tidak valid." });
-    const attemptCheck = await db.prepare(`
+    const attemptIdStr = form.get("attempt_id")?.toString();
+    const parsedAttemptId = parseInt(attemptIdStr || "", 10);
+    if (isNaN(parsedAttemptId)) return fail(400, { error: "ID tidak valid." });
+    try {
+      const attemptCheck = await db.prepare(`
 			SELECT sa.id FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
 			WHERE sa.id = ? AND e.school_id = ?
-		`).bind(attemptId, locals.user.school_id).first();
-    if (!attemptCheck) {
-      return fail(403, { error: "Sesi ujian tidak ditemukan atau bukan milik sekolah Anda." });
+		`).bind(parsedAttemptId, locals.user.school_id).first();
+      if (!attemptCheck) {
+        return fail(403, { error: "Sesi ujian tidak ditemukan atau bukan milik sekolah Anda." });
+      }
+      await db.batch([
+        db.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(parsedAttemptId),
+        db.prepare("DELETE FROM student_attempts WHERE id = ?").bind(parsedAttemptId)
+      ]);
+      return { success: "Sesi ujian siswa berhasil direset." };
+    } catch (e) {
+      console.error(e);
+      return fail(500, { error: e.message || "Gagal mereset sesi ujian" });
     }
-    await db.batch([
-      db.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(attemptId),
-      db.prepare("DELETE FROM student_attempts WHERE id = ?").bind(attemptId)
-    ]);
-    return { success: "Sesi ujian siswa berhasil direset." };
   }
 };
 export {

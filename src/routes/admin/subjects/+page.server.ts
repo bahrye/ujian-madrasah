@@ -29,27 +29,29 @@ export const actions: Actions = {
 				.run();
 			
 			return { success: true };
-		} catch (e) {
-			return fail(500, { error: 'Gagal menambahkan mata pelajaran' });
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal menambahkan mata pelajaran' });
 		}
 	},
 	edit: async ({ request, locals, platform }) => {
 		const db = getDB(platform);
 		const data = await request.formData();
-		const id = data.get('id')?.toString();
+		const idStr = data.get('id')?.toString();
 		const name = data.get('name')?.toString().trim();
 		const code = data.get('code')?.toString().trim() || null;
+		const parsedId = parseInt(idStr || '', 10);
 
-		if (!id || !name) return fail(400, { error: 'ID dan Nama wajib diisi' });
+		if (isNaN(parsedId) || !name) return fail(400, { error: 'ID dan Nama wajib diisi' });
 
 		try {
 			// Ambil nama lama untuk cek apakah berubah
 			const oldSubject = await db.prepare('SELECT name FROM subjects WHERE id = ? AND school_id = ?')
-				.bind(id, locals.user!.school_id)
+				.bind(parsedId, locals.user!.school_id)
 				.first<{ name: string }>();
 
 			await db.prepare('UPDATE subjects SET name = ?, code = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?')
-				.bind(name, code, id, locals.user!.school_id)
+				.bind(name, code, parsedId, locals.user!.school_id)
 				.run();
 
 			// Otomatis perbarui title semua ujian yang terhubung jika nama mapel berubah
@@ -60,7 +62,7 @@ export const actions: Actions = {
 					FROM exams e
 					LEFT JOIN exam_types et ON e.exam_type_id = et.id
 					WHERE e.subject_id = ?
-				`).bind(id).all<{ id: number; type_code: string | null }>();
+				`).bind(parsedId).all<{ id: number; type_code: string | null }>();
 
 				if (linkedExams.results.length > 0) {
 					const updateBatch = linkedExams.results.map(exam =>
@@ -72,23 +74,29 @@ export const actions: Actions = {
 			}
 
 			return { success: true };
-		} catch (e) {
-			return fail(500, { error: 'Gagal mengupdate mata pelajaran' });
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal mengupdate mata pelajaran' });
 		}
 	},
 
 	delete: async ({ request, locals, platform }) => {
 		const db = getDB(platform);
 		const data = await request.formData();
-		const id = data.get('id')?.toString();
+		const idStr = data.get('id')?.toString();
+		const parsedId = parseInt(idStr || '', 10);
 
-		if (!id) return fail(400, { error: 'ID tidak valid' });
+		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid' });
 
 		try {
-			await db.prepare('DELETE FROM subjects WHERE id = ? AND school_id = ?').bind(id, locals.user!.school_id).run();
+			await db.batch([
+				db.prepare('UPDATE exams SET subject_id = NULL WHERE subject_id = ?').bind(parsedId),
+				db.prepare('DELETE FROM subjects WHERE id = ? AND school_id = ?').bind(parsedId, locals.user!.school_id)
+			]);
 			return { success: true };
-		} catch (e) {
-			return fail(500, { error: 'Gagal menghapus mata pelajaran' });
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal menghapus mata pelajaran' });
 		}
 	}
 };
