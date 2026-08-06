@@ -12,6 +12,7 @@
 	$: if (form?.error) toasts.error(form.error);
 	$: attempts = data.attempts as any[];
 
+	let formElement: HTMLFormElement;
 	let statusFilter = 'semua';
 	$: filteredAttempts = statusFilter === 'semua' ? attempts : attempts.filter(a => a.status === statusFilter);
 
@@ -42,14 +43,16 @@
 
 	<!-- Filter -->
 	<div class="card p-4">
-		<form method="GET" class="flex flex-wrap gap-3 mb-4">
-			<select name="exam_id" class="select flex-1 min-w-[200px]" required>
+		<form method="GET" class="flex flex-wrap gap-3 mb-4" bind:this={formElement}>
+			<select name="exam_id" class="select flex-1 min-w-[200px]" required on:change={() => formElement?.submit()}>
 				<option value="">-- Pilih Ujian --</option>
 				{#each data.exams as exam}
 					<option value={exam.id} selected={data.examFilter === String(exam.id)}>{exam.title}</option>
 				{/each}
 			</select>
-			<button type="submit" class="btn-secondary btn-sm">Tampilkan</button>
+			<noscript>
+				<button type="submit" class="btn-secondary btn-sm">Tampilkan</button>
+			</noscript>
 		</form>
 		
 		{#if data.examFilter}

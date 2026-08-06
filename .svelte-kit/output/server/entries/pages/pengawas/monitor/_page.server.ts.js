@@ -46,6 +46,20 @@ const load = async ({ platform, url, locals }) => {
 		`).bind(examFilter, locals.user.school_id, locals.user.id).all();
     attempts = result.results;
   }
+  let answeredCountsMap = {};
+  const attemptIds = attempts.map((a) => a.attempt_id).filter((id) => id);
+  if (attemptIds.length > 0) {
+    const countsResult = await db.prepare(`
+			SELECT sa.attempt_id, COUNT(*) as c
+			FROM student_answers sa
+			JOIN student_attempts st ON sa.attempt_id = st.id
+			WHERE st.exam_id = ? AND sa.answer_given IS NOT NULL AND sa.answer_given != ""
+			GROUP BY sa.attempt_id
+		`).bind(examFilter).all();
+    countsResult.results.forEach((r) => {
+      answeredCountsMap[r.attempt_id] = r.c;
+    });
+  }
   const kv = platform?.env?.EXAM_ANSWERS;
   const attemptsWithProgress = await Promise.all(attempts.map(async (a) => {
     let answeredCount = 0;
@@ -68,8 +82,7 @@ const load = async ({ platform, url, locals }) => {
         }
       }
       if (answeredCount === 0 && a.attempt_id) {
-        const dbAnswers = await db.prepare('SELECT COUNT(*) as c FROM student_answers WHERE attempt_id = ? AND answer_given IS NOT NULL AND answer_given != ""').bind(a.attempt_id).first();
-        if (dbAnswers && dbAnswers.c) answeredCount = dbAnswers.c;
+        answeredCount = answeredCountsMap[a.attempt_id] || 0;
       }
     } else if (status === "selesai" || status === "waktu_habis") {
       warnings = a.violation_count || 0;
@@ -78,8 +91,7 @@ const load = async ({ platform, url, locals }) => {
       } catch (e) {
       }
       if (a.attempt_id) {
-        const dbAnswers = await db.prepare('SELECT COUNT(*) as c FROM student_answers WHERE attempt_id = ? AND answer_given IS NOT NULL AND answer_given != ""').bind(a.attempt_id).first();
-        if (dbAnswers && dbAnswers.c) answeredCount = dbAnswers.c;
+        answeredCount = answeredCountsMap[a.attempt_id] || 0;
       }
     }
     return {

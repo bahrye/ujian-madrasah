@@ -43,7 +43,7 @@ function _page($$renderer, $$props) {
         }
       );
     }
-    $$renderer2.push(`<!--]--></select> <button type="submit" class="btn-secondary btn-sm">Tampilkan</button></form> `);
+    $$renderer2.push(`<!--]--></select> <noscript><button type="submit" class="btn-secondary btn-sm">Tampilkan</button></noscript></form> `);
     if (data.examFilter) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div class="flex gap-2 overflow-x-auto p-1.5 -m-1.5 mb-1 mt-2"><button${attr_class(`btn-sm ${"btn-primary"}`)}>Semua</button> <button${attr_class(`btn-sm ${"btn-ghost border border-slate-200 text-slate-600"}`)}>Sedang Mengerjakan</button> <button${attr_class(`btn-sm ${"btn-ghost border border-slate-200 text-slate-600"}`)}>Selesai</button> <button${attr_class(`btn-sm ${"btn-ghost border border-slate-200 text-slate-600"}`)}>Belum Mengerjakan</button></div>`);
