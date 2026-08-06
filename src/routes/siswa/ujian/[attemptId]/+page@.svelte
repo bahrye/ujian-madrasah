@@ -121,6 +121,9 @@
 			wakeLock = null;
 		}
 		if (statusPollingInterval) clearInterval(statusPollingInterval);
+		if (typeof document !== 'undefined' && document.fullscreenElement) {
+			document.exitFullscreen().catch(() => {});
+		}
 	});
 
 	beforeNavigate(({ cancel, willUnload }) => {
