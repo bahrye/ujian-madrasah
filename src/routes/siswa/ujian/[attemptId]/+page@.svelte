@@ -25,6 +25,8 @@
 	let isExamBlurred = false;
 	let isFullscreen = false;
 	let cheatWarningTimeout: any;
+	let cheatCountdownInterval: any;
+	let cheatCountdownRemaining = 0;
 
 	// Anti-cheat state
 	let currentEndTime = data.attempt.end_time;
@@ -177,6 +179,15 @@
 		
 		isExamBlurred = true;
 		if (cheatWarningTimeout) clearTimeout(cheatWarningTimeout);
+		if (cheatCountdownInterval) clearInterval(cheatCountdownInterval);
+		
+		cheatCountdownRemaining = Math.floor(toleranceMs / 1000);
+		cheatCountdownInterval = setInterval(() => {
+			cheatCountdownRemaining -= 1;
+			if (cheatCountdownRemaining <= 0) {
+				clearInterval(cheatCountdownInterval);
+			}
+		}, 1000);
 		
 		cheatWarningTimeout = setTimeout(() => {
 			if (isUnloading) return;
@@ -186,6 +197,7 @@
 
 	function handleReturnToExam() {
 		if (cheatWarningTimeout) clearTimeout(cheatWarningTimeout);
+		if (cheatCountdownInterval) clearInterval(cheatCountdownInterval);
 		if (isExamBlurred) {
 			isExamBlurred = false;
 		}
@@ -606,8 +618,15 @@
 			<h2 class="text-2xl font-bold mb-3 text-rose-400">Ujian Dijeda Sementara</h2>
 			<p class="text-slate-300 text-sm mb-6">Anda terdeteksi keluar dari layar ujian atau membuka aplikasi melayang (Messenger, Notifikasi, dsb). Ujian disembunyikan demi keamanan.</p>
 			
-			<div class="bg-rose-500/10 border border-rose-500/20 rounded-lg p-3 mb-6">
-				<p class="text-rose-300 text-xs text-left">💡 Jika Anda sedang memperbaiki masalah koneksi, segera tutup notifikasi bar Anda. Waktu toleransi terus berjalan dan akan dihitung sebagai pelanggaran berat jika melewati batas!</p>
+			<div class="bg-rose-500/10 border border-rose-500/20 rounded-lg p-4 mb-6 relative overflow-hidden">
+				<div class="flex items-center justify-between mb-2">
+					<p class="text-rose-300 text-xs text-left font-medium">Batas Waktu Toleransi:</p>
+					<span class="text-3xl font-black tracking-wider {cheatCountdownRemaining <= 10 ? 'text-red-500 animate-pulse' : 'text-rose-400'}">{cheatCountdownRemaining}d</span>
+				</div>
+				<div class="w-full bg-rose-900/30 h-2 rounded-full overflow-hidden mb-3">
+					<div class="h-full bg-rose-500 transition-all duration-1000 ease-linear" style="width: {Math.max(0, (cheatCountdownRemaining / 60) * 100)}%"></div>
+				</div>
+				<p class="text-rose-300 text-xs text-left">💡 Jika Anda sedang memperbaiki masalah koneksi, segera tutup notifikasi bar Anda. Anda akan dikenakan pelanggaran berat jika waktu habis!</p>
 			</div>
 			
 			<button class="btn-primary w-full justify-center" on:click={enterFullscreen}>Saya Sudah Kembali</button>
