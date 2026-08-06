@@ -2,6 +2,8 @@
 	export let attempt: any;
 	export let currentTime: Date;
 
+	export let type: 'otomatis' | 'manual' | 'akhir' = 'akhir';
+
 	// Helper to parse date from string (similar to the one in +page.svelte)
 	function parseDate(dateStr: string | null | undefined): Date | null {
 		if (!dateStr) return null;
@@ -31,20 +33,43 @@
 		if (isAfterEndTime && (!endTime || currentTime < endTime)) return 'Menunggu jadwal berakhir';
 		return '';
 	})();
+
+	$: otomatis = attempt.objective_score ?? 0;
+	$: akhir = attempt.score ?? 0;
+	$: manual = isObjectiveOnly ? null : (akhir - otomatis);
+
+	function formatScore(score: number | null) {
+		if (score == null) return '-';
+		return score.toFixed(1).replace(/\.0$/, '');
+	}
 </script>
 
 {#if attempt.status !== 'selesai' && attempt.status !== 'waktu_habis'}
 	<span class="text-slate-400 font-normal">-</span>
 {:else if !isScoreVisible}
-	<span class="text-slate-400 text-xs font-normal font-sans bg-slate-100 px-2 py-1 rounded whitespace-nowrap">{statusLabel}</span>
-{:else}
-	{#if isObjectiveOnly}
-		<span class={(attempt.objective_score ?? 0) >= 70 ? 'text-emerald-600' : 'text-rose-600'} title="Nilai Objektif (Tanpa Isian & Essay)">
-			{attempt.objective_score != null ? attempt.objective_score.toFixed(1) : '-'}
-		</span>
+	{#if type === 'akhir'}
+		<span class="text-slate-400 text-xs font-normal font-sans bg-slate-100 px-2 py-1 rounded whitespace-nowrap">{statusLabel}</span>
 	{:else}
-		<span class={(attempt.score ?? 0) >= 70 ? 'text-emerald-600' : 'text-rose-600'}>
-			{attempt.score != null ? attempt.score.toFixed(1) : '-'}
-		</span>
+		<span class="text-slate-400 font-normal">-</span>
+	{/if}
+{:else}
+	{#if type === 'otomatis'}
+		<span class={otomatis >= 70 ? 'text-emerald-600' : 'text-rose-600'}>{formatScore(otomatis)}</span>
+	{:else if type === 'manual'}
+		{#if manual === null}
+			<span class="text-slate-400 font-normal" title="Disembunyikan">-</span>
+		{:else}
+			<span class="text-indigo-600 font-semibold">{formatScore(manual)}</span>
+		{/if}
+	{:else if type === 'akhir'}
+		{#if isObjectiveOnly}
+			<span class={otomatis >= 70 ? 'text-emerald-600' : 'text-rose-600'} title="Nilai Objektif (Tanpa Isian & Essay)">
+				{formatScore(otomatis)}
+			</span>
+		{:else}
+			<span class={akhir >= 70 ? 'text-emerald-600' : 'text-rose-600'}>
+				{formatScore(akhir)}
+			</span>
+		{/if}
 	{/if}
 {/if}

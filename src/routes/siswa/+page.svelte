@@ -250,7 +250,7 @@
 			<div class="card overflow-hidden">
 				<div class="table-container border-0 rounded-none">
 					<table class="table">
-						<thead><tr><th>Ujian</th><th>Mapel</th><th>Status</th><th>Sisa Waktu</th><th>Nilai</th><th>Tanggal</th></tr></thead>
+						<thead><tr><th>Ujian</th><th>Mapel</th><th>Status</th><th>Sisa Waktu</th><th>Nilai Otomatis</th><th>Nilai Manual</th><th>Nilai Akhir</th><th>Tanggal</th></tr></thead>
 						<tbody>
 							{#each myAttempts as a}
 								<tr>
@@ -284,8 +284,14 @@
 											{/if}
 										{/if}
 									</td>
-									<td class="font-bold">
-										<ScoreDisplay attempt={a} {currentTime} />
+									<td class="font-bold bg-slate-50/50">
+										<ScoreDisplay attempt={a} {currentTime} type="otomatis" />
+									</td>
+									<td class="font-bold bg-slate-50/50">
+										<ScoreDisplay attempt={a} {currentTime} type="manual" />
+									</td>
+									<td class="font-bold bg-indigo-50/30">
+										<ScoreDisplay attempt={a} {currentTime} type="akhir" />
 									</td>
 									<td class="text-xs text-slate-500">{new Date(String(a.created_at).replace(' ', 'T') + (String(a.created_at).includes(' ') && !String(a.created_at).includes('Z') ? 'Z' : '')).toLocaleDateString('id-ID')}</td>
 								</tr>

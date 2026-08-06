@@ -135,10 +135,30 @@
 						</div>
 					</div>
 
-					<div class="md:w-auto w-full md:border-l border-t md:border-t-0 border-slate-100 md:pl-6 pt-4 md:pt-0 flex flex-col md:items-end gap-1">
-						<span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Nilai Akhir</span>
-						<div class="text-3xl font-black">
-							<ScoreDisplay {attempt} {currentTime} />
+					<div class="w-full md:w-auto md:border-l border-t md:border-t-0 border-slate-100 md:pl-6 pt-4 md:pt-0 flex items-center justify-between md:justify-end gap-3 md:gap-5">
+						<div class="text-center">
+							<span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-0.5">Otomatis</span>
+							<div class="text-xl font-bold">
+								<ScoreDisplay {attempt} {currentTime} type="otomatis" />
+							</div>
+						</div>
+						
+						<div class="text-slate-200 font-black text-xl mb-1">+</div>
+						
+						<div class="text-center">
+							<span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-0.5">Manual</span>
+							<div class="text-xl font-bold">
+								<ScoreDisplay {attempt} {currentTime} type="manual" />
+							</div>
+						</div>
+						
+						<div class="text-slate-200 font-black text-xl mb-1">=</div>
+						
+						<div class="text-right">
+							<span class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider block mb-0.5">Nilai Akhir</span>
+							<div class="text-3xl font-black">
+								<ScoreDisplay {attempt} {currentTime} type="akhir" />
+							</div>
 						</div>
 					</div>
 				</div>

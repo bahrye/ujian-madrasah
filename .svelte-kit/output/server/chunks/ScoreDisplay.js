@@ -1,13 +1,18 @@
-import { e as escape_html, j as attr_class, l as clsx, f as bind_props } from "./index.js";
+import { m as fallback, e as escape_html, j as attr_class, l as clsx, f as bind_props } from "./index.js";
 function ScoreDisplay($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
-    let showScoreType, isManual, isAfterTypeEndTime, isAfterEndTime, isObjectiveOnly, typeEndTime, endTime, isScoreVisible, statusLabel;
+    let showScoreType, isManual, isAfterTypeEndTime, isAfterEndTime, isObjectiveOnly, typeEndTime, endTime, isScoreVisible, statusLabel, otomatis, akhir, manual;
     let attempt = $$props["attempt"];
     let currentTime = $$props["currentTime"];
+    let type = fallback($$props["type"], "akhir");
     function parseDate(dateStr) {
       if (!dateStr) return null;
       const str = String(dateStr).replace(" ", "T");
       return /* @__PURE__ */ new Date(str + (str.includes("T") && !str.includes("Z") ? "Z" : ""));
+    }
+    function formatScore(score) {
+      if (score == null) return "-";
+      return score.toFixed(1).replace(/\.0$/, "");
     }
     showScoreType = attempt.show_score_type || "after_submit";
     isManual = showScoreType === "manual";
@@ -28,25 +33,54 @@ function ScoreDisplay($$renderer, $$props) {
       if (isAfterEndTime && (!endTime || currentTime < endTime)) return "Menunggu jadwal berakhir";
       return "";
     })();
+    otomatis = attempt.objective_score ?? 0;
+    akhir = attempt.score ?? 0;
+    manual = isObjectiveOnly ? null : akhir - otomatis;
     if (attempt.status !== "selesai" && attempt.status !== "waktu_habis") {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<span class="text-slate-400 font-normal">-</span>`);
     } else if (!isScoreVisible) {
       $$renderer2.push("<!--[1-->");
-      $$renderer2.push(`<span class="text-slate-400 text-xs font-normal font-sans bg-slate-100 px-2 py-1 rounded whitespace-nowrap">${escape_html(statusLabel)}</span>`);
-    } else {
-      $$renderer2.push("<!--[-1-->");
-      if (isObjectiveOnly) {
+      if (type === "akhir") {
         $$renderer2.push("<!--[0-->");
-        $$renderer2.push(`<span${attr_class(clsx((attempt.objective_score ?? 0) >= 70 ? "text-emerald-600" : "text-rose-600"))} title="Nilai Objektif (Tanpa Isian &amp; Essay)">${escape_html(attempt.objective_score != null ? attempt.objective_score.toFixed(1) : "-")}</span>`);
+        $$renderer2.push(`<span class="text-slate-400 text-xs font-normal font-sans bg-slate-100 px-2 py-1 rounded whitespace-nowrap">${escape_html(statusLabel)}</span>`);
       } else {
         $$renderer2.push("<!--[-1-->");
-        $$renderer2.push(`<span${attr_class(clsx((attempt.score ?? 0) >= 70 ? "text-emerald-600" : "text-rose-600"))}>${escape_html(attempt.score != null ? attempt.score.toFixed(1) : "-")}</span>`);
+        $$renderer2.push(`<span class="text-slate-400 font-normal">-</span>`);
+      }
+      $$renderer2.push(`<!--]-->`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+      if (type === "otomatis") {
+        $$renderer2.push("<!--[0-->");
+        $$renderer2.push(`<span${attr_class(clsx(otomatis >= 70 ? "text-emerald-600" : "text-rose-600"))}>${escape_html(formatScore(otomatis))}</span>`);
+      } else if (type === "manual") {
+        $$renderer2.push("<!--[1-->");
+        if (manual === null) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<span class="text-slate-400 font-normal" title="Disembunyikan">-</span>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<span class="text-indigo-600 font-semibold">${escape_html(formatScore(manual))}</span>`);
+        }
+        $$renderer2.push(`<!--]-->`);
+      } else if (type === "akhir") {
+        $$renderer2.push("<!--[2-->");
+        if (isObjectiveOnly) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<span${attr_class(clsx(otomatis >= 70 ? "text-emerald-600" : "text-rose-600"))} title="Nilai Objektif (Tanpa Isian &amp; Essay)">${escape_html(formatScore(otomatis))}</span>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<span${attr_class(clsx(akhir >= 70 ? "text-emerald-600" : "text-rose-600"))}>${escape_html(formatScore(akhir))}</span>`);
+        }
+        $$renderer2.push(`<!--]-->`);
+      } else {
+        $$renderer2.push("<!--[-1-->");
       }
       $$renderer2.push(`<!--]-->`);
     }
     $$renderer2.push(`<!--]-->`);
-    bind_props($$props, { attempt, currentTime });
+    bind_props($$props, { attempt, currentTime, type });
   });
 }
 export {

@@ -110,7 +110,7 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<div class="card p-6 text-center text-slate-400 text-sm">Belum ada riwayat ujian.</div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="card overflow-hidden"><div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Ujian</th><th>Mapel</th><th>Status</th><th>Sisa Waktu</th><th>Nilai</th><th>Tanggal</th></tr></thead><tbody><!--[-->`);
+      $$renderer2.push(`<div class="card overflow-hidden"><div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Ujian</th><th>Mapel</th><th>Status</th><th>Sisa Waktu</th><th>Nilai Otomatis</th><th>Nilai Manual</th><th>Nilai Akhir</th><th>Tanggal</th></tr></thead><tbody><!--[-->`);
       const each_array_1 = ensure_array_like(myAttempts);
       for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
         let a = each_array_1[$$index_1];
@@ -138,8 +138,12 @@ function _page($$renderer, $$props) {
           }
           $$renderer2.push(`<!--]-->`);
         }
-        $$renderer2.push(`<!--]--></td><td class="font-bold">`);
-        ScoreDisplay($$renderer2, { attempt: a, currentTime });
+        $$renderer2.push(`<!--]--></td><td class="font-bold bg-slate-50/50">`);
+        ScoreDisplay($$renderer2, { attempt: a, currentTime, type: "otomatis" });
+        $$renderer2.push(`<!----></td><td class="font-bold bg-slate-50/50">`);
+        ScoreDisplay($$renderer2, { attempt: a, currentTime, type: "manual" });
+        $$renderer2.push(`<!----></td><td class="font-bold bg-indigo-50/30">`);
+        ScoreDisplay($$renderer2, { attempt: a, currentTime, type: "akhir" });
         $$renderer2.push(`<!----></td><td class="text-xs text-slate-500">${escape_html((/* @__PURE__ */ new Date(String(a.created_at).replace(" ", "T") + (String(a.created_at).includes(" ") && !String(a.created_at).includes("Z") ? "Z" : ""))).toLocaleDateString("id-ID"))}</td></tr>`);
       }
       $$renderer2.push(`<!--]--></tbody></table></div></div>`);
