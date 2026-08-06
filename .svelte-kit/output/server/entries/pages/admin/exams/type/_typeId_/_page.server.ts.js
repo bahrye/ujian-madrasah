@@ -12,7 +12,9 @@ const load = async ({ params, platform, locals }) => {
   const exams = await db.prepare(`
 		SELECT e.*, u.name as creator_name, s.name as subject_name,
 			(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count,
-			(SELECT COUNT(*) FROM exam_participants WHERE exam_id = e.id) as participant_count
+			(SELECT COUNT(*) FROM exam_participants WHERE exam_id = e.id) as participant_count,
+			(SELECT COUNT(*) FROM exam_teachers WHERE exam_id = e.id) as teacher_count,
+			(SELECT COUNT(*) FROM exam_proctors WHERE exam_id = e.id) as proctor_count
 		FROM exams e
 		LEFT JOIN users u ON e.created_by = u.id
 		LEFT JOIN subjects s ON e.subject_id = s.id

@@ -123,12 +123,12 @@
 			<p class="text-xs text-slate-500">Token</p>
 		</div>
 		<div class="card p-4 text-center">
-			<p class="text-2xl font-bold text-indigo-500">{examTeachers.length + 1}</p>
-			<p class="text-xs text-slate-500">Jumlah Guru</p>
+			<p class="text-2xl font-bold text-indigo-500">{examTeachers.length}</p>
+			<p class="text-xs text-slate-500">Guru</p>
 		</div>
 		<div class="card p-4 text-center col-span-2 md:col-span-1">
 			<p class="text-2xl font-bold text-rose-500">{examProctors.length}</p>
-			<p class="text-xs text-slate-500">Jumlah Pengawas</p>
+			<p class="text-xs text-slate-500">Pengawas</p>
 		</div>
 	</div>
 

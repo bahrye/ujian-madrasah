@@ -99,6 +99,31 @@
 						</svg>
 						{exam.participant_count} peserta
 					</span>
+					<span class="flex items-center gap-1">
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+						</svg>
+						{exam.teacher_count} guru
+					</span>
+					<span class="flex items-center gap-1">
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+							<path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+						</svg>
+						{exam.proctor_count} pengawas
+					</span>
+					<span class="flex items-center gap-1 w-full mt-1">
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+						</svg>
+						Soal: {exam.shuffle_questions ? 'Acak' : 'Tidak Acak'}
+					</span>
+					<span class="flex items-center gap-1 w-full">
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+						</svg>
+						Nilai: {exam.show_score_type === 'manual' ? 'Manual' : (exam.show_score_type === 'objective_only' ? 'Hanya Nilai PG' : 'Langsung Tampil')}
+					</span>
 					<div class="flex items-start gap-1 w-full mt-0.5 {isOutOfBounds ? 'text-rose-500 font-medium' : 'text-slate-500'}" title={isOutOfBounds ? 'Waktu ujian berada di luar rentang tipe ujian, sehingga otomatis nonaktif' : 'Rentang Waktu Ujian'}>
 					<svg class="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.calendar} />
