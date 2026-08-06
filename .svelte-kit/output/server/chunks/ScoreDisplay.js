@@ -1,7 +1,7 @@
 import { m as fallback, e as escape_html, j as attr_class, l as clsx, f as bind_props } from "./index.js";
 function ScoreDisplay($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
-    let showScoreType, isManual, isAfterTypeEndTime, isAfterEndTime, isObjectiveOnly, typeEndTime, endTime, isScoreVisible, statusLabel, total_points, objective_max, objective_raw, akhir_raw, manual_raw, otomatis, akhir, manual;
+    let showScoreType, isManual, isAfterTypeEndTime, isAfterEndTime, isObjectiveOnly, typeEndTime, endTime, isScoreVisible, statusLabel, total_points, objective_raw, akhir_raw, manual_raw, otomatis, akhir, manual;
     let attempt = $$props["attempt"];
     let currentTime = $$props["currentTime"];
     let type = fallback($$props["type"], "akhir");
@@ -34,8 +34,7 @@ function ScoreDisplay($$renderer, $$props) {
       return "";
     })();
     total_points = attempt.total_points || 1;
-    objective_max = attempt.objective_max_points || 0;
-    objective_raw = (attempt.objective_score ?? 0) / 100 * objective_max;
+    objective_raw = attempt.objective_earned_points ?? 0;
     akhir_raw = (attempt.score ?? 0) / 100 * total_points;
     manual_raw = akhir_raw - objective_raw;
     otomatis = objective_raw / total_points * 100;

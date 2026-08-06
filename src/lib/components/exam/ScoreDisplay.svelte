@@ -35,9 +35,9 @@
 	})();
 
 	$: total_points = attempt.total_points || 1;
-	$: objective_max = attempt.objective_max_points || 0;
 	
-	$: objective_raw = ((attempt.objective_score ?? 0) / 100) * objective_max;
+	// Gunakan poin mentah asli dari database agar 100% presisi dan mengatasi data lama yang corrupt
+	$: objective_raw = attempt.objective_earned_points ?? 0;
 	$: akhir_raw = ((attempt.score ?? 0) / 100) * total_points;
 	$: manual_raw = akhir_raw - objective_raw;
 

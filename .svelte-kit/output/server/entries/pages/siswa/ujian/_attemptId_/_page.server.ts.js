@@ -182,6 +182,7 @@ const actions = {
         if (ans.type === "essay" || ans.type === "isian_singkat") {
           continue;
         }
+        objectivePoints += ans.points;
         if (!ans.correct_answer_json || !ans.answer_given) {
           updateStmts.push(
             db.prepare("UPDATE student_answers SET score_given = 0, is_correct = 0 WHERE id = ?").bind(ans.id)
@@ -243,7 +244,6 @@ const actions = {
         }
         const scoreGiven = partialScore !== null ? partialScore : isCorrect ? ans.points : 0;
         totalScore += scoreGiven;
-        objectivePoints += ans.points;
         objectiveScore += scoreGiven;
         updateStmts.push(
           db.prepare("UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?").bind(scoreGiven, isCorrect ? 1 : 0, ans.id)
