@@ -103,7 +103,7 @@
 			</span>
 			<span class="flex items-center gap-1">
 				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-				Tampilan Nilai: <strong class="text-slate-600 font-medium">{exam.show_score_type === 'manual' ? 'Manual (Oleh Admin/Guru)' : (exam.show_score_type === 'objective_only' ? 'Hanya Nilai PG' : 'Otomatis (Langsung Tampil)')}</strong>
+				Tampilan Nilai: <strong class="text-slate-600 font-medium">{({ after_type_end_time: 'Jadwal Tipe Ujian', after_submit: 'Langsung Tampil', after_end_time: 'Jadwal Ujian', objective_only: 'Hanya Nilai Otomatis', manual: 'Manual (Guru/Admin)' })[exam.show_score_type || 'after_submit'] || 'Langsung Tampil'}</strong>
 			</span>
 		</div>
 	</div>

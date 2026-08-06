@@ -122,7 +122,7 @@
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
 						</svg>
-						Nilai: {exam.show_score_type === 'manual' ? 'Manual' : (exam.show_score_type === 'objective_only' ? 'Hanya Nilai PG' : 'Langsung Tampil')}
+						Nilai: {({ after_type_end_time: 'Jadwal Tipe Ujian', after_submit: 'Langsung Tampil', after_end_time: 'Jadwal Ujian', objective_only: 'Hanya Nilai Otomatis', manual: 'Manual (Guru/Admin)' })[exam.show_score_type || 'after_submit'] || 'Langsung Tampil'}
 					</span>
 					<div class="flex items-start gap-1 w-full mt-0.5 {isOutOfBounds ? 'text-rose-500 font-medium' : 'text-slate-500'}" title={isOutOfBounds ? 'Waktu ujian berada di luar rentang tipe ujian, sehingga otomatis nonaktif' : 'Rentang Waktu Ujian'}>
 					<svg class="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
