@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { QUESTION_TYPE_LABELS, ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS, ICONS } from '$lib/utils/constants';
 	import { mathRender } from '$lib/actions/mathRender';
+	import { arabicRender } from '$lib/actions/arabicRender';
 
 	export let data;
 	$: attempt = data.attempt as any;
@@ -71,7 +72,7 @@
 	<!-- Detail Soal dan Jawaban -->
 	<div>
 		<h2 class="text-lg font-bold text-slate-800 mb-4">Rincian Jawaban Siswa</h2>
-		<div class="space-y-4" use:mathRender={answers}>
+		<div class="space-y-4" use:mathRender={answers} use:arabicRender={answers}>
 			{#each answers as ans, i}
 				<div class="card p-5 border-l-4 {ans.score_given === ans.max_points ? 'border-emerald-400' : (ans.score_given > 0 ? 'border-amber-400' : 'border-rose-400')}">
 					<div class="flex items-start justify-between gap-4 mb-3">

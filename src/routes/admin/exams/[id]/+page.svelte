@@ -3,6 +3,7 @@
 	import ConfirmForm from '$lib/components/ConfirmForm.svelte';
 	import { QUESTION_TYPE_LABELS, ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS, ICONS } from '$lib/utils/constants';
 	import { mathRender } from '$lib/actions/mathRender';
+	import { arabicRender } from '$lib/actions/arabicRender';
 
 	export let form: { error?: string; success?: string } | null = null;
 	export let data;
@@ -266,7 +267,7 @@
 		{#if questions.length === 0}
 			<div class="p-8 text-center text-slate-400 text-sm">Belum ada soal untuk ujian ini.</div>
 		{:else}
-			<div class="divide-y divide-slate-100" use:mathRender={questions}>
+			<div class="divide-y divide-slate-100" use:mathRender={questions} use:arabicRender={questions}>
 				{#each questions as q}
 					<div class="p-4 flex items-center gap-3">
 						<span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold flex-shrink-0">{q.question_number}</span>

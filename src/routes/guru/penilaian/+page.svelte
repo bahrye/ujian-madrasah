@@ -3,6 +3,7 @@
 	import { QUESTION_TYPE_LABELS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
 	import { mathRender } from '$lib/actions/mathRender';
+	import { arabicRender } from '$lib/actions/arabicRender';
 
 	export let data;
 	export let form: any;
@@ -73,7 +74,7 @@
 			<p class="text-sm">Jawaban essay/isian siswa akan muncul di sini.</p>
 		</div>
 	{:else}
-		<div class="space-y-4" use:mathRender={answers}>
+		<div class="space-y-4" use:mathRender={answers} use:arabicRender={answers}>
 			{#each answers as a (a.answer_id)}
 				<div class="card p-5 {a.score_given != null ? 'border-l-4 border-emerald-400' : 'border-l-4 border-amber-400'}">
 					<div class="flex flex-wrap items-center gap-2 mb-3">

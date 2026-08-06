@@ -10,6 +10,7 @@
 	import { toasts } from '$lib/stores/toast';
 	import { tick } from 'svelte';
 	import { mathRender } from '$lib/actions/mathRender';
+	import { arabicRender } from '$lib/actions/arabicRender';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -282,7 +283,7 @@
 	{/if}
 
 	<!-- Questions List -->
-	<div class="space-y-3" use:mathRender={questions}>
+	<div class="space-y-3" use:mathRender={questions} use:arabicRender={questions}>
 		{#each questions as q, idx (q.id)}
 			<div class="card p-4 flex items-start gap-4 group">
 				<span class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-md shadow-indigo-500/20">

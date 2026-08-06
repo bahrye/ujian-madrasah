@@ -3,6 +3,7 @@
 	import AudioPlayer from './AudioPlayer.svelte';
 	import { QUESTION_TYPE_LABELS } from '$lib/utils/constants';
 	import { mathRender } from '$lib/actions/mathRender';
+	import { arabicRender } from '$lib/actions/arabicRender';
 
 	export let question: {
 		id: number;
@@ -82,7 +83,7 @@
 	}
 </script>
 
-<div class="space-y-5 animate-in" on:click={handleContentClick} on:keydown={(e) => e.key === 'Enter' && handleContentClick(e as any)} role="presentation" use:mathRender>
+<div class="space-y-5 animate-in" on:click={handleContentClick} on:keydown={(e) => e.key === 'Enter' && handleContentClick(e as any)} role="presentation" use:mathRender use:arabicRender>
 	<!-- Header -->
 	<div class="flex items-center justify-between flex-wrap gap-2">
 		<div class="flex items-center gap-3">
