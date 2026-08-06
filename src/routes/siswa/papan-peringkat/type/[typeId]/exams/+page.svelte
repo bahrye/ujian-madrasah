@@ -5,19 +5,19 @@
 </script>
 
 <svelte:head>
-	<title>Peringkat Ujian: {data.type_name} - Siswa</title>
+	<title>Papan Peringkat - {data.type_name}</title>
 </svelte:head>
 
 <div class="space-y-6 animate-in">
 	<div class="mb-8">
-		<a href="/siswa/papan-peringkat" class="inline-flex items-center text-sm text-slate-500 hover:text-slate-800 transition-colors mb-4">
+		<a href="/siswa/papan-peringkat" class="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-700 mb-4 transition-colors">
 			<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
 			</svg>
-			Kembali ke Kategori
+			Kembali ke Papan Peringkat
 		</a>
-		<h1 class="text-3xl font-bold text-slate-800 tracking-tight">Peringkat Per Ujian</h1>
-		<p class="text-slate-500 mt-1">Daftar peringkat untuk setiap ujian pada kategori <span class="font-bold text-slate-700">{data.type_name}</span>.</p>
+		<h1 class="text-3xl font-bold text-slate-800 tracking-tight">Per Ujian: {data.type_name}</h1>
+		<p class="text-slate-500 mt-1">Daftar papan peringkat untuk setiap ujian pada kategori {data.type_name}</p>
 	</div>
 
 	<!-- Peringkat Ujian -->
