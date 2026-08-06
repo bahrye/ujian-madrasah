@@ -10,6 +10,40 @@
 	let currentTime = new Date();
 	let timer: any;
 
+	function formatDateTime(dateStr: string) {
+		if (!dateStr) return '-';
+		const str = String(dateStr).replace(' ', 'T');
+		const date = new Date(str + (str.includes('T') && !str.includes('Z') ? 'Z' : ''));
+		return date.toLocaleString('id-ID', {
+			day: '2-digit',
+			month: 'short',
+			year: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit',
+			second: '2-digit'
+		}).replace(/\./g, ':');
+	}
+
+	function calculateRemainingTime(attempt: any) {
+		const submitStr = attempt.submit_time || attempt.updated_at;
+		if (!attempt.end_time || !submitStr) return '-';
+
+		const submit = new Date(String(submitStr).replace(' ', 'T') + (String(submitStr).includes(' ') && !String(submitStr).includes('Z') ? 'Z' : ''));
+		const targetEnd = new Date(String(attempt.end_time).replace(' ', 'T') + (String(attempt.end_time).includes(' ') && !String(attempt.end_time).includes('Z') ? 'Z' : ''));
+		
+		let remainingMs = targetEnd.getTime() - submit.getTime();
+		if (remainingMs < 0) remainingMs = 0;
+		
+		const totalS = Math.floor(remainingMs / 1000);
+		const h = Math.floor(totalS / 3600);
+		const m = Math.floor((totalS % 3600) / 60);
+		const s = totalS % 60;
+		
+		if (h > 0) return `${h} Jam ${m} Menit ${s} Detik`;
+		if (m > 0) return `${m} Menit ${s} Detik`;
+		return `${s} Detik`;
+	}
+
 	onMount(() => {
 		timer = setInterval(() => {
 			currentTime = new Date();
@@ -78,6 +112,25 @@
 									<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
 								</svg>
 								{attempt.question_count} Soal
+							</div>
+						</div>
+
+						<div class="pt-4 mt-2 border-t border-dashed border-slate-200">
+							<span class="inline-block px-2.5 py-1 bg-slate-100 text-slate-500 text-xs font-semibold rounded-md uppercase tracking-wider mb-3">Proses Ujian</span>
+							
+							<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+								<div>
+									<p class="text-xs text-slate-400 font-medium mb-0.5">Tanggal Mulai Ujian</p>
+									<p class="text-sm font-semibold text-slate-700">{formatDateTime(attempt.start_time)}</p>
+								</div>
+								<div>
+									<p class="text-xs text-slate-400 font-medium mb-0.5">Tanggal Selesai Ujian</p>
+									<p class="text-sm font-semibold text-slate-700">{formatDateTime(attempt.submit_time || attempt.updated_at)}</p>
+								</div>
+								<div>
+									<p class="text-xs text-slate-400 font-medium mb-0.5">Sisa Waktu Ujian</p>
+									<p class="text-sm font-semibold text-indigo-600">{calculateRemainingTime(attempt)}</p>
+								</div>
 							</div>
 						</div>
 					</div>
