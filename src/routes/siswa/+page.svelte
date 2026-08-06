@@ -106,9 +106,16 @@
 		return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 	}
 
-	function getAttemptRemainingTime(endTimeStr: string, current: Date) {
+	function getAttemptRemainingTime(endTimeStr: string, current: Date, isPaused = false, pausedAtStr: string | null = null) {
 		const end = parseDate(endTimeStr);
-		const diff = end.getTime() - current.getTime();
+		
+		let diff = 0;
+		if (isPaused && pausedAtStr) {
+			const paused = parseDate(pausedAtStr);
+			diff = end.getTime() - paused.getTime();
+		} else {
+			diff = end.getTime() - current.getTime();
+		}
 		
 		if (diff <= 0) return '00:00:00';
 		
@@ -255,7 +262,7 @@
 												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 													<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} />
 												</svg>
-												{getAttemptRemainingTime(a.end_time, currentTime)}
+												{getAttemptRemainingTime(a.end_time, currentTime, a.is_paused === 1, a.paused_at)}
 											</span>
 										{:else}
 											{@const startStr = String(a.start_time).replace(' ', 'T') + (String(a.start_time).includes(' ') && !String(a.start_time).includes('Z') ? 'Z' : '')}
