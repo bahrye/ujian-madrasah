@@ -121,8 +121,10 @@ export async function exportExamResults(examId: string, examTitle: string) {
 						kunci = correct.answer;
 					} else if (q.type === 'benar_salah') {
 						kunci = correct.answer ? 'Benar' : 'Salah';
+					} else if (q.type === 'pilihan_ganda_kompleks' && Array.isArray(correct)) {
+						kunci = correct.join(', ');
 					} else {
-						kunci = JSON.stringify(correct);
+						kunci = Array.isArray(correct) ? correct.join(', ') : JSON.stringify(correct);
 					}
 				} catch(e) {
 					kunci = q.correct_answer_json;
@@ -182,6 +184,8 @@ export async function exportExamResults(examId: string, examTitle: string) {
 						const parsed = JSON.parse(ans.answer_given);
 						if (parsed.answer !== undefined) {
 							ansText = parsed.answer.toString();
+						} else if (Array.isArray(parsed)) {
+							ansText = parsed.join(', ');
 						} else {
 							ansText = ans.answer_given;
 						}
