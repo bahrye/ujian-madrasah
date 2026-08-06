@@ -66,13 +66,19 @@ function _page_($$renderer, $$props) {
       }
     }
     currentQuestion = questions[currentIndex];
-    questions.map((q, i) => ({
-      id: q.id,
-      question_number: q.question_number,
-      answered: !!localAnswers[q.id],
-      doubted: !!localDoubts[q.id]
-    }));
-    answeredCount = questions.filter((q) => localAnswers[q.id]).length;
+    questions.map((q, i) => {
+      let isAnswered = false;
+      if (localAnswers[q.id]) {
+        isAnswered = localAnswers[q.id] !== "[]" && localAnswers[q.id] !== "{}";
+      }
+      return {
+        id: q.id,
+        question_number: q.question_number,
+        answered: isAnswered,
+        doubted: !!localDoubts[q.id]
+      };
+    });
+    answeredCount = questions.filter((q) => localAnswers[q.id] && localAnswers[q.id] !== "[]" && localAnswers[q.id] !== "{}").length;
     doubtedCount = questions.filter((q) => localDoubts[q.id]).length;
     unansweredCount = questions.length - answeredCount;
     head("1huqvgl", $$renderer2, ($$renderer3) => {

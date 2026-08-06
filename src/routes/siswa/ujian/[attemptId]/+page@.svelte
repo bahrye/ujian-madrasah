@@ -258,14 +258,20 @@
 	}
 
 	$: currentQuestion = questions[currentIndex];
-	$: navQuestions = questions.map((q: any, i: number) => ({
-		id: q.id,
-		question_number: q.question_number,
-		answered: !!(localAnswers[q.id]),
-		doubted: !!(localDoubts[q.id])
-	}));
+	$: navQuestions = questions.map((q: any, i: number) => {
+		let isAnswered = false;
+		if (localAnswers[q.id]) {
+			isAnswered = localAnswers[q.id] !== '[]' && localAnswers[q.id] !== '{}';
+		}
+		return {
+			id: q.id,
+			question_number: q.question_number,
+			answered: isAnswered,
+			doubted: !!(localDoubts[q.id])
+		};
+	});
 
-	$: answeredCount = questions.filter((q: any) => localAnswers[q.id]).length;
+	$: answeredCount = questions.filter((q: any) => localAnswers[q.id] && localAnswers[q.id] !== '[]' && localAnswers[q.id] !== '{}').length;
 	$: doubtedCount = questions.filter((q: any) => localDoubts[q.id]).length;
 	$: unansweredCount = questions.length - answeredCount;
 
