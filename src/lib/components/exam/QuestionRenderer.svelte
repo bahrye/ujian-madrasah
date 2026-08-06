@@ -183,11 +183,15 @@
 			<!-- Short Answer -->
 			<input
 				type="text"
+				name="jawaban_siswa_{question.id}"
+				id="jawaban_siswa_{question.id}"
+				data-lpignore="true"
+				data-form-type="other"
 				class="input text-base"
 				placeholder="Ketik jawaban singkat di sini..."
 				value={answer}
 				on:input={(e) => handleAnswer(e.currentTarget.value)}
-				autocomplete="off"
+				autocomplete="new-password"
 				autocorrect="off"
 				autocapitalize="off"
 				spellcheck="false"
@@ -196,12 +200,16 @@
 		{:else if question.type === 'essay'}
 			<!-- Essay -->
 			<textarea
+				name="jawaban_uraian_{question.id}"
+				id="jawaban_uraian_{question.id}"
+				data-lpignore="true"
+				data-form-type="other"
 				class="input text-base min-h-[200px] resize-y"
 				placeholder="Tulis jawaban uraian di sini..."
 				value={answer}
 				on:input={(e) => handleAnswer(e.currentTarget.value)}
 				rows="8"
-				autocomplete="off"
+				autocomplete="new-password"
 				autocorrect="off"
 				autocapitalize="off"
 				spellcheck="false"
