@@ -1,9 +1,6 @@
 -- 1. Disable foreign key constraints temporarily
 PRAGMA foreign_keys=off;
 
--- 2. Begin transaction
-BEGIN TRANSACTION;
-
 -- 3. Rename existing table
 ALTER TABLE questions RENAME TO questions_old;
 
@@ -34,9 +31,6 @@ CREATE INDEX IF NOT EXISTS idx_questions_type ON questions(type);
 
 -- 7. Drop the old table
 DROP TABLE questions_old;
-
--- 8. Commit transaction
-COMMIT;
 
 -- 9. Re-enable foreign key constraints
 PRAGMA foreign_keys=on;
