@@ -65,6 +65,11 @@
 		"src/routes/admin/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/admin/papan-peringkat/type/[typeId]/exams": [
+		"src/routes/admin/papan-peringkat/type/[typeId]/exams/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/admin/papan-peringkat/[examId]": [
 		"src/routes/admin/papan-peringkat/[examId]/+page.server.ts",
 		"src/routes/admin/+layout.server.ts",
@@ -171,6 +176,11 @@
 	],
 	"/guru/papan-peringkat/type/[typeId]": [
 		"src/routes/guru/papan-peringkat/type/[typeId]/+page.server.ts",
+		"src/routes/guru/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/guru/papan-peringkat/type/[typeId]/exams": [
+		"src/routes/guru/papan-peringkat/type/[typeId]/exams/+page.server.ts",
 		"src/routes/guru/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],

@@ -1,10 +1,10 @@
-import * as server from '../entries/pages/siswa/jadwal/_page.server.ts.js';
+import * as server from '../entries/pages/pengawas/tokens/_page.server.ts.js';
 
 export const index = 49;
 let component_cache;
-export const component = async () => component_cache ??= (await import('../entries/pages/siswa/jadwal/_page.svelte.js')).default;
+export const component = async () => component_cache ??= (await import('../entries/pages/pengawas/tokens/_page.svelte.js')).default;
 export { server };
-export const server_id = "src/routes/siswa/jadwal/+page.server.ts";
-export const imports = ["_app/immutable/nodes/49.MXS_77KB.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CD7Sw7Ut.js","_app/immutable/chunks/D0O7yx7I.js","_app/immutable/chunks/onhbUEEH.js","_app/immutable/chunks/BnYE3itn.js","_app/immutable/chunks/D2xMzRQh.js","_app/immutable/chunks/KK8x-0AI.js","_app/immutable/chunks/mtvdH_ec.js","_app/immutable/chunks/CkudF3X1.js","_app/immutable/chunks/CY8zA_BH.js","_app/immutable/chunks/DcrpamBL.js","_app/immutable/chunks/BCrKnTY_.js","_app/immutable/chunks/-LO9irFG.js"];
+export const server_id = "src/routes/pengawas/tokens/+page.server.ts";
+export const imports = ["_app/immutable/nodes/49.BRt82IGy.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CD7Sw7Ut.js","_app/immutable/chunks/D0O7yx7I.js","_app/immutable/chunks/BVdG4OGp.js","_app/immutable/chunks/onhbUEEH.js","_app/immutable/chunks/DcrpamBL.js","_app/immutable/chunks/BCrKnTY_.js","_app/immutable/chunks/BnYE3itn.js","_app/immutable/chunks/D2xMzRQh.js","_app/immutable/chunks/KK8x-0AI.js","_app/immutable/chunks/Cimf0Tid.js","_app/immutable/chunks/mtvdH_ec.js","_app/immutable/chunks/B4jzVL06.js","_app/immutable/chunks/B5xf_oRu.js","_app/immutable/chunks/DkXk1XIR.js","_app/immutable/chunks/Bfc47y5P.js","_app/immutable/chunks/CkudF3X1.js","_app/immutable/chunks/DNY9haof.js","_app/immutable/chunks/CY8zA_BH.js","_app/immutable/chunks/zDyqujsk.js","_app/immutable/chunks/B_87hzmL.js","_app/immutable/chunks/BFr4Bi1C.js","_app/immutable/chunks/-LO9irFG.js","_app/immutable/chunks/BlACJPux.js","_app/immutable/chunks/D4Pah7l-.js"];
 export const stylesheets = [];
 export const fonts = [];
