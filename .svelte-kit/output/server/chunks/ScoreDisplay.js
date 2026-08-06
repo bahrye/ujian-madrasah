@@ -47,7 +47,7 @@ function ScoreDisplay($$renderer, $$props) {
       $$renderer2.push("<!--[1-->");
       if (type === "akhir") {
         $$renderer2.push("<!--[0-->");
-        $$renderer2.push(`<span class="text-slate-400 text-xs font-normal font-sans bg-slate-100 px-2 py-1 rounded whitespace-nowrap">${escape_html(statusLabel)}</span>`);
+        $$renderer2.push(`<span class="text-slate-400 text-[11px] leading-snug font-normal font-sans bg-slate-100 px-2.5 py-1.5 rounded-md inline-block max-w-[140px] text-center break-words">${escape_html(statusLabel)}</span>`);
       } else {
         $$renderer2.push("<!--[-1-->");
         $$renderer2.push(`<span class="text-slate-400 font-normal">-</span>`);

@@ -55,7 +55,7 @@
 	<span class="text-slate-400 font-normal">-</span>
 {:else if !isScoreVisible}
 	{#if type === 'akhir'}
-		<span class="text-slate-400 text-xs font-normal font-sans bg-slate-100 px-2 py-1 rounded whitespace-nowrap">{statusLabel}</span>
+		<span class="text-slate-400 text-[11px] leading-snug font-normal font-sans bg-slate-100 px-2.5 py-1.5 rounded-md inline-block max-w-[140px] text-center break-words">{statusLabel}</span>
 	{:else}
 		<span class="text-slate-400 font-normal">-</span>
 	{/if}

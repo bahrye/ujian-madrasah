@@ -20,6 +20,18 @@ function _page($$renderer, $$props) {
         second: "2-digit"
       }).replace(/\./g, ":");
     }
+    function checkIsScoreVisible(attempt) {
+      const type = attempt.show_score_type || "after_submit";
+      if (type === "manual") return attempt.is_score_released === 1;
+      if (type === "after_type_end_time" || type === "after_end_time") {
+        const timeStr = type === "after_type_end_time" ? attempt.exam_type_end_time : attempt.exam_end_time;
+        if (!timeStr) return false;
+        const str = String(timeStr).replace(" ", "T");
+        const time = (/* @__PURE__ */ new Date(str + (str.includes("T") && !str.includes("Z") ? "Z" : ""))).getTime();
+        return currentTime.getTime() >= time;
+      }
+      return true;
+    }
     function calculateRemainingTime(attempt) {
       const submitStr = attempt.submit_time || attempt.updated_at;
       if (!attempt.end_time || !submitStr) return "-";
@@ -65,31 +77,39 @@ function _page($$renderer, $$props) {
         ScoreDisplay($$renderer2, { attempt, currentTime, type: "manual" });
         $$renderer2.push(`<!----></div></div> <div class="text-slate-200 font-black text-xl mb-1">=</div> <div class="text-right"><span class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider block mb-0.5">Nilai Akhir</span> <div class="text-3xl font-black">`);
         ScoreDisplay($$renderer2, { attempt, currentTime, type: "akhir" });
-        $$renderer2.push(`<!----></div></div></div></div> <div class="mt-5 pt-4 border-t border-slate-100"><details class="group"><summary class="flex justify-between items-center font-medium cursor-pointer list-none text-xs text-slate-500 hover:text-indigo-600 transition-colors"><span>Lihat Rincian Perhitungan Nilai</span> <span class="transition group-open:rotate-180"><svg fill="none" height="16" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16"><path d="M6 9l6 6 6-6"></path></svg></span></summary> <div class="text-xs text-slate-600 mt-3 bg-slate-50/70 rounded-xl p-4 space-y-3"><p>Nilai ujian selalu dihitung dan ditampilkan dalam <strong>skala persentase (0-100)</strong>.</p> <div class="grid grid-cols-1 md:grid-cols-2 gap-3"><div class="bg-white p-3 rounded-lg border border-slate-200"><p class="font-semibold text-slate-800 mb-1.5 border-b border-slate-100 pb-1.5">Poin Otomatis</p> <ul class="space-y-1"><li class="flex justify-between"><span>Poin Mentah Didapat:</span> <strong>${escape_html(attempt.objective_earned_points ?? 0)}</strong></li> <li class="flex justify-between text-slate-400"><span>Poin Mentah Maks:</span> <strong>${escape_html(attempt.objective_max_points ?? 0)}</strong></li> <li class="mt-3 pt-3 border-t border-slate-100"><div class="flex justify-between items-center text-indigo-700 font-semibold mb-1.5"><span>Kontribusi ke Nilai Akhir:</span> <span>${escape_html(((attempt.objective_earned_points ?? 0) / (attempt.total_points || 1) * 100).toFixed(1).replace(/\.0$/, ""))}</span></div> <div class="flex items-center gap-2 font-mono text-[10px] bg-indigo-50/50 px-2.5 py-1.5 rounded-lg border border-indigo-100/50 w-fit"><div class="flex flex-col items-center leading-none"><span class="border-b border-indigo-200 pb-0.5 px-1">${escape_html(attempt.objective_earned_points ?? 0)}</span> <span class="pt-0.5 px-1">${escape_html(attempt.total_points || 1)}</span></div> <span class="text-indigo-400">× 100</span> <span class="text-indigo-400">=</span> <span class="font-bold text-xs">${escape_html(((attempt.objective_earned_points ?? 0) / (attempt.total_points || 1) * 100).toFixed(1).replace(/\.0$/, ""))}</span></div></li></ul></div> <div class="bg-white p-3 rounded-lg border border-slate-200"><p class="font-semibold text-slate-800 mb-1.5 border-b border-slate-100 pb-1.5">Poin Manual (Essay/Isian)</p> <ul class="space-y-1">`);
-        if (attempt.show_score_type === "objective_only") {
+        $$renderer2.push(`<!----></div></div></div></div> <div class="mt-5 pt-4 border-t border-slate-100">`);
+        if (checkIsScoreVisible(attempt)) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<li class="text-center text-slate-400 italic py-2">Disembunyikan</li>`);
+          $$renderer2.push(`<details class="group"><summary class="flex justify-between items-center font-medium cursor-pointer list-none text-xs text-slate-500 hover:text-indigo-600 transition-colors"><span>Lihat Rincian Perhitungan Nilai</span> <span class="transition group-open:rotate-180"><svg fill="none" height="16" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16"><path d="M6 9l6 6 6-6"></path></svg></span></summary> <div class="text-xs text-slate-600 mt-3 bg-slate-50/70 rounded-xl p-4 space-y-3"><p>Nilai ujian selalu dihitung dan ditampilkan dalam <strong>skala persentase (0-100)</strong>.</p> <div class="grid grid-cols-1 md:grid-cols-2 gap-3"><div class="bg-white p-3 rounded-lg border border-slate-200"><p class="font-semibold text-slate-800 mb-1.5 border-b border-slate-100 pb-1.5">Poin Otomatis</p> <ul class="space-y-1"><li class="flex justify-between"><span>Poin Mentah Didapat:</span> <strong>${escape_html(attempt.objective_earned_points ?? 0)}</strong></li> <li class="flex justify-between text-slate-400"><span>Poin Mentah Maks:</span> <strong>${escape_html(attempt.objective_max_points ?? 0)}</strong></li> <li class="mt-3 pt-3 border-t border-slate-100"><div class="flex justify-between items-center text-indigo-700 font-semibold mb-1.5"><span>Kontribusi ke Nilai Akhir:</span> <span>${escape_html(((attempt.objective_earned_points ?? 0) / (attempt.total_points || 1) * 100).toFixed(1).replace(/\.0$/, ""))}</span></div> <div class="flex items-center gap-2 font-mono text-[10px] bg-indigo-50/50 px-2.5 py-1.5 rounded-lg border border-indigo-100/50 w-fit"><div class="flex flex-col items-center leading-none"><span class="border-b border-indigo-200 pb-0.5 px-1">${escape_html(attempt.objective_earned_points ?? 0)}</span> <span class="pt-0.5 px-1">${escape_html(attempt.total_points || 1)}</span></div> <span class="text-indigo-400">× 100</span> <span class="text-indigo-400">=</span> <span class="font-bold text-xs">${escape_html(((attempt.objective_earned_points ?? 0) / (attempt.total_points || 1) * 100).toFixed(1).replace(/\.0$/, ""))}</span></div></li></ul></div> <div class="bg-white p-3 rounded-lg border border-slate-200"><p class="font-semibold text-slate-800 mb-1.5 border-b border-slate-100 pb-1.5">Poin Manual (Essay/Isian)</p> <ul class="space-y-1">`);
+          if (attempt.show_score_type === "objective_only") {
+            $$renderer2.push("<!--[0-->");
+            $$renderer2.push(`<li class="text-center text-slate-400 italic py-2">Disembunyikan</li>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+            $$renderer2.push(`<li class="flex justify-between"><span>Poin Mentah Didapat:</span> <strong>${escape_html(manual_earned.toFixed(1).replace(/\.0$/, ""))}</strong></li> <li class="flex justify-between text-slate-400"><span>Poin Mentah Maks:</span> <strong>${escape_html((attempt.total_points || 1) - (attempt.objective_max_points ?? 0))}</strong></li> <li class="mt-3 pt-3 border-t border-slate-100"><div class="flex justify-between items-center text-indigo-700 font-semibold mb-1.5"><span>Kontribusi ke Nilai Akhir:</span> <span>${escape_html((manual_earned / (attempt.total_points || 1) * 100).toFixed(1).replace(/\.0$/, ""))}</span></div> <div class="flex items-center gap-2 font-mono text-[10px] bg-indigo-50/50 px-2.5 py-1.5 rounded-lg border border-indigo-100/50 w-fit"><div class="flex flex-col items-center leading-none"><span class="border-b border-indigo-200 pb-0.5 px-1">${escape_html(manual_earned.toFixed(1).replace(/\.0$/, ""))}</span> <span class="pt-0.5 px-1">${escape_html(attempt.total_points || 1)}</span></div> <span class="text-indigo-400">× 100</span> <span class="text-indigo-400">=</span> <span class="font-bold text-xs">${escape_html((manual_earned / (attempt.total_points || 1) * 100).toFixed(1).replace(/\.0$/, ""))}</span></div></li>`);
+          }
+          $$renderer2.push(`<!--]--></ul></div></div> <div class="bg-indigo-50/50 border border-indigo-100 p-3.5 rounded-xl text-indigo-800 flex justify-between items-center mt-2"><div><p class="font-bold text-sm mb-2">Rumus Total Nilai Akhir</p> <div class="flex items-center gap-2.5 font-mono text-xs bg-white px-3 py-2 rounded-lg border border-indigo-100 shadow-sm w-fit"><div class="flex flex-col items-center leading-none"><span class="border-b border-indigo-200 pb-1 px-1 text-slate-700">${escape_html(attempt.show_score_type === "objective_only" ? attempt.objective_earned_points ?? 0 : ((attempt.score ?? 0) / 100 * (attempt.total_points || 1)).toFixed(1).replace(/\.0$/, ""))}</span> <span class="pt-1 px-1 text-slate-700">${escape_html(attempt.total_points || 1)}</span></div> <span class="text-indigo-400 font-semibold">× 100</span> <span class="text-indigo-400 font-semibold">=</span> <span class="font-black text-sm text-indigo-700">`);
+          if (attempt.show_score_type === "objective_only") {
+            $$renderer2.push("<!--[0-->");
+            $$renderer2.push(`${escape_html(((attempt.objective_earned_points ?? 0) / (attempt.total_points || 1) * 100).toFixed(1).replace(/\.0$/, ""))}`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+            $$renderer2.push(`${escape_html(attempt.score ?? 0)}`);
+          }
+          $$renderer2.push(`<!--]--></span></div></div> <div class="text-4xl font-black bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text hidden sm:block">`);
+          if (attempt.show_score_type === "objective_only") {
+            $$renderer2.push("<!--[0-->");
+            $$renderer2.push(`${escape_html(((attempt.objective_earned_points ?? 0) / (attempt.total_points || 1) * 100).toFixed(1).replace(/\.0$/, ""))}`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+            $$renderer2.push(`${escape_html(attempt.score ?? 0)}`);
+          }
+          $$renderer2.push(`<!--]--></div></div></div></details>`);
         } else {
           $$renderer2.push("<!--[-1-->");
-          $$renderer2.push(`<li class="flex justify-between"><span>Poin Mentah Didapat:</span> <strong>${escape_html(manual_earned.toFixed(1).replace(/\.0$/, ""))}</strong></li> <li class="flex justify-between text-slate-400"><span>Poin Mentah Maks:</span> <strong>${escape_html((attempt.total_points || 1) - (attempt.objective_max_points ?? 0))}</strong></li> <li class="mt-3 pt-3 border-t border-slate-100"><div class="flex justify-between items-center text-indigo-700 font-semibold mb-1.5"><span>Kontribusi ke Nilai Akhir:</span> <span>${escape_html((manual_earned / (attempt.total_points || 1) * 100).toFixed(1).replace(/\.0$/, ""))}</span></div> <div class="flex items-center gap-2 font-mono text-[10px] bg-indigo-50/50 px-2.5 py-1.5 rounded-lg border border-indigo-100/50 w-fit"><div class="flex flex-col items-center leading-none"><span class="border-b border-indigo-200 pb-0.5 px-1">${escape_html(manual_earned.toFixed(1).replace(/\.0$/, ""))}</span> <span class="pt-0.5 px-1">${escape_html(attempt.total_points || 1)}</span></div> <span class="text-indigo-400">× 100</span> <span class="text-indigo-400">=</span> <span class="font-bold text-xs">${escape_html((manual_earned / (attempt.total_points || 1) * 100).toFixed(1).replace(/\.0$/, ""))}</span></div></li>`);
+          $$renderer2.push(`<div class="flex items-center justify-center py-2 px-4 rounded-xl border border-dashed border-amber-200 bg-amber-50 text-amber-600 text-xs font-medium text-center"><svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Rincian perhitungan akan ditampilkan setelah nilai Anda dirilis.</div>`);
         }
-        $$renderer2.push(`<!--]--></ul></div></div> <div class="bg-indigo-50/50 border border-indigo-100 p-3.5 rounded-xl text-indigo-800 flex justify-between items-center mt-2"><div><p class="font-bold text-sm mb-2">Rumus Total Nilai Akhir</p> <div class="flex items-center gap-2.5 font-mono text-xs bg-white px-3 py-2 rounded-lg border border-indigo-100 shadow-sm w-fit"><div class="flex flex-col items-center leading-none"><span class="border-b border-indigo-200 pb-1 px-1 text-slate-700">${escape_html(attempt.show_score_type === "objective_only" ? attempt.objective_earned_points ?? 0 : ((attempt.score ?? 0) / 100 * (attempt.total_points || 1)).toFixed(1).replace(/\.0$/, ""))}</span> <span class="pt-1 px-1 text-slate-700">${escape_html(attempt.total_points || 1)}</span></div> <span class="text-indigo-400 font-semibold">× 100</span> <span class="text-indigo-400 font-semibold">=</span> <span class="font-black text-sm text-indigo-700">`);
-        if (attempt.show_score_type === "objective_only") {
-          $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`${escape_html(((attempt.objective_earned_points ?? 0) / (attempt.total_points || 1) * 100).toFixed(1).replace(/\.0$/, ""))}`);
-        } else {
-          $$renderer2.push("<!--[-1-->");
-          $$renderer2.push(`${escape_html(attempt.score ?? 0)}`);
-        }
-        $$renderer2.push(`<!--]--></span></div></div> <div class="text-4xl font-black bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text hidden sm:block">`);
-        if (attempt.show_score_type === "objective_only") {
-          $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`${escape_html(((attempt.objective_earned_points ?? 0) / (attempt.total_points || 1) * 100).toFixed(1).replace(/\.0$/, ""))}`);
-        } else {
-          $$renderer2.push("<!--[-1-->");
-          $$renderer2.push(`${escape_html(attempt.score ?? 0)}`);
-        }
-        $$renderer2.push(`<!--]--></div></div></div></details></div></div>`);
+        $$renderer2.push(`<!--]--></div></div>`);
       }
       $$renderer2.push(`<!--]--></div>`);
     }
