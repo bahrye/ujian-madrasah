@@ -1,4 +1,4 @@
-import { h as head, j as attr, e as escape_html, f as ensure_array_like, i as attr_class, d as bind_props } from "../../../../chunks/index.js";
+import { h as head, k as attr, e as escape_html, i as ensure_array_like, j as attr_class, f as bind_props } from "../../../../chunks/index.js";
 import "@sveltejs/kit/internal";
 import "../../../../chunks/exports.js";
 import "../../../../chunks/utils2.js";

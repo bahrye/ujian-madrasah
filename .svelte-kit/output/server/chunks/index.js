@@ -36,7 +36,7 @@ const STALE_REACTION = new class StaleReactionError extends Error {
   message = "The reaction that called `getAbortSignal()` was re-run or destroyed";
 }();
 const COMMENT_NODE = 8;
-const DEV = false;
+const browser = false;
 var is_array = Array.isArray;
 var index_of = Array.prototype.indexOf;
 var includes = Array.prototype.includes;
@@ -996,7 +996,7 @@ class Batch {
   }
   flush() {
     try {
-      if (DEV) ;
+      if (browser) ;
       is_processing = true;
       current_batch = this;
       this.#process();
@@ -1781,7 +1781,7 @@ function update_effect(effect) {
     effect.teardown = typeof teardown === "function" ? teardown : null;
     effect.wv = write_version;
     var dep;
-    if (DEV && tracing_mode_flag && (effect.f & DIRTY) !== 0 && effect.deps !== null) ;
+    if (browser && tracing_mode_flag && (effect.f & DIRTY) !== 0 && effect.deps !== null) ;
   } finally {
     is_updating_effect = was_updating_effect;
     active_effect = previous_effect;
@@ -3322,10 +3322,10 @@ function derived(fn) {
 }
 export {
   define_property as $,
-  active_effect as A,
-  BOUNDARY_EFFECT as B,
+  queue_micro_task as A,
+  active_effect as B,
   COMMENT_NODE as C,
-  DEV as D,
+  BOUNDARY_EFFECT as D,
   block as E,
   branch as F,
   create_text as G,
@@ -3369,29 +3369,29 @@ export {
   noop as ag,
   safe_not_equal as ah,
   ssr_context as ai,
-  stringify as b,
-  slot as c,
-  bind_props as d,
+  browser as b,
+  stringify as c,
+  slot as d,
   escape_html as e,
-  ensure_array_like as f,
+  bind_props as f,
   getContext as g,
   head as h,
-  attr_class as i,
-  attr as j,
-  clsx as k,
-  fallback as l,
-  hydration_mismatch as m,
-  HYDRATION_END as n,
-  HYDRATION_START as o,
-  HYDRATION_START_ELSE as p,
-  get_next_sibling as q,
-  effect_tracking as r,
+  ensure_array_like as i,
+  attr_class as j,
+  attr as k,
+  clsx as l,
+  fallback as m,
+  hydration_mismatch as n,
+  HYDRATION_END as o,
+  HYDRATION_START as p,
+  HYDRATION_START_ELSE as q,
+  get_next_sibling as r,
   store_get as s,
-  get as t,
+  effect_tracking as t,
   unsubscribe_stores as u,
-  render_effect as v,
-  source as w,
-  untrack as x,
-  increment as y,
-  queue_micro_task as z
+  get as v,
+  render_effect as w,
+  source as x,
+  untrack as y,
+  increment as z
 };

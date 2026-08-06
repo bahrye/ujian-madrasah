@@ -1,4 +1,4 @@
-import { f as ensure_array_like, s as store_get, i as attr_class, b as stringify, j as attr, e as escape_html, u as unsubscribe_stores } from "./index.js";
+import { i as ensure_array_like, s as store_get, j as attr_class, c as stringify, k as attr, e as escape_html, u as unsubscribe_stores } from "./index.js";
 import { t as toasts } from "./toast.js";
 function Toast($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {

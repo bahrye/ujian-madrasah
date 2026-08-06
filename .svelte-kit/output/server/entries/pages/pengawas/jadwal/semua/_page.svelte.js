@@ -1,4 +1,4 @@
-import { h as head, f as ensure_array_like, e as escape_html, j as attr, d as bind_props } from "../../../../../chunks/index.js";
+import { h as head, i as ensure_array_like, e as escape_html, k as attr, f as bind_props } from "../../../../../chunks/index.js";
 import { I as ICONS } from "../../../../../chunks/constants.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {

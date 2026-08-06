@@ -1,4 +1,4 @@
-import { l as fallback, j as attr, i as attr_class, d as bind_props } from "./index.js";
+import { m as fallback, k as attr, j as attr_class, f as bind_props } from "./index.js";
 function PasswordInput($$renderer, $$props) {
   let id = fallback($$props["id"], "password");
   let name = fallback($$props["name"], "password");

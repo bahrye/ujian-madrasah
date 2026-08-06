@@ -8,6 +8,7 @@
 	import Toast from '$lib/components/ui/Toast.svelte';
 	import { toasts } from '$lib/stores/toast';
 	import { onMount, onDestroy } from 'svelte';
+	import { browser } from '$app/environment';
 
 	export let data;
 
@@ -19,6 +20,11 @@
 	let showNav = false;
 	let showSubmitConfirm = false;
 	let submitting = false;
+
+	// Anti-cheat v2 state
+	let isExamBlurred = false;
+	let isFullscreen = false;
+	let cheatWarningTimeout: any;
 
 	// Anti-cheat state
 	let isPausedByProctor = false;
@@ -73,6 +79,9 @@
 	onMount(() => {
 		requestWakeLock();
 		
+		if (browser) {
+			isFullscreen = !!document.fullscreenElement;
+		}
 		const savedWarnings = localStorage.getItem(`warnings_${attempt.id}`);
 		const savedLogs = localStorage.getItem(`warningLogs_${attempt.id}`);
 		
@@ -126,86 +135,85 @@
 
 	let isDisqualifying = false;
 
-	function triggerDisqualification() {
-		isUnloading = true; // allow navigation later
-		showDisqualifiedModal = true;
-		submitting = true;
-		isDisqualifying = true;
-		saveCurrentAnswer().then(() => {
-			const fd = new FormData();
-			return fetch('?/submit', { 
-				method: 'POST', 
-				body: fd,
-				headers: {
-					'x-sveltekit-action': 'true'
-				}
-			});
-		}).then(() => {
-			isDisqualifying = false;
-		}).catch((err) => {
-			console.error(err);
-			isDisqualifying = false;
-		});
+	function triggerViolation(type: string) {
+		if (showWarningModal || showDisqualifiedModal || submitting || isUnloading) return;
+		
+		warnings += 1;
+		warningLogs.push({ time: Date.now(), type });
+		localStorage.setItem(`warnings_${attempt.id}`, warnings.toString());
+		localStorage.setItem(`warningLogs_${attempt.id}`, JSON.stringify(warningLogs));
+		
+		triggerAutoSave();
+		isExamBlurred = false;
+
+		if (warnings > MAX_WARNINGS) {
+			triggerDisqualification();
+		} else {
+			showWarningModal = true;
+		}
 	}
 
-	let cheatWarningTimeout: any;
-
-	function handleCheatWarning(type = 'Meninggalkan halaman ujian') {
-		if (showWarningModal || showDisqualifiedModal || submitting || isUnloading) return; // Prevent multiple triggers at once
+	function handleCheatWarning(type: string, toleranceMs: number) {
+		if (showWarningModal || showDisqualifiedModal || submitting || isUnloading) return;
 		
+		isExamBlurred = true;
 		if (cheatWarningTimeout) clearTimeout(cheatWarningTimeout);
 		
 		cheatWarningTimeout = setTimeout(() => {
-			if (isUnloading) return; // If page is actually unloading (reload/close), abort the warning
-			
-			warnings += 1;
-			warningLogs.push({ time: Date.now(), type });
-			localStorage.setItem(`warnings_${attempt.id}`, warnings.toString());
-			localStorage.setItem(`warningLogs_${attempt.id}`, JSON.stringify(warningLogs));
-			
-			triggerAutoSave();
-
-			if (warnings > MAX_WARNINGS) {
-				triggerDisqualification();
-			} else {
-				showWarningModal = true;
-			}
-		}, 500);
+			if (isUnloading) return;
+			triggerViolation(type);
+		}, toleranceMs);
 	}
 
-	async function handleAutoSubmit() {
-		if (isPausedByProctor) return;
-		submitting = true;
-		await saveCurrentAnswer();
-		
-		// Random jitter (0 - 2500ms) untuk meratakan trafik POST submit ratusan siswa
-		const jitter = Math.floor(Math.random() * 2500);
-		await new Promise((resolve) => setTimeout(resolve, jitter));
-		
-		const form = document.createElement('form');
-		form.method = 'POST';
-		form.action = '?/submit';
-		document.body.appendChild(form);
-		form.submit();
+	function handleReturnToExam() {
+		if (cheatWarningTimeout) clearTimeout(cheatWarningTimeout);
+		if (isExamBlurred) {
+			isExamBlurred = false;
+		}
+		if (wakeLock !== null && wakeLock.released) {
+			requestWakeLock();
+		} else if (wakeLock === null) {
+			requestWakeLock();
+		}
+	}
+
+	async function enterFullscreen() {
+		handleReturnToExam();
+		try {
+			if (document.documentElement.requestFullscreen) {
+				await document.documentElement.requestFullscreen();
+			}
+		} catch (err) {}
+	}
+
+	function handleFullscreenChange() {
+		isFullscreen = !!document.fullscreenElement;
+		if (!isFullscreen && !isExamBlurred && !showWarningModal && !showDisqualifiedModal && !submitting) {
+			handleCheatWarning('Keluar dari Layar Penuh', 15000); // 15 detik toleransi
+		} else if (isFullscreen) {
+			handleReturnToExam();
+		}
 	}
 
 	function handleVisibilityChange() {
 		if (document.visibilityState === 'hidden') {
-			handleCheatWarning('Membuka tab/aplikasi lain (Visibility Hidden)');
+			handleCheatWarning('Keluar dari aplikasi ujian (Berpindah Tab/Layar)', 15000); // 15 detik
 		} else if (document.visibilityState === 'visible') {
-			if (wakeLock !== null && wakeLock.released) {
-				requestWakeLock();
-			} else if (wakeLock === null) {
-				requestWakeLock();
-			}
+			handleReturnToExam();
 		}
 	}
 
 	function handleBlur() {
-		// handleCheatWarning('Window blur / Tidak fokus pada halaman');
-		// Note: we can optionally listen to window blur, but visibilitychange is usually more reliable
-		// For stricter rules, we can uncomment the blur listener.
-		handleCheatWarning('Tidak fokus pada halaman ujian (Window Blur)');
+		if (document.visibilityState !== 'hidden') {
+			// Muncul aplikasi melayang / ditariknya notifikasi bar
+			handleCheatWarning('Membuka aplikasi melayang / Notifikasi', 180000); // 3 menit
+		}
+	}
+	
+	function handleFocus() {
+		if (document.visibilityState === 'visible') {
+			handleReturnToExam();
+		}
 	}
 
 	// Local answer state
@@ -310,9 +318,13 @@
 	on:copy|preventDefault 
 	on:cut|preventDefault 
 	on:paste|preventDefault 
-	on:blur={handleBlur} 
+	on:blur={handleBlur}
+	on:focus={handleFocus}
 />
-<svelte:document on:visibilitychange={handleVisibilityChange} />
+<svelte:document 
+	on:visibilitychange={handleVisibilityChange}
+	on:fullscreenchange={handleFullscreenChange}
+/>
 
 <Toast />
 
@@ -502,6 +514,39 @@
 					</button>
 				</form>
 			</div>
+		</div>
+	</div>
+{/if}
+
+{#if !isFullscreen && !isExamBlurred && !isPausedByProctor}
+	<div class="fixed inset-0 z-[60] flex flex-col items-center justify-center p-4 bg-slate-900/95 backdrop-blur-xl">
+		<div class="text-center text-white max-w-md animate-in fade-in zoom-in duration-300">
+			<svg class="w-16 h-16 mx-auto mb-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+			</svg>
+			<h2 class="text-2xl font-bold mb-4">Mode Layar Penuh Diperlukan</h2>
+			<p class="text-slate-300 text-sm mb-6">Ujian ini wajib menggunakan mode layar penuh untuk mencegah kecurangan dan menutupi notifikasi sistem. Silakan masuk ke Layar Penuh untuk mulai/melanjutkan.</p>
+			<button class="btn-primary w-full justify-center py-3" on:click={enterFullscreen}>Masuk Layar Penuh</button>
+		</div>
+	</div>
+{/if}
+
+{#if isExamBlurred}
+	<div class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/95 backdrop-blur-xl">
+		<div class="text-center text-white max-w-md animate-in fade-in zoom-in duration-300">
+			<div class="w-16 h-16 mx-auto mb-6 bg-slate-800 rounded-full flex items-center justify-center">
+				<svg class="w-8 h-8 text-rose-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+				</svg>
+			</div>
+			<h2 class="text-2xl font-bold mb-3 text-rose-400">Ujian Dijeda Sementara</h2>
+			<p class="text-slate-300 text-sm mb-6">Anda terdeteksi keluar dari layar ujian atau membuka aplikasi melayang (Messenger, Notifikasi, dsb). Ujian disembunyikan demi keamanan.</p>
+			
+			<div class="bg-rose-500/10 border border-rose-500/20 rounded-lg p-3 mb-6">
+				<p class="text-rose-300 text-xs text-left">💡 Jika Anda sedang memperbaiki masalah koneksi, segera tutup notifikasi bar Anda. Waktu toleransi terus berjalan dan akan dihitung sebagai pelanggaran berat jika melewati batas!</p>
+			</div>
+			
+			<button class="btn-primary w-full justify-center" on:click={enterFullscreen}>Saya Sudah Kembali</button>
 		</div>
 	</div>
 {/if}

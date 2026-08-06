@@ -1,4 +1,4 @@
-import { h as head, e as escape_html, j as attr, s as store_get, u as unsubscribe_stores, d as bind_props } from "../../../../../../chunks/index.js";
+import { h as head, e as escape_html, k as attr, s as store_get, u as unsubscribe_stores, f as bind_props } from "../../../../../../chunks/index.js";
 import { Q as QuestionRenderer } from "../../../../../../chunks/QuestionRenderer.js";
 import { I as ICONS } from "../../../../../../chunks/constants.js";
 import { p as page } from "../../../../../../chunks/stores.js";

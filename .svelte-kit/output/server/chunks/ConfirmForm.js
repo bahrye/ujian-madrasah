@@ -1,4 +1,4 @@
-import { l as fallback, j as attr, c as slot, i as attr_class, k as clsx, d as bind_props } from "./index.js";
+import { m as fallback, k as attr, d as slot, j as attr_class, l as clsx, f as bind_props } from "./index.js";
 import "@sveltejs/kit/internal";
 import "./exports.js";
 import "./utils2.js";

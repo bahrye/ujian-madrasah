@@ -1,4 +1,4 @@
-import { l as fallback, j as attr, i as attr_class, a as attr_style, e as escape_html, d as bind_props, b as stringify, f as ensure_array_like } from "./index.js";
+import { m as fallback, k as attr, j as attr_class, a as attr_style, e as escape_html, f as bind_props, c as stringify, i as ensure_array_like } from "./index.js";
 import { Q as QUESTION_TYPE_LABELS } from "./constants.js";
 /* empty css                                               */
 import { h as html } from "./html.js";

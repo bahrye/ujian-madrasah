@@ -1,4 +1,4 @@
-import { l as fallback, e as escape_html, i as attr_class, j as attr, d as bind_props, b as stringify } from "./index.js";
+import { m as fallback, e as escape_html, j as attr_class, k as attr, f as bind_props, c as stringify } from "./index.js";
 function StatCard($$renderer, $$props) {
   let value = fallback($$props["value"], "");
   let label = fallback($$props["label"], "");

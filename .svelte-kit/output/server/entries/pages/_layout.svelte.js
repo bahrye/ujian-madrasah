@@ -1,4 +1,4 @@
-import { s as store_get, a as attr_style, u as unsubscribe_stores, b as stringify, c as slot } from "../../chunks/index.js";
+import { s as store_get, a as attr_style, u as unsubscribe_stores, c as stringify, d as slot } from "../../chunks/index.js";
 import { n as navigating } from "../../chunks/stores.js";
 function PageLoader($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {

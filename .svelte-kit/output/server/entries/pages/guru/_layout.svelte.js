@@ -1,4 +1,4 @@
-import { d as bind_props, c as slot } from "../../../chunks/index.js";
+import { f as bind_props, d as slot } from "../../../chunks/index.js";
 import { A as AppShell } from "../../../chunks/AppShell.js";
 import { S as SIDEBAR_MENUS } from "../../../chunks/constants.js";
 function _layout($$renderer, $$props) {
