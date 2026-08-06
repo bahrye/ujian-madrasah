@@ -42,6 +42,7 @@ function _page_($$renderer, $$props) {
     let attempt, questions, answerMap, currentQuestion, answeredCount, doubtedCount, unansweredCount;
     let data = $$props["data"];
     let currentIndex = 0;
+    let currentEndTime = data.attempt.end_time;
     let isPausedByProctor = data.attempt.is_paused === 1;
     onDestroy(() => {
     });
@@ -89,7 +90,7 @@ function _page_($$renderer, $$props) {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]--> `);
-    Timer($$renderer2, { endTime: attempt.end_time, isPaused: isPausedByProctor });
+    Timer($$renderer2, { endTime: currentEndTime, isPaused: isPausedByProctor });
     $$renderer2.push(`<!----></div></div> <div class="max-w-4xl mx-auto mt-2"><div class="h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-500"${attr_style(`width: ${stringify(answeredCount / questions.length * 100)}%`)}></div></div></div></header> <main class="flex-1 max-w-4xl mx-auto w-full px-4 py-6">`);
     if (currentQuestion) {
       $$renderer2.push("<!--[0-->");

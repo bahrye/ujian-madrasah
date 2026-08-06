@@ -27,6 +27,7 @@
 	let cheatWarningTimeout: any;
 
 	// Anti-cheat state
+	let currentEndTime = data.attempt.end_time;
 	let isPausedByProctor = data.attempt.is_paused === 1;
 	let statusPollingInterval: any;
 	
@@ -100,10 +101,10 @@
 				const res = await fetch(`/api/attempt-status/${attempt.id}`);
 				if (res.ok) {
 					const data = await res.json() as any;
-					isPausedByProctor = data.is_paused;
-					if (data.end_time && data.end_time !== attempt.end_time) {
-						attempt.end_time = data.end_time;
+					if (data.end_time && data.end_time !== currentEndTime) {
+						currentEndTime = data.end_time;
 					}
+					isPausedByProctor = data.is_paused;
 					if (data.status !== 'mengerjakan' && data.status !== attempt.status) {
 						window.location.reload();
 					}
@@ -402,7 +403,7 @@
 						<span class="text-xs font-bold">{warnings}/{MAX_WARNINGS}</span>
 					</div>
 				{/if}
-				<Timer endTime={attempt.end_time} isPaused={isPausedByProctor} on:timeup={handleTimeUp} />
+				<Timer endTime={currentEndTime} isPaused={isPausedByProctor} on:timeup={handleTimeUp} />
 			</div>
 		</div>
 		<!-- Progress Bar -->
