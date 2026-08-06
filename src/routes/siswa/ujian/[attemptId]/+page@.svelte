@@ -406,11 +406,6 @@
 				</div>
 			</div>
 			<div class="flex items-center gap-2 sm:gap-3">
-				<button class="btn-ghost p-1.5 sm:p-2 text-slate-500 hover:text-indigo-600 rounded-lg" on:click={() => window.location.reload()} title="Muat Ulang Halaman">
-					<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-					</svg>
-				</button>
 				{#if warnings > 0}
 					<div class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 bg-red-50 text-red-600 rounded-full border border-red-200 animate-in fade-in slide-in-from-right-4">
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
@@ -436,14 +431,16 @@
 	<!-- Main Content -->
 	<main class="flex-1 max-w-4xl mx-auto w-full px-4 py-6">
 		{#if currentQuestion}
-			<QuestionRenderer
-				question={currentQuestion}
-				displayNumber={currentIndex + 1}
-				answer={localAnswers[currentQuestion.id] || ''}
-				isDoubted={localDoubts[currentQuestion.id] || false}
-				on:answer={handleAnswer}
-				on:doubt={handleDoubt}
-			/>
+			{#key currentQuestion.id}
+				<QuestionRenderer
+					question={currentQuestion}
+					displayNumber={currentIndex + 1}
+					answer={localAnswers[currentQuestion.id] || ''}
+					isDoubted={localDoubts[currentQuestion.id] || false}
+					on:answer={handleAnswer}
+					on:doubt={handleDoubt}
+				/>
+			{/key}
 		{/if}
 	</main>
 
@@ -452,15 +449,22 @@
 		<div class="max-w-4xl mx-auto px-4 py-3">
 			<!-- Nav Toggle + Info -->
 			<div class="flex items-center justify-between mb-3">
-				<button
-					class="btn-sm btn-ghost border border-slate-200"
-					on:click={() => (showNav = !showNav)}
-				>
-					<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-					</svg>
-					Navigasi Soal
-				</button>
+				<div class="flex items-center gap-2">
+					<button
+						class="btn-sm btn-ghost border border-slate-200"
+						on:click={() => (showNav = !showNav)}
+					>
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+						</svg>
+						Navigasi Soal
+					</button>
+					<button class="btn-sm btn-ghost border border-slate-200" on:click={() => window.location.reload()} title="Muat Ulang Halaman">
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+						</svg>
+					</button>
+				</div>
 				<div class="flex items-center gap-3 text-xs">
 					<span class="text-emerald-600 font-semibold">{answeredCount} terjawab</span>
 					{#if doubtedCount > 0}
