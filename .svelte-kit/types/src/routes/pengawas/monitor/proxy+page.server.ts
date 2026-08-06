@@ -10,8 +10,9 @@ export interface ExamFilterOption {
 
 export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>[0]) => {
 	if (!locals.user) throw redirect(302, '/login');
-	const db = getDB(platform);
-	const examFilter = url.searchParams.get('exam_id') || '';
+	try {
+		const db = getDB(platform);
+		const examFilter = url.searchParams.get('exam_id') || '';
 
 	const exams = await db.prepare(`
 		SELECT e.id, e.title 
@@ -65,7 +66,7 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 			SELECT sa.attempt_id, COUNT(*) as c
 			FROM student_answers sa
 			JOIN student_attempts st ON sa.attempt_id = st.id
-			WHERE st.exam_id = ? AND sa.answer_given IS NOT NULL AND sa.answer_given != ""
+			WHERE st.exam_id = ? AND sa.answer_given IS NOT NULL AND sa.answer_given != ''
 			GROUP BY sa.attempt_id
 		`).bind(examFilter).all();
 		
@@ -75,7 +76,8 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 	}
 
 	const kv = platform?.env?.EXAM_ANSWERS;
-	const attemptsWithProgress = await Promise.all(attempts.map(async (a) => {
+	const attemptsWithProgress = [];
+	for (const a of attempts) {
 		let answeredCount = 0;
 		let warnings = 0;
 		let warningLogs: any[] = [];
@@ -83,16 +85,18 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 
 		if (status === 'mengerjakan') {
 			if (kv && a.attempt_id) {
-				const stored = await kv.get(`attempt_${a.attempt_id}_answers`);
-				if (stored) {
-					try {
+				try {
+					const stored = await kv.get(`attempt_${a.attempt_id}_answers`);
+					if (stored) {
 						const data = JSON.parse(stored);
 						if (data && data.answers) {
 							answeredCount = Object.values(data.answers).filter(val => val !== null && val !== '').length;
 						}
 						if (data && data.warnings) warnings = data.warnings;
 						if (data && data.warningLogs) warningLogs = data.warningLogs;
-					} catch (e) {}
+					}
+				} catch (e) {
+					console.error("KV get error:", e);
 				}
 			}
 			if (answeredCount === 0 && a.attempt_id) {
@@ -106,7 +110,7 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 			}
 		}
 
-		return {
+		attemptsWithProgress.push({
 			...a,
 			id: a.attempt_id || `no_attempt_${a.student_id}`,
 			attempt_id: a.attempt_id,
@@ -116,10 +120,14 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 			warningLogs,
 			is_paused: a.is_paused,
 			paused_at: a.paused_at
-		};
-	}));
+		});
+	}
 
 	return { exams: exams.results, attempts: attemptsWithProgress, examFilter };
+	} catch (err: any) {
+		console.error("Load Error in monitor page:", err);
+		return { exams: [], attempts: [], examFilter: '', loadError: err.message || String(err) };
+	}
 };
 
 export const actions = {

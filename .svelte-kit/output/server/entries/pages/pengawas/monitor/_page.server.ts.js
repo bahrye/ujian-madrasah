@@ -2,18 +2,19 @@ import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
 const load = async ({ platform, url, locals }) => {
   if (!locals.user) throw redirect(302, "/login");
-  const db = getDB(platform);
-  const examFilter = url.searchParams.get("exam_id") || "";
-  const exams = await db.prepare(`
+  try {
+    const db = getDB(platform);
+    const examFilter = url.searchParams.get("exam_id") || "";
+    const exams = await db.prepare(`
 		SELECT e.id, e.title 
 		FROM exams e 
 		JOIN exam_proctors ep ON e.id = ep.exam_id
 		WHERE e.is_active = 1 AND e.school_id = ? AND ep.proctor_id = ?
 		ORDER BY e.title
 	`).bind(locals.user.school_id, locals.user.id).all();
-  let attempts = [];
-  if (examFilter) {
-    const result = await db.prepare(`
+    let attempts = [];
+    if (examFilter) {
+      const result = await db.prepare(`
 			SELECT 
 				epart.student_id,
 				u.name as student_name, 
@@ -44,69 +45,75 @@ const load = async ({ platform, url, locals }) => {
 					 ELSE 3 END ASC,
 				u.name ASC
 		`).bind(examFilter, locals.user.school_id, locals.user.id).all();
-    attempts = result.results;
-  }
-  let answeredCountsMap = {};
-  const attemptIds = attempts.map((a) => a.attempt_id).filter((id) => id);
-  if (attemptIds.length > 0) {
-    const countsResult = await db.prepare(`
+      attempts = result.results;
+    }
+    let answeredCountsMap = {};
+    const attemptIds = attempts.map((a) => a.attempt_id).filter((id) => id);
+    if (attemptIds.length > 0) {
+      const countsResult = await db.prepare(`
 			SELECT sa.attempt_id, COUNT(*) as c
 			FROM student_answers sa
 			JOIN student_attempts st ON sa.attempt_id = st.id
-			WHERE st.exam_id = ? AND sa.answer_given IS NOT NULL AND sa.answer_given != ""
+			WHERE st.exam_id = ? AND sa.answer_given IS NOT NULL AND sa.answer_given != ''
 			GROUP BY sa.attempt_id
 		`).bind(examFilter).all();
-    countsResult.results.forEach((r) => {
-      answeredCountsMap[r.attempt_id] = r.c;
-    });
-  }
-  const kv = platform?.env?.EXAM_ANSWERS;
-  const attemptsWithProgress = await Promise.all(attempts.map(async (a) => {
-    let answeredCount = 0;
-    let warnings = 0;
-    let warningLogs = [];
-    const status = a.status || "belum_mengerjakan";
-    if (status === "mengerjakan") {
-      if (kv && a.attempt_id) {
-        const stored = await kv.get(`attempt_${a.attempt_id}_answers`);
-        if (stored) {
+      countsResult.results.forEach((r) => {
+        answeredCountsMap[r.attempt_id] = r.c;
+      });
+    }
+    const kv = platform?.env?.EXAM_ANSWERS;
+    const attemptsWithProgress = [];
+    for (const a of attempts) {
+      let answeredCount = 0;
+      let warnings = 0;
+      let warningLogs = [];
+      const status = a.status || "belum_mengerjakan";
+      if (status === "mengerjakan") {
+        if (kv && a.attempt_id) {
           try {
-            const data = JSON.parse(stored);
-            if (data && data.answers) {
-              answeredCount = Object.values(data.answers).filter((val) => val !== null && val !== "").length;
+            const stored = await kv.get(`attempt_${a.attempt_id}_answers`);
+            if (stored) {
+              const data = JSON.parse(stored);
+              if (data && data.answers) {
+                answeredCount = Object.values(data.answers).filter((val) => val !== null && val !== "").length;
+              }
+              if (data && data.warnings) warnings = data.warnings;
+              if (data && data.warningLogs) warningLogs = data.warningLogs;
             }
-            if (data && data.warnings) warnings = data.warnings;
-            if (data && data.warningLogs) warningLogs = data.warningLogs;
           } catch (e) {
+            console.error("KV get error:", e);
           }
         }
+        if (answeredCount === 0 && a.attempt_id) {
+          answeredCount = answeredCountsMap[a.attempt_id] || 0;
+        }
+      } else if (status === "selesai" || status === "waktu_habis") {
+        warnings = a.violation_count || 0;
+        try {
+          warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : [];
+        } catch (e) {
+        }
+        if (a.attempt_id) {
+          answeredCount = answeredCountsMap[a.attempt_id] || 0;
+        }
       }
-      if (answeredCount === 0 && a.attempt_id) {
-        answeredCount = answeredCountsMap[a.attempt_id] || 0;
-      }
-    } else if (status === "selesai" || status === "waktu_habis") {
-      warnings = a.violation_count || 0;
-      try {
-        warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : [];
-      } catch (e) {
-      }
-      if (a.attempt_id) {
-        answeredCount = answeredCountsMap[a.attempt_id] || 0;
-      }
+      attemptsWithProgress.push({
+        ...a,
+        id: a.attempt_id || `no_attempt_${a.student_id}`,
+        attempt_id: a.attempt_id,
+        status,
+        answeredCount,
+        warnings,
+        warningLogs,
+        is_paused: a.is_paused,
+        paused_at: a.paused_at
+      });
     }
-    return {
-      ...a,
-      id: a.attempt_id || `no_attempt_${a.student_id}`,
-      attempt_id: a.attempt_id,
-      status,
-      answeredCount,
-      warnings,
-      warningLogs,
-      is_paused: a.is_paused,
-      paused_at: a.paused_at
-    };
-  }));
-  return { exams: exams.results, attempts: attemptsWithProgress, examFilter };
+    return { exams: exams.results, attempts: attemptsWithProgress, examFilter };
+  } catch (err) {
+    console.error("Load Error in monitor page:", err);
+    return { exams: [], attempts: [], examFilter: "", loadError: err.message || String(err) };
+  }
 };
 const actions = {
   togglePause: async ({ request, platform, locals }) => {

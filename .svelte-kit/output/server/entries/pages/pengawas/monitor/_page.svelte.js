@@ -18,6 +18,7 @@ function _page($$renderer, $$props) {
     });
     if (form?.success) toasts.success(form.success);
     if (form?.error) toasts.error(form.error);
+    if (data.loadError) toasts.error("Terjadi kesalahan data: " + data.loadError);
     attempts = data.attempts;
     filteredAttempts = attempts;
     head("1lbp9vi", $$renderer2, ($$renderer3) => {
