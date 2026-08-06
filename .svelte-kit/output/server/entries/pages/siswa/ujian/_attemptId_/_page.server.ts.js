@@ -184,6 +184,31 @@ const actions = {
       let partialScore = null;
       if (ans.type === "pilihan_ganda" || ans.type === "benar_salah") {
         isCorrect = ans.answer_given === correctAnswer;
+      } else if (ans.type === "pilihan_ganda_kompleks") {
+        try {
+          const givenAnswers = typeof ans.answer_given === "string" ? JSON.parse(ans.answer_given) : [];
+          const correctAnswers = Array.isArray(correctAnswer) ? correctAnswer : typeof correctAnswer === "string" ? JSON.parse(correctAnswer) : [];
+          if (Array.isArray(givenAnswers) && Array.isArray(correctAnswers)) {
+            let correctPicks = 0;
+            let wrongPicks = 0;
+            for (const g of givenAnswers) {
+              if (correctAnswers.includes(g)) {
+                correctPicks++;
+              } else {
+                wrongPicks++;
+              }
+            }
+            const totalCorrect = correctAnswers.length;
+            if (totalCorrect > 0) {
+              let rawScore = (correctPicks - wrongPicks) / totalCorrect;
+              if (rawScore < 0) rawScore = 0;
+              isCorrect = correctPicks === totalCorrect && wrongPicks === 0;
+              partialScore = Math.round(rawScore * ans.points * 100) / 100;
+            }
+          }
+        } catch {
+          isCorrect = false;
+        }
       } else if (ans.type === "menjodohkan") {
         try {
           const givenMap = JSON.parse(ans.answer_given);

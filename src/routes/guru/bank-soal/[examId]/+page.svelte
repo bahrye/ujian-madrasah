@@ -26,9 +26,9 @@
 
 	// Media picker for options
 	let showOptionMediaPicker = false;
-	let activeOptionTarget: { form: 'create' | 'edit', type: 'pilihan_ganda' | 'menjodohkan_left' | 'menjodohkan_right', index: number } | null = null;
+	let activeOptionTarget: { form: 'create' | 'edit', type: 'pilihan_ganda' | 'pilihan_ganda_kompleks' | 'menjodohkan_left' | 'menjodohkan_right', index: number } | null = null;
 
-	function openOptionMediaPicker(form: 'create' | 'edit', type: 'pilihan_ganda' | 'menjodohkan_left' | 'menjodohkan_right', index: number) {
+	function openOptionMediaPicker(form: 'create' | 'edit', type: 'pilihan_ganda' | 'pilihan_ganda_kompleks' | 'menjodohkan_left' | 'menjodohkan_right', index: number) {
 		activeOptionTarget = { form, type, index };
 		showOptionMediaPicker = true;
 	}
@@ -42,7 +42,7 @@
 			: `<audio controls src="${url}" class="w-full"></audio>`;
 
 		let inputId = `${form}_`;
-		if (type === 'pilihan_ganda') inputId += `option_${index}`;
+		if (type.startsWith('pilihan_ganda')) inputId += `option_${index}`;
 		else if (type === 'menjodohkan_left') inputId += `left_${index}`;
 		else if (type === 'menjodohkan_right') inputId += `right_${index}`;
 		
@@ -207,29 +207,37 @@
 				</div>
 
 				<!-- Type-specific fields -->
-				{#if selectedType === 'pilihan_ganda'}
+				{#if selectedType === 'pilihan_ganda' || selectedType === 'pilihan_ganda_kompleks'}
 					<div class="space-y-2">
-						<label class="label">Opsi Jawaban</label>
+						<label class="label">Opsi Jawaban {selectedType === 'pilihan_ganda_kompleks' ? '(Centang jawaban yang benar)' : ''}</label>
 						{#each Array(optionCount) as _, i}
 							<div class="flex items-center gap-2">
 								<span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500">{String.fromCharCode(65 + i)}</span>
 								<input id="create_option_{i}" name="option_{i}" type="text" class="input flex-1" placeholder="Opsi {String.fromCharCode(65 + i)}" required bind:value={options[i]} />
-								<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 shrink-0" on:click={() => openOptionMediaPicker('create', 'pilihan_ganda', i)} title="Tambahkan Media">
+								<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 shrink-0" on:click={() => openOptionMediaPicker('create', selectedType, i)} title="Tambahkan Media">
 									🖼️
 								</button>
+								{#if selectedType === 'pilihan_ganda_kompleks'}
+									<label class="flex items-center gap-1 cursor-pointer shrink-0 ml-1">
+										<input type="checkbox" name="correct_answer_{i}" value={String.fromCharCode(65 + i)} class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+										<span class="text-sm font-medium text-slate-700">Benar</span>
+									</label>
+								{/if}
 							</div>
 						{/each}
 						{#if optionCount < 5}
 							<button type="button" class="text-xs text-indigo-500 hover:text-indigo-700" on:click={() => optionCount++}>+ Tambah opsi</button>
 						{/if}
-						<div class="mt-2">
-							<label class="label" for="q-correct">Jawaban Benar</label>
-							<select id="q-correct" name="correct_answer" class="select w-32">
-								{#each Array(optionCount) as _, i}
-									<option value={String.fromCharCode(65 + i)}>{String.fromCharCode(65 + i)}</option>
-								{/each}
-							</select>
-						</div>
+						{#if selectedType === 'pilihan_ganda'}
+							<div class="mt-2">
+								<label class="label" for="q-correct">Jawaban Benar</label>
+								<select id="q-correct" name="correct_answer" class="select w-32">
+									{#each Array(optionCount) as _, i}
+										<option value={String.fromCharCode(65 + i)}>{String.fromCharCode(65 + i)}</option>
+									{/each}
+								</select>
+							</div>
+						{/if}
 					</div>
 				{:else if selectedType === 'benar_salah'}
 					<div>
@@ -304,9 +312,9 @@
 						{#if Array.isArray(opts)}
 							<div class="flex flex-wrap gap-1.5 mt-2">
 								{#each opts as opt, i}
-									{@const isCorrect = (q.type === 'pilihan_ganda' && correct === String.fromCharCode(65 + i)) || (q.type === 'benar_salah' && correct === opt)}
+									{@const isCorrect = (q.type === 'pilihan_ganda' && correct === String.fromCharCode(65 + i)) || (q.type === 'pilihan_ganda_kompleks' && Array.isArray(correct) && correct.includes(String.fromCharCode(65 + i))) || (q.type === 'benar_salah' && correct === opt)}
 									<span class="text-[10px] px-2 py-0.5 rounded-md {isCorrect ? 'bg-green-100 text-green-700 font-bold border border-green-200' : 'bg-slate-100 text-slate-600'}">
-										{q.type === 'pilihan_ganda' ? `${String.fromCharCode(65 + i)}. ` : ''}{opt}
+										{q.type.startsWith('pilihan_ganda') ? `${String.fromCharCode(65 + i)}. ` : ''}{opt}
 									</span>
 								{/each}
 							</div>
@@ -339,7 +347,7 @@
 					<div class="flex flex-col gap-2">
 						<button type="button" class="p-2 rounded-xl text-indigo-600 bg-indigo-50 hover:bg-indigo-500 hover:text-white transition-all shadow-sm" title="Edit soal" on:click={() => {
 							editingQuestion = { ...q };
-							if (q.type === 'pilihan_ganda' && q.options_json) {
+							if (q.type.startsWith('pilihan_ganda') && q.options_json) {
 								editOptionCount = JSON.parse(q.options_json).length;
 							}
 						}}>
@@ -434,31 +442,39 @@
 					</div>
 
 					<!-- Type-specific fields for edit -->
-					{#if editingQuestion.type === 'pilihan_ganda'}
+					{#if editingQuestion.type === 'pilihan_ganda' || editingQuestion.type === 'pilihan_ganda_kompleks'}
 						{@const opts = editingQuestion.options_json ? JSON.parse(editingQuestion.options_json) : []}
-						{@const correct = editingQuestion.correct_answer_json ? JSON.parse(editingQuestion.correct_answer_json) : 'A'}
+						{@const correct = editingQuestion.correct_answer_json ? JSON.parse(editingQuestion.correct_answer_json) : (editingQuestion.type === 'pilihan_ganda_kompleks' ? [] : 'A')}
 						<div class="space-y-2">
-							<label class="label">Opsi Jawaban</label>
+							<label class="label">Opsi Jawaban {editingQuestion.type === 'pilihan_ganda_kompleks' ? '(Centang jawaban yang benar)' : ''}</label>
 							{#each Array(editOptionCount) as _, i}
 								<div class="flex items-center gap-2">
 									<span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500">{String.fromCharCode(65 + i)}</span>
 									<input id="edit_option_{i}" name="option_{i}" type="text" class="input flex-1" value={opts[i] || ''} required />
-									<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 shrink-0" on:click={() => openOptionMediaPicker('edit', 'pilihan_ganda', i)} title="Tambahkan Media">
+									<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 shrink-0" on:click={() => openOptionMediaPicker('edit', editingQuestion.type, i)} title="Tambahkan Media">
 										🖼️
 									</button>
+									{#if editingQuestion.type === 'pilihan_ganda_kompleks'}
+										<label class="flex items-center gap-1 cursor-pointer shrink-0 ml-1">
+											<input type="checkbox" name="correct_answer_{i}" value={String.fromCharCode(65 + i)} class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" checked={Array.isArray(correct) && correct.includes(String.fromCharCode(65 + i))} />
+											<span class="text-sm font-medium text-slate-700">Benar</span>
+										</label>
+									{/if}
 								</div>
 							{/each}
 							{#if editOptionCount < 5}
 								<button type="button" class="text-xs text-indigo-500" on:click={() => editOptionCount++}>+ Tambah opsi</button>
 							{/if}
-							<div class="mt-2">
-								<label class="label" for="eq-correct">Jawaban Benar</label>
-								<select id="eq-correct" name="correct_answer" class="select w-32" value={correct}>
-									{#each Array(editOptionCount) as _, i}
-										<option value={String.fromCharCode(65 + i)}>{String.fromCharCode(65 + i)}</option>
-									{/each}
-								</select>
-							</div>
+							{#if editingQuestion.type === 'pilihan_ganda'}
+								<div class="mt-2">
+									<label class="label" for="eq-correct">Jawaban Benar</label>
+									<select id="eq-correct" name="correct_answer" class="select w-32" value={correct}>
+										{#each Array(editOptionCount) as _, i}
+											<option value={String.fromCharCode(65 + i)}>{String.fromCharCode(65 + i)}</option>
+										{/each}
+									</select>
+								</div>
+							{/if}
 						</div>
 					{:else if editingQuestion.type === 'benar_salah'}
 						{@const correct = editingQuestion.correct_answer_json ? JSON.parse(editingQuestion.correct_answer_json) : 'Benar'}

@@ -121,6 +121,23 @@
 											{ans.answer_given}
 										{/if}
 									</p>
+								{:else if ans.type === 'pilihan_ganda_kompleks'}
+									<div class="space-y-1 text-sm bg-white p-2 rounded border border-slate-200">
+										{#if ans.answer_given}
+											{@const givenArr = (typeof ans.answer_given === 'string' && ans.answer_given.startsWith('[')) ? JSON.parse(ans.answer_given) : [ans.answer_given]}
+											{#if Array.isArray(givenArr)}
+												<div class="flex flex-wrap gap-1.5">
+													{#each givenArr as item}
+														<span class="px-2 py-0.5 bg-slate-100 text-slate-700 rounded border border-slate-200">{item}</span>
+													{/each}
+												</div>
+											{:else}
+												<p class="text-slate-800">{ans.answer_given}</p>
+											{/if}
+										{:else}
+											<p class="text-slate-400 italic">Tidak dijawab</p>
+										{/if}
+									</div>
 								{:else}
 									<p class="text-sm text-slate-800 bg-white p-2 rounded border border-slate-200 whitespace-pre-wrap">{ans.answer_given}</p>
 								{/if}
@@ -160,6 +177,19 @@
 												{JSON.parse(ans.correct_answer_json)}
 											{/if}
 										</p>
+									{:else if ans.type === 'pilihan_ganda_kompleks'}
+										{@const correctArr = typeof ans.correct_answer_json === 'string' ? JSON.parse(ans.correct_answer_json) : ans.correct_answer_json}
+										<div class="space-y-1 text-sm bg-emerald-50 p-2 rounded border border-emerald-100">
+											{#if Array.isArray(correctArr)}
+												<div class="flex flex-wrap gap-1.5">
+													{#each correctArr as item}
+														<span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 font-medium rounded border border-emerald-200">{item}</span>
+													{/each}
+												</div>
+											{:else}
+												<p class="text-emerald-800">{JSON.parse(ans.correct_answer_json)}</p>
+											{/if}
+										</div>
 									{:else}
 										<p class="text-sm text-emerald-800 bg-emerald-50 p-2 rounded border border-emerald-100">{JSON.parse(ans.correct_answer_json)}</p>
 									{/if}

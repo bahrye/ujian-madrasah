@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS tokens (
 CREATE TABLE IF NOT EXISTS questions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     exam_id INTEGER NOT NULL REFERENCES exams(id) ON DELETE CASCADE,
-    type TEXT NOT NULL CHECK(type IN ('pilihan_ganda', 'isian_singkat', 'essay', 'benar_salah', 'menjodohkan')),
+    type TEXT NOT NULL CHECK(type IN ('pilihan_ganda', 'pilihan_ganda_kompleks', 'isian_singkat', 'essay', 'benar_salah', 'menjodohkan')),
     question_text TEXT NOT NULL,
     question_number INTEGER NOT NULL DEFAULT 0,
     points INTEGER NOT NULL DEFAULT 1,

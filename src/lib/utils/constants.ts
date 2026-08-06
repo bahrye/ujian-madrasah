@@ -24,6 +24,7 @@ export const ROLE_COLORS: Record<string, string> = {
 
 export const QUESTION_TYPES = {
 	PILIHAN_GANDA: 'pilihan_ganda',
+	PILIHAN_GANDA_KOMPLEKS: 'pilihan_ganda_kompleks',
 	ISIAN_SINGKAT: 'isian_singkat',
 	ESSAY: 'essay',
 	BENAR_SALAH: 'benar_salah',
@@ -32,6 +33,7 @@ export const QUESTION_TYPES = {
 
 export const QUESTION_TYPE_LABELS: Record<string, string> = {
 	pilihan_ganda: 'Pilihan Ganda',
+	pilihan_ganda_kompleks: 'Pilihan Ganda Kompleks',
 	isian_singkat: 'Isian Singkat',
 	essay: 'Essay / Uraian',
 	benar_salah: 'Benar / Salah',

@@ -52,6 +52,31 @@ function _page($$renderer, $$props) {
             $$renderer2.push(`${escape_html(ans.answer_given)}`);
           }
           $$renderer2.push(`<!--]--></p>`);
+        } else if (ans.type === "pilihan_ganda_kompleks") {
+          $$renderer2.push("<!--[2-->");
+          $$renderer2.push(`<div class="space-y-1 text-sm bg-white p-2 rounded border border-slate-200">`);
+          if (ans.answer_given) {
+            $$renderer2.push("<!--[0-->");
+            const givenArr = typeof ans.answer_given === "string" && ans.answer_given.startsWith("[") ? JSON.parse(ans.answer_given) : [ans.answer_given];
+            if (Array.isArray(givenArr)) {
+              $$renderer2.push("<!--[0-->");
+              $$renderer2.push(`<div class="flex flex-wrap gap-1.5"><!--[-->`);
+              const each_array_2 = ensure_array_like(givenArr);
+              for (let $$index_1 = 0, $$length2 = each_array_2.length; $$index_1 < $$length2; $$index_1++) {
+                let item = each_array_2[$$index_1];
+                $$renderer2.push(`<span class="px-2 py-0.5 bg-slate-100 text-slate-700 rounded border border-slate-200">${escape_html(item)}</span>`);
+              }
+              $$renderer2.push(`<!--]--></div>`);
+            } else {
+              $$renderer2.push("<!--[-1-->");
+              $$renderer2.push(`<p class="text-slate-800">${escape_html(ans.answer_given)}</p>`);
+            }
+            $$renderer2.push(`<!--]-->`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+            $$renderer2.push(`<p class="text-slate-400 italic">Tidak dijawab</p>`);
+          }
+          $$renderer2.push(`<!--]--></div>`);
         } else {
           $$renderer2.push("<!--[-1-->");
           $$renderer2.push(`<p class="text-sm text-slate-800 bg-white p-2 rounded border border-slate-200 whitespace-pre-wrap">${escape_html(ans.answer_given)}</p>`);
@@ -76,9 +101,9 @@ function _page($$renderer, $$props) {
           if (ans.type === "menjodohkan") {
             $$renderer2.push("<!--[0-->");
             $$renderer2.push(`<div class="space-y-2 text-sm bg-emerald-50 p-2 rounded border border-emerald-100"><!--[-->`);
-            const each_array_2 = ensure_array_like(Object.entries(typeof JSON.parse(ans.correct_answer_json) === "string" ? JSON.parse(JSON.parse(ans.correct_answer_json)) : JSON.parse(ans.correct_answer_json)));
-            for (let $$index_1 = 0, $$length2 = each_array_2.length; $$index_1 < $$length2; $$index_1++) {
-              let [key, value] = each_array_2[$$index_1];
+            const each_array_3 = ensure_array_like(Object.entries(typeof JSON.parse(ans.correct_answer_json) === "string" ? JSON.parse(JSON.parse(ans.correct_answer_json)) : JSON.parse(ans.correct_answer_json)));
+            for (let $$index_2 = 0, $$length2 = each_array_3.length; $$index_2 < $$length2; $$index_2++) {
+              let [key, value] = each_array_3[$$index_2];
               $$renderer2.push(`<div class="flex border-b border-emerald-200/50 last:border-0 pb-1 last:pb-0"><span class="font-medium text-emerald-800 w-1/2">${escape_html(key)}</span> <span class="text-emerald-900 w-1/2">-> ${escape_html(value)}</span></div>`);
             }
             $$renderer2.push(`<!--]--></div>`);
@@ -96,6 +121,24 @@ function _page($$renderer, $$props) {
               $$renderer2.push(`${escape_html(JSON.parse(ans.correct_answer_json))}`);
             }
             $$renderer2.push(`<!--]--></p>`);
+          } else if (ans.type === "pilihan_ganda_kompleks") {
+            $$renderer2.push("<!--[2-->");
+            const correctArr = typeof ans.correct_answer_json === "string" ? JSON.parse(ans.correct_answer_json) : ans.correct_answer_json;
+            $$renderer2.push(`<div class="space-y-1 text-sm bg-emerald-50 p-2 rounded border border-emerald-100">`);
+            if (Array.isArray(correctArr)) {
+              $$renderer2.push("<!--[0-->");
+              $$renderer2.push(`<div class="flex flex-wrap gap-1.5"><!--[-->`);
+              const each_array_4 = ensure_array_like(correctArr);
+              for (let $$index_3 = 0, $$length2 = each_array_4.length; $$index_3 < $$length2; $$index_3++) {
+                let item = each_array_4[$$index_3];
+                $$renderer2.push(`<span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 font-medium rounded border border-emerald-200">${escape_html(item)}</span>`);
+              }
+              $$renderer2.push(`<!--]--></div>`);
+            } else {
+              $$renderer2.push("<!--[-1-->");
+              $$renderer2.push(`<p class="text-emerald-800">${escape_html(JSON.parse(ans.correct_answer_json))}</p>`);
+            }
+            $$renderer2.push(`<!--]--></div>`);
           } else {
             $$renderer2.push("<!--[-1-->");
             $$renderer2.push(`<p class="text-sm text-emerald-800 bg-emerald-50 p-2 rounded border border-emerald-100">${escape_html(JSON.parse(ans.correct_answer_json))}</p>`);

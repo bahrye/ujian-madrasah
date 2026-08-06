@@ -57,6 +57,20 @@ export const actions: Actions = {
 			}
 			optionsJson = JSON.stringify(opts);
 			correctAnswerJson = JSON.stringify(form.get('correct_answer')?.toString() || 'A');
+		} else if (type === 'pilihan_ganda_kompleks') {
+			const opts = [];
+			const corrects = [];
+			for (let i = 0; i < 5; i++) {
+				const opt = form.get(`option_${i}`)?.toString().trim();
+				if (opt) {
+					opts.push(opt);
+					if (form.get(`correct_answer_${i}`)) {
+						corrects.push(String.fromCharCode(65 + i));
+					}
+				}
+			}
+			optionsJson = JSON.stringify(opts);
+			correctAnswerJson = JSON.stringify(corrects);
 		} else if (type === 'benar_salah') {
 			optionsJson = JSON.stringify(['Benar', 'Salah']);
 			correctAnswerJson = JSON.stringify(form.get('correct_answer')?.toString() || 'Benar');
@@ -120,6 +134,20 @@ export const actions: Actions = {
 			}
 			optionsJson = JSON.stringify(opts);
 			correctAnswerJson = JSON.stringify(form.get('correct_answer')?.toString() || 'A');
+		} else if (type === 'pilihan_ganda_kompleks') {
+			const opts = [];
+			const corrects = [];
+			for (let i = 0; i < 5; i++) {
+				const opt = form.get(`option_${i}`)?.toString().trim();
+				if (opt) {
+					opts.push(opt);
+					if (form.get(`correct_answer_${i}`)) {
+						corrects.push(String.fromCharCode(65 + i));
+					}
+				}
+			}
+			optionsJson = JSON.stringify(opts);
+			correctAnswerJson = JSON.stringify(corrects);
 		} else if (type === 'benar_salah') {
 			optionsJson = JSON.stringify(['Benar', 'Salah']);
 			correctAnswerJson = JSON.stringify(form.get('correct_answer')?.toString() || 'Benar');

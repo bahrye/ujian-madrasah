@@ -37,8 +37,33 @@
 		}
 	}
 
+	let complexAnswers: string[] = [];
+	$: if (question.type === 'pilihan_ganda_kompleks') {
+		if (answer) {
+			try {
+				const parsed = JSON.parse(answer);
+				complexAnswers = Array.isArray(parsed) ? parsed : [];
+			} catch {
+				complexAnswers = [];
+			}
+		} else {
+			complexAnswers = [];
+		}
+	}
+
 	function handleAnswer(value: string) {
 		dispatch('answer', { questionId: question.id, answer: value });
+	}
+
+	function handleComplexAnswer(value: string) {
+		let newAnswers;
+		if (complexAnswers.includes(value)) {
+			newAnswers = complexAnswers.filter(a => a !== value);
+		} else {
+			newAnswers = [...complexAnswers, value];
+		}
+		complexAnswers = newAnswers;
+		dispatch('answer', { questionId: question.id, answer: JSON.stringify(newAnswers) });
 	}
 
 	function handleMatchingChange(leftIndex: string, rightIndex: string) {
@@ -131,33 +156,54 @@
 
 	<!-- Answer Area -->
 	<div class="space-y-2">
-		{#if question.type === 'pilihan_ganda'}
+		{#if question.type === 'pilihan_ganda' || question.type === 'pilihan_ganda_kompleks'}
 			<!-- Multiple Choice -->
 			{#each options as option, i}
+				{@const isSelected = question.type === 'pilihan_ganda_kompleks' ? complexAnswers.includes(optionLetters[i]) : answer === optionLetters[i]}
 				<div
 					role="button"
 					tabindex="0"
 					class="w-full flex items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer
-						   {answer === optionLetters[i]
+						   {isSelected
 							? 'border-indigo-500 bg-indigo-50 shadow-md shadow-indigo-500/10'
 							: 'border-slate-200 hover:border-indigo-300 hover:bg-slate-50'}"
 					on:click={(e) => {
 						const target = e.target;
 						if (target.tagName === 'AUDIO' || target.closest('audio')) return;
 						if (target.tagName === 'IMG') return; // let the lightbox handle it
-						handleAnswer(optionLetters[i]);
+						if (question.type === 'pilihan_ganda_kompleks') {
+							handleComplexAnswer(optionLetters[i]);
+						} else {
+							handleAnswer(optionLetters[i]);
+						}
 					}}
-					on:keydown={(e) => e.key === 'Enter' && handleAnswer(optionLetters[i])}
+					on:keydown={(e) => {
+						if (e.key === 'Enter') {
+							if (question.type === 'pilihan_ganda_kompleks') {
+								handleComplexAnswer(optionLetters[i]);
+							} else {
+								handleAnswer(optionLetters[i]);
+							}
+						}
+					}}
 				>
+					{#if question.type === 'pilihan_ganda_kompleks'}
+						<div class="flex items-center justify-center w-6 h-6 rounded border-2 flex-shrink-0 transition-colors mr-1
+							{isSelected ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-slate-300 bg-white'}">
+							{#if isSelected}
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+							{/if}
+						</div>
+					{/if}
 					<span
 						class="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0 transition-colors
-							   {answer === optionLetters[i]
+							   {isSelected
 								? 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white'
 								: 'bg-slate-100 text-slate-500'}"
 					>
 						{optionLetters[i]}
 					</span>
-					<div class="option-content text-sm prose prose-sm max-w-none flex-1 {answer === optionLetters[i] ? 'text-indigo-700 font-medium' : 'text-slate-700'}">
+					<div class="option-content text-sm prose prose-sm max-w-none flex-1 {isSelected ? 'text-indigo-700 font-medium' : 'text-slate-700'}">
 						{@html option.replace(/^(<br\s*\/?>\s*)+/i, '')}
 					</div>
 				</div>

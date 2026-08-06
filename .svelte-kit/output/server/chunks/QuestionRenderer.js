@@ -63,6 +63,7 @@ function QuestionRenderer($$renderer, $$props) {
     let isDoubted = fallback($$props["isDoubted"], false);
     let displayNumber = fallback($$props["displayNumber"], void 0);
     let matchingAnswers = {};
+    let complexAnswers = [];
     const optionLetters = ["A", "B", "C", "D", "E", "F", "G", "H"];
     function getDirectUrl(url) {
       if (!url) return "";
@@ -95,6 +96,18 @@ function QuestionRenderer($$renderer, $$props) {
         matchingAnswers = {};
       }
     }
+    if (question.type === "pilihan_ganda_kompleks") {
+      if (answer) {
+        try {
+          const parsed = JSON.parse(answer);
+          complexAnswers = Array.isArray(parsed) ? parsed : [];
+        } catch {
+          complexAnswers = [];
+        }
+      } else {
+        complexAnswers = [];
+      }
+    }
     directMediaUrl = getDirectUrl(question.media_url);
     $$renderer2.push(`<div class="space-y-5 animate-in" role="presentation"><div class="flex items-center justify-between flex-wrap gap-2"><div class="flex items-center gap-3"><span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold text-sm shadow-md shadow-indigo-500/20">${escape_html(
       // Image Lightbox
@@ -114,13 +127,28 @@ function QuestionRenderer($$renderer, $$props) {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]--> <div class="text-base text-slate-800 leading-relaxed font-medium">${html(question.question_text)}</div> <div class="space-y-2">`);
-    if (question.type === "pilihan_ganda") {
+    if (question.type === "pilihan_ganda" || question.type === "pilihan_ganda_kompleks") {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<!--[-->`);
       const each_array = ensure_array_like(options);
       for (let i = 0, $$length = each_array.length; i < $$length; i++) {
         let option = each_array[i];
-        $$renderer2.push(`<div role="button" tabindex="0"${attr_class(`w-full flex items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer ${answer === optionLetters[i] ? "border-indigo-500 bg-indigo-50 shadow-md shadow-indigo-500/10" : "border-slate-200 hover:border-indigo-300 hover:bg-slate-50"}`)}><span${attr_class(`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0 transition-colors ${answer === optionLetters[i] ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white" : "bg-slate-100 text-slate-500"}`)}>${escape_html(optionLetters[i])}</span> <div${attr_class(`option-content text-sm prose prose-sm max-w-none flex-1 ${answer === optionLetters[i] ? "text-indigo-700 font-medium" : "text-slate-700"}`, "svelte-v7h8kb")}>${html(option.replace(/^(<br\s*\/?>\s*)+/i, ""))}</div></div>`);
+        const isSelected = question.type === "pilihan_ganda_kompleks" ? complexAnswers.includes(optionLetters[i]) : answer === optionLetters[i];
+        $$renderer2.push(`<div role="button" tabindex="0"${attr_class(`w-full flex items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer ${isSelected ? "border-indigo-500 bg-indigo-50 shadow-md shadow-indigo-500/10" : "border-slate-200 hover:border-indigo-300 hover:bg-slate-50"}`)}>`);
+        if (question.type === "pilihan_ganda_kompleks") {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<div${attr_class(`flex items-center justify-center w-6 h-6 rounded border-2 flex-shrink-0 transition-colors mr-1 ${isSelected ? "bg-indigo-500 border-indigo-500 text-white" : "border-slate-300 bg-white"}`)}>`);
+          if (isSelected) {
+            $$renderer2.push("<!--[0-->");
+            $$renderer2.push(`<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+          }
+          $$renderer2.push(`<!--]--></div>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+        }
+        $$renderer2.push(`<!--]--> <span${attr_class(`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0 transition-colors ${isSelected ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white" : "bg-slate-100 text-slate-500"}`)}>${escape_html(optionLetters[i])}</span> <div${attr_class(`option-content text-sm prose prose-sm max-w-none flex-1 ${isSelected ? "text-indigo-700 font-medium" : "text-slate-700"}`, "svelte-v7h8kb")}>${html(option.replace(/^(<br\s*\/?>\s*)+/i, ""))}</div></div>`);
       }
       $$renderer2.push(`<!--]-->`);
     } else if (question.type === "benar_salah") {

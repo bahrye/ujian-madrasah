@@ -14,6 +14,7 @@ const ROLE_COLORS = {
 };
 const QUESTION_TYPE_LABELS = {
   pilihan_ganda: "Pilihan Ganda",
+  pilihan_ganda_kompleks: "Pilihan Ganda Kompleks",
   isian_singkat: "Isian Singkat",
   essay: "Essay / Uraian",
   benar_salah: "Benar / Salah",
