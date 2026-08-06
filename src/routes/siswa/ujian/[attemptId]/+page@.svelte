@@ -300,6 +300,55 @@
 		toasts.warning('Waktu habis! Jawaban akan disubmit otomatis.');
 		handleAutoSubmit();
 	}
+
+	async function handleAutoSubmit() {
+		if (submitting) return;
+		submitting = true;
+		saveCurrentAnswer();
+		
+		const form = new FormData();
+		form.set('answers', JSON.stringify(localAnswers));
+		form.set('doubts', JSON.stringify(localDoubts));
+		form.set('warnings', warnings.toString());
+		form.set('warningLogs', JSON.stringify(warningLogs));
+
+		try {
+			await fetch('?/submit', { 
+				method: 'POST', 
+				body: form,
+				headers: { 'x-sveltekit-action': 'true' } 
+			});
+			window.location.href = '/siswa/papan-peringkat';
+		} catch (err) {
+			console.error('Submit error:', err);
+		} finally {
+			submitting = false;
+		}
+	}
+
+	async function triggerDisqualification() {
+		showWarningModal = false;
+		showDisqualifiedModal = true;
+		if (isDisqualifying) return;
+		isDisqualifying = true;
+		saveCurrentAnswer();
+		
+		const form = new FormData();
+		form.set('answers', JSON.stringify(localAnswers));
+		form.set('doubts', JSON.stringify(localDoubts));
+		form.set('warnings', warnings.toString());
+		form.set('warningLogs', JSON.stringify(warningLogs));
+
+		try {
+			await fetch('?/submit', { 
+				method: 'POST', 
+				body: form,
+				headers: { 'x-sveltekit-action': 'true' } 
+			});
+		} catch (err) {
+			console.error('Submit error:', err);
+		}
+	}
 </script>
 
 <svelte:head><title>{attempt.exam_title} — Ujian Online Madrasah</title></svelte:head>

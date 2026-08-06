@@ -1,10 +1,10 @@
-import * as server from '../entries/pages/guru/papan-peringkat/_page.server.ts.js';
+import * as server from '../entries/pages/guru/bank-soal/_examId_/preview/_page.server.ts.js';
 
 export const index = 31;
 let component_cache;
-export const component = async () => component_cache ??= (await import('../entries/pages/guru/papan-peringkat/_page.svelte.js')).default;
+export const component = async () => component_cache ??= (await import('../entries/pages/guru/bank-soal/_examId_/preview/_page@.svelte.js')).default;
 export { server };
-export const server_id = "src/routes/guru/papan-peringkat/+page.server.ts";
-export const imports = ["_app/immutable/nodes/31.0eCgZkWL.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/C7EiyzO9.js","_app/immutable/chunks/DaxUIi1N.js","_app/immutable/chunks/D0kWAKGz.js","_app/immutable/chunks/ByWXOByZ.js","_app/immutable/chunks/fBRbgZ48.js","_app/immutable/chunks/B4g5bLfz.js","_app/immutable/chunks/BD3Z46Uh.js","_app/immutable/chunks/-dQGtK5g.js","_app/immutable/chunks/DlfC_uMm.js","_app/immutable/chunks/DZWI-wt2.js","_app/immutable/chunks/BP7TrtM-.js"];
-export const stylesheets = [];
+export const server_id = "src/routes/guru/bank-soal/[examId]/preview/+page.server.ts";
+export const imports = ["_app/immutable/nodes/31.Bb1XhnrK.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/C7EiyzO9.js","_app/immutable/chunks/DaxUIi1N.js","_app/immutable/chunks/DZWI-wt2.js","_app/immutable/chunks/BP7TrtM-.js","_app/immutable/chunks/D0kWAKGz.js","_app/immutable/chunks/ByWXOByZ.js","_app/immutable/chunks/B4g5bLfz.js","_app/immutable/chunks/BD3Z46Uh.js","_app/immutable/chunks/-dQGtK5g.js","_app/immutable/chunks/DlfC_uMm.js","_app/immutable/chunks/DAOrVH43.js","_app/immutable/chunks/taqFCRQ_.js","_app/immutable/chunks/fBRbgZ48.js","_app/immutable/chunks/B6hIrxYM.js","_app/immutable/chunks/oY6yk6yD.js","_app/immutable/chunks/DOunTSY7.js","_app/immutable/chunks/B5xf_oRu.js","_app/immutable/chunks/CSY_kniQ.js","_app/immutable/chunks/Bfc47y5P.js","_app/immutable/chunks/DUkW5mn-.js","_app/immutable/chunks/-LO9irFG.js","_app/immutable/chunks/WOw1egtm.js","_app/immutable/chunks/C8PWleWS.js","_app/immutable/chunks/BR0gXNzL.js","_app/immutable/chunks/CXi_cZHw.js","_app/immutable/chunks/hUIxMuZh.js"];
+export const stylesheets = ["_app/immutable/assets/QuestionRenderer.CwYmYea-.css"];
 export const fonts = [];

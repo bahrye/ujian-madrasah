@@ -75,7 +75,15 @@ export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
 		{ label: 'Mata Pelajaran', href: '/admin/subjects', icon: 'exam' },
 		{ label: 'Bank Soal', href: '/admin/bank-soal', icon: 'questions' },
 		{ label: 'Bank Media', href: '/admin/media-bank', icon: 'folder' },
-		{ label: 'Ujian', href: '/admin/exams', icon: 'exam' },
+		{ 
+			label: 'Ujian', 
+			icon: 'exam',
+			subItems: [
+				{ label: 'Daftar Ujian', href: '/admin/exams' },
+				{ label: 'Token Ujian', href: '/admin/tokens' },
+				{ label: 'Monitoring', href: '/admin/monitor' }
+			]
+		},
 		{ label: 'Hasil Ujian', href: '/admin/results', icon: 'results' },
 		{ label: 'Papan Peringkat', href: '/admin/papan-peringkat', icon: 'results' }
 	],

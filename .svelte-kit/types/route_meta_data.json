@@ -50,6 +50,11 @@
 		"src/routes/admin/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/admin/monitor": [
+		"src/routes/admin/monitor/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/admin/papan-peringkat": [
 		"src/routes/admin/papan-peringkat/+page.server.ts",
 		"src/routes/admin/+layout.server.ts",
@@ -87,6 +92,11 @@
 	],
 	"/admin/subjects": [
 		"src/routes/admin/subjects/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/tokens": [
+		"src/routes/admin/tokens/+page.server.ts",
 		"src/routes/admin/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],

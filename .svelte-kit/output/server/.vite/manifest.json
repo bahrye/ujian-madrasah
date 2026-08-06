@@ -807,6 +807,31 @@
       "_state.svelte.js"
     ]
   },
+  "src/routes/admin/monitor/+page.server.ts": {
+    "file": "entries/pages/admin/monitor/_page.server.ts.js",
+    "name": "entries/pages/admin/monitor/_page.server.ts",
+    "src": "src/routes/admin/monitor/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/admin/monitor/+page.svelte": {
+    "file": "entries/pages/admin/monitor/_page.svelte.js",
+    "name": "entries/pages/admin/monitor/_page.svelte",
+    "src": "src/routes/admin/monitor/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_index-server.js",
+      "_exports.js",
+      "_utils2.js",
+      "_root.js",
+      "_state.svelte.js",
+      "_constants.js",
+      "_toast.js"
+    ]
+  },
   "src/routes/admin/papan-peringkat/+page.server.ts": {
     "file": "entries/pages/admin/papan-peringkat/_page.server.ts.js",
     "name": "entries/pages/admin/papan-peringkat/_page.server.ts",
@@ -987,6 +1012,32 @@
       "_root.js",
       "_state.svelte.js",
       "_ConfirmForm.js",
+      "_toast.js"
+    ]
+  },
+  "src/routes/admin/tokens/+page.server.ts": {
+    "file": "entries/pages/admin/tokens/_page.server.ts.js",
+    "name": "entries/pages/admin/tokens/_page.server.ts",
+    "src": "src/routes/admin/tokens/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js",
+      "_auth.js"
+    ]
+  },
+  "src/routes/admin/tokens/+page.svelte": {
+    "file": "entries/pages/admin/tokens/_page.svelte.js",
+    "name": "entries/pages/admin/tokens/_page.svelte",
+    "src": "src/routes/admin/tokens/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_index-server.js",
+      "_exports.js",
+      "_utils2.js",
+      "_root.js",
+      "_state.svelte.js",
+      "_constants.js",
       "_toast.js"
     ]
   },
