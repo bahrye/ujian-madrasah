@@ -7,6 +7,7 @@ import "../../../../chunks/root.js";
 import "../../../../chunks/state.svelte.js";
 import { Q as QUESTION_TYPE_LABELS } from "../../../../chunks/constants.js";
 import { t as toasts } from "../../../../chunks/toast.js";
+import "katex/dist/contrib/auto-render.mjs";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let answers;

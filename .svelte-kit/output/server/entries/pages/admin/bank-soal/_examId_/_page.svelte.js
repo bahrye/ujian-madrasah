@@ -7,6 +7,7 @@ import "../../../../../chunks/root.js";
 import "../../../../../chunks/state.svelte.js";
 import { C as ConfirmForm } from "../../../../../chunks/ConfirmForm.js";
 import { I as ICONS, Q as QUESTION_TYPE_LABELS } from "../../../../../chunks/constants.js";
+import "katex/dist/contrib/auto-render.mjs";
 /* empty css                                                                   */
 import { I as ImportExcelModal } from "../../../../../chunks/ImportExcelModal.js";
 import { t as toasts } from "../../../../../chunks/toast.js";

@@ -28,7 +28,9 @@
     "vite": "^5.4.0"
   },
   "dependencies": {
+    "@types/katex": "^0.16.8",
     "jose": "^5.9.0",
+    "katex": "^0.18.1",
     "xlsx": "^0.18.5"
   }
 }
