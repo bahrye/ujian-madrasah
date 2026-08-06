@@ -89,13 +89,27 @@
 			<p class="mt-3 text-sm text-slate-600">{exam.description}</p>
 		{/if}
 		<div class="mt-4 flex flex-wrap gap-4 text-xs text-slate-500">
-			<span>Mulai: {exam.start_time ? new Date(String(exam.start_time).replace(' ', 'T') + (String(exam.start_time).includes(' ') && !String(exam.start_time).includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : '-'}</span>
-			<span>Selesai: {exam.end_time ? new Date(String(exam.end_time).replace(' ', 'T') + (String(exam.end_time).includes(' ') && !String(exam.end_time).includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : '-'}</span>
+			<span class="flex items-center gap-1">
+				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} /></svg>
+				Mulai: <strong class="text-slate-600 font-medium">{exam.start_time ? new Date(String(exam.start_time).replace(' ', 'T') + (String(exam.start_time).includes(' ') && !String(exam.start_time).includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : '-'}</strong>
+			</span>
+			<span class="flex items-center gap-1">
+				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} /></svg>
+				Selesai: <strong class="text-slate-600 font-medium">{exam.end_time ? new Date(String(exam.end_time).replace(' ', 'T') + (String(exam.end_time).includes(' ') && !String(exam.end_time).includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : '-'}</strong>
+			</span>
+			<span class="flex items-center gap-1">
+				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+				Tampilan Soal: <strong class="text-slate-600 font-medium">{exam.shuffle_questions ? 'Acak' : 'Tidak Acak'}</strong>
+			</span>
+			<span class="flex items-center gap-1">
+				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+				Tampilan Nilai: <strong class="text-slate-600 font-medium">{exam.show_score_type === 'manual' ? 'Manual (Oleh Admin/Guru)' : (exam.show_score_type === 'objective_only' ? 'Hanya Nilai PG' : 'Otomatis (Langsung Tampil)')}</strong>
+			</span>
 		</div>
 	</div>
 
 	<!-- Stats Row -->
-	<div class="grid grid-cols-3 gap-4">
+	<div class="grid grid-cols-2 md:grid-cols-5 gap-4">
 		<div class="card p-4 text-center">
 			<p class="text-2xl font-bold text-gradient">{questions.length}</p>
 			<p class="text-xs text-slate-500">Soal</p>
@@ -107,6 +121,14 @@
 		<div class="card p-4 text-center">
 			<p class="text-2xl font-bold text-amber-500">{tokens.length}</p>
 			<p class="text-xs text-slate-500">Token</p>
+		</div>
+		<div class="card p-4 text-center">
+			<p class="text-2xl font-bold text-indigo-500">{examTeachers.length + 1}</p>
+			<p class="text-xs text-slate-500">Jumlah Guru</p>
+		</div>
+		<div class="card p-4 text-center col-span-2 md:col-span-1">
+			<p class="text-2xl font-bold text-rose-500">{examProctors.length}</p>
+			<p class="text-xs text-slate-500">Jumlah Pengawas</p>
 		</div>
 	</div>
 
