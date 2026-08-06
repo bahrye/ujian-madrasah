@@ -84,33 +84,43 @@
 
         let type = '';
         if (tipeRaw.toLowerCase() === 'pilihan ganda') type = 'pilihan_ganda';
+        else if (tipeRaw.toLowerCase() === 'pilihan ganda kompleks') type = 'pilihan_ganda_kompleks';
         else if (tipeRaw.toLowerCase() === 'benar salah') type = 'benar_salah';
         else if (tipeRaw.toLowerCase() === 'isian singkat') type = 'isian_singkat';
         else if (tipeRaw.toLowerCase() === 'esai') type = 'essay';
         else {
-          throw new Error(`Baris ${rowNum}: Tipe soal tidak valid "${tipeRaw}". Gunakan "Pilihan Ganda", "Benar Salah", "Isian Singkat", atau "Esai".`);
+          throw new Error(`Baris ${rowNum}: Tipe soal tidak valid "${tipeRaw}". Gunakan "Pilihan Ganda", "Pilihan Ganda Kompleks", "Benar Salah", "Isian Singkat", atau "Esai".`);
         }
 
         const q: any = { type, question_text: teks, points: bobot };
 
-        if (type === 'pilihan_ganda') {
+        if (type === 'pilihan_ganda' || type === 'pilihan_ganda_kompleks') {
           const opts = [];
           for (let i = 2; i <= 6; i++) {
              const optText = String(row[i] || '').trim();
              if (optText) opts.push(optText);
           }
-          if (opts.length < 2) throw new Error(`Baris ${rowNum}: Pilihan Ganda minimal harus memiliki 2 opsi jawaban (diisi di kolom Opsi A dan Opsi B).`);
+          if (opts.length < 2) throw new Error(`Baris ${rowNum}: ${type === 'pilihan_ganda_kompleks' ? 'Pilihan Ganda Kompleks' : 'Pilihan Ganda'} minimal harus memiliki 2 opsi jawaban (diisi di kolom Opsi A dan Opsi B).`);
           q.options_json = JSON.stringify(opts);
           
           let correctAnswer = String(row[7] || '').trim().toUpperCase();
-          if (!['A','B','C','D','E'].includes(correctAnswer)) {
-             throw new Error(`Baris ${rowNum}: Jawaban Benar untuk Pilihan Ganda harus huruf A, B, C, D, atau E.`);
+          if (type === 'pilihan_ganda_kompleks') {
+            const answers = correctAnswer.split(',').map(a => a.trim());
+            for (const a of answers) {
+              if (!['A','B','C','D','E'].includes(a)) {
+                throw new Error(`Baris ${rowNum}: Jawaban Benar untuk Pilihan Ganda Kompleks harus berupa huruf A, B, C, D, atau E (pisahkan dengan koma jika lebih dari satu).`);
+              }
+            }
+            if (answers.length === 0 || (answers.length === 1 && answers[0] === '')) {
+              throw new Error(`Baris ${rowNum}: Pilihan Ganda Kompleks harus memiliki setidaknya satu jawaban benar.`);
+            }
+            q.correct_answer_json = JSON.stringify(answers);
+          } else {
+            if (!['A','B','C','D','E'].includes(correctAnswer)) {
+               throw new Error(`Baris ${rowNum}: Jawaban Benar untuk Pilihan Ganda harus huruf A, B, C, D, atau E.`);
+            }
+            q.correct_answer_json = JSON.stringify(correctAnswer);
           }
-          // Correct index mapping: A is 0, B is 1, etc. Wait, we usually save the actual answer text or index?
-          // The database expects the correct answer in options_json if not, wait.
-          // Let's check how the regular form saves it.
-          // The regular form saves it as '"A"' (JSON string of "A"). So we just need to stringify it.
-          q.correct_answer_json = JSON.stringify(correctAnswer);
         } else if (type === 'benar_salah') {
           q.options_json = JSON.stringify(['Benar', 'Salah']);
           let correctAnswer = String(row[7] || '').trim();
@@ -159,11 +169,12 @@
     ];
     
     const sampleRow1 = ["Pilihan Ganda", "Siapakah penemu bola lampu?", "Thomas Edison", "Albert Einstein", "Nikola Tesla", "Isaac Newton", "", "A", 1];
-    const sampleRow2 = ["Benar Salah", "Bumi itu bulat", "", "", "", "", "", "Benar", 1];
-    const sampleRow3 = ["Isian Singkat", "Ibukota Indonesia adalah...", "", "", "", "", "", "Jakarta", 1];
-    const sampleRow4 = ["Esai", "Jelaskan proses terjadinya hujan!", "", "", "", "", "", "Hujan terjadi karena penguapan air laut yang mengembun menjadi awan, lalu turun sebagai titik-titik air.", 5];
+    const sampleRow2 = ["Pilihan Ganda Kompleks", "Manakah yang merupakan hewan mamalia?", "Kucing", "Ayam", "Paus", "Ikan Hiu", "", "A, C", 2];
+    const sampleRow3 = ["Benar Salah", "Bumi itu bulat", "", "", "", "", "", "Benar", 1];
+    const sampleRow4 = ["Isian Singkat", "Ibukota Indonesia adalah...", "", "", "", "", "", "Jakarta", 1];
+    const sampleRow5 = ["Esai", "Jelaskan proses terjadinya hujan!", "", "", "", "", "", "Hujan terjadi karena penguapan air laut yang mengembun menjadi awan, lalu turun sebagai titik-titik air.", 5];
     
-    const ws = XLSX.utils.aoa_to_sheet([headers, sampleRow1, sampleRow2, sampleRow3, sampleRow4]);
+    const ws = XLSX.utils.aoa_to_sheet([headers, sampleRow1, sampleRow2, sampleRow3, sampleRow4, sampleRow5]);
     
     ws['!cols'] = [
       { wch: 15 },
@@ -181,10 +192,10 @@
     const instructionData = [
       ["PETUNJUK PENGISIAN SOAL"],
       [],
-      ["1. TIPE SOAL", "Harus diisi dengan ejaan persis: Pilihan Ganda, Benar Salah, Isian Singkat, atau Esai"],
+      ["1. TIPE SOAL", "Harus diisi dengan ejaan persis: Pilihan Ganda, Pilihan Ganda Kompleks, Benar Salah, Isian Singkat, atau Esai"],
       ["2. TEKS SOAL", "Isi dengan pertanyaan soal Anda"],
-      ["3. OPSI A - E", "Khusus untuk tipe Pilihan Ganda. Minimal isi Opsi A dan B."],
-      ["4. JAWABAN BENAR", "Untuk Pilihan Ganda: A, B, C, D, atau E. \nUntuk Benar Salah: Benar atau Salah. \nUntuk Isian Singkat: Kata kuncinya.\nUntuk Esai: Penjelasan/Kunci Jawabannya."],
+      ["3. OPSI A - E", "Khusus untuk tipe Pilihan Ganda & Pilihan Ganda Kompleks. Minimal isi Opsi A dan B."],
+      ["4. JAWABAN BENAR", "Untuk Pilihan Ganda: A, B, C, D, atau E. \nUntuk Pilihan Ganda Kompleks: Pisahkan huruf jawaban dengan koma (contoh: A, C). \nUntuk Benar Salah: Benar atau Salah. \nUntuk Isian Singkat: Kata kuncinya.\nUntuk Esai: Penjelasan/Kunci Jawabannya."],
       ["5. BOBOT NILAI", "Angka (misal: 1, 2, 5). Default adalah 1."],
       [],
       ["CONTOH PENGISIAN BENAR:"],
@@ -246,9 +257,9 @@
                 <div class="mt-2 text-xs text-gray-600 p-2 bg-gray-50 rounded border border-gray-100">
                   <p class="font-semibold mb-1">Panduan Pengisian:</p>
                   <ul class="list-disc pl-4 space-y-1">
-                    <li>Gunakan <strong>Pilihan Ganda</strong>, <strong>Benar Salah</strong>, <strong>Isian Singkat</strong>, atau <strong>Esai</strong> di kolom Tipe Soal.</li>
-                    <li>Jawaban Benar untuk Pilihan Ganda cukup diisi <strong>A/B/C/D/E</strong>.</li>
-                    <li>Biarkan kolom opsi jawaban kosong untuk tipe selain Pilihan Ganda.</li>
+                    <li>Gunakan <strong>Pilihan Ganda</strong>, <strong>Pilihan Ganda Kompleks</strong>, <strong>Benar Salah</strong>, <strong>Isian Singkat</strong>, atau <strong>Esai</strong> di kolom Tipe Soal.</li>
+                    <li>Jawaban Benar untuk Pilihan Ganda cukup diisi <strong>A/B/C/D/E</strong> (pisahkan dengan koma untuk Pilihan Ganda Kompleks, misal: <strong>A, C</strong>).</li>
+                    <li>Biarkan kolom opsi jawaban kosong untuk tipe selain pilihan ganda.</li>
                   </ul>
                 </div>
               </div>
