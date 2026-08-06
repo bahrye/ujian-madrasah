@@ -186,6 +186,10 @@
 				placeholder="Ketik jawaban singkat di sini..."
 				value={answer}
 				on:input={(e) => handleAnswer(e.currentTarget.value)}
+				autocomplete="off"
+				autocorrect="off"
+				autocapitalize="off"
+				spellcheck="false"
 			/>
 
 		{:else if question.type === 'essay'}
@@ -196,6 +200,10 @@
 				value={answer}
 				on:input={(e) => handleAnswer(e.currentTarget.value)}
 				rows="8"
+				autocomplete="off"
+				autocorrect="off"
+				autocapitalize="off"
+				spellcheck="false"
 			></textarea>
 
 		{:else if question.type === 'menjodohkan'}

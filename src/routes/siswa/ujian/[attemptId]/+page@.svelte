@@ -122,7 +122,7 @@
 	});
 
 	beforeNavigate(({ cancel, willUnload }) => {
-		if (!submitting) {
+		if (!submitting && !isDisqualifying) {
 			if (willUnload) {
 				isUnloading = true;
 			} else {
@@ -131,6 +131,26 @@
 			}
 		}
 	});
+
+	let isManualReload = false;
+	
+	function triggerReload() {
+		isManualReload = true;
+		window.location.reload();
+	}
+
+	function handleBeforeUnload(e: BeforeUnloadEvent) {
+		if (!submitting && !isDisqualifying && !isManualReload) {
+			e.preventDefault();
+			e.returnValue = '';
+		}
+		isUnloading = true;
+		// Jika dialog cancel ditekan, JS akan lanjut jalan dan reset isUnloading
+		setTimeout(() => {
+			isUnloading = false;
+			isManualReload = false;
+		}, 1000);
+	}
 
 	let isDisqualifying = false;
 
@@ -354,7 +374,7 @@
 <svelte:head><title>{attempt.exam_title} — Ujian Online Madrasah</title></svelte:head>
 
 <svelte:window 
-	on:beforeunload={() => { isUnloading = true; }}
+	on:beforeunload={handleBeforeUnload}
 	on:contextmenu|preventDefault 
 	on:copy|preventDefault 
 	on:cut|preventDefault 
@@ -448,7 +468,7 @@
 						</svg>
 						Navigasi Soal
 					</button>
-					<button class="btn-sm btn-ghost border border-slate-200" on:click={() => window.location.reload()} title="Muat Ulang Halaman">
+					<button class="btn-sm btn-ghost border border-slate-200" on:click={triggerReload} title="Muat Ulang Halaman">
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
 						</svg>

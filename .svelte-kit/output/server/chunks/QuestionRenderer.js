@@ -134,10 +134,10 @@ function QuestionRenderer($$renderer, $$props) {
       $$renderer2.push(`<!--]--></div>`);
     } else if (question.type === "isian_singkat") {
       $$renderer2.push("<!--[2-->");
-      $$renderer2.push(`<input type="text" class="input text-base" placeholder="Ketik jawaban singkat di sini..."${attr("value", answer)}/>`);
+      $$renderer2.push(`<input type="text" class="input text-base" placeholder="Ketik jawaban singkat di sini..."${attr("value", answer)} autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>`);
     } else if (question.type === "essay") {
       $$renderer2.push("<!--[3-->");
-      $$renderer2.push(`<textarea class="input text-base min-h-[200px] resize-y" placeholder="Tulis jawaban uraian di sini..." rows="8">`);
+      $$renderer2.push(`<textarea class="input text-base min-h-[200px] resize-y" placeholder="Tulis jawaban uraian di sini..." rows="8" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">`);
       const $$body = escape_html(answer);
       if ($$body) {
         $$renderer2.push(`${$$body}`);
