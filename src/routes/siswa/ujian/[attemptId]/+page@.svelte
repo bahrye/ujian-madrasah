@@ -135,7 +135,7 @@
 	let isDisqualifying = false;
 
 	function triggerViolation(type: string) {
-		if (showWarningModal || showDisqualifiedModal || submitting || isUnloading) return;
+		if (showWarningModal || showDisqualifiedModal || submitting || isUnloading || isPausedByProctor) return;
 		
 		warnings += 1;
 		warningLogs.push({ time: Date.now(), type });
@@ -153,7 +153,7 @@
 	}
 
 	function handleCheatWarning(type: string, toleranceMs: number) {
-		if (showWarningModal || showDisqualifiedModal || submitting || isUnloading) return;
+		if (showWarningModal || showDisqualifiedModal || submitting || isUnloading || isPausedByProctor) return;
 		
 		isExamBlurred = true;
 		if (cheatWarningTimeout) clearTimeout(cheatWarningTimeout);
@@ -302,7 +302,7 @@
 	}
 
 	async function handleAutoSubmit() {
-		if (submitting) return;
+		if (submitting || isPausedByProctor) return;
 		submitting = true;
 		saveCurrentAnswer();
 		
@@ -533,18 +533,23 @@
 				<p class="text-sm text-amber-600 mb-4 font-medium">⚠ Masih ada {unansweredCount} soal yang belum dijawab!</p>
 			{/if}
 
-			<div class="flex gap-3">
+			<div class="flex gap-3 mt-8">
 				<button type="button" class="btn-ghost flex-1" on:click={() => (showSubmitConfirm = false)}>Kembali</button>
-				<form id="submit-form" method="POST" action="?/submit" use:enhance={() => {
+				<form id="submit-form" method="POST" action="?/submit" use:enhance={({ cancel }) => {
+					if (isPausedByProctor) {
+						cancel();
+						return;
+					}
 					submitting = true;
-					return async ({ result, update }) => { 
+					saveCurrentAnswer();
+					return async ({ result, update }) => {
 						if (result.type !== 'redirect') {
 							submitting = false; 
 						}
-						await update(); 
+						await update();
 					};
 				}} class="flex-1">
-					<button type="submit" disabled={submitting} class="btn-success w-full justify-center">
+					<button type="submit" disabled={submitting || isPausedByProctor} class="btn-success w-full justify-center">
 						{#if submitting}
 							Mengirim...
 						{:else}
