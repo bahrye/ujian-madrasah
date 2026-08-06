@@ -131,6 +131,68 @@
 		const end = parseDate(endTimeStr);
 		return current.getTime() >= end.getTime();
 	}
+
+	function formatOnlyTime(dateStr: string | null) {
+		if (!dateStr) return '--.--';
+		const date = parseDate(dateStr);
+		return new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(date).replace(':', '.');
+	}
+
+	$: proctorMap = new Map<string, number>();
+	$: totalExamsCount = data.schedules?.length || 0;
+	$: groupedSchedules = (() => {
+		const groups: { dateStr: string, exams: any[], colorIdx: number }[] = [];
+		if (!data.schedules) return groups;
+		
+		let currentDateStr = '';
+		let currentGroup: { dateStr: string, exams: any[], colorIdx: number } | null = null;
+		let colorCounter = 0;
+		let proctorCounter = 1;
+		proctorMap.clear();
+
+		data.schedules.forEach((exam: any) => {
+			if (exam.proctor_names) {
+				(exam.proctor_names || '').split('||').forEach((p: string) => {
+					const name = p.trim();
+					if (name && !proctorMap.has(name)) {
+						proctorMap.set(name, proctorCounter++);
+					}
+				});
+			}
+
+			if (!exam.start_time) return;
+			const date = parseDate(String(exam.start_time));
+			const dateFormatted = new Intl.DateTimeFormat('id-ID', {
+				weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+			}).format(date);
+			
+			if (dateFormatted !== currentDateStr) {
+				currentDateStr = dateFormatted;
+				currentGroup = { dateStr: dateFormatted, exams: [], colorIdx: colorCounter++ };
+				groups.push(currentGroup);
+			}
+			currentGroup?.exams.push(exam);
+		});
+		return groups;
+	})();
+
+	function getProctorNumbers(namesStr: string | null) {
+		if (!namesStr) return '-';
+		const names = namesStr.split('||').map(n => n.trim()).filter(Boolean);
+		if (names.length === 0) return '-';
+		const numbers = names.map(n => proctorMap.get(n)).sort((a, b) => (a || 0) - (b || 0));
+		return numbers.join(' & ');
+	}
+
+	const rowColors = [
+		'bg-[#fde68a]', // kuning
+		'bg-[#bfdbfe]', // biru muda
+		'bg-[#fed7aa]', // oranye muda
+		'bg-[#e2e8f0]', // abu-abu muda
+		'bg-[#d9f99d]', // hijau lime
+		'bg-[#fbcfe8]', // pink muda
+		'bg-[#c7d2fe]', // indigo muda
+	];
 </script>
 
 <svelte:head><title>Dashboard Siswa — Ujian Online Madrasah</title></svelte:head>
@@ -240,6 +302,59 @@
 			</div>
 		{/if}
 	</div>
+
+	<!-- Jadwal Ujian Table -->
+	{#if data.schedules && data.schedules.length > 0}
+	<div class="mt-8 mb-4">
+		<h2 class="text-lg font-bold text-slate-800 mb-3">Jadwal Ujian</h2>
+		<div class="card overflow-x-auto bg-white !rounded-none !shadow-none border-2 border-black p-0">
+			<table class="w-full text-sm border-collapse border-black whitespace-nowrap">
+				<thead>
+					<tr class="bg-[#d9f99d]">
+						<th class="border-2 border-black px-3 py-2 uppercase">NO</th>
+						<th class="border-2 border-black px-3 py-2 uppercase">HARI, TANGGAL</th>
+						<th class="border-2 border-black px-3 py-2 uppercase">JAM KE</th>
+						<th class="border-2 border-black px-3 py-2 uppercase">WAKTU</th>
+						<th class="border-2 border-black px-3 py-2 uppercase">MATA PELAJARAN</th>
+						<th class="border-2 border-black px-3 py-2 uppercase">PENGAWAS</th>
+						<th class="border-2 border-black px-3 py-2">Daftar Pengawas</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each groupedSchedules as group, gIdx}
+						{#each group.exams as exam, eIdx}
+							<tr class="{rowColors[group.colorIdx % rowColors.length]}">
+								{#if eIdx === 0}
+									<td class="border-2 border-black px-3 py-2 text-center" rowspan={group.exams.length}>{gIdx + 1}</td>
+									<td class="border-2 border-black px-3 py-2 text-center" rowspan={group.exams.length}>{group.dateStr}</td>
+								{/if}
+								<td class="border-2 border-black px-3 py-2 text-center">{eIdx + 1}</td>
+								<td class="border-2 border-black px-3 py-2 text-center tracking-wider">
+									{formatOnlyTime(exam.start_time || '')} - {formatOnlyTime(exam.end_time || '')}
+								</td>
+								<td class="border-2 border-black px-3 py-2 text-center">{exam.subject_name || exam.title || ''}</td>
+								<td class="border-2 border-black px-3 py-2 text-center font-medium">
+									{getProctorNumbers(exam.proctor_names || '')}
+								</td>
+								{#if gIdx === 0 && eIdx === 0}
+									<td class="border-2 border-black px-4 py-2 align-top bg-white" rowspan={totalExamsCount}>
+										<div class="space-y-0.5">
+											{#each Array.from(proctorMap.entries()) as [name, num]}
+												<div class="text-xs">
+													<span class="inline-block w-4">{num}.</span> {name}
+												</div>
+											{/each}
+										</div>
+									</td>
+								{/if}
+							</tr>
+						{/each}
+					{/each}
+				</tbody>
+			</table>
+		</div>
+	</div>
+	{/if}
 
 	<!-- History -->
 	<div>
