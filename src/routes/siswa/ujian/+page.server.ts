@@ -62,15 +62,6 @@ export const actions: Actions = {
 		`).bind(tokenCode, parsedExamId).first<any>();
 
 		if (!token) return fail(400, { error: 'Token tidak valid untuk ujian ini atau belum dirilis.' });
-		if (!token.is_active) return fail(400, { error: 'Ujian tidak aktif.' });
-		if (token.released_at) {
-			const releasedAt = new Date(token.released_at + 'Z').getTime();
-			const now = new Date().getTime();
-			if (now - releasedAt > 15 * 60 * 1000) return fail(400, { error: 'Token sudah ditarik otomatis (melewati batas 15 menit).' });
-		} else {
-			return fail(400, { error: 'Status rilis token tidak valid.' });
-		}
-		if (new Date(token.expires_at) < new Date()) return fail(400, { error: 'Token sudah kedaluwarsa.' });
 
 		const existingAttempt = await db.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`)
 			.bind(locals.user!.id, token.exam_id).first<{ id: number; status: string }>();
@@ -84,8 +75,19 @@ export const actions: Actions = {
 			return fail(400, { error: 'Anda sudah pernah mengerjakan ujian ini.' });
 		}
 
+		if (!token.is_active) return fail(400, { error: 'Ujian tidak aktif.' });
+		if (token.released_at) {
+			const releasedAt = new Date(token.released_at + 'Z').getTime();
+			const now = new Date().getTime();
+			if (now - releasedAt > 15 * 60 * 1000) return fail(400, { error: 'Token sudah ditarik otomatis (melewati batas 15 menit).' });
+		} else {
+			return fail(400, { error: 'Status rilis token tidak valid.' });
+		}
+		if (new Date(token.expires_at) < new Date()) return fail(400, { error: 'Token sudah kedaluwarsa.' });
+
 		return { success: true, tokenCode, examId: parsedExamId };
 		} catch (e: any) {
+			if (e.status === 302) throw e;
 			console.error(e);
 			return fail(500, { error: e.message || 'Gagal memvalidasi token.' });
 		}
@@ -110,15 +112,6 @@ export const actions: Actions = {
 		`).bind(tokenCode, parsedExamId).first<any>();
 
 		if (!token) return fail(400, { error: 'Token tidak valid untuk ujian ini atau belum dirilis.' });
-		if (!token.is_active) return fail(400, { error: 'Ujian tidak aktif.' });
-		if (token.released_at) {
-			const releasedAt = new Date(token.released_at + 'Z').getTime();
-			const now = new Date().getTime();
-			if (now - releasedAt > 15 * 60 * 1000) return fail(400, { error: 'Token sudah ditarik otomatis.' });
-		} else {
-			return fail(400, { error: 'Status rilis token tidak valid.' });
-		}
-		if (new Date(token.expires_at) < new Date()) return fail(400, { error: 'Token sudah kedaluwarsa.' });
 
 		const existingAttempt = await db.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`)
 			.bind(locals.user!.id, token.exam_id).first<{ id: number; status: string }>();
@@ -131,6 +124,16 @@ export const actions: Actions = {
 			}
 			return fail(400, { error: 'Anda sudah pernah mengerjakan ujian ini.' });
 		}
+
+		if (!token.is_active) return fail(400, { error: 'Ujian tidak aktif.' });
+		if (token.released_at) {
+			const releasedAt = new Date(token.released_at + 'Z').getTime();
+			const now = new Date().getTime();
+			if (now - releasedAt > 15 * 60 * 1000) return fail(400, { error: 'Token sudah ditarik otomatis.' });
+		} else {
+			return fail(400, { error: 'Status rilis token tidak valid.' });
+		}
+		if (new Date(token.expires_at) < new Date()) return fail(400, { error: 'Token sudah kedaluwarsa.' });
 
 		const endTime = new Date(Date.now() + token.duration_minutes * 60 * 1000).toISOString();
 
