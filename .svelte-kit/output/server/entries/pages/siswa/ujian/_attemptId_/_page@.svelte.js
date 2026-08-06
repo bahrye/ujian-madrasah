@@ -42,7 +42,7 @@ function _page_($$renderer, $$props) {
     let attempt, questions, answerMap, currentQuestion, answeredCount, doubtedCount, unansweredCount;
     let data = $$props["data"];
     let currentIndex = 0;
-    let isPausedByProctor = false;
+    let isPausedByProctor = data.attempt.is_paused === 1;
     onDestroy(() => {
     });
     let localAnswers = {};
@@ -130,12 +130,10 @@ function _page_($$renderer, $$props) {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]--> `);
-    {
+    if (!isPausedByProctor) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div class="fixed inset-0 z-[60] flex flex-col items-center justify-center p-4 bg-slate-900/95 backdrop-blur-xl"><div class="text-center text-white max-w-md animate-in fade-in zoom-in duration-300"><svg class="w-16 h-16 mx-auto mb-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg> <h2 class="text-2xl font-bold mb-4">Mode Layar Penuh Diperlukan</h2> <p class="text-slate-300 text-sm mb-6">Ujian ini wajib menggunakan mode layar penuh untuk mencegah kecurangan dan menutupi notifikasi sistem. Silakan masuk ke Layar Penuh untuk mulai/melanjutkan.</p> <button class="btn-primary w-full justify-center py-3">Masuk Layar Penuh</button></div></div>`);
-    }
-    $$renderer2.push(`<!--]--> `);
-    {
+    } else {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]--> `);
@@ -148,6 +146,13 @@ function _page_($$renderer, $$props) {
     }
     $$renderer2.push(`<!--]--> `);
     {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--> `);
+    if (isPausedByProctor) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/95 backdrop-blur-xl"><div class="text-center text-white max-w-md animate-in fade-in zoom-in duration-300"><svg class="w-20 h-20 mx-auto mb-6 text-amber-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <h2 class="text-3xl font-bold mb-4">Ujian Ditahan</h2> <p class="text-slate-300 text-lg">Waktu ujian Anda sedang dibekukan oleh Pengawas.</p> <p class="text-slate-400 mt-4 text-sm">Silakan hubungi pengawas ujian jika ini adalah sebuah kesalahan. Anda tidak dapat melanjutkan ujian atau melihat soal hingga akses dibuka kembali.</p></div></div>`);
+    } else {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]-->`);

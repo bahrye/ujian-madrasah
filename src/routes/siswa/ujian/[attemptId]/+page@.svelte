@@ -27,7 +27,7 @@
 	let cheatWarningTimeout: any;
 
 	// Anti-cheat state
-	let isPausedByProctor = false;
+	let isPausedByProctor = data.attempt.is_paused === 1;
 	let statusPollingInterval: any;
 	
 	let warnings = 0;
