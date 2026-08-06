@@ -4,6 +4,7 @@
 	import { QUESTION_TYPE_LABELS } from '$lib/utils/constants';
 	import { mathRender } from '$lib/actions/mathRender';
 	import { arabicRender } from '$lib/actions/arabicRender';
+	import { pinchZoom } from '$lib/actions/pinchZoom';
 
 	export let question: {
 		id: number;
@@ -247,8 +248,9 @@
 		<img 
 			src={lightboxImage} 
 			alt="Gambar Layar Penuh" 
-			class="max-w-full max-h-[95vh] object-contain cursor-zoom-out shadow-2xl rounded-lg transform transition-transform"
-			on:click|stopPropagation={() => lightboxImage = null}
+			class="max-w-full max-h-[95vh] object-contain cursor-move shadow-2xl rounded-lg"
+			on:click|stopPropagation
+			use:pinchZoom
 		/>
 	</div>
 {/if}
