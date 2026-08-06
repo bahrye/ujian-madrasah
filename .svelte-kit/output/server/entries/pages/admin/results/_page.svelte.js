@@ -7,13 +7,16 @@ import "../../../../chunks/root.js";
 import "../../../../chunks/state.svelte.js";
 import { A as ATTEMPT_STATUS_COLORS, a as ATTEMPT_STATUS_LABELS } from "../../../../chunks/constants.js";
 import { C as ConfirmForm } from "../../../../chunks/ConfirmForm.js";
-import "../../../../chunks/toast.js";
+import { t as toasts } from "../../../../chunks/toast.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let results;
     let data = $$props["data"];
+    let form = $$props["form"];
     let isExporting = false;
     results = data.results;
+    if (form?.error) toasts.error(form.error);
+    if (form?.success) toasts.success("Hasil ujian berhasil dihapus!");
     head("nnpp9p", $$renderer2, ($$renderer3) => {
       $$renderer3.title(($$renderer4) => {
         $$renderer4.push(`<title>Hasil Ujian — Ujian Online Madrasah</title>`);
@@ -84,7 +87,7 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<!--]--></tbody></table></div>`);
     }
     $$renderer2.push(`<!--]--></div></div>`);
-    bind_props($$props, { data });
+    bind_props($$props, { data, form });
   });
 }
 export {

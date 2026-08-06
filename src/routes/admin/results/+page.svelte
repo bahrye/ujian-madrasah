@@ -6,7 +6,12 @@
 	import { toasts } from '$lib/stores/toast';
 
 	export let data;
+	export let form: any;
+
 	$: results = data.results as any[];
+
+	$: if (form?.error) toasts.error(form.error);
+	$: if (form?.success) toasts.success('Hasil ujian berhasil dihapus!');
 
 	let isExporting = false;
 	async function handleExport() {

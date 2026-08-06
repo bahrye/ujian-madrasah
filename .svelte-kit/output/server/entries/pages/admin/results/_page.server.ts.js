@@ -1,3 +1,4 @@
+import { fail } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
 const load = async ({ platform, url, locals }) => {
   const db = getDB(platform);
@@ -28,9 +29,20 @@ const actions = {
     if (!attemptId) {
       return { success: false, error: "ID tidak valid" };
     }
-    await db.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(attemptId).run();
-    await db.prepare("DELETE FROM student_attempts WHERE id = ?").bind(attemptId).run();
-    return { success: true };
+    const parsedId = parseInt(attemptId, 10);
+    if (isNaN(parsedId)) {
+      return fail(400, { error: "ID tidak valid" });
+    }
+    try {
+      await db.batch([
+        db.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(parsedId),
+        db.prepare("DELETE FROM student_attempts WHERE id = ?").bind(parsedId)
+      ]);
+      return { success: true };
+    } catch (e) {
+      console.error("Error deleting attempt:", e);
+      return fail(500, { error: e.message || "Terjadi kesalahan saat menghapus data ujian." });
+    }
   }
 };
 export {

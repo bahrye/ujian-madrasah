@@ -1,3 +1,4 @@
+import { fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { getDB } from '$lib/server/db';
 
@@ -39,11 +40,23 @@ export const actions: Actions = {
 			return { success: false, error: 'ID tidak valid' };
 		}
 
-		// Karena foreign key D1 tidak otomatis cascade jika pragma foreign_keys tidak ON tiap koneksi,
-		// kita pastikan menghapus data anak (answers) terlebih dahulu
-		await db.prepare('DELETE FROM student_answers WHERE attempt_id = ?').bind(attemptId).run();
-		await db.prepare('DELETE FROM student_attempts WHERE id = ?').bind(attemptId).run();
+		const parsedId = parseInt(attemptId, 10);
+		if (isNaN(parsedId)) {
+			return fail(400, { error: 'ID tidak valid' });
+		}
 
-		return { success: true };
+		try {
+			// Karena foreign key D1 tidak otomatis cascade jika pragma foreign_keys tidak ON tiap koneksi,
+			// kita pastikan menghapus data anak (answers) terlebih dahulu
+			await db.batch([
+				db.prepare('DELETE FROM student_answers WHERE attempt_id = ?').bind(parsedId),
+				db.prepare('DELETE FROM student_attempts WHERE id = ?').bind(parsedId)
+			]);
+
+			return { success: true };
+		} catch (e: any) {
+			console.error('Error deleting attempt:', e);
+			return fail(500, { error: e.message || 'Terjadi kesalahan saat menghapus data ujian.' });
+		}
 	}
 };
