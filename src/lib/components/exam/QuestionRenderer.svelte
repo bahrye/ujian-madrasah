@@ -182,16 +182,16 @@
 		{:else if question.type === 'isian_singkat'}
 			<!-- Short Answer -->
 			<input
-				type="text"
-				name="jawaban_siswa_{question.id}"
+				type="search"
+				name="jawaban_siswa_{question.id}_{Date.now()}"
 				id="jawaban_siswa_{question.id}"
 				data-lpignore="true"
 				data-form-type="other"
-				class="input text-base"
+				class="input text-base appearance-none"
 				placeholder="Ketik jawaban singkat di sini..."
 				value={answer}
 				on:input={(e) => handleAnswer(e.currentTarget.value)}
-				autocomplete="new-password"
+				autocomplete="do-not-autofill"
 				autocorrect="off"
 				autocapitalize="off"
 				spellcheck="false"
@@ -200,16 +200,16 @@
 		{:else if question.type === 'essay'}
 			<!-- Essay -->
 			<textarea
-				name="jawaban_uraian_{question.id}"
+				name="jawaban_uraian_{question.id}_{Date.now()}"
 				id="jawaban_uraian_{question.id}"
 				data-lpignore="true"
 				data-form-type="other"
-				class="input text-base min-h-[200px] resize-y"
+				class="input text-base min-h-[200px] resize-y appearance-none"
 				placeholder="Tulis jawaban uraian di sini..."
 				value={answer}
 				on:input={(e) => handleAnswer(e.currentTarget.value)}
 				rows="8"
-				autocomplete="new-password"
+				autocomplete="do-not-autofill"
 				autocorrect="off"
 				autocapitalize="off"
 				spellcheck="false"

@@ -134,10 +134,10 @@ function QuestionRenderer($$renderer, $$props) {
       $$renderer2.push(`<!--]--></div>`);
     } else if (question.type === "isian_singkat") {
       $$renderer2.push("<!--[2-->");
-      $$renderer2.push(`<input type="text"${attr("name", `jawaban_siswa_${stringify(question.id)}`)}${attr("id", `jawaban_siswa_${stringify(question.id)}`)} data-lpignore="true" data-form-type="other" class="input text-base" placeholder="Ketik jawaban singkat di sini..."${attr("value", answer)} autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false"/>`);
+      $$renderer2.push(`<input type="search"${attr("name", `jawaban_siswa_${stringify(question.id)}_${stringify(Date.now())}`)}${attr("id", `jawaban_siswa_${stringify(question.id)}`)} data-lpignore="true" data-form-type="other" class="input text-base appearance-none" placeholder="Ketik jawaban singkat di sini..."${attr("value", answer)} autocomplete="do-not-autofill" autocorrect="off" autocapitalize="off" spellcheck="false"/>`);
     } else if (question.type === "essay") {
       $$renderer2.push("<!--[3-->");
-      $$renderer2.push(`<textarea${attr("name", `jawaban_uraian_${stringify(question.id)}`)}${attr("id", `jawaban_uraian_${stringify(question.id)}`)} data-lpignore="true" data-form-type="other" class="input text-base min-h-[200px] resize-y" placeholder="Tulis jawaban uraian di sini..." rows="8" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">`);
+      $$renderer2.push(`<textarea${attr("name", `jawaban_uraian_${stringify(question.id)}_${stringify(Date.now())}`)}${attr("id", `jawaban_uraian_${stringify(question.id)}`)} data-lpignore="true" data-form-type="other" class="input text-base min-h-[200px] resize-y appearance-none" placeholder="Tulis jawaban uraian di sini..." rows="8" autocomplete="do-not-autofill" autocorrect="off" autocapitalize="off" spellcheck="false">`);
       const $$body = escape_html(answer);
       if ($$body) {
         $$renderer2.push(`${$$body}`);
