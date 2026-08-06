@@ -182,9 +182,20 @@
 									<ul class="space-y-1">
 										<li class="flex justify-between"><span>Poin Mentah Didapat:</span> <strong>{attempt.objective_earned_points ?? 0}</strong></li>
 										<li class="flex justify-between text-slate-400"><span>Poin Mentah Maks:</span> <strong>{attempt.objective_max_points ?? 0}</strong></li>
-										<li class="mt-2 pt-2 border-t border-slate-100 flex justify-between text-indigo-600 font-semibold">
-											<span>Kontribusi ke Nilai Akhir:</span>
-											<span>{(((attempt.objective_earned_points ?? 0) / (attempt.total_points || 1)) * 100).toFixed(1).replace(/\.0$/, '')}</span>
+										<li class="mt-3 pt-3 border-t border-slate-100">
+											<div class="flex justify-between items-center text-indigo-700 font-semibold mb-1.5">
+												<span>Kontribusi ke Nilai Akhir:</span>
+												<span>{(((attempt.objective_earned_points ?? 0) / (attempt.total_points || 1)) * 100).toFixed(1).replace(/\.0$/, '')}</span>
+											</div>
+											<div class="flex items-center gap-2 font-mono text-[10px] bg-indigo-50/50 px-2.5 py-1.5 rounded-lg border border-indigo-100/50 w-fit">
+												<div class="flex flex-col items-center leading-none">
+													<span class="border-b border-indigo-200 pb-0.5 px-1">{attempt.objective_earned_points ?? 0}</span>
+													<span class="pt-0.5 px-1">{attempt.total_points || 1}</span>
+												</div>
+												<span class="text-indigo-400">&times; 100</span>
+												<span class="text-indigo-400">=</span>
+												<span class="font-bold text-xs">{(((attempt.objective_earned_points ?? 0) / (attempt.total_points || 1)) * 100).toFixed(1).replace(/\.0$/, '')}</span>
+											</div>
 										</li>
 									</ul>
 								</div>
@@ -197,21 +208,46 @@
 										{:else}
 											<li class="flex justify-between"><span>Poin Mentah Didapat:</span> <strong>{manual_earned.toFixed(1).replace(/\.0$/, '')}</strong></li>
 											<li class="flex justify-between text-slate-400"><span>Poin Mentah Maks:</span> <strong>{(attempt.total_points || 1) - (attempt.objective_max_points ?? 0)}</strong></li>
-											<li class="mt-2 pt-2 border-t border-slate-100 flex justify-between text-indigo-600 font-semibold">
-												<span>Kontribusi ke Nilai Akhir:</span>
-												<span>{((manual_earned / (attempt.total_points || 1)) * 100).toFixed(1).replace(/\.0$/, '')}</span>
+											<li class="mt-3 pt-3 border-t border-slate-100">
+												<div class="flex justify-between items-center text-indigo-700 font-semibold mb-1.5">
+													<span>Kontribusi ke Nilai Akhir:</span>
+													<span>{((manual_earned / (attempt.total_points || 1)) * 100).toFixed(1).replace(/\.0$/, '')}</span>
+												</div>
+												<div class="flex items-center gap-2 font-mono text-[10px] bg-indigo-50/50 px-2.5 py-1.5 rounded-lg border border-indigo-100/50 w-fit">
+													<div class="flex flex-col items-center leading-none">
+														<span class="border-b border-indigo-200 pb-0.5 px-1">{manual_earned.toFixed(1).replace(/\.0$/, '')}</span>
+														<span class="pt-0.5 px-1">{attempt.total_points || 1}</span>
+													</div>
+													<span class="text-indigo-400">&times; 100</span>
+													<span class="text-indigo-400">=</span>
+													<span class="font-bold text-xs">{((manual_earned / (attempt.total_points || 1)) * 100).toFixed(1).replace(/\.0$/, '')}</span>
+												</div>
 											</li>
 										{/if}
 									</ul>
 								</div>
 							</div>
 
-							<div class="bg-indigo-50/50 border border-indigo-100 p-3 rounded-lg text-indigo-800 flex justify-between items-center">
+							<div class="bg-indigo-50/50 border border-indigo-100 p-3.5 rounded-xl text-indigo-800 flex justify-between items-center mt-2">
 								<div>
-									<p class="font-semibold text-sm">Rumus Total Nilai Akhir</p>
-									<p class="mt-0.5 text-indigo-600/80">(Total Poin Mentah Didapat &divide; Total Semua Poin Maksimal) &times; 100</p>
+									<p class="font-bold text-sm mb-2">Rumus Total Nilai Akhir</p>
+									<div class="flex items-center gap-2.5 font-mono text-xs bg-white px-3 py-2 rounded-lg border border-indigo-100 shadow-sm w-fit">
+										<div class="flex flex-col items-center leading-none">
+											<span class="border-b border-indigo-200 pb-1 px-1 text-slate-700">{attempt.show_score_type === 'objective_only' ? (attempt.objective_earned_points ?? 0) : ((attempt.score ?? 0)/100 * (attempt.total_points || 1)).toFixed(1).replace(/\.0$/, '')}</span>
+											<span class="pt-1 px-1 text-slate-700">{attempt.total_points || 1}</span>
+										</div>
+										<span class="text-indigo-400 font-semibold">&times; 100</span>
+										<span class="text-indigo-400 font-semibold">=</span>
+										<span class="font-black text-sm text-indigo-700">
+											{#if attempt.show_score_type === 'objective_only'}
+												{(((attempt.objective_earned_points ?? 0) / (attempt.total_points || 1)) * 100).toFixed(1).replace(/\.0$/, '')}
+											{:else}
+												{attempt.score ?? 0}
+											{/if}
+										</span>
+									</div>
 								</div>
-								<div class="text-2xl font-black">
+								<div class="text-4xl font-black bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text hidden sm:block">
 									{#if attempt.show_score_type === 'objective_only'}
 										{(((attempt.objective_earned_points ?? 0) / (attempt.total_points || 1)) * 100).toFixed(1).replace(/\.0$/, '')}
 									{:else}
