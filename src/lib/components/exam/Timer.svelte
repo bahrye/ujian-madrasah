@@ -29,7 +29,14 @@
 
 	function calculateRemaining() {
 		if (isPaused) return; // Bekukan timer saat ujian ditahan
-		const end = new Date(endTime).getTime();
+		
+		// Perbaiki format SQLite datetime yang kehilangan 'Z' dan 'T'
+		let validEndTime = endTime;
+		if (validEndTime && !validEndTime.endsWith('Z') && !validEndTime.includes('+')) {
+			validEndTime = validEndTime.replace(' ', 'T') + 'Z';
+		}
+
+		const end = new Date(validEndTime).getTime();
 		const now = Date.now();
 		const diff = Math.max(0, Math.floor((end - now) / 1000));
 		remainingSeconds = diff;
