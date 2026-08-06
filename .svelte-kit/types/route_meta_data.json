@@ -261,6 +261,11 @@
 		"src/routes/siswa/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/siswa/papan-peringkat/type/[typeId]/exams": [
+		"src/routes/siswa/papan-peringkat/type/[typeId]/exams/+page.server.ts",
+		"src/routes/siswa/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/siswa/papan-peringkat/[examId]": [
 		"src/routes/siswa/papan-peringkat/[examId]/+page.server.ts",
 		"src/routes/siswa/+layout.server.ts",

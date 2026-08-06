@@ -46,6 +46,10 @@ function _page_($$renderer, $$props) {
     let currentEndTime = data.attempt.end_time;
     let isPausedByProctor = data.attempt.is_paused === 1;
     onDestroy(() => {
+      if (typeof document !== "undefined" && document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {
+        });
+      }
     });
     let localAnswers = {};
     let localDoubts = {};

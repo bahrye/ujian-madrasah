@@ -300,6 +300,8 @@
 </div>
 
 {#if showModal && selectedSchedule}
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" on:click={() => showModal = false}>
 		<div class="max-h-[90vh] overflow-y-auto bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-xl" on:click|stopPropagation>
 			<div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
@@ -307,7 +309,7 @@
 					<h3 class="font-bold text-lg text-slate-800">Daftar Peserta Ujian</h3>
 					<p class="text-sm text-slate-500 mt-1">{selectedSchedule.title} - {selectedSchedule.subject_name}</p>
 				</div>
-				<button class="w-8 h-8 rounded-full bg-white hover:bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 transition-colors" on:click={() => showModal = false}>
+				<button class="w-8 h-8 rounded-full bg-white hover:bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 transition-colors" aria-label="Tutup Modal" on:click={() => showModal = false}>
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
 					</svg>

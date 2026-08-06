@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg"]),
 	mimeTypes: {".svg":"image/svg+xml"},
 	_: {
-		client: {start:"_app/immutable/entry/start.CGx2NxyU.js",app:"_app/immutable/entry/app.-7o-BT_q.js",imports:["_app/immutable/entry/start.CGx2NxyU.js","_app/immutable/chunks/CW_zDOOh.js","_app/immutable/chunks/BVdG4OGp.js","_app/immutable/chunks/D0O7yx7I.js","_app/immutable/chunks/onhbUEEH.js","_app/immutable/chunks/BPedFfFe.js","_app/immutable/chunks/BCrKnTY_.js","_app/immutable/entry/app.-7o-BT_q.js","_app/immutable/chunks/D0O7yx7I.js","_app/immutable/chunks/onhbUEEH.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/BVdG4OGp.js","_app/immutable/chunks/BnYE3itn.js","_app/immutable/chunks/Dx_inKhY.js","_app/immutable/chunks/CY8zA_BH.js","_app/immutable/chunks/DcrpamBL.js","_app/immutable/chunks/BCrKnTY_.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
+		client: {start:"_app/immutable/entry/start.CE2LPAiQ.js",app:"_app/immutable/entry/app.7DghT2cW.js",imports:["_app/immutable/entry/start.CE2LPAiQ.js","_app/immutable/chunks/OkriCGT5.js","_app/immutable/chunks/BVdG4OGp.js","_app/immutable/chunks/D0O7yx7I.js","_app/immutable/chunks/onhbUEEH.js","_app/immutable/chunks/BXtDJnUj.js","_app/immutable/chunks/BCrKnTY_.js","_app/immutable/entry/app.7DghT2cW.js","_app/immutable/chunks/D0O7yx7I.js","_app/immutable/chunks/onhbUEEH.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/BVdG4OGp.js","_app/immutable/chunks/BnYE3itn.js","_app/immutable/chunks/Dx_inKhY.js","_app/immutable/chunks/CY8zA_BH.js","_app/immutable/chunks/DcrpamBL.js","_app/immutable/chunks/BCrKnTY_.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
 		nodes: [
 			__memo(() => import('./nodes/0.js')),
 			__memo(() => import('./nodes/1.js')),
@@ -71,7 +71,8 @@ return {
 			__memo(() => import('./nodes/56.js')),
 			__memo(() => import('./nodes/57.js')),
 			__memo(() => import('./nodes/58.js')),
-			__memo(() => import('./nodes/59.js'))
+			__memo(() => import('./nodes/59.js')),
+			__memo(() => import('./nodes/60.js'))
 		],
 		remotes: {
 			
@@ -470,59 +471,66 @@ return {
 				endpoint: null
 			},
 			{
+				id: "/siswa/papan-peringkat/type/[typeId]/exams",
+				pattern: /^\/siswa\/papan-peringkat\/type\/([^/]+?)\/exams\/?$/,
+				params: [{"name":"typeId","optional":false,"rest":false,"chained":false}],
+				page: { layouts: [0,5,], errors: [1,,], leaf: 52 },
+				endpoint: null
+			},
+			{
 				id: "/siswa/papan-peringkat/[examId]",
 				pattern: /^\/siswa\/papan-peringkat\/([^/]+?)\/?$/,
 				params: [{"name":"examId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 52 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 53 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/tata-tertib",
 				pattern: /^\/siswa\/tata-tertib\/?$/,
 				params: [],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 53 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 54 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/ujian",
 				pattern: /^\/siswa\/ujian\/?$/,
 				params: [],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 54 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 55 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/ujian/[attemptId]",
 				pattern: /^\/siswa\/ujian\/([^/]+?)\/?$/,
 				params: [{"name":"attemptId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,], errors: [1,], leaf: 55 },
+				page: { layouts: [0,], errors: [1,], leaf: 56 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin",
 				pattern: /^\/superadmin\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 56 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 57 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin/accounts",
 				pattern: /^\/superadmin\/accounts\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 57 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 58 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin/admins",
 				pattern: /^\/superadmin\/admins\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 58 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 59 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin/schools",
 				pattern: /^\/superadmin\/schools\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 59 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 60 },
 				endpoint: null
 			}
 		],
