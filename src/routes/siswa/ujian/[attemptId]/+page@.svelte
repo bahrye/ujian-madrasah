@@ -223,7 +223,7 @@
 	function handleFullscreenChange() {
 		isFullscreen = !!document.fullscreenElement;
 		if (!isFullscreen && !isExamBlurred && !showWarningModal && !showDisqualifiedModal && !submitting) {
-			handleCheatWarning('Keluar dari Layar Penuh', 60000); // 60 detik toleransi
+			handleCheatWarning('Keluar dari Layar Penuh', 30000); // 30 detik toleransi
 		} else if (isFullscreen) {
 			handleReturnToExam();
 		}
@@ -238,7 +238,7 @@
 	function handleBlur() {
 		if (document.visibilityState !== 'hidden') {
 			// Muncul aplikasi melayang / ditariknya notifikasi bar
-			handleCheatWarning('Membuka aplikasi melayang / Notifikasi', 60000); // 60 detik
+			handleCheatWarning('Membuka aplikasi melayang / Notifikasi', 30000); // 30 detik
 		}
 	}
 
@@ -633,7 +633,7 @@
 					<span class="text-3xl font-black tracking-wider {cheatCountdownRemaining <= 10 ? 'text-red-500 animate-pulse' : 'text-rose-400'}">{cheatCountdownRemaining}d</span>
 				</div>
 				<div class="w-full bg-rose-900/30 h-2 rounded-full overflow-hidden mb-3">
-					<div class="h-full bg-rose-500 transition-all duration-1000 ease-linear" style="width: {Math.max(0, (cheatCountdownRemaining / 60) * 100)}%"></div>
+					<div class="h-full bg-rose-500 transition-all duration-1000 ease-linear" style="width: {Math.max(0, (cheatCountdownRemaining / 30) * 100)}%"></div>
 				</div>
 				<p class="text-rose-300 text-xs text-left">💡 Jika Anda sedang memperbaiki masalah koneksi, segera tutup notifikasi bar Anda. Anda akan dikenakan pelanggaran berat jika waktu habis!</p>
 			</div>
