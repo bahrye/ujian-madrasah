@@ -47,16 +47,6 @@
 		}, 0);
 	}
 
-	let subtitleElement: HTMLElement;
-	let subtitleClientWidth = 0;
-	let isSubtitleOverflowing = false;
-	$: if (subtitleElement && subtitleClientWidth) {
-		setTimeout(() => {
-			if (subtitleElement) {
-				isSubtitleOverflowing = subtitleElement.scrollWidth > subtitleClientWidth;
-			}
-		}, 0);
-	}
 
 	let wakeLock: any = null;
 
@@ -93,6 +83,14 @@
 			warnings = parseInt(savedWarnings, 10);
 			if (warnings > MAX_WARNINGS) {
 				triggerDisqualification();
+			}
+		}
+		
+		const savedIndex = localStorage.getItem(`currentIndex_${attempt.id}`);
+		if (savedIndex) {
+			const idx = parseInt(savedIndex, 10);
+			if (!isNaN(idx) && idx >= 0 && idx < questions.length) {
+				currentIndex = idx;
 			}
 		}
 
@@ -239,6 +237,7 @@
 		// Save current before navigating
 		saveCurrentAnswer();
 		currentIndex = index;
+		localStorage.setItem(`currentIndex_${attempt.id}`, currentIndex.toString());
 		showNav = false;
 	}
 
@@ -385,17 +384,6 @@
 					</h1>
 				</div>
 				<div class="flex items-center gap-2 overflow-hidden w-full">
-					<div class="flex-1 min-w-0 overflow-hidden" bind:clientWidth={subtitleClientWidth}>
-						<p 
-							bind:this={subtitleElement}
-							class="text-xs text-slate-500 whitespace-nowrap {isSubtitleOverflowing ? 'animate-[marquee_15s_linear_infinite]' : 'truncate'}"
-						>
-							{attempt.subject || ''} · Soal {currentIndex + 1}/{questions.length}
-							{#if isSubtitleOverflowing}
-								<span class="pl-8">{attempt.subject || ''} · Soal {currentIndex + 1}/{questions.length}</span>
-							{/if}
-						</p>
-					</div>
 					<div class="shrink-0 flex items-center">
 						{#if isSaving}
 							<span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 animate-pulse">Menyimpan...</span>

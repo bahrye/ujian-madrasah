@@ -79,11 +79,7 @@ function _page_($$renderer, $$props) {
     {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--></h1></div> <div class="flex items-center gap-2 overflow-hidden w-full"><div class="flex-1 min-w-0 overflow-hidden"><p${attr_class(`text-xs text-slate-500 whitespace-nowrap ${"truncate"}`)}>${escape_html(attempt.subject || "")} · Soal ${escape_html(currentIndex + 1)}/${escape_html(questions.length)} `);
-    {
-      $$renderer2.push("<!--[-1-->");
-    }
-    $$renderer2.push(`<!--]--></p></div> <div class="shrink-0 flex items-center">`);
+    $$renderer2.push(`<!--]--></h1></div> <div class="flex items-center gap-2 overflow-hidden w-full"><div class="shrink-0 flex items-center">`);
     {
       $$renderer2.push("<!--[-1-->");
       $$renderer2.push(`<span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">Tersimpan</span>`);
