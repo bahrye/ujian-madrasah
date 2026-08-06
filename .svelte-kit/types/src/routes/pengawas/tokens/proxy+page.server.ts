@@ -76,11 +76,22 @@ export const actions = {
 		if (!exam) return fail(400, { error: 'Ujian tidak ditemukan.' });
 
 		const now = Date.now();
+		const nowIso = new Date(now).toISOString();
+
+		// Check for active token
+		const activeToken = await db.prepare(`
+			SELECT token_code FROM tokens 
+			WHERE exam_id = ? AND school_id = ? AND expires_at > ?
+		`).bind(examId, locals.user.school_id, nowIso).first() as { token_code: string } | null;
+
+		if (activeToken) {
+			return fail(400, { error: `Gagal: Masih ada token aktif untuk ujian ini (${activeToken.token_code}). Harap hapus token tersebut dahulu jika ingin membuat yang baru.` });
+		}
 
 		const tokenCode = generateTokenCode(6);
 		const expiresAt = new Date(now + durationHours * 60 * 60 * 1000).toISOString();
 
-		// Hapus token lama yang tidak pernah digunakan oleh siswa (agar tidak menumpuk)
+		// Hapus token lama yang kadaluwarsa dan tidak pernah digunakan oleh siswa
 		await db.prepare(`
 			DELETE FROM tokens 
 			WHERE exam_id = ? AND school_id = ? 

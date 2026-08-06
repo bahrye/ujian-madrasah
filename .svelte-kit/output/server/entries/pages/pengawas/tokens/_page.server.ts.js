@@ -58,6 +58,14 @@ const actions = {
     const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(examId, locals.user.school_id).first();
     if (!exam) return fail(400, { error: "Ujian tidak ditemukan." });
     const now = Date.now();
+    const nowIso = new Date(now).toISOString();
+    const activeToken = await db.prepare(`
+			SELECT token_code FROM tokens 
+			WHERE exam_id = ? AND school_id = ? AND expires_at > ?
+		`).bind(examId, locals.user.school_id, nowIso).first();
+    if (activeToken) {
+      return fail(400, { error: `Gagal: Masih ada token aktif untuk ujian ini (${activeToken.token_code}). Harap hapus token tersebut dahulu jika ingin membuat yang baru.` });
+    }
     const tokenCode = generateTokenCode(6);
     const expiresAt = new Date(now + durationHours * 60 * 60 * 1e3).toISOString();
     await db.prepare(`
