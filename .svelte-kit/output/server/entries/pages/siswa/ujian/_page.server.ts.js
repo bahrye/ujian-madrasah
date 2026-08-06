@@ -47,7 +47,7 @@ const actions = {
 			FROM tokens t JOIN exams e ON t.exam_id = e.id
 			JOIN exam_types et ON e.exam_type_id = et.id
 			WHERE t.token_code = ? AND t.is_released = 1 AND t.exam_id = ? AND et.is_active = 1
-		`).bind(tokenCode, examId).first();
+		`).bind(tokenCode, parsedExamId).first();
       if (!token) return fail(400, { error: "Token tidak valid untuk ujian ini atau belum dirilis." });
       if (!token.is_active) return fail(400, { error: "Ujian tidak aktif." });
       if (token.released_at) {
@@ -86,7 +86,7 @@ const actions = {
 			FROM tokens t JOIN exams e ON t.exam_id = e.id
 			JOIN exam_types et ON e.exam_type_id = et.id
 			WHERE t.token_code = ? AND t.is_released = 1 AND t.exam_id = ? AND et.is_active = 1
-		`).bind(tokenCode, examId).first();
+		`).bind(tokenCode, parsedExamId).first();
       if (!token) return fail(400, { error: "Token tidak valid untuk ujian ini atau belum dirilis." });
       if (!token.is_active) return fail(400, { error: "Ujian tidak aktif." });
       if (token.released_at) {
