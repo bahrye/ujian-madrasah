@@ -189,7 +189,7 @@
 	function handleFullscreenChange() {
 		isFullscreen = !!document.fullscreenElement;
 		if (!isFullscreen && !isExamBlurred && !showWarningModal && !showDisqualifiedModal && !submitting) {
-			handleCheatWarning('Keluar dari Layar Penuh', 15000); // 15 detik toleransi
+			handleCheatWarning('Keluar dari Layar Penuh', 60000); // 60 detik toleransi
 		} else if (isFullscreen) {
 			handleReturnToExam();
 		}
@@ -197,22 +197,14 @@
 
 	function handleVisibilityChange() {
 		if (document.visibilityState === 'hidden') {
-			handleCheatWarning('Keluar dari aplikasi ujian (Berpindah Tab/Layar)', 15000); // 15 detik
-		} else if (document.visibilityState === 'visible') {
-			handleReturnToExam();
+			triggerViolation('Keluar dari aplikasi ujian (Berpindah Tab/Layar)');
 		}
 	}
 
 	function handleBlur() {
 		if (document.visibilityState !== 'hidden') {
 			// Muncul aplikasi melayang / ditariknya notifikasi bar
-			handleCheatWarning('Membuka aplikasi melayang / Notifikasi', 180000); // 3 menit
-		}
-	}
-	
-	function handleFocus() {
-		if (document.visibilityState === 'visible') {
-			handleReturnToExam();
+			handleCheatWarning('Membuka aplikasi melayang / Notifikasi', 60000); // 60 detik
 		}
 	}
 
@@ -319,7 +311,6 @@
 	on:cut|preventDefault 
 	on:paste|preventDefault 
 	on:blur={handleBlur}
-	on:focus={handleFocus}
 />
 <svelte:document 
 	on:visibilitychange={handleVisibilityChange}
@@ -366,6 +357,11 @@
 				</div>
 			</div>
 			<div class="flex items-center gap-2 sm:gap-3">
+				<button class="btn-ghost p-1.5 sm:p-2 text-slate-500 hover:text-indigo-600 rounded-lg" on:click={() => window.location.reload()} title="Muat Ulang Halaman">
+					<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+					</svg>
+				</button>
 				{#if warnings > 0}
 					<div class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 bg-red-50 text-red-600 rounded-full border border-red-200 animate-in fade-in slide-in-from-right-4">
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
