@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { ICONS, ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS } from '$lib/utils/constants';
 	import { onMount, onDestroy } from 'svelte';
+	import ScoreDisplay from '$lib/components/exam/ScoreDisplay.svelte';
 
 	export let data;
 	$: activeExams = (data.activeExams as any[]).filter(exam => {
@@ -284,23 +285,7 @@
 										{/if}
 									</td>
 									<td class="font-bold">
-										{#if a.status !== 'selesai'}
-											<span class="text-slate-400 font-normal">-</span>
-										{:else if (a.show_score_type || 'after_submit') === 'manual' && a.is_score_released !== 1}
-											<span class="text-slate-400 text-xs font-normal font-sans bg-slate-100 px-2 py-1 rounded whitespace-nowrap">Belum dirilis</span>
-										{:else if (a.show_score_type || 'after_submit') === 'after_end_time' && a.exam_end_time && currentTime < parseDate(a.exam_end_time)}
-											<span class="text-slate-400 text-xs font-normal font-sans bg-slate-100 px-2 py-1 rounded whitespace-nowrap">Menunggu jadwal berakhir</span>
-										{:else}
-											{#if (a.show_score_type || 'after_submit') === 'objective_only'}
-												<span class={(a.objective_score ?? 0) >= 70 ? 'text-emerald-600' : 'text-rose-600'} title="Nilai Objektif (Tanpa Isian & Essay)">
-													{a.objective_score != null ? a.objective_score.toFixed(1) : '-'}
-												</span>
-											{:else}
-												<span class={(a.score ?? 0) >= 70 ? 'text-emerald-600' : 'text-rose-600'}>
-													{a.score != null ? a.score.toFixed(1) : '-'}
-												</span>
-											{/if}
-										{/if}
+										<ScoreDisplay attempt={a} {currentTime} />
 									</td>
 									<td class="text-xs text-slate-500">{new Date(String(a.created_at).replace(' ', 'T') + (String(a.created_at).includes(' ') && !String(a.created_at).includes('Z') ? 'Z' : '')).toLocaleDateString('id-ID')}</td>
 								</tr>

@@ -67,6 +67,13 @@
     "file": "_app/immutable/assets/QuestionRenderer.CwYmYea-.css",
     "src": "_QuestionRenderer.svelte_svelte_type_style_lang.js"
   },
+  "_ScoreDisplay.js": {
+    "file": "chunks/ScoreDisplay.js",
+    "name": "ScoreDisplay",
+    "imports": [
+      "_index.js"
+    ]
+  },
   "_StatCard.js": {
     "file": "chunks/StatCard.js",
     "name": "StatCard",
@@ -497,7 +504,7 @@
       "_stores.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.DNRQjTfC.css"
+      "_app/immutable/assets/_layout.CWQBATCv.css"
     ],
     "assets": [
       "_app/immutable/assets/KaTeX_AMS-Regular.BQhdFMY1.woff2",
@@ -1710,6 +1717,28 @@
     "imports": [
       "_index.js",
       "_constants.js",
+      "_index-server.js",
+      "_ScoreDisplay.js"
+    ]
+  },
+  "src/routes/siswa/hasil-ujian/+page.server.ts": {
+    "file": "entries/pages/siswa/hasil-ujian/_page.server.ts.js",
+    "name": "entries/pages/siswa/hasil-ujian/_page.server.ts",
+    "src": "src/routes/siswa/hasil-ujian/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/siswa/hasil-ujian/+page.svelte": {
+    "file": "entries/pages/siswa/hasil-ujian/_page.svelte.js",
+    "name": "entries/pages/siswa/hasil-ujian/_page.svelte",
+    "src": "src/routes/siswa/hasil-ujian/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_constants.js",
+      "_ScoreDisplay.js",
       "_index-server.js"
     ]
   },

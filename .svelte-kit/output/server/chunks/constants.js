@@ -87,6 +87,7 @@ const SIDEBAR_MENUS = {
     { label: "Dashboard", href: "/siswa", icon: "dashboard" },
     { label: "Tata Tertib Ujian", href: "/siswa/tata-tertib", icon: "rules" },
     { label: "Jadwal Ujian", href: "/siswa/jadwal", icon: "calendar" },
+    { label: "Hasil Ujian", href: "/siswa/hasil-ujian", icon: "results" },
     { label: "Papan Peringkat", href: "/siswa/papan-peringkat", icon: "results" }
   ]
 };
