@@ -389,6 +389,7 @@
 		{#if currentQuestion}
 			<QuestionRenderer
 				question={currentQuestion}
+				displayNumber={currentIndex + 1}
 				answer={localAnswers[currentQuestion.id] || ''}
 				isDoubted={localDoubts[currentQuestion.id] || false}
 				on:answer={handleAnswer}

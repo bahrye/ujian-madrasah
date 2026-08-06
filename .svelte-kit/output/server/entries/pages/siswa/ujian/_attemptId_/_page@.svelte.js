@@ -99,6 +99,7 @@ function _page_($$renderer, $$props) {
       $$renderer2.push("<!--[0-->");
       QuestionRenderer($$renderer2, {
         question: currentQuestion,
+        displayNumber: currentIndex + 1,
         answer: localAnswers[currentQuestion.id] || "",
         isDoubted: localDoubts[currentQuestion.id] || false
       });

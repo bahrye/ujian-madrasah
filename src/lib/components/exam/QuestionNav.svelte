@@ -56,9 +56,9 @@
 			<button
 				class="w-full aspect-square rounded-lg text-xs font-bold transition-all duration-200 {getButtonClass(q, index)}"
 				on:click={() => goTo(index)}
-				title="Soal {q.question_number}"
+				title="Soal {index + 1}"
 			>
-				{q.question_number}
+				{index + 1}
 			</button>
 		{/each}
 	</div>

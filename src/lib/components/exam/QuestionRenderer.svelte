@@ -18,6 +18,7 @@
 	};
 	export let answer: string = '';
 	export let isDoubted: boolean = false;
+	export let displayNumber: number | undefined = undefined;
 
 	const dispatch = createEventDispatcher();
 
@@ -83,12 +84,12 @@
 	}
 </script>
 
-<div class="space-y-5 animate-in" on:click={handleContentClick} on:keydown={(e) => e.key === 'Enter' && handleContentClick(e as any)} role="presentation" use:mathRender use:arabicRender>
+<div class="space-y-5 animate-in" on:click={handleContentClick} on:keydown={(e) => e.key === 'Enter' && handleContentClick(e as any)} role="presentation" use:mathRender={question.id} use:arabicRender={question.id}>
 	<!-- Header -->
 	<div class="flex items-center justify-between flex-wrap gap-2">
 		<div class="flex items-center gap-3">
 			<span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold text-sm shadow-md shadow-indigo-500/20">
-				{question.question_number}
+				{displayNumber !== undefined ? displayNumber : question.question_number}
 			</span>
 			<div>
 				<span class="badge-primary text-[10px]">{QUESTION_TYPE_LABELS[question.type] || question.type}</span>

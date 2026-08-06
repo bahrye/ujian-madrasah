@@ -61,6 +61,7 @@ function QuestionRenderer($$renderer, $$props) {
     let question = $$props["question"];
     let answer = fallback($$props["answer"], "");
     let isDoubted = fallback($$props["isDoubted"], false);
+    let displayNumber = fallback($$props["displayNumber"], void 0);
     let matchingAnswers = {};
     const optionLetters = ["A", "B", "C", "D", "E", "F", "G", "H"];
     function getDirectUrl(url) {
@@ -97,7 +98,7 @@ function QuestionRenderer($$renderer, $$props) {
     directMediaUrl = getDirectUrl(question.media_url);
     $$renderer2.push(`<div class="space-y-5 animate-in" role="presentation"><div class="flex items-center justify-between flex-wrap gap-2"><div class="flex items-center gap-3"><span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold text-sm shadow-md shadow-indigo-500/20">${escape_html(
       // Image Lightbox
-      question.question_number
+      displayNumber !== void 0 ? displayNumber : question.question_number
     )}</span> <div><span class="badge-primary text-[10px]">${escape_html(QUESTION_TYPE_LABELS[question.type] || question.type)}</span> <span class="text-xs text-slate-400 ml-2">${escape_html(question.points)} poin</span></div></div> <button${attr_class(`btn-sm ${isDoubted ? "bg-amber-100 text-amber-700 border-2 border-amber-400" : "btn-ghost border border-slate-200"}`)}><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg> ${escape_html(isDoubted ? "Diragu-ragukan" : "Ragu-ragu")}</button></div> `);
     if (question.media_type === "image" && directMediaUrl) {
       $$renderer2.push("<!--[0-->");
@@ -180,7 +181,7 @@ function QuestionRenderer($$renderer, $$props) {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]-->`);
-    bind_props($$props, { question, answer, isDoubted });
+    bind_props($$props, { question, answer, isDoubted, displayNumber });
   });
 }
 export {
