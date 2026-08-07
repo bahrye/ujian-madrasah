@@ -66,22 +66,7 @@ function _page($$renderer, $$props) {
       const numbers = names.map((n) => proctorMap.get(n)).sort((a, b) => (a || 0) - (b || 0));
       return numbers.join(" & ");
     }
-    const rowColors = [
-      "bg-[#fde68a]",
-      // kuning
-      "bg-[#bfdbfe]",
-      // biru muda
-      "bg-[#fed7aa]",
-      // oranye muda
-      "bg-[#e2e8f0]",
-      // abu-abu muda
-      "bg-[#d9f99d]",
-      // hijau lime
-      "bg-[#fbcfe8]",
-      // pink muda
-      "bg-[#c7d2fe]"
-      // indigo muda
-    ];
+    const rowColors = ["bg-white", "bg-slate-50"];
     activeExams = data.activeExams.filter((exam) => {
       const now = /* @__PURE__ */ new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -171,7 +156,7 @@ function _page($$renderer, $$props) {
     $$renderer2.push(`<!--]--></div> `);
     if (data.schedules && data.schedules.length > 0) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="mt-8 mb-4"><h2 class="text-lg font-bold text-slate-800 mb-3">Jadwal Ujian</h2> <div class="card overflow-x-auto bg-white !rounded-none !shadow-none border-2 border-black p-0"><table class="w-full text-sm border-collapse border-black whitespace-nowrap"><thead><tr class="bg-[#d9f99d]"><th class="border-2 border-black px-3 py-2 uppercase">NO</th><th class="border-2 border-black px-3 py-2 uppercase">HARI, TANGGAL</th><th class="border-2 border-black px-3 py-2 uppercase">JAM KE</th><th class="border-2 border-black px-3 py-2 uppercase">WAKTU</th><th class="border-2 border-black px-3 py-2 uppercase">MATA PELAJARAN</th><th class="border-2 border-black px-3 py-2 uppercase">PENGAWAS</th><th class="border-2 border-black px-3 py-2">Daftar Pengawas</th></tr></thead><tbody><!--[-->`);
+      $$renderer2.push(`<div class="mt-8 mb-4"><h2 class="text-lg font-bold text-slate-800 mb-3">Jadwal Ujian</h2> <div class="card overflow-x-auto bg-white !rounded-none !shadow-none border-2 border-slate-300 p-0"><table class="w-full text-sm border-collapse border-slate-300 whitespace-nowrap"><thead><tr class="bg-slate-100 text-slate-700"><th class="border-2 border-slate-300 px-3 py-2 uppercase">NO</th><th class="border-2 border-slate-300 px-3 py-2 uppercase">HARI, TANGGAL</th><th class="border-2 border-slate-300 px-3 py-2 uppercase">JAM KE</th><th class="border-2 border-slate-300 px-3 py-2 uppercase">WAKTU</th><th class="border-2 border-slate-300 px-3 py-2 uppercase">MATA PELAJARAN</th><th class="border-2 border-slate-300 px-3 py-2 uppercase">PENGAWAS</th><th class="border-2 border-slate-300 px-3 py-2">Daftar Pengawas</th></tr></thead><tbody><!--[-->`);
       const each_array_1 = ensure_array_like(groupedSchedules);
       for (let gIdx = 0, $$length = each_array_1.length; gIdx < $$length; gIdx++) {
         let group = each_array_1[gIdx];
@@ -182,14 +167,14 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<tr${attr_class(rowColors[group.colorIdx % rowColors.length])}>`);
           if (eIdx === 0) {
             $$renderer2.push("<!--[0-->");
-            $$renderer2.push(`<td class="border-2 border-black px-3 py-2 text-center"${attr("rowspan", group.exams.length)}>${escape_html(gIdx + 1)}</td> <td class="border-2 border-black px-3 py-2 text-center"${attr("rowspan", group.exams.length)}>${escape_html(group.dateStr)}</td>`);
+            $$renderer2.push(`<td class="border-2 border-slate-300 px-3 py-2 text-center"${attr("rowspan", group.exams.length)}>${escape_html(gIdx + 1)}</td> <td class="border-2 border-slate-300 px-3 py-2 text-center"${attr("rowspan", group.exams.length)}>${escape_html(group.dateStr)}</td>`);
           } else {
             $$renderer2.push("<!--[-1-->");
           }
-          $$renderer2.push(`<!--]--><td class="border-2 border-black px-3 py-2 text-center">${escape_html(eIdx + 1)}</td><td class="border-2 border-black px-3 py-2 text-center tracking-wider">${escape_html(formatOnlyTime(exam.start_time || ""))} - ${escape_html(formatOnlyTime(exam.end_time || ""))}</td><td class="border-2 border-black px-3 py-2 text-center">${escape_html(exam.subject_name || exam.title || "")}</td><td class="border-2 border-black px-3 py-2 text-center font-medium">${escape_html(getProctorNumbers(exam.proctor_names || ""))}</td>`);
+          $$renderer2.push(`<!--]--><td class="border-2 border-slate-300 px-3 py-2 text-center">${escape_html(eIdx + 1)}</td><td class="border-2 border-slate-300 px-3 py-2 text-center tracking-wider">${escape_html(formatOnlyTime(exam.start_time || ""))} - ${escape_html(formatOnlyTime(exam.end_time || ""))}</td><td class="border-2 border-slate-300 px-3 py-2 text-center">${escape_html(exam.subject_name || exam.title || "")}</td><td class="border-2 border-slate-300 px-3 py-2 text-center font-medium">${escape_html(getProctorNumbers(exam.proctor_names || ""))}</td>`);
           if (gIdx === 0 && eIdx === 0) {
             $$renderer2.push("<!--[0-->");
-            $$renderer2.push(`<td class="border-2 border-black px-4 py-2 align-top bg-white"${attr("rowspan", totalExamsCount)}><div class="space-y-0.5"><!--[-->`);
+            $$renderer2.push(`<td class="border-2 border-slate-300 px-4 py-2 align-top bg-white"${attr("rowspan", totalExamsCount)}><div class="space-y-0.5"><!--[-->`);
             const each_array_3 = ensure_array_like(Array.from(proctorMap.entries()));
             for (let $$index_1 = 0, $$length3 = each_array_3.length; $$index_1 < $$length3; $$index_1++) {
               let [name, num] = each_array_3[$$index_1];

@@ -185,13 +185,8 @@
 	}
 
 	const rowColors = [
-		'bg-[#fde68a]', // kuning
-		'bg-[#bfdbfe]', // biru muda
-		'bg-[#fed7aa]', // oranye muda
-		'bg-[#e2e8f0]', // abu-abu muda
-		'bg-[#d9f99d]', // hijau lime
-		'bg-[#fbcfe8]', // pink muda
-		'bg-[#c7d2fe]', // indigo muda
+		'bg-white',
+		'bg-slate-50'
 	];
 </script>
 
@@ -307,17 +302,17 @@
 	{#if data.schedules && data.schedules.length > 0}
 	<div class="mt-8 mb-4">
 		<h2 class="text-lg font-bold text-slate-800 mb-3">Jadwal Ujian</h2>
-		<div class="card overflow-x-auto bg-white !rounded-none !shadow-none border-2 border-black p-0">
-			<table class="w-full text-sm border-collapse border-black whitespace-nowrap">
+		<div class="card overflow-x-auto bg-white !rounded-none !shadow-none border-2 border-slate-300 p-0">
+			<table class="w-full text-sm border-collapse border-slate-300 whitespace-nowrap">
 				<thead>
-					<tr class="bg-[#d9f99d]">
-						<th class="border-2 border-black px-3 py-2 uppercase">NO</th>
-						<th class="border-2 border-black px-3 py-2 uppercase">HARI, TANGGAL</th>
-						<th class="border-2 border-black px-3 py-2 uppercase">JAM KE</th>
-						<th class="border-2 border-black px-3 py-2 uppercase">WAKTU</th>
-						<th class="border-2 border-black px-3 py-2 uppercase">MATA PELAJARAN</th>
-						<th class="border-2 border-black px-3 py-2 uppercase">PENGAWAS</th>
-						<th class="border-2 border-black px-3 py-2">Daftar Pengawas</th>
+					<tr class="bg-slate-100 text-slate-700">
+						<th class="border-2 border-slate-300 px-3 py-2 uppercase">NO</th>
+						<th class="border-2 border-slate-300 px-3 py-2 uppercase">HARI, TANGGAL</th>
+						<th class="border-2 border-slate-300 px-3 py-2 uppercase">JAM KE</th>
+						<th class="border-2 border-slate-300 px-3 py-2 uppercase">WAKTU</th>
+						<th class="border-2 border-slate-300 px-3 py-2 uppercase">MATA PELAJARAN</th>
+						<th class="border-2 border-slate-300 px-3 py-2 uppercase">PENGAWAS</th>
+						<th class="border-2 border-slate-300 px-3 py-2">Daftar Pengawas</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -325,19 +320,19 @@
 						{#each group.exams as exam, eIdx}
 							<tr class="{rowColors[group.colorIdx % rowColors.length]}">
 								{#if eIdx === 0}
-									<td class="border-2 border-black px-3 py-2 text-center" rowspan={group.exams.length}>{gIdx + 1}</td>
-									<td class="border-2 border-black px-3 py-2 text-center" rowspan={group.exams.length}>{group.dateStr}</td>
+									<td class="border-2 border-slate-300 px-3 py-2 text-center" rowspan={group.exams.length}>{gIdx + 1}</td>
+									<td class="border-2 border-slate-300 px-3 py-2 text-center" rowspan={group.exams.length}>{group.dateStr}</td>
 								{/if}
-								<td class="border-2 border-black px-3 py-2 text-center">{eIdx + 1}</td>
-								<td class="border-2 border-black px-3 py-2 text-center tracking-wider">
+								<td class="border-2 border-slate-300 px-3 py-2 text-center">{eIdx + 1}</td>
+								<td class="border-2 border-slate-300 px-3 py-2 text-center tracking-wider">
 									{formatOnlyTime(exam.start_time || '')} - {formatOnlyTime(exam.end_time || '')}
 								</td>
-								<td class="border-2 border-black px-3 py-2 text-center">{exam.subject_name || exam.title || ''}</td>
-								<td class="border-2 border-black px-3 py-2 text-center font-medium">
+								<td class="border-2 border-slate-300 px-3 py-2 text-center">{exam.subject_name || exam.title || ''}</td>
+								<td class="border-2 border-slate-300 px-3 py-2 text-center font-medium">
 									{getProctorNumbers(exam.proctor_names || '')}
 								</td>
 								{#if gIdx === 0 && eIdx === 0}
-									<td class="border-2 border-black px-4 py-2 align-top bg-white" rowspan={totalExamsCount}>
+									<td class="border-2 border-slate-300 px-4 py-2 align-top bg-white" rowspan={totalExamsCount}>
 										<div class="space-y-0.5">
 											{#each Array.from(proctorMap.entries()) as [name, num]}
 												<div class="text-xs">
