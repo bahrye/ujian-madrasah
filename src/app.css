@@ -16,8 +16,17 @@
 	}
 
 	body {
-		@apply bg-slate-50 text-slate-800 antialiased;
+		@apply bg-slate-50 text-slate-900 antialiased;
 		font-family: 'Inter', system-ui, -apple-system, sans-serif;
+	}
+
+	/* Table styles for rendered questions */
+	.prose table {
+		@apply border-collapse w-full my-4;
+	}
+	.prose th,
+	.prose td {
+		@apply border border-slate-300 p-2;
 	}
 
 	/* Custom scrollbar */

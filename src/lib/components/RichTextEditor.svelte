@@ -123,4 +123,14 @@
 		pointer-events: none;
 		display: block; /* For Firefox */
 	}
+	div[contenteditable] :global(table) {
+		border-collapse: collapse;
+		width: 100%;
+		margin: 1rem 0;
+	}
+	div[contenteditable] :global(th),
+	div[contenteditable] :global(td) {
+		border: 1px solid #cbd5e1;
+		padding: 0.5rem;
+	}
 </style>
