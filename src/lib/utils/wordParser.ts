@@ -25,62 +25,87 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 	const doc = parser.parseFromString(html, 'text/html');
 	
 	// Pre-process lists (ol, ul) from Mammoth to extract auto-numbering
-	// because Mammoth converts auto-numbered paragraphs into HTML lists without the numbers
-	const lists = Array.from(doc.querySelectorAll('ol, ul'));
+	// We must process in document order to correctly guess if a list is for questions or options
+	const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_ELEMENT, {
+		acceptNode: (node) => node.tagName === 'LI' ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
+	});
 	
-	// Process deepest lists first
-	lists.reverse().forEach(list => {
-		let isTopLevel = true;
-		let parent = list.parentElement;
-		while(parent && parent.tagName !== 'BODY') {
-			if (parent.tagName === 'OL' || parent.tagName === 'UL' || parent.tagName === 'LI') {
-				isTopLevel = false;
+	const allLIs: Element[] = [];
+	let currentNode = walker.nextNode();
+	while(currentNode) {
+		allLIs.push(currentNode as Element);
+		currentNode = walker.nextNode();
+	}
+
+	let expectedListType: 'question' | 'options' = 'question';
+	let qCount = 0;
+	let oCount = 0;
+	
+	allLIs.forEach((li) => {
+		const liText = li.textContent?.trim() || '';
+		
+		// Deteksi KUNCI
+		if (liText.toUpperCase().startsWith('KUNCI:')) {
+			expectedListType = 'question';
+			oCount = 0;
+			// Jangan diubah textnya
+			return;
+		}
+
+		// Jika kita mencari pertanyaan (misal setelah KUNCI atau di awal dokumen)
+		// Tapi perhatikan: jika LI ini adalah anak dari LI lain (nested), itu PASTI opsi!
+		let isNested = false;
+		let parent = li.parentElement;
+		while (parent && parent.tagName !== 'BODY') {
+			if (parent.tagName === 'LI') {
+				isNested = true;
 				break;
 			}
 			parent = parent.parentElement;
 		}
 
-		const listItems = Array.from(list.children).filter(el => el.tagName === 'LI');
+		if (isNested) {
+			expectedListType = 'options';
+		}
+
+		let prefix = '';
+		if (expectedListType === 'question') {
+			qCount++;
+			prefix = `${qCount}. `;
+			expectedListType = 'options'; // Setelah pertanyaan, list berikutnya (atau item berikutnya di level sama tapi beda list) kemungkinan opsi
+			oCount = 0;
+		} else {
+			oCount++;
+			prefix = `${String.fromCharCode(64 + oCount)}. `;
+		}
+
+		const textWalker = doc.createTreeWalker(li, NodeFilter.SHOW_TEXT);
+		let firstText = textWalker.nextNode();
 		
-		let htmlToInject = '';
-		let validItemCount = 0;
-		listItems.forEach((li) => {
-			let prefix = '';
-			const liText = li.textContent?.trim() || '';
-			
-			// Jika text ternyata KUNCI yang tidak sengaja masuk format list di MS Word
-			if (liText.toUpperCase().startsWith('KUNCI:')) {
-				prefix = '';
-			} else {
-				if (isTopLevel) {
-					prefix = `${validItemCount + 1}. `; // Questions: 1., 2., 3.
-				} else {
-					prefix = `${String.fromCharCode(65 + validItemCount)}. `; // Options: A., B., C.
-				}
-				validItemCount++;
+		if (firstText && firstText.nodeValue && firstText.nodeValue.trim().length > 0) {
+			firstText.nodeValue = prefix + firstText.nodeValue;
+		} else {
+			li.insertAdjacentText('afterbegin', prefix);
+		}
+	});
+
+	// Setelah semua LI diberi prefix teks, kita ubah OL/UL menjadi DIV agar strukturnya rata
+	// Kita memproses dari bawah ke atas agar reference tidak hilang saat parent diubah
+	const lists = Array.from(doc.querySelectorAll('ol, ul'));
+	lists.reverse().forEach(list => {
+		const div = doc.createElement('div');
+		while (list.firstChild) {
+			div.appendChild(list.firstChild);
+		}
+		// Replace children LI with P
+		Array.from(div.children).forEach(child => {
+			if (child.tagName === 'LI') {
+				const p = doc.createElement('p');
+				while (child.firstChild) p.appendChild(child.firstChild);
+				child.replaceWith(p);
 			}
-			
-			const p = doc.createElement('p');
-			
-			const walker = document.createTreeWalker(li, NodeFilter.SHOW_TEXT);
-			let firstText = walker.nextNode();
-			
-			if (prefix !== '') {
-				if (firstText && firstText.nodeValue && firstText.nodeValue.trim().length > 0) {
-					firstText.nodeValue = prefix + firstText.nodeValue;
-				} else {
-					li.insertAdjacentText('afterbegin', prefix);
-				}
-			}
-			
-			while(li.firstChild) {
-				p.appendChild(li.firstChild);
-			}
-			
-			htmlToInject += p.outerHTML;
 		});
-		
-		list.outerHTML = htmlToInject;
+		list.replaceWith(div);
 	});
 	
 	const questions: ParsedQuestion[] = [];
