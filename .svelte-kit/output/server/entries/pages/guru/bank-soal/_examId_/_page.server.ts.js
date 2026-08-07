@@ -243,14 +243,38 @@ const actions = {
     let nextNum = (last?.max_num ?? 0) + 1;
     const statements = [];
     const stmt = db.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points, options_json, correct_answer_json) VALUES (?, ?, ?, ?, ?, ?, ?)`);
+    const cloudinaryRegex = /https:\/\/res\.cloudinary\.com\/[^"'\s>]+/g;
+    const mediaUrlsToInsert = /* @__PURE__ */ new Set();
     for (const q of parsedQuestions) {
       statements.push(
         stmt.bind(parsedExamId, q.type, q.question_text, nextNum, q.points || 1, q.options_json || null, q.correct_answer_json || null)
       );
       nextNum++;
+      if (q.question_text) {
+        const matches = q.question_text.match(cloudinaryRegex);
+        if (matches) matches.forEach((m) => mediaUrlsToInsert.add(m));
+      }
+      if (q.options_json) {
+        const matches = q.options_json.match(cloudinaryRegex);
+        if (matches) matches.forEach((m) => mediaUrlsToInsert.add(m));
+      }
     }
     try {
       await db.batch(statements);
+      if (mediaUrlsToInsert.size > 0) {
+        const mediaStmt = db.prepare(`
+					INSERT INTO uploaded_media (url, name, media_type, uploaded_by, school_id)
+					VALUES (?, ?, ?, ?, ?)
+				`);
+        const mediaBatch = Array.from(mediaUrlsToInsert).map(
+          (url) => mediaStmt.bind(url, "Gambar Import Word", "image", locals.user.id, locals.user.school_id)
+        );
+        try {
+          await db.batch(mediaBatch);
+        } catch (e) {
+          console.warn("Sebagian gambar mungkin sudah ada di media bank:", e);
+        }
+      }
     } catch (e) {
       console.error("Import Excel Error:", e);
       return fail(500, { error: "Gagal menyimpan soal ke database: " + (e.message || String(e)) });
