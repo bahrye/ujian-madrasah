@@ -86,7 +86,7 @@
 
 				const url = await uploadPastedImage(file);
 				if (url) {
-					const imgHtml = `<img src="${url}" class="max-h-64 object-contain rounded-lg border border-slate-200 mt-2 mb-2">`;
+					const imgHtml = `<img src="${url}" class="max-h-64 object-contain rounded-lg border border-slate-200 mt-2 mb-2">&nbsp;`;
 					if (targetComponent) {
 						targetComponent.insertHtml(imgHtml);
 					}
@@ -107,7 +107,7 @@
 					
 					const url = await uploadPastedImage(file);
 					if (url) {
-						const imgHtml = `<img src="${url}" class="max-h-64 object-contain rounded-lg border border-slate-200 mt-2 mb-2">`;
+						const imgHtml = `<img src="${url}" class="max-h-64 object-contain rounded-lg border border-slate-200 mt-2 mb-2">&nbsp;`;
 						if (targetComponent) {
 							targetComponent.insertHtml(imgHtml);
 						}
@@ -140,8 +140,8 @@
 		if (!activeMediaTarget) return;
 
 		const htmlToInsert = mediaType === 'image' 
-			? `<img src="${url}" class="max-h-64 object-contain rounded-lg border border-slate-200 mt-2 mb-2">`
-			: `<audio controls src="${url}" class="w-full mt-2 mb-2"></audio>`;
+			? `<img src="${url}" class="max-h-64 object-contain rounded-lg border border-slate-200 mt-2 mb-2">&nbsp;`
+			: `<audio controls src="${url}" class="w-full mt-2 mb-2"></audio>&nbsp;`;
 
 		if (activeMediaTarget.type === 'editor' && activeMediaTarget.target) {
 			activeMediaTarget.target.insertHtml(htmlToInsert);
