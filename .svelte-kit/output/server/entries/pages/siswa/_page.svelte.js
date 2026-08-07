@@ -82,7 +82,11 @@ function _page($$renderer, $$props) {
       }
       return true;
     });
-    myAttempts = data.myAttempts;
+    myAttempts = data.myAttempts.filter((a) => {
+      const attemptDate = parseDate(a.created_at);
+      const today = /* @__PURE__ */ new Date();
+      return attemptDate.getDate() === today.getDate() && attemptDate.getMonth() === today.getMonth() && attemptDate.getFullYear() === today.getFullYear();
+    });
     activeAttempt = data.activeAttempt;
     groupedByType = (() => {
       const typeGroups = [];
@@ -232,7 +236,7 @@ function _page($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--> <div><h2 class="text-lg font-bold text-slate-800 mb-3">Riwayat Ujian</h2> `);
+    $$renderer2.push(`<!--]--> <div><h2 class="text-lg font-bold text-slate-800 mb-3">Riwayat Ujian Hari Ini</h2> `);
     if (myAttempts.length === 0) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div class="card p-6 text-center text-slate-400 text-sm">Belum ada riwayat ujian.</div>`);
