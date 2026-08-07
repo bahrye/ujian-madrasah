@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { parseDate } from '$lib/utils/date';
+
 	import { QUESTION_TYPE_LABELS, ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS, ICONS } from '$lib/utils/constants';
 	import { mathRender } from '$lib/actions/mathRender';
 	import { arabicRender } from '$lib/actions/arabicRender';
@@ -58,7 +60,7 @@
 			</div>
 			<div>
 				<p class="text-slate-500 mb-1">Waktu Selesai</p>
-				<p class="font-medium text-slate-800">{attempt.submit_time ? new Date(String(attempt.submit_time).replace(' ', 'T') + (String(attempt.submit_time).includes(' ') && !String(attempt.submit_time).includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : '-'}</p>
+				<p class="font-medium text-slate-800">{attempt.submit_time ? parseDate(attempt.submit_time).toLocaleString('id-ID') : '-'}</p>
 			</div>
 			<div>
 				<p class="text-slate-500 mb-1">Pelanggaran</p>

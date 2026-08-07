@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { parseDate } from '$lib/utils/date';
+
 	import type { PageData } from './$types';
 	import { ICONS, ATTEMPT_STATUS_COLORS, ATTEMPT_STATUS_LABELS } from '$lib/utils/constants';
 	import ScoreDisplay from '$lib/components/exam/ScoreDisplay.svelte';
@@ -42,8 +44,8 @@
 		const submitStr = attempt.submit_time || attempt.updated_at;
 		if (!attempt.end_time || !submitStr) return '-';
 
-		const submit = new Date(String(submitStr).replace(' ', 'T') + (String(submitStr).includes(' ') && !String(submitStr).includes('Z') ? 'Z' : ''));
-		const targetEnd = new Date(String(attempt.end_time).replace(' ', 'T') + (String(attempt.end_time).includes(' ') && !String(attempt.end_time).includes('Z') ? 'Z' : ''));
+		const submit = parseDate(submitStr);
+		const targetEnd = parseDate(attempt.end_time);
 		
 		let remainingMs = targetEnd.getTime() - submit.getTime();
 		if (remainingMs < 0) remainingMs = 0;
@@ -115,7 +117,7 @@
 								<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
 								</svg>
-								{new Date(String(attempt.submit_time || attempt.updated_at).replace(' ', 'T') + (String(attempt.submit_time || attempt.updated_at).includes(' ') && !String(attempt.submit_time || attempt.updated_at).includes('Z') ? 'Z' : '')).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+								{parseDate(attempt.submit_time || attempt.updated_at).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
 							</div>
 							<div class="flex items-center gap-1.5">
 								<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">

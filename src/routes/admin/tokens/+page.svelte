@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { parseDate } from '$lib/utils/date';
+
 	import { enhance } from '$app/forms';
 	import { ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
@@ -49,7 +51,7 @@
 	function getReleaseStatus(token: any, current: number) {
 		if (token.is_released === 1) {
 			if (!token.released_at) return { active: true, label: 'Dirilis' };
-			const releasedAt = new Date(token.released_at + 'Z').getTime();
+			const releasedAt = parseDate(token.released_at).getTime();
 			const remaining = (releasedAt + 15 * 60 * 1000) - current;
 			if (remaining > 0) {
 				const m = Math.floor(remaining / 60000);
@@ -90,8 +92,8 @@
 						<select id="t-exam" name="exam_id" required class="select" bind:value={selectedExamId}>
 							<option value="">Pilih ujian</option>
 							{#each data.exams as exam}
-								{@const start = exam.start_time ? new Date(String(exam.start_time)).getTime() : 0}
-								{@const end = exam.end_time ? new Date(String(exam.end_time)).getTime() : Infinity}
+								{@const start = exam.start_time ? parseDate(exam.start_time).getTime() : 0}
+								{@const end = exam.end_time ? parseDate(exam.end_time).getTime() : Infinity}
 								{@const isPastEnd = currentTime > end}
 								{@const isAllowed = (!exam.start_time || currentTime >= start - 15 * 60 * 1000) && !isPastEnd}
 								<option value={exam.id} disabled={!isAllowed}>
@@ -140,7 +142,7 @@
 						</div>
 						<p class="text-sm text-slate-600">{token.exam_title}</p>
 						<p class="text-xs text-slate-400 mt-1">
-							Berlaku hingga: {new Date(String(token.expires_at).replace(' ', 'T') + (String(token.expires_at).includes(' ') && !String(token.expires_at).includes('Z') ? 'Z' : '')).toLocaleString('id-ID')}
+							Berlaku hingga: {parseDate(token.expires_at).toLocaleString('id-ID')}
 						</p>
 					</div>
 					<div class="flex items-center gap-2 flex-shrink-0">
@@ -215,7 +217,7 @@
 								</div>
 								<div class="text-right flex-shrink-0">
 									<p class="text-xs font-medium text-slate-700">Waktu Akses</p>
-									<p class="text-[10px] text-slate-500">{new Date(student.start_time.replace(' ', 'T') + (student.start_time.includes(' ') && !student.start_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+									<p class="text-[10px] text-slate-500">{parseDate(student.start_time).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
 								</div>
 							</div>
 						{/each}

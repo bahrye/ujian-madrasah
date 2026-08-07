@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { parseDate } from '$lib/utils/date';
+
 	import { enhance } from '$app/forms';
 	import { ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS, ICONS } from '$lib/utils/constants';
 	import ConfirmForm from '$lib/components/ConfirmForm.svelte';
@@ -93,7 +95,7 @@
 									</span>
 								</td>
 								<td><span class={ATTEMPT_STATUS_COLORS[r.status] || 'badge-info'}>{ATTEMPT_STATUS_LABELS[r.status]}</span></td>
-								<td class="text-xs text-slate-500">{r.submit_time ? new Date(String(r.submit_time).replace(' ', 'T') + (String(r.submit_time).includes(' ') && !String(r.submit_time).includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : '-'}</td>
+								<td class="text-xs text-slate-500">{r.submit_time ? parseDate(r.submit_time).toLocaleString('id-ID') : '-'}</td>
 								<td class="text-center">
 									<div class="flex items-center justify-center gap-2">
 										<a href="/admin/results/{r.id}" class="p-1.5 text-indigo-500 hover:bg-indigo-50 rounded transition-colors" title="Lihat Detail Ujian">

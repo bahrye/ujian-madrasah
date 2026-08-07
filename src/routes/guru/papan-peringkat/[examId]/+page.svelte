@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { parseDate } from '$lib/utils/date';
+
 	import type { PageData } from './$types';
 	export let data: PageData;
 
@@ -54,7 +56,7 @@
 					</thead>
 					<tbody class="divide-y divide-slate-100">
 						{#each data.leaderboard as student, index}
-							{@const timeSpent = new Date(student.submit_time).getTime() - new Date(student.start_time).getTime()}
+							{@const timeSpent = new Date(student.submit_time).getTime() - parseDate(student.start_time).getTime()}
 							<tr class="hover:bg-slate-50 transition-colors">
 								<!-- Rank -->
 								<td class="p-4 text-center align-middle">

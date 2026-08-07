@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { parseDate } from '$lib/utils/date';
+
 	import { enhance } from '$app/forms';
 	import ConfirmForm from '$lib/components/ConfirmForm.svelte';
 	import type { PageData, ActionData } from './$types';
@@ -91,7 +93,7 @@
 								<div class="text-sm text-slate-500">@{admin.username}</div>
 							</td>
 							<td class="p-4 font-medium text-indigo-600">{admin.school_name || 'Tidak diketahui'}</td>
-							<td class="p-4 text-sm">{new Date(String(admin.created_at).replace(' ', 'T') + (String(admin.created_at).includes(' ') && !String(admin.created_at).includes('Z') ? 'Z' : '')).toLocaleDateString('id-ID')}</td>
+							<td class="p-4 text-sm">{parseDate(admin.created_at).toLocaleDateString('id-ID')}</td>
 							<td class="p-4">
 								{#if admin.is_active}
 									<span class="badge badge-success">Aktif</span>

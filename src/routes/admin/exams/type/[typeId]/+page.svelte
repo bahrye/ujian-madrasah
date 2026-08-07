@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { parseDate } from '$lib/utils/date';
+
 	import { enhance } from '$app/forms';
 	import { ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
@@ -131,9 +133,9 @@
 					{#if exam.start_time || exam.end_time}
 						<div class="flex flex-col gap-0.5 min-w-0 flex-1">
 							<span class="text-slate-400 text-[10px] font-medium">Mulai:</span>
-							<span class="truncate text-xs">{exam.start_time ? new Date(exam.start_time.replace(' ', 'T') + (exam.start_time.includes(' ') && !exam.start_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'}</span>
+							<span class="truncate text-xs">{exam.start_time ? parseDate(exam.start_time).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'}</span>
 							<span class="text-slate-400 text-[10px] font-medium mt-0.5">Berakhir:</span>
-							<span class="truncate text-xs">{exam.end_time ? new Date(exam.end_time.replace(' ', 'T') + (exam.end_time.includes(' ') && !exam.end_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'}</span>
+							<span class="truncate text-xs">{exam.end_time ? parseDate(exam.end_time).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'}</span>
 							{#if isOutOfBounds}
 								<span class="mt-0.5 px-1.5 py-0.5 rounded bg-rose-100 text-[9px] text-rose-600 font-bold tracking-wide w-fit">NONAKTIF</span>
 							{/if}
@@ -230,8 +232,8 @@
 					</div>
 					<div class="col-span-2 text-xs text-slate-500 mt-1">
 						Pastikan waktu berada di dalam rentang: <br/> 
-						{data.examType.start_time ? new Date(data.examType.start_time.replace(' ', 'T') + (data.examType.start_time.includes(' ') && !data.examType.start_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : '-'} s.d. 
-						{data.examType.end_time ? new Date(data.examType.end_time.replace(' ', 'T') + (data.examType.end_time.includes(' ') && !data.examType.end_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : '-'}
+						{data.examType.start_time ? parseDate(data.examType.start_time).toLocaleString('id-ID') : '-'} s.d. 
+						{data.examType.end_time ? parseDate(data.examType.end_time).toLocaleString('id-ID') : '-'}
 					</div>
 				</div>
 				<div>

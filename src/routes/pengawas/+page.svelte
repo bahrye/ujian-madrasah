@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { parseDate } from '$lib/utils/date';
+
 	import { onMount, onDestroy } from 'svelte';
 	import StatCard from '$lib/components/dashboard/StatCard.svelte';
 	import { ICONS } from '$lib/utils/constants';
@@ -27,7 +29,7 @@
 	function formatScheduleDate(dateString: string | null) {
 		if (!dateString) return 'Belum ditentukan';
 		
-		const date = new Date(dateString);
+		const date = parseDate(dateString);
 		const today = new Date();
 		const tomorrow = new Date(today);
 		tomorrow.setDate(tomorrow.getDate() + 1);
@@ -58,12 +60,12 @@
 
 	function formatTimeRange(startStr: string | null, endStr: string | null) {
 		if (!startStr) return '--:--';
-		const start = new Date(startStr);
+		const start = parseDate(startStr);
 		const startFormatted = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(start);
 		
 		if (!endStr) return `${startFormatted} - Selesai`;
 		
-		const end = new Date(endStr);
+		const end = parseDate(endStr);
 		const endFormatted = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(end);
 
 		if (

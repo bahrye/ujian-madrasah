@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { parseDate } from '$lib/utils/date';
+
 	import { enhance } from '$app/forms';
 	import { ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS, ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
@@ -154,8 +156,8 @@
 										<span class="text-slate-400 font-medium opacity-80">-</span>
 									{:else if a.status === 'mengerjakan'}
 										{@const endStr = a.end_time.replace(' ', 'T') + (a.end_time.includes(' ') && !a.end_time.includes('Z') ? 'Z' : '')}
-										{@const end = new Date(endStr).getTime()}
-										{@const compareTime = a.is_paused && a.paused_at ? new Date(a.paused_at.replace(' ', 'T') + (a.paused_at.includes(' ') && !a.paused_at.includes('Z') ? 'Z' : '')).getTime() : currentTime}
+										{@const end = parseDate(endStr).getTime()}
+										{@const compareTime = a.is_paused && a.paused_at ? parseDate(a.paused_at).getTime() : currentTime}
 										{@const remainingMs = end - compareTime}
 										{#if remainingMs > 0}
 											{@const totalM = Math.floor(remainingMs / 60000)}
@@ -170,8 +172,8 @@
 									{:else}
 										{@const endStr = a.end_time.replace(' ', 'T') + (a.end_time.includes(' ') && !a.end_time.includes('Z') ? 'Z' : '')}
 										{@const submitStr = a.submit_time ? (a.submit_time.replace(' ', 'T') + (a.submit_time.includes(' ') && !a.submit_time.includes('Z') ? 'Z' : '')) : endStr}
-										{@const end = new Date(endStr).getTime()}
-										{@const submit = new Date(submitStr).getTime()}
+										{@const end = parseDate(endStr).getTime()}
+										{@const submit = parseDate(submitStr).getTime()}
 										{@const remainingMs = end - submit}
 										{#if remainingMs > 0}
 											{@const totalM = Math.floor(remainingMs / 60000)}
@@ -278,7 +280,7 @@
 					{#each selectedLogs as log}
 						<li class="flex flex-col border-b border-slate-100 pb-2 last:border-0">
 							<span class="font-medium text-rose-600 text-sm">{log.type}</span>
-							<span class="text-xs text-slate-400">{new Date(log.time).toLocaleString('id-ID')}</span>
+							<span class="text-xs text-slate-400">{parseDate(log.time).toLocaleString('id-ID')}</span>
 						</li>
 					{/each}
 				</ul>

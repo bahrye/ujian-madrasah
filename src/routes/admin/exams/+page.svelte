@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { parseDate } from '$lib/utils/date';
+
 	import { enhance } from '$app/forms';
 	import { ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
@@ -95,9 +97,9 @@
 						</svg>
 						<div class="flex flex-col gap-0.5 min-w-0">
 							<span class="text-slate-400 font-medium">Mulai:</span>
-							<span class="truncate font-medium">{type.start_time ? new Date(type.start_time.replace(' ', 'T') + (type.start_time.includes(' ') && !type.start_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : 'Belum diatur'}</span>
+							<span class="truncate font-medium">{type.start_time ? parseDate(type.start_time).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : 'Belum diatur'}</span>
 							<span class="text-slate-400 font-medium mt-1">Berakhir:</span>
-							<span class="truncate font-medium">{type.end_time ? new Date(type.end_time.replace(' ', 'T') + (type.end_time.includes(' ') && !type.end_time.includes('Z') ? 'Z' : '')).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : 'Belum diatur'}</span>
+							<span class="truncate font-medium">{type.end_time ? parseDate(type.end_time).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : 'Belum diatur'}</span>
 						</div>
 					</div>
 					<div class="flex items-center gap-3 mt-1">

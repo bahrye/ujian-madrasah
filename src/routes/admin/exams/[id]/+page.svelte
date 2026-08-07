@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { parseDate } from '$lib/utils/date';
+
 	import { enhance } from '$app/forms';
 	import ConfirmForm from '$lib/components/ConfirmForm.svelte';
 	import { QUESTION_TYPE_LABELS, ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS, ICONS } from '$lib/utils/constants';
@@ -91,11 +93,11 @@
 		<div class="mt-4 flex flex-wrap gap-4 text-xs text-slate-500">
 			<span class="flex items-center gap-1">
 				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} /></svg>
-				Mulai: <strong class="text-slate-600 font-medium">{exam.start_time ? new Date(String(exam.start_time).replace(' ', 'T') + (String(exam.start_time).includes(' ') && !String(exam.start_time).includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : '-'}</strong>
+				Mulai: <strong class="text-slate-600 font-medium">{exam.start_time ? parseDate(exam.start_time).toLocaleString('id-ID') : '-'}</strong>
 			</span>
 			<span class="flex items-center gap-1">
 				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} /></svg>
-				Selesai: <strong class="text-slate-600 font-medium">{exam.end_time ? new Date(String(exam.end_time).replace(' ', 'T') + (String(exam.end_time).includes(' ') && !String(exam.end_time).includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : '-'}</strong>
+				Selesai: <strong class="text-slate-600 font-medium">{exam.end_time ? parseDate(exam.end_time).toLocaleString('id-ID') : '-'}</strong>
 			</span>
 			<span class="flex items-center gap-1">
 				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" /></svg>
@@ -321,7 +323,7 @@
 								<td class="font-medium">{a.student_name}</td>
 								<td><span class={ATTEMPT_STATUS_COLORS[a.status] || 'badge-info'}>{ATTEMPT_STATUS_LABELS[a.status] || a.status}</span></td>
 								<td class="font-semibold">{a.score != null ? a.score : '-'}</td>
-								<td class="text-xs text-slate-500">{new Date(String(a.start_time).replace(' ', 'T') + (String(a.start_time).includes(' ') && !String(a.start_time).includes('Z') ? 'Z' : '')).toLocaleString('id-ID')}</td>
+								<td class="text-xs text-slate-500">{parseDate(a.start_time).toLocaleString('id-ID')}</td>
 							</tr>
 						{/each}
 					</tbody>

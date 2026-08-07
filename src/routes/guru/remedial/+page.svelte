@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { parseDate } from '$lib/utils/date';
+
 	import { enhance } from '$app/forms';
 	import { ICONS } from '$lib/utils/constants';
 	import ConfirmForm from '$lib/components/ConfirmForm.svelte';
@@ -81,8 +83,8 @@
 								</form>
 							</td>
 							<td class="text-xs text-slate-600 space-y-1">
-								<div>Mulai: {exam.start_time ? new Date(String(exam.start_time).replace(' ', 'T') + (String(exam.start_time).includes(' ') && !String(exam.start_time).includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : '-'}</div>
-								<div>Akhir: {exam.end_time ? new Date(String(exam.end_time).replace(' ', 'T') + (String(exam.end_time).includes(' ') && !String(exam.end_time).includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : '-'}</div>
+								<div>Mulai: {exam.start_time ? parseDate(exam.start_time).toLocaleString('id-ID') : '-'}</div>
+								<div>Akhir: {exam.end_time ? parseDate(exam.end_time).toLocaleString('id-ID') : '-'}</div>
 							</td>
 							<td>
 								<div class="flex items-center gap-3">

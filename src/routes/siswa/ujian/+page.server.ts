@@ -1,3 +1,4 @@
+import { parseDate } from '$lib/utils/date';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
@@ -77,13 +78,13 @@ export const actions: Actions = {
 
 		if (!token.is_active) return fail(400, { error: 'Ujian tidak aktif.' });
 		if (token.released_at) {
-			const releasedAt = new Date(token.released_at + 'Z').getTime();
+			const releasedAt = parseDate(token.released_at).getTime();
 			const now = new Date().getTime();
 			if (now - releasedAt > 15 * 60 * 1000) return fail(400, { error: 'Token sudah ditarik otomatis (melewati batas 15 menit).' });
 		} else {
 			return fail(400, { error: 'Status rilis token tidak valid.' });
 		}
-		if (new Date(token.expires_at) < new Date()) return fail(400, { error: 'Token sudah kedaluwarsa.' });
+		if (parseDate(token.expires_at) < new Date()) return fail(400, { error: 'Token sudah kedaluwarsa.' });
 
 		return { success: true, tokenCode, examId: parsedExamId };
 		} catch (e: any) {
@@ -127,13 +128,13 @@ export const actions: Actions = {
 
 		if (!token.is_active) return fail(400, { error: 'Ujian tidak aktif.' });
 		if (token.released_at) {
-			const releasedAt = new Date(token.released_at + 'Z').getTime();
+			const releasedAt = parseDate(token.released_at).getTime();
 			const now = new Date().getTime();
 			if (now - releasedAt > 15 * 60 * 1000) return fail(400, { error: 'Token sudah ditarik otomatis.' });
 		} else {
 			return fail(400, { error: 'Status rilis token tidak valid.' });
 		}
-		if (new Date(token.expires_at) < new Date()) return fail(400, { error: 'Token sudah kedaluwarsa.' });
+		if (parseDate(token.expires_at) < new Date()) return fail(400, { error: 'Token sudah kedaluwarsa.' });
 
 		const endTime = new Date(Date.now() + token.duration_minutes * 60 * 1000).toISOString();
 

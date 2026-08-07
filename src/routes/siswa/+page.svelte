@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { ICONS, ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS } from '$lib/utils/constants';
+	import { parseDate } from '$lib/utils/date';
 	import { onMount, onDestroy } from 'svelte';
 	import ScoreDisplay from '$lib/components/exam/ScoreDisplay.svelte';
 
@@ -60,14 +61,6 @@
 	onDestroy(() => {
 		if (intervalId) clearInterval(intervalId);
 	});
-
-	function parseDate(dateStr: string | null) {
-		if (!dateStr) return new Date();
-		if (dateStr.includes(' ')) {
-			return new Date(dateStr.replace(' ', 'T') + (dateStr.includes(' ') && !dateStr.includes('Z') ? 'Z' : ''));
-		}
-		return new Date(dateStr);
-	}
 
 	function formatTimeRange(startStr: string | null, endStr: string | null) {
 		if (!startStr) return '--:--';

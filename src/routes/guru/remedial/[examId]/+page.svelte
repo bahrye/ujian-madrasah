@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { parseDate } from '$lib/utils/date';
+
 	import { enhance } from '$app/forms';
 	import { ICONS, ATTEMPT_STATUS_COLORS, ATTEMPT_STATUS_LABELS } from '$lib/utils/constants';
 	import ConfirmForm from '$lib/components/ConfirmForm.svelte';
@@ -129,11 +131,11 @@
 			<div class="space-y-3 text-sm">
 				<div class="flex justify-between py-2 border-b border-slate-50">
 					<span class="text-slate-500">Mulai</span>
-					<span class="font-medium text-slate-700">{exam.start_time ? new Date(String(exam.start_time).replace(' ', 'T') + (String(exam.start_time).includes(' ') && !String(exam.start_time).includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : '-'}</span>
+					<span class="font-medium text-slate-700">{exam.start_time ? parseDate(exam.start_time).toLocaleString('id-ID') : '-'}</span>
 				</div>
 				<div class="flex justify-between py-2 border-b border-slate-50">
 					<span class="text-slate-500">Selesai</span>
-					<span class="font-medium text-slate-700">{exam.end_time ? new Date(String(exam.end_time).replace(' ', 'T') + (String(exam.end_time).includes(' ') && !String(exam.end_time).includes('Z') ? 'Z' : '')).toLocaleString('id-ID') : '-'}</span>
+					<span class="font-medium text-slate-700">{exam.end_time ? parseDate(exam.end_time).toLocaleString('id-ID') : '-'}</span>
 				</div>
 				<div class="flex justify-between py-2 border-b border-slate-50">
 					<span class="text-slate-500">Soal Diacak</span>
@@ -189,7 +191,7 @@
 										<div class="text-xs text-slate-500">{attempt.class_name || '-'}</div>
 									</td>
 									<td class="text-xs font-mono text-slate-600">
-										{new Date(String(attempt.start_time).replace(' ', 'T') + (String(attempt.start_time).includes(' ') && !String(attempt.start_time).includes('Z') ? 'Z' : '')).toLocaleTimeString('id-ID')}
+										{parseDate(attempt.start_time).toLocaleTimeString('id-ID')}
 									</td>
 									<td>
 										<span class="badge {ATTEMPT_STATUS_COLORS[attempt.status] || 'badge-slate'}">
@@ -230,7 +232,7 @@
 									<td class="text-xs">
 										{#if attempt.status === 'mengerjakan'}
 											{@const startStr = attempt.start_time.replace(' ', 'T') + (attempt.start_time.includes(' ') && !attempt.start_time.includes('Z') ? 'Z' : '')}
-											{@const start = new Date(startStr).getTime()}
+											{@const start = parseDate(startStr).getTime()}
 											{@const end = start + (exam.duration_minutes * 60 * 1000)}
 											{@const remainingMs = end - currentTime}
 											{#if remainingMs > 0}
@@ -246,8 +248,8 @@
 										{:else}
 											{@const startStr = attempt.start_time.replace(' ', 'T') + (attempt.start_time.includes(' ') && !attempt.start_time.includes('Z') ? 'Z' : '')}
 											{@const submitStr = attempt.submit_time ? (attempt.submit_time.replace(' ', 'T') + (attempt.submit_time.includes(' ') && !attempt.submit_time.includes('Z') ? 'Z' : '')) : startStr}
-											{@const start = new Date(startStr).getTime()}
-											{@const submit = new Date(submitStr).getTime()}
+											{@const start = parseDate(startStr).getTime()}
+											{@const submit = parseDate(submitStr).getTime()}
 											{@const end = start + (exam.duration_minutes * 60 * 1000)}
 											{@const remainingMs = end - submit}
 											{#if remainingMs > 0}
@@ -428,7 +430,7 @@
 					{#each selectedLogs as log}
 						<li class="flex flex-col border-b border-slate-100 pb-2 last:border-0">
 							<span class="font-medium text-rose-600 text-sm">{log.type}</span>
-							<span class="text-xs text-slate-400">{new Date(log.time).toLocaleString('id-ID')}</span>
+							<span class="text-xs text-slate-400">{parseDate(log.time).toLocaleString('id-ID')}</span>
 						</li>
 					{/each}
 				</ul>

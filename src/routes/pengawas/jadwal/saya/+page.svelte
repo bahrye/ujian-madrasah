@@ -1,11 +1,13 @@
 <script lang="ts">
+	import { parseDate } from '$lib/utils/date';
+
 	import { ICONS } from '$lib/utils/constants';
 	export let data;
 
 	function formatScheduleDate(dateString: string | null) {
 		if (!dateString) return 'Belum ditentukan';
 		
-		const date = new Date(dateString);
+		const date = parseDate(dateString);
 		const today = new Date();
 		
 		// Reset jam untuk membandingkan murni tanggal
@@ -33,12 +35,12 @@
 
 	function formatTimeRange(startStr: string | null, endStr: string | null) {
 		if (!startStr) return '--:--';
-		const start = new Date(startStr);
+		const start = parseDate(startStr);
 		const startFormatted = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(start);
 		
 		if (!endStr) return `${startFormatted} - Selesai`;
 		
-		const end = new Date(endStr);
+		const end = parseDate(endStr);
 		const endFormatted = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(end);
 
 		if (
@@ -55,10 +57,10 @@
 	function getExamStatus(exam: any) {
 		if (!exam.is_active) return 'inactive';
 		const now = new Date();
-		if (exam.end_time && now > new Date(exam.end_time)) {
+		if (exam.end_time && now > parseDate(exam.end_time)) {
 			return 'ended';
 		}
-		if (exam.start_time && now < new Date(exam.start_time)) {
+		if (exam.start_time && now < parseDate(exam.start_time)) {
 			return 'upcoming';
 		}
 		return 'active';
