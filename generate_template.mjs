@@ -17,15 +17,16 @@ const doc = new Document({
             new Paragraph({
                 text: "- Gunakan penomoran angka (1., 2., 3., dst) untuk teks soal.",
             }),
-            new Paragraph({
-                text: "- Gunakan penomoran huruf (A., B., C., D., E.) untuk opsi jawaban.",
-            }),
-            new Paragraph({
-                text: "- Tulis KUNCI: diikuti huruf jawaban benar di akhir setiap soal.",
-            }),
-            new Paragraph({
-                text: "- Anda bebas menyisipkan gambar atau tabel di dalam soal.",
-            }),
+            new Paragraph({ text: "- Gunakan penomoran huruf (A., B., C., D., E.) untuk opsi jawaban (hanya Pilihan Ganda)." }),
+            new Paragraph({ text: "- Tulis KUNCI: diikuti huruf jawaban benar di akhir setiap soal." }),
+            new Paragraph({ text: "- Anda bebas menyisipkan gambar atau tabel di dalam soal." }),
+            new Paragraph({ text: "" }),
+            new Paragraph({ text: "Cara Menulis Berbagai Tipe Soal:", heading: HeadingLevel.HEADING_3 }),
+            new Paragraph({ text: "- Pilihan Ganda: Tulis opsi A, B, C, D dan satu kunci (KUNCI: A)" }),
+            new Paragraph({ text: "- Pilihan Ganda Kompleks: Tulis opsi dan lebih dari satu kunci (KUNCI: A, C)" }),
+            new Paragraph({ text: "- Benar Salah: Jangan tulis opsi, langsung tulis (KUNCI: Benar atau KUNCI: Salah)" }),
+            new Paragraph({ text: "- Isian Singkat: Jangan tulis opsi, langsung tulis jawaban (KUNCI: Jawaban Anda)" }),
+            new Paragraph({ text: "- Esai: Jangan tulis opsi, langsung tulis (KUNCI: ESSAY)" }),
             new Paragraph({ text: "" }),
             new Paragraph({ text: "=================================================" }),
             new Paragraph({ text: "" }),
@@ -52,11 +53,17 @@ const doc = new Document({
             new Paragraph({ text: "3. Perhatikan gambar hewan di bawah ini!" }),
             new Paragraph({ text: "[ Sisipkan Gambar di sini ]" }),
             new Paragraph({ text: "Apa nama hewan tersebut?" }),
-            new Paragraph({ text: "A. Kucing" }),
-            new Paragraph({ text: "B. Anjing" }),
-            new Paragraph({ text: "C. Gajah" }),
-            new Paragraph({ text: "D. Jerapah" }),
-            new Paragraph({ text: "KUNCI: C" }),
+            new Paragraph({ text: "KUNCI: Gajah" }),
+            new Paragraph({ text: "" }),
+            
+            // Soal 4
+            new Paragraph({ text: "4. Apakah Matahari terbit dari timur?" }),
+            new Paragraph({ text: "KUNCI: Benar" }),
+            new Paragraph({ text: "" }),
+            
+            // Soal 5
+            new Paragraph({ text: "5. Sebutkan dan jelaskan proses terjadinya hujan!" }),
+            new Paragraph({ text: "KUNCI: ESSAY" }),
             new Paragraph({ text: "" }),
         ],
     }],
