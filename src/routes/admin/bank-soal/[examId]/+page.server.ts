@@ -311,5 +311,42 @@ export const actions: Actions = {
 		}
 
 		return { success: `Berhasil mengimpor ${parsedQuestions.length} soal.` };
+	},
+
+	deleteBulk: async ({ request, platform, params, locals }) => {
+		const db = getDB(platform);
+		const examIdStr = params.examId;
+		const parsedExamId = parseInt(examIdStr, 10);
+		if (isNaN(parsedExamId)) return fail(400, { error: 'ID Ujian tidak valid' });
+
+		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(parsedExamId, locals.user!.school_id).first();
+		if (!exam) return fail(403, { error: 'Anda tidak memiliki akses ke ujian ini.' });
+
+		const form = await request.formData();
+		const idsStr = form.get('ids')?.toString();
+		if (!idsStr) return fail(400, { error: 'Tidak ada soal yang dipilih.' });
+
+		try {
+			const ids = JSON.parse(idsStr);
+			if (!Array.isArray(ids) || ids.length === 0) return fail(400, { error: 'Daftar ID tidak valid.' });
+
+			// Delete media from Cloudinary if exists
+			const placeholders = ids.map(() => '?').join(',');
+			const questions = await db.prepare(`SELECT media_url FROM questions WHERE id IN (${placeholders})`).bind(...ids).all<{media_url: string}>();
+			
+			for (const q of questions.results) {
+				if (q.media_url && q.media_url.includes('res.cloudinary.com')) {
+					await deleteFromCloudinary(q.media_url, env);
+				}
+			}
+
+			await db.prepare(`DELETE FROM student_answers WHERE question_id IN (${placeholders})`).bind(...ids).run();
+			await db.prepare(`DELETE FROM questions WHERE id IN (${placeholders})`).bind(...ids).run();
+			
+			return { success: `${ids.length} soal berhasil dihapus.` };
+		} catch (e: any) {
+			console.error('Error delete bulk:', e);
+			return fail(500, { error: 'Gagal menghapus soal secara massal.' });
+		}
 	}
 };

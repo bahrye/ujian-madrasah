@@ -28,6 +28,11 @@
 	let options: string[] = ['', '', '', ''];
 	let createQuestionText = '';
 	
+	let isBulkSelectMode = false;
+	let selectedQuestionIds: Set<number> = new Set();
+	$: totalSelectedAnswers = questions.filter(q => selectedQuestionIds.has(q.id)).reduce((sum, q) => sum + ((q as any).answers_count || 0), 0);
+	$: isAllSelected = questions.length > 0 && selectedQuestionIds.size === questions.length;
+
 	let previewQuestionId: string | null = null;
 	let qEditorComponent: any;
 	let eqEditorComponent: any;
@@ -527,6 +532,12 @@
 				<svg class="w-4 h-4 mr-1 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
 				Import Word
 			</button>
+			{#if questions.length > 0}
+				<button class="btn px-2 sm:px-4 justify-center {isBulkSelectMode ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300'} transition-all shadow-sm" on:click={() => { isBulkSelectMode = !isBulkSelectMode; selectedQuestionIds.clear(); selectedQuestionIds = selectedQuestionIds; }}>
+					<svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+					<span class="text-[13px] sm:text-sm font-semibold">{isBulkSelectMode ? 'Batal Pilih' : 'Pilih Massal'}</span>
+				</button>
+			{/if}
 			<button class="btn px-2 sm:px-4 justify-center bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-all shadow-sm" on:click={() => (showImportModal = true)}>
 				<svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
 				<span class="text-[13px] sm:text-sm font-semibold">Import Excel</span>
@@ -702,9 +713,41 @@
 	{/if}
 
 	<!-- Questions List -->
+	{#if isBulkSelectMode && questions.length > 0}
+		<div class="flex justify-between items-center bg-slate-50 border border-slate-200 p-3 rounded-xl mb-4" transition:slide>
+			<label class="flex items-center gap-2 cursor-pointer select-none">
+				<input type="checkbox" class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" 
+					checked={isAllSelected}
+					on:change={(e) => {
+						if (e.currentTarget.checked) {
+							selectedQuestionIds = new Set(questions.map(q => q.id));
+						} else {
+							selectedQuestionIds.clear();
+							selectedQuestionIds = selectedQuestionIds;
+						}
+					}}
+				/>
+				<span class="font-medium text-slate-700">Pilih Semua ({questions.length} soal)</span>
+			</label>
+			<span class="text-sm text-slate-500">{selectedQuestionIds.size} terpilih</span>
+		</div>
+	{/if}
+
 	<div class="space-y-3" use:mathRender={questions} use:arabicRender={questions}>
 		{#each questions as q, idx (q.id)}
-			<div class="card p-4 flex items-start gap-4 group">
+			<div class="card p-4 flex items-start gap-4 group {selectedQuestionIds.has(q.id) ? 'ring-2 ring-indigo-500 bg-indigo-50/20' : ''}">
+				{#if isBulkSelectMode}
+					<div class="flex flex-col items-center justify-center pt-2" transition:slide={{axis: 'x'}}>
+						<input type="checkbox" class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" 
+							checked={selectedQuestionIds.has(q.id)}
+							on:change={(e) => {
+								if (e.currentTarget.checked) selectedQuestionIds.add(q.id);
+								else selectedQuestionIds.delete(q.id);
+								selectedQuestionIds = selectedQuestionIds;
+							}}
+						/>
+					</div>
+				{/if}
 				<span class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-md shadow-indigo-500/20">
 					{q.question_number}
 				</span>
@@ -806,6 +849,34 @@
 			</div>
 		{/each}
 	</div>
+
+	{#if selectedQuestionIds.size > 0}
+		<div use:portal class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 flex items-center gap-6 z-50 animate-in slide-in-from-bottom-8">
+			<div>
+				<div class="text-slate-800 font-bold">{selectedQuestionIds.size} soal terpilih</div>
+				<div class="text-slate-500 text-sm">Hapus massal soal yang dipilih</div>
+			</div>
+			<ConfirmForm 
+				action="?/deleteBulk"
+				confirmTitle="Hapus Massal Soal"
+				confirmMessage={totalSelectedAnswers > 0 ? `Hapus ${selectedQuestionIds.size} soal terpilih? <br><br><strong>Perhatian:</strong> Ditemukan ${totalSelectedAnswers} jawaban siswa pada soal-soal ini. Menghapus soal akan ikut menghapus seluruh riwayat jawaban siswa tersebut.` : `Yakin ingin menghapus ${selectedQuestionIds.size} soal yang dipilih?`}
+				verifyText={totalSelectedAnswers > 0 ? 'HAPUS MASSAL' : null}
+				verifyPlaceholder="Ketik HAPUS MASSAL"
+				buttonClass="btn px-4 bg-rose-600 text-white hover:bg-rose-700 shadow-sm border-none"
+				buttonTitle="Hapus {selectedQuestionIds.size} soal"
+			>
+				<svelte:fragment slot="inputs">
+					<input type="hidden" name="ids" value={JSON.stringify(Array.from(selectedQuestionIds))} />
+				</svelte:fragment>
+				<svelte:fragment slot="buttonContent">
+					<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
+					</svg>
+					Hapus Terpilih
+				</svelte:fragment>
+			</ConfirmForm>
+		</div>
+	{/if}
 </div>
 
 <!-- Edit Modal -->
