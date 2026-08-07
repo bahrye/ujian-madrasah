@@ -126,7 +126,7 @@ function QuestionRenderer($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--> <div class="text-base text-slate-800 leading-relaxed font-medium">${html(question.question_text)}</div> <div class="space-y-2">`);
+    $$renderer2.push(`<!--]--> <div class="text-base text-slate-800 leading-relaxed font-medium prose prose-sm max-w-none">${html(question.question_text)}</div> <div class="space-y-2">`);
     if (question.type === "pilihan_ganda" || question.type === "pilihan_ganda_kompleks") {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<!--[-->`);

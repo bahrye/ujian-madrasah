@@ -150,7 +150,7 @@
 	{/if}
 
 	<!-- Question Text -->
-	<div class="text-base text-slate-800 leading-relaxed font-medium">
+	<div class="text-base text-slate-800 leading-relaxed font-medium prose prose-sm max-w-none">
 		{@html question.question_text}
 	</div>
 
