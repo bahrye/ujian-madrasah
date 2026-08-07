@@ -127,20 +127,20 @@ export function parseWordHtmlToQuestions(html) {
 		let finalAnswer = q.answer;
 		
 		if (q.options.length > 0) {
-			if (q.answer.includes(',') || q.answer.length > 1) {
+			if (q.answer && (q.answer.includes(',') || q.answer.length > 1)) {
 				// Multiple answers = pilihan_ganda_kompleks
 				type = 'pilihan_ganda_kompleks';
 				finalAnswer = q.answer.split(',').map(a => a.trim().toUpperCase());
 			} else {
 				type = 'pilihan_ganda';
-				finalAnswer = q.answer.toUpperCase();
+				finalAnswer = q.answer ? q.answer.toUpperCase() : null;
 			}
 		} else {
 			// No options
-			if (q.answer.toLowerCase() === 'essay') {
+			if (q.answer && q.answer.toLowerCase() === 'essay') {
 				type = 'essay';
 				finalAnswer = ''; // Essays usually have manual grading
-			} else if (q.answer.toLowerCase() === 'benar' || q.answer.toLowerCase() === 'salah') {
+			} else if (q.answer && (q.answer.toLowerCase() === 'benar' || q.answer.toLowerCase() === 'salah')) {
 				type = 'benar_salah';
 				q.options = [{ id: 'A', html: 'Benar' }, { id: 'B', html: 'Salah' }];
 				finalAnswer = q.answer.toLowerCase() === 'benar' ? 'Benar' : 'Salah';
