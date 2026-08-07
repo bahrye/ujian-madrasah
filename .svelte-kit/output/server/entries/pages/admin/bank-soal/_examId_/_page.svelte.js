@@ -74,7 +74,7 @@ function _page($$renderer, $$props) {
               for (let i = 0, $$length2 = each_array_5.length; i < $$length2; i++) {
                 let opt = each_array_5[i];
                 const isCorrect = q.type === "pilihan_ganda" && correct === String.fromCharCode(65 + i) || q.type === "pilihan_ganda_kompleks" && Array.isArray(correct) && correct.includes(String.fromCharCode(65 + i)) || q.type === "benar_salah" && correct === opt;
-                $$renderer3.push(`<span${attr_class(`text-[10px] px-2 py-0.5 rounded-md ${isCorrect ? "bg-green-100 text-green-700 font-bold border border-green-200" : "bg-slate-100 text-slate-600"}`)}>${escape_html(q.type.startsWith("pilihan_ganda") ? `${String.fromCharCode(65 + i)}. ` : "")}${escape_html(opt)}</span>`);
+                $$renderer3.push(`<span${attr_class(`text-[10px] px-2 py-0.5 rounded-md ${isCorrect ? "bg-green-100 text-green-700 font-bold border border-green-200" : "bg-slate-100 text-slate-600"} flex items-center gap-1`)}>${escape_html(q.type.startsWith("pilihan_ganda") ? `${String.fromCharCode(65 + i)}.` : "")} ${html(opt)}</span>`);
               }
               $$renderer3.push(`<!--]--></div>`);
             } else if (q.type === "menjodohkan" && opts.left) {

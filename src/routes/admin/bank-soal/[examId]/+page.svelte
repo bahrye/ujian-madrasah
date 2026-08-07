@@ -197,6 +197,41 @@
 						}
 					}
 
+					// Terapkan Rich Text dari HTML jika tersedia
+					if (parsedOptions.length >= 2 && htmlData) {
+						const parser = new DOMParser();
+						const doc = parser.parseFromString(htmlData, 'text/html');
+						
+						const htmlOptionsExtracted = [];
+						const candidateElements = Array.from(doc.querySelectorAll('li, p, div'));
+						
+						candidateElements.forEach(el => {
+							if (htmlOptionsExtracted.some(parent => parent.contains(el))) return;
+							
+							const text = el.textContent?.trim() || '';
+							const html = el.innerHTML || '';
+							if (/^[a-eA-E][\.\)]/i.test(text) || />\s*[a-eA-E][\.\)]/i.test(html) || /<!--.*?-->\s*[a-eA-E][\.\)]/i.test(html) || /^\s*(?:<[^>]+>)*\s*[a-eA-E][\.\)]/i.test(html)) {
+								htmlOptionsExtracted.push(el);
+							}
+						});
+						
+						if (htmlOptionsExtracted.length === parsedOptions.length) {
+							for (let j = 0; j < parsedOptions.length; j++) {
+								const el = htmlOptionsExtracted[j];
+								const hasImg = el.querySelector('img');
+								const hasVml = el.querySelector('v\\:imagedata, imagedata');
+								
+								if (!hasImg && !hasVml) {
+									let cleanHtml = el.innerHTML;
+									cleanHtml = cleanHtml.replace(/<span[^>]*style="[^"]*mso-list:Ignore[^"]*"[^>]*>.*?<\/span>/gi, '');
+									cleanHtml = cleanHtml.replace(/<!--\[if !supportLists\]-->.*?<!--\[endif\]-->/gi, '');
+									cleanHtml = cleanHtml.replace(/^\s*(?:<[^>]+>)*\s*[a-eA-E][\.\)]\s*(?:<\/[^>]+>)*\s*(?:&nbsp;|\s)*/i, '');
+									parsedOptions[j] = cleanHtml.trim();
+								}
+							}
+						}
+					}
+
 					let smartPasted = false;
 					if (parsedOptions.length >= 2) {
 						smartPasted = true;
@@ -498,7 +533,9 @@
 						{#each Array(optionCount) as _, i}
 							<div class="flex items-center gap-2">
 								<span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500">{String.fromCharCode(65 + i)}</span>
-								<input id="create_option_{i}" name="option_{i}" type="text" class="input flex-1" placeholder="Opsi {String.fromCharCode(65 + i)}" required bind:value={options[i]} />
+								<div class="flex-1">
+									<RichTextEditor id="create_option_{i}" name="option_{i}" placeholder="Opsi {String.fromCharCode(65 + i)}" bind:value={options[i]} compact={true} />
+								</div>
 								<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 shrink-0" on:click={() => openMediaPickerForOption('create', selectedType, i)} title="Tambahkan Media">
 									🖼️
 								</button>
@@ -604,8 +641,8 @@
 							<div class="flex flex-wrap gap-1.5 mt-2">
 								{#each opts as opt, i}
 									{@const isCorrect = (q.type === 'pilihan_ganda' && correct === String.fromCharCode(65 + i)) || (q.type === 'pilihan_ganda_kompleks' && Array.isArray(correct) && correct.includes(String.fromCharCode(65 + i))) || (q.type === 'benar_salah' && correct === opt)}
-									<span class="text-[10px] px-2 py-0.5 rounded-md {isCorrect ? 'bg-green-100 text-green-700 font-bold border border-green-200' : 'bg-slate-100 text-slate-600'}">
-										{q.type.startsWith('pilihan_ganda') ? `${String.fromCharCode(65 + i)}. ` : ''}{opt}
+									<span class="text-[10px] px-2 py-0.5 rounded-md {isCorrect ? 'bg-green-100 text-green-700 font-bold border border-green-200' : 'bg-slate-100 text-slate-600'} flex items-center gap-1">
+										{q.type.startsWith('pilihan_ganda') ? `${String.fromCharCode(65 + i)}.` : ''} {@html opt}
 									</span>
 								{/each}
 							</div>
@@ -756,7 +793,9 @@
 							{#each Array(editOptionCount) as _, i}
 								<div class="flex items-center gap-2">
 									<span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500">{String.fromCharCode(65 + i)}</span>
-									<input id="edit_option_{i}" name="option_{i}" type="text" class="input flex-1" value={opts[i] || ''} required />
+									<div class="flex-1">
+										<RichTextEditor id="edit_option_{i}" name="option_{i}" placeholder="Opsi {String.fromCharCode(65 + i)}" bind:value={opts[i]} compact={true} />
+									</div>
 									<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 shrink-0" on:click={() => openMediaPickerForOption('edit', editingQuestion.type, i)} title="Tambahkan Media">
 										🖼️
 									</button>

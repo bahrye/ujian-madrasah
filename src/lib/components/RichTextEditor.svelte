@@ -5,6 +5,7 @@
 	export let placeholder = 'Tuliskan teks di sini...';
 	export let id = '';
 	export let name = 'question_text';
+	export let compact = false;
 	
 	let editor: HTMLDivElement;
 	const dispatch = createEventDispatcher();
@@ -79,7 +80,7 @@
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div 
 		bind:this={editor}
-		class="p-4 min-h-[150px] outline-none prose max-w-none text-sm text-slate-800"
+		class="{compact ? 'p-2 min-h-[40px] text-sm' : 'p-4 min-h-[150px] text-sm'} outline-none prose max-w-none text-slate-800"
 		contenteditable="true"
 		on:input={updateValue}
 		on:blur={updateValue}
