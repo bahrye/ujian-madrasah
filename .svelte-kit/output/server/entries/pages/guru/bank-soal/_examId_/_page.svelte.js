@@ -10,7 +10,7 @@ import { C as ConfirmForm } from "../../../../../chunks/ConfirmForm.js";
 import { I as ICONS, Q as QUESTION_TYPE_LABELS } from "../../../../../chunks/constants.js";
 import "katex/dist/contrib/auto-render.mjs";
 /* empty css                                                                   */
-import { I as ImportExcelModal } from "../../../../../chunks/RichTextEditor.svelte_svelte_type_style_lang.js";
+import { I as ImportExcelModal, a as ImportWordModal } from "../../../../../chunks/RichTextEditor.svelte_svelte_type_style_lang.js";
 import { t as toasts } from "../../../../../chunks/toast.js";
 import { h as html } from "../../../../../chunks/html.js";
 function _page($$renderer, $$props) {
@@ -19,6 +19,7 @@ function _page($$renderer, $$props) {
     let data = $$props["data"];
     let form = $$props["form"];
     let showImportModal = false;
+    let showImportWordModal = false;
     public_env.PUBLIC_CLOUDINARY_CLOUD_NAME || "dfhtjgwcz";
     public_env.PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ujian-madrasah";
     if (form?.success) toasts.success(form.success);
@@ -40,6 +41,16 @@ function _page($$renderer, $$props) {
         },
         set show($$value) {
           showImportModal = $$value;
+          $$settled = false;
+        }
+      });
+      $$renderer3.push(`<!----> `);
+      ImportWordModal($$renderer3, {
+        get show() {
+          return showImportWordModal;
+        },
+        set show($$value) {
+          showImportWordModal = $$value;
           $$settled = false;
         }
       });

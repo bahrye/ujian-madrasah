@@ -6,6 +6,7 @@
 	],
 	"exclude": [
 		"/_app/*",
-		"/favicon.svg"
+		"/favicon.svg",
+		"/template_soal_ujian.docx"
 	]
 }

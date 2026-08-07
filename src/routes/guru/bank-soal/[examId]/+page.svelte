@@ -5,6 +5,7 @@
 	import MediaUploader from '$lib/components/admin/MediaUploader.svelte';
 	import QuestionRenderer from '$lib/components/exam/QuestionRenderer.svelte';
 	import ImportExcelModal from '$lib/components/exam/ImportExcelModal.svelte';
+	import ImportWordModal from '$lib/components/exam/ImportWordModal.svelte';
 	import { fade, slide } from 'svelte/transition';
 	import { QUESTION_TYPE_LABELS, ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
@@ -19,6 +20,7 @@
 
 	let showCreateForm = false;
 	let showImportModal = false;
+	let showImportWordModal = false;
 	let selectedType = 'pilihan_ganda';
 	let optionCount = 4;
 	let editOptionCount = 4;
@@ -33,6 +35,17 @@
 	const cloudName = env.PUBLIC_CLOUDINARY_CLOUD_NAME || 'dfhtjgwcz';
 	const uploadPreset = env.PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'ujian-madrasah';
 	let isPastingImage = false;
+
+	async function handleImportExcel(event: any) {
+		const { questions: importedQuestions } = event.detail;
+		const formData = new FormData();
+		formData.append('questions_json', JSON.stringify(importedQuestions));
+		const response = await fetch('?/importExcel', { method: 'POST', body: formData });
+		if (response.ok) {
+			toasts.success('Berhasil mengimpor soal');
+			location.reload();
+		}
+	}
 
 	async function uploadPastedImage(file: File): Promise<string | null> {
 		if (!cloudName || !uploadPreset) {
@@ -524,7 +537,8 @@
 	</div>
 
 	<!-- Import Modal -->
-	<ImportExcelModal bind:show={showImportModal} on:close={() => showImportModal = false} />
+	<ImportExcelModal bind:show={showImportModal} on:import={handleImportExcel} />
+	<ImportWordModal bind:show={showImportWordModal} on:import={handleImportExcel} />
 
 	<!-- Create Form -->
 	{#if showCreateForm}

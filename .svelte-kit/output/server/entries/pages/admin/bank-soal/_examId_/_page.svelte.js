@@ -10,7 +10,7 @@ import { C as ConfirmForm } from "../../../../../chunks/ConfirmForm.js";
 import { I as ICONS, Q as QUESTION_TYPE_LABELS } from "../../../../../chunks/constants.js";
 import "katex/dist/contrib/auto-render.mjs";
 /* empty css                                                                   */
-import { I as ImportExcelModal } from "../../../../../chunks/RichTextEditor.svelte_svelte_type_style_lang.js";
+import { I as ImportExcelModal, a as ImportWordModal } from "../../../../../chunks/RichTextEditor.svelte_svelte_type_style_lang.js";
 import { t as toasts } from "../../../../../chunks/toast.js";
 import { p as page } from "../../../../../chunks/stores.js";
 import { h as html } from "../../../../../chunks/html.js";
@@ -21,6 +21,7 @@ function _page($$renderer, $$props) {
     let data = $$props["data"];
     let form = $$props["form"];
     let showImportModal = false;
+    let showImportWordModal = false;
     public_env.PUBLIC_CLOUDINARY_CLOUD_NAME || "dfhtjgwcz";
     public_env.PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ujian-madrasah";
     if (form?.success) toasts.success(form.success);
@@ -35,13 +36,23 @@ function _page($$renderer, $$props) {
           $$renderer5.push(`<title>Soal - ${escape_html(exam.title)} — Ujian Online Madrasah</title>`);
         });
       });
-      $$renderer3.push(`<div class="space-y-6 animate-in"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div class="flex items-start sm:items-center gap-3"><a${attr("href", store_get($$store_subs ??= {}, "$page", page).url.searchParams.get("from") === "bank" ? "/admin/bank-soal" : `/admin/exams/${exam.id}`)} class="btn-ghost btn-sm mt-1 sm:mt-0"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.chevronLeft)}></path></svg></a> <div><h1 class="text-2xl font-bold text-slate-800 leading-tight">${escape_html(exam.title)}</h1> <p class="text-sm text-slate-500 mt-1">${escape_html(exam.subject || "Umum")} · ${escape_html(questions.length)} soal</p></div></div> <div class="grid grid-cols-2 sm:flex sm:items-center gap-2 pl-12 sm:pl-0"><button class="btn px-2 sm:px-4 justify-center bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-all shadow-sm"><svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> <span class="text-[13px] sm:text-sm font-semibold">Import Excel</span></button> <button class="btn-primary px-2 sm:px-4 justify-center shadow-md shadow-indigo-500/20"><svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> <span class="text-[13px] sm:text-sm font-semibold">Tambah Soal</span></button></div></div> `);
+      $$renderer3.push(`<div class="space-y-6 animate-in"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div class="flex items-start sm:items-center gap-3"><a${attr("href", store_get($$store_subs ??= {}, "$page", page).url.searchParams.get("from") === "bank" ? "/admin/bank-soal" : `/admin/exams/${exam.id}`)} class="btn-ghost btn-sm mt-1 sm:mt-0"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.chevronLeft)}></path></svg></a> <div><h1 class="text-2xl font-bold text-slate-800 leading-tight">${escape_html(exam.title)}</h1> <p class="text-sm text-slate-500 mt-1">${escape_html(exam.subject || "Umum")} · ${escape_html(questions.length)} soal</p></div></div> <div class="grid grid-cols-2 sm:flex sm:items-center gap-2 pl-12 sm:pl-0"><button class="btn bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm"><svg class="w-4 h-4 mr-1 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg> Import Word</button> <button class="btn px-2 sm:px-4 justify-center bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-all shadow-sm"><svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> <span class="text-[13px] sm:text-sm font-semibold">Import Excel</span></button> <button class="btn-primary px-2 sm:px-4 justify-center shadow-md shadow-indigo-500/20"><svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> <span class="text-[13px] sm:text-sm font-semibold">Tambah Soal</span></button></div></div> `);
       ImportExcelModal($$renderer3, {
         get show() {
           return showImportModal;
         },
         set show($$value) {
           showImportModal = $$value;
+          $$settled = false;
+        }
+      });
+      $$renderer3.push(`<!----> `);
+      ImportWordModal($$renderer3, {
+        get show() {
+          return showImportWordModal;
+        },
+        set show($$value) {
+          showImportWordModal = $$value;
           $$settled = false;
         }
       });

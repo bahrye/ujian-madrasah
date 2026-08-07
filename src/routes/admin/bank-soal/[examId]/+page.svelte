@@ -4,6 +4,7 @@
 	import MediaUploader from '$lib/components/admin/MediaUploader.svelte';
 	import QuestionRenderer from '$lib/components/exam/QuestionRenderer.svelte';
 	import ImportExcelModal from '$lib/components/exam/ImportExcelModal.svelte';
+	import ImportWordModal from '$lib/components/exam/ImportWordModal.svelte';
 	import { fade, slide } from 'svelte/transition';
 	import { QUESTION_TYPE_LABELS, ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
@@ -20,6 +21,7 @@
 
 	let showCreateForm = false;
 	let showImportModal = false;
+	let showImportWordModal = false;
 	let selectedType = 'pilihan_ganda';
 	let optionCount = 4;
 	let editOptionCount = 4;
@@ -34,6 +36,17 @@
 	const cloudName = env.PUBLIC_CLOUDINARY_CLOUD_NAME || 'dfhtjgwcz';
 	const uploadPreset = env.PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'ujian-madrasah';
 	let isPastingImage = false;
+
+	async function handleImportExcel(event: any) {
+		const { questions: importedQuestions } = event.detail;
+		const formData = new FormData();
+		formData.append('questions_json', JSON.stringify(importedQuestions));
+		const response = await fetch('?/importExcel', { method: 'POST', body: formData });
+		if (response.ok) {
+			toasts.success('Berhasil mengimpor soal');
+			location.reload();
+		}
+	}
 
 	async function uploadPastedImage(file: File): Promise<string | null> {
 		if (!cloudName || !uploadPreset) {
@@ -510,6 +523,10 @@
 			</div>
 		</div>
 		<div class="grid grid-cols-2 sm:flex sm:items-center gap-2 pl-12 sm:pl-0">
+			<button class="btn bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm" on:click={() => showImportWordModal = true}>
+				<svg class="w-4 h-4 mr-1 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+				Import Word
+			</button>
 			<button class="btn px-2 sm:px-4 justify-center bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-all shadow-sm" on:click={() => (showImportModal = true)}>
 				<svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
 				<span class="text-[13px] sm:text-sm font-semibold">Import Excel</span>
@@ -524,7 +541,8 @@
 	</div>
 
 	<!-- Import Modal -->
-	<ImportExcelModal bind:show={showImportModal} on:close={() => showImportModal = false} />
+	<ImportExcelModal bind:show={showImportModal} on:import={handleImportExcel} on:close={() => showImportModal = false} />
+	<ImportWordModal bind:show={showImportWordModal} on:import={handleImportExcel} on:close={() => showImportWordModal = false} />
 
 	<!-- Create Form -->
 	{#if showCreateForm}
