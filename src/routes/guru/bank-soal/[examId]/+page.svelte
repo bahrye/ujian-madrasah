@@ -848,30 +848,33 @@
 	</div>
 	
 	{#if selectedQuestionIds.size > 0}
-		<div use:portal class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 flex items-center gap-6 z-50 animate-in slide-in-from-bottom-8">
-			<div>
-				<div class="text-slate-800 font-bold">{selectedQuestionIds.size} soal terpilih</div>
-				<div class="text-slate-500 text-sm">Hapus massal soal yang dipilih</div>
+		<div use:portal class="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] sm:w-auto bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 sm:p-4 flex items-center justify-between gap-3 sm:gap-6 z-50 animate-in slide-in-from-bottom-8">
+			<div class="flex-1 min-w-0">
+				<div class="text-slate-800 font-bold text-sm sm:text-base">{selectedQuestionIds.size} soal terpilih</div>
+				<div class="text-slate-500 text-xs sm:text-sm hidden sm:block">Hapus massal soal yang dipilih</div>
 			</div>
-			<ConfirmForm 
-				action="?/deleteBulk"
-				confirmTitle="Hapus Massal Soal"
-				confirmMessage={totalSelectedAnswers > 0 ? `Hapus ${selectedQuestionIds.size} soal terpilih? <br><br><strong>Perhatian:</strong> Ditemukan ${totalSelectedAnswers} jawaban siswa pada soal-soal ini. Menghapus soal akan ikut menghapus seluruh riwayat jawaban siswa tersebut.` : `Yakin ingin menghapus ${selectedQuestionIds.size} soal yang dipilih?`}
-				verifyText={totalSelectedAnswers > 0 ? 'HAPUS MASSAL' : null}
-				verifyPlaceholder="Ketik HAPUS MASSAL"
-				buttonClass="btn px-4 bg-rose-600 text-white hover:bg-rose-700 shadow-sm border-none"
-				buttonTitle="Hapus {selectedQuestionIds.size} soal"
-			>
-				<svelte:fragment slot="inputs">
-					<input type="hidden" name="ids" value={JSON.stringify(Array.from(selectedQuestionIds))} />
-				</svelte:fragment>
-				<svelte:fragment slot="buttonContent">
-					<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
-					</svg>
-					Hapus Terpilih
-				</svelte:fragment>
-			</ConfirmForm>
+			<div class="flex-shrink-0">
+				<ConfirmForm 
+					action="?/deleteBulk"
+					confirmTitle="Hapus Massal Soal"
+					confirmMessage={totalSelectedAnswers > 0 ? `Hapus ${selectedQuestionIds.size} soal terpilih? <br><br><strong>Perhatian:</strong> Ditemukan ${totalSelectedAnswers} jawaban siswa pada soal-soal ini. Menghapus soal akan ikut menghapus seluruh riwayat jawaban siswa tersebut.` : `Yakin ingin menghapus ${selectedQuestionIds.size} soal yang dipilih?`}
+					verifyText={totalSelectedAnswers > 0 ? 'HAPUS MASSAL' : null}
+					verifyPlaceholder="Ketik HAPUS MASSAL"
+					buttonClass="btn px-3 sm:px-4 bg-rose-600 text-white hover:bg-rose-700 shadow-sm border-none whitespace-nowrap flex items-center"
+					buttonTitle="Hapus {selectedQuestionIds.size} soal"
+				>
+					<svelte:fragment slot="inputs">
+						<input type="hidden" name="ids" value={JSON.stringify(Array.from(selectedQuestionIds))} />
+					</svelte:fragment>
+					<svelte:fragment slot="buttonContent">
+						<svg class="w-4 h-4 sm:mr-2 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
+						</svg>
+						<span class="hidden sm:inline">Hapus Terpilih</span>
+						<span class="sm:hidden">Hapus</span>
+					</svelte:fragment>
+				</ConfirmForm>
+			</div>
 		</div>
 	{/if}
 </div>
