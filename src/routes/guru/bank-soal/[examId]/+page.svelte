@@ -98,6 +98,7 @@
 			
 			if (textData && textData.trim().length > 0) {
 				let textToPaste = textData;
+				let smartPasted = false;
 
 				// Fitur Smart Paste: Deteksi opsi A, B, C, D jika paste di Teks Soal
 				const isPilihanGanda = selectedType === 'pilihan_ganda' || selectedType === 'pilihan_ganda_kompleks';
@@ -231,7 +232,6 @@
 						}
 					}
 
-					let smartPasted = false;
 					if (parsedOptions.length >= 2) {
 						smartPasted = true;
 						// Hapus nomor soal (misal "5. ") dari baris pertama pertanyaan
