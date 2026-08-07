@@ -79,21 +79,41 @@
 		const items = e.clipboardData?.items;
 		if (!items) return;
 
+		let hasImage = false;
+		let hasText = false;
+		let imageItem = null;
+
 		for (let i = 0; i < items.length; i++) {
 			if (items[i].type.indexOf('image') !== -1) {
-				const file = items[i].getAsFile();
-				if (!file) continue;
+				hasImage = true;
+				imageItem = items[i];
+			}
+			if (items[i].type === 'text/plain') {
+				hasText = true;
+			}
+		}
 
-				e.preventDefault();
+		if (hasText) {
+			const textData = e.clipboardData?.getData('text/plain');
+			// Jika ada teks yang valid, biarkan browser yang menangani paste (default behavior).
+			// Ini mencegah teks dari MS Word terbuang dan hanya gambar fallback yang terupload.
+			if (textData && textData.trim().length > 0) {
+				return; 
+			}
+		}
 
-				const url = await uploadPastedImage(file);
-				if (url) {
-					const imgHtml = `<img src="${url}" class="max-h-64 object-contain rounded-lg border border-slate-200 mt-2 mb-2">&nbsp;`;
-					if (targetComponent) {
-						targetComponent.insertHtml(imgHtml);
-					}
+		if (hasImage && imageItem) {
+			const file = imageItem.getAsFile();
+			if (!file) return;
+
+			e.preventDefault();
+
+			const url = await uploadPastedImage(file);
+			if (url) {
+				const imgHtml = `<img src="${url}" class="max-h-64 object-contain rounded-lg border border-slate-200 mt-2 mb-2">&nbsp;`;
+				if (targetComponent) {
+					targetComponent.insertHtml(imgHtml);
 				}
-				break; 
 			}
 		}
 	}
