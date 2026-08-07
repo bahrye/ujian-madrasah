@@ -98,24 +98,88 @@
 			const htmlData = e.clipboardData?.getData('text/html');
 			
 			if (textData && textData.trim().length > 0) {
-				// Jika copy dari MS Word mengandung rumus/gambar, HTML-nya akan berisi src="file:///..."
-				// Browser memblokir local file, sehingga gambar/rumus menjadi rusak (broken).
-				// Untungnya MS Word juga menyediakan versi teks murni dari rumusnya di text/plain.
-				// Jadi jika terdeteksi file:///, kita paksa paste sebagai teks murni agar rumus tidak hilang.
-				if (htmlData && htmlData.includes('file:///')) {
+				let textToPaste = textData;
+
+				// Fitur Smart Paste: Deteksi opsi A, B, C, D jika paste di Teks Soal
+				const isPilihanGanda = selectedType === 'pilihan_ganda' || selectedType === 'pilihan_ganda_kompleks';
+				const isMainEditor = targetComponent === qEditorComponent || targetComponent === eqEditorComponent;
+				
+				if (isMainEditor && isPilihanGanda) {
+					const lines = textData.split('\n');
+					let questionLines = [];
+					let parsedOptions = [];
+
+					for (let i = 0; i < lines.length; i++) {
+						const line = lines[i].trim();
+						const optionMatch = line.match(/^([a-eA-E])[\.\)]\s*(.*)/);
+						
+						if (optionMatch) {
+							const letter = optionMatch[1].toLowerCase();
+							const expectedLetter = String.fromCharCode(97 + parsedOptions.length);
+							
+							if (letter === 'a') {
+								parsedOptions = [optionMatch[2]];
+							} else if (letter === expectedLetter) {
+								parsedOptions.push(optionMatch[2]);
+							} else if (parsedOptions.length > 0) {
+								parsedOptions[parsedOptions.length - 1] += (parsedOptions[parsedOptions.length - 1] ? '\n' : '') + line;
+							} else {
+								questionLines.push(lines[i]);
+							}
+						} else {
+							if (parsedOptions.length > 0) {
+								if (line !== '') parsedOptions[parsedOptions.length - 1] += '\n' + line;
+							} else {
+								questionLines.push(lines[i]);
+							}
+						}
+					}
+
+					if (parsedOptions.length >= 2) {
+						// Hapus nomor soal (misal "5. ") dari baris pertama pertanyaan
+						if (questionLines.length > 0) {
+							questionLines[0] = questionLines[0].replace(/^\d+[\.\)]\s+/, '');
+						}
+						
+						textToPaste = questionLines.join('\n').trim();
+						
+						// Masukkan opsi ke input
+						if (targetComponent === qEditorComponent) {
+							for(let i=0; i<parsedOptions.length; i++) {
+								if (i < 5) options[i] = parsedOptions[i].trim();
+							}
+							if (parsedOptions.length > optionCount && parsedOptions.length <= 5) {
+								optionCount = parsedOptions.length;
+							}
+						} else if (targetComponent === eqEditorComponent && editingQuestion) {
+							let currentOpts = [];
+							try { currentOpts = JSON.parse(editingQuestion.options_json || '[]'); } catch(e) {}
+							for(let i=0; i<parsedOptions.length; i++) {
+								if (i < 5) currentOpts[i] = parsedOptions[i].trim();
+							}
+							editingQuestion.options_json = JSON.stringify(currentOpts);
+							editOptionCount = Math.max(currentOpts.length, 2);
+						}
+					}
+				}
+
+				// Jika copy dari MS Word mengandung rumus/gambar (file:///) ATAU kita melakukan Smart Paste
+				// Kita paksa paste sebagai teks murni agar rumus/opsi terformat dengan baik
+				if ((htmlData && htmlData.includes('file:///')) || textToPaste !== textData) {
 					e.preventDefault();
-					const escapedText = textData
+					const escapedText = textToPaste
 						.replace(/&/g, '&amp;')
 						.replace(/</g, '&lt;')
 						.replace(/>/g, '&gt;')
 						.replace(/\n/g, '<br>');
-					if (targetComponent) {
+					if (targetComponent && escapedText) {
 						targetComponent.insertHtml(escapedText);
 					}
+					toasts.success('Smart Paste: Teks dan opsi berhasil diekstrak!');
 					return;
 				}
 
-				// Jika tidak ada gambar lokal (copy web / teks biasa Word), biarkan browser paste HTML-nya.
+				// Jika tidak ada gambar lokal dan bukan smart paste, biarkan browser paste HTML-nya.
 				return; 
 			}
 		}
