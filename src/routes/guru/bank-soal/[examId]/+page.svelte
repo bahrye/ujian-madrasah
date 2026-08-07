@@ -11,6 +11,7 @@
 	import { tick } from 'svelte';
 	import { mathRender } from '$lib/actions/mathRender';
 	import { arabicRender } from '$lib/actions/arabicRender';
+	import { env } from '$env/dynamic/public';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -23,6 +24,110 @@
 	let options: string[] = ['', '', '', ''];
 	
 	let previewQuestionId: string | null = null;
+
+	// Image paste support
+	const cloudName = env.PUBLIC_CLOUDINARY_CLOUD_NAME || 'dfhtjgwcz';
+	const uploadPreset = env.PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'ujian-madrasah';
+	let isPastingImage = false;
+
+	async function uploadPastedImage(file: File): Promise<string | null> {
+		if (!cloudName || !uploadPreset) {
+			toasts.error('Sistem belum dikonfigurasi untuk unggah media.');
+			return null;
+		}
+
+		const formData = new FormData();
+		formData.append('file', file);
+		formData.append('upload_preset', uploadPreset);
+
+		isPastingImage = true;
+		try {
+			const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+				method: 'POST',
+				body: formData
+			});
+
+			if (!response.ok) throw new Error('Gagal mengunggah gambar');
+
+			const data = await response.json();
+			
+			try {
+				await fetch('/api/track-media', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ url: data.secure_url, media_type: 'image' })
+				});
+			} catch (e) {
+				console.error(e);
+			}
+
+			return data.secure_url;
+		} catch (e: any) {
+			toasts.error(e.message || 'Terjadi kesalahan saat mengunggah gambar paste.');
+			return null;
+		} finally {
+			isPastingImage = false;
+		}
+	}
+
+	async function handlePaste(e: ClipboardEvent, targetId: string) {
+		const items = e.clipboardData?.items;
+		if (!items) return;
+
+		for (let i = 0; i < items.length; i++) {
+			if (items[i].type.indexOf('image') !== -1) {
+				const file = items[i].getAsFile();
+				if (!file) continue;
+
+				e.preventDefault();
+
+				const url = await uploadPastedImage(file);
+				if (url) {
+					const imgHtml = `<img src="${url}" class="max-h-64 object-contain rounded-lg border border-slate-200 mt-2 mb-2">`;
+					const inputEl = document.getElementById(targetId) as HTMLTextAreaElement;
+					if (inputEl) {
+						const start = inputEl.selectionStart;
+						const end = inputEl.selectionEnd;
+						const text = inputEl.value;
+						inputEl.value = text.substring(0, start) + imgHtml + text.substring(end);
+						inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+					}
+				}
+				break; 
+			}
+		}
+	}
+
+	async function handlePasteButtonClick(targetId: string) {
+		try {
+			const clipboardItems = await navigator.clipboard.read();
+			for (const clipboardItem of clipboardItems) {
+				const imageTypes = clipboardItem.types.filter(type => type.startsWith('image/'));
+				for (const imageType of imageTypes) {
+					const blob = await clipboardItem.getType(imageType);
+					const file = new File([blob], "pasted-image.png", { type: imageType });
+					
+					const url = await uploadPastedImage(file);
+					if (url) {
+						const imgHtml = `<img src="${url}" class="max-h-64 object-contain rounded-lg border border-slate-200 mt-2 mb-2">`;
+						const inputEl = document.getElementById(targetId) as HTMLTextAreaElement;
+						if (inputEl) {
+							const start = inputEl.selectionStart;
+							const end = inputEl.selectionEnd;
+							const text = inputEl.value;
+							inputEl.value = text.substring(0, start) + imgHtml + text.substring(end);
+							inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+						}
+					}
+					return;
+				}
+			}
+			toasts.error('Tidak ada gambar di clipboard (copy/salin gambar terlebih dahulu).');
+		} catch (err) {
+			console.error(err);
+			toasts.error('Gagal mengakses clipboard. Pastikan browser memberi izin akses.');
+		}
+	}
 
 	// Media picker for options
 	let showOptionMediaPicker = false;
@@ -177,8 +282,19 @@
 				</div>
 
 				<div>
-					<label class="label" for="q-text">Teks Soal</label>
-					<textarea id="q-text" name="question_text" required class="input min-h-[100px]" placeholder="Tuliskan pertanyaan di sini..." rows="3"></textarea>
+					<div class="flex items-center justify-between mb-1">
+						<label class="label mb-0" for="q-text">Teks Soal</label>
+						<button type="button" class="btn-ghost btn-sm text-xs flex items-center gap-1 text-indigo-600 hover:bg-indigo-50" on:click={() => handlePasteButtonClick('q-text')} disabled={isPastingImage}>
+							{#if isPastingImage}
+								<svg class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+								Mengunggah...
+							{:else}
+								<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+								Paste Gambar
+							{/if}
+						</button>
+					</div>
+					<textarea id="q-text" name="question_text" required class="input min-h-[100px]" placeholder="Tuliskan pertanyaan di sini... (Bisa langsung Paste / Ctrl+V gambar ke kotak ini)" rows="3" on:paste={(e) => handlePaste(e, 'q-text')}></textarea>
 				</div>
 
 				<div class="bg-slate-50 border border-slate-100 rounded-xl p-4">
@@ -420,8 +536,19 @@
 					</div>
 
 					<div>
-						<label class="label" for="eq-text">Teks Soal</label>
-						<textarea id="eq-text" name="question_text" required class="input min-h-[100px]" rows="3" value={editingQuestion.question_text}></textarea>
+						<div class="flex items-center justify-between mb-1">
+							<label class="label mb-0" for="eq-text">Teks Soal</label>
+							<button type="button" class="btn-ghost btn-sm text-xs flex items-center gap-1 text-indigo-600 hover:bg-indigo-50" on:click={() => handlePasteButtonClick('eq-text')} disabled={isPastingImage}>
+								{#if isPastingImage}
+									<svg class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+									Mengunggah...
+								{:else}
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+									Paste Gambar
+								{/if}
+							</button>
+						</div>
+						<textarea id="eq-text" name="question_text" required class="input min-h-[100px]" placeholder="Tuliskan soal di sini... (Bisa langsung Paste / Ctrl+V gambar ke kotak ini)" rows="3" bind:value={editingQuestion.question_text} on:paste={(e) => handlePaste(e, 'eq-text')}></textarea>
 					</div>
 
 					<div class="bg-slate-50 border border-slate-100 rounded-xl p-4">

@@ -4,6 +4,7 @@ import "../../../../../chunks/exports.js";
 import "../../../../../chunks/utils2.js";
 import "@sveltejs/kit/internal/server";
 import "../../../../../chunks/root.js";
+import { p as public_env } from "../../../../../chunks/shared-server.js";
 import "../../../../../chunks/state.svelte.js";
 import { C as ConfirmForm } from "../../../../../chunks/ConfirmForm.js";
 import { I as ICONS, Q as QUESTION_TYPE_LABELS } from "../../../../../chunks/constants.js";
@@ -19,6 +20,8 @@ function _page($$renderer, $$props) {
     let data = $$props["data"];
     let form = $$props["form"];
     let showImportModal = false;
+    public_env.PUBLIC_CLOUDINARY_CLOUD_NAME || "dfhtjgwcz";
+    public_env.PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ujian-madrasah";
     if (form?.success) toasts.success(form.success);
     if (form?.error) toasts.error(form.error);
     exam = data.exam;
