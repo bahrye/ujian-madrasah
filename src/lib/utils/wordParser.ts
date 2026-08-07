@@ -130,13 +130,53 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 				
 				if (listItems.length >= 2 && (!answerKey || answerKey.toLowerCase() !== 'essay')) {
 					questionElements = workingElements.slice(0, lastListIdx);
-					listItems.forEach((li, idx) => {
-						const id = String.fromCharCode(65 + idx);
-						options.push({
-							id: id,
-							html: li.innerHTML || ''
+					
+					if (questionElements.length === 0) {
+						// Mammoth collapsed the question and options into a single list
+						const firstLi = listItems[0];
+						const nestedList = firstLi.querySelector('ol, ul');
+						
+						if (nestedList) {
+							// Nested list: Question is outer item, options are inner items
+							const nestedItems = Array.from(nestedList.children).filter(c => c.tagName === 'LI');
+							const qClone = firstLi.cloneNode(true) as Element;
+							const nestedInClone = qClone.querySelector('ol, ul');
+							if (nestedInClone) nestedInClone.remove();
+							
+							questionElements = [qClone];
+							nestedItems.forEach((li, idx) => {
+								options.push({
+									id: String.fromCharCode(65 + idx),
+									html: li.innerHTML || ''
+								});
+							});
+						} else {
+							// Flat list: Question is first item, rest are options
+							// We only do this if it's a reasonable number of options (e.g. max 5 options)
+							// Otherwise it might be a huge list of statements where options were not lists
+							if (listItems.length <= 6) {
+								questionElements = [firstLi];
+								listItems.slice(1).forEach((li, idx) => {
+									options.push({
+										id: String.fromCharCode(65 + idx),
+										html: li.innerHTML || ''
+									});
+								});
+							} else {
+								// Too many items to blindly assume they are all options
+								questionElements = workingElements;
+							}
+						}
+					} else {
+						// Standard fallback
+						listItems.forEach((li, idx) => {
+							const id = String.fromCharCode(65 + idx);
+							options.push({
+								id: id,
+								html: li.innerHTML || ''
+							});
 						});
-					});
+					}
 				} else {
 					questionElements = workingElements;
 				}
