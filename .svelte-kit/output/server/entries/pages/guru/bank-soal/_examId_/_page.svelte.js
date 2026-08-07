@@ -158,7 +158,7 @@ function _page($$renderer, $$props) {
       $$renderer3.push(`<!--]--></div> `);
       if (selectedQuestionIds.size > 0) {
         $$renderer3.push("<!--[0-->");
-        $$renderer3.push(`<div class="fixed bottom-4 sm:bottom-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none"><div class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 sm:p-4 flex items-center justify-between gap-3 sm:gap-6 animate-in slide-in-from-bottom-8 pointer-events-auto w-full sm:w-auto max-w-md sm:max-w-none"><div class="flex-1 min-w-0"><div class="text-slate-800 font-bold text-sm sm:text-base">${escape_html(selectedQuestionIds.size)} soal terpilih</div> <div class="text-slate-500 text-xs sm:text-sm hidden sm:block">Hapus massal soal yang dipilih</div></div> <div class="flex-shrink-0">`);
+        $$renderer3.push(`<div class="fixed bottom-4 sm:bottom-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none"><div class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 sm:p-4 flex items-center justify-between gap-3 sm:gap-6 animate-in slide-in-from-bottom-8 pointer-events-auto w-full sm:w-auto max-w-md sm:max-w-none"><div class="flex-1 min-w-0"><div class="text-slate-800 font-bold text-sm sm:text-base">${escape_html(selectedQuestionIds.size)} soal terpilih</div> <div class="text-slate-500 text-xs sm:text-sm hidden sm:block">Hapus massal soal yang dipilih</div></div> <div class="flex-shrink-0 flex items-center gap-2"><button type="button" class="btn px-3 sm:px-4 bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800 shadow-sm border-none whitespace-nowrap transition-colors">Batal</button> `);
         ConfirmForm($$renderer3, {
           action: "?/deleteBulk",
           confirmTitle: "Hapus Massal Soal",

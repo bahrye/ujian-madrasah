@@ -857,7 +857,10 @@
 					<div class="text-slate-800 font-bold text-sm sm:text-base">{selectedQuestionIds.size} soal terpilih</div>
 					<div class="text-slate-500 text-xs sm:text-sm hidden sm:block">Hapus massal soal yang dipilih</div>
 				</div>
-				<div class="flex-shrink-0">
+				<div class="flex-shrink-0 flex items-center gap-2">
+					<button type="button" class="btn px-3 sm:px-4 bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800 shadow-sm border-none whitespace-nowrap transition-colors" on:click={() => { isBulkSelectMode = false; selectedQuestionIds.clear(); selectedQuestionIds = selectedQuestionIds; }}>
+						Batal
+					</button>
 					<ConfirmForm 
 						action="?/deleteBulk"
 						confirmTitle="Hapus Massal Soal"
