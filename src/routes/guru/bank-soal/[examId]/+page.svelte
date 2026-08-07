@@ -23,6 +23,7 @@
 	let optionCount = 4;
 	let editOptionCount = 4;
 	let options: string[] = ['', '', '', ''];
+	let createQuestionText = '';
 	
 	let previewQuestionId: string | null = null;
 	let qEditorComponent: any;
@@ -258,8 +259,20 @@
 	{#if showCreateForm}
 		<div class="card p-6 border-2 border-indigo-200 animate-in">
 			<h2 class="text-lg font-bold text-slate-800 mb-4">Tambah Soal Baru</h2>
-			<form method="POST" action="?/create" use:enhance={() => { return async ({ update }) => { await update(); }; }} class="space-y-4">
-				<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+			<form method="POST" action="?/create" use:enhance={() => { 
+				return async ({ result, update }) => { 
+					if (result.type === 'success') {
+						createQuestionText = '';
+						options = ['', '', '', '', ''];
+						optionCount = 4;
+						createMenjodohkanCount = 4;
+						await update({ reset: true });
+					} else {
+						await update();
+					}
+				}; 
+			}} class="space-y-4">
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 					<div>
 						<label class="label" for="q-type">Tipe Soal</label>
 						<select id="q-type" name="type" class="select" bind:value={selectedType}>
@@ -280,6 +293,7 @@
 						id="q-text" 
 						name="question_text" 
 						placeholder="Tuliskan pertanyaan di sini... (Bisa langsung Paste / Ctrl+V gambar ke kotak ini)" 
+						bind:value={createQuestionText}
 						bind:this={qEditorComponent}
 						on:paste={(e) => handlePaste(e, qEditorComponent)}
 					>
