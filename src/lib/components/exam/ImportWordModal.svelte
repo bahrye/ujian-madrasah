@@ -184,11 +184,10 @@
 						<li><b>Benar Salah:</b> Opsi tidak perlu ditulis, cukup <code>KUNCI: Benar</code> atau <code>KUNCI: Salah</code></li>
 						<li><b>Isian Singkat:</b> Opsi tidak perlu ditulis, cukup <code>KUNCI: [jawaban Anda]</code></li>
 						<li><b>Esai:</b> Opsi tidak perlu ditulis, cukup <code>KUNCI: ESSAY</code></li>
+						<li><b>Tips Kualitas Gambar:</b> Di Word: <b>File > Options > Advanced > Image Size and Quality</b> centang <b>"Do not compress images in file"</b>.</li>
+						<li><b>Rumus & Teks Arab:</b> Fitur <i>Equation</i> tidak didukung. Untuk rumus, gunakan LaTeX (contoh: <code>$$ x = \frac{1}{2} $$</code>) atau jadikan gambar. Untuk teks Arab, gunakan font Unicode biasa (Arial/Times New Roman), jangan gunakan <i>Equation</i>.</li>
 					</ul>
-
-					<div class="mb-3 p-3 bg-white/50 border border-indigo-200 rounded-lg text-xs text-indigo-800">
-						<strong>Tips Kualitas Gambar:</strong> Jika kualitas gambar terlihat pecah, itu karena MS Word mengompres gambar secara otomatis. Untuk mematikannya di Word: Pilih menu <strong>File &gt; Options &gt; Advanced &gt; Image Size and Quality</strong> lalu centang <strong>"Do not compress images in file"</strong> sebelum menyimpan dokumen.
-					</div>
+				</div>
 					
 					<div class="bg-white p-3 rounded-lg border border-indigo-100 text-sm text-slate-600 font-mono mb-3 max-h-48 overflow-y-auto">
 						1. Siapa penemu lampu?<br>
