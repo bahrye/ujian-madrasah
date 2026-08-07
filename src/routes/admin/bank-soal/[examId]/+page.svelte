@@ -538,10 +538,10 @@
 					<span class="text-[13px] sm:text-sm font-semibold">{isBulkSelectMode ? 'Batal Pilih' : 'Pilih Massal'}</span>
 				</button>
 			{/if}
-			<button class="btn px-2 sm:px-4 justify-center bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-all shadow-sm" on:click={() => (showImportModal = true)}>
+			<!-- <button class="btn px-2 sm:px-4 justify-center bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-all shadow-sm" on:click={() => (showImportModal = true)}>
 				<svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
 				<span class="text-[13px] sm:text-sm font-semibold">Import Excel</span>
-			</button>
+			</button> -->
 			<button class="btn-primary px-2 sm:px-4 justify-center shadow-md shadow-indigo-500/20" on:click={() => (showCreateForm = !showCreateForm)}>
 				<svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
