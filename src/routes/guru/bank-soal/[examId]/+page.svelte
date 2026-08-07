@@ -141,22 +141,32 @@
 						const doc = parser.parseFromString(htmlData, 'text/html');
 						const listElements = Array.from(doc.querySelectorAll('li, p[style*="mso-list:" i], p[class*="MsoListParagraph" i]'));
 						
-						if (listElements.length >= 2 && listElements.length <= 5) {
-							let htmlOpts = listElements.map(el => el.textContent?.trim() || '');
+						// Filter hanya elemen list yang merupakan opsi (awalan a. b. c. d. e.)
+						// Ini mencegah soal bernomor (misal "5. ") ikut diekstrak sebagai opsi
+						const optionElements = listElements.filter(el => {
+							const text = el.textContent?.trim() || '';
+							if (/^[a-eA-E][\.\)]/.test(text)) return true;
+							const html = el.innerHTML || '';
+							if (/>\s*[a-eA-E][\.\)]/.test(html) || /<!--.*?-->\s*[a-eA-E][\.\)]/.test(html) || /^\s*[a-eA-E][\.\)]/.test(html)) return true;
+							return false;
+						});
+						
+						if (optionElements.length >= 2 && optionElements.length <= 5) {
+							let htmlOpts = optionElements.map(el => el.textContent?.trim() || '');
 							const nonEmptylines = lines.map(l => l.trim()).filter(l => l.length > 0);
 							let matched = true;
 							
-							if (nonEmptylines.length >= listElements.length) {
-								for (let j = 0; j < listElements.length; j++) {
-									const optText = htmlOpts[listElements.length - 1 - j].replace(/\s+/g, '');
+							if (nonEmptylines.length >= optionElements.length) {
+								for (let j = 0; j < optionElements.length; j++) {
+									const optText = htmlOpts[optionElements.length - 1 - j].replace(/\s+/g, '');
 									const lineText = nonEmptylines[nonEmptylines.length - 1 - j].replace(/\s+/g, '');
 									
 									let isMatch = false;
 									if (optText === lineText || (optText && lineText.includes(optText)) || (lineText && optText.includes(lineText))) {
 										isMatch = true;
 									} else {
-										const hasImg = listElements[listElements.length - 1 - j].querySelector('img');
-										const hasVml = listElements[listElements.length - 1 - j].querySelector('v\\:imagedata, imagedata');
+										const hasImg = optionElements[optionElements.length - 1 - j].querySelector('img');
+										const hasVml = optionElements[optionElements.length - 1 - j].querySelector('v\\:imagedata, imagedata');
 										if (hasImg || hasVml) isMatch = true;
 									}
 									
@@ -167,11 +177,11 @@
 								}
 								
 								if (matched) {
-									parsedOptions = nonEmptylines.slice(nonEmptylines.length - listElements.length).map(opt => {
+									parsedOptions = nonEmptylines.slice(nonEmptylines.length - optionElements.length).map(opt => {
 										return opt.replace(/^([a-eA-E])[\.\)]\s*/, '');
 									});
 									
-									let linesToKeep = nonEmptylines.length - listElements.length;
+									let linesToKeep = nonEmptylines.length - optionElements.length;
 									questionLines = [];
 									let kept = 0;
 									for (let i = 0; i < lines.length; i++) {
