@@ -317,11 +317,7 @@
 				</div>
                 <input type="hidden" name="media_url" value="" />
                 <input type="hidden" name="media_type" value="none" />
-
-				<div>
-					<label class="label" for="q-max-plays">Maks. Putar Audio</label>
-					<input id="q-max-plays" name="audio_max_plays" type="number" min="1" class="input w-32" value="3" />
-				</div>
+                <input type="hidden" name="audio_max_plays" value="3" />
 
 				<!-- Type-specific fields -->
 				{#if selectedType === 'pilihan_ganda' || selectedType === 'pilihan_ganda_kompleks'}
@@ -532,7 +528,7 @@
 					<input type="hidden" name="id" value={editingQuestion.id} />
 					<input type="hidden" name="type" value={editingQuestion.type} />
 					
-					<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+					<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 						<div>
 							<label class="label">Tipe Soal</label>
 							<input type="text" class="input bg-slate-50" value={QUESTION_TYPE_LABELS[editingQuestion.type] || editingQuestion.type} disabled />

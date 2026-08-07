@@ -272,7 +272,7 @@
 					}
 				}; 
 			}} class="space-y-4">
-				<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 					<div>
 						<label class="label" for="q-type">Tipe Soal</label>
 						<select id="q-type" name="type" class="select" bind:value={selectedType}>
@@ -284,14 +284,6 @@
 					<div>
 						<label class="label" for="q-points">Poin</label>
 						<input id="q-points" name="points" type="number" min="1" class="input" value="1" />
-					</div>
-					<div>
-						<label class="label" for="q-media">Media</label>
-						<select id="q-media" name="media_type" class="select">
-							<option value="none">Tanpa Media</option>
-							<option value="image">Gambar</option>
-							<option value="audio">Audio</option>
-						</select>
 					</div>
 				</div>
 
@@ -326,11 +318,7 @@
 
 				<input type="hidden" name="media_url" value="" />
 				<input type="hidden" name="media_type" value="none" />
-
-				<div>
-					<label class="label" for="q-max-plays">Maks. Putar Audio</label>
-					<input id="q-max-plays" name="audio_max_plays" type="number" min="1" class="input w-32" value="3" />
-				</div>
+				<input type="hidden" name="audio_max_plays" value="3" />
 
 				<!-- Type-specific fields -->
 				{#if selectedType === 'pilihan_ganda' || selectedType === 'pilihan_ganda_kompleks'}
@@ -539,7 +527,7 @@
 					<input type="hidden" name="id" value={editingQuestion.id} />
 					<input type="hidden" name="type" value={editingQuestion.type} />
 					
-					<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+					<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 						<div>
 							<label class="label">Tipe Soal</label>
 							<input type="text" class="input bg-slate-50" value={QUESTION_TYPE_LABELS[editingQuestion.type] || editingQuestion.type} disabled />
@@ -547,14 +535,6 @@
 						<div>
 							<label class="label" for="eq-points">Poin</label>
 							<input id="eq-points" name="points" type="number" min="1" class="input" value={editingQuestion.points} />
-						</div>
-						<div>
-							<label class="label" for="eq-media">Media</label>
-							<select id="eq-media" name="media_type" class="select" value={editingQuestion.media_type}>
-								<option value="none">Tanpa Media</option>
-								<option value="image">Gambar</option>
-								<option value="audio">Audio</option>
-							</select>
 						</div>
 					</div>
 
