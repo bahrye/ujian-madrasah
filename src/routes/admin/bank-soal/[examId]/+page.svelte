@@ -143,30 +143,43 @@
 						const listElements = Array.from(doc.querySelectorAll('li, p[style*="mso-list:" i], p[class*="MsoListParagraph" i]'));
 						
 						if (listElements.length >= 2 && listElements.length <= 5) {
-							let htmlOpts = listElements.map(el => el.textContent?.trim() || '').filter(t => t.length > 0);
-							if (htmlOpts.length >= 2) {
-								const nonEmptylines = lines.map(l => l.trim()).filter(l => l.length > 0);
-								let matched = true;
-								if (nonEmptylines.length >= htmlOpts.length) {
-									for (let j = 0; j < htmlOpts.length; j++) {
-										const optText = htmlOpts[htmlOpts.length - 1 - j].replace(/\s+/g, '');
-										const lineText = nonEmptylines[nonEmptylines.length - 1 - j].replace(/\s+/g, '');
-										if (optText !== lineText && !optText.includes(lineText) && !lineText.includes(optText)) {
-											matched = false;
-											break;
-										}
+							let htmlOpts = listElements.map(el => el.textContent?.trim() || '');
+							const nonEmptylines = lines.map(l => l.trim()).filter(l => l.length > 0);
+							let matched = true;
+							
+							if (nonEmptylines.length >= listElements.length) {
+								for (let j = 0; j < listElements.length; j++) {
+									const optText = htmlOpts[listElements.length - 1 - j].replace(/\s+/g, '');
+									const lineText = nonEmptylines[nonEmptylines.length - 1 - j].replace(/\s+/g, '');
+									
+									let isMatch = false;
+									if (optText === lineText || (optText && lineText.includes(optText)) || (lineText && optText.includes(lineText))) {
+										isMatch = true;
+									} else {
+										const hasImg = listElements[listElements.length - 1 - j].querySelector('img');
+										const hasVml = listElements[listElements.length - 1 - j].querySelector('v\\:imagedata, imagedata');
+										if (hasImg || hasVml) isMatch = true;
 									}
-									if (matched) {
-										parsedOptions = htmlOpts;
-										let linesToKeep = nonEmptylines.length - htmlOpts.length;
-										questionLines = [];
-										let kept = 0;
-										for (let i = 0; i < lines.length; i++) {
-											if (lines[i].trim().length > 0) {
-												if (kept < linesToKeep) { questionLines.push(lines[i]); kept++; }
-											} else {
-												if (kept < linesToKeep) questionLines.push(lines[i]);
-											}
+									
+									if (!isMatch) {
+										matched = false;
+										break;
+									}
+								}
+								
+								if (matched) {
+									parsedOptions = nonEmptylines.slice(nonEmptylines.length - listElements.length).map(opt => {
+										return opt.replace(/^([a-eA-E])[\.\)]\s*/, '');
+									});
+									
+									let linesToKeep = nonEmptylines.length - listElements.length;
+									questionLines = [];
+									let kept = 0;
+									for (let i = 0; i < lines.length; i++) {
+										if (lines[i].trim().length > 0) {
+											if (kept < linesToKeep) { questionLines.push(lines[i]); kept++; }
+										} else {
+											if (kept < linesToKeep) questionLines.push(lines[i]);
 										}
 									}
 								}
