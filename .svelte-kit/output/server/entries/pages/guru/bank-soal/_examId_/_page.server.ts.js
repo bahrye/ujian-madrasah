@@ -217,6 +217,15 @@ const actions = {
       }
       await db.prepare("DELETE FROM student_answers WHERE question_id = ?").bind(parsedId).run();
       await db.prepare("DELETE FROM questions WHERE id = ?").bind(parsedId).run();
+      const remainingQuestions = await db.prepare("SELECT id FROM questions WHERE exam_id = ? ORDER BY question_number ASC, id ASC").bind(parsedExamId).all();
+      if (remainingQuestions.results.length > 0) {
+        const statements = [];
+        const stmt = db.prepare("UPDATE questions SET question_number = ? WHERE id = ?");
+        remainingQuestions.results.forEach((q2, idx) => {
+          statements.push(stmt.bind(idx + 1, q2.id));
+        });
+        await db.batch(statements);
+      }
       return { success: "Soal berhasil dihapus." };
     } catch (e) {
       console.error(e);
@@ -312,6 +321,15 @@ const actions = {
       }
       await db.prepare(`DELETE FROM student_answers WHERE question_id IN (${placeholders})`).bind(...ids).run();
       await db.prepare(`DELETE FROM questions WHERE id IN (${placeholders})`).bind(...ids).run();
+      const remainingQuestions = await db.prepare("SELECT id FROM questions WHERE exam_id = ? ORDER BY question_number ASC, id ASC").bind(parsedExamId).all();
+      if (remainingQuestions.results.length > 0) {
+        const statements = [];
+        const stmt = db.prepare("UPDATE questions SET question_number = ? WHERE id = ?");
+        remainingQuestions.results.forEach((q, idx) => {
+          statements.push(stmt.bind(idx + 1, q.id));
+        });
+        await db.batch(statements);
+      }
       return { success: `${ids.length} soal berhasil dihapus.` };
     } catch (e) {
       console.error("Error delete bulk:", e);
