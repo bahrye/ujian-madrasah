@@ -3,6 +3,6 @@
 export const index = 1;
 let component_cache;
 export const component = async () => component_cache ??= (await import('../entries/fallbacks/error.svelte.js')).default;
-export const imports = ["_app/immutable/nodes/1.BPZtCSL1.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/D4qA_8uZ.js","_app/immutable/chunks/B8nvzFA9.js","_app/immutable/chunks/BaRBRlMS.js","_app/immutable/chunks/DefmdQD4.js","_app/immutable/chunks/Cn73aa_U.js","_app/immutable/chunks/DY7HCYAa.js"];
+export const imports = ["_app/immutable/nodes/1.B8NHZkPM.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/D4qA_8uZ.js","_app/immutable/chunks/B8nvzFA9.js","_app/immutable/chunks/B22lS0LW.js","_app/immutable/chunks/DefmdQD4.js","_app/immutable/chunks/Cn73aa_U.js","_app/immutable/chunks/B1w3Sjg2.js"];
 export const stylesheets = [];
 export const fonts = [];
