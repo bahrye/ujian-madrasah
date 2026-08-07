@@ -15,16 +15,16 @@ const doc = new Document({
                 ],
             }),
             new Paragraph({
-                text: "1. Gunakan penomoran angka (1., 2., 3., dst) untuk teks soal.",
+                text: "- Gunakan penomoran angka (1., 2., 3., dst) untuk teks soal.",
             }),
             new Paragraph({
-                text: "2. Gunakan penomoran huruf (A., B., C., D., E.) untuk opsi jawaban.",
+                text: "- Gunakan penomoran huruf (A., B., C., D., E.) untuk opsi jawaban.",
             }),
             new Paragraph({
-                text: "3. Tulis KUNCI: diikuti huruf jawaban benar di akhir setiap soal.",
+                text: "- Tulis KUNCI: diikuti huruf jawaban benar di akhir setiap soal.",
             }),
             new Paragraph({
-                text: "4. Anda bebas menyisipkan gambar atau tabel di dalam soal.",
+                text: "- Anda bebas menyisipkan gambar atau tabel di dalam soal.",
             }),
             new Paragraph({ text: "" }),
             new Paragraph({ text: "=================================================" }),

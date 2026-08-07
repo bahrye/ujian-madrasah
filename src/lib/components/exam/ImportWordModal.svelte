@@ -117,11 +117,11 @@
 			}
 
 			parsedData = questions.map((q, i) => {
-				if (!q.correct_answer) {
+				if (!q.correct_answer && q.type !== 'essay') {
 					throw new Error(`Soal nomor ${i+1} kehilangan Kunci Jawaban. Pastikan ada tulisan "KUNCI: A" (atau jawaban lainnya) di bawah opsi.`);
 				}
-				if (q.options.length < 2) {
-					throw new Error(`Soal nomor ${i+1} tidak memiliki opsi jawaban yang cukup. Pastikan diawali huruf kapital dan titik/kurung (misal "A. " atau "a) ").`);
+				if (q.type.startsWith('pilihan_ganda') && q.options.length < 2) {
+					throw new Error(`Soal nomor ${i+1} (Pilihan Ganda) tidak memiliki opsi jawaban yang cukup. Pastikan diawali huruf kapital dan titik/kurung (misal "A. " atau "a) ").`);
 				}
 
 				return {
@@ -177,9 +177,16 @@
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
 						Petunjuk Import
 					</h4>
-					<p class="text-sm text-indigo-700 mb-2">Pastikan file Word (.docx) Anda mengikuti format penulisan baku agar sistem dapat membacanya dengan tepat. Sistem otomatis mendukung tulisan tebal/miring, rumus (equation), hingga tabel dan gambar.</p>
+					<p class="text-sm text-indigo-700 mb-2">Pastikan file Word (.docx) Anda mengikuti format penulisan baku agar sistem dapat membacanya dengan tepat.</p>
+					<ul class="text-xs text-indigo-700 list-disc list-inside mb-3 space-y-1">
+						<li><b>Pilihan Ganda:</b> Opsi A,B,C,D dan <code>KUNCI: A</code></li>
+						<li><b>Pilihan Ganda Kompleks:</b> Kunci lebih dari satu (pisahkan koma) <code>KUNCI: A, B</code></li>
+						<li><b>Benar Salah:</b> Opsi tidak perlu ditulis, cukup <code>KUNCI: Benar</code> atau <code>KUNCI: Salah</code></li>
+						<li><b>Isian Singkat:</b> Opsi tidak perlu ditulis, cukup <code>KUNCI: [jawaban Anda]</code></li>
+						<li><b>Esai:</b> Opsi tidak perlu ditulis, cukup <code>KUNCI: ESSAY</code></li>
+					</ul>
 					
-					<div class="bg-white p-3 rounded-lg border border-indigo-100 text-sm text-slate-600 font-mono mb-3">
+					<div class="bg-white p-3 rounded-lg border border-indigo-100 text-sm text-slate-600 font-mono mb-3 max-h-48 overflow-y-auto">
 						1. Siapa penemu lampu?<br>
 						A. Thomas Alfa Edison<br>
 						B. Alexander Graham Bell<br>
@@ -187,12 +194,11 @@
 						D. Albert Einstein<br>
 						KUNCI: A<br>
 						<br>
-						2. Apa ibukota Indonesia?<br>
-						A. Bandung<br>
-						B. Jakarta<br>
-						C. Surabaya<br>
-						D. Semarang<br>
-						KUNCI: B
+						2. Ibukota Indonesia adalah...<br>
+						KUNCI: Jakarta<br>
+						<br>
+						3. Jelaskan proses terjadinya hujan!<br>
+						KUNCI: ESSAY
 					</div>
 
 					<a href="/template_soal_ujian.docx" download class="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700 bg-white px-3 py-1.5 rounded-lg border border-indigo-200 shadow-sm transition-all hover:shadow">

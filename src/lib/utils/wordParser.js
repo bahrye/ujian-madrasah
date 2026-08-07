@@ -62,9 +62,9 @@ export function parseWordHtmlToQuestions(html) {
 		}
 		
 		// Check if it's the answer key (KUNCI: A)
-		const keyMatch = text.match(/^KUNCI:\s*([a-eA-E])/i);
+		const keyMatch = text.match(/^KUNCI:\s*(.+)/i);
 		if (keyMatch && currentQuestion) {
-			currentQuestion.answer = keyMatch[1].toUpperCase();
+			currentQuestion.answer = keyMatch[1].trim();
 			parsingState = 'question'; // Reset state for safety
 			
 			// Push the current question because it's complete
@@ -123,12 +123,37 @@ export function parseWordHtmlToQuestions(html) {
 				.replace(/([a-zA-Z0-9\)])\^([a-zA-Z0-9]+)/g, '$1<sup>$2</sup>')
 				.replace(/([a-zA-Z0-9\)])_([a-zA-Z0-9]+)/g, '$1<sub>$2</sub>');
 		};
+		let type = 'pilihan_ganda';
+		let finalAnswer = q.answer;
 		
+		if (q.options.length > 0) {
+			if (q.answer.includes(',') || q.answer.length > 1) {
+				// Multiple answers = pilihan_ganda_kompleks
+				type = 'pilihan_ganda_kompleks';
+				finalAnswer = q.answer.split(',').map(a => a.trim().toUpperCase());
+			} else {
+				type = 'pilihan_ganda';
+				finalAnswer = q.answer.toUpperCase();
+			}
+		} else {
+			// No options
+			if (q.answer.toLowerCase() === 'essay') {
+				type = 'essay';
+				finalAnswer = ''; // Essays usually have manual grading
+			} else if (q.answer.toLowerCase() === 'benar' || q.answer.toLowerCase() === 'salah') {
+				type = 'benar_salah';
+				q.options = [{ id: 'A', html: 'Benar' }, { id: 'B', html: 'Salah' }];
+				finalAnswer = q.answer.toLowerCase() === 'benar' ? 'Benar' : 'Salah';
+			} else {
+				type = 'isian_singkat';
+			}
+		}
+
 		return {
 			question_text: cleanEq(q.questionHtml.join('')),
 			options: q.options.map(opt => cleanEq(opt.html)),
-			correct_answer: q.answer,
-			type: q.type
+			correct_answer: finalAnswer,
+			type: type
 		};
 	});
 }
