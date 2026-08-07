@@ -134,7 +134,48 @@
 						}
 					}
 
+					// Fallback: Jika opsi tidak terdeteksi (karena Word menghilangkan a. b. c. pada auto-numbering)
+					// Kita coba periksa struktur HTML-nya
+					if (parsedOptions.length === 0 && htmlData) {
+						const parser = new DOMParser();
+						const doc = parser.parseFromString(htmlData, 'text/html');
+						const listElements = Array.from(doc.querySelectorAll('li, p[style*="mso-list:" i], p[class*="MsoListParagraph" i]'));
+						
+						if (listElements.length >= 2 && listElements.length <= 5) {
+							let htmlOpts = listElements.map(el => el.textContent?.trim() || '').filter(t => t.length > 0);
+							if (htmlOpts.length >= 2) {
+								const nonEmptylines = lines.map(l => l.trim()).filter(l => l.length > 0);
+								let matched = true;
+								if (nonEmptylines.length >= htmlOpts.length) {
+									for (let j = 0; j < htmlOpts.length; j++) {
+										const optText = htmlOpts[htmlOpts.length - 1 - j].replace(/\s+/g, '');
+										const lineText = nonEmptylines[nonEmptylines.length - 1 - j].replace(/\s+/g, '');
+										if (optText !== lineText && !optText.includes(lineText) && !lineText.includes(optText)) {
+											matched = false;
+											break;
+										}
+									}
+									if (matched) {
+										parsedOptions = htmlOpts;
+										let linesToKeep = nonEmptylines.length - htmlOpts.length;
+										questionLines = [];
+										let kept = 0;
+										for (let i = 0; i < lines.length; i++) {
+											if (lines[i].trim().length > 0) {
+												if (kept < linesToKeep) { questionLines.push(lines[i]); kept++; }
+											} else {
+												if (kept < linesToKeep) questionLines.push(lines[i]);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+
+					let smartPasted = false;
 					if (parsedOptions.length >= 2) {
+						smartPasted = true;
 						// Hapus nomor soal (misal "5. ") dari baris pertama pertanyaan
 						if (questionLines.length > 0) {
 							questionLines[0] = questionLines[0].replace(/^\d+[\.\)]\s+/, '');
@@ -164,7 +205,7 @@
 
 				// Jika copy dari MS Word mengandung rumus/gambar (file:///) ATAU kita melakukan Smart Paste
 				// Kita paksa paste sebagai teks murni agar rumus/opsi terformat dengan baik
-				if ((htmlData && htmlData.includes('file:///')) || textToPaste !== textData) {
+				if ((htmlData && htmlData.includes('file:///')) || smartPasted) {
 					e.preventDefault();
 					const escapedText = textToPaste
 						.replace(/&/g, '&amp;')
@@ -174,7 +215,12 @@
 					if (targetComponent && escapedText) {
 						targetComponent.insertHtml(escapedText);
 					}
-					toasts.success('Smart Paste: Teks dan opsi berhasil diekstrak!');
+					
+					if (smartPasted) {
+						toasts.success('Smart Paste: Teks dan opsi berhasil diekstrak!');
+					} else {
+						toasts.success('Paste berhasil (format gambar lokal MS Word diubah ke teks)');
+					}
 					return;
 				}
 
