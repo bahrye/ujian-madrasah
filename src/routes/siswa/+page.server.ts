@@ -62,6 +62,12 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 			s.name as subject_name,
 			et.name as exam_type_name,
 			(
+				SELECT status 
+				FROM student_attempts 
+				WHERE exam_id = e.id AND student_id = ? 
+				ORDER BY created_at DESC LIMIT 1
+			) as attempt_status,
+			(
 				SELECT GROUP_CONCAT(u.name, '||')
 				FROM exam_proctors epr
 				JOIN users u ON epr.proctor_id = u.id
@@ -81,7 +87,7 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		  AND e.is_active = 1
 		  AND et.is_active = 1
 		ORDER BY et.id ASC, e.start_time ASC, e.id ASC
-	`).bind(locals.user!.school_id, userId).all();
+	`).bind(userId, locals.user!.school_id, userId).all();
 
 	return {
 		activeExams: activeExams.results,

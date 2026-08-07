@@ -330,6 +330,7 @@
 							<th class="border-2 border-slate-300 px-3 py-2 uppercase">JAM KE</th>
 							<th class="border-2 border-slate-300 px-3 py-2 uppercase">WAKTU</th>
 							<th class="border-2 border-slate-300 px-3 py-2 uppercase">MATA PELAJARAN</th>
+							<th class="border-2 border-slate-300 px-3 py-2 uppercase">STATUS</th>
 							<th class="border-2 border-slate-300 px-3 py-2 uppercase">PENGAWAS</th>
 							<th class="border-2 border-slate-300 px-3 py-2">Daftar Pengawas</th>
 						</tr>
@@ -347,6 +348,19 @@
 										{formatOnlyTime(exam.start_time || '')} - {formatOnlyTime(exam.end_time || '')}
 									</td>
 									<td class="border-2 border-slate-300 px-3 py-2 text-center">{exam.subject_name || exam.title || ''}</td>
+									<td class="border-2 border-slate-300 px-3 py-2 text-center">
+										{#if exam.attempt_status === 'selesai' || exam.attempt_status === 'remedial'}
+											<span class="text-emerald-600 font-bold">Selesai</span>
+										{:else if exam.attempt_status === 'mengerjakan'}
+											<span class="text-indigo-600 font-bold">Mengerjakan</span>
+										{:else}
+											{#if exam.end_time && isAttemptExpired(exam.end_time, currentTime)}
+												<span class="text-rose-600 font-bold">Tidak dikerjakan</span>
+											{:else}
+												<span class="text-slate-400 font-bold">Belum mulai</span>
+											{/if}
+										{/if}
+									</td>
 									<td class="border-2 border-slate-300 px-3 py-2 text-center font-medium">
 										{getProctorNumbers(exam.proctor_names || '', typeGroup.proctorMap)}
 									</td>
