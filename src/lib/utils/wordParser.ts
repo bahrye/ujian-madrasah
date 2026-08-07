@@ -27,67 +27,79 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 	// Pre-process lists (ol, ul) from Mammoth to extract auto-numbering
 	// We must process in document order to correctly guess if a list is for questions or options
 	const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_ELEMENT, {
-		acceptNode: (node) => node.tagName === 'LI' ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
+		acceptNode: (node) => {
+			const el = node as Element;
+			if (el.tagName === 'LI' || el.tagName === 'P' || el.tagName === 'DIV' || /^H[1-6]$/.test(el.tagName)) {
+				return NodeFilter.FILTER_ACCEPT;
+			}
+			return NodeFilter.FILTER_SKIP;
+		}
 	});
 	
-	const allLIs: Element[] = [];
-	let currentNode = walker.nextNode();
-	while(currentNode) {
-		allLIs.push(currentNode as Element);
-		currentNode = walker.nextNode();
-	}
-
 	let expectedListType: 'question' | 'options' = 'question';
 	let qCount = 0;
 	let oCount = 0;
 	
-	allLIs.forEach((li) => {
-		const liText = li.textContent?.trim() || '';
+	let currentNode = walker.nextNode();
+	while(currentNode) {
+		const el = currentNode as Element;
+		const text = el.textContent?.trim() || '';
 		
-		// Deteksi KUNCI
-		if (liText.toUpperCase().startsWith('KUNCI:')) {
+		// Deteksi KUNCI di elemen mana pun (LI, P, DIV, dll)
+		if (text.toUpperCase().startsWith('KUNCI:')) {
 			expectedListType = 'question';
 			oCount = 0;
-			// Jangan diubah textnya
-			return;
+			currentNode = walker.nextNode();
+			continue;
 		}
 
-		// Jika kita mencari pertanyaan (misal setelah KUNCI atau di awal dokumen)
-		// Tapi perhatikan: jika LI ini adalah anak dari LI lain (nested), itu PASTI opsi!
-		let isNested = false;
-		let parent = li.parentElement;
-		while (parent && parent.tagName !== 'BODY') {
-			if (parent.tagName === 'LI') {
-				isNested = true;
-				break;
+		if (el.tagName === 'LI') {
+			// Jika kita mencari pertanyaan (misal setelah KUNCI atau di awal dokumen)
+			// Tapi perhatikan: jika LI ini adalah anak dari LI lain (nested), itu PASTI opsi!
+			let isNested = false;
+			let parent = el.parentElement;
+			while (parent && parent.tagName !== 'BODY') {
+				if (parent.tagName === 'LI') {
+					isNested = true;
+					break;
+				}
+				parent = parent.parentElement;
 			}
-			parent = parent.parentElement;
-		}
 
-		if (isNested) {
-			expectedListType = 'options';
-		}
+			if (isNested) {
+				expectedListType = 'options';
+			}
 
-		let prefix = '';
-		if (expectedListType === 'question') {
-			qCount++;
-			prefix = `${qCount}. `;
-			expectedListType = 'options'; // Setelah pertanyaan, list berikutnya (atau item berikutnya di level sama tapi beda list) kemungkinan opsi
-			oCount = 0;
+			let prefix = '';
+			if (expectedListType === 'question') {
+				qCount++;
+				prefix = `${qCount}. `;
+				expectedListType = 'options'; // Setelah pertanyaan, list berikutnya (atau item berikutnya di level sama tapi beda list) kemungkinan opsi
+				oCount = 0;
+			} else {
+				oCount++;
+				prefix = `${String.fromCharCode(64 + oCount)}. `;
+			}
+
+			const textWalker = doc.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+			let firstText = textWalker.nextNode();
+			
+			if (firstText && firstText.nodeValue && firstText.nodeValue.trim().length > 0) {
+				firstText.nodeValue = prefix + firstText.nodeValue;
+			} else {
+				el.insertAdjacentText('afterbegin', prefix);
+			}
 		} else {
-			oCount++;
-			prefix = `${String.fromCharCode(64 + oCount)}. `;
+			// Elemen bukan LI (misal P, DIV)
+			// Jika pengguna secara manual mengetik "1. Soal...", maka list berikutnya adalah opsi
+			if (/^\d+[\.\)]\s/.test(text)) {
+				expectedListType = 'options';
+				oCount = 0;
+			}
 		}
-
-		const textWalker = doc.createTreeWalker(li, NodeFilter.SHOW_TEXT);
-		let firstText = textWalker.nextNode();
 		
-		if (firstText && firstText.nodeValue && firstText.nodeValue.trim().length > 0) {
-			firstText.nodeValue = prefix + firstText.nodeValue;
-		} else {
-			li.insertAdjacentText('afterbegin', prefix);
-		}
-	});
+		currentNode = walker.nextNode();
+	}
 
 	// Setelah semua LI diberi prefix teks, kita ubah OL/UL menjadi P agar strukturnya rata
 	// Kita memproses dari bawah ke atas agar reference tidak hilang saat parent diubah
