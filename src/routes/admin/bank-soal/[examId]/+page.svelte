@@ -262,17 +262,23 @@
 					}
 				}
 
+				let parsedDoc = null;
+				if (htmlData) {
+					const parser = new DOMParser();
+					parsedDoc = parser.parseFromString(htmlData, 'text/html');
+				}
+				
+				const hasLocalImage = parsedDoc && parsedDoc.body.innerHTML.includes('file:///');
+
 				// Jika copy dari MS Word mengandung rumus/gambar (file:///) ATAU kita melakukan Smart Paste
 				// Kita cegah paste default
-				if ((htmlData && htmlData.includes('file:///')) || smartPasted) {
+				if (hasLocalImage || smartPasted) {
 					e.preventDefault();
 					
 					let questionHtmlToPaste = null;
-					const hasLocalImage = htmlData && htmlData.includes('file:///');
 					
-					if (smartPasted && htmlData) {
-						const parser = new DOMParser();
-						const doc = parser.parseFromString(htmlData, 'text/html');
+					if (smartPasted && parsedDoc) {
+						const doc = parsedDoc;
 						
 						const htmlOptionsExtracted = [];
 						const candidateElements = Array.from(doc.querySelectorAll('li, p, div'));
