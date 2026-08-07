@@ -55,6 +55,14 @@
 		</button>
 		
 		<div class="w-px h-4 bg-slate-300 mx-1"></div>
+
+		<button type="button" class="p-1.5 text-slate-600 hover:bg-slate-200 hover:text-indigo-600 rounded transition-colors" on:click={() => exec('subscript')} title="Subscript / Tulisan Bawah (Kimia)">
+			<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 5 8 8"/><path d="m12 5-8 8"/><path d="M20 19h-4c0-1.5.44-2 1.5-2.5S20 15.33 20 14c0-.47-.17-.93-.48-1.29a2.11 2.11 0 0 0-2.62-.44c-.42.24-.74.62-.9 1.07"/></svg>
+		</button>
+		<button type="button" class="p-1.5 text-slate-600 hover:bg-slate-200 hover:text-indigo-600 rounded transition-colors" on:click={() => exec('superscript')} title="Superscript / Pangkat">
+			<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 19 8-8"/><path d="m12 19-8-8"/><path d="M20 8h-4c0-1.5.44-2 1.5-2.5S20 4.33 20 3c0-.47-.17-.93-.48-1.29a2.11 2.11 0 0 0-2.62-.44c-.42.24-.74.62-.9 1.07"/></svg>
+		</button>
+		<div class="w-px h-4 bg-slate-300 mx-1"></div>
 		
 		<button type="button" class="p-1.5 text-slate-600 hover:bg-slate-200 hover:text-indigo-600 rounded transition-colors" on:click={() => exec('insertOrderedList')} title="Daftar Angka">
 			<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"></line><line x1="10" y1="12" x2="21" y2="12"></line><line x1="10" y1="18" x2="21" y2="18"></line><path d="M4 6h1v4"></path><path d="M4 10h2"></path><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg>
