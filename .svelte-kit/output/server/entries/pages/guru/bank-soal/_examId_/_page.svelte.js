@@ -10,8 +10,9 @@ import { C as ConfirmForm } from "../../../../../chunks/ConfirmForm.js";
 import { I as ICONS, Q as QUESTION_TYPE_LABELS } from "../../../../../chunks/constants.js";
 import "katex/dist/contrib/auto-render.mjs";
 /* empty css                                                                   */
-import { I as ImportExcelModal } from "../../../../../chunks/ImportExcelModal.js";
+import { I as ImportExcelModal } from "../../../../../chunks/RichTextEditor.svelte_svelte_type_style_lang.js";
 import { t as toasts } from "../../../../../chunks/toast.js";
+import { h as html } from "../../../../../chunks/html.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let exam, questions;
@@ -59,7 +60,7 @@ function _page($$renderer, $$props) {
           } else {
             $$renderer3.push("<!--[-1-->");
           }
-          $$renderer3.push(`<!--]--></div> <p class="text-sm text-slate-700 line-clamp-2">${escape_html(q.question_text)}</p> `);
+          $$renderer3.push(`<!--]--></div> <div class="text-sm text-slate-700 line-clamp-2 prose prose-sm max-w-none prose-p:m-0 prose-img:m-0 prose-ul:m-0">${html(q.question_text)}</div> `);
           if (q.options_json) {
             $$renderer3.push("<!--[0-->");
             const opts = JSON.parse(q.options_json);

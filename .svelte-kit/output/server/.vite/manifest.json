@@ -37,13 +37,6 @@
       "_state.svelte.js"
     ]
   },
-  "_ImportExcelModal.js": {
-    "file": "chunks/ImportExcelModal.js",
-    "name": "ImportExcelModal",
-    "imports": [
-      "_index.js"
-    ]
-  },
   "_PasswordInput.js": {
     "file": "chunks/PasswordInput.js",
     "name": "PasswordInput",
@@ -66,6 +59,16 @@
   "_QuestionRenderer.svelte_svelte_type_style_lang.js": {
     "file": "_app/immutable/assets/QuestionRenderer.CwYmYea-.css",
     "src": "_QuestionRenderer.svelte_svelte_type_style_lang.js"
+  },
+  "_RichTextEditor.svelte_svelte_type_style_lang.js": {
+    "file": "chunks/RichTextEditor.svelte_svelte_type_style_lang.js",
+    "name": "RichTextEditor.svelte_svelte_type_style_lang",
+    "imports": [
+      "_index.js"
+    ],
+    "css": [
+      "_app/immutable/assets/RichTextEditor.CFISWGle.css"
+    ]
   },
   "_ScoreDisplay.js": {
     "file": "chunks/ScoreDisplay.js",
@@ -508,7 +511,7 @@
       "_stores.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.JTLInDn4.css"
+      "_app/immutable/assets/_layout.D7LgIElq.css"
     ],
     "assets": [
       "_app/immutable/assets/KaTeX_AMS-Regular.BQhdFMY1.woff2",
@@ -670,9 +673,10 @@
       "_state.svelte.js",
       "_ConfirmForm.js",
       "_constants.js",
-      "_ImportExcelModal.js",
+      "_RichTextEditor.svelte_svelte_type_style_lang.js",
       "_toast.js",
-      "_stores.js"
+      "_stores.js",
+      "_html.js"
     ],
     "css": [
       "_app/immutable/assets/QuestionRenderer.CwYmYea-.css"
@@ -1294,8 +1298,9 @@
       "_state.svelte.js",
       "_ConfirmForm.js",
       "_constants.js",
-      "_ImportExcelModal.js",
-      "_toast.js"
+      "_RichTextEditor.svelte_svelte_type_style_lang.js",
+      "_toast.js",
+      "_html.js"
     ],
     "css": [
       "_app/immutable/assets/QuestionRenderer.CwYmYea-.css"

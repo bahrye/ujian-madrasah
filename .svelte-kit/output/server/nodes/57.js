@@ -3,6 +3,6 @@
 export const index = 57;
 let component_cache;
 export const component = async () => component_cache ??= (await import('../entries/pages/siswa/tata-tertib/_page.svelte.js')).default;
-export const imports = ["_app/immutable/nodes/57.CEXIrUom.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CD7Sw7Ut.js","_app/immutable/chunks/D0O7yx7I.js","_app/immutable/chunks/onhbUEEH.js","_app/immutable/chunks/BnYE3itn.js","_app/immutable/chunks/D2xMzRQh.js","_app/immutable/chunks/KK8x-0AI.js","_app/immutable/chunks/mtvdH_ec.js","_app/immutable/chunks/B4jzVL06.js","_app/immutable/chunks/B5xf_oRu.js"];
+export const imports = ["_app/immutable/nodes/57.CNI8J3I6.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/BVZgrqP0.js","_app/immutable/chunks/BhtR-1bA.js","_app/immutable/chunks/BkiEJhJY.js","_app/immutable/chunks/B0viW3RP.js","_app/immutable/chunks/DoWNjUKu.js","_app/immutable/chunks/Ba_0fM9c.js","_app/immutable/chunks/CeoUgidO.js","_app/immutable/chunks/DX4-oXAc.js","_app/immutable/chunks/B5xf_oRu.js"];
 export const stylesheets = [];
 export const fonts = [];

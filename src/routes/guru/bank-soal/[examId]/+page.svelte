@@ -12,6 +12,7 @@
 	import { mathRender } from '$lib/actions/mathRender';
 	import { arabicRender } from '$lib/actions/arabicRender';
 	import { env } from '$env/dynamic/public';
+	import RichTextEditor from '$lib/components/RichTextEditor.svelte';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -24,6 +25,8 @@
 	let options: string[] = ['', '', '', ''];
 	
 	let previewQuestionId: string | null = null;
+	let qEditorComponent: any;
+	let eqEditorComponent: any;
 
 	// Image paste support
 	const cloudName = env.PUBLIC_CLOUDINARY_CLOUD_NAME || 'dfhtjgwcz';
@@ -70,7 +73,7 @@
 		}
 	}
 
-	async function handlePaste(e: ClipboardEvent, targetId: string) {
+	async function handlePaste(e: ClipboardEvent, targetComponent: any) {
 		const items = e.clipboardData?.items;
 		if (!items) return;
 
@@ -84,13 +87,8 @@
 				const url = await uploadPastedImage(file);
 				if (url) {
 					const imgHtml = `<img src="${url}" class="max-h-64 object-contain rounded-lg border border-slate-200 mt-2 mb-2">`;
-					const inputEl = document.getElementById(targetId) as HTMLTextAreaElement;
-					if (inputEl) {
-						const start = inputEl.selectionStart;
-						const end = inputEl.selectionEnd;
-						const text = inputEl.value;
-						inputEl.value = text.substring(0, start) + imgHtml + text.substring(end);
-						inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+					if (targetComponent) {
+						targetComponent.insertHtml(imgHtml);
 					}
 				}
 				break; 
@@ -98,7 +96,7 @@
 		}
 	}
 
-	async function handlePasteButtonClick(targetId: string) {
+	async function handlePasteButtonClick(targetComponent: any) {
 		try {
 			const clipboardItems = await navigator.clipboard.read();
 			for (const clipboardItem of clipboardItems) {
@@ -110,13 +108,8 @@
 					const url = await uploadPastedImage(file);
 					if (url) {
 						const imgHtml = `<img src="${url}" class="max-h-64 object-contain rounded-lg border border-slate-200 mt-2 mb-2">`;
-						const inputEl = document.getElementById(targetId) as HTMLTextAreaElement;
-						if (inputEl) {
-							const start = inputEl.selectionStart;
-							const end = inputEl.selectionEnd;
-							const text = inputEl.value;
-							inputEl.value = text.substring(0, start) + imgHtml + text.substring(end);
-							inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+						if (targetComponent) {
+							targetComponent.insertHtml(imgHtml);
 						}
 					}
 					return;
@@ -281,20 +274,27 @@
 					</div>
 				</div>
 
-				<div>
-					<div class="flex items-center justify-between mb-1">
-						<label class="label mb-0" for="q-text">Teks Soal</label>
-						<button type="button" class="btn-ghost btn-sm text-xs flex items-center gap-1 text-indigo-600 hover:bg-indigo-50" on:click={() => handlePasteButtonClick('q-text')} disabled={isPastingImage}>
-							{#if isPastingImage}
-								<svg class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-								Mengunggah...
-							{:else}
-								<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-								Paste Gambar
-							{/if}
-						</button>
-					</div>
-					<textarea id="q-text" name="question_text" required class="input min-h-[100px]" placeholder="Tuliskan pertanyaan di sini... (Bisa langsung Paste / Ctrl+V gambar ke kotak ini)" rows="3" on:paste={(e) => handlePaste(e, 'q-text')}></textarea>
+				<div class="mb-2">
+					<label class="label" for="q-text">Teks Soal</label>
+					<RichTextEditor 
+						id="q-text" 
+						name="question_text" 
+						placeholder="Tuliskan pertanyaan di sini... (Bisa langsung Paste / Ctrl+V gambar ke kotak ini)" 
+						bind:this={qEditorComponent}
+						on:paste={(e) => handlePaste(e, qEditorComponent)}
+					>
+						<div slot="toolbar-right">
+							<button type="button" class="btn-ghost btn-sm text-xs flex items-center gap-1 text-indigo-600 hover:bg-indigo-50" on:click={() => handlePasteButtonClick(qEditorComponent)} disabled={isPastingImage}>
+								{#if isPastingImage}
+									<svg class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+									Mengunggah...
+								{:else}
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+									Paste Gambar
+								{/if}
+							</button>
+						</div>
+					</RichTextEditor>
 				</div>
 
 				<div class="bg-slate-50 border border-slate-100 rounded-xl p-4">
@@ -421,7 +421,7 @@
 							<span class="badge-info text-[10px]">📎 {q.media_type === 'image' ? 'Gambar' : 'Audio'}</span>
 						{/if}
 					</div>
-					<p class="text-sm text-slate-700 line-clamp-2">{q.question_text}</p>
+					<div class="text-sm text-slate-700 line-clamp-2 prose prose-sm max-w-none prose-p:m-0 prose-img:m-0 prose-ul:m-0">{@html q.question_text}</div>
 					{#if q.options_json}
 						{@const opts = JSON.parse(q.options_json)}
 						{@const correct = q.correct_answer_json ? JSON.parse(q.correct_answer_json) : null}
@@ -535,20 +535,28 @@
 						</div>
 					</div>
 
-					<div>
-						<div class="flex items-center justify-between mb-1">
-							<label class="label mb-0" for="eq-text">Teks Soal</label>
-							<button type="button" class="btn-ghost btn-sm text-xs flex items-center gap-1 text-indigo-600 hover:bg-indigo-50" on:click={() => handlePasteButtonClick('eq-text')} disabled={isPastingImage}>
-								{#if isPastingImage}
-									<svg class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-									Mengunggah...
-								{:else}
-									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-									Paste Gambar
-								{/if}
-							</button>
-						</div>
-						<textarea id="eq-text" name="question_text" required class="input min-h-[100px]" placeholder="Tuliskan soal di sini... (Bisa langsung Paste / Ctrl+V gambar ke kotak ini)" rows="3" bind:value={editingQuestion.question_text} on:paste={(e) => handlePaste(e, 'eq-text')}></textarea>
+					<div class="mb-2">
+						<label class="label" for="eq-text">Teks Soal</label>
+						<RichTextEditor 
+							id="eq-text" 
+							name="question_text" 
+							placeholder="Tuliskan soal di sini... (Bisa langsung Paste / Ctrl+V gambar ke kotak ini)" 
+							bind:value={editingQuestion.question_text}
+							bind:this={eqEditorComponent}
+							on:paste={(e) => handlePaste(e, eqEditorComponent)}
+						>
+							<div slot="toolbar-right">
+								<button type="button" class="btn-ghost btn-sm text-xs flex items-center gap-1 text-indigo-600 hover:bg-indigo-50" on:click={() => handlePasteButtonClick(eqEditorComponent)} disabled={isPastingImage}>
+									{#if isPastingImage}
+										<svg class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+										Mengunggah...
+									{:else}
+										<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+										Paste Gambar
+									{/if}
+								</button>
+							</div>
+						</RichTextEditor>
 					</div>
 
 					<div class="bg-slate-50 border border-slate-100 rounded-xl p-4">
