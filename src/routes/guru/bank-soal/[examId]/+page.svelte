@@ -99,6 +99,7 @@
 			if (textData && textData.trim().length > 0) {
 				let textToPaste = textData;
 				let smartPasted = false;
+				let parsedOptions = [];
 
 				// Fitur Smart Paste: Deteksi opsi A, B, C, D jika paste di Teks Soal
 				const isPilihanGanda = selectedType === 'pilihan_ganda' || selectedType === 'pilihan_ganda_kompleks';
@@ -107,7 +108,6 @@
 				if (isMainEditor && isPilihanGanda) {
 					const lines = textData.split('\n');
 					let questionLines = [];
-					let parsedOptions = [];
 
 					for (let i = 0; i < lines.length; i++) {
 						const line = lines[i].trim();
@@ -210,7 +210,7 @@
 							
 							const text = el.textContent?.trim() || '';
 							const html = el.innerHTML || '';
-							if (/^[a-eA-E][\.\)]/i.test(text) || />\s*[a-eA-E][\.\)]/i.test(html) || /<!--.*?-->\s*[a-eA-E][\.\)]/i.test(html) || /^\s*(?:<[^>]+>)*\s*[a-eA-E][\.\)]/i.test(html)) {
+							if (/^[a-eA-E][\.\)]/i.test(text) || /^\s*(?:<[^>]+>|\s|<!--.*?-->)*[a-eA-E][\.\)]/i.test(html)) {
 								htmlOptionsExtracted.push(el);
 							}
 						});
@@ -279,7 +279,7 @@
 							if (htmlOptionsExtracted.some(parent => parent.contains(el))) return;
 							const text = el.textContent?.trim() || '';
 							const html = el.innerHTML || '';
-							if (/^[a-eA-E][\.\)]/i.test(text) || />\s*[a-eA-E][\.\)]/i.test(html) || /<!--.*?-->\s*[a-eA-E][\.\)]/i.test(html) || /^\s*(?:<[^>]+>)*\s*[a-eA-E][\.\)]/i.test(html)) {
+							if (/^[a-eA-E][\.\)]/i.test(text) || /^\s*(?:<[^>]+>|\s|<!--.*?-->)*[a-eA-E][\.\)]/i.test(html)) {
 								htmlOptionsExtracted.push(el);
 							}
 						});
@@ -299,8 +299,9 @@
 						if (firstTextNode) {
 							firstTextNode.nodeValue = firstTextNode.nodeValue.replace(/^\s*\d+[\.\)]\s+/, '');
 						}
-						
-						questionHtmlToPaste = doc.body.innerHTML;
+						questionHtmlToPaste = doc.body.innerHTML
+							.replace(/<!--StartFragment-->/gi, '')
+							.replace(/<!--EndFragment-->/gi, '');
 					}
 
 					if (smartPasted && questionHtmlToPaste && !hasLocalImage) {
