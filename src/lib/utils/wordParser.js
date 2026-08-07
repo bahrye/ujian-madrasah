@@ -1,4 +1,7 @@
 export function parseWordHtmlToQuestions(html) {
+	// Convert soft returns to separate paragraphs to avoid swallowing KUNCI: tags
+	html = html.replace(/<br\s*\/?>/gi, '</p><p>');
+	
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, 'text/html');
 	
