@@ -89,23 +89,21 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 		}
 	});
 
-	// Setelah semua LI diberi prefix teks, kita ubah OL/UL menjadi DIV agar strukturnya rata
+	// Setelah semua LI diberi prefix teks, kita ubah OL/UL menjadi P agar strukturnya rata
 	// Kita memproses dari bawah ke atas agar reference tidak hilang saat parent diubah
 	const lists = Array.from(doc.querySelectorAll('ol, ul'));
 	lists.reverse().forEach(list => {
-		const div = doc.createElement('div');
-		while (list.firstChild) {
-			div.appendChild(list.firstChild);
-		}
-		// Replace children LI with P
-		Array.from(div.children).forEach(child => {
+		const newElements: Element[] = [];
+		Array.from(list.children).forEach(child => {
 			if (child.tagName === 'LI') {
 				const p = doc.createElement('p');
 				while (child.firstChild) p.appendChild(child.firstChild);
-				child.replaceWith(p);
+				newElements.push(p);
+			} else {
+				newElements.push(child);
 			}
 		});
-		list.replaceWith(div);
+		list.replaceWith(...newElements);
 	});
 	
 	const questions: ParsedQuestion[] = [];
