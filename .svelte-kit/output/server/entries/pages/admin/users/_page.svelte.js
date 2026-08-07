@@ -1,4 +1,5 @@
 import { m as fallback, k as attr, f as bind_props, h as head, i as ensure_array_like, e as escape_html, j as attr_class, c as stringify } from "../../../../chunks/index.js";
+import { p as parseDate } from "../../../../chunks/date.js";
 import "@sveltejs/kit/internal";
 import "../../../../chunks/exports.js";
 import "../../../../chunks/utils2.js";
@@ -118,7 +119,7 @@ function _page($$renderer, $$props) {
             $$renderer3.push("<!--[-1-->");
             $$renderer3.push(`<span class="badge-danger whitespace-nowrap">Nonaktif</span>`);
           }
-          $$renderer3.push(`<!--]--></td><td class="p-4 text-xs text-slate-500 whitespace-nowrap">${escape_html((/* @__PURE__ */ new Date(String(user.created_at).replace(" ", "T") + (String(user.created_at).includes(" ") && !String(user.created_at).includes("Z") ? "Z" : ""))).toLocaleDateString("id-ID"))}</td><td class="p-4 text-right whitespace-nowrap"><div class="flex items-center justify-end gap-1.5 whitespace-nowrap"><button type="button" class="p-2 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700 transition-colors shadow-xs" title="Edit Pengguna"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.edit)}></path></svg></button> `);
+          $$renderer3.push(`<!--]--></td><td class="p-4 text-xs text-slate-500 whitespace-nowrap">${escape_html(parseDate(user.created_at).toLocaleDateString("id-ID"))}</td><td class="p-4 text-right whitespace-nowrap"><div class="flex items-center justify-end gap-1.5 whitespace-nowrap"><button type="button" class="p-2 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700 transition-colors shadow-xs" title="Edit Pengguna"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.edit)}></path></svg></button> `);
           if (user.is_active) {
             $$renderer3.push("<!--[0-->");
             $$renderer3.push(`<button type="button" class="p-2 rounded-xl bg-slate-100 text-slate-300 cursor-not-allowed opacity-60 shadow-xs" disabled="" title="Nonaktifkan pengguna terlebih dahulu sebelum menghapus"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.trash)}></path></svg></button>`);

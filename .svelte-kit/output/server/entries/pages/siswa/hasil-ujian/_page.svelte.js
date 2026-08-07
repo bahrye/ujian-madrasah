@@ -1,4 +1,5 @@
 import { h as head, k as attr, i as ensure_array_like, e as escape_html, j as attr_class, l as clsx, f as bind_props } from "../../../../chunks/index.js";
+import { p as parseDate } from "../../../../chunks/date.js";
 import { A as ATTEMPT_STATUS_COLORS, a as ATTEMPT_STATUS_LABELS, I as ICONS } from "../../../../chunks/constants.js";
 import { S as ScoreDisplay } from "../../../../chunks/ScoreDisplay.js";
 import { o as onDestroy } from "../../../../chunks/index-server.js";
@@ -35,8 +36,8 @@ function _page($$renderer, $$props) {
     function calculateRemainingTime(attempt) {
       const submitStr = attempt.submit_time || attempt.updated_at;
       if (!attempt.end_time || !submitStr) return "-";
-      const submit = /* @__PURE__ */ new Date(String(submitStr).replace(" ", "T") + (String(submitStr).includes(" ") && !String(submitStr).includes("Z") ? "Z" : ""));
-      const targetEnd = /* @__PURE__ */ new Date(String(attempt.end_time).replace(" ", "T") + (String(attempt.end_time).includes(" ") && !String(attempt.end_time).includes("Z") ? "Z" : ""));
+      const submit = parseDate(submitStr);
+      const targetEnd = parseDate(attempt.end_time);
       let remainingMs = targetEnd.getTime() - submit.getTime();
       if (remainingMs < 0) remainingMs = 0;
       const totalS = Math.floor(remainingMs / 1e3);
@@ -66,7 +67,7 @@ function _page($$renderer, $$props) {
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
         let attempt = each_array[$$index];
         const manual_earned = (attempt.score ?? 0) / 100 * (attempt.total_points || 1) - (attempt.objective_earned_points ?? 0);
-        $$renderer2.push(`<div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-shadow"><div class="flex flex-col md:flex-row md:items-center gap-6"><div class="flex-1 space-y-3"><div><div class="flex items-center gap-2 mb-1"><span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">${escape_html(attempt.subject || "Tanpa Mapel")}</span> <span${attr_class(clsx(ATTEMPT_STATUS_COLORS[attempt.status]))}>${escape_html(ATTEMPT_STATUS_LABELS[attempt.status])}</span></div> <h3 class="text-xl font-bold text-slate-800 leading-tight">${escape_html(attempt.exam_title)}</h3></div> <div class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500"><div class="flex items-center gap-1.5"><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> ${escape_html((/* @__PURE__ */ new Date(String(attempt.submit_time || attempt.updated_at).replace(" ", "T") + (String(attempt.submit_time || attempt.updated_at).includes(" ") && !String(attempt.submit_time || attempt.updated_at).includes("Z") ? "Z" : ""))).toLocaleDateString("id-ID", {
+        $$renderer2.push(`<div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-shadow"><div class="flex flex-col md:flex-row md:items-center gap-6"><div class="flex-1 space-y-3"><div><div class="flex items-center gap-2 mb-1"><span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">${escape_html(attempt.subject || "Tanpa Mapel")}</span> <span${attr_class(clsx(ATTEMPT_STATUS_COLORS[attempt.status]))}>${escape_html(ATTEMPT_STATUS_LABELS[attempt.status])}</span></div> <h3 class="text-xl font-bold text-slate-800 leading-tight">${escape_html(attempt.exam_title)}</h3></div> <div class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500"><div class="flex items-center gap-1.5"><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> ${escape_html(parseDate(attempt.submit_time || attempt.updated_at).toLocaleDateString("id-ID", {
           weekday: "long",
           year: "numeric",
           month: "long",

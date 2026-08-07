@@ -1,4 +1,5 @@
 import { h as head, i as ensure_array_like, e as escape_html, f as bind_props } from "../../../chunks/index.js";
+import { p as parseDate } from "../../../chunks/date.js";
 import { S as StatCard } from "../../../chunks/StatCard.js";
 import { I as ICONS } from "../../../chunks/constants.js";
 function _page($$renderer, $$props) {
@@ -30,7 +31,7 @@ function _page($$renderer, $$props) {
       $$renderer2.push("<!--[-->");
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
         let school = each_array[$$index];
-        $$renderer2.push(`<tr class="hover:bg-slate-50 transition-colors"><td class="p-4 font-medium text-slate-900">${escape_html(school.name)}</td><td class="p-4">${escape_html(school.address || "-")}</td><td class="p-4">${escape_html((/* @__PURE__ */ new Date(String(school.created_at).replace(" ", "T") + (String(school.created_at).includes(" ") && !String(school.created_at).includes("Z") ? "Z" : ""))).toLocaleDateString("id-ID"))}</td><td class="p-4">`);
+        $$renderer2.push(`<tr class="hover:bg-slate-50 transition-colors"><td class="p-4 font-medium text-slate-900">${escape_html(school.name)}</td><td class="p-4">${escape_html(school.address || "-")}</td><td class="p-4">${escape_html(parseDate(school.created_at).toLocaleDateString("id-ID"))}</td><td class="p-4">`);
         if (school.is_active) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<span class="badge badge-success">Aktif</span>`);

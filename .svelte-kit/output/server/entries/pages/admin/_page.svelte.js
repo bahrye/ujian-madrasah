@@ -1,4 +1,5 @@
 import { h as head, e as escape_html, c as stringify, i as ensure_array_like, j as attr_class, a as attr_style, k as attr, l as clsx, f as bind_props } from "../../../chunks/index.js";
+import { p as parseDate } from "../../../chunks/date.js";
 import { S as StatCard } from "../../../chunks/StatCard.js";
 import { A as ATTEMPT_STATUS_COLORS, a as ATTEMPT_STATUS_LABELS, I as ICONS } from "../../../chunks/constants.js";
 function _page($$renderer, $$props) {
@@ -81,7 +82,7 @@ function _page($$renderer, $$props) {
       const each_array_1 = ensure_array_like(recentAttempts);
       for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
         let attempt = each_array_1[$$index_1];
-        $$renderer2.push(`<tr><td class="font-medium text-slate-700">${escape_html(attempt.student_name)}</td><td class="text-slate-600">${escape_html(attempt.exam_title)}</td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[attempt.status] || "badge-info"))}>${escape_html(ATTEMPT_STATUS_LABELS[attempt.status] || attempt.status)}</span></td><td class="font-semibold">${escape_html(attempt.score != null ? attempt.score : "-")}</td><td class="text-xs text-slate-500">${escape_html(attempt.created_at ? (/* @__PURE__ */ new Date(String(attempt.created_at).replace(" ", "T") + (String(attempt.created_at).includes(" ") && !String(attempt.created_at).includes("Z") ? "Z" : ""))).toLocaleDateString("id-ID") : "-")}</td></tr>`);
+        $$renderer2.push(`<tr><td class="font-medium text-slate-700">${escape_html(attempt.student_name)}</td><td class="text-slate-600">${escape_html(attempt.exam_title)}</td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[attempt.status] || "badge-info"))}>${escape_html(ATTEMPT_STATUS_LABELS[attempt.status] || attempt.status)}</span></td><td class="font-semibold">${escape_html(attempt.score != null ? attempt.score : "-")}</td><td class="text-xs text-slate-500">${escape_html(attempt.created_at ? parseDate(attempt.created_at).toLocaleDateString("id-ID") : "-")}</td></tr>`);
       }
       $$renderer2.push(`<!--]--></tbody></table></div>`);
     }

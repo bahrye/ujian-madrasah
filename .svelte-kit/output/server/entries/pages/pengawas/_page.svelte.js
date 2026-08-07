@@ -1,4 +1,5 @@
 import { h as head, e as escape_html, i as ensure_array_like, k as attr, c as stringify, f as bind_props } from "../../../chunks/index.js";
+import { p as parseDate } from "../../../chunks/date.js";
 import { o as onDestroy } from "../../../chunks/index-server.js";
 import { S as StatCard } from "../../../chunks/StatCard.js";
 import { I as ICONS } from "../../../chunks/constants.js";
@@ -10,7 +11,7 @@ function _page($$renderer, $$props) {
     });
     function formatScheduleDate(dateString) {
       if (!dateString) return "Belum ditentukan";
-      const date = new Date(dateString);
+      const date = parseDate(dateString);
       const today = /* @__PURE__ */ new Date();
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
@@ -29,10 +30,10 @@ function _page($$renderer, $$props) {
     }
     function formatTimeRange(startStr, endStr) {
       if (!startStr) return "--:--";
-      const start = new Date(startStr);
+      const start = parseDate(startStr);
       const startFormatted = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" }).format(start);
       if (!endStr) return `${startFormatted} - Selesai`;
-      const end = new Date(endStr);
+      const end = parseDate(endStr);
       const endFormatted = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" }).format(end);
       if (start.getDate() === end.getDate() && start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
         return `${startFormatted} - ${endFormatted}`;

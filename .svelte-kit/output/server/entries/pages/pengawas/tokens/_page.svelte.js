@@ -1,4 +1,5 @@
 import { h as head, k as attr, i as ensure_array_like, j as attr_class, e as escape_html, f as bind_props } from "../../../../chunks/index.js";
+import { p as parseDate } from "../../../../chunks/date.js";
 import { o as onDestroy } from "../../../../chunks/index-server.js";
 import "@sveltejs/kit/internal";
 import "../../../../chunks/exports.js";
@@ -22,7 +23,7 @@ function _page($$renderer, $$props) {
     function getReleaseStatus(token, current) {
       if (token.is_released === 1) {
         if (!token.released_at) return { active: true, label: "Dirilis" };
-        const releasedAt = (/* @__PURE__ */ new Date(token.released_at + "Z")).getTime();
+        const releasedAt = parseDate(token.released_at).getTime();
         const remaining = releasedAt + 15 * 60 * 1e3 - current;
         if (remaining > 0) {
           const m = Math.floor(remaining / 6e4);
@@ -76,7 +77,7 @@ function _page($$renderer, $$props) {
         } else {
           $$renderer2.push("<!--[-1-->");
         }
-        $$renderer2.push(`<!--]--></div> <p class="text-sm text-slate-600">${escape_html(token.exam_title)}</p> <p class="text-xs text-slate-400 mt-1">Berlaku hingga: ${escape_html((/* @__PURE__ */ new Date(String(token.expires_at).replace(" ", "T") + (String(token.expires_at).includes(" ") && !String(token.expires_at).includes("Z") ? "Z" : ""))).toLocaleString("id-ID"))}</p></div> <div class="flex items-center gap-2 flex-shrink-0">`);
+        $$renderer2.push(`<!--]--></div> <p class="text-sm text-slate-600">${escape_html(token.exam_title)}</p> <p class="text-xs text-slate-400 mt-1">Berlaku hingga: ${escape_html(parseDate(token.expires_at).toLocaleString("id-ID"))}</p></div> <div class="flex items-center gap-2 flex-shrink-0">`);
         if (!expired) {
           $$renderer2.push("<!--[0-->");
           if (status.active) {

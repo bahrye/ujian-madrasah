@@ -1,11 +1,12 @@
 import { h as head, i as ensure_array_like, k as attr, e as escape_html, c as stringify, f as bind_props } from "../../../../chunks/index.js";
+import { p as parseDate } from "../../../../chunks/date.js";
 import { I as ICONS } from "../../../../chunks/constants.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let data = $$props["data"];
     function formatScheduleDate(dateString) {
       if (!dateString) return "Belum ditentukan";
-      const date = new Date(dateString);
+      const date = parseDate(dateString);
       const today = /* @__PURE__ */ new Date();
       date.setHours(0, 0, 0, 0);
       today.setHours(0, 0, 0, 0);
@@ -26,10 +27,10 @@ function _page($$renderer, $$props) {
     }
     function formatTimeRange(startStr, endStr) {
       if (!startStr) return "--:--";
-      const start = new Date(startStr);
+      const start = parseDate(startStr);
       const startFormatted = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" }).format(start);
       if (!endStr) return `${startFormatted} - Selesai`;
-      const end = new Date(endStr);
+      const end = parseDate(endStr);
       const endFormatted = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" }).format(end);
       if (start.getDate() === end.getDate() && start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
         return `${startFormatted} - ${endFormatted}`;
@@ -40,10 +41,10 @@ function _page($$renderer, $$props) {
     }
     function getExamStatus(exam) {
       const now = /* @__PURE__ */ new Date();
-      if (exam.end_time && now > new Date(exam.end_time)) {
+      if (exam.end_time && now > parseDate(exam.end_time)) {
         return "ended";
       }
-      if (exam.start_time && now < new Date(exam.start_time)) {
+      if (exam.start_time && now < parseDate(exam.start_time)) {
         return "upcoming";
       }
       return "active";

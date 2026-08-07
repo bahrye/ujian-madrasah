@@ -1,4 +1,5 @@
 import { h as head, e as escape_html, k as attr, i as ensure_array_like, f as bind_props } from "../../../../chunks/index.js";
+import { p as parseDate } from "../../../../chunks/date.js";
 import "@sveltejs/kit/internal";
 import "../../../../chunks/exports.js";
 import "../../../../chunks/utils2.js";
@@ -44,7 +45,7 @@ function _page($$renderer, $$props) {
         } else {
           $$renderer2.push("<!--[-1-->");
         }
-        $$renderer2.push(`<!--]--></div></td><td class="p-4 text-sm text-slate-600">@${escape_html(sa.username)}</td><td class="p-4 text-xs text-slate-500">${escape_html((/* @__PURE__ */ new Date(String(sa.created_at).replace(" ", "T") + (String(sa.created_at).includes(" ") && !String(sa.created_at).includes("Z") ? "Z" : ""))).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }))}</td><td class="p-4 text-right">`);
+        $$renderer2.push(`<!--]--></div></td><td class="p-4 text-sm text-slate-600">@${escape_html(sa.username)}</td><td class="p-4 text-xs text-slate-500">${escape_html(parseDate(sa.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }))}</td><td class="p-4 text-right">`);
         if (sa.id === data.currentUser.id) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<span class="text-xs text-slate-400 italic">Aktif</span>`);

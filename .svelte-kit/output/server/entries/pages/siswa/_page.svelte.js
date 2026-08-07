@@ -1,5 +1,6 @@
 import { h as head, e as escape_html, k as attr, c as stringify, i as ensure_array_like, j as attr_class, l as clsx, f as bind_props } from "../../../chunks/index.js";
 import { A as ATTEMPT_STATUS_COLORS, a as ATTEMPT_STATUS_LABELS, I as ICONS } from "../../../chunks/constants.js";
+import { p as parseDate } from "../../../chunks/date.js";
 import { o as onDestroy } from "../../../chunks/index-server.js";
 import { S as ScoreDisplay } from "../../../chunks/ScoreDisplay.js";
 function _page($$renderer, $$props) {
@@ -9,13 +10,6 @@ function _page($$renderer, $$props) {
     let currentTime = /* @__PURE__ */ new Date();
     onDestroy(() => {
     });
-    function parseDate(dateStr) {
-      if (!dateStr) return /* @__PURE__ */ new Date();
-      if (dateStr.includes(" ")) {
-        return /* @__PURE__ */ new Date(dateStr.replace(" ", "T") + (dateStr.includes(" ") && !dateStr.includes("Z") ? "Z" : ""));
-      }
-      return new Date(dateStr);
-    }
     function formatTimeRange(startStr, endStr) {
       if (!startStr) return "--:--";
       const start = parseDate(startStr);

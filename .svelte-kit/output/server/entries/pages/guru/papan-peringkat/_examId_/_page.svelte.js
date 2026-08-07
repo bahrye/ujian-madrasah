@@ -1,4 +1,5 @@
 import { h as head, k as attr, c as stringify, e as escape_html, i as ensure_array_like, f as bind_props } from "../../../../../chunks/index.js";
+import { p as parseDate } from "../../../../../chunks/date.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let data = $$props["data"];
@@ -23,7 +24,7 @@ function _page($$renderer, $$props) {
       const each_array = ensure_array_like(data.leaderboard);
       for (let index = 0, $$length = each_array.length; index < $$length; index++) {
         let student = each_array[index];
-        const timeSpent = new Date(student.submit_time).getTime() - new Date(student.start_time).getTime();
+        const timeSpent = new Date(student.submit_time).getTime() - parseDate(student.start_time).getTime();
         $$renderer2.push(`<tr class="hover:bg-slate-50 transition-colors"><td class="p-4 text-center align-middle">`);
         if (index === 0) {
           $$renderer2.push("<!--[0-->");

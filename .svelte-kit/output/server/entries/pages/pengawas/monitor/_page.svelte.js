@@ -1,4 +1,5 @@
 import { h as head, i as ensure_array_like, e as escape_html, j as attr_class, k as attr, l as clsx, a as attr_style, f as bind_props, c as stringify } from "../../../../chunks/index.js";
+import { p as parseDate } from "../../../../chunks/date.js";
 import { o as onDestroy } from "../../../../chunks/index-server.js";
 import "@sveltejs/kit/internal";
 import "../../../../chunks/exports.js";
@@ -116,8 +117,8 @@ function _page($$renderer, $$props) {
         } else if (a.status === "mengerjakan") {
           $$renderer2.push("<!--[1-->");
           const endStr = a.end_time.replace(" ", "T") + (a.end_time.includes(" ") && !a.end_time.includes("Z") ? "Z" : "");
-          const end = new Date(endStr).getTime();
-          const compareTime = a.is_paused && a.paused_at ? (/* @__PURE__ */ new Date(a.paused_at.replace(" ", "T") + (a.paused_at.includes(" ") && !a.paused_at.includes("Z") ? "Z" : ""))).getTime() : currentTime;
+          const end = parseDate(endStr).getTime();
+          const compareTime = a.is_paused && a.paused_at ? parseDate(a.paused_at).getTime() : currentTime;
           const remainingMs = end - compareTime;
           if (remainingMs > 0) {
             $$renderer2.push("<!--[0-->");
@@ -141,8 +142,8 @@ function _page($$renderer, $$props) {
           $$renderer2.push("<!--[-1-->");
           const endStr = a.end_time.replace(" ", "T") + (a.end_time.includes(" ") && !a.end_time.includes("Z") ? "Z" : "");
           const submitStr = a.submit_time ? a.submit_time.replace(" ", "T") + (a.submit_time.includes(" ") && !a.submit_time.includes("Z") ? "Z" : "") : endStr;
-          const end = new Date(endStr).getTime();
-          const submit = new Date(submitStr).getTime();
+          const end = parseDate(endStr).getTime();
+          const submit = parseDate(submitStr).getTime();
           const remainingMs = end - submit;
           if (remainingMs > 0) {
             $$renderer2.push("<!--[0-->");
