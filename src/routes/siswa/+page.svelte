@@ -18,7 +18,13 @@
 		
 		return true;
 	});
-	$: myAttempts = data.myAttempts as any[];
+	$: myAttempts = (data.myAttempts as any[]).filter(a => {
+		const attemptDate = parseDate(a.created_at);
+		const today = new Date();
+		return attemptDate.getDate() === today.getDate() && 
+			   attemptDate.getMonth() === today.getMonth() && 
+			   attemptDate.getFullYear() === today.getFullYear();
+	});
 	$: activeAttempt = data.activeAttempt as any;
 
 	let currentTime = new Date();
@@ -388,7 +394,7 @@
 
 	<!-- History -->
 	<div>
-		<h2 class="text-lg font-bold text-slate-800 mb-3">Riwayat Ujian</h2>
+		<h2 class="text-lg font-bold text-slate-800 mb-3">Riwayat Ujian Hari Ini</h2>
 		{#if myAttempts.length === 0}
 			<div class="card p-6 text-center text-slate-400 text-sm">Belum ada riwayat ujian.</div>
 		{:else}
