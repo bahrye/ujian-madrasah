@@ -568,7 +568,13 @@
 				{/if}
 
 				<div class="flex gap-3 pt-2">
-					<button type="button" class="btn-ghost flex-1" on:click={() => (showCreateForm = false)}>Batal</button>
+					<button type="button" class="btn-ghost flex-1" on:click={() => {
+						showCreateForm = false;
+						createQuestionText = '';
+						options = ['', '', '', ''];
+						optionCount = 4;
+						createMenjodohkanCount = 4;
+					}}>Batal</button>
 					<button type="submit" class="btn-primary flex-1">Simpan Soal</button>
 				</div>
 			</form>
