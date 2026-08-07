@@ -24,7 +24,11 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 		// If we see a new question start, AND the current chunk already has substantial content
 		if (/^\d+[\.\)]\s/.test(text)) {
 			const hasContent = currentChunk.some(e => e.textContent?.trim() || e.querySelector('img'));
-			if (hasContent) {
+			// Only split if we have already seen options in the current chunk.
+			// This prevents splitting on numbered statements (e.g. "1. Pernyataan satu") which appear before options.
+			const hasExplicitOptions = currentChunk.some(e => /^[a-eA-E][\.\)]\s/i.test(e.textContent?.trim() || ''));
+			
+			if (hasContent && hasExplicitOptions) {
 				chunks.push(currentChunk);
 				currentChunk = [];
 			}
@@ -200,6 +204,15 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 					firstText = walker.nextNode();
 				}
 				questionElements[0] = cloned;
+			}
+		}
+		
+		// Convert any orphaned LI elements in questionElements to DIV to prevent black bullet points
+		for (let i = 0; i < questionElements.length; i++) {
+			if (questionElements[i].tagName === 'LI') {
+				const div = document.createElement('div');
+				div.innerHTML = questionElements[i].innerHTML;
+				questionElements[i] = div;
 			}
 		}
 		

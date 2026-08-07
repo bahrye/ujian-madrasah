@@ -29,6 +29,17 @@
 		@apply border border-slate-300 p-2;
 	}
 
+	/* List styles for rendered questions */
+	.prose ul {
+		@apply list-disc pl-5 my-2;
+	}
+	.prose ol {
+		@apply list-decimal pl-5 my-2;
+	}
+	.prose li {
+		@apply mb-1;
+	}
+
 	/* Custom scrollbar */
 	::-webkit-scrollbar {
 		@apply w-1.5;
