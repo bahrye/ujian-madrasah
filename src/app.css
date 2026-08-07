@@ -22,7 +22,7 @@
 
 	/* Table styles for rendered questions */
 	.prose table {
-		@apply border-collapse w-full my-4;
+		@apply border-collapse my-4;
 	}
 	.prose th,
 	.prose td {

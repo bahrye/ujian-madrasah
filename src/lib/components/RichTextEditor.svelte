@@ -125,7 +125,6 @@
 	}
 	div[contenteditable] :global(table) {
 		border-collapse: collapse;
-		width: 100%;
 		margin: 1rem 0;
 	}
 	div[contenteditable] :global(th),
