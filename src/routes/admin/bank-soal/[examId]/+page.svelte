@@ -95,9 +95,27 @@
 
 		if (hasText) {
 			const textData = e.clipboardData?.getData('text/plain');
-			// Jika ada teks yang valid, biarkan browser yang menangani paste (default behavior).
-			// Ini mencegah teks dari MS Word terbuang dan hanya gambar fallback yang terupload.
+			const htmlData = e.clipboardData?.getData('text/html');
+			
 			if (textData && textData.trim().length > 0) {
+				// Jika copy dari MS Word mengandung rumus/gambar, HTML-nya akan berisi src="file:///..."
+				// Browser memblokir local file, sehingga gambar/rumus menjadi rusak (broken).
+				// Untungnya MS Word juga menyediakan versi teks murni dari rumusnya di text/plain.
+				// Jadi jika terdeteksi file:///, kita paksa paste sebagai teks murni agar rumus tidak hilang.
+				if (htmlData && htmlData.includes('file:///')) {
+					e.preventDefault();
+					const escapedText = textData
+						.replace(/&/g, '&amp;')
+						.replace(/</g, '&lt;')
+						.replace(/>/g, '&gt;')
+						.replace(/\n/g, '<br>');
+					if (targetComponent) {
+						targetComponent.insertHtml(escapedText);
+					}
+					return;
+				}
+
+				// Jika tidak ada gambar lokal (copy web / teks biasa Word), biarkan browser paste HTML-nya.
 				return; 
 			}
 		}
