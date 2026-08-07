@@ -4,7 +4,7 @@ import { o as onDestroy } from "../../../chunks/index-server.js";
 import { S as ScoreDisplay } from "../../../chunks/ScoreDisplay.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
-    let activeExams, myAttempts, activeAttempt, proctorMap, totalExamsCount, groupedSchedules;
+    let activeExams, myAttempts, activeAttempt, groupedByType;
     let data = $$props["data"];
     let currentTime = /* @__PURE__ */ new Date();
     onDestroy(() => {
@@ -59,11 +59,11 @@ function _page($$renderer, $$props) {
       const date = parseDate(dateStr);
       return new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" }).format(date).replace(":", ".");
     }
-    function getProctorNumbers(namesStr) {
+    function getProctorNumbers(namesStr, map) {
       if (!namesStr) return "-";
       const names = namesStr.split("||").map((n) => n.trim()).filter(Boolean);
       if (names.length === 0) return "-";
-      const numbers = names.map((n) => proctorMap.get(n)).sort((a, b) => (a || 0) - (b || 0));
+      const numbers = names.map((n) => map.get(n)).sort((a, b) => (a || 0) - (b || 0));
       return numbers.join(" & ");
     }
     const rowColors = ["bg-white", "bg-slate-50"];
@@ -80,41 +80,53 @@ function _page($$renderer, $$props) {
     });
     myAttempts = data.myAttempts;
     activeAttempt = data.activeAttempt;
-    proctorMap = /* @__PURE__ */ new Map();
-    totalExamsCount = data.schedules?.length || 0;
-    groupedSchedules = (() => {
-      const groups = [];
-      if (!data.schedules) return groups;
-      let currentDateStr = "";
-      let currentGroup = null;
-      let colorCounter = 0;
-      let proctorCounter = 1;
-      proctorMap.clear();
+    groupedByType = (() => {
+      const typeGroups = [];
+      if (!data.schedules) return typeGroups;
+      const typeMap = /* @__PURE__ */ new Map();
       data.schedules.forEach((exam) => {
-        if (exam.proctor_names) {
-          (exam.proctor_names || "").split("||").forEach((p) => {
-            const name = p.trim();
-            if (name && !proctorMap.has(name)) {
-              proctorMap.set(name, proctorCounter++);
-            }
-          });
-        }
-        if (!exam.start_time) return;
-        const date = parseDate(String(exam.start_time));
-        const dateFormatted = new Intl.DateTimeFormat("id-ID", {
-          weekday: "long",
-          day: "numeric",
-          month: "long",
-          year: "numeric"
-        }).format(date);
-        if (dateFormatted !== currentDateStr) {
-          currentDateStr = dateFormatted;
-          currentGroup = { dateStr: dateFormatted, exams: [], colorIdx: colorCounter++ };
-          groups.push(currentGroup);
-        }
-        currentGroup?.exams.push(exam);
+        const tName = exam.exam_type_name || "Jadwal Ujian";
+        if (!typeMap.has(tName)) typeMap.set(tName, []);
+        typeMap.get(tName).push(exam);
       });
-      return groups;
+      typeMap.forEach((exams, typeName) => {
+        const days = [];
+        const localProctorMap = /* @__PURE__ */ new Map();
+        let currentDateStr = "";
+        let currentGroup = null;
+        let colorCounter = 0;
+        let proctorCounter = 1;
+        let totalExams = 0;
+        exams.forEach((exam) => {
+          if (exam.proctor_names) {
+            (exam.proctor_names || "").split("||").forEach((p) => {
+              const name = p.trim();
+              if (name && !localProctorMap.has(name)) {
+                localProctorMap.set(name, proctorCounter++);
+              }
+            });
+          }
+          if (!exam.start_time) return;
+          const date = parseDate(String(exam.start_time));
+          const dateFormatted = new Intl.DateTimeFormat("id-ID", {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+          }).format(date);
+          if (dateFormatted !== currentDateStr) {
+            currentDateStr = dateFormatted;
+            currentGroup = { dateStr: dateFormatted, exams: [], colorIdx: colorCounter++ };
+            days.push(currentGroup);
+          }
+          currentGroup?.exams.push(exam);
+          totalExams++;
+        });
+        if (days.length > 0) {
+          typeGroups.push({ typeName, days, proctorMap: localProctorMap, totalExams });
+        }
+      });
+      return typeGroups;
     })();
     head("1sjgise", $$renderer2, ($$renderer3) => {
       $$renderer3.title(($$renderer4) => {
@@ -154,41 +166,47 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<!--]--></div>`);
     }
     $$renderer2.push(`<!--]--></div> `);
-    if (data.schedules && data.schedules.length > 0) {
+    if (groupedByType.length > 0) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="mt-8 mb-4"><h2 class="text-lg font-bold text-slate-800 mb-3">Jadwal Ujian</h2> <div class="card overflow-x-auto bg-white !rounded-none !shadow-none border-2 border-slate-300 p-0"><table class="w-full text-sm border-collapse border-slate-300 whitespace-nowrap"><thead><tr class="bg-slate-100 text-slate-700"><th class="border-2 border-slate-300 px-3 py-2 uppercase">NO</th><th class="border-2 border-slate-300 px-3 py-2 uppercase">HARI, TANGGAL</th><th class="border-2 border-slate-300 px-3 py-2 uppercase">JAM KE</th><th class="border-2 border-slate-300 px-3 py-2 uppercase">WAKTU</th><th class="border-2 border-slate-300 px-3 py-2 uppercase">MATA PELAJARAN</th><th class="border-2 border-slate-300 px-3 py-2 uppercase">PENGAWAS</th><th class="border-2 border-slate-300 px-3 py-2">Daftar Pengawas</th></tr></thead><tbody><!--[-->`);
-      const each_array_1 = ensure_array_like(groupedSchedules);
-      for (let gIdx = 0, $$length = each_array_1.length; gIdx < $$length; gIdx++) {
-        let group = each_array_1[gIdx];
-        $$renderer2.push(`<!--[-->`);
-        const each_array_2 = ensure_array_like(group.exams);
-        for (let eIdx = 0, $$length2 = each_array_2.length; eIdx < $$length2; eIdx++) {
-          let exam = each_array_2[eIdx];
-          $$renderer2.push(`<tr${attr_class(rowColors[group.colorIdx % rowColors.length])}>`);
-          if (eIdx === 0) {
-            $$renderer2.push("<!--[0-->");
-            $$renderer2.push(`<td class="border-2 border-slate-300 px-3 py-2 text-center"${attr("rowspan", group.exams.length)}>${escape_html(gIdx + 1)}</td> <td class="border-2 border-slate-300 px-3 py-2 text-center"${attr("rowspan", group.exams.length)}>${escape_html(group.dateStr)}</td>`);
-          } else {
-            $$renderer2.push("<!--[-1-->");
-          }
-          $$renderer2.push(`<!--]--><td class="border-2 border-slate-300 px-3 py-2 text-center">${escape_html(eIdx + 1)}</td><td class="border-2 border-slate-300 px-3 py-2 text-center tracking-wider">${escape_html(formatOnlyTime(exam.start_time || ""))} - ${escape_html(formatOnlyTime(exam.end_time || ""))}</td><td class="border-2 border-slate-300 px-3 py-2 text-center">${escape_html(exam.subject_name || exam.title || "")}</td><td class="border-2 border-slate-300 px-3 py-2 text-center font-medium">${escape_html(getProctorNumbers(exam.proctor_names || ""))}</td>`);
-          if (gIdx === 0 && eIdx === 0) {
-            $$renderer2.push("<!--[0-->");
-            $$renderer2.push(`<td class="border-2 border-slate-300 px-4 py-2 align-top bg-white"${attr("rowspan", totalExamsCount)}><div class="space-y-0.5"><!--[-->`);
-            const each_array_3 = ensure_array_like(Array.from(proctorMap.entries()));
-            for (let $$index_1 = 0, $$length3 = each_array_3.length; $$index_1 < $$length3; $$index_1++) {
-              let [name, num] = each_array_3[$$index_1];
-              $$renderer2.push(`<div class="text-xs"><span class="inline-block w-4">${escape_html(num)}.</span> ${escape_html(name)}</div>`);
+      $$renderer2.push(`<div class="mt-8 mb-4 space-y-8"><!--[-->`);
+      const each_array_1 = ensure_array_like(groupedByType);
+      for (let $$index_4 = 0, $$length = each_array_1.length; $$index_4 < $$length; $$index_4++) {
+        let typeGroup = each_array_1[$$index_4];
+        $$renderer2.push(`<div><h2 class="text-lg font-bold text-slate-800 mb-3">Jadwal ${escape_html(typeGroup.typeName)}</h2> <div class="card overflow-x-auto bg-white !rounded-none !shadow-none border-2 border-slate-300 p-0"><table class="w-full text-sm border-collapse border-slate-300 whitespace-nowrap"><thead><tr class="bg-slate-100 text-slate-700"><th class="border-2 border-slate-300 px-3 py-2 uppercase">NO</th><th class="border-2 border-slate-300 px-3 py-2 uppercase">HARI, TANGGAL</th><th class="border-2 border-slate-300 px-3 py-2 uppercase">JAM KE</th><th class="border-2 border-slate-300 px-3 py-2 uppercase">WAKTU</th><th class="border-2 border-slate-300 px-3 py-2 uppercase">MATA PELAJARAN</th><th class="border-2 border-slate-300 px-3 py-2 uppercase">PENGAWAS</th><th class="border-2 border-slate-300 px-3 py-2">Daftar Pengawas</th></tr></thead><tbody><!--[-->`);
+        const each_array_2 = ensure_array_like(typeGroup.days);
+        for (let gIdx = 0, $$length2 = each_array_2.length; gIdx < $$length2; gIdx++) {
+          let group = each_array_2[gIdx];
+          $$renderer2.push(`<!--[-->`);
+          const each_array_3 = ensure_array_like(group.exams);
+          for (let eIdx = 0, $$length3 = each_array_3.length; eIdx < $$length3; eIdx++) {
+            let exam = each_array_3[eIdx];
+            $$renderer2.push(`<tr${attr_class(rowColors[group.colorIdx % rowColors.length])}>`);
+            if (eIdx === 0) {
+              $$renderer2.push("<!--[0-->");
+              $$renderer2.push(`<td class="border-2 border-slate-300 px-3 py-2 text-center"${attr("rowspan", group.exams.length)}>${escape_html(gIdx + 1)}</td> <td class="border-2 border-slate-300 px-3 py-2 text-center"${attr("rowspan", group.exams.length)}>${escape_html(group.dateStr)}</td>`);
+            } else {
+              $$renderer2.push("<!--[-1-->");
             }
-            $$renderer2.push(`<!--]--></div></td>`);
-          } else {
-            $$renderer2.push("<!--[-1-->");
+            $$renderer2.push(`<!--]--><td class="border-2 border-slate-300 px-3 py-2 text-center">${escape_html(eIdx + 1)}</td><td class="border-2 border-slate-300 px-3 py-2 text-center tracking-wider">${escape_html(formatOnlyTime(exam.start_time || ""))} - ${escape_html(formatOnlyTime(exam.end_time || ""))}</td><td class="border-2 border-slate-300 px-3 py-2 text-center">${escape_html(exam.subject_name || exam.title || "")}</td><td class="border-2 border-slate-300 px-3 py-2 text-center font-medium">${escape_html(getProctorNumbers(exam.proctor_names || "", typeGroup.proctorMap))}</td>`);
+            if (gIdx === 0 && eIdx === 0) {
+              $$renderer2.push("<!--[0-->");
+              $$renderer2.push(`<td class="border-2 border-slate-300 px-4 py-2 align-top bg-white"${attr("rowspan", typeGroup.totalExams)}><div class="space-y-0.5"><!--[-->`);
+              const each_array_4 = ensure_array_like(Array.from(typeGroup.proctorMap.entries()));
+              for (let $$index_1 = 0, $$length4 = each_array_4.length; $$index_1 < $$length4; $$index_1++) {
+                let [name, num] = each_array_4[$$index_1];
+                $$renderer2.push(`<div class="text-xs"><span class="inline-block w-4">${escape_html(num)}.</span> ${escape_html(name)}</div>`);
+              }
+              $$renderer2.push(`<!--]--></div></td>`);
+            } else {
+              $$renderer2.push("<!--[-1-->");
+            }
+            $$renderer2.push(`<!--]--></tr>`);
           }
-          $$renderer2.push(`<!--]--></tr>`);
+          $$renderer2.push(`<!--]-->`);
         }
-        $$renderer2.push(`<!--]-->`);
+        $$renderer2.push(`<!--]--></tbody></table></div></div>`);
       }
-      $$renderer2.push(`<!--]--></tbody></table></div></div>`);
+      $$renderer2.push(`<!--]--></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
@@ -199,9 +217,9 @@ function _page($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
       $$renderer2.push(`<div class="card overflow-hidden"><div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Ujian</th><th>Mapel</th><th>Status</th><th>Sisa Waktu</th><th>Nilai Otomatis</th><th>Nilai Manual</th><th>Nilai Akhir</th><th>Tanggal</th></tr></thead><tbody><!--[-->`);
-      const each_array_4 = ensure_array_like(myAttempts);
-      for (let $$index_4 = 0, $$length = each_array_4.length; $$index_4 < $$length; $$index_4++) {
-        let a = each_array_4[$$index_4];
+      const each_array_5 = ensure_array_like(myAttempts);
+      for (let $$index_5 = 0, $$length = each_array_5.length; $$index_5 < $$length; $$index_5++) {
+        let a = each_array_5[$$index_5];
         $$renderer2.push(`<tr><td class="font-medium">${escape_html(a.exam_title)}</td><td class="text-slate-500">${escape_html(a.subject || "-")}</td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[a.status]))}>${escape_html(ATTEMPT_STATUS_LABELS[a.status])}</span></td><td class="font-mono text-sm">`);
         if (a.status === "mengerjakan") {
           $$renderer2.push("<!--[0-->");
