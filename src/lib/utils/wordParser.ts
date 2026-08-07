@@ -43,12 +43,21 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 		const listItems = Array.from(list.children).filter(el => el.tagName === 'LI');
 		
 		let htmlToInject = '';
-		listItems.forEach((li, index) => {
+		let validItemCount = 0;
+		listItems.forEach((li) => {
 			let prefix = '';
-			if (isTopLevel) {
-				prefix = `${index + 1}. `; // Questions: 1., 2., 3.
+			const liText = li.textContent?.trim() || '';
+			
+			// Jika text ternyata KUNCI yang tidak sengaja masuk format list di MS Word
+			if (liText.toUpperCase().startsWith('KUNCI:')) {
+				prefix = '';
 			} else {
-				prefix = `${String.fromCharCode(65 + index)}. `; // Options: A., B., C.
+				if (isTopLevel) {
+					prefix = `${validItemCount + 1}. `; // Questions: 1., 2., 3.
+				} else {
+					prefix = `${String.fromCharCode(65 + validItemCount)}. `; // Options: A., B., C.
+				}
+				validItemCount++;
 			}
 			
 			const p = doc.createElement('p');
@@ -56,10 +65,12 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 			const walker = document.createTreeWalker(li, NodeFilter.SHOW_TEXT);
 			let firstText = walker.nextNode();
 			
-			if (firstText && firstText.nodeValue && firstText.nodeValue.trim().length > 0) {
-				firstText.nodeValue = prefix + firstText.nodeValue;
-			} else {
-				li.insertAdjacentText('afterbegin', prefix);
+			if (prefix !== '') {
+				if (firstText && firstText.nodeValue && firstText.nodeValue.trim().length > 0) {
+					firstText.nodeValue = prefix + firstText.nodeValue;
+				} else {
+					li.insertAdjacentText('afterbegin', prefix);
+				}
 			}
 			
 			while(li.firstChild) {
