@@ -228,6 +228,14 @@
 									cleanHtml = cleanHtml.replace(/<!--\[if !supportLists\]-->.*?<!--\[endif\]-->/gi, '');
 									cleanHtml = cleanHtml.replace(/^\s*(?:<[^>]+>)*\s*[a-eA-E][\.\)]\s*(?:<\/[^>]+>)*\s*(?:&nbsp;|\s)*/i, '');
 									parsedOptions[j] = cleanHtml.trim();
+								} else {
+									let plainText = parsedOptions[j];
+									plainText = plainText
+										.replace(/〖([^〗]+)〗\^([a-zA-Z0-9]+)/g, '$1<sup>$2</sup>')
+										.replace(/〖([^〗]+)〗_([a-zA-Z0-9]+)/g, '$1<sub>$2</sub>')
+										.replace(/([a-zA-Z0-9\)])\^([a-zA-Z0-9]+)/g, '$1<sup>$2</sup>')
+										.replace(/([a-zA-Z0-9\)])_([a-zA-Z0-9]+)/g, '$1<sub>$2</sub>');
+									parsedOptions[j] = plainText;
 								}
 							}
 						}
@@ -315,11 +323,17 @@
 						if (targetComponent) targetComponent.insertHtml(questionHtmlToPaste);
 						toasts.success('Smart Paste: Teks dan opsi berhasil diekstrak dengan format!');
 					} else {
-						const escapedText = textToPaste
+						let escapedText = textToPaste
 							.replace(/&/g, '&amp;')
 							.replace(/</g, '&lt;')
 							.replace(/>/g, '&gt;')
 							.replace(/\n/g, '<br>');
+							
+						escapedText = escapedText
+							.replace(/〖([^〗]+)〗\^([a-zA-Z0-9]+)/g, '$1<sup>$2</sup>')
+							.replace(/〖([^〗]+)〗_([a-zA-Z0-9]+)/g, '$1<sub>$2</sub>')
+							.replace(/([a-zA-Z0-9\)])\^([a-zA-Z0-9]+)/g, '$1<sup>$2</sup>')
+							.replace(/([a-zA-Z0-9\)])_([a-zA-Z0-9]+)/g, '$1<sub>$2</sub>');
 						
 						if (targetComponent && escapedText) {
 							targetComponent.insertHtml(escapedText);
