@@ -72,9 +72,11 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		WHERE e.school_id = ? 
 		  AND e.exam_type_id IN (
-			  SELECT exam_type_id 
-			  FROM exam_type_participants 
-			  WHERE student_id = ?
+			  SELECT DISTINCT exam_type_id 
+			  FROM exams 
+			  WHERE id IN (
+				  SELECT exam_id FROM exam_participants WHERE student_id = ?
+			  )
 		  )
 		  AND e.is_active = 1
 		  AND et.is_active = 1
