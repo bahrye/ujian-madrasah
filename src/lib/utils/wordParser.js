@@ -8,9 +8,19 @@ export function parseWordHtmlToQuestions(html) {
 	const questions = [];
 	let currentQuestion = null;
 	let parsingState = 'question'; // 'question' | 'options'
+	let hasFoundFirstQuestion = false;
 	
 	Array.from(doc.body.children).forEach(el => {
 		let text = el.textContent.trim();
+		
+		// Wait until we find the first question to avoid parsing instructions
+		if (!hasFoundFirstQuestion) {
+			if (/^\d+[\.\)]\s/.test(text)) {
+				hasFoundFirstQuestion = true;
+			} else {
+				return;
+			}
+		}
 		
 		// Check if it's a new question (starts with number and dot/parenthesis)
 		if (/^\d+[\.\)]\s/.test(text) && parsingState !== 'options') {
@@ -97,9 +107,9 @@ export function parseWordHtmlToQuestions(html) {
 				currentQuestion.options[currentQuestion.options.length - 1].html += '<br>' + el.innerHTML;
 			}
 		} else {
-			// If no current question, and we found text without "1. "
-			// Initialize a new question implicitly
-			if (text.length > 0 || el.querySelector('img')) {
+			// If no current question, and we found text without number
+			// Initialize a new question implicitly, but only if we are past the first question
+			if (hasFoundFirstQuestion && (text.length > 0 || el.querySelector('img'))) {
 				currentQuestion = {
 					questionHtml: [el.outerHTML],
 					options: [],
