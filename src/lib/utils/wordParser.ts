@@ -24,6 +24,54 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, 'text/html');
 	
+	// Pre-process lists (ol, ul) from Mammoth to extract auto-numbering
+	// because Mammoth converts auto-numbered paragraphs into HTML lists without the numbers
+	const lists = Array.from(doc.querySelectorAll('ol, ul'));
+	
+	// Process deepest lists first
+	lists.reverse().forEach(list => {
+		let isTopLevel = true;
+		let parent = list.parentElement;
+		while(parent && parent.tagName !== 'BODY') {
+			if (parent.tagName === 'OL' || parent.tagName === 'UL' || parent.tagName === 'LI') {
+				isTopLevel = false;
+				break;
+			}
+			parent = parent.parentElement;
+		}
+
+		const listItems = Array.from(list.children).filter(el => el.tagName === 'LI');
+		
+		let htmlToInject = '';
+		listItems.forEach((li, index) => {
+			let prefix = '';
+			if (isTopLevel) {
+				prefix = `${index + 1}. `; // Questions: 1., 2., 3.
+			} else {
+				prefix = `${String.fromCharCode(65 + index)}. `; // Options: A., B., C.
+			}
+			
+			const p = doc.createElement('p');
+			
+			const walker = document.createTreeWalker(li, NodeFilter.SHOW_TEXT);
+			let firstText = walker.nextNode();
+			
+			if (firstText && firstText.nodeValue && firstText.nodeValue.trim().length > 0) {
+				firstText.nodeValue = prefix + firstText.nodeValue;
+			} else {
+				li.insertAdjacentText('afterbegin', prefix);
+			}
+			
+			while(li.firstChild) {
+				p.appendChild(li.firstChild);
+			}
+			
+			htmlToInject += p.outerHTML;
+		});
+		
+		list.outerHTML = htmlToInject;
+	});
+	
 	const questions: ParsedQuestion[] = [];
 	let currentQuestion: ParsedQuestion | null = null;
 	let parsingState: 'question' | 'options' = 'question';
