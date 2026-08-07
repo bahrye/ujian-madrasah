@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import * as mammoth from 'mammoth';
+	import JSZip from 'jszip';
 	import { parseWordHtmlToQuestions } from '$lib/utils/wordParser';
 	import { env } from '$env/dynamic/public';
 	import { toasts } from '$lib/stores/toast';
@@ -81,6 +82,35 @@
 
 		try {
 			const arrayBuffer = await selectedFile.arrayBuffer();
+
+			// --- PREPROCESS DOCX FOR OMML (Math Equations) ---
+			// MS Word Equation Editor uses OMML (<m:oMath>). Mammoth ignores these tags.
+			// We use JSZip to read document.xml, extract the plain text from <m:t> tags,
+			// and convert them to standard Word text runs (<w:r><w:t>) so Mammoth can read them.
+			const zip = await JSZip.loadAsync(arrayBuffer);
+			const docXmlFile = zip.file("word/document.xml");
+			let modifiedArrayBuffer = arrayBuffer;
+			
+			if (docXmlFile) {
+				let xml = await docXmlFile.async("string");
+				
+				// 1. Convert <m:t> to <w:t>
+				xml = xml.replace(/<m:t>/g, '<w:t>');
+				xml = xml.replace(/<m:t ([^>]+)>/g, '<w:t $1>');
+				xml = xml.replace(/<\/m:t>/g, '</w:t>');
+
+				// 2. Convert <m:r> to <w:r>
+				xml = xml.replace(/<m:r>/g, '<w:r>');
+				xml = xml.replace(/<m:r ([^>]+)>/g, '<w:r $1>');
+				xml = xml.replace(/<\/m:r>/g, '</w:r>');
+
+				// 3. Remove all remaining m: tags (like m:oMath, m:f, m:num, etc)
+				xml = xml.replace(/<\/?m:[^>]+>/g, '');
+				
+				zip.file("word/document.xml", xml);
+				modifiedArrayBuffer = await zip.generateAsync({type: "arraybuffer"});
+			}
+			// --- END PREPROCESS ---
 			
 			// Konfigurasi Mammoth.js untuk mengonversi dokumen Word ke HTML
 			// dan sekaligus me-ngunggah gambar-gambar yang ada di dalamnya ke Cloudinary
@@ -102,7 +132,7 @@
 				})
 			};
 
-			const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer }, options);
+			const result = await mammoth.convertToHtml({ arrayBuffer: modifiedArrayBuffer }, options);
 			const html = result.value; 
 			
 			if (result.messages && result.messages.length > 0) {

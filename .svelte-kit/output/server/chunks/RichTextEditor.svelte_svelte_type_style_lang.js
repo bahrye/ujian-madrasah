@@ -1,5 +1,6 @@
 import { m as fallback, k as attr, f as bind_props, e as escape_html, i as ensure_array_like } from "./index.js";
 import "mammoth";
+import "jszip";
 import { p as public_env } from "./shared-server.js";
 import "./toast.js";
 import { h as html } from "./html.js";

@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg","template_soal_ujian.docx"]),
 	mimeTypes: {".svg":"image/svg+xml"},
 	_: {
-		client: {start:"_app/immutable/entry/start.dxfEiwKy.js",app:"_app/immutable/entry/app.BuIluMpL.js",imports:["_app/immutable/entry/start.dxfEiwKy.js","_app/immutable/chunks/BpotIU2G.js","_app/immutable/chunks/Daeh1Iq0.js","_app/immutable/chunks/knUfZVuA.js","_app/immutable/chunks/DILnuZdk.js","_app/immutable/chunks/DqglqMhs.js","_app/immutable/chunks/diGzQ5hW.js","_app/immutable/entry/app.BuIluMpL.js","_app/immutable/chunks/knUfZVuA.js","_app/immutable/chunks/DILnuZdk.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/Daeh1Iq0.js","_app/immutable/chunks/BsEC6tHK.js","_app/immutable/chunks/Djlry0b1.js","_app/immutable/chunks/IzJYtrUp.js","_app/immutable/chunks/By8t3yp7.js","_app/immutable/chunks/diGzQ5hW.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
+		client: null,
 		nodes: [
 			__memo(() => import('./nodes/0.js')),
 			__memo(() => import('./nodes/1.js')),
