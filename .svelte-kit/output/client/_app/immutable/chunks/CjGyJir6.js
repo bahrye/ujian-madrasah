@@ -1,0 +1,1 @@
+function i(n){if(!n)return new Date;let e=String(n);return e.includes(" ")&&!e.includes("Z")&&!e.includes("T")?e=e.replace(" ","T")+"Z":e.includes("T")&&!e.includes("Z")&&!e.includes("+")&&!e.includes("-")&&(e=e+"Z"),new Date(e)}export{i as p};
