@@ -263,22 +263,66 @@
 				}
 
 				// Jika copy dari MS Word mengandung rumus/gambar (file:///) ATAU kita melakukan Smart Paste
-				// Kita paksa paste sebagai teks murni agar rumus/opsi terformat dengan baik
+				// Kita cegah paste default
 				if ((htmlData && htmlData.includes('file:///')) || smartPasted) {
 					e.preventDefault();
-					const escapedText = textToPaste
-						.replace(/&/g, '&amp;')
-						.replace(/</g, '&lt;')
-						.replace(/>/g, '&gt;')
-						.replace(/\n/g, '<br>');
-					if (targetComponent && escapedText) {
-						targetComponent.insertHtml(escapedText);
-					}
 					
-					if (smartPasted) {
-						toasts.success('Smart Paste: Teks dan opsi berhasil diekstrak!');
+					let questionHtmlToPaste = null;
+					const hasLocalImage = htmlData && htmlData.includes('file:///');
+					
+					if (smartPasted && htmlData) {
+						const parser = new DOMParser();
+						const doc = parser.parseFromString(htmlData, 'text/html');
+						
+						const htmlOptionsExtracted = [];
+						const candidateElements = Array.from(doc.querySelectorAll('li, p, div'));
+						candidateElements.forEach(el => {
+							if (htmlOptionsExtracted.some(parent => parent.contains(el))) return;
+							const text = el.textContent?.trim() || '';
+							const html = el.innerHTML || '';
+							if (/^[a-eA-E][\.\)]/i.test(text) || />\s*[a-eA-E][\.\)]/i.test(html) || /<!--.*?-->\s*[a-eA-E][\.\)]/i.test(html) || /^\s*(?:<[^>]+>)*\s*[a-eA-E][\.\)]/i.test(html)) {
+								htmlOptionsExtracted.push(el);
+							}
+						});
+						
+						if (htmlOptionsExtracted.length === parsedOptions.length) {
+							htmlOptionsExtracted.forEach(el => el.remove());
+						}
+						
+						const walker = document.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, null, false);
+						let firstTextNode = null;
+						while (walker.nextNode()) {
+							if (walker.currentNode.nodeValue.trim().length > 0) {
+								firstTextNode = walker.currentNode;
+								break;
+							}
+						}
+						if (firstTextNode) {
+							firstTextNode.nodeValue = firstTextNode.nodeValue.replace(/^\s*\d+[\.\)]\s+/, '');
+						}
+						
+						questionHtmlToPaste = doc.body.innerHTML;
+					}
+
+					if (smartPasted && questionHtmlToPaste && !hasLocalImage) {
+						if (targetComponent) targetComponent.insertHtml(questionHtmlToPaste);
+						toasts.success('Smart Paste: Teks dan opsi berhasil diekstrak dengan format!');
 					} else {
-						toasts.success('Paste berhasil (format gambar lokal MS Word diubah ke teks)');
+						const escapedText = textToPaste
+							.replace(/&/g, '&amp;')
+							.replace(/</g, '&lt;')
+							.replace(/>/g, '&gt;')
+							.replace(/\n/g, '<br>');
+						
+						if (targetComponent && escapedText) {
+							targetComponent.insertHtml(escapedText);
+						}
+						
+						if (smartPasted) {
+							toasts.success('Smart Paste berhasil (format teks hilang untuk menyelamatkan tulisan rumus/gambar)');
+						} else {
+							toasts.success('Paste berhasil (format gambar lokal MS Word diubah ke teks)');
+						}
 					}
 					return;
 				}
