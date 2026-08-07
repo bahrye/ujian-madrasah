@@ -1,1 +1,0 @@
-import{B as c,u as o,E as d,d as i,aL as u}from"./BhtR-1bA.js";function k(e,n,f){c(()=>{var r=o(()=>n(e,f==null?void 0:f())||{});if(f&&(r!=null&&r.update)){var a=!1,t={};d(()=>{var s=f();i(s),a&&u(t,s)&&(t=s,r.update(s))}),a=!0}if(r!=null&&r.destroy)return()=>r.destroy()})}export{k as a};

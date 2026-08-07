@@ -123,38 +123,46 @@
 		}
 	}
 
-	// Media picker for options
-	let showOptionMediaPicker = false;
-	let activeOptionTarget: { form: 'create' | 'edit', type: 'pilihan_ganda' | 'pilihan_ganda_kompleks' | 'menjodohkan_left' | 'menjodohkan_right', index: number } | null = null;
+	// Media picker for options and editor
+	let showMediaPicker = false;
+	let activeMediaTarget: { type: 'editor' | 'option', target: any, form?: string, index?: number } | null = null;
 
-	function openOptionMediaPicker(form: 'create' | 'edit', type: 'pilihan_ganda' | 'pilihan_ganda_kompleks' | 'menjodohkan_left' | 'menjodohkan_right', index: number) {
-		activeOptionTarget = { form, type, index };
-		showOptionMediaPicker = true;
+	function openMediaPickerForOption(form: 'create' | 'edit', type: 'pilihan_ganda' | 'pilihan_ganda_kompleks' | 'menjodohkan_left' | 'menjodohkan_right', index: number) {
+		activeMediaTarget = { type: 'option', target: type, form, index };
+		showMediaPicker = true;
 	}
 
-	function insertMediaToOption(url: string, mediaType: string) {
-		if (!activeOptionTarget) return;
+	function openMediaPickerForEditor(editorComponent: any) {
+		activeMediaTarget = { type: 'editor', target: editorComponent };
+		showMediaPicker = true;
+	}
 
-		const { form, type, index } = activeOptionTarget;
+	function insertMedia(url: string, mediaType: string) {
+		if (!activeMediaTarget) return;
+
 		const htmlToInsert = mediaType === 'image' 
-			? `<img src="${url}" class="max-h-32 object-contain rounded-lg border border-slate-200">`
-			: `<audio controls src="${url}" class="w-full"></audio>`;
+			? `<img src="${url}" class="max-h-64 object-contain rounded-lg border border-slate-200 mt-2 mb-2">`
+			: `<audio controls src="${url}" class="w-full mt-2 mb-2"></audio>`;
 
-		let inputId = `${form}_`;
-		if (type.startsWith('pilihan_ganda')) inputId += `option_${index}`;
-		else if (type === 'menjodohkan_left') inputId += `left_${index}`;
-		else if (type === 'menjodohkan_right') inputId += `right_${index}`;
-		
-		const inputEl = document.getElementById(inputId) as HTMLInputElement;
-		if (inputEl) {
-			const prefix = inputEl.value.trim() !== '' ? '<br>' : '';
-			inputEl.value = inputEl.value + prefix + htmlToInsert;
-			// Trigger input event to update Svelte bindings if any
-			inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+		if (activeMediaTarget.type === 'editor' && activeMediaTarget.target) {
+			activeMediaTarget.target.insertHtml(htmlToInsert);
+		} else if (activeMediaTarget.type === 'option') {
+			const { form, target: type, index } = activeMediaTarget;
+			let inputId = `${form}_`;
+			if (type.startsWith('pilihan_ganda')) inputId += `option_${index}`;
+			else if (type === 'menjodohkan_left') inputId += `left_${index}`;
+			else if (type === 'menjodohkan_right') inputId += `right_${index}`;
+			
+			const inputEl = document.getElementById(inputId) as HTMLInputElement;
+			if (inputEl) {
+				const prefix = inputEl.value.trim() !== '' ? '<br>' : '';
+				inputEl.value = inputEl.value + prefix + htmlToInsert;
+				inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+			}
 		}
 		
-		showOptionMediaPicker = false;
-		activeOptionTarget = null;
+		showMediaPicker = false;
+		activeMediaTarget = null;
 	}
 
 	function portal(node: HTMLElement) {
@@ -283,7 +291,12 @@
 						bind:this={qEditorComponent}
 						on:paste={(e) => handlePaste(e, qEditorComponent)}
 					>
-						<div slot="toolbar-right">
+						<div slot="toolbar-right" class="flex gap-1 items-center">
+							<button type="button" class="btn-ghost btn-sm text-xs flex items-center gap-1 text-indigo-600 hover:bg-indigo-50" on:click={() => openMediaPickerForEditor(qEditorComponent)}>
+								<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+								Tambah Media
+							</button>
+							<div class="w-px h-3 bg-slate-200 mx-1"></div>
 							<button type="button" class="btn-ghost btn-sm text-xs flex items-center gap-1 text-indigo-600 hover:bg-indigo-50" on:click={() => handlePasteButtonClick(qEditorComponent)} disabled={isPastingImage}>
 								{#if isPastingImage}
 									<svg class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -297,25 +310,8 @@
 					</RichTextEditor>
 				</div>
 
-				<div class="bg-slate-50 border border-slate-100 rounded-xl p-4">
-					<MediaUploader 
-						label="File Media (Opsional)" 
-						accept="image/*,audio/*"
-						on:upload={(e) => {
-							const mediaUrlInput = document.getElementById('q-media-url') as HTMLInputElement;
-							const mediaTypeSelect = document.getElementById('q-media') as HTMLSelectElement;
-							if (mediaUrlInput) mediaUrlInput.value = e.detail.url;
-							if (mediaTypeSelect) mediaTypeSelect.value = e.detail.type;
-						}}
-						on:remove={() => {
-							const mediaUrlInput = document.getElementById('q-media-url') as HTMLInputElement;
-							const mediaTypeSelect = document.getElementById('q-media') as HTMLSelectElement;
-							if (mediaUrlInput) mediaUrlInput.value = '';
-							if (mediaTypeSelect) mediaTypeSelect.value = 'none';
-						}}
-					/>
-					<input type="hidden" id="q-media-url" name="media_url" />
-				</div>
+				<input type="hidden" name="media_url" value="" />
+				<input type="hidden" name="media_type" value="none" />
 
 				<div>
 					<label class="label" for="q-max-plays">Maks. Putar Audio</label>
@@ -330,7 +326,7 @@
 							<div class="flex items-center gap-2">
 								<span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500">{String.fromCharCode(65 + i)}</span>
 								<input id="create_option_{i}" name="option_{i}" type="text" class="input flex-1" placeholder="Opsi {String.fromCharCode(65 + i)}" required bind:value={options[i]} />
-								<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 shrink-0" on:click={() => openOptionMediaPicker('create', selectedType, i)} title="Tambahkan Media">
+								<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 shrink-0" on:click={() => openMediaPickerForOption('create', selectedType, i)} title="Tambahkan Media">
 									🖼️
 								</button>
 								{#if selectedType === 'pilihan_ganda_kompleks'}
@@ -375,11 +371,11 @@
 							<div class="grid grid-cols-2 gap-2">
 								<div class="flex gap-1">
 									<input id="create_left_{i}" name="left_{i}" type="text" class="input w-full" placeholder="Kiri {i + 1}" />
-									<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-2 shrink-0" on:click={() => openOptionMediaPicker('create', 'menjodohkan_left', i)} title="Media">🖼️</button>
+									<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-2 shrink-0" on:click={() => openMediaPickerForOption('create', 'menjodohkan_left', i)} title="Media">🖼️</button>
 								</div>
 								<div class="flex gap-1">
 									<input id="create_right_{i}" name="right_{i}" type="text" class="input w-full" placeholder="Kanan {i + 1}" />
-									<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-2 shrink-0" on:click={() => openOptionMediaPicker('create', 'menjodohkan_right', i)} title="Media">🖼️</button>
+									<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-2 shrink-0" on:click={() => openMediaPickerForOption('create', 'menjodohkan_right', i)} title="Media">🖼️</button>
 								</div>
 							</div>
 						{/each}
@@ -417,7 +413,7 @@
 					<div class="flex items-center gap-2 mb-1">
 						<span class="badge-primary text-[10px]">{QUESTION_TYPE_LABELS[q.type] || q.type}</span>
 						<span class="text-xs text-slate-400">{q.points} poin</span>
-						{#if q.media_type}
+						{#if q.media_type && q.media_type !== 'none'}
 							<span class="badge-info text-[10px]">📎 {q.media_type === 'image' ? 'Gambar' : 'Audio'}</span>
 						{/if}
 					</div>
@@ -461,10 +457,23 @@
 						</svg>
 					</button>
 					<div class="flex flex-col gap-2">
-						<button type="button" class="p-2 rounded-xl text-indigo-600 bg-indigo-50 hover:bg-indigo-500 hover:text-white transition-all shadow-sm" title="Edit soal" on:click={() => {
+						<button type="button" class="p-2 rounded-xl text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-700 transition-colors" title="Edit soal" on:click={() => {
 							editingQuestion = { ...q };
+							// Migrate old media to rich text
+							if (editingQuestion.media_url && editingQuestion.media_type !== 'none') {
+								const mediaHtml = editingQuestion.media_type === 'audio' 
+									? `<br><audio controls src="${editingQuestion.media_url}" class="w-full mt-2 mb-2"></audio>`
+									: `<br><img src="${editingQuestion.media_url}" class="max-h-64 object-contain rounded-lg border border-slate-200 mt-2 mb-2">`;
+								editingQuestion.question_text += mediaHtml;
+								editingQuestion.media_url = null;
+								editingQuestion.media_type = 'none';
+							}
 							if (q.type.startsWith('pilihan_ganda') && q.options_json) {
 								editOptionCount = JSON.parse(q.options_json).length;
+							}
+							if (q.type === 'menjodohkan' && q.options_json) {
+								const parsed = JSON.parse(q.options_json);
+								if (parsed.left) editMenjodohkanCount = parsed.left.length;
 							}
 						}}>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -528,7 +537,7 @@
 						<div>
 							<label class="label" for="eq-media">Media</label>
 							<select id="eq-media" name="media_type" class="select" value={editingQuestion.media_type}>
-								<option value={null}>Tanpa Media</option>
+								<option value="none">Tanpa Media</option>
 								<option value="image">Gambar</option>
 								<option value="audio">Audio</option>
 							</select>
@@ -545,7 +554,12 @@
 							bind:this={eqEditorComponent}
 							on:paste={(e) => handlePaste(e, eqEditorComponent)}
 						>
-							<div slot="toolbar-right">
+							<div slot="toolbar-right" class="flex gap-1 items-center">
+								<button type="button" class="btn-ghost btn-sm text-xs flex items-center gap-1 text-indigo-600 hover:bg-indigo-50" on:click={() => openMediaPickerForEditor(eqEditorComponent)}>
+									<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+									Tambah Media
+								</button>
+								<div class="w-px h-3 bg-slate-200 mx-1"></div>
 								<button type="button" class="btn-ghost btn-sm text-xs flex items-center gap-1 text-indigo-600 hover:bg-indigo-50" on:click={() => handlePasteButtonClick(eqEditorComponent)} disabled={isPastingImage}>
 									{#if isPastingImage}
 										<svg class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -559,22 +573,8 @@
 						</RichTextEditor>
 					</div>
 
-					<div class="bg-slate-50 border border-slate-100 rounded-xl p-4">
-						<MediaUploader 
-							label="Ubah/Unggah Media" 
-							accept="image/*,audio/*"
-							value={editingQuestion.media_url || ''}
-							on:upload={(e) => {
-								editingQuestion.media_url = e.detail.url;
-								editingQuestion.media_type = e.detail.type;
-							}}
-							on:remove={() => {
-								editingQuestion.media_url = '';
-								editingQuestion.media_type = null;
-							}}
-						/>
-						<input type="hidden" name="media_url" value={editingQuestion.media_url || ''} />
-					</div>
+					<input type="hidden" name="media_url" value={editingQuestion.media_url || ''} />
+					<input type="hidden" name="media_type" value={editingQuestion.media_type || 'none'} />
 
 					<!-- Type-specific fields for edit -->
 					{#if editingQuestion.type === 'pilihan_ganda' || editingQuestion.type === 'pilihan_ganda_kompleks'}
@@ -586,7 +586,7 @@
 								<div class="flex items-center gap-2">
 									<span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500">{String.fromCharCode(65 + i)}</span>
 									<input id="edit_option_{i}" name="option_{i}" type="text" class="input flex-1" value={opts[i] || ''} required />
-									<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 shrink-0" on:click={() => openOptionMediaPicker('edit', editingQuestion.type, i)} title="Tambahkan Media">
+									<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 shrink-0" on:click={() => openMediaPickerForOption('edit', editingQuestion.type, i)} title="Tambahkan Media">
 										🖼️
 									</button>
 									{#if editingQuestion.type === 'pilihan_ganda_kompleks'}
@@ -634,11 +634,11 @@
 								<div class="grid grid-cols-2 gap-2">
 									<div class="flex gap-1">
 										<input id="edit_left_{i}" name="left_{i}" type="text" class="input w-full" value={opts.left?.[i] || ''} placeholder="Kiri {i + 1}" />
-										<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-2 shrink-0" on:click={() => openOptionMediaPicker('edit', 'menjodohkan_left', i)} title="Media">🖼️</button>
+										<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-2 shrink-0" on:click={() => openMediaPickerForOption('edit', 'menjodohkan_left', i)} title="Media">🖼️</button>
 									</div>
 									<div class="flex gap-1">
 										<input id="edit_right_{i}" name="right_{i}" type="text" class="input w-full" value={opts.right?.[i] || ''} placeholder="Kanan {i + 1}" />
-										<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-2 shrink-0" on:click={() => openOptionMediaPicker('edit', 'menjodohkan_right', i)} title="Media">🖼️</button>
+										<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-2 shrink-0" on:click={() => openMediaPickerForOption('edit', 'menjodohkan_right', i)} title="Media">🖼️</button>
 									</div>
 								</div>
 							{/each}
@@ -689,26 +689,26 @@
 	{/if}
 {/if}
 
-<!-- Media Picker Modal for Options -->
-{#if showOptionMediaPicker}
+<!-- Media Picker Modal -->
+{#if showMediaPicker}
 	<div use:portal class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300">
 		<div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col transform scale-100">
 			<div class="p-4 border-b flex justify-between items-center bg-slate-50/50">
 				<h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
 					<svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2-2v12a2 2 0 002 2z" /></svg>
-					Tambahkan Media ke Opsi
+					Tambahkan Media {activeMediaTarget?.type === 'option' ? 'ke Opsi' : 'ke Soal'}
 				</h3>
-				<button type="button" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" on:click={() => showOptionMediaPicker = false}>
+				<button type="button" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" on:click={() => showMediaPicker = false}>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
 				</button>
 			</div>
 			<div class="p-5">
-				<p class="text-sm text-slate-500 mb-4">Pilih media dari bank berkas atau unggah baru. HTML media akan otomatis ditambahkan ke opsi jawaban.</p>
+				<p class="text-sm text-slate-500 mb-4">Pilih media dari bank berkas atau unggah baru. HTML media akan otomatis ditambahkan.</p>
 				<div class="border border-indigo-100 bg-indigo-50/30 rounded-xl p-4">
 					<MediaUploader 
 						label="Pilih / Unggah Media"
 						on:upload={(e) => {
-							insertMediaToOption(e.detail.url, e.detail.type);
+							insertMedia(e.detail.url, e.detail.type);
 						}}
 					/>
 				</div>
