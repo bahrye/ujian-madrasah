@@ -60,6 +60,7 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 			e.start_time,
 			e.end_time,
 			s.name as subject_name,
+			et.name as exam_type_name,
 			(
 				SELECT GROUP_CONCAT(u.name, '||')
 				FROM exam_proctors epr
@@ -79,7 +80,7 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		  )
 		  AND e.is_active = 1
 		  AND et.is_active = 1
-		ORDER BY e.start_time ASC, e.id ASC
+		ORDER BY et.id ASC, e.start_time ASC, e.id ASC
 	`).bind(locals.user!.school_id, userId).all();
 
 	return {

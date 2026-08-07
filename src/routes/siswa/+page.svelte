@@ -138,49 +138,66 @@
 		return new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(date).replace(':', '.');
 	}
 
-	$: proctorMap = new Map<string, number>();
-	$: totalExamsCount = data.schedules?.length || 0;
-	$: groupedSchedules = (() => {
-		const groups: { dateStr: string, exams: any[], colorIdx: number }[] = [];
-		if (!data.schedules) return groups;
+	type ScheduleGroup = { dateStr: string, exams: any[], colorIdx: number };
+	type TypeGroup = { typeName: string, days: ScheduleGroup[], proctorMap: Map<string, number>, totalExams: number };
+
+	$: groupedByType = (() => {
+		const typeGroups: TypeGroup[] = [];
+		if (!data.schedules) return typeGroups;
 		
-		let currentDateStr = '';
-		let currentGroup: { dateStr: string, exams: any[], colorIdx: number } | null = null;
-		let colorCounter = 0;
-		let proctorCounter = 1;
-		proctorMap.clear();
-
+		const typeMap = new Map<string, any[]>();
 		data.schedules.forEach((exam: any) => {
-			if (exam.proctor_names) {
-				(exam.proctor_names || '').split('||').forEach((p: string) => {
-					const name = p.trim();
-					if (name && !proctorMap.has(name)) {
-						proctorMap.set(name, proctorCounter++);
-					}
-				});
-			}
-
-			if (!exam.start_time) return;
-			const date = parseDate(String(exam.start_time));
-			const dateFormatted = new Intl.DateTimeFormat('id-ID', {
-				weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-			}).format(date);
-			
-			if (dateFormatted !== currentDateStr) {
-				currentDateStr = dateFormatted;
-				currentGroup = { dateStr: dateFormatted, exams: [], colorIdx: colorCounter++ };
-				groups.push(currentGroup);
-			}
-			currentGroup?.exams.push(exam);
+			const tName = exam.exam_type_name || 'Jadwal Ujian';
+			if (!typeMap.has(tName)) typeMap.set(tName, []);
+			typeMap.get(tName)!.push(exam);
 		});
-		return groups;
+
+		typeMap.forEach((exams, typeName) => {
+			const days: ScheduleGroup[] = [];
+			const localProctorMap = new Map<string, number>();
+			let currentDateStr = '';
+			let currentGroup: ScheduleGroup | null = null;
+			let colorCounter = 0;
+			let proctorCounter = 1;
+			let totalExams = 0;
+
+			exams.forEach(exam => {
+				if (exam.proctor_names) {
+					(exam.proctor_names || '').split('||').forEach((p: string) => {
+						const name = p.trim();
+						if (name && !localProctorMap.has(name)) {
+							localProctorMap.set(name, proctorCounter++);
+						}
+					});
+				}
+
+				if (!exam.start_time) return;
+				const date = parseDate(String(exam.start_time));
+				const dateFormatted = new Intl.DateTimeFormat('id-ID', {
+					weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+				}).format(date);
+				
+				if (dateFormatted !== currentDateStr) {
+					currentDateStr = dateFormatted;
+					currentGroup = { dateStr: dateFormatted, exams: [], colorIdx: colorCounter++ };
+					days.push(currentGroup);
+				}
+				currentGroup?.exams.push(exam);
+				totalExams++;
+			});
+
+			if (days.length > 0) {
+				typeGroups.push({ typeName, days, proctorMap: localProctorMap, totalExams });
+			}
+		});
+		return typeGroups;
 	})();
 
-	function getProctorNumbers(namesStr: string | null) {
+	function getProctorNumbers(namesStr: string | null, map: Map<string, number>) {
 		if (!namesStr) return '-';
 		const names = namesStr.split('||').map(n => n.trim()).filter(Boolean);
 		if (names.length === 0) return '-';
-		const numbers = names.map(n => proctorMap.get(n)).sort((a, b) => (a || 0) - (b || 0));
+		const numbers = names.map(n => map.get(n)).sort((a, b) => (a || 0) - (b || 0));
 		return numbers.join(' & ');
 	}
 
@@ -299,55 +316,59 @@
 	</div>
 
 	<!-- Jadwal Ujian Table -->
-	{#if data.schedules && data.schedules.length > 0}
-	<div class="mt-8 mb-4">
-		<h2 class="text-lg font-bold text-slate-800 mb-3">Jadwal Ujian</h2>
-		<div class="card overflow-x-auto bg-white !rounded-none !shadow-none border-2 border-slate-300 p-0">
-			<table class="w-full text-sm border-collapse border-slate-300 whitespace-nowrap">
-				<thead>
-					<tr class="bg-slate-100 text-slate-700">
-						<th class="border-2 border-slate-300 px-3 py-2 uppercase">NO</th>
-						<th class="border-2 border-slate-300 px-3 py-2 uppercase">HARI, TANGGAL</th>
-						<th class="border-2 border-slate-300 px-3 py-2 uppercase">JAM KE</th>
-						<th class="border-2 border-slate-300 px-3 py-2 uppercase">WAKTU</th>
-						<th class="border-2 border-slate-300 px-3 py-2 uppercase">MATA PELAJARAN</th>
-						<th class="border-2 border-slate-300 px-3 py-2 uppercase">PENGAWAS</th>
-						<th class="border-2 border-slate-300 px-3 py-2">Daftar Pengawas</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each groupedSchedules as group, gIdx}
-						{#each group.exams as exam, eIdx}
-							<tr class="{rowColors[group.colorIdx % rowColors.length]}">
-								{#if eIdx === 0}
-									<td class="border-2 border-slate-300 px-3 py-2 text-center" rowspan={group.exams.length}>{gIdx + 1}</td>
-									<td class="border-2 border-slate-300 px-3 py-2 text-center" rowspan={group.exams.length}>{group.dateStr}</td>
-								{/if}
-								<td class="border-2 border-slate-300 px-3 py-2 text-center">{eIdx + 1}</td>
-								<td class="border-2 border-slate-300 px-3 py-2 text-center tracking-wider">
-									{formatOnlyTime(exam.start_time || '')} - {formatOnlyTime(exam.end_time || '')}
-								</td>
-								<td class="border-2 border-slate-300 px-3 py-2 text-center">{exam.subject_name || exam.title || ''}</td>
-								<td class="border-2 border-slate-300 px-3 py-2 text-center font-medium">
-									{getProctorNumbers(exam.proctor_names || '')}
-								</td>
-								{#if gIdx === 0 && eIdx === 0}
-									<td class="border-2 border-slate-300 px-4 py-2 align-top bg-white" rowspan={totalExamsCount}>
-										<div class="space-y-0.5">
-											{#each Array.from(proctorMap.entries()) as [name, num]}
-												<div class="text-xs">
-													<span class="inline-block w-4">{num}.</span> {name}
-												</div>
-											{/each}
-										</div>
+	{#if groupedByType.length > 0}
+	<div class="mt-8 mb-4 space-y-8">
+		{#each groupedByType as typeGroup}
+		<div>
+			<h2 class="text-lg font-bold text-slate-800 mb-3">Jadwal {typeGroup.typeName}</h2>
+			<div class="card overflow-x-auto bg-white !rounded-none !shadow-none border-2 border-slate-300 p-0">
+				<table class="w-full text-sm border-collapse border-slate-300 whitespace-nowrap">
+					<thead>
+						<tr class="bg-slate-100 text-slate-700">
+							<th class="border-2 border-slate-300 px-3 py-2 uppercase">NO</th>
+							<th class="border-2 border-slate-300 px-3 py-2 uppercase">HARI, TANGGAL</th>
+							<th class="border-2 border-slate-300 px-3 py-2 uppercase">JAM KE</th>
+							<th class="border-2 border-slate-300 px-3 py-2 uppercase">WAKTU</th>
+							<th class="border-2 border-slate-300 px-3 py-2 uppercase">MATA PELAJARAN</th>
+							<th class="border-2 border-slate-300 px-3 py-2 uppercase">PENGAWAS</th>
+							<th class="border-2 border-slate-300 px-3 py-2">Daftar Pengawas</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each typeGroup.days as group, gIdx}
+							{#each group.exams as exam, eIdx}
+								<tr class="{rowColors[group.colorIdx % rowColors.length]}">
+									{#if eIdx === 0}
+										<td class="border-2 border-slate-300 px-3 py-2 text-center" rowspan={group.exams.length}>{gIdx + 1}</td>
+										<td class="border-2 border-slate-300 px-3 py-2 text-center" rowspan={group.exams.length}>{group.dateStr}</td>
+									{/if}
+									<td class="border-2 border-slate-300 px-3 py-2 text-center">{eIdx + 1}</td>
+									<td class="border-2 border-slate-300 px-3 py-2 text-center tracking-wider">
+										{formatOnlyTime(exam.start_time || '')} - {formatOnlyTime(exam.end_time || '')}
 									</td>
-								{/if}
-							</tr>
+									<td class="border-2 border-slate-300 px-3 py-2 text-center">{exam.subject_name || exam.title || ''}</td>
+									<td class="border-2 border-slate-300 px-3 py-2 text-center font-medium">
+										{getProctorNumbers(exam.proctor_names || '', typeGroup.proctorMap)}
+									</td>
+									{#if gIdx === 0 && eIdx === 0}
+										<td class="border-2 border-slate-300 px-4 py-2 align-top bg-white" rowspan={typeGroup.totalExams}>
+											<div class="space-y-0.5">
+												{#each Array.from(typeGroup.proctorMap.entries()) as [name, num]}
+													<div class="text-xs">
+														<span class="inline-block w-4">{num}.</span> {name}
+													</div>
+												{/each}
+											</div>
+										</td>
+									{/if}
+								</tr>
+							{/each}
 						{/each}
-					{/each}
-				</tbody>
-			</table>
+					</tbody>
+				</table>
+			</div>
 		</div>
+		{/each}
 	</div>
 	{/if}
 
