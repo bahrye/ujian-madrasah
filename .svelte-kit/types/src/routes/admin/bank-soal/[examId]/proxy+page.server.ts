@@ -225,6 +225,9 @@ export const actions = {
 						await deleteFromCloudinary(q.media_url, env);
 			}
 
+			// Hapus referensi jawaban siswa untuk mencegah error foreign key
+			await db.prepare('DELETE FROM student_answers WHERE question_id = ?').bind(parsedId).run();
+
 			await db.prepare('DELETE FROM questions WHERE id = ?').bind(parsedId).run();
 			return { success: 'Soal berhasil dihapus.' };
 		} catch (e: any) {

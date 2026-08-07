@@ -197,6 +197,7 @@ const actions = {
       if (q && q.media_url && q.media_url.includes("res.cloudinary.com")) {
         await deleteFromCloudinary(q.media_url, private_env);
       }
+      await db.prepare("DELETE FROM student_answers WHERE question_id = ?").bind(parsedId).run();
       await db.prepare("DELETE FROM questions WHERE id = ?").bind(parsedId).run();
       return { success: "Soal berhasil dihapus." };
     } catch (e) {
