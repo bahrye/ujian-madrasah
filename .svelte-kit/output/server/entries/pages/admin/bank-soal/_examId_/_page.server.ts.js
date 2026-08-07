@@ -9,7 +9,12 @@ const load = async ({ platform, params, locals }) => {
   if (isNaN(parsedExamId)) throw error(400, "ID Ujian tidak valid");
   const exam = await db.prepare("SELECT * FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
   if (!exam) throw error(404, "Ujian tidak ditemukan");
-  const questions = await db.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number").bind(parsedExamId).all();
+  const questions = await db.prepare(`
+		SELECT q.*, (SELECT COUNT(*) FROM student_answers sa WHERE sa.question_id = q.id) as answers_count 
+		FROM questions q 
+		WHERE q.exam_id = ? 
+		ORDER BY q.question_number
+	`).bind(parsedExamId).all();
   return { exam, questions: questions.results };
 };
 const actions = {

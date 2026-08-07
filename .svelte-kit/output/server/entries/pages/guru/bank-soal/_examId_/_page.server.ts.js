@@ -13,7 +13,12 @@ const load = async ({ platform, params, locals }) => {
   if (exam.created_by !== locals.user.id && !isTeacher) {
     throw error(403, "Anda tidak memiliki akses ke ujian ini.");
   }
-  const questions = await db.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number").bind(parsedExamId).all();
+  const questions = await db.prepare(`
+		SELECT q.*, (SELECT COUNT(*) FROM student_answers sa WHERE sa.question_id = q.id) as answers_count 
+		FROM questions q 
+		WHERE q.exam_id = ? 
+		ORDER BY q.question_number
+	`).bind(parsedExamId).all();
   return { exam, questions: questions.results };
 };
 const actions = {

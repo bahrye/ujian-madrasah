@@ -115,7 +115,9 @@ function _page($$renderer, $$props) {
           ConfirmForm($$renderer3, {
             action: "?/delete",
             confirmTitle: "Hapus Soal",
-            confirmMessage: "Hapus soal ini?",
+            confirmMessage: q.answers_count > 0 ? `Hapus soal ini? <br><br><strong>Perhatian:</strong> Sudah ada ${q.answers_count} jawaban siswa untuk soal ini. Menghapus soal akan ikut menghapus riwayat jawaban mereka.` : "Hapus soal ini?",
+            verifyText: q.answers_count > 0 ? q.question_number.toString() : null,
+            verifyPlaceholder: "Nomor soal",
             buttonClass: "p-2 rounded-xl text-rose-600 bg-rose-50 hover:bg-rose-500 hover:text-white transition-all shadow-sm flex items-center justify-center",
             buttonTitle: "Hapus soal",
             $$slots: {

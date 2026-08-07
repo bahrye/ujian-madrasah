@@ -11,6 +11,8 @@ function ConfirmForm($$renderer, $$props) {
   let confirmTitle = fallback($$props["confirmTitle"], "Konfirmasi");
   let buttonClass = fallback($$props["buttonClass"], "");
   let buttonTitle = fallback($$props["buttonTitle"], "");
+  let verifyText = fallback($$props["verifyText"], null);
+  let verifyPlaceholder = fallback($$props["verifyPlaceholder"], null);
   $$renderer.push(`<form method="POST"${attr("action", action)} class="inline-block"><!--[-->`);
   slot($$renderer, $$props, "inputs", {});
   $$renderer.push(`<!--]--> <button type="submit"${attr_class(clsx(buttonClass))}${attr("title", buttonTitle)}><!--[-->`);
@@ -25,7 +27,9 @@ function ConfirmForm($$renderer, $$props) {
     confirmMessage,
     confirmTitle,
     buttonClass,
-    buttonTitle
+    buttonTitle,
+    verifyText,
+    verifyPlaceholder
   });
 }
 export {

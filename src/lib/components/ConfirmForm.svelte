@@ -8,10 +8,13 @@
 	export let confirmTitle: string = 'Konfirmasi';
 	export let buttonClass: string = '';
 	export let buttonTitle: string = '';
+	export let verifyText: string | null = null;
+	export let verifyPlaceholder: string | null = null;
 
 	let showModal = false;
 	let formElement: HTMLFormElement;
 	let isConfirmed = false;
+	let verifyInput = '';
 
 	const handleEnhance: SubmitFunction = ({ cancel }) => {
 		if (!isConfirmed) {
@@ -38,6 +41,7 @@
 			// Reset confirmation state
 			setTimeout(() => {
 				isConfirmed = false;
+				verifyInput = '';
 			}, 100);
 		}, 0);
 	}
@@ -71,11 +75,31 @@
 					</svg>
 				</div>
 				<h3 class="text-lg font-bold text-slate-900">{confirmTitle}</h3>
-				<p class="text-slate-500 mt-2 text-sm">{confirmMessage}</p>
+				<p class="text-slate-500 mt-2 text-sm">{@html confirmMessage}</p>
+				{#if verifyText}
+					<div class="mt-4">
+						<label class="block text-sm font-medium text-slate-700 mb-1">
+							Silakan ketik <strong class="text-rose-600 select-all">{verifyText}</strong> untuk konfirmasi:
+						</label>
+						<input 
+							type="text" 
+							bind:value={verifyInput} 
+							class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-sm" 
+							placeholder={verifyPlaceholder || verifyText} 
+						/>
+					</div>
+				{/if}
 			</div>
 			<div class="px-6 py-4 bg-slate-50 flex justify-end gap-3 rounded-b-2xl border-t border-slate-100">
-				<button type="button" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-colors" on:click={() => showModal = false}>Batal</button>
-				<button type="button" class="px-4 py-2 text-sm font-medium text-white bg-rose-600 rounded-lg hover:bg-rose-700 shadow-sm transition-colors" on:click={confirm}>Ya, Lanjutkan</button>
+				<button type="button" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-colors" on:click={() => { showModal = false; verifyInput = ''; }}>Batal</button>
+				<button 
+					type="button" 
+					class="px-4 py-2 text-sm font-medium text-white bg-rose-600 rounded-lg hover:bg-rose-700 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
+					disabled={verifyText !== null && verifyInput !== verifyText}
+					on:click={confirm}
+				>
+					Ya, Lanjutkan
+				</button>
 			</div>
 		</div>
 	</div>
