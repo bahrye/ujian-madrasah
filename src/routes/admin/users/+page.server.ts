@@ -184,26 +184,50 @@ export const actions: Actions = {
 
 		try {
 			const users = JSON.parse(usersJson) as any[];
-			if (users.length === 0) return fail(400, { error: 'Tidak ada data pengguna' });
+			if (!Array.isArray(users) || users.length === 0) return fail(400, { error: 'Tidak ada data pengguna' });
 
-			let successCount = 0;
-			
-			// Process sequentially to handle password hashing
+			// Ambil semua username yang sudah ada untuk validasi cepat
+			const existingUsersResult = await db.prepare('SELECT username FROM users').all<{ username: string }>();
+			const existingUsernames = new Set(existingUsersResult.results.map(u => u.username.toLowerCase()));
+
+			const stmts = [];
+			let skippedCount = 0;
+
 			for (const user of users) {
-				// Cek apakah username sudah ada (sekolah manapun, karena username harus unik global di sistem kita atau per sekolah tergantung constraint)
-				// Disini cek username per sekolah
-				const existing = await db.prepare('SELECT id FROM users WHERE username = ? AND school_id = ?').bind(user.username, locals.user!.school_id).first();
-				
-				if (!existing) {
-					const passwordHash = await hashPassword(user.password);
-					await db.prepare('INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)')
-						.bind(locals.user!.school_id, user.username, passwordHash, user.name, user.role)
-						.run();
-					successCount++;
+				const username = String(user.username || '').trim();
+				const name = String(user.name || '').trim();
+				const password = String(user.password || '').trim();
+				const role = String(user.role || '').trim();
+
+				if (!username || !name || !password || !role) continue;
+
+				if (existingUsernames.has(username.toLowerCase())) {
+					skippedCount++;
+					continue;
+				}
+
+				existingUsernames.add(username.toLowerCase());
+				const passwordHash = await hashPassword(password);
+				stmts.push(
+					db.prepare('INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)')
+						.bind(locals.user!.school_id, username, passwordHash, name, role)
+				);
+			}
+
+			if (stmts.length > 0) {
+				const chunkSize = 50;
+				for (let i = 0; i < stmts.length; i += chunkSize) {
+					await db.batch(stmts.slice(i, i + chunkSize));
 				}
 			}
 
-			return { success: `Berhasil mengimpor ${successCount} pengguna dari total ${users.length} data.` };
+			const successCount = stmts.length;
+			let msg = `Berhasil mengimpor ${successCount} pengguna.`;
+			if (skippedCount > 0) {
+				msg += ` (${skippedCount} data dilewati karena Username sudah terdaftar).`;
+			}
+
+			return { success: msg };
 		} catch (e: any) {
 			console.error('Import error:', e);
 			return fail(500, { error: e.message || 'Terjadi kesalahan saat memproses data import' });

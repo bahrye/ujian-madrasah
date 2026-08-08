@@ -8,6 +8,13 @@ CREATE TABLE IF NOT EXISTS schools (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     address TEXT,
+    logo_url TEXT,
+    principal_name TEXT,
+    npsn TEXT,
+    phone TEXT,
+    email TEXT,
+    accreditation TEXT,
+    website TEXT,
     is_active INTEGER NOT NULL DEFAULT 1,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -78,6 +85,8 @@ CREATE TABLE IF NOT EXISTS exams (
     end_time TEXT,
     is_active INTEGER NOT NULL DEFAULT 0,
     shuffle_questions INTEGER NOT NULL DEFAULT 0,
+    show_score_type TEXT DEFAULT 'after_submit',
+    is_score_released INTEGER NOT NULL DEFAULT 0,
     show_result INTEGER NOT NULL DEFAULT 0,
     created_by INTEGER REFERENCES users(id),
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -154,15 +163,18 @@ CREATE INDEX IF NOT EXISTS idx_exams_school ON exams(school_id);
 CREATE INDEX IF NOT EXISTS idx_exams_active ON exams(is_active);
 CREATE INDEX IF NOT EXISTS idx_tokens_exam ON tokens(exam_id);
 CREATE INDEX IF NOT EXISTS idx_tokens_code ON tokens(token_code);
+CREATE INDEX IF NOT EXISTS idx_tokens_exam_school ON tokens(exam_id, school_id);
 CREATE INDEX IF NOT EXISTS idx_questions_exam ON questions(exam_id);
 CREATE INDEX IF NOT EXISTS idx_questions_type ON questions(type);
 CREATE INDEX IF NOT EXISTS idx_attempts_student ON student_attempts(student_id);
 CREATE INDEX IF NOT EXISTS idx_attempts_exam ON student_attempts(exam_id);
+CREATE INDEX IF NOT EXISTS idx_attempts_exam_student ON student_attempts(exam_id, student_id);
 CREATE INDEX IF NOT EXISTS idx_attempts_status ON student_attempts(status);
 CREATE INDEX IF NOT EXISTS idx_answers_attempt ON student_answers(attempt_id);
 CREATE INDEX IF NOT EXISTS idx_answers_question ON student_answers(question_id);
+CREATE INDEX IF NOT EXISTS idx_answers_attempt_question ON student_answers(attempt_id, question_id);
 
--- Tabel Peserta Ujian (baru)
+-- Tabel Peserta Ujian
 CREATE TABLE IF NOT EXISTS exam_participants (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	exam_id INTEGER NOT NULL,
@@ -212,6 +224,7 @@ CREATE TABLE IF NOT EXISTS uploaded_media (
 );
 CREATE INDEX IF NOT EXISTS idx_uploaded_media_url ON uploaded_media(url);
 CREATE INDEX IF NOT EXISTS idx_uploaded_media_school ON uploaded_media(school_id);
+CREATE INDEX IF NOT EXISTS idx_uploaded_media_school_public ON uploaded_media(school_id, is_public);
 
 -- Tabel Peserta Default per Tipe Ujian
 CREATE TABLE IF NOT EXISTS exam_type_participants (

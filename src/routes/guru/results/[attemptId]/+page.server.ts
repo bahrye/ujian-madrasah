@@ -14,7 +14,8 @@ export const load: PageServerLoad = async ({ params, platform, locals }) => {
 		JOIN exams e ON sa.exam_id = e.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		WHERE sa.id = ? AND e.school_id = ?
-	`).bind(attemptId, locals.user!.school_id).first();
+		AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))
+	`).bind(attemptId, locals.user!.school_id, locals.user!.id, locals.user!.id).first();
 
 	if (!attempt) throw error(404, 'Data hasil ujian tidak ditemukan atau Anda tidak memiliki akses ke data ini.');
 

@@ -11,20 +11,6 @@ export const load: PageServerLoad = async ({ locals, url, platform }) => {
 	const search = url.searchParams.get('search') || '';
 	const classFilter = url.searchParams.get('class') || '';
 
-	// Auto-migration D1: pastikan kolom place_of_birth, date_of_birth, photo ada di tabel users
-	try {
-		await db.prepare('ALTER TABLE users ADD COLUMN place_of_birth TEXT').run();
-	} catch {}
-	try {
-		await db.prepare('ALTER TABLE users ADD COLUMN date_of_birth TEXT').run();
-	} catch {}
-	try {
-		await db.prepare('ALTER TABLE users ADD COLUMN photo TEXT').run();
-	} catch {}
-	try {
-		await db.prepare('ALTER TABLE uploaded_media ADD COLUMN school_id INTEGER').run();
-	} catch {}
-
 	let query = `
 		SELECT u.id, u.username, u.name, u.is_active, u.created_at, u.class_id, c.name as class_name, u.place_of_birth, u.date_of_birth, u.photo 
 		FROM users u 
@@ -42,7 +28,7 @@ export const load: PageServerLoad = async ({ locals, url, platform }) => {
 		params.push(classFilter);
 	}
 
-	query += ' ORDER BY c.name ASC, u.name ASC LIMIT 200';
+	query += ' ORDER BY c.name ASC, u.name ASC LIMIT 500';
 
 	try {
 		const [usersResult, classesResult, school] = await Promise.all([
@@ -58,25 +44,12 @@ export const load: PageServerLoad = async ({ locals, url, platform }) => {
 			schoolLogo: (school as any)?.logo_url || ''
 		};
 	} catch (err: any) {
-		console.error('Error loading students, attempting fallback query:', err);
-		const fallbackQuery = `
-			SELECT u.id, u.username, u.name, u.is_active, u.created_at, u.class_id, c.name as class_name, NULL as place_of_birth, NULL as date_of_birth, NULL as photo 
-			FROM users u 
-			LEFT JOIN classes c ON u.class_id = c.id 
-			WHERE u.school_id = ? AND u.role = 'siswa'
-			ORDER BY c.name ASC, u.name ASC LIMIT 200
-		`;
-		const [usersResult, classesResult, school] = await Promise.all([
-			db.prepare(fallbackQuery).bind(locals.user.school_id).all(),
-			db.prepare('SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC').bind(locals.user.school_id).all(),
-			db.prepare('SELECT name, logo_url FROM schools WHERE id = ?').bind(locals.user.school_id).first()
-		]);
-
+		console.error('Error loading students:', err);
 		return { 
-			users: usersResult.results || [],
-			classes: classesResult.results || [],
-			schoolName: (school as any)?.name || '',
-			schoolLogo: (school as any)?.logo_url || ''
+			users: [],
+			classes: [],
+			schoolName: '',
+			schoolLogo: ''
 		};
 	}
 };
@@ -166,6 +139,7 @@ export const actions: Actions = {
 				db.prepare('DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)').bind(parsedId),
 				db.prepare('DELETE FROM student_attempts WHERE student_id = ?').bind(parsedId),
 				db.prepare('DELETE FROM exam_participants WHERE student_id = ?').bind(parsedId),
+				db.prepare('DELETE FROM exam_type_participants WHERE student_id = ?').bind(parsedId),
 				db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(parsedId, locals.user.school_id)
 			]);
 			return { success: true, message: 'Berhasil menghapus data siswa.' };
@@ -194,6 +168,7 @@ export const actions: Actions = {
 					db.prepare('DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)').bind(id),
 					db.prepare('DELETE FROM student_attempts WHERE student_id = ?').bind(id),
 					db.prepare('DELETE FROM exam_participants WHERE student_id = ?').bind(id),
+					db.prepare('DELETE FROM exam_type_participants WHERE student_id = ?').bind(id),
 					db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(id, locals.user.school_id)
 				);
 			}
@@ -222,23 +197,46 @@ export const actions: Actions = {
 			const students = JSON.parse(studentsJson) as any[];
 			if (students.length === 0) return fail(400, { error: 'Tidak ada data siswa' });
 
-			let successCount = 0;
-			
-			// Process sequentially to handle password hashing
+			// Ambil semua username yang sudah ada untuk validasi cepat
+			const existingUsersResult = await db.prepare('SELECT username FROM users').all<{ username: string }>();
+			const existingUsernames = new Set(existingUsersResult.results.map(u => u.username.toLowerCase()));
+
+			const stmts = [];
+			let skippedCount = 0;
+
 			for (const student of students) {
-				// Cek apakah NISN sudah ada
-				const existing = await db.prepare('SELECT id FROM users WHERE username = ? AND school_id = ?').bind(student.nisn, locals.user.school_id).first();
-				
-				if (!existing) {
-					const passwordHash = await hashPassword(student.nisn);
-					await db.prepare('INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
-						.bind(locals.user.school_id, student.class_id, student.nisn, passwordHash, student.name, 'siswa', student.place_of_birth || null, student.date_of_birth || null)
-						.run();
-					successCount++;
+				const nisn = String(student.nisn || '').trim();
+				const name = String(student.name || '').trim();
+				if (!nisn || !name) continue;
+
+				if (existingUsernames.has(nisn.toLowerCase())) {
+					skippedCount++;
+					continue;
+				}
+
+				existingUsernames.add(nisn.toLowerCase());
+				const passwordHash = await hashPassword(nisn);
+				stmts.push(
+					db.prepare('INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+						.bind(locals.user.school_id, student.class_id || null, nisn, passwordHash, name, 'siswa', student.place_of_birth || null, student.date_of_birth || null)
+				);
+			}
+
+			if (stmts.length > 0) {
+				// Jalankan dalam batch untuk performa maksimal di Cloudflare D1
+				const chunkSize = 50;
+				for (let i = 0; i < stmts.length; i += chunkSize) {
+					await db.batch(stmts.slice(i, i + chunkSize));
 				}
 			}
 
-			return { success: true, message: `Berhasil mengimpor ${successCount} siswa dari total ${students.length} data.` };
+			const successCount = stmts.length;
+			let msg = `Berhasil mengimpor ${successCount} siswa.`;
+			if (skippedCount > 0) {
+				msg += ` (${skippedCount} data dilewati karena NISN sudah terdaftar).`;
+			}
+
+			return { success: true, message: msg };
 		} catch (e: any) {
 			console.error('Import error:', e);
 			return fail(500, { error: e.message || 'Terjadi kesalahan saat memproses data import' });
@@ -306,14 +304,12 @@ export const actions: Actions = {
 			if (photo && photo.includes('res.cloudinary.com')) {
 				try {
 					await db.prepare(`
-						INSERT INTO uploaded_media (url, media_type, uploaded_by, school_id, is_public) 
-						VALUES (?, 'image', ?, ?, 0)
-					`).bind(photo, locals.user.id, locals.user.school_id).run();
+						INSERT INTO uploaded_media (url, name, media_type, uploaded_by, school_id, is_public) 
+						VALUES (?, ?, 'image', ?, ?, 0)
+						ON CONFLICT(url) DO UPDATE SET school_id = excluded.school_id
+					`).bind(photo, 'Foto Siswa', locals.user.id, locals.user.school_id).run();
 				} catch (err: any) {
-					// Abaikan jika duplikat (UNIQUE constraint)
-					if (!err.message?.includes('UNIQUE')) {
-						console.error('Failed to log media:', err);
-					}
+					console.error('Failed to log media:', err);
 				}
 			}
 			

@@ -2,18 +2,6 @@ import { fail } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
 const load = async ({ platform, locals }) => {
   const db = getDB(platform);
-  try {
-    await db.prepare(`
-			CREATE TABLE IF NOT EXISTS exam_type_participants (
-				id INTEGER PRIMARY KEY AUTOINCREMENT,
-				exam_type_id INTEGER NOT NULL REFERENCES exam_types(id) ON DELETE CASCADE,
-				student_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-				created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-				UNIQUE(exam_type_id, student_id)
-			)
-		`).run();
-  } catch {
-  }
   const examTypes = await db.prepare(`
 		SELECT et.*, 
 			(SELECT COUNT(*) FROM exams WHERE exam_type_id = et.id) as exam_count,
@@ -72,11 +60,11 @@ const actions = {
 					SELECT e.id, s.name as subject_name
 					FROM exams e
 					LEFT JOIN subjects s ON e.subject_id = s.id
-					WHERE e.exam_type_id = ?
-				`).bind(parsedId).all();
+					WHERE e.exam_type_id = ? AND e.school_id = ?
+				`).bind(parsedId, locals.user.school_id).all();
         if (linkedExams.results.length > 0) {
           const updateBatch = linkedExams.results.map(
-            (exam) => db.prepare(`UPDATE exams SET title = ?, updated_at = datetime('now') WHERE id = ?`).bind(`${code} - ${exam.subject_name || "Ujian"}`, exam.id)
+            (exam) => db.prepare(`UPDATE exams SET title = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?`).bind(`${code} - ${exam.subject_name || "Ujian"}`, exam.id, locals.user.school_id)
           );
           await db.batch(updateBatch);
         }
@@ -85,12 +73,12 @@ const actions = {
         await db.prepare(`
 					UPDATE exams 
 					SET is_active = 0 
-					WHERE exam_type_id = ? 
+					WHERE exam_type_id = ? AND school_id = ?
 					AND (
 						(start_time IS NOT NULL AND start_time < ?) OR 
 						(end_time IS NOT NULL AND end_time > ?)
 					)
-				`).bind(parsedId, startTime, endTime).run();
+				`).bind(parsedId, locals.user.school_id, startTime, endTime).run();
       }
       return { success: "Tipe Ujian berhasil diperbarui. Nama ujian yang terhubung telah diperbarui otomatis." };
     } catch (e) {
@@ -105,7 +93,7 @@ const actions = {
     const parsedId = parseInt(idStr || "", 10);
     if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
     try {
-      const exams = await db.prepare("SELECT COUNT(*) as count FROM exams WHERE exam_type_id = ?").bind(parsedId).first();
+      const exams = await db.prepare("SELECT COUNT(*) as count FROM exams WHERE exam_type_id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).first();
       if (exams && exams.count > 0) {
         return fail(400, { error: "Gagal dihapus: Masih ada ujian yang terikat pada tipe ini." });
       }
@@ -127,16 +115,17 @@ const actions = {
     if (isNaN(parsedExamTypeId) || isNaN(parsedClassId)) return fail(400, { error: "Data tidak lengkap." });
     const examType = await db.prepare("SELECT id FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedExamTypeId, locals.user.school_id).first();
     if (!examType) return fail(404, { error: "Tipe ujian tidak ditemukan." });
-    const students = await db.prepare('SELECT id FROM users WHERE class_id = ? AND role = "siswa"').bind(parsedClassId).all();
-    let added = 0;
-    for (const student of students.results) {
-      try {
-        await db.prepare("INSERT INTO exam_type_participants (exam_type_id, student_id) VALUES (?, ?)").bind(parsedExamTypeId, student.id).run();
-        added++;
-      } catch {
-      }
+    const validClass = await db.prepare("SELECT id FROM classes WHERE id = ? AND school_id = ?").bind(parsedClassId, locals.user.school_id).first();
+    if (!validClass) return fail(404, { error: "Kelas tidak ditemukan." });
+    const students = await db.prepare('SELECT id FROM users WHERE class_id = ? AND school_id = ? AND role = "siswa"').bind(parsedClassId, locals.user.school_id).all();
+    if (students.results.length === 0) {
+      return { success: "Tidak ada siswa di kelas ini." };
     }
-    return { success: `Berhasil menambahkan ${added} siswa dari kelas sebagai peserta default.` };
+    const insertStmts = students.results.map(
+      (student) => db.prepare("INSERT OR IGNORE INTO exam_type_participants (exam_type_id, student_id) VALUES (?, ?)").bind(parsedExamTypeId, student.id)
+    );
+    await db.batch(insertStmts);
+    return { success: `Berhasil menambahkan ${students.results.length} siswa dari kelas sebagai peserta default.` };
   },
   addTypeParticipantStudent: async ({ request, platform, locals }) => {
     const db = getDB(platform);
@@ -148,23 +137,27 @@ const actions = {
     if (isNaN(parsedExamTypeId) || parsedStudentIds.length === 0) return fail(400, { error: "Data tidak lengkap." });
     const examType = await db.prepare("SELECT id FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedExamTypeId, locals.user.school_id).first();
     if (!examType) return fail(404, { error: "Tipe ujian tidak ditemukan." });
-    let added = 0;
-    for (const studentId of parsedStudentIds) {
-      try {
-        await db.prepare("INSERT INTO exam_type_participants (exam_type_id, student_id) VALUES (?, ?)").bind(parsedExamTypeId, studentId).run();
-        added++;
-      } catch {
-      }
+    const placeholders = parsedStudentIds.map(() => "?").join(",");
+    const validStudents = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "siswa"`).bind(...parsedStudentIds, locals.user.school_id).all();
+    if (validStudents.results.length === 0) {
+      return fail(400, { error: "Siswa yang dipilih tidak valid." });
     }
-    return { success: `Berhasil menambahkan ${added} siswa sebagai peserta default.` };
+    const insertStmts = validStudents.results.map(
+      (s) => db.prepare("INSERT OR IGNORE INTO exam_type_participants (exam_type_id, student_id) VALUES (?, ?)").bind(parsedExamTypeId, s.id)
+    );
+    await db.batch(insertStmts);
+    return { success: `Berhasil menambahkan ${validStudents.results.length} siswa sebagai peserta default.` };
   },
-  removeTypeParticipant: async ({ request, platform }) => {
+  removeTypeParticipant: async ({ request, platform, locals }) => {
     const db = getDB(platform);
     const form = await request.formData();
     const idStr = form.get("id")?.toString();
     const parsedId = parseInt(idStr || "", 10);
     if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
-    await db.prepare("DELETE FROM exam_type_participants WHERE id = ?").bind(parsedId).run();
+    await db.prepare(`
+			DELETE FROM exam_type_participants 
+			WHERE id = ? AND exam_type_id IN (SELECT id FROM exam_types WHERE school_id = ?)
+		`).bind(parsedId, locals.user.school_id).run();
     return { success: "Peserta default berhasil dihapus." };
   },
   clearTypeParticipants: async ({ request, platform, locals }) => {
@@ -184,14 +177,16 @@ const actions = {
     const examTypeIdStr = form.get("exam_type_id")?.toString();
     const parsedExamTypeId = parseInt(examTypeIdStr || "", 10);
     if (isNaN(parsedExamTypeId)) return fail(400, { error: "ID tidak valid." });
+    const examType = await db.prepare("SELECT id FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedExamTypeId, locals.user.school_id).first();
+    if (!examType) return fail(404, { error: "Tipe ujian tidak ditemukan." });
     const participants = await db.prepare(`
 			SELECT etp.id, u.name as student_name, u.username as nisn, c.name as class_name
 			FROM exam_type_participants etp
 			JOIN users u ON etp.student_id = u.id
 			LEFT JOIN classes c ON u.class_id = c.id
-			WHERE etp.exam_type_id = ?
+			WHERE etp.exam_type_id = ? AND u.school_id = ?
 			ORDER BY c.name, u.name
-		`).bind(parsedExamTypeId).all();
+		`).bind(parsedExamTypeId, locals.user.school_id).all();
     return { participants: participants.results };
   }
 };

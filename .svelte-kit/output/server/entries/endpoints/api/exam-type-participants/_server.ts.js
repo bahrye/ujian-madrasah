@@ -14,9 +14,9 @@ const GET = async ({ url, platform, locals }) => {
 		FROM exam_type_participants etp
 		JOIN users u ON etp.student_id = u.id
 		LEFT JOIN classes c ON u.class_id = c.id
-		WHERE etp.exam_type_id = ?
+		WHERE etp.exam_type_id = ? AND u.school_id = ?
 		ORDER BY c.name, u.name
-	`).bind(examTypeId).all();
+	`).bind(examTypeId, locals.user.school_id).all();
   return json({ participants: participants.results || [] });
 };
 export {

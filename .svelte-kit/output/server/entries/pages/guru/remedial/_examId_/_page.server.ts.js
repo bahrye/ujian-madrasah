@@ -1,5 +1,6 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB } from "../../../../../chunks/db.js";
+import { g as generateTokenCode } from "../../../../../chunks/auth.js";
 const load = async ({ platform, params, locals }) => {
   const db = getDB(platform);
   const examIdStr = params.examId;
@@ -92,22 +93,27 @@ const actions = {
   addParticipants: async ({ request, platform, params, locals }) => {
     const db = getDB(platform);
     const form = await request.formData();
-    const studentIds = form.getAll("student_ids");
-    if (!studentIds.length) return fail(400, { error: "Pilih minimal satu siswa." });
+    const studentIdsStr = form.getAll("student_ids").map((id) => id.toString());
+    const parsedStudentIds = studentIdsStr.map((id) => parseInt(id, 10)).filter((id) => !isNaN(id));
+    if (!parsedStudentIds.length) return fail(400, { error: "Pilih minimal satu siswa." });
     const examIdStr = params.examId;
     const parsedExamId = parseInt(examIdStr, 10);
     if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid." });
-    const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND created_by = ?").bind(parsedExamId, locals.user.id).first();
+    const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND created_by = ? AND school_id = ?").bind(parsedExamId, locals.user.id, locals.user.school_id).first();
     if (!exam) return fail(403, { error: "Akses ditolak." });
-    const stmt = db.prepare("INSERT INTO exam_participants (exam_id, student_id) VALUES (?, ?)");
-    const batch = studentIds.map((id) => stmt.bind(parsedExamId, id.toString()));
+    const placeholders = parsedStudentIds.map(() => "?").join(",");
+    const validStudents = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "siswa"`).bind(...parsedStudentIds, locals.user.school_id).all();
+    if (validStudents.results.length === 0) {
+      return fail(400, { error: "Siswa yang dipilih tidak valid." });
+    }
+    const batch = validStudents.results.map(
+      (s) => db.prepare("INSERT OR IGNORE INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(parsedExamId, s.id)
+    );
     try {
       await db.batch(batch);
-      return { success: "Peserta berhasil ditambahkan." };
+      return { success: `Berhasil menambahkan ${validStudents.results.length} peserta remedial.` };
     } catch (e) {
-      if (e.message.includes("UNIQUE")) {
-        return fail(400, { error: "Beberapa siswa sudah ada di daftar." });
-      }
+      console.error(e);
       return fail(500, { error: "Gagal menambahkan peserta." });
     }
   },
@@ -120,8 +126,8 @@ const actions = {
     const isOwner = await db.prepare(`
 			SELECT 1 FROM exam_participants ep 
 			JOIN exams e ON ep.exam_id = e.id 
-			WHERE ep.id = ? AND e.created_by = ?
-		`).bind(parsedParticipantId, locals.user.id).first();
+			WHERE ep.id = ? AND e.created_by = ? AND e.school_id = ?
+		`).bind(parsedParticipantId, locals.user.id, locals.user.school_id).first();
     if (!isOwner) return fail(403, { error: "Akses ditolak." });
     try {
       await db.prepare("DELETE FROM exam_participants WHERE id = ?").bind(parsedParticipantId).run();
@@ -138,13 +144,8 @@ const actions = {
     const examIdStr = params.examId;
     const parsedExamId = parseInt(examIdStr, 10);
     if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid." });
-    const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND created_by = ?").bind(parsedExamId, locals.user.id).first();
+    const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND created_by = ? AND school_id = ?").bind(parsedExamId, locals.user.id, locals.user.school_id).first();
     if (!exam) return fail(403, { error: "Akses ditolak." });
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let token = "";
-    for (let i = 0; i < 6; i++) {
-      token += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
     const now = Date.now();
     const expiresAt = new Date(now + 15 * 60 * 1e3).toISOString();
     try {
@@ -153,10 +154,28 @@ const actions = {
 				WHERE exam_id = ? AND school_id = ? 
 				  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
 			`).bind(parsedExamId, locals.user.school_id, parsedExamId).run();
-      await db.prepare(`
-				INSERT INTO tokens (school_id, exam_id, created_by, token_code, is_released, expires_at, released_at)
-				VALUES (?, ?, ?, ?, 1, ?, datetime('now'))
-			`).bind(locals.user.school_id, parsedExamId, locals.user.id, token, expiresAt).run();
+      let token = "";
+      let inserted = false;
+      let attemptsCount = 0;
+      while (!inserted && attemptsCount < 5) {
+        attemptsCount++;
+        token = generateTokenCode(6);
+        try {
+          await db.prepare(`
+						INSERT INTO tokens (school_id, exam_id, created_by, token_code, is_released, expires_at, released_at)
+						VALUES (?, ?, ?, ?, 1, ?, datetime('now'))
+					`).bind(locals.user.school_id, parsedExamId, locals.user.id, token, expiresAt).run();
+          inserted = true;
+        } catch (err) {
+          if (err.message && err.message.includes("UNIQUE")) {
+            continue;
+          }
+          throw err;
+        }
+      }
+      if (!inserted) {
+        return fail(500, { error: "Gagal membuat kode token unik. Silakan coba lagi." });
+      }
       return { success: "Token berhasil dibuat.", token };
     } catch (e) {
       console.error(e);

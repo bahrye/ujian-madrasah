@@ -66,7 +66,8 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 };
 
 export const actions = {
-	addParticipantClass: async ({ request, platform, params }: import('./$types').RequestEvent) => {
+	addParticipantClass: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const form = await request.formData();
 		const classIdStr = form.get('class_id')?.toString();
@@ -75,23 +76,31 @@ export const actions = {
 
 		if (isNaN(parsedClassId) || isNaN(parsedExamId)) return fail(400, { error: 'Data tidak valid' });
 
-		const students = await db.prepare('SELECT id FROM users WHERE class_id = ? AND role = "siswa"').bind(parsedClassId).all();
+		// Verifikasi kepemilikan ujian dan kelas
+		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(parsedExamId, locals.user.school_id).first();
+		if (!exam) return fail(403, { error: 'Ujian tidak ditemukan atau bukan milik sekolah Anda.' });
+
+		const validClass = await db.prepare('SELECT id FROM classes WHERE id = ? AND school_id = ?').bind(parsedClassId, locals.user.school_id).first();
+		if (!validClass) return fail(403, { error: 'Kelas tidak ditemukan.' });
+
+		const students = await db.prepare('SELECT id FROM users WHERE class_id = ? AND school_id = ? AND role = "siswa"')
+			.bind(parsedClassId, locals.user.school_id).all<{ id: number }>();
 		
-		let added = 0;
-		for (const student of students.results) {
-			try {
-				await db.prepare('INSERT INTO exam_participants (exam_id, student_id) VALUES (?, ?)')
-					.bind(parsedExamId, student.id).run();
-				added++;
-			} catch (e) {
-				// Ignore if already exists (UNIQUE constraint)
-			}
+		if (students.results.length === 0) {
+			return { success: 'Tidak ada siswa di kelas ini.' };
 		}
 
-		return { success: `Berhasil menambahkan ${added} siswa dari kelas ke peserta ujian.` };
+		const insertStmts = students.results.map(student =>
+			db.prepare('INSERT OR IGNORE INTO exam_participants (exam_id, student_id) VALUES (?, ?)')
+				.bind(parsedExamId, student.id)
+		);
+
+		await db.batch(insertStmts);
+		return { success: `Berhasil menambahkan ${students.results.length} siswa dari kelas ke peserta ujian.` };
 	},
 
-	addParticipantStudent: async ({ request, platform, params }: import('./$types').RequestEvent) => {
+	addParticipantStudent: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const form = await request.formData();
 		const studentIdsStr = form.getAll('student_ids').map(id => id.toString());
@@ -100,32 +109,46 @@ export const actions = {
 
 		if (parsedStudentIds.length === 0 || isNaN(parsedExamId)) return fail(400, { error: 'Data tidak valid' });
 
-		let added = 0;
-		for (const studentId of parsedStudentIds) {
-			try {
-				await db.prepare('INSERT INTO exam_participants (exam_id, student_id) VALUES (?, ?)')
-					.bind(parsedExamId, studentId).run();
-				added++;
-			} catch (e) {
-				// Ignore if already exists (UNIQUE constraint)
-			}
+		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(parsedExamId, locals.user.school_id).first();
+		if (!exam) return fail(403, { error: 'Ujian tidak ditemukan atau bukan milik sekolah Anda.' });
+
+		const placeholders = parsedStudentIds.map(() => '?').join(',');
+		const validStudents = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "siswa"`)
+			.bind(...parsedStudentIds, locals.user.school_id).all<{ id: number }>();
+
+		if (validStudents.results.length === 0) {
+			return fail(400, { error: 'Siswa tidak valid.' });
 		}
-		return { success: `Berhasil menambahkan ${added} siswa ke peserta ujian.` };
+
+		const insertStmts = validStudents.results.map(s =>
+			db.prepare('INSERT OR IGNORE INTO exam_participants (exam_id, student_id) VALUES (?, ?)')
+				.bind(parsedExamId, s.id)
+		);
+
+		await db.batch(insertStmts);
+		return { success: `Berhasil menambahkan ${validStudents.results.length} siswa ke peserta ujian.` };
 	},
 
-	removeParticipant: async ({ request, platform, params }: import('./$types').RequestEvent) => {
+	removeParticipant: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const form = await request.formData();
 		const participantIdStr = form.get('participant_id')?.toString();
 		const parsedParticipantId = parseInt(participantIdStr || '', 10);
+		const parsedExamId = parseInt(params.id, 10);
 
-		if (isNaN(parsedParticipantId)) return fail(400, { error: 'ID peserta tidak valid' });
+		if (isNaN(parsedParticipantId) || isNaN(parsedExamId)) return fail(400, { error: 'ID peserta tidak valid' });
 
-		await db.prepare('DELETE FROM exam_participants WHERE id = ?').bind(parsedParticipantId).run();
+		await db.prepare(`
+			DELETE FROM exam_participants 
+			WHERE id = ? AND exam_id = ? AND exam_id IN (SELECT id FROM exams WHERE school_id = ?)
+		`).bind(parsedParticipantId, parsedExamId, locals.user.school_id).run();
+
 		return { success: 'Peserta berhasil dihapus dari ujian.' };
 	},
 
-	addTeacher: async ({ request, platform, params }: import('./$types').RequestEvent) => {
+	addTeacher: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const form = await request.formData();
 		const teacherIdsStr = form.getAll('teacher_ids').map(id => id.toString());
@@ -134,32 +157,46 @@ export const actions = {
 
 		if (parsedTeacherIds.length === 0 || isNaN(parsedExamId)) return fail(400, { error: 'Data tidak valid' });
 
-		let added = 0;
-		for (const teacherId of parsedTeacherIds) {
-			try {
-				await db.prepare('INSERT INTO exam_teachers (exam_id, teacher_id) VALUES (?, ?)')
-					.bind(parsedExamId, teacherId).run();
-				added++;
-			} catch (e) {
-				// Ignore if already exists
-			}
+		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(parsedExamId, locals.user.school_id).first();
+		if (!exam) return fail(403, { error: 'Ujian tidak ditemukan atau bukan milik sekolah Anda.' });
+
+		const placeholders = parsedTeacherIds.map(() => '?').join(',');
+		const validTeachers = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "guru"`)
+			.bind(...parsedTeacherIds, locals.user.school_id).all<{ id: number }>();
+
+		if (validTeachers.results.length === 0) {
+			return fail(400, { error: 'Guru tidak valid.' });
 		}
-		return { success: `Berhasil menambahkan ${added} guru pengajar ujian.` };
+
+		const insertStmts = validTeachers.results.map(t =>
+			db.prepare('INSERT OR IGNORE INTO exam_teachers (exam_id, teacher_id) VALUES (?, ?)')
+				.bind(parsedExamId, t.id)
+		);
+
+		await db.batch(insertStmts);
+		return { success: `Berhasil menambahkan ${validTeachers.results.length} guru pengajar ujian.` };
 	},
 
-	removeTeacher: async ({ request, platform, params }: import('./$types').RequestEvent) => {
+	removeTeacher: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const form = await request.formData();
 		const examTeacherIdStr = form.get('exam_teacher_id')?.toString();
 		const parsedExamTeacherId = parseInt(examTeacherIdStr || '', 10);
+		const parsedExamId = parseInt(params.id, 10);
 
-		if (isNaN(parsedExamTeacherId)) return fail(400, { error: 'ID pengajar tidak valid' });
+		if (isNaN(parsedExamTeacherId) || isNaN(parsedExamId)) return fail(400, { error: 'ID pengajar tidak valid' });
 
-		await db.prepare('DELETE FROM exam_teachers WHERE id = ?').bind(parsedExamTeacherId).run();
+		await db.prepare(`
+			DELETE FROM exam_teachers 
+			WHERE id = ? AND exam_id = ? AND exam_id IN (SELECT id FROM exams WHERE school_id = ?)
+		`).bind(parsedExamTeacherId, parsedExamId, locals.user.school_id).run();
+
 		return { success: 'Pengajar berhasil dihapus.' };
 	},
 
-	addProctor: async ({ request, platform, params }: import('./$types').RequestEvent) => {
+	addProctor: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const form = await request.formData();
 		const proctorIdsStr = form.getAll('proctor_ids').map(id => id.toString());
@@ -168,37 +205,56 @@ export const actions = {
 
 		if (parsedProctorIds.length === 0 || isNaN(parsedExamId)) return fail(400, { error: 'Data tidak valid' });
 
-		let added = 0;
-		for (const proctorId of parsedProctorIds) {
-			try {
-				await db.prepare('INSERT INTO exam_proctors (exam_id, proctor_id) VALUES (?, ?)')
-					.bind(parsedExamId, proctorId).run();
-				added++;
-			} catch (e) {
-				// Ignore if already exists
-			}
+		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(parsedExamId, locals.user.school_id).first();
+		if (!exam) return fail(403, { error: 'Ujian tidak ditemukan atau bukan milik sekolah Anda.' });
+
+		const placeholders = parsedProctorIds.map(() => '?').join(',');
+		const validProctors = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "pengawas"`)
+			.bind(...parsedProctorIds, locals.user.school_id).all<{ id: number }>();
+
+		if (validProctors.results.length === 0) {
+			return fail(400, { error: 'Pengawas tidak valid.' });
 		}
-		return { success: `Berhasil menambahkan ${added} pengawas ujian.` };
+
+		const insertStmts = validProctors.results.map(p =>
+			db.prepare('INSERT OR IGNORE INTO exam_proctors (exam_id, proctor_id) VALUES (?, ?)')
+				.bind(parsedExamId, p.id)
+		);
+
+		await db.batch(insertStmts);
+		return { success: `Berhasil menambahkan ${validProctors.results.length} pengawas ujian.` };
 	},
 
-	removeProctor: async ({ request, platform, params }: import('./$types').RequestEvent) => {
+	removeProctor: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const form = await request.formData();
 		const examProctorIdStr = form.get('exam_proctor_id')?.toString();
 		const parsedExamProctorId = parseInt(examProctorIdStr || '', 10);
+		const parsedExamId = parseInt(params.id, 10);
 
-		if (isNaN(parsedExamProctorId)) return fail(400, { error: 'ID pengawas tidak valid' });
+		if (isNaN(parsedExamProctorId) || isNaN(parsedExamId)) return fail(400, { error: 'ID pengawas tidak valid' });
 
-		await db.prepare('DELETE FROM exam_proctors WHERE id = ?').bind(parsedExamProctorId).run();
+		await db.prepare(`
+			DELETE FROM exam_proctors 
+			WHERE id = ? AND exam_id = ? AND exam_id IN (SELECT id FROM exams WHERE school_id = ?)
+		`).bind(parsedExamProctorId, parsedExamId, locals.user.school_id).run();
+
 		return { success: 'Pengawas berhasil dihapus.' };
 	},
 
-	toggleScoreRelease: async ({ request, platform, params }: import('./$types').RequestEvent) => {
+	toggleScoreRelease: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const parsedId = parseInt(params.id, 10);
 		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid' });
 
-		await db.prepare(`UPDATE exams SET is_score_released = CASE WHEN is_score_released = 1 THEN 0 ELSE 1 END, updated_at = datetime('now') WHERE id = ?`).bind(parsedId).run();
+		await db.prepare(`
+			UPDATE exams 
+			SET is_score_released = CASE WHEN is_score_released = 1 THEN 0 ELSE 1 END, updated_at = datetime('now') 
+			WHERE id = ? AND school_id = ?
+		`).bind(parsedId, locals.user.school_id).run();
+
 		return { success: 'Status rilis nilai berhasil diperbarui.' };
 	}
 };

@@ -77,52 +77,53 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 	}
 
 	const kv = platform?.env?.EXAM_ANSWERS;
-	const attemptsWithProgress = [];
-	for (const a of attempts) {
-		let answeredCount = 0;
-		let warnings = 0;
-		let warningLogs: any[] = [];
-		const status = a.status || 'belum_mengerjakan';
+	const attemptsWithProgress = await Promise.all(
+		attempts.map(async (a) => {
+			let answeredCount = 0;
+			let warnings = 0;
+			let warningLogs: any[] = [];
+			const status = a.status || 'belum_mengerjakan';
 
-		if (status === 'mengerjakan') {
-			if (kv && a.attempt_id) {
-				try {
-					const stored = await kv.get(`attempt_${a.attempt_id}_answers`);
-					if (stored) {
-						const data = JSON.parse(stored);
-						if (data && data.answers) {
-							answeredCount = Object.values(data.answers).filter(val => val !== null && val !== '').length;
+			if (status === 'mengerjakan') {
+				if (kv && a.attempt_id) {
+					try {
+						const stored = await kv.get(`attempt_${a.attempt_id}_answers`);
+						if (stored) {
+							const data = JSON.parse(stored);
+							if (data && data.answers) {
+								answeredCount = Object.values(data.answers).filter(val => val !== null && val !== '').length;
+							}
+							if (data && data.warnings) warnings = data.warnings;
+							if (data && data.warningLogs) warningLogs = data.warningLogs;
 						}
-						if (data && data.warnings) warnings = data.warnings;
-						if (data && data.warningLogs) warningLogs = data.warningLogs;
+					} catch (e) {
+						console.error("KV get error:", e);
 					}
-				} catch (e) {
-					console.error("KV get error:", e);
+				}
+				if (answeredCount === 0 && a.attempt_id) {
+					answeredCount = answeredCountsMap[a.attempt_id] || 0;
+				}
+			} else if (status === 'selesai' || status === 'waktu_habis') {
+				warnings = a.violation_count || 0;
+				try { warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : []; } catch(e) {}
+				if (a.attempt_id) {
+					answeredCount = answeredCountsMap[a.attempt_id] || 0;
 				}
 			}
-			if (answeredCount === 0 && a.attempt_id) {
-				answeredCount = answeredCountsMap[a.attempt_id] || 0;
-			}
-		} else if (status === 'selesai' || status === 'waktu_habis') {
-			warnings = a.violation_count || 0;
-			try { warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : []; } catch(e) {}
-			if (a.attempt_id) {
-				answeredCount = answeredCountsMap[a.attempt_id] || 0;
-			}
-		}
 
-		attemptsWithProgress.push({
-			...a,
-			id: a.attempt_id || `no_attempt_${a.student_id}`,
-			attempt_id: a.attempt_id,
-			status,
-			answeredCount,
-			warnings,
-			warningLogs,
-			is_paused: a.is_paused,
-			paused_at: a.paused_at
-		});
-	}
+			return {
+				...a,
+				id: a.attempt_id || `no_attempt_${a.student_id}`,
+				attempt_id: a.attempt_id,
+				status,
+				answeredCount,
+				warnings,
+				warningLogs,
+				is_paused: a.is_paused,
+				paused_at: a.paused_at
+			};
+		})
+	);
 
 	return { exams: exams.results, attempts: attemptsWithProgress, examFilter: isNaN(examFilter) ? '' : examFilter };
 	} catch (err: any) {

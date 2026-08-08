@@ -56,8 +56,12 @@ const actions = {
     const parsedExamId = parseInt(examIdStr || "", 10);
     const durationHours = parseInt(form.get("duration_hours")?.toString() || "2");
     if (isNaN(parsedExamId)) return fail(400, { error: "Pilih ujian terlebih dahulu." });
-    const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
-    if (!exam) return fail(400, { error: "Ujian tidak ditemukan." });
+    const exam = await db.prepare(`
+			SELECT e.id FROM exams e
+			JOIN exam_proctors ep ON e.id = ep.exam_id
+			WHERE e.id = ? AND e.school_id = ? AND ep.proctor_id = ?
+		`).bind(parsedExamId, locals.user.school_id, locals.user.id).first();
+    if (!exam) return fail(403, { error: "Anda bukan pengawas yang ditugaskan untuk ujian ini." });
     const now = Date.now();
     const nowIso = new Date(now).toISOString();
     const activeToken = await db.prepare(`
@@ -67,7 +71,6 @@ const actions = {
     if (activeToken) {
       return fail(400, { error: `Gagal: Masih ada token aktif untuk ujian ini (${activeToken.token_code}). Harap hapus token tersebut dahulu jika ingin membuat yang baru.` });
     }
-    const tokenCode = generateTokenCode(6);
     const expiresAt = new Date(now + durationHours * 60 * 60 * 1e3).toISOString();
     try {
       await db.prepare(`
@@ -75,7 +78,25 @@ const actions = {
 				WHERE exam_id = ? AND school_id = ? 
 				  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
 			`).bind(parsedExamId, locals.user.school_id, parsedExamId).run();
-      await db.prepare("INSERT INTO tokens (school_id, exam_id, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?)").bind(locals.user.school_id, parsedExamId, tokenCode, locals.user.id, expiresAt).run();
+      let tokenCode = "";
+      let inserted = false;
+      let attemptsCount = 0;
+      while (!inserted && attemptsCount < 5) {
+        attemptsCount++;
+        tokenCode = generateTokenCode(6);
+        try {
+          await db.prepare("INSERT INTO tokens (school_id, exam_id, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?)").bind(locals.user.school_id, parsedExamId, tokenCode, locals.user.id, expiresAt).run();
+          inserted = true;
+        } catch (err) {
+          if (err.message && err.message.includes("UNIQUE")) {
+            continue;
+          }
+          throw err;
+        }
+      }
+      if (!inserted) {
+        return fail(500, { error: "Gagal membuat kode token unik. Silakan coba lagi." });
+      }
       return { success: `Token berhasil dibuat: ${tokenCode}` };
     } catch (e) {
       console.error(e);
@@ -90,8 +111,14 @@ const actions = {
     const parsedId = parseInt(idStr || "", 10);
     if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
     try {
+      const tokenCheck = await db.prepare(`
+				SELECT t.id FROM tokens t
+				JOIN exam_proctors ep ON t.exam_id = ep.exam_id
+				WHERE t.id = ? AND t.school_id = ? AND ep.proctor_id = ?
+			`).bind(parsedId, locals.user.school_id, locals.user.id).first();
+      if (!tokenCheck) return fail(403, { error: "Anda tidak memiliki hak untuk merilis token ini." });
       await db.prepare('UPDATE tokens SET is_released = 1, released_at = datetime("now") WHERE id = ? AND school_id = ?').bind(parsedId, locals.user.school_id).run();
-      return { success: "Token berhasil dirilis ke siswa. Token akan ditarik otomatis dalam 15 menit." };
+      return { success: "Token berhasil dirilis ke siswa." };
     } catch (e) {
       console.error(e);
       return fail(500, { error: e.message || "Gagal merilis token." });
@@ -105,6 +132,12 @@ const actions = {
     const parsedId = parseInt(idStr || "", 10);
     if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
     try {
+      const tokenCheck = await db.prepare(`
+				SELECT t.id FROM tokens t
+				JOIN exam_proctors ep ON t.exam_id = ep.exam_id
+				WHERE t.id = ? AND t.school_id = ? AND ep.proctor_id = ?
+			`).bind(parsedId, locals.user.school_id, locals.user.id).first();
+      if (!tokenCheck) return fail(403, { error: "Anda tidak memiliki hak untuk menarik token ini." });
       await db.prepare("UPDATE tokens SET is_released = 0 WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).run();
       return { success: "Token berhasil ditarik." };
     } catch (e) {
@@ -120,6 +153,12 @@ const actions = {
     const parsedId = parseInt(idStr || "", 10);
     if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
     try {
+      const tokenCheck = await db.prepare(`
+				SELECT t.id FROM tokens t
+				JOIN exam_proctors ep ON t.exam_id = ep.exam_id
+				WHERE t.id = ? AND t.school_id = ? AND ep.proctor_id = ?
+			`).bind(parsedId, locals.user.school_id, locals.user.id).first();
+      if (!tokenCheck) return fail(403, { error: "Anda tidak memiliki hak untuk menghapus token ini." });
       const usage = await db.prepare("SELECT COUNT(*) as count FROM student_attempts WHERE token_id = ?").bind(parsedId).first();
       if (usage && usage.count > 0) {
         return fail(400, { error: "Gagal dihapus: Token ini telah digunakan oleh peserta ujian." });

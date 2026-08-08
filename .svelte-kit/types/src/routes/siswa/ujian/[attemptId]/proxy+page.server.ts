@@ -106,9 +106,18 @@ export const load = async ({ platform, locals, params, cookies }: Parameters<Pag
 };
 
 export const actions = {
-	saveAnswer: async ({ request, platform, params }: import('./$types').RequestEvent) => {
+	saveAnswer: async ({ request, platform, params, locals, cookies }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const kv = platform?.env?.EXAM_ANSWERS;
 		if (!kv) return fail(500, { error: 'KV not configured' });
+
+		const attemptIdStr = params.attemptId;
+		const parsedAttemptId = parseInt(attemptIdStr, 10);
+		if (isNaN(parsedAttemptId)) return fail(400, { error: 'ID tidak valid' });
+
+		const cookieVal = cookies.get('exam_token_verified_' + parsedAttemptId);
+		const isVerified = await verifyExamTokenSignature(cookieVal, parsedAttemptId, locals.user.id);
+		if (!isVerified) return fail(401, { error: 'Sesi token tidak valid.' });
 
 		const form = await request.formData();
 		const answersStr = form.get('answers')?.toString();
@@ -124,9 +133,6 @@ export const actions = {
 					warnings: warningsStr ? parseInt(warningsStr, 10) : 0,
 					warningLogs: warningLogsStr ? JSON.parse(warningLogsStr) : []
 				};
-				const attemptIdStr = params.attemptId;
-				const parsedAttemptId = parseInt(attemptIdStr, 10);
-				if (isNaN(parsedAttemptId)) return fail(400, { error: 'ID tidak valid' });
 
 				await kv.put(`attempt_${parsedAttemptId}_answers`, JSON.stringify(payload));
 			} catch (e) {
@@ -137,7 +143,7 @@ export const actions = {
 		return { saved: true };
 	},
 
-	submit: async ({ platform, params, locals }: import('./$types').RequestEvent) => {
+	submit: async ({ request, platform, params, locals, cookies }: import('./$types').RequestEvent) => {
 		if (!locals.user) return fail(401, { error: 'Sesi telah berakhir. Silakan login kembali.' });
 		const db = getDB(platform);
 		const attemptIdStr = params.attemptId;
@@ -145,179 +151,204 @@ export const actions = {
 		if (isNaN(parsedAttemptId)) return fail(400, { error: 'ID tidak valid' });
 
 		try {
-		// Ambil attempt
-		const attempt = await db.prepare('SELECT * FROM student_attempts WHERE id = ? AND student_id = ?')
-			.bind(parsedAttemptId, locals.user.id).first<any>();
+			// Ambil attempt dan verifikasi kepemilikan siswa
+			const attempt = await db.prepare('SELECT * FROM student_attempts WHERE id = ? AND student_id = ?')
+				.bind(parsedAttemptId, locals.user.id).first<any>();
 
-		if (!attempt || attempt.status !== 'mengerjakan') {
-			return fail(400, { error: 'Sesi ujian tidak valid.' });
-		}
-
-		let warnings = 0;
-		let warningLogs = '[]';
-		let kvAnswers: Record<string, any> = {};
-		let kvDoubts: Record<string, any> = {};
-
-		const kv = platform?.env?.EXAM_ANSWERS;
-		if (kv) {
-			const stored = await kv.get(`attempt_${parsedAttemptId}_answers`);
-			if (stored) {
-				try {
-					const kvData = JSON.parse(stored);
-					if (kvData && kvData.warnings) warnings = kvData.warnings;
-					if (kvData && kvData.warningLogs) warningLogs = JSON.stringify(kvData.warningLogs);
-					if (kvData && kvData.answers) kvAnswers = kvData.answers;
-					if (kvData && kvData.doubts) kvDoubts = kvData.doubts;
-					await kv.delete(`attempt_${parsedAttemptId}_answers`);
-				} catch (e) {}
+			if (!attempt || attempt.status !== 'mengerjakan') {
+				return fail(400, { error: 'Sesi ujian tidak valid atau sudah selesai.' });
 			}
-		}
 
-		// Sync answers to student_answers database
-		const examQuestions = await db.prepare('SELECT id FROM questions WHERE exam_id = ?').bind(attempt.exam_id).all<{ id: number }>();
-		const existingAnswers = await db.prepare('SELECT question_id, id FROM student_answers WHERE attempt_id = ?').bind(parsedAttemptId).all<{ question_id: number; id: number }>();
-		const existingMap = new Map<number, number>(existingAnswers.results.map(a => [a.question_id, a.id]));
+			const form = await request.formData().catch(() => null);
+			let formAnswers: Record<string, any> = {};
+			let formDoubts: Record<string, any> = {};
+			let warnings = 0;
+			let warningLogs = '[]';
 
-		const syncStmts = [];
-		for (const q of examQuestions.results) {
-			const ansVal = typeof kvAnswers[q.id] !== 'undefined' ? String(kvAnswers[q.id]) : null;
-			const isDoubted = kvDoubts[q.id] ? 1 : 0;
+			if (form) {
+				const formAnswersStr = form.get('answers')?.toString();
+				const formDoubtsStr = form.get('doubts')?.toString();
+				const formWarningsStr = form.get('warnings')?.toString();
+				const formWarningLogsStr = form.get('warningLogs')?.toString();
 
-			if (existingMap.has(q.id)) {
-				if (ansVal !== null) {
+				if (formAnswersStr) {
+					try { formAnswers = JSON.parse(formAnswersStr); } catch {}
+				}
+				if (formDoubtsStr) {
+					try { formDoubts = JSON.parse(formDoubtsStr); } catch {}
+				}
+				if (formWarningsStr) {
+					warnings = parseInt(formWarningsStr, 10) || 0;
+				}
+				if (formWarningLogsStr) {
+					warningLogs = formWarningLogsStr;
+				}
+			}
+
+			let kvAnswers: Record<string, any> = { ...formAnswers };
+			let kvDoubts: Record<string, any> = { ...formDoubts };
+
+			const kv = platform?.env?.EXAM_ANSWERS;
+			if (kv) {
+				const stored = await kv.get(`attempt_${parsedAttemptId}_answers`);
+				if (stored) {
+					try {
+						const kvData = JSON.parse(stored);
+						if (kvData && kvData.warnings) warnings = kvData.warnings;
+						if (kvData && kvData.warningLogs) warningLogs = JSON.stringify(kvData.warningLogs);
+						if (kvData && kvData.answers) kvAnswers = { ...kvAnswers, ...kvData.answers };
+						if (kvData && kvData.doubts) kvDoubts = { ...kvDoubts, ...kvData.doubts };
+						await kv.delete(`attempt_${parsedAttemptId}_answers`);
+					} catch (e) {}
+				}
+			}
+
+			// Sync answers to student_answers database
+			const examQuestions = await db.prepare('SELECT id FROM questions WHERE exam_id = ?').bind(attempt.exam_id).all<{ id: number }>();
+			const existingAnswers = await db.prepare('SELECT question_id, id FROM student_answers WHERE attempt_id = ?').bind(parsedAttemptId).all<{ question_id: number; id: number }>();
+			const existingMap = new Map<number, number>(existingAnswers.results.map(a => [a.question_id, a.id]));
+
+			const syncStmts = [];
+			for (const q of examQuestions.results) {
+				const ansVal = typeof kvAnswers[q.id] !== 'undefined' && kvAnswers[q.id] !== null ? String(kvAnswers[q.id]) : null;
+				const isDoubted = kvDoubts[q.id] ? 1 : 0;
+
+				if (existingMap.has(q.id)) {
+					if (ansVal !== null) {
+						syncStmts.push(
+							db.prepare(`UPDATE student_answers SET answer_given = ?, is_doubted = ?, answered_at = datetime('now') WHERE attempt_id = ? AND question_id = ?`)
+								.bind(ansVal, isDoubted, parsedAttemptId, q.id)
+						);
+					}
+				} else {
 					syncStmts.push(
-						db.prepare(`UPDATE student_answers SET answer_given = ?, is_doubted = ?, answered_at = datetime('now') WHERE attempt_id = ? AND question_id = ?`)
-							.bind(ansVal, isDoubted, parsedAttemptId, q.id)
+						db.prepare(`INSERT INTO student_answers (attempt_id, question_id, answer_given, is_doubted, answered_at) VALUES (?, ?, ?, ?, datetime('now'))`)
+							.bind(parsedAttemptId, q.id, ansVal, isDoubted)
 					);
 				}
-			} else {
-				syncStmts.push(
-					db.prepare(`INSERT INTO student_answers (attempt_id, question_id, answer_given, is_doubted, answered_at) VALUES (?, ?, ?, ?, datetime('now'))`)
-						.bind(parsedAttemptId, q.id, ansVal, isDoubted)
-				);
-			}
-		}
-
-		if (syncStmts.length > 0) {
-			await db.batch(syncStmts);
-		}
-
-		// Auto-grade soal objektif
-		const answers = await db.prepare(`
-			SELECT sa.*, q.type, q.correct_answer_json, q.points
-			FROM student_answers sa
-			JOIN questions q ON sa.question_id = q.id
-			WHERE sa.attempt_id = ?
-		`).bind(parsedAttemptId).all();
-
-		let totalScore = 0;
-		let totalPoints = 0;
-		let objectiveScore = 0;
-		let objectivePoints = 0;
-
-		const updateStmts = [];
-
-		for (const ans of answers.results as any[]) {
-			totalPoints += ans.points;
-
-			if (ans.type === 'essay' || ans.type === 'isian_singkat') {
-				// Essay dan isian singkat dinilai manual — skip
-				continue;
 			}
 
-			objectivePoints += ans.points;
-
-			if (!ans.correct_answer_json || !ans.answer_given) {
-				updateStmts.push(
-					db.prepare('UPDATE student_answers SET score_given = 0, is_correct = 0 WHERE id = ?').bind(ans.id)
-				);
-				continue;
+			if (syncStmts.length > 0) {
+				await db.batch(syncStmts);
 			}
 
-			let correctAnswer: string;
-			try {
-				correctAnswer = JSON.parse(ans.correct_answer_json);
-			} catch {
-				continue;
-			}
+			// Auto-grade soal objektif
+			const answers = await db.prepare(`
+				SELECT sa.*, q.type, q.correct_answer_json, q.points
+				FROM student_answers sa
+				JOIN questions q ON sa.question_id = q.id
+				WHERE sa.attempt_id = ?
+			`).bind(parsedAttemptId).all();
 
-			let isCorrect = false;
-			let partialScore: number | null = null;
+			let totalScore = 0;
+			let totalPoints = 0;
 
-			if (ans.type === 'pilihan_ganda' || ans.type === 'benar_salah') {
-				isCorrect = ans.answer_given === correctAnswer;
-			} else if (ans.type === 'pilihan_ganda_kompleks') {
+			const updateStmts = [];
+
+			for (const ans of answers.results as any[]) {
+				totalPoints += ans.points;
+
+				if (ans.type === 'essay' || ans.type === 'isian_singkat') {
+					// Essay dan isian singkat dinilai manual oleh guru
+					continue;
+				}
+
+				if (!ans.correct_answer_json || !ans.answer_given) {
+					updateStmts.push(
+						db.prepare('UPDATE student_answers SET score_given = 0, is_correct = 0 WHERE id = ?').bind(ans.id)
+					);
+					continue;
+				}
+
+				let correctAnswer: any;
 				try {
-					const givenAnswers = typeof ans.answer_given === 'string' ? JSON.parse(ans.answer_given) : [];
-					const correctAnswers = Array.isArray(correctAnswer) ? correctAnswer : (typeof correctAnswer === 'string' ? JSON.parse(correctAnswer) : []);
-					
-					if (Array.isArray(givenAnswers) && Array.isArray(correctAnswers)) {
-						let correctPicks = 0;
-						let wrongPicks = 0;
-						
-						for (const g of givenAnswers) {
-							if (correctAnswers.includes(g)) {
-								correctPicks++;
-							} else {
-								wrongPicks++;
+					correctAnswer = JSON.parse(ans.correct_answer_json);
+				} catch {
+					continue;
+				}
+
+				let isCorrect = false;
+				let partialScore: number | null = null;
+
+				if (ans.type === 'pilihan_ganda' || ans.type === 'benar_salah') {
+					isCorrect = String(ans.answer_given).trim() === String(correctAnswer).trim();
+				} else if (ans.type === 'pilihan_ganda_kompleks') {
+					try {
+						const givenRaw = typeof ans.answer_given === 'string' ? JSON.parse(ans.answer_given) : ans.answer_given;
+						const correctRaw = Array.isArray(correctAnswer) ? correctAnswer : (typeof correctAnswer === 'string' ? JSON.parse(correctAnswer) : []);
+						const givenAnswers = Array.isArray(givenRaw) ? givenRaw.map(String) : [];
+						const correctAnswers = Array.isArray(correctRaw) ? correctRaw.map(String) : [];
+
+						if (correctAnswers.length > 0) {
+							let correctPicks = 0;
+							let wrongPicks = 0;
+
+							for (const g of givenAnswers) {
+								if (correctAnswers.includes(g)) {
+									correctPicks++;
+								} else {
+									wrongPicks++;
+								}
 							}
-						}
-						
-						const totalCorrect = correctAnswers.length;
-						if (totalCorrect > 0) {
-							let rawScore = (correctPicks - wrongPicks) / totalCorrect;
+
+							let rawScore = (correctPicks - wrongPicks) / correctAnswers.length;
 							if (rawScore < 0) rawScore = 0;
-							
-							isCorrect = correctPicks === totalCorrect && wrongPicks === 0;
+
+							isCorrect = correctPicks === correctAnswers.length && wrongPicks === 0;
 							partialScore = Math.round(rawScore * ans.points * 100) / 100;
 						}
+					} catch {
+						isCorrect = false;
 					}
-				} catch {
-					isCorrect = false;
-				}
-			} else if (ans.type === 'menjodohkan') {
-				try {
-					const givenMap = JSON.parse(ans.answer_given);
-					const correctMap = typeof correctAnswer === 'string' ? JSON.parse(correctAnswer) : correctAnswer;
-					
-					const keys = Object.keys(correctMap);
-					const totalPairs = keys.length;
-					if (totalPairs > 0) {
-						let correctCount = 0;
-						for (const key of keys) {
-							if (givenMap[key] === correctMap[key]) correctCount++;
+				} else if (ans.type === 'menjodohkan') {
+					try {
+						const givenMap = typeof ans.answer_given === 'string' ? JSON.parse(ans.answer_given) : ans.answer_given;
+						const correctMap = typeof correctAnswer === 'string' ? JSON.parse(correctAnswer) : correctAnswer;
+
+						if (givenMap && correctMap && typeof correctMap === 'object') {
+							const keys = Object.keys(correctMap);
+							const totalPairs = keys.length;
+							if (totalPairs > 0) {
+								let correctCount = 0;
+								for (const key of keys) {
+									if (String(givenMap[key]).trim() === String(correctMap[key]).trim()) {
+										correctCount++;
+									}
+								}
+								isCorrect = correctCount === totalPairs;
+								partialScore = Math.round((correctCount / totalPairs) * ans.points * 100) / 100;
+							}
 						}
-						isCorrect = correctCount === totalPairs;
-						partialScore = Math.round((correctCount / totalPairs) * ans.points * 100) / 100;
+					} catch {
+						isCorrect = false;
 					}
-				} catch {
-					isCorrect = false;
 				}
+
+				const scoreGiven = partialScore !== null ? partialScore : (isCorrect ? ans.points : 0);
+				totalScore += scoreGiven;
+
+				updateStmts.push(
+					db.prepare('UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?')
+						.bind(scoreGiven, isCorrect ? 1 : 0, ans.id)
+				);
 			}
 
-			const scoreGiven = partialScore !== null ? partialScore : (isCorrect ? ans.points : 0);
-			totalScore += scoreGiven;
-			objectiveScore += scoreGiven;
+			// Hitung skor persentase
+			const finalScore = totalPoints > 0 ? Math.round((totalScore / totalPoints) * 1000) / 10 : 0;
 
+			// Simpan status selesai ke student_attempts
 			updateStmts.push(
-				db.prepare('UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?')
-					.bind(scoreGiven, isCorrect ? 1 : 0, ans.id)
+				db.prepare(`UPDATE student_attempts SET status = 'selesai', submit_time = datetime('now'),
+					score = ?, total_points = ?, violation_count = ?, violation_logs = ? WHERE id = ?`)
+					.bind(finalScore, totalPoints, warnings, warningLogs, parsedAttemptId)
 			);
-		}
 
-		// Hitung skor persentase
-		const finalScore = totalPoints > 0 ? Math.round((totalScore / totalPoints) * 1000) / 10 : 0;
-		const finalObjectiveScore = objectivePoints > 0 ? Math.round((objectiveScore / objectivePoints) * 1000) / 10 : 0;
+			await db.batch(updateStmts);
 
-		updateStmts.push(
-			db.prepare(`UPDATE student_attempts SET status = 'selesai', submit_time = datetime('now'),
-				score = ?, objective_score = ?, total_points = ?, violation_count = ?, violation_logs = ? WHERE id = ?`)
-				.bind(finalScore, finalObjectiveScore, totalPoints, warnings, warningLogs, parsedAttemptId)
-		);
+			// Hapus cookie sesi ujian
+			cookies.delete('exam_token_verified_' + parsedAttemptId, { path: '/' });
 
-		await db.batch(updateStmts);
-
-		throw redirect(302, '/siswa');
+			throw redirect(302, '/siswa');
 		} catch (e: any) {
 			if (e.status === 302) throw e;
 			console.error("Submit error:", e);

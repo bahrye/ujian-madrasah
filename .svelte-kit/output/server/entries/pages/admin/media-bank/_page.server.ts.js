@@ -4,40 +4,49 @@ import { d as deleteFromCloudinary } from "../../../../chunks/cloudinary.js";
 import { b as private_env } from "../../../../chunks/shared-server.js";
 const load = async ({ platform, locals }) => {
   const db = getDB(platform);
+  const isSuperAdmin = locals.user?.role === "superadmin";
+  const schoolId = locals.user?.school_id || -1;
+  const query = isSuperAdmin ? `
+			SELECT 
+				u.id as log_id,
+				u.url as media_url,
+				u.name,
+				u.media_type,
+				u.is_public,
+				usr.name as uploader_name,
+				q.id as question_id,
+				q.question_number,
+				e.title as exam_title,
+				s.name as subject_name
+			FROM uploaded_media u
+			LEFT JOIN questions q ON u.url = q.media_url
+			LEFT JOIN exams e ON q.exam_id = e.id
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			LEFT JOIN users usr ON u.uploaded_by = usr.id
+			ORDER BY u.id DESC
+		` : `
+			SELECT 
+				u.id as log_id,
+				u.url as media_url,
+				u.name,
+				u.media_type,
+				u.is_public,
+				usr.name as uploader_name,
+				q.id as question_id,
+				q.question_number,
+				e.title as exam_title,
+				s.name as subject_name
+			FROM uploaded_media u
+			LEFT JOIN questions q ON u.url = q.media_url
+			LEFT JOIN exams e ON q.exam_id = e.id
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			LEFT JOIN users usr ON u.uploaded_by = usr.id
+			WHERE u.school_id = ?
+			ORDER BY u.id DESC
+		`;
   try {
-    await db.prepare(`
-			INSERT INTO uploaded_media (url, media_type, school_id)
-			SELECT media_url, media_type, ? FROM questions 
-			WHERE media_url LIKE '%res.cloudinary.com%' 
-			AND media_url NOT IN (SELECT url FROM uploaded_media)
-			GROUP BY media_url
-		`).bind(locals.user?.school_id || -1).run();
-  } catch (e) {
-    console.error("Sync uploaded_media error:", e);
-  }
-  const query = `
-		SELECT 
-			u.id as log_id,
-			u.url as media_url,
-			u.name,
-			u.media_type,
-			u.is_public,
-			usr.name as uploader_name,
-			q.id as question_id,
-			q.question_number,
-			e.title as exam_title,
-			s.name as subject_name
-		FROM uploaded_media u
-		LEFT JOIN questions q ON (u.url = q.media_url OR instr(q.question_text, u.url) > 0 OR instr(q.options_json, u.url) > 0)
-		LEFT JOIN exams e ON q.exam_id = e.id
-		LEFT JOIN subjects s ON e.subject_id = s.id
-		LEFT JOIN users usr ON u.uploaded_by = usr.id
-		WHERE u.school_id = ? OR ? = 'superadmin'
-		ORDER BY q.id IS NULL DESC, s.name ASC, e.title ASC, q.question_number ASC
-	`;
-  try {
-    const result = await db.prepare(query).bind(locals.user?.school_id || -1, locals.user?.role).all();
-    return { mediaItems: result.results };
+    const result = isSuperAdmin ? await db.prepare(query).all() : await db.prepare(query).bind(schoolId).all();
+    return { mediaItems: result.results || [] };
   } catch (e) {
     console.error("Fetch uploaded_media error:", e.message, e);
     return { mediaItems: [] };

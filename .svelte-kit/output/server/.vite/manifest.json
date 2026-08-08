@@ -1135,6 +1135,7 @@
     "isEntry": true,
     "imports": [
       "_cloudinary.js",
+      "_db.js",
       "_shared-server.js"
     ]
   },
@@ -1490,7 +1491,8 @@
     "src": "src/routes/guru/remedial/[examId]/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_auth.js"
     ]
   },
   "src/routes/guru/remedial/[examId]/+page.svelte": {

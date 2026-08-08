@@ -91,7 +91,7 @@ export const actions = {
 
 		try {
 			await db.batch([
-				db.prepare('UPDATE exams SET subject_id = NULL WHERE subject_id = ?').bind(parsedId),
+				db.prepare('UPDATE exams SET subject_id = NULL WHERE subject_id = ? AND school_id = ?').bind(parsedId, locals.user!.school_id),
 				db.prepare('DELETE FROM subjects WHERE id = ? AND school_id = ?').bind(parsedId, locals.user!.school_id)
 			]);
 			return { success: true };

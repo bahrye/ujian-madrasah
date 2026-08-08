@@ -34,6 +34,14 @@ const actions = {
       return fail(400, { error: "ID tidak valid" });
     }
     try {
+      const attemptCheck = await db.prepare(`
+				SELECT sa.id FROM student_attempts sa
+				JOIN exams e ON sa.exam_id = e.id
+				WHERE sa.id = ? AND e.school_id = ?
+			`).bind(parsedId, locals.user.school_id).first();
+      if (!attemptCheck) {
+        return fail(403, { error: "Data hasil ujian tidak ditemukan atau bukan milik sekolah Anda." });
+      }
       await db.batch([
         db.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(parsedId),
         db.prepare("DELETE FROM student_attempts WHERE id = ?").bind(parsedId)

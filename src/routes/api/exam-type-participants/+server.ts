@@ -22,9 +22,9 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 		FROM exam_type_participants etp
 		JOIN users u ON etp.student_id = u.id
 		LEFT JOIN classes c ON u.class_id = c.id
-		WHERE etp.exam_type_id = ?
+		WHERE etp.exam_type_id = ? AND u.school_id = ?
 		ORDER BY c.name, u.name
-	`).bind(examTypeId).all<{ id: number; student_name: string; nisn: string; class_name: string | null }>();
+	`).bind(examTypeId, locals.user.school_id).all<{ id: number; student_name: string; nisn: string; class_name: string | null }>();
 
 	return json({ participants: participants.results || [] });
 };

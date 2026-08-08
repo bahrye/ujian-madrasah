@@ -17,19 +17,30 @@ export const GET: RequestHandler = async ({ url, fetch, locals }) => {
 			throw error(400, 'Invalid protocol');
 		}
 
-		// Prevent SSRF against private IP ranges / localhost
+		// Whitelist trusted media domains to prevent open proxy exploitation
 		const hostname = parsedUrl.hostname.toLowerCase();
-		if (
-			hostname === 'localhost' ||
-			hostname === '127.0.0.1' ||
-			hostname === '::1' ||
-			hostname.startsWith('10.') ||
-			hostname.startsWith('192.168.') ||
-			hostname.startsWith('169.254.') ||
-			hostname.endsWith('.internal') ||
-			hostname.endsWith('.local')
-		) {
-			throw error(403, 'Access to internal network is forbidden');
+		const isCloudinary = hostname === 'res.cloudinary.com' || hostname.endsWith('.cloudinary.com');
+		
+		if (!isCloudinary) {
+			// Cegah SSRF terhadap private / internal network dan batasi domain
+			if (
+				hostname === 'localhost' ||
+				hostname === '127.0.0.1' ||
+				hostname === '::1' ||
+				hostname.startsWith('10.') ||
+				hostname.startsWith('192.168.') ||
+				hostname.startsWith('172.') ||
+				hostname.startsWith('169.254.') ||
+				hostname.endsWith('.internal') ||
+				hostname.endsWith('.local')
+			) {
+				throw error(403, 'Access to internal network is forbidden');
+			}
+
+			// Hanya izinkan domain HTTPS publik
+			if (parsedUrl.protocol !== 'https:') {
+				throw error(403, 'Only HTTPS media proxying is supported');
+			}
 		}
 		// Fetch target URL. Cloudflare fetch follows redirects automatically up to a limit.
 		const response = await fetch(targetUrl, {

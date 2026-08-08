@@ -18,6 +18,14 @@ export const GET = async ({ params, platform, locals }: any) => {
 			LEFT JOIN subjects s ON e.subject_id = s.id
 			WHERE e.id = ?
 		`).bind(examId).first();
+	} else if (locals.user.role === 'guru') {
+		exam = await db.prepare(`
+			SELECT e.*, s.name as subject_name 
+			FROM exams e
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			WHERE e.id = ? AND e.school_id = ?
+			AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))
+		`).bind(examId, locals.user.school_id, locals.user.id, locals.user.id).first();
 	} else {
 		exam = await db.prepare(`
 			SELECT e.*, s.name as subject_name 
@@ -28,7 +36,7 @@ export const GET = async ({ params, platform, locals }: any) => {
 	}
 
 	if (!exam) {
-		return json({ error: 'Ujian tidak ditemukan.' }, { status: 404 });
+		return json({ error: 'Ujian tidak ditemukan atau Anda tidak memiliki akses.' }, { status: 404 });
 	}
 
 	// 2. Get All Questions for the Exam

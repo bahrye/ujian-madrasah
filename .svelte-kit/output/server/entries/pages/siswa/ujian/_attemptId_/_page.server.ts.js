@@ -88,9 +88,16 @@ const load = async ({ platform, locals, params, cookies }) => {
   }
 };
 const actions = {
-  saveAnswer: async ({ request, platform, params }) => {
+  saveAnswer: async ({ request, platform, params, locals, cookies }) => {
+    if (!locals.user) return fail(401, { error: "Unauthorized" });
     const kv = platform?.env?.EXAM_ANSWERS;
     if (!kv) return fail(500, { error: "KV not configured" });
+    const attemptIdStr = params.attemptId;
+    const parsedAttemptId = parseInt(attemptIdStr, 10);
+    if (isNaN(parsedAttemptId)) return fail(400, { error: "ID tidak valid" });
+    const cookieVal = cookies.get("exam_token_verified_" + parsedAttemptId);
+    const isVerified = await verifyExamTokenSignature(cookieVal, parsedAttemptId, locals.user.id);
+    if (!isVerified) return fail(401, { error: "Sesi token tidak valid." });
     const form = await request.formData();
     const answersStr = form.get("answers")?.toString();
     const doubtsStr = form.get("doubts")?.toString();
@@ -104,9 +111,6 @@ const actions = {
           warnings: warningsStr ? parseInt(warningsStr, 10) : 0,
           warningLogs: warningLogsStr ? JSON.parse(warningLogsStr) : []
         };
-        const attemptIdStr = params.attemptId;
-        const parsedAttemptId = parseInt(attemptIdStr, 10);
-        if (isNaN(parsedAttemptId)) return fail(400, { error: "ID tidak valid" });
         await kv.put(`attempt_${parsedAttemptId}_answers`, JSON.stringify(payload));
       } catch (e) {
         return fail(400, { error: "Invalid JSON payload" });
@@ -114,7 +118,7 @@ const actions = {
     }
     return { saved: true };
   },
-  submit: async ({ platform, params, locals }) => {
+  submit: async ({ request, platform, params, locals, cookies }) => {
     if (!locals.user) return fail(401, { error: "Sesi telah berakhir. Silakan login kembali." });
     const db = getDB(platform);
     const attemptIdStr = params.attemptId;
@@ -123,12 +127,39 @@ const actions = {
     try {
       const attempt = await db.prepare("SELECT * FROM student_attempts WHERE id = ? AND student_id = ?").bind(parsedAttemptId, locals.user.id).first();
       if (!attempt || attempt.status !== "mengerjakan") {
-        return fail(400, { error: "Sesi ujian tidak valid." });
+        return fail(400, { error: "Sesi ujian tidak valid atau sudah selesai." });
       }
+      const form = await request.formData().catch(() => null);
+      let formAnswers = {};
+      let formDoubts = {};
       let warnings = 0;
       let warningLogs = "[]";
-      let kvAnswers = {};
-      let kvDoubts = {};
+      if (form) {
+        const formAnswersStr = form.get("answers")?.toString();
+        const formDoubtsStr = form.get("doubts")?.toString();
+        const formWarningsStr = form.get("warnings")?.toString();
+        const formWarningLogsStr = form.get("warningLogs")?.toString();
+        if (formAnswersStr) {
+          try {
+            formAnswers = JSON.parse(formAnswersStr);
+          } catch {
+          }
+        }
+        if (formDoubtsStr) {
+          try {
+            formDoubts = JSON.parse(formDoubtsStr);
+          } catch {
+          }
+        }
+        if (formWarningsStr) {
+          warnings = parseInt(formWarningsStr, 10) || 0;
+        }
+        if (formWarningLogsStr) {
+          warningLogs = formWarningLogsStr;
+        }
+      }
+      let kvAnswers = { ...formAnswers };
+      let kvDoubts = { ...formDoubts };
       const kv = platform?.env?.EXAM_ANSWERS;
       if (kv) {
         const stored = await kv.get(`attempt_${parsedAttemptId}_answers`);
@@ -137,8 +168,8 @@ const actions = {
             const kvData = JSON.parse(stored);
             if (kvData && kvData.warnings) warnings = kvData.warnings;
             if (kvData && kvData.warningLogs) warningLogs = JSON.stringify(kvData.warningLogs);
-            if (kvData && kvData.answers) kvAnswers = kvData.answers;
-            if (kvData && kvData.doubts) kvDoubts = kvData.doubts;
+            if (kvData && kvData.answers) kvAnswers = { ...kvAnswers, ...kvData.answers };
+            if (kvData && kvData.doubts) kvDoubts = { ...kvDoubts, ...kvData.doubts };
             await kv.delete(`attempt_${parsedAttemptId}_answers`);
           } catch (e) {
           }
@@ -149,7 +180,7 @@ const actions = {
       const existingMap = new Map(existingAnswers.results.map((a) => [a.question_id, a.id]));
       const syncStmts = [];
       for (const q of examQuestions.results) {
-        const ansVal = typeof kvAnswers[q.id] !== "undefined" ? String(kvAnswers[q.id]) : null;
+        const ansVal = typeof kvAnswers[q.id] !== "undefined" && kvAnswers[q.id] !== null ? String(kvAnswers[q.id]) : null;
         const isDoubted = kvDoubts[q.id] ? 1 : 0;
         if (existingMap.has(q.id)) {
           if (ansVal !== null) {
@@ -167,22 +198,19 @@ const actions = {
         await db.batch(syncStmts);
       }
       const answers = await db.prepare(`
-			SELECT sa.*, q.type, q.correct_answer_json, q.points
-			FROM student_answers sa
-			JOIN questions q ON sa.question_id = q.id
-			WHERE sa.attempt_id = ?
-		`).bind(parsedAttemptId).all();
+				SELECT sa.*, q.type, q.correct_answer_json, q.points
+				FROM student_answers sa
+				JOIN questions q ON sa.question_id = q.id
+				WHERE sa.attempt_id = ?
+			`).bind(parsedAttemptId).all();
       let totalScore = 0;
       let totalPoints = 0;
-      let objectiveScore = 0;
-      let objectivePoints = 0;
       const updateStmts = [];
       for (const ans of answers.results) {
         totalPoints += ans.points;
         if (ans.type === "essay" || ans.type === "isian_singkat") {
           continue;
         }
-        objectivePoints += ans.points;
         if (!ans.correct_answer_json || !ans.answer_given) {
           updateStmts.push(
             db.prepare("UPDATE student_answers SET score_given = 0, is_correct = 0 WHERE id = ?").bind(ans.id)
@@ -198,12 +226,14 @@ const actions = {
         let isCorrect = false;
         let partialScore = null;
         if (ans.type === "pilihan_ganda" || ans.type === "benar_salah") {
-          isCorrect = ans.answer_given === correctAnswer;
+          isCorrect = String(ans.answer_given).trim() === String(correctAnswer).trim();
         } else if (ans.type === "pilihan_ganda_kompleks") {
           try {
-            const givenAnswers = typeof ans.answer_given === "string" ? JSON.parse(ans.answer_given) : [];
-            const correctAnswers = Array.isArray(correctAnswer) ? correctAnswer : typeof correctAnswer === "string" ? JSON.parse(correctAnswer) : [];
-            if (Array.isArray(givenAnswers) && Array.isArray(correctAnswers)) {
+            const givenRaw = typeof ans.answer_given === "string" ? JSON.parse(ans.answer_given) : ans.answer_given;
+            const correctRaw = Array.isArray(correctAnswer) ? correctAnswer : typeof correctAnswer === "string" ? JSON.parse(correctAnswer) : [];
+            const givenAnswers = Array.isArray(givenRaw) ? givenRaw.map(String) : [];
+            const correctAnswers = Array.isArray(correctRaw) ? correctRaw.map(String) : [];
+            if (correctAnswers.length > 0) {
               let correctPicks = 0;
               let wrongPicks = 0;
               for (const g of givenAnswers) {
@@ -213,30 +243,31 @@ const actions = {
                   wrongPicks++;
                 }
               }
-              const totalCorrect = correctAnswers.length;
-              if (totalCorrect > 0) {
-                let rawScore = (correctPicks - wrongPicks) / totalCorrect;
-                if (rawScore < 0) rawScore = 0;
-                isCorrect = correctPicks === totalCorrect && wrongPicks === 0;
-                partialScore = Math.round(rawScore * ans.points * 100) / 100;
-              }
+              let rawScore = (correctPicks - wrongPicks) / correctAnswers.length;
+              if (rawScore < 0) rawScore = 0;
+              isCorrect = correctPicks === correctAnswers.length && wrongPicks === 0;
+              partialScore = Math.round(rawScore * ans.points * 100) / 100;
             }
           } catch {
             isCorrect = false;
           }
         } else if (ans.type === "menjodohkan") {
           try {
-            const givenMap = JSON.parse(ans.answer_given);
+            const givenMap = typeof ans.answer_given === "string" ? JSON.parse(ans.answer_given) : ans.answer_given;
             const correctMap = typeof correctAnswer === "string" ? JSON.parse(correctAnswer) : correctAnswer;
-            const keys = Object.keys(correctMap);
-            const totalPairs = keys.length;
-            if (totalPairs > 0) {
-              let correctCount = 0;
-              for (const key of keys) {
-                if (givenMap[key] === correctMap[key]) correctCount++;
+            if (givenMap && correctMap && typeof correctMap === "object") {
+              const keys = Object.keys(correctMap);
+              const totalPairs = keys.length;
+              if (totalPairs > 0) {
+                let correctCount = 0;
+                for (const key of keys) {
+                  if (String(givenMap[key]).trim() === String(correctMap[key]).trim()) {
+                    correctCount++;
+                  }
+                }
+                isCorrect = correctCount === totalPairs;
+                partialScore = Math.round(correctCount / totalPairs * ans.points * 100) / 100;
               }
-              isCorrect = correctCount === totalPairs;
-              partialScore = Math.round(correctCount / totalPairs * ans.points * 100) / 100;
             }
           } catch {
             isCorrect = false;
@@ -244,18 +275,17 @@ const actions = {
         }
         const scoreGiven = partialScore !== null ? partialScore : isCorrect ? ans.points : 0;
         totalScore += scoreGiven;
-        objectiveScore += scoreGiven;
         updateStmts.push(
           db.prepare("UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?").bind(scoreGiven, isCorrect ? 1 : 0, ans.id)
         );
       }
       const finalScore = totalPoints > 0 ? Math.round(totalScore / totalPoints * 1e3) / 10 : 0;
-      const finalObjectiveScore = objectivePoints > 0 ? Math.round(objectiveScore / objectivePoints * 1e3) / 10 : 0;
       updateStmts.push(
         db.prepare(`UPDATE student_attempts SET status = 'selesai', submit_time = datetime('now'),
-				score = ?, objective_score = ?, total_points = ?, violation_count = ?, violation_logs = ? WHERE id = ?`).bind(finalScore, finalObjectiveScore, totalPoints, warnings, warningLogs, parsedAttemptId)
+					score = ?, total_points = ?, violation_count = ?, violation_logs = ? WHERE id = ?`).bind(finalScore, totalPoints, warnings, warningLogs, parsedAttemptId)
       );
       await db.batch(updateStmts);
+      cookies.delete("exam_token_verified_" + parsedAttemptId, { path: "/" });
       throw redirect(302, "/siswa");
     } catch (e) {
       if (e.status === 302) throw e;

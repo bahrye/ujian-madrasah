@@ -13,8 +13,14 @@ const GET = async ({ url, fetch, locals }) => {
       throw error(400, "Invalid protocol");
     }
     const hostname = parsedUrl.hostname.toLowerCase();
-    if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1" || hostname.startsWith("10.") || hostname.startsWith("192.168.") || hostname.startsWith("169.254.") || hostname.endsWith(".internal") || hostname.endsWith(".local")) {
-      throw error(403, "Access to internal network is forbidden");
+    const isCloudinary = hostname === "res.cloudinary.com" || hostname.endsWith(".cloudinary.com");
+    if (!isCloudinary) {
+      if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1" || hostname.startsWith("10.") || hostname.startsWith("192.168.") || hostname.startsWith("172.") || hostname.startsWith("169.254.") || hostname.endsWith(".internal") || hostname.endsWith(".local")) {
+        throw error(403, "Access to internal network is forbidden");
+      }
+      if (parsedUrl.protocol !== "https:") {
+        throw error(403, "Only HTTPS media proxying is supported");
+      }
     }
     const response = await fetch(targetUrl, {
       headers: {

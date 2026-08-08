@@ -7,7 +7,8 @@ const GET = async ({ params, platform, locals }) => {
   }
   const db = getDB(platform);
   const examId = params.id;
-  const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(examId, user.school_id).first();
+  const isSuperAdmin = user.role === "superadmin";
+  const exam = isSuperAdmin ? await db.prepare("SELECT id FROM exams WHERE id = ?").bind(examId).first() : await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(examId, user.school_id).first();
   if (!exam) {
     return json({ error: "Exam not found or unauthorized" }, { status: 404 });
   }

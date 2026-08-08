@@ -64,7 +64,8 @@ const load = async ({ platform, url, locals }) => {
   }
 };
 const actions = {
-  grade: async ({ request, platform }) => {
+  grade: async ({ request, platform, locals }) => {
+    if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
     const form = await request.formData();
     const answerIdStr = form.get("answer_id")?.toString();
@@ -74,20 +75,28 @@ const actions = {
     if (isNaN(parsedAnswerId)) return fail(400, { error: "ID jawaban tidak valid." });
     if (!scoreStr || scoreStr.trim() === "") return fail(400, { error: "Nilai tidak boleh kosong." });
     try {
+      const answerAuthCheck = await db.prepare(`
+				SELECT sa.id, sa.attempt_id
+				FROM student_answers sa
+				JOIN student_attempts st ON sa.attempt_id = st.id
+				JOIN exams e ON st.exam_id = e.id
+				WHERE sa.id = ? AND e.school_id = ?
+				AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))
+			`).bind(parsedAnswerId, locals.user.school_id, locals.user.id, locals.user.id).first();
+      if (!answerAuthCheck) {
+        return fail(403, { error: "Anda tidak memiliki hak untuk menilai jawaban ini." });
+      }
       const scoreGiven = parseFloat(scoreStr);
       const isCorrect = scoreGiven >= maxPoints ? 1 : scoreGiven > 0 ? 0 : 0;
       await db.prepare("UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?").bind(scoreGiven, isCorrect, parsedAnswerId).run();
-      const answer = await db.prepare("SELECT attempt_id FROM student_answers WHERE id = ?").bind(parsedAnswerId).first();
-      if (answer) {
-        const totalResult = await db.prepare(`
-					SELECT SUM(COALESCE(sa.score_given, 0)) as total_score, SUM(q.points) as total_points
-					FROM student_answers sa JOIN questions q ON sa.question_id = q.id
-					WHERE sa.attempt_id = ?
-				`).bind(answer.attempt_id).first();
-        if (totalResult && totalResult.total_points > 0) {
-          const score = totalResult.total_score / totalResult.total_points * 100;
-          await db.prepare("UPDATE student_attempts SET score = ? WHERE id = ?").bind(Math.round(score * 10) / 10, answer.attempt_id).run();
-        }
+      const totalResult = await db.prepare(`
+				SELECT SUM(COALESCE(sa.score_given, 0)) as total_score, SUM(q.points) as total_points
+				FROM student_answers sa JOIN questions q ON sa.question_id = q.id
+				WHERE sa.attempt_id = ?
+			`).bind(answerAuthCheck.attempt_id).first();
+      if (totalResult && totalResult.total_points > 0) {
+        const score = totalResult.total_score / totalResult.total_points * 100;
+        await db.prepare("UPDATE student_attempts SET score = ? WHERE id = ?").bind(Math.round(score * 10) / 10, answerAuthCheck.attempt_id).run();
       }
       return { success: "Nilai berhasil disimpan." };
     } catch (e) {
@@ -95,14 +104,27 @@ const actions = {
       return fail(500, { error: e.message || "Gagal menyimpan nilai." });
     }
   },
-  toggleScoreRelease: async ({ request, platform }) => {
+  toggleScoreRelease: async ({ request, platform, locals }) => {
+    if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
     const form = await request.formData();
     const examIdStr = form.get("exam_id")?.toString();
     const parsedExamId = parseInt(examIdStr || "", 10);
     if (isNaN(parsedExamId)) return fail(400, { error: "ID ujian tidak valid." });
     try {
-      await db.prepare(`UPDATE exams SET is_score_released = CASE WHEN is_score_released = 1 THEN 0 ELSE 1 END, updated_at = datetime('now') WHERE id = ?`).bind(parsedExamId).run();
+      const examAuthCheck = await db.prepare(`
+				SELECT id FROM exams
+				WHERE id = ? AND school_id = ?
+				AND (created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = exams.id AND et.teacher_id = ?))
+			`).bind(parsedExamId, locals.user.school_id, locals.user.id, locals.user.id).first();
+      if (!examAuthCheck) {
+        return fail(403, { error: "Anda tidak memiliki hak untuk mengubah pengaturan ujian ini." });
+      }
+      await db.prepare(`
+				UPDATE exams 
+				SET is_score_released = CASE WHEN is_score_released = 1 THEN 0 ELSE 1 END, updated_at = datetime('now') 
+				WHERE id = ? AND school_id = ?
+			`).bind(parsedExamId, locals.user.school_id).run();
       return { success: "Status rilis nilai berhasil diperbarui." };
     } catch (e) {
       console.error(e);
