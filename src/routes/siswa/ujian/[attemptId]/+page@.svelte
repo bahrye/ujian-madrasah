@@ -99,15 +99,16 @@
 
 		// Cek apakah reload ini dipicu resmi dari tombol muat ulang website
 		const officialReloadKey = `allowed_official_reload_${attempt.id}`;
-		const isOfficialReload = sessionStorage.getItem(officialReloadKey) === 'true';
-		if (isOfficialReload) {
+		if (sessionStorage.getItem(officialReloadKey) === 'true') {
+			isOfficialReload = true;
 			sessionStorage.removeItem(officialReloadKey);
 		}
 
-		// Berikan jeda inisialisasi agar transisi modal/pop-up awal dan reload resmi tidak memicu false-positive pelanggaran
+		// Berikan jeda inisialisasi 3 detik agar transisi modal/pop-up awal dan reload resmi tidak memicu false-positive pelanggaran
 		setTimeout(() => {
 			isMountedAndReady = true;
-		}, 2000);
+			isOfficialReload = false;
+		}, 3000);
 
 		statusPollingInterval = setInterval(async () => {
 			if (isUnloading || submitting || showSubmitConfirm) return;
@@ -128,6 +129,7 @@
 		}, 10000);
 	});
 
+	let isOfficialReload = false;
 	let isMountedAndReady = false;
 
 	onDestroy(() => {
@@ -155,7 +157,13 @@
 	let isManualReload = false;
 	
 	async function triggerReload() {
+		isOfficialReload = true;
 		isManualReload = true;
+		isUnloading = true;
+		isMountedAndReady = false; // Matikan segera listener sebelum reload berjalan
+		if (cheatWarningTimeout) clearTimeout(cheatWarningTimeout);
+		if (cheatCountdownInterval) clearInterval(cheatCountdownInterval);
+		isExamBlurred = false;
 		sessionStorage.setItem(`allowed_official_reload_${attempt.id}`, 'true');
 		try {
 			await saveCurrentAnswer(true);
@@ -164,12 +172,13 @@
 	}
 
 	function handleBeforeUnload(e: BeforeUnloadEvent) {
-		if (!submitting && !isDisqualifying && !isManualReload) {
+		isUnloading = true;
+		if (cheatWarningTimeout) clearTimeout(cheatWarningTimeout);
+		if (cheatCountdownInterval) clearInterval(cheatCountdownInterval);
+		if (!submitting && !isDisqualifying && !isManualReload && !isOfficialReload) {
 			e.preventDefault();
 			e.returnValue = '';
 		}
-		isUnloading = true;
-		// Jika dialog cancel ditekan, JS akan lanjut jalan dan reset isUnloading
 		setTimeout(() => {
 			isUnloading = false;
 			isManualReload = false;
@@ -179,7 +188,7 @@
 	let isDisqualifying = false;
 
 	function triggerViolation(type: string) {
-		if (!isMountedAndReady || showWarningModal || showDisqualifiedModal || submitting || isPausedByProctor) return;
+		if (isUnloading || isManualReload || isOfficialReload || !isMountedAndReady || showWarningModal || showDisqualifiedModal || submitting || isPausedByProctor) return;
 		
 		warnings += 1;
 		warningLogs.push({ time: Date.now(), type });
@@ -197,7 +206,7 @@
 	}
 
 	function handleCheatWarning(type: string, toleranceMs: number) {
-		if (!isMountedAndReady || showWarningModal || showDisqualifiedModal || submitting || isPausedByProctor) return;
+		if (isUnloading || isManualReload || isOfficialReload || !isMountedAndReady || showWarningModal || showDisqualifiedModal || submitting || isPausedByProctor) return;
 		
 		isExamBlurred = true;
 		if (cheatWarningTimeout) clearTimeout(cheatWarningTimeout);
@@ -240,7 +249,7 @@
 
 	function handleFullscreenChange() {
 		isFullscreen = !!document.fullscreenElement;
-		if (isMountedAndReady && !isFullscreen && !isExamBlurred && !showWarningModal && !showDisqualifiedModal && !submitting) {
+		if (isMountedAndReady && !isUnloading && !isManualReload && !isOfficialReload && !isFullscreen && !isExamBlurred && !showWarningModal && !showDisqualifiedModal && !submitting) {
 			handleCheatWarning('Keluar dari Layar Penuh', 10000); // 10 detik jeda toleransi
 		} else if (isFullscreen) {
 			handleReturnToExam();
@@ -248,13 +257,13 @@
 	}
 
 	function handleVisibilityChange() {
-		if (isMountedAndReady && document.visibilityState === 'hidden') {
+		if (isMountedAndReady && !isUnloading && !isManualReload && !isOfficialReload && document.visibilityState === 'hidden') {
 			triggerViolation('Keluar dari aplikasi ujian (Berpindah Tab/Layar)');
 		}
 	}
 
 	function handleBlur() {
-		if (isMountedAndReady && document.visibilityState !== 'hidden') {
+		if (isMountedAndReady && !isUnloading && !isManualReload && !isOfficialReload && document.visibilityState !== 'hidden') {
 			// Muncul aplikasi melayang / ditariknya notifikasi bar
 			handleCheatWarning('Membuka aplikasi melayang / Notifikasi', 10000); // 10 detik jeda toleransi
 		}
