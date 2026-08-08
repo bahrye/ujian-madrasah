@@ -104,21 +104,10 @@
 			sessionStorage.removeItem(officialReloadKey);
 		}
 
-		// Deteksi apakah halaman di-reload secara manual dari browser (F5, tombol reload browser, swipe refresh)
-		let isBrowserReloaded = false;
-		try {
-			const navEntries = performance.getEntriesByType('navigation');
-			if (navEntries.length > 0 && (navEntries[0] as PerformanceNavigationTiming).type === 'reload') {
-				isBrowserReloaded = true;
-			} else if (typeof performance.navigation !== 'undefined' && performance.navigation.type === 1) {
-				isBrowserReloaded = true;
-			}
-		} catch (e) {}
-
-		if (isBrowserReloaded && !isOfficialReload) {
-			// Hanya catat pelanggaran jika reload dilakukan manual dari browser
-			triggerViolation('Memuat ulang / Refresh halaman ujian dari browser');
-		}
+		// Berikan jeda inisialisasi agar transisi modal/pop-up awal dan reload resmi tidak memicu false-positive pelanggaran
+		setTimeout(() => {
+			isMountedAndReady = true;
+		}, 2000);
 
 		statusPollingInterval = setInterval(async () => {
 			if (isUnloading || submitting || showSubmitConfirm) return;
@@ -138,6 +127,8 @@
 			} catch (e) {}
 		}, 10000);
 	});
+
+	let isMountedAndReady = false;
 
 	onDestroy(() => {
 		if (wakeLock !== null) {
@@ -166,7 +157,9 @@
 	async function triggerReload() {
 		isManualReload = true;
 		sessionStorage.setItem(`allowed_official_reload_${attempt.id}`, 'true');
-		await saveCurrentAnswer(true);
+		try {
+			await saveCurrentAnswer(true);
+		} catch {}
 		window.location.reload();
 	}
 
@@ -186,7 +179,7 @@
 	let isDisqualifying = false;
 
 	function triggerViolation(type: string) {
-		if (showWarningModal || showDisqualifiedModal || submitting || isPausedByProctor) return;
+		if (!isMountedAndReady || showWarningModal || showDisqualifiedModal || submitting || isPausedByProctor) return;
 		
 		warnings += 1;
 		warningLogs.push({ time: Date.now(), type });
@@ -204,7 +197,7 @@
 	}
 
 	function handleCheatWarning(type: string, toleranceMs: number) {
-		if (showWarningModal || showDisqualifiedModal || submitting || isPausedByProctor) return;
+		if (!isMountedAndReady || showWarningModal || showDisqualifiedModal || submitting || isPausedByProctor) return;
 		
 		isExamBlurred = true;
 		if (cheatWarningTimeout) clearTimeout(cheatWarningTimeout);
@@ -247,23 +240,23 @@
 
 	function handleFullscreenChange() {
 		isFullscreen = !!document.fullscreenElement;
-		if (!isFullscreen && !isExamBlurred && !showWarningModal && !showDisqualifiedModal && !submitting) {
-			handleCheatWarning('Keluar dari Layar Penuh', 5000); // 5 detik toleransi langsung
+		if (isMountedAndReady && !isFullscreen && !isExamBlurred && !showWarningModal && !showDisqualifiedModal && !submitting) {
+			handleCheatWarning('Keluar dari Layar Penuh', 10000); // 10 detik jeda toleransi
 		} else if (isFullscreen) {
 			handleReturnToExam();
 		}
 	}
 
 	function handleVisibilityChange() {
-		if (document.visibilityState === 'hidden') {
+		if (isMountedAndReady && document.visibilityState === 'hidden') {
 			triggerViolation('Keluar dari aplikasi ujian (Berpindah Tab/Layar)');
 		}
 	}
 
 	function handleBlur() {
-		if (document.visibilityState !== 'hidden') {
+		if (isMountedAndReady && document.visibilityState !== 'hidden') {
 			// Muncul aplikasi melayang / ditariknya notifikasi bar
-			handleCheatWarning('Membuka aplikasi melayang / Notifikasi', 5000); // 5 detik
+			handleCheatWarning('Membuka aplikasi melayang / Notifikasi', 10000); // 10 detik jeda toleransi
 		}
 	}
 
