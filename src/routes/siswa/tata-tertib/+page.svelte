@@ -1,5 +1,14 @@
 <script lang="ts">
 	import { ICONS } from '$lib/utils/constants';
+	
+	let activeBadge = 0;
+	function highlightBadge(no: number) {
+		activeBadge = no;
+		const el = document.getElementById(`badge-desc-${no}`);
+		if (el) {
+			el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		}
+	}
 </script>
 
 <svelte:head>
@@ -188,16 +197,16 @@
 				<img src="/panduan-ui-ujian.jpeg" alt="Antarmuka Ujian" class="w-full h-auto block object-cover" />
 				
 				<!-- Badges Overlay (Diperkecil & digeser ke tepi agar tidak menutupi gambar) -->
-				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 3%; left: 3%;">1</div>
-				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 3%; left: 52%;">2</div>
-				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 3%; left: 90%;">3</div>
-				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 15%; left: 90%;">4</div>
-				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 30%; left: 3%;">5</div>
-				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 55%; left: 3%;">6</div>
-				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 85%; left: 3%;">7</div>
-				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 85%; left: 40%;">8</div>
-				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 85%; left: 88%;">9</div>
-				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 96%; left: 88%;">10</div>
+				<button type="button" on:click={() => highlightBadge(1)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 1 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 3%; left: 3%;">1</button>
+				<button type="button" on:click={() => highlightBadge(2)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 2 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 3%; left: 52%;">2</button>
+				<button type="button" on:click={() => highlightBadge(3)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 3 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 3%; left: 90%;">3</button>
+				<button type="button" on:click={() => highlightBadge(4)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 4 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 15%; left: 90%;">4</button>
+				<button type="button" on:click={() => highlightBadge(5)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 5 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 30%; left: 3%;">5</button>
+				<button type="button" on:click={() => highlightBadge(6)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 6 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 55%; left: 3%;">6</button>
+				<button type="button" on:click={() => highlightBadge(7)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 7 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 85%; left: 3%;">7</button>
+				<button type="button" on:click={() => highlightBadge(8)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 8 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 85%; left: 40%;">8</button>
+				<button type="button" on:click={() => highlightBadge(9)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 9 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 85%; left: 88%;">9</button>
+				<button type="button" on:click={() => highlightBadge(10)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 10 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 96%; left: 88%;">10</button>
 			</div>
 
 			<!-- Explanations -->
@@ -214,12 +223,18 @@
 					{ no: 9, title: 'Informasi Progres', desc: 'Melihat ringkasan berapa soal yang sudah dijawab dan yang masih kosong.' },
 					{ no: 10, title: 'Tombol Navigasi (Sebelumnya/Selanjutnya)', desc: 'Digunakan untuk beralih ke soal sebelum atau soal sesudahnya.' }
 				] as item}
-					<div class="flex items-start gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
-						<div class="shrink-0 w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">
+					<!-- svelte-ignore a11y-click-events-have-key-events -->
+					<!-- svelte-ignore a11y-no-static-element-interactions -->
+					<div 
+						id="badge-desc-{item.no}" 
+						on:click={() => activeBadge = item.no}
+						class="flex items-start gap-4 p-3 rounded-xl transition-all border cursor-pointer {activeBadge === item.no ? 'bg-indigo-50 border-indigo-200 shadow-sm ring-1 ring-indigo-200' : 'hover:bg-slate-50 border-transparent hover:border-slate-100'}"
+					>
+						<div class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors {activeBadge === item.no ? 'bg-indigo-600 text-white' : 'bg-indigo-100 text-indigo-700'}">
 							{item.no}
 						</div>
 						<div>
-							<h4 class="font-bold text-slate-800 text-sm">{item.title}</h4>
+							<h4 class="font-bold text-slate-800 text-sm transition-colors {activeBadge === item.no ? 'text-indigo-700' : ''}">{item.title}</h4>
 							<p class="text-slate-500 text-xs mt-1 leading-relaxed">{item.desc}</p>
 						</div>
 					</div>
