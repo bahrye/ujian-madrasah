@@ -97,6 +97,26 @@
 			}
 		}
 
+		// Deteksi apakah halaman baru saja direload secara manual
+		let isReloaded = false;
+		try {
+			const navEntries = performance.getEntriesByType('navigation');
+			if (navEntries.length > 0 && (navEntries[0] as PerformanceNavigationTiming).type === 'reload') {
+				isReloaded = true;
+			} else if (typeof performance.navigation !== 'undefined' && performance.navigation.type === 1) {
+				isReloaded = true;
+			}
+		} catch (e) {}
+
+		const sessionActiveKey = `exam_session_active_${attempt.id}`;
+		const hasBeenActiveBefore = sessionStorage.getItem(sessionActiveKey) === 'true';
+		sessionStorage.setItem(sessionActiveKey, 'true');
+
+		if (isReloaded || hasBeenActiveBefore) {
+			// Catat pelanggaran reload halaman secara instan pada kali pertama!
+			triggerViolation('Memuat ulang / Refresh halaman ujian');
+		}
+
 		statusPollingInterval = setInterval(async () => {
 			if (isUnloading || submitting || showSubmitConfirm) return;
 			try {
@@ -160,7 +180,7 @@
 	let isDisqualifying = false;
 
 	function triggerViolation(type: string) {
-		if (showWarningModal || showDisqualifiedModal || submitting || isUnloading || isPausedByProctor) return;
+		if (showWarningModal || showDisqualifiedModal || submitting || isPausedByProctor) return;
 		
 		warnings += 1;
 		warningLogs.push({ time: Date.now(), type });
@@ -178,7 +198,7 @@
 	}
 
 	function handleCheatWarning(type: string, toleranceMs: number) {
-		if (showWarningModal || showDisqualifiedModal || submitting || isUnloading || isPausedByProctor) return;
+		if (showWarningModal || showDisqualifiedModal || submitting || isPausedByProctor) return;
 		
 		isExamBlurred = true;
 		if (cheatWarningTimeout) clearTimeout(cheatWarningTimeout);
@@ -193,7 +213,6 @@
 		}, 1000);
 		
 		cheatWarningTimeout = setTimeout(() => {
-			if (isUnloading) return;
 			triggerViolation(type);
 		}, toleranceMs);
 	}
@@ -223,7 +242,7 @@
 	function handleFullscreenChange() {
 		isFullscreen = !!document.fullscreenElement;
 		if (!isFullscreen && !isExamBlurred && !showWarningModal && !showDisqualifiedModal && !submitting) {
-			handleCheatWarning('Keluar dari Layar Penuh', 30000); // 30 detik toleransi
+			handleCheatWarning('Keluar dari Layar Penuh', 5000); // 5 detik toleransi langsung
 		} else if (isFullscreen) {
 			handleReturnToExam();
 		}
@@ -238,7 +257,7 @@
 	function handleBlur() {
 		if (document.visibilityState !== 'hidden') {
 			// Muncul aplikasi melayang / ditariknya notifikasi bar
-			handleCheatWarning('Membuka aplikasi melayang / Notifikasi', 30000); // 30 detik
+			handleCheatWarning('Membuka aplikasi melayang / Notifikasi', 5000); // 5 detik
 		}
 	}
 
