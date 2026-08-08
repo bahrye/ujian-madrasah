@@ -104,6 +104,32 @@
 			sessionStorage.removeItem(officialReloadKey);
 		}
 
+		// Cek apakah sebelum reload siswa sedang dalam masa jeda peringatan (misal keluar fullscreen di HP)
+		const savedDeadline = sessionStorage.getItem(`cheat_deadline_${attempt.id}`);
+		const savedCheatType = sessionStorage.getItem(`cheat_type_${attempt.id}`) || 'Keluar dari Layar Penuh';
+		if (savedDeadline && !isOfficialReload) {
+			const deadline = parseInt(savedDeadline, 10);
+			const remainingMs = deadline - Date.now();
+			if (remainingMs <= 0) {
+				// Waktu toleransi sudah habis saat reload! Catat pelanggaran seketika!
+				sessionStorage.removeItem(`cheat_deadline_${attempt.id}`);
+				sessionStorage.removeItem(`cheat_type_${attempt.id}`);
+				warnings += 1;
+				warningLogs.push({ time: Date.now(), type: savedCheatType });
+				localStorage.setItem(`warnings_${attempt.id}`, warnings.toString());
+				localStorage.setItem(`warningLogs_${attempt.id}`, JSON.stringify(warningLogs));
+				triggerAutoSave();
+				if (warnings > MAX_WARNINGS) {
+					triggerDisqualification();
+				} else {
+					showWarningModal = true;
+				}
+			} else {
+				// Lanjutkan sisa waktu jeda toleransi tanpa mereset ke 10 detik penuh!
+				handleCheatWarning(savedCheatType, remainingMs);
+			}
+		}
+
 		// Berikan jeda inisialisasi 3 detik agar transisi modal/pop-up awal dan reload resmi tidak memicu false-positive pelanggaran
 		setTimeout(() => {
 			isMountedAndReady = true;
@@ -188,6 +214,8 @@
 	let isDisqualifying = false;
 
 	function triggerViolation(type: string) {
+		sessionStorage.removeItem(`cheat_deadline_${attempt.id}`);
+		sessionStorage.removeItem(`cheat_type_${attempt.id}`);
 		if (isUnloading || isManualReload || isOfficialReload || !isMountedAndReady || showWarningModal || showDisqualifiedModal || submitting || isPausedByProctor) return;
 		
 		warnings += 1;
@@ -206,13 +234,17 @@
 	}
 
 	function handleCheatWarning(type: string, toleranceMs: number) {
-		if (isUnloading || isManualReload || isOfficialReload || !isMountedAndReady || showWarningModal || showDisqualifiedModal || submitting || isPausedByProctor) return;
+		if (isUnloading || isManualReload || isOfficialReload || (!isMountedAndReady && !sessionStorage.getItem(`cheat_deadline_${attempt.id}`)) || showWarningModal || showDisqualifiedModal || submitting || isPausedByProctor) return;
 		
 		isExamBlurred = true;
 		if (cheatWarningTimeout) clearTimeout(cheatWarningTimeout);
 		if (cheatCountdownInterval) clearInterval(cheatCountdownInterval);
 		
-		cheatCountdownRemaining = Math.floor(toleranceMs / 1000);
+		const deadline = Date.now() + toleranceMs;
+		sessionStorage.setItem(`cheat_deadline_${attempt.id}`, deadline.toString());
+		sessionStorage.setItem(`cheat_type_${attempt.id}`, type);
+		
+		cheatCountdownRemaining = Math.max(1, Math.floor(toleranceMs / 1000));
 		cheatCountdownInterval = setInterval(() => {
 			cheatCountdownRemaining -= 1;
 			if (cheatCountdownRemaining <= 0) {
@@ -226,6 +258,8 @@
 	}
 
 	function handleReturnToExam() {
+		sessionStorage.removeItem(`cheat_deadline_${attempt.id}`);
+		sessionStorage.removeItem(`cheat_type_${attempt.id}`);
 		if (cheatWarningTimeout) clearTimeout(cheatWarningTimeout);
 		if (cheatCountdownInterval) clearInterval(cheatCountdownInterval);
 		if (isExamBlurred) {
