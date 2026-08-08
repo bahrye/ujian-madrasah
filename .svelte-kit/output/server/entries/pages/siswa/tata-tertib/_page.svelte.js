@@ -87,6 +87,63 @@ function _page($$renderer) {
     let step = each_array_2[i];
     $$renderer.push(`<div class="relative flex flex-col items-center text-center group bg-white pt-2"><div${attr_class(`w-20 h-20 rounded-2xl ${stringify(step.bg)} ${stringify(step.color)} flex items-center justify-center mb-5 shadow-sm border border-white ring-4 ring-slate-50 group-hover:scale-110 transition-transform duration-300 relative z-10`)}><svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", step.icon)}></path></svg> <div class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center text-sm font-bold shadow-lg">${escape_html(i + 1)}</div></div> <h3 class="font-bold text-slate-800 text-lg mb-2">${escape_html(step.title)}</h3> <p class="text-sm text-slate-500 px-4 leading-relaxed">${escape_html(step.desc)}</p></div>`);
   }
+  $$renderer.push(`<!--]--></div></div></div> <div class="bg-white rounded-3xl p-6 md:p-10 border border-slate-200 shadow-sm relative overflow-hidden"><div class="text-center max-w-2xl mx-auto mb-12 relative z-10"><span class="text-indigo-600 font-semibold tracking-wider uppercase text-sm mb-2 block">Panduan Antarmuka</span> <h2 class="text-3xl font-bold text-slate-800 mb-4">Mengenal Halaman Ujian</h2> <p class="text-slate-500">Berikut adalah penjelasan mengenai fungsi-fungsi tombol dan informasi yang ada pada halaman pengerjaan ujian.</p></div> <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center"><div class="relative mx-auto w-full max-w-sm rounded-2xl overflow-hidden border-4 border-slate-100 shadow-xl bg-slate-50"><img src="/panduan-ui-ujian.jpeg" alt="Antarmuka Ujian" class="w-full h-auto block object-cover"/> <div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 8%; left: 15%;">1</div> <div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 8%; left: 55%;">2</div> <div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 8%; left: 80%;">3</div> <div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 20%; left: 80%;">4</div> <div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 35%; left: 15%;">5</div> <div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 55%; left: 15%;">6</div> <div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 89%; left: 20%;">7</div> <div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 89%; left: 47%;">8</div> <div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 89%; left: 75%;">9</div> <div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 96%; left: 50%; transform: translate(-50%, -50%);">10</div></div> <div class="space-y-2"><!--[-->`);
+  const each_array_3 = ensure_array_like([
+    {
+      no: 1,
+      title: "Judul Ujian",
+      desc: "Menampilkan nama mata pelajaran ujian yang sedang dikerjakan."
+    },
+    {
+      no: 2,
+      title: "Indikator Pelanggaran",
+      desc: "Menampilkan jumlah peringatan jika Anda terdeteksi keluar dari layar penuh/membuka aplikasi lain."
+    },
+    {
+      no: 3,
+      title: "Sisa Waktu",
+      desc: "Menunjukkan batas waktu pengerjaan. Ujian otomatis berakhir jika waktu habis."
+    },
+    {
+      no: 4,
+      title: "Tombol Ragu-ragu",
+      desc: "Tandai soal dengan ini jika Anda belum yakin dengan jawaban yang dipilih."
+    },
+    {
+      no: 5,
+      title: "Teks Soal",
+      desc: "Area utama yang menampilkan pertanyaan ujian yang harus dijawab."
+    },
+    {
+      no: 6,
+      title: "Pilihan Jawaban",
+      desc: "Pilih jawaban yang paling tepat. Jawaban akan langsung tersimpan ke sistem."
+    },
+    {
+      no: 7,
+      title: "Navigasi Soal",
+      desc: "Membuka panel berisi daftar seluruh nomor soal untuk memudahkan berpindah nomor."
+    },
+    {
+      no: 8,
+      title: "Tombol Muat Ulang",
+      desc: "Gunakan tombol ini untuk memuat ulang halaman tanpa keluar dari ujian jika terjadi kendala/error jaringan."
+    },
+    {
+      no: 9,
+      title: "Informasi Progres",
+      desc: "Melihat ringkasan berapa soal yang sudah dijawab dan yang masih kosong."
+    },
+    {
+      no: 10,
+      title: "Tombol Navigasi (Sebelumnya/Selanjutnya)",
+      desc: "Digunakan untuk beralih ke soal sebelum atau soal sesudahnya."
+    }
+  ]);
+  for (let $$index_3 = 0, $$length = each_array_3.length; $$index_3 < $$length; $$index_3++) {
+    let item = each_array_3[$$index_3];
+    $$renderer.push(`<div class="flex items-start gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100"><div class="shrink-0 w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">${escape_html(item.no)}</div> <div><h4 class="font-bold text-slate-800 text-sm">${escape_html(item.title)}</h4> <p class="text-slate-500 text-xs mt-1 leading-relaxed">${escape_html(item.desc)}</p></div></div>`);
+  }
   $$renderer.push(`<!--]--></div></div></div> <div class="rounded-3xl overflow-hidden shadow-md relative h-48 md:h-64 mt-8 group"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&amp;auto=format&amp;fit=crop&amp;w=1200&amp;q=80" alt="Sukses Ujian" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/> <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent flex flex-col items-center justify-end pb-8 text-center px-4"><h3 class="text-2xl md:text-3xl font-bold text-white mb-2 drop-shadow-md">Semoga Berhasil!</h3> <p class="text-slate-200 md:text-lg drop-shadow">Kejujuran adalah kunci kesuksesan yang sesungguhnya.</p></div></div></div>`);
 }
 export {

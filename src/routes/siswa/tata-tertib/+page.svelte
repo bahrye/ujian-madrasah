@@ -171,6 +171,63 @@
 		</div>
 	</div>
 
+	<!-- Panduan Antarmuka Ujian -->
+	<div class="bg-white rounded-3xl p-6 md:p-10 border border-slate-200 shadow-sm relative overflow-hidden">
+		<div class="text-center max-w-2xl mx-auto mb-12 relative z-10">
+			<span class="text-indigo-600 font-semibold tracking-wider uppercase text-sm mb-2 block">Panduan Antarmuka</span>
+			<h2 class="text-3xl font-bold text-slate-800 mb-4">Mengenal Halaman Ujian</h2>
+			<p class="text-slate-500">
+				Berikut adalah penjelasan mengenai fungsi-fungsi tombol dan informasi yang ada pada halaman pengerjaan ujian.
+			</p>
+		</div>
+
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+			<!-- Image with Badges -->
+			<div class="relative mx-auto w-full max-w-sm rounded-2xl overflow-hidden border-4 border-slate-100 shadow-xl bg-slate-50">
+				<!-- Gambar UI Ujian -->
+				<img src="/panduan-ui-ujian.jpeg" alt="Antarmuka Ujian" class="w-full h-auto block object-cover" />
+				
+				<!-- Badges Overlay -->
+				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 8%; left: 15%;">1</div>
+				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 8%; left: 55%;">2</div>
+				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 8%; left: 80%;">3</div>
+				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 20%; left: 80%;">4</div>
+				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 35%; left: 15%;">5</div>
+				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 55%; left: 15%;">6</div>
+				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 89%; left: 20%;">7</div>
+				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 89%; left: 47%;">8</div>
+				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 89%; left: 75%;">9</div>
+				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 96%; left: 50%; transform: translate(-50%, -50%);">10</div>
+			</div>
+
+			<!-- Explanations -->
+			<div class="space-y-2">
+				{#each [
+					{ no: 1, title: 'Judul Ujian', desc: 'Menampilkan nama mata pelajaran ujian yang sedang dikerjakan.' },
+					{ no: 2, title: 'Indikator Pelanggaran', desc: 'Menampilkan jumlah peringatan jika Anda terdeteksi keluar dari layar penuh/membuka aplikasi lain.' },
+					{ no: 3, title: 'Sisa Waktu', desc: 'Menunjukkan batas waktu pengerjaan. Ujian otomatis berakhir jika waktu habis.' },
+					{ no: 4, title: 'Tombol Ragu-ragu', desc: 'Tandai soal dengan ini jika Anda belum yakin dengan jawaban yang dipilih.' },
+					{ no: 5, title: 'Teks Soal', desc: 'Area utama yang menampilkan pertanyaan ujian yang harus dijawab.' },
+					{ no: 6, title: 'Pilihan Jawaban', desc: 'Pilih jawaban yang paling tepat. Jawaban akan langsung tersimpan ke sistem.' },
+					{ no: 7, title: 'Navigasi Soal', desc: 'Membuka panel berisi daftar seluruh nomor soal untuk memudahkan berpindah nomor.' },
+					{ no: 8, title: 'Tombol Muat Ulang', desc: 'Gunakan tombol ini untuk memuat ulang halaman tanpa keluar dari ujian jika terjadi kendala/error jaringan.' },
+					{ no: 9, title: 'Informasi Progres', desc: 'Melihat ringkasan berapa soal yang sudah dijawab dan yang masih kosong.' },
+					{ no: 10, title: 'Tombol Navigasi (Sebelumnya/Selanjutnya)', desc: 'Digunakan untuk beralih ke soal sebelum atau soal sesudahnya.' }
+				] as item}
+					<div class="flex items-start gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
+						<div class="shrink-0 w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">
+							{item.no}
+						</div>
+						<div>
+							<h4 class="font-bold text-slate-800 text-sm">{item.title}</h4>
+							<p class="text-slate-500 text-xs mt-1 leading-relaxed">{item.desc}</p>
+						</div>
+					</div>
+				{/each}
+			</div>
+		</div>
+	</div>
+
 	<!-- Bottom Image Banner -->
 	<div class="rounded-3xl overflow-hidden shadow-md relative h-48 md:h-64 mt-8 group">
 		<img 
