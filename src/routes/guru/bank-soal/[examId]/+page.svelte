@@ -61,6 +61,7 @@
 		const formData = new FormData();
 		formData.append('file', file);
 		formData.append('upload_preset', uploadPreset);
+		formData.append('folder', 'ujian-madrasah/media');
 
 		isPastingImage = true;
 		try {

@@ -64,6 +64,7 @@
 		const formData = new FormData();
 		formData.append('file', file);
 		formData.append('upload_preset', uploadPreset);
+		formData.append('folder', 'ujian-madrasah/media');
 
 		// Menentukan resource_type berdasarkan tipe file
 		const resourceType = file.type.startsWith('image/') ? 'image' : 'video'; // Cloudinary uses 'video' for audio files too

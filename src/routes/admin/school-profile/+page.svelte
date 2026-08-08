@@ -51,6 +51,7 @@
 		const fd = new FormData();
 		fd.append('file', file);
 		fd.append('upload_preset', uploadPreset);
+		fd.append('folder', 'ujian-madrasah/school');
 
 		try {
 			uploadProgress = 50;

@@ -103,6 +103,7 @@
 		const fd = new FormData();
 		fd.append('file', file);
 		fd.append('upload_preset', uploadPreset);
+		fd.append('folder', 'ujian-madrasah/students');
 
 		try {
 			const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
