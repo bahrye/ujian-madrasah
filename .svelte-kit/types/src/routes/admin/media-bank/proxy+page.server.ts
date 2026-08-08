@@ -35,7 +35,7 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 			e.title as exam_title,
 			s.name as subject_name
 		FROM uploaded_media u
-		LEFT JOIN questions q ON u.url = q.media_url
+		LEFT JOIN questions q ON (u.url = q.media_url OR instr(q.question_text, u.url) > 0 OR instr(q.options_json, u.url) > 0)
 		LEFT JOIN exams e ON q.exam_id = e.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		LEFT JOIN users usr ON u.uploaded_by = usr.id
@@ -46,8 +46,8 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 	try {
 		const result = await db.prepare(query).bind(locals.user?.school_id || -1, locals.user?.role).all();
 		return { mediaItems: result.results };
-	} catch (e) {
-		console.error('Fetch uploaded_media error:', e);
+	} catch (e: any) {
+		console.error('Fetch uploaded_media error:', e.message, e);
 		return { mediaItems: [] };
 	}
 };

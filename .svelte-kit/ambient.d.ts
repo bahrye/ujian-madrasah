@@ -73,11 +73,13 @@ declare module '$env/static/private' {
 	export const NODE: string;
 	export const EFC_19836_3789132940: string;
 	export const EFC_19836_4126798990: string;
+	export const npm_config_noproxy: string;
+	export const FPS_BROWSER_APP_PROFILE_STRING: string;
+	export const FPS_BROWSER_USER_PROFILE_STRING: string;
 	export const GOPATH: string;
 	export const npm_config_global_prefix: string;
 	export const VSCODE_GIT_ASKPASS_EXTRA_ARGS: string;
 	export const HOME: string;
-	export const ProgramFiles: string;
 	export const npm_package_version: string;
 	export const HOMEDRIVE: string;
 	export const HOMEPATH: string;
@@ -89,9 +91,7 @@ declare module '$env/static/private' {
 	export const VSCODE_GIT_IPC_HANDLE: string;
 	export const npm_command: string;
 	export const npm_config_cache: string;
-	export const ProgramData: string;
 	export const npm_config_globalconfig: string;
-	export const npm_config_noproxy: string;
 	export const npm_config_npm_version: string;
 	export const npm_config_prefix: string;
 	export const OS: string;
@@ -104,6 +104,8 @@ declare module '$env/static/private' {
 	export const PROCESSOR_ARCHITECTURE: string;
 	export const PROCESSOR_LEVEL: string;
 	export const PROCESSOR_REVISION: string;
+	export const ProgramData: string;
+	export const ProgramFiles: string;
 	export const ProgramW6432: string;
 	export const PROMPT: string;
 	export const PSModulePath: string;
@@ -247,11 +249,13 @@ declare module '$env/dynamic/private' {
 		NODE: string;
 		EFC_19836_3789132940: string;
 		EFC_19836_4126798990: string;
+		npm_config_noproxy: string;
+		FPS_BROWSER_APP_PROFILE_STRING: string;
+		FPS_BROWSER_USER_PROFILE_STRING: string;
 		GOPATH: string;
 		npm_config_global_prefix: string;
 		VSCODE_GIT_ASKPASS_EXTRA_ARGS: string;
 		HOME: string;
-		ProgramFiles: string;
 		npm_package_version: string;
 		HOMEDRIVE: string;
 		HOMEPATH: string;
@@ -263,9 +267,7 @@ declare module '$env/dynamic/private' {
 		VSCODE_GIT_IPC_HANDLE: string;
 		npm_command: string;
 		npm_config_cache: string;
-		ProgramData: string;
 		npm_config_globalconfig: string;
-		npm_config_noproxy: string;
 		npm_config_npm_version: string;
 		npm_config_prefix: string;
 		OS: string;
@@ -278,6 +280,8 @@ declare module '$env/dynamic/private' {
 		PROCESSOR_ARCHITECTURE: string;
 		PROCESSOR_LEVEL: string;
 		PROCESSOR_REVISION: string;
+		ProgramData: string;
+		ProgramFiles: string;
 		ProgramW6432: string;
 		PROMPT: string;
 		PSModulePath: string;
