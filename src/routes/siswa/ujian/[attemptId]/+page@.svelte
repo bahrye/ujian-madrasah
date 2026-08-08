@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { goto, beforeNavigate } from '$app/navigation';
+	import { goto, beforeNavigate, invalidateAll } from '$app/navigation';
 	import Timer from '$lib/components/exam/Timer.svelte';
 	import QuestionRenderer from '$lib/components/exam/QuestionRenderer.svelte';
 	import QuestionNav from '$lib/components/exam/QuestionNav.svelte';
@@ -211,18 +211,32 @@
 	let isManualReload = false;
 	
 	async function triggerReload() {
+		// Masuk ke fullscreen langsung karena ini dipicu oleh klik (user gesture)
+		if (!document.fullscreenElement) {
+			await enterFullscreen();
+		}
+
 		isOfficialReload = true;
 		isManualReload = true;
 		isUnloading = true;
-		isMountedAndReady = false; // Matikan segera listener sebelum reload berjalan
+		
 		if (cheatWarningTimeout) clearTimeout(cheatWarningTimeout);
 		if (cheatCountdownInterval) clearInterval(cheatCountdownInterval);
 		isExamBlurred = false;
-		sessionStorage.setItem(`allowed_official_reload_${attempt.id}`, 'true');
+		
 		try {
 			await saveCurrentAnswer(true);
 		} catch {}
-		window.location.reload();
+		
+		// Gunakan invalidateAll untuk soft-reload data tanpa mereload DOM/Browser
+		await invalidateAll();
+		
+		setTimeout(() => {
+			isOfficialReload = false;
+			isManualReload = false;
+			isUnloading = false;
+			toasts.success('Halaman berhasil dimuat ulang');
+		}, 500);
 	}
 
 	function handleBeforeUnload(e: BeforeUnloadEvent) {
