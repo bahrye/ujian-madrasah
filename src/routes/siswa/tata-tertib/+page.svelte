@@ -187,17 +187,17 @@
 				<!-- Gambar UI Ujian -->
 				<img src="/panduan-ui-ujian.jpeg" alt="Antarmuka Ujian" class="w-full h-auto block object-cover" />
 				
-				<!-- Badges Overlay -->
-				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 8%; left: 15%;">1</div>
-				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 8%; left: 55%;">2</div>
-				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 8%; left: 80%;">3</div>
-				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 20%; left: 80%;">4</div>
-				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 35%; left: 15%;">5</div>
-				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 55%; left: 15%;">6</div>
-				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 89%; left: 20%;">7</div>
-				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 89%; left: 47%;">8</div>
-				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 89%; left: 75%;">9</div>
-				<div class="absolute w-7 h-7 rounded-full bg-indigo-600 ring-4 ring-white text-white flex items-center justify-center text-xs font-bold shadow-lg" style="top: 96%; left: 50%; transform: translate(-50%, -50%);">10</div>
+				<!-- Badges Overlay (Diperkecil & digeser ke tepi agar tidak menutupi gambar) -->
+				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 3%; left: 3%;">1</div>
+				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 3%; left: 52%;">2</div>
+				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 3%; left: 90%;">3</div>
+				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 15%; left: 90%;">4</div>
+				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 30%; left: 3%;">5</div>
+				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 55%; left: 3%;">6</div>
+				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 85%; left: 3%;">7</div>
+				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 85%; left: 40%;">8</div>
+				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 85%; left: 88%;">9</div>
+				<div class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-600/95 ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-transform cursor-default" style="top: 96%; left: 88%;">10</div>
 			</div>
 
 			<!-- Explanations -->
