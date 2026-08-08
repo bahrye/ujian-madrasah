@@ -97,24 +97,27 @@
 			}
 		}
 
-		// Deteksi apakah halaman baru saja direload secara manual
-		let isReloaded = false;
+		// Cek apakah reload ini dipicu resmi dari tombol muat ulang website
+		const officialReloadKey = `allowed_official_reload_${attempt.id}`;
+		const isOfficialReload = sessionStorage.getItem(officialReloadKey) === 'true';
+		if (isOfficialReload) {
+			sessionStorage.removeItem(officialReloadKey);
+		}
+
+		// Deteksi apakah halaman di-reload secara manual dari browser (F5, tombol reload browser, swipe refresh)
+		let isBrowserReloaded = false;
 		try {
 			const navEntries = performance.getEntriesByType('navigation');
 			if (navEntries.length > 0 && (navEntries[0] as PerformanceNavigationTiming).type === 'reload') {
-				isReloaded = true;
+				isBrowserReloaded = true;
 			} else if (typeof performance.navigation !== 'undefined' && performance.navigation.type === 1) {
-				isReloaded = true;
+				isBrowserReloaded = true;
 			}
 		} catch (e) {}
 
-		const sessionActiveKey = `exam_session_active_${attempt.id}`;
-		const hasBeenActiveBefore = sessionStorage.getItem(sessionActiveKey) === 'true';
-		sessionStorage.setItem(sessionActiveKey, 'true');
-
-		if (isReloaded || hasBeenActiveBefore) {
-			// Catat pelanggaran reload halaman secara instan pada kali pertama!
-			triggerViolation('Memuat ulang / Refresh halaman ujian');
+		if (isBrowserReloaded && !isOfficialReload) {
+			// Hanya catat pelanggaran jika reload dilakukan manual dari browser
+			triggerViolation('Memuat ulang / Refresh halaman ujian dari browser');
 		}
 
 		statusPollingInterval = setInterval(async () => {
@@ -128,6 +131,7 @@
 					}
 					isPausedByProctor = data.is_paused;
 					if (data.status !== 'mengerjakan' && data.status !== attempt.status) {
+						sessionStorage.setItem(officialReloadKey, 'true');
 						window.location.reload();
 					}
 				}
@@ -159,8 +163,10 @@
 
 	let isManualReload = false;
 	
-	function triggerReload() {
+	async function triggerReload() {
 		isManualReload = true;
+		sessionStorage.setItem(`allowed_official_reload_${attempt.id}`, 'true');
+		await saveCurrentAnswer(true);
 		window.location.reload();
 	}
 
