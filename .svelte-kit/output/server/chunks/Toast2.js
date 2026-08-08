@@ -31,7 +31,7 @@ function Toast($$renderer, $$props) {
       warning: "text-amber-500",
       info: "text-sky-500"
     };
-    $$renderer2.push(`<div class="fixed top-4 right-4 z-[9999] flex flex-col gap-3 max-w-sm w-full pointer-events-none"><!--[-->`);
+    $$renderer2.push(`<div class="fixed top-4 left-4 right-4 md:left-auto md:right-4 z-[9999] flex flex-col gap-3 md:max-w-sm w-auto md:w-full pointer-events-none"><!--[-->`);
     const each_array = ensure_array_like(store_get($$store_subs ??= {}, "$toasts", toasts));
     for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
       let toast = each_array[$$index];

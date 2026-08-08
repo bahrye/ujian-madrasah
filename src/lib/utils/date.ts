@@ -5,6 +5,12 @@
  */
 export function parseDate(dateStr: any): Date {
     if (!dateStr) return new Date();
+    
+    // Handle timestamps (numbers or numeric strings)
+    if (typeof dateStr === 'number' || (typeof dateStr === 'string' && /^\d+$/.test(dateStr))) {
+        return new Date(Number(dateStr));
+    }
+
     let str = String(dateStr);
     
     // Convert SQLite datetime string "2026-08-07 10:00:00" to "2026-08-07T10:00:00Z"
