@@ -2,6 +2,9 @@
 	import { enhance } from '$app/forms';
 	import type { ActionData, PageData } from './$types';
 	import MediaUploader from '$lib/components/admin/MediaUploader.svelte';
+	import ConfirmForm from '$lib/components/ConfirmForm.svelte';
+	import { slide } from 'svelte/transition';
+	import { ICONS } from '$lib/utils/constants';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -11,6 +14,10 @@
 	let tempUploadedUrl = '';
 	let itemToDelete: any = null;
 	let previewMedia: { type: 'image' | 'audio', url: string } | null = null;
+	
+	let isBulkSelectMode = false;
+	let selectedMediaUrls: Set<string> = new Set();
+	$: isAllSelected = data.mediaItems.length > 0 && selectedMediaUrls.size === data.mediaItems.length;
 
 	let successMsg = '';
 	let errorMsg = '';
@@ -50,10 +57,18 @@
 			</h1>
 			<p class="text-slate-500 mt-1">Kelola semua file gambar dan audio yang telah diunggah ke Cloudinary dan terhubung dengan soal ujian.</p>
 		</div>
-		<button class="btn btn-primary whitespace-nowrap shadow-sm" on:click={() => showUploadModal = true}>
-			<svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-			Unggah Media Baru
-		</button>
+		<div class="flex flex-col sm:flex-row gap-2">
+			{#if data.mediaItems.length > 0}
+				<button class="btn justify-center {isBulkSelectMode ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300'} transition-all shadow-sm" on:click={() => { isBulkSelectMode = !isBulkSelectMode; selectedMediaUrls.clear(); selectedMediaUrls = selectedMediaUrls; }}>
+					<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+					<span class="font-semibold">{isBulkSelectMode ? 'Batal Pilih' : 'Pilih Massal'}</span>
+				</button>
+			{/if}
+			<button class="btn btn-primary whitespace-nowrap shadow-sm" on:click={() => showUploadModal = true}>
+				<svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+				Unggah Media Baru
+			</button>
+		</div>
 	</div>
 
 	{#if errorMsg}
@@ -79,9 +94,29 @@
 			<p class="text-slate-500 mt-1">Belum ada file media Cloudinary yang terhubung dengan soal ujian.</p>
 		</div>
 	{:else}
+		{#if isBulkSelectMode && data.mediaItems.length > 0}
+			<div class="flex justify-between items-center bg-slate-50 border border-slate-200 p-3 rounded-xl mb-4" transition:slide>
+				<label class="flex items-center gap-2 cursor-pointer select-none">
+					<input type="checkbox" class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" 
+						checked={isAllSelected}
+						on:change={(e) => {
+							if (e.currentTarget.checked) {
+								selectedMediaUrls = new Set(data.mediaItems.map(m => m.media_url));
+							} else {
+								selectedMediaUrls.clear();
+								selectedMediaUrls = selectedMediaUrls;
+							}
+						}}
+					/>
+					<span class="font-medium text-slate-700">Pilih Semua ({data.mediaItems.length} media)</span>
+				</label>
+				<span class="text-sm text-slate-500">{selectedMediaUrls.size} terpilih</span>
+			</div>
+		{/if}
+
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 			{#each data.mediaItems as item}
-				<div class="card overflow-hidden flex flex-col {item.question_id ? '' : 'border-amber-400 ring-2 ring-amber-400/20'}">
+				<div class="card overflow-hidden flex flex-col {item.question_id ? '' : 'border-amber-400 ring-2 ring-amber-400/20'} {selectedMediaUrls.has(item.media_url) ? 'ring-2 ring-indigo-500' : ''}">
 					<!-- Preview Area -->
 					<div class="h-40 {item.question_id ? 'bg-slate-100' : 'bg-amber-50'} relative flex items-center justify-center border-b {item.question_id ? 'border-slate-100' : 'border-amber-200'} cursor-pointer group" on:click={() => previewMedia = { type: item.media_type, url: item.media_url }}>
 						{#if item.media_type === 'image'}
@@ -111,6 +146,20 @@
 								</button>
 							</form>
 						</div>
+						
+						{#if isBulkSelectMode}
+							<div class="absolute inset-0 bg-black/10 z-20 pointer-events-none transition-colors {selectedMediaUrls.has(item.media_url) ? 'bg-indigo-500/20' : ''}"></div>
+							<div class="absolute bottom-2 right-2 z-30" transition:slide={{axis: 'x'}}>
+								<input type="checkbox" class="w-6 h-6 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer shadow-sm" 
+									checked={selectedMediaUrls.has(item.media_url)}
+									on:change={(e) => {
+										if (e.currentTarget.checked) selectedMediaUrls.add(item.media_url);
+										else selectedMediaUrls.delete(item.media_url);
+										selectedMediaUrls = selectedMediaUrls;
+									}}
+								/>
+							</div>
+						{/if}
 					</div>
 
 					<!-- Details Area -->
@@ -177,6 +226,42 @@
 					</div>
 				</div>
 			{/each}
+		</div>
+	{/if}
+	
+	{#if selectedMediaUrls.size > 0}
+		<div use:portal class="fixed bottom-4 sm:bottom-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+			<div class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 sm:p-4 flex items-center justify-between gap-3 sm:gap-6 animate-in slide-in-from-bottom-8 pointer-events-auto w-full sm:w-auto max-w-md sm:max-w-none">
+				<div class="flex-1 min-w-0">
+					<div class="text-slate-800 font-bold text-sm sm:text-base">{selectedMediaUrls.size} media terpilih</div>
+					<div class="text-slate-500 text-xs sm:text-sm hidden sm:block">Hapus massal dari Cloudinary</div>
+				</div>
+				<div class="flex-shrink-0 flex items-center gap-2">
+					<button type="button" class="btn px-3 sm:px-4 bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800 shadow-sm border-none whitespace-nowrap transition-colors" on:click={() => { isBulkSelectMode = false; selectedMediaUrls.clear(); selectedMediaUrls = selectedMediaUrls; }}>
+						Batal
+					</button>
+					<ConfirmForm 
+						action="?/deleteBulk"
+						confirmTitle="Hapus Massal Media"
+						confirmMessage={`Yakin ingin menghapus secara permanen ${selectedMediaUrls.size} media yang dipilih dari Cloudinary?<br><br><strong>Peringatan Keras:</strong><br>Media yang dihapus tidak bisa dikembalikan. Jika media ini sedang digunakan di soal, soal tersebut akan kehilangan gambar/audio-nya.`}
+						verifyText="HAPUS PERMANEN"
+						verifyPlaceholder="Ketik HAPUS PERMANEN"
+						buttonClass="btn px-3 sm:px-4 bg-rose-600 text-white hover:bg-rose-700 shadow-sm border-none whitespace-nowrap flex items-center"
+						buttonTitle="Hapus {selectedMediaUrls.size} media"
+					>
+						<svelte:fragment slot="inputs">
+							<input type="hidden" name="urls" value={JSON.stringify(Array.from(selectedMediaUrls))} />
+						</svelte:fragment>
+						<svelte:fragment slot="buttonContent">
+							<svg class="w-4 h-4 sm:mr-2 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
+							</svg>
+							<span class="hidden sm:inline">Hapus Terpilih</span>
+							<span class="sm:hidden">Hapus</span>
+						</svelte:fragment>
+					</ConfirmForm>
+				</div>
+			</div>
 		</div>
 	{/if}
 </div>

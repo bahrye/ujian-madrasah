@@ -1,17 +1,21 @@
-import { f as bind_props, h as head, e as escape_html, i as ensure_array_like, j as attr_class, k as attr, c as stringify } from "../../../../chunks/index.js";
+import { f as bind_props, h as head, j as attr_class, e as escape_html, i as ensure_array_like, k as attr, c as stringify } from "../../../../chunks/index.js";
 import "@sveltejs/kit/internal";
 import "../../../../chunks/exports.js";
 import "../../../../chunks/utils2.js";
 import "@sveltejs/kit/internal/server";
 import "../../../../chunks/root.js";
 import "../../../../chunks/state.svelte.js";
+import { C as ConfirmForm } from "../../../../chunks/ConfirmForm.js";
+import { I as ICONS } from "../../../../chunks/constants.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let data = $$props["data"];
     let form = $$props["form"];
     let isDeleting = false;
+    let selectedMediaUrls = /* @__PURE__ */ new Set();
     let successMsg = "";
     let errorMsg = "";
+    data.mediaItems.length > 0 && selectedMediaUrls.size === data.mediaItems.length;
     {
       if (form?.success) {
         successMsg = form.success;
@@ -30,7 +34,14 @@ function _page($$renderer, $$props) {
           $$renderer5.push(`<title>Bank Media - Ujian Madrasah</title>`);
         });
       });
-      $$renderer3.push(`<div class="max-w-6xl mx-auto"><div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4"><div><h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2"><svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg> Bank Media (Cloudinary)</h1> <p class="text-slate-500 mt-1">Kelola semua file gambar dan audio yang telah diunggah ke Cloudinary dan terhubung dengan soal ujian.</p></div> <button class="btn btn-primary whitespace-nowrap shadow-sm"><svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg> Unggah Media Baru</button></div> `);
+      $$renderer3.push(`<div class="max-w-6xl mx-auto"><div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4"><div><h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2"><svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg> Bank Media Pribadi</h1> <p class="text-slate-500 mt-1">Kelola semua file gambar dan audio yang telah Anda unggah ke Cloudinary.</p></div> <div class="flex flex-col sm:flex-row gap-2">`);
+      if (data.mediaItems.length > 0) {
+        $$renderer3.push("<!--[0-->");
+        $$renderer3.push(`<button${attr_class(`btn justify-center ${"bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300"} transition-all shadow-sm`)}><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg> <span class="font-semibold">${escape_html("Pilih Massal")}</span></button>`);
+      } else {
+        $$renderer3.push("<!--[-1-->");
+      }
+      $$renderer3.push(`<!--]--> <button class="btn btn-primary whitespace-nowrap shadow-sm"><svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg> Unggah Media Baru</button></div></div> `);
       if (errorMsg) {
         $$renderer3.push("<!--[0-->");
         $$renderer3.push(`<div class="alert alert-danger mb-6 transition-opacity duration-300"><svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> <span>${escape_html(errorMsg)}</span></div>`);
@@ -50,11 +61,14 @@ function _page($$renderer, $$props) {
         $$renderer3.push(`<div class="card p-12 text-center"><div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg></div> <h3 class="text-lg font-medium text-slate-900">Bank Media Kosong</h3> <p class="text-slate-500 mt-1">Belum ada file media Cloudinary yang terhubung dengan soal ujian.</p></div>`);
       } else {
         $$renderer3.push("<!--[-1-->");
-        $$renderer3.push(`<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"><!--[-->`);
+        {
+          $$renderer3.push("<!--[-1-->");
+        }
+        $$renderer3.push(`<!--]--> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"><!--[-->`);
         const each_array = ensure_array_like(data.mediaItems);
         for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
           let item = each_array[$$index];
-          $$renderer3.push(`<div${attr_class(`card overflow-hidden flex flex-col ${item.question_id ? "" : "border-amber-400 ring-2 ring-amber-400/20"}`)}><div${attr_class(`h-40 ${item.question_id ? "bg-slate-100" : "bg-amber-50"} relative flex items-center justify-center border-b ${item.question_id ? "border-slate-100" : "border-amber-200"} cursor-pointer group`)}>`);
+          $$renderer3.push(`<div${attr_class(`card overflow-hidden flex flex-col ${item.question_id ? "" : "border-amber-400 ring-2 ring-amber-400/20"} ${selectedMediaUrls.has(item.media_url) ? "ring-2 ring-indigo-500" : ""}`)}><div${attr_class(`h-40 ${item.question_id ? "bg-slate-100" : "bg-amber-50"} relative flex items-center justify-center border-b ${item.question_id ? "border-slate-100" : "border-amber-200"} cursor-pointer group`)}>`);
           if (item.media_type === "image") {
             $$renderer3.push("<!--[0-->");
             $$renderer3.push(`<img${attr("src", item.media_url)}${attr("alt", `Media Soal ${stringify(item.question_number)}`)} class="w-full h-full object-contain p-2 transition-transform group-hover:scale-105" loading="lazy"/>`);
@@ -70,7 +84,11 @@ function _page($$renderer, $$props) {
             $$renderer3.push("<!--[-1-->");
             $$renderer3.push(`<span class="badge bg-emerald-100 text-emerald-700 border-emerald-200 shadow-sm text-[10px] border px-2.5 py-1">🌐 Publik</span>`);
           }
-          $$renderer3.push(`<!--]--></div></div> <div${attr_class(`p-4 flex-1 flex flex-col ${item.question_id ? "" : "bg-amber-50/50"}`)}><form method="POST" action="?/updateName" class="mb-4"><input type="hidden" name="media_url"${attr("value", item.media_url)}/> <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Nama File</p> <div class="flex gap-2"><input type="text" name="name"${attr("value", item.name || "")} placeholder="Belum ada nama" class="input py-1.5 px-2.5 text-sm flex-1 h-8"${attr("disabled", item.uploaded_by !== data.user?.id, true)}/> `);
+          $$renderer3.push(`<!--]--></div> `);
+          {
+            $$renderer3.push("<!--[-1-->");
+          }
+          $$renderer3.push(`<!--]--></div> <div${attr_class(`p-4 flex-1 flex flex-col ${item.question_id ? "" : "bg-amber-50/50"}`)}><form method="POST" action="?/updateName" class="mb-4"><input type="hidden" name="media_url"${attr("value", item.media_url)}/> <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Nama File</p> <div class="flex gap-2"><input type="text" name="name"${attr("value", item.name || "")} placeholder="Belum ada nama" class="input py-1.5 px-2.5 text-sm flex-1 h-8"${attr("disabled", item.uploaded_by !== data.user?.id, true)}/> `);
           if (item.uploaded_by === data.user?.id) {
             $$renderer3.push("<!--[0-->");
             $$renderer3.push(`<button type="submit" class="btn btn-primary py-1.5 px-3 text-xs h-8">Simpan</button>`);
@@ -95,6 +113,35 @@ function _page($$renderer, $$props) {
           $$renderer3.push(`<!--]--></div></div>`);
         }
         $$renderer3.push(`<!--]--></div>`);
+      }
+      $$renderer3.push(`<!--]--> `);
+      if (selectedMediaUrls.size > 0) {
+        $$renderer3.push("<!--[0-->");
+        $$renderer3.push(`<div class="fixed bottom-4 sm:bottom-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none"><div class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 sm:p-4 flex items-center justify-between gap-3 sm:gap-6 animate-in slide-in-from-bottom-8 pointer-events-auto w-full sm:w-auto max-w-md sm:max-w-none"><div class="flex-1 min-w-0"><div class="text-slate-800 font-bold text-sm sm:text-base">${escape_html(selectedMediaUrls.size)} media terpilih</div> <div class="text-slate-500 text-xs sm:text-sm hidden sm:block">Hapus massal dari Cloudinary</div></div> <div class="flex-shrink-0 flex items-center gap-2"><button type="button" class="btn px-3 sm:px-4 bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800 shadow-sm border-none whitespace-nowrap transition-colors">Batal</button> `);
+        ConfirmForm($$renderer3, {
+          action: "?/deleteBulk",
+          confirmTitle: "Hapus Massal Media",
+          confirmMessage: `Yakin ingin menghapus secara permanen ${selectedMediaUrls.size} media yang dipilih dari Cloudinary?<br><br><strong>Peringatan Keras:</strong><br>Media yang dihapus tidak bisa dikembalikan. Jika media ini sedang digunakan di soal, soal tersebut akan kehilangan gambar/audio-nya.`,
+          verifyText: "HAPUS PERMANEN",
+          verifyPlaceholder: "Ketik HAPUS PERMANEN",
+          buttonClass: "btn px-3 sm:px-4 bg-rose-600 text-white hover:bg-rose-700 shadow-sm border-none whitespace-nowrap flex items-center",
+          buttonTitle: `Hapus ${stringify(selectedMediaUrls.size)} media`,
+          $$slots: {
+            inputs: ($$renderer4) => {
+              {
+                $$renderer4.push(`<input type="hidden" name="urls"${attr("value", JSON.stringify(Array.from(selectedMediaUrls)))}/>`);
+              }
+            },
+            buttonContent: ($$renderer4) => {
+              {
+                $$renderer4.push(`<svg class="w-4 h-4 sm:mr-2 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.trash)}></path></svg> <span class="hidden sm:inline">Hapus Terpilih</span> <span class="sm:hidden">Hapus</span>`);
+              }
+            }
+          }
+        });
+        $$renderer3.push(`<!----></div></div></div>`);
+      } else {
+        $$renderer3.push("<!--[-1-->");
       }
       $$renderer3.push(`<!--]--></div> `);
       {
