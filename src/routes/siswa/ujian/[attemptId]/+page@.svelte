@@ -270,6 +270,7 @@
 		sessionStorage.removeItem(`cheat_type_${attempt.id}`);
 		if (cheatWarningTimeout) clearTimeout(cheatWarningTimeout);
 		if (cheatCountdownInterval) clearInterval(cheatCountdownInterval);
+		cheatCountdownRemaining = 0;
 		if (isExamBlurred) {
 			isExamBlurred = false;
 		}
@@ -705,6 +706,20 @@
 			</svg>
 			<h2 class="text-2xl font-bold mb-4">Mode Layar Penuh Diperlukan</h2>
 			<p class="text-slate-300 text-sm mb-6">Ujian ini wajib menggunakan mode layar penuh untuk mencegah kecurangan dan menutupi notifikasi sistem. Silakan masuk ke Layar Penuh untuk mulai/melanjutkan.</p>
+			
+			{#if cheatCountdownRemaining > 0}
+				<div class="bg-rose-500/10 border border-rose-500/20 rounded-lg p-4 mb-6 relative overflow-hidden">
+					<div class="flex items-center justify-between mb-2">
+						<p class="text-rose-300 text-xs text-left font-medium">⚠ Batas Waktu Toleransi:</p>
+						<span class="text-3xl font-black tracking-wider {cheatCountdownRemaining <= 5 ? 'text-red-500 animate-pulse' : 'text-rose-400'}">{cheatCountdownRemaining}d</span>
+					</div>
+					<div class="w-full bg-rose-900/30 h-2 rounded-full overflow-hidden mb-3">
+						<div class="h-full bg-rose-500 transition-all duration-1000 ease-linear" style="width: {Math.max(0, (cheatCountdownRemaining / 10) * 100)}%"></div>
+					</div>
+					<p class="text-rose-300 text-xs text-left">💡 Segera masuk ke layar penuh sebelum waktu habis, atau Anda akan dikenakan pelanggaran!</p>
+				</div>
+			{/if}
+
 			<button class="btn-primary w-full justify-center py-3" on:click={enterFullscreen}>Masuk Layar Penuh</button>
 		</div>
 	</div>
