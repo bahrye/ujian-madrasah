@@ -17,11 +17,36 @@
 	
 	let isBulkSelectMode = false;
 	let selectedMediaUrls: Set<string> = new Set();
-	$: isAllSelected = data.mediaItems.length > 0 && selectedMediaUrls.size === data.mediaItems.length;
 
 	let successMsg = '';
 	let errorMsg = '';
+
+	function getCloudinaryFolder(url: string) {
+		try {
+			const urlObj = new URL(url);
+			const pathParts = urlObj.pathname.split('/');
+			const uploadIndex = pathParts.findIndex(p => p === 'upload');
+			if (uploadIndex !== -1) {
+				let startIndex = uploadIndex + 1;
+				if (pathParts[startIndex] && pathParts[startIndex].match(/^v\d+$/)) {
+					startIndex++;
+				}
+				if (startIndex < pathParts.length - 1) {
+					return pathParts.slice(startIndex, -1).join('/');
+				}
+			}
+		} catch (e) {}
+		return 'Tanpa Folder';
+	}
+
+	let activeFolder = 'Semua Media';
+	$: folders = ['Semua Media', ...Array.from(new Set(data.mediaItems.map(item => getCloudinaryFolder(item.media_url)))).sort()];
+	$: filteredMedia = activeFolder === 'Semua Media' 
+		? data.mediaItems 
+		: data.mediaItems.filter(item => getCloudinaryFolder(item.media_url) === activeFolder);
 	
+	$: isAllSelected = filteredMedia.length > 0 && selectedMediaUrls.size === filteredMedia.length;
+
 	$: {
 		if (form?.success) {
 			successMsg = form.success;
@@ -71,6 +96,29 @@
 		</div>
 	</div>
 
+	{#if data.mediaItems.length > 0}
+		<!-- Folder Tabs -->
+		<div class="mb-6 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+			{#each folders as folder}
+				<button 
+					class="flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-colors whitespace-nowrap {activeFolder === folder ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}"
+					on:click={() => {
+						activeFolder = folder;
+						selectedMediaUrls.clear();
+						selectedMediaUrls = selectedMediaUrls;
+					}}
+				>
+					{#if folder === 'Semua Media'}
+						<svg class="w-4 h-4 {activeFolder === folder ? 'text-indigo-600' : 'text-slate-400'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+					{:else}
+						<svg class="w-4 h-4 {activeFolder === folder ? 'text-indigo-600' : 'text-slate-400'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
+					{/if}
+					{folder}
+				</button>
+			{/each}
+		</div>
+	{/if}
+
 	{#if errorMsg}
 		<div class="alert alert-danger mb-6 transition-opacity duration-300">
 			<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
@@ -94,29 +142,38 @@
 			<p class="text-slate-500 mt-1">Belum ada file media Cloudinary yang terhubung dengan soal ujian.</p>
 		</div>
 	{:else}
-		{#if isBulkSelectMode && data.mediaItems.length > 0}
+		{#if isBulkSelectMode && filteredMedia.length > 0}
 			<div class="flex justify-between items-center bg-slate-50 border border-slate-200 p-3 rounded-xl mb-4" transition:slide>
 				<label class="flex items-center gap-2 cursor-pointer select-none">
 					<input type="checkbox" class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" 
 						checked={isAllSelected}
 						on:change={(e) => {
 							if (e.currentTarget.checked) {
-								selectedMediaUrls = new Set(data.mediaItems.map(m => m.media_url));
+								selectedMediaUrls = new Set(filteredMedia.map(m => m.media_url));
 							} else {
 								selectedMediaUrls.clear();
 								selectedMediaUrls = selectedMediaUrls;
 							}
 						}}
 					/>
-					<span class="font-medium text-slate-700">Pilih Semua ({data.mediaItems.length} media)</span>
+					<span class="font-medium text-slate-700">Pilih Semua ({filteredMedia.length} media)</span>
 				</label>
 				<span class="text-sm text-slate-500">{selectedMediaUrls.size} terpilih</span>
 			</div>
 		{/if}
 
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-			{#each data.mediaItems as item}
-				<div class="card overflow-hidden flex flex-col {item.question_id ? '' : 'border-amber-400 ring-2 ring-amber-400/20'} {selectedMediaUrls.has(item.media_url) ? 'ring-2 ring-indigo-500' : ''}">
+		{#if filteredMedia.length === 0}
+			<div class="card p-12 text-center">
+				<div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
+					<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
+				</div>
+				<h3 class="text-lg font-medium text-slate-900">Folder Kosong</h3>
+				<p class="text-slate-500 mt-1">Tidak ada file media di dalam folder ini.</p>
+			</div>
+		{:else}
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+				{#each filteredMedia as item}
+					<div class="card overflow-hidden flex flex-col {item.question_id ? '' : 'border-amber-400 ring-2 ring-amber-400/20'} {selectedMediaUrls.has(item.media_url) ? 'ring-2 ring-indigo-500' : ''}">
 					<!-- Preview Area -->
 					<div class="h-40 {item.question_id ? 'bg-slate-100' : 'bg-amber-50'} relative flex items-center justify-center border-b {item.question_id ? 'border-slate-100' : 'border-amber-200'} cursor-pointer group" on:click={() => previewMedia = { type: item.media_type, url: item.media_url }}>
 						{#if item.media_type === 'image'}
@@ -227,6 +284,7 @@
 				</div>
 			{/each}
 		</div>
+		{/if}
 	{/if}
 	
 	{#if selectedMediaUrls.size > 0}
