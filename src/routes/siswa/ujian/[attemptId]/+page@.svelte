@@ -27,6 +27,7 @@
 	let cheatWarningTimeout: any;
 	let cheatCountdownInterval: any;
 	let cheatCountdownRemaining = 0;
+	let hasEnteredFullscreenOnce = false; // Track jika siswa sudah pernah masuk fullscreen
 
 	// Anti-cheat state
 	let currentEndTime = data.attempt.end_time;
@@ -87,6 +88,16 @@
 			if (warnings > MAX_WARNINGS) {
 				triggerDisqualification();
 			}
+			// Jika siswa sudah punya pelanggaran, berarti sudah pernah masuk fullscreen sebelumnya
+			if (warnings > 0) {
+				hasEnteredFullscreenOnce = true;
+			}
+		}
+		
+		// Jika ada saved deadline, siswa pasti sudah pernah masuk fullscreen
+		const hasSavedDeadline = localStorage.getItem(`cheat_deadline_${attempt.id}`) || sessionStorage.getItem(`cheat_deadline_${attempt.id}`);
+		if (hasSavedDeadline) {
+			hasEnteredFullscreenOnce = true;
 		}
 		
 		const savedIndex = localStorage.getItem(`currentIndex_${attempt.id}`);
@@ -136,6 +147,11 @@
 		setTimeout(() => {
 			isMountedAndReady = true;
 			isOfficialReload = false;
+			// Setelah grace period, jika siswa sudah pernah masuk fullscreen tapi sekarang TIDAK di fullscreen
+			// dan tidak ada countdown yang sedang berjalan, mulai countdown baru
+			if (hasEnteredFullscreenOnce && !isFullscreen && !isExamBlurred && !showWarningModal && !showDisqualifiedModal && cheatCountdownRemaining <= 0) {
+				handleCheatWarning('Keluar dari Layar Penuh', 10000);
+			}
 		}, 3000);
 
 		statusPollingInterval = setInterval(async () => {
@@ -286,16 +302,19 @@
 		try {
 			if (document.documentElement.requestFullscreen) {
 				await document.documentElement.requestFullscreen();
+				hasEnteredFullscreenOnce = true;
 			}
 		} catch (err) {}
 	}
 
 	function handleFullscreenChange() {
 		isFullscreen = !!document.fullscreenElement;
-		if (isMountedAndReady && !isUnloading && !isManualReload && !isOfficialReload && !isFullscreen && !isExamBlurred && !showWarningModal && !showDisqualifiedModal && !submitting) {
-			handleCheatWarning('Keluar dari Layar Penuh', 10000); // 10 detik jeda toleransi
-		} else if (isFullscreen) {
+		if (isFullscreen) {
+			hasEnteredFullscreenOnce = true;
 			handleReturnToExam();
+		} else if (isMountedAndReady && !isUnloading && !isManualReload && !isOfficialReload && !isExamBlurred && !showWarningModal && !showDisqualifiedModal && !submitting && hasEnteredFullscreenOnce) {
+			// Hanya mulai countdown jika siswa SUDAH PERNAH masuk fullscreen sebelumnya
+			handleCheatWarning('Keluar dari Layar Penuh', 10000); // 10 detik jeda toleransi
 		}
 	}
 
@@ -742,7 +761,7 @@
 					<span class="text-3xl font-black tracking-wider {cheatCountdownRemaining <= 10 ? 'text-red-500 animate-pulse' : 'text-rose-400'}">{cheatCountdownRemaining}d</span>
 				</div>
 				<div class="w-full bg-rose-900/30 h-2 rounded-full overflow-hidden mb-3">
-					<div class="h-full bg-rose-500 transition-all duration-1000 ease-linear" style="width: {Math.max(0, (cheatCountdownRemaining / 30) * 100)}%"></div>
+					<div class="h-full bg-rose-500 transition-all duration-1000 ease-linear" style="width: {Math.max(0, (cheatCountdownRemaining / 10) * 100)}%"></div>
 				</div>
 				<p class="text-rose-300 text-xs text-left">💡 Jika Anda sedang memperbaiki masalah koneksi, segera tutup notifikasi bar Anda. Anda akan dikenakan pelanggaran berat jika waktu habis!</p>
 			</div>
@@ -762,7 +781,7 @@
 			</div>
 			<h3 class="text-xl font-bold text-slate-800 mb-2">Peringatan Kecurangan!</h3>
 			<p class="text-slate-600 mb-6 text-sm">Anda terdeteksi melakukan aktivitas di luar halaman ujian. Peringatan ke-{warnings} dari {MAX_WARNINGS}. Jika melebihi batas, ujian akan otomatis dihentikan.</p>
-			<button class="btn-primary w-full" on:click={() => showWarningModal = false}>
+			<button class="btn-primary w-full" on:click={() => { showWarningModal = false; if (!isFullscreen && hasEnteredFullscreenOnce) { handleCheatWarning('Keluar dari Layar Penuh', 10000); } }}>
 				Saya Mengerti
 			</button>
 		</div>

@@ -30,14 +30,13 @@ export const load = async ({ platform, locals, params, cookies }: Parameters<Pag
 		throw redirect(302, '/siswa');
 	}
 
-	// Cek apakah token pada attempt ini masih aktif dan belum ditarik oleh pengawas
-	const isTokenValid = attempt.token_is_released === 1 &&
-		(!attempt.token_released_at || (Date.now() - new Date(attempt.token_released_at).getTime() <= 15 * 60 * 1000)) &&
-		(!attempt.token_expires_at || new Date(attempt.token_expires_at) >= new Date());
+	// Untuk siswa yang SUDAH mengerjakan (status 'mengerjakan'), hanya cek apakah token masih dirilis
+	// JANGAN cek jendela 15 menit karena siswa bisa mengerjakan lebih dari 15 menit
+	const isTokenStillReleased = attempt.token_is_released === 1;
 
 	const cookieVal = cookies.get('exam_token_verified_' + parsedAttemptId);
 	const isVerified = await verifyExamTokenSignature(cookieVal, parsedAttemptId, locals.user.id);
-	if (!isVerified || !isTokenValid) {
+	if (!isVerified || !isTokenStillReleased) {
 		cookies.delete('exam_token_verified_' + parsedAttemptId, { path: '/' });
 		throw redirect(302, `/siswa/ujian?exam_id=${attempt.exam_id}`);
 	}
