@@ -155,7 +155,7 @@
 						
 						{#if isBulkSelectMode}
 							<div class="absolute inset-0 bg-black/10 z-20 pointer-events-none transition-colors {selectedMediaUrls.has(item.media_url) ? 'bg-indigo-500/20' : ''}"></div>
-							<div class="absolute bottom-2 right-2 z-30" transition:slide={{axis: 'x'}}>
+							<div class="absolute bottom-2 right-2 z-30" transition:slide={{axis: 'x'}} on:click|stopPropagation>
 								<input type="checkbox" class="w-6 h-6 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer shadow-sm" 
 									checked={selectedMediaUrls.has(item.media_url)}
 									on:change={(e) => {
