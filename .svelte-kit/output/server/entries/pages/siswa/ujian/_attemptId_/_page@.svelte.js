@@ -176,6 +176,10 @@ function _page_($$renderer, $$props) {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]--> `);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--> `);
     if (isPausedByProctor) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/95 backdrop-blur-xl"><div class="text-center text-white max-w-md animate-in fade-in zoom-in duration-300"><svg class="w-20 h-20 mx-auto mb-6 text-amber-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <h2 class="text-3xl font-bold mb-4">Ujian Ditahan</h2> <p class="text-slate-300 text-lg">Waktu ujian Anda sedang dibekukan oleh Pengawas.</p> <p class="text-slate-400 mt-4 text-sm">Silakan hubungi pengawas ujian jika ini adalah sebuah kesalahan. Anda tidak dapat melanjutkan ujian atau melihat soal hingga akses dibuka kembali.</p></div></div>`);

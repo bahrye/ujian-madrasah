@@ -37,6 +37,7 @@
 	let warnings = 0;
 	let showWarningModal = false;
 	let showDisqualifiedModal = false;
+	let showTimeUpModal = false;
 	const MAX_WARNINGS = 3;
 	let isUnloading = false;
 	
@@ -499,10 +500,9 @@
 				body: form,
 				headers: { 'x-sveltekit-action': 'true' } 
 			});
-			window.location.href = '/siswa/papan-peringkat';
+			showTimeUpModal = true;
 		} catch (err) {
 			console.error('Submit error:', err);
-		} finally {
 			submitting = false;
 		}
 	}
@@ -815,7 +815,7 @@
 {/if}
 
 {#if showDisqualifiedModal}
-	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+	<div class="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
 		<div class="max-h-[90vh] overflow-y-auto bg-white rounded-2xl w-full max-w-sm p-6 text-center shadow-xl animate-in fade-in zoom-in-95 duration-200 border-t-4 border-rose-500">
 			<div class="w-16 h-16 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4">
 				<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -826,6 +826,23 @@
 			<p class="text-slate-600 mb-6 text-sm">Anda telah melanggar batas maksimal peringatan ({MAX_WARNINGS} kali). Ujian Anda diselesaikan secara otomatis.</p>
 			<button class="btn-danger w-full" disabled={isDisqualifying} on:click={() => window.location.href = '/siswa'}>
 				{isDisqualifying ? 'Memproses Penghentian...' : 'Kembali ke Dashboard'}
+			</button>
+		</div>
+	</div>
+{/if}
+
+{#if showTimeUpModal}
+	<div class="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+		<div class="max-h-[90vh] overflow-y-auto bg-white rounded-2xl w-full max-w-sm p-6 text-center shadow-xl animate-in fade-in zoom-in-95 duration-200 border-t-4 border-indigo-500">
+			<div class="w-16 h-16 bg-indigo-100 text-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4">
+				<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+				</svg>
+			</div>
+			<h3 class="text-xl font-bold text-slate-800 mb-2">Waktu Habis!</h3>
+			<p class="text-slate-600 mb-6 text-sm">Waktu pengerjaan ujian Anda telah selesai. Jawaban Anda telah berhasil dikumpulkan secara otomatis oleh sistem.</p>
+			<button class="btn-primary w-full" on:click={() => window.location.href = '/siswa'}>
+				Kembali ke Dashboard
 			</button>
 		</div>
 	</div>
