@@ -9,9 +9,12 @@ const load = async ({ platform, locals, params, cookies }) => {
   if (isNaN(parsedAttemptId)) throw error(400, "ID Ujian tidak valid");
   try {
     const attempt = await db.prepare(`
-		SELECT sa.*, e.title as exam_title, s.name as subject, e.duration_minutes, e.shuffle_questions
+		SELECT sa.*, e.title as exam_title, s.name as subject, e.duration_minutes, e.shuffle_questions,
+		       t.is_released as token_is_released, t.released_at as token_released_at, t.expires_at as token_expires_at,
+		       e.is_active as exam_active
 		FROM student_attempts sa
 		JOIN exams e ON sa.exam_id = e.id
+		LEFT JOIN tokens t ON sa.token_id = t.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		WHERE sa.id = ? AND sa.student_id = ?
 	`).bind(parsedAttemptId, locals.user.id).first();
@@ -19,9 +22,11 @@ const load = async ({ platform, locals, params, cookies }) => {
     if (attempt.status !== "mengerjakan") {
       throw redirect(302, "/siswa");
     }
+    const isTokenValid = attempt.token_is_released === 1 && (!attempt.token_released_at || Date.now() - new Date(attempt.token_released_at).getTime() <= 15 * 60 * 1e3) && (!attempt.token_expires_at || new Date(attempt.token_expires_at) >= /* @__PURE__ */ new Date());
     const cookieVal = cookies.get("exam_token_verified_" + parsedAttemptId);
     const isVerified = await verifyExamTokenSignature(cookieVal, parsedAttemptId, locals.user.id);
-    if (!isVerified) {
+    if (!isVerified || !isTokenValid) {
+      cookies.delete("exam_token_verified_" + parsedAttemptId, { path: "/" });
       throw redirect(302, `/siswa/ujian?exam_id=${attempt.exam_id}`);
     }
     let questions = await db.prepare(`

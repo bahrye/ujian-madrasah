@@ -44,12 +44,33 @@ const actions = {
     if (!tokenCode || isNaN(parsedExamId)) return fail(400, { error: "Data tidak lengkap." });
     try {
       const token = await db.prepare(`
-			SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
-			FROM tokens t JOIN exams e ON t.exam_id = e.id
-			JOIN exam_types et ON e.exam_type_id = et.id
-			WHERE t.token_code = ? AND t.is_released = 1 AND t.exam_id = ? AND et.is_active = 1
-		`).bind(tokenCode, parsedExamId).first();
-      if (!token) return fail(400, { error: "Token tidak valid untuk ujian ini atau belum dirilis." });
+				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
+				FROM tokens t 
+				JOIN exams e ON t.exam_id = e.id
+				JOIN exam_types et ON e.exam_type_id = et.id
+				WHERE t.token_code = ? AND t.exam_id = ? AND et.is_active = 1
+			`).bind(tokenCode, parsedExamId).first();
+      if (!token) {
+        return fail(400, { error: "Token tidak valid untuk ujian ini." });
+      }
+      if (!token.is_active) {
+        return fail(400, { error: "Ujian saat ini tidak aktif." });
+      }
+      if (!token.is_released) {
+        return fail(400, { error: "Token ujian ini sudah ditarik atau belum dirilis oleh pengawas." });
+      }
+      if (token.released_at) {
+        const releasedAt = parseDate(token.released_at).getTime();
+        const now = (/* @__PURE__ */ new Date()).getTime();
+        if (now - releasedAt > 15 * 60 * 1e3) {
+          return fail(400, { error: "Token sudah kedaluwarsa / ditarik otomatis (melewati batas waktu 15 menit)." });
+        }
+      } else {
+        return fail(400, { error: "Status rilis token tidak valid." });
+      }
+      if (parseDate(token.expires_at) < /* @__PURE__ */ new Date()) {
+        return fail(400, { error: "Token sudah kedaluwarsa." });
+      }
       const existingAttempt = await db.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`).bind(locals.user.id, token.exam_id).first();
       if (existingAttempt) {
         if (existingAttempt.status === "mengerjakan") {
@@ -59,15 +80,6 @@ const actions = {
         }
         return fail(400, { error: "Anda sudah pernah mengerjakan ujian ini." });
       }
-      if (!token.is_active) return fail(400, { error: "Ujian tidak aktif." });
-      if (token.released_at) {
-        const releasedAt = parseDate(token.released_at).getTime();
-        const now = (/* @__PURE__ */ new Date()).getTime();
-        if (now - releasedAt > 15 * 60 * 1e3) return fail(400, { error: "Token sudah ditarik otomatis (melewati batas 15 menit)." });
-      } else {
-        return fail(400, { error: "Status rilis token tidak valid." });
-      }
-      if (parseDate(token.expires_at) < /* @__PURE__ */ new Date()) return fail(400, { error: "Token sudah kedaluwarsa." });
       return { success: true, tokenCode, examId: parsedExamId };
     } catch (e) {
       if (e.status === 302) throw e;
@@ -84,12 +96,33 @@ const actions = {
     if (!tokenCode || isNaN(parsedExamId)) return fail(400, { error: "Data tidak lengkap." });
     try {
       const token = await db.prepare(`
-			SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
-			FROM tokens t JOIN exams e ON t.exam_id = e.id
-			JOIN exam_types et ON e.exam_type_id = et.id
-			WHERE t.token_code = ? AND t.is_released = 1 AND t.exam_id = ? AND et.is_active = 1
-		`).bind(tokenCode, parsedExamId).first();
-      if (!token) return fail(400, { error: "Token tidak valid untuk ujian ini atau belum dirilis." });
+				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
+				FROM tokens t 
+				JOIN exams e ON t.exam_id = e.id
+				JOIN exam_types et ON e.exam_type_id = et.id
+				WHERE t.token_code = ? AND t.exam_id = ? AND et.is_active = 1
+			`).bind(tokenCode, parsedExamId).first();
+      if (!token) {
+        return fail(400, { error: "Token tidak valid untuk ujian ini." });
+      }
+      if (!token.is_active) {
+        return fail(400, { error: "Ujian saat ini tidak aktif." });
+      }
+      if (!token.is_released) {
+        return fail(400, { error: "Token ujian ini sudah ditarik atau belum dirilis oleh pengawas." });
+      }
+      if (token.released_at) {
+        const releasedAt = parseDate(token.released_at).getTime();
+        const now = (/* @__PURE__ */ new Date()).getTime();
+        if (now - releasedAt > 15 * 60 * 1e3) {
+          return fail(400, { error: "Token sudah kedaluwarsa / ditarik otomatis (melewati batas waktu 15 menit)." });
+        }
+      } else {
+        return fail(400, { error: "Status rilis token tidak valid." });
+      }
+      if (parseDate(token.expires_at) < /* @__PURE__ */ new Date()) {
+        return fail(400, { error: "Token sudah kedaluwarsa." });
+      }
       const existingAttempt = await db.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`).bind(locals.user.id, token.exam_id).first();
       if (existingAttempt) {
         if (existingAttempt.status === "mengerjakan") {
@@ -99,15 +132,6 @@ const actions = {
         }
         return fail(400, { error: "Anda sudah pernah mengerjakan ujian ini." });
       }
-      if (!token.is_active) return fail(400, { error: "Ujian tidak aktif." });
-      if (token.released_at) {
-        const releasedAt = parseDate(token.released_at).getTime();
-        const now = (/* @__PURE__ */ new Date()).getTime();
-        if (now - releasedAt > 15 * 60 * 1e3) return fail(400, { error: "Token sudah ditarik otomatis." });
-      } else {
-        return fail(400, { error: "Status rilis token tidak valid." });
-      }
-      if (parseDate(token.expires_at) < /* @__PURE__ */ new Date()) return fail(400, { error: "Token sudah kedaluwarsa." });
       const endTime = new Date(Date.now() + token.duration_minutes * 60 * 1e3).toISOString();
       const result = await db.prepare(`INSERT INTO student_attempts (student_id, exam_id, token_id, end_time, status) VALUES (?, ?, ?, ?, 'mengerjakan')`).bind(locals.user.id, token.exam_id, token.id, endTime).run();
       const attemptId = result.meta.last_row_id;
