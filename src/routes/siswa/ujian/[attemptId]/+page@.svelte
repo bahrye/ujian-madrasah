@@ -94,6 +94,12 @@
 			}
 		}
 		
+		// Cek apakah siswa sudah pernah masuk fullscreen (dari localStorage)
+		const savedFullscreenFlag = localStorage.getItem(`hasEnteredFullscreen_${attempt.id}`);
+		if (savedFullscreenFlag === 'true') {
+			hasEnteredFullscreenOnce = true;
+		}
+		
 		// Jika ada saved deadline, siswa pasti sudah pernah masuk fullscreen
 		const hasSavedDeadline = localStorage.getItem(`cheat_deadline_${attempt.id}`) || sessionStorage.getItem(`cheat_deadline_${attempt.id}`);
 		if (hasSavedDeadline) {
@@ -113,6 +119,11 @@
 		if (sessionStorage.getItem(officialReloadKey) === 'true') {
 			isOfficialReload = true;
 			sessionStorage.removeItem(officialReloadKey);
+			// Hapus cheat deadline saat official reload agar tidak tercatat pelanggaran palsu
+			localStorage.removeItem(`cheat_deadline_${attempt.id}`);
+			localStorage.removeItem(`cheat_type_${attempt.id}`);
+			sessionStorage.removeItem(`cheat_deadline_${attempt.id}`);
+			sessionStorage.removeItem(`cheat_type_${attempt.id}`);
 		}
 
 		// Cek apakah sebelum reload/tutup halaman siswa sedang dalam masa jeda peringatan (misal keluar fullscreen di HP)
@@ -147,10 +158,9 @@
 		setTimeout(() => {
 			isMountedAndReady = true;
 			isOfficialReload = false;
-			// Setelah grace period, jika siswa sudah pernah masuk fullscreen tapi sekarang TIDAK di fullscreen
-			// dan tidak ada countdown yang sedang berjalan, mulai countdown baru
-			if (hasEnteredFullscreenOnce && !isFullscreen && !isExamBlurred && !showWarningModal && !showDisqualifiedModal && cheatCountdownRemaining <= 0) {
-				handleCheatWarning('Keluar dari Layar Penuh', 10000);
+			// Jika siswa sudah pernah masuk fullscreen sebelumnya, otomatis masuk fullscreen tanpa overlay
+			if (hasEnteredFullscreenOnce && !isFullscreen && !showDisqualifiedModal) {
+				enterFullscreen();
 			}
 		}, 3000);
 
@@ -303,6 +313,7 @@
 			if (document.documentElement.requestFullscreen) {
 				await document.documentElement.requestFullscreen();
 				hasEnteredFullscreenOnce = true;
+				localStorage.setItem(`hasEnteredFullscreen_${attempt.id}`, 'true');
 			}
 		} catch (err) {}
 	}
@@ -311,6 +322,7 @@
 		isFullscreen = !!document.fullscreenElement;
 		if (isFullscreen) {
 			hasEnteredFullscreenOnce = true;
+			localStorage.setItem(`hasEnteredFullscreen_${attempt.id}`, 'true');
 			handleReturnToExam();
 		} else if (isMountedAndReady && !isUnloading && !isManualReload && !isOfficialReload && !isExamBlurred && !showWarningModal && !showDisqualifiedModal && !submitting && hasEnteredFullscreenOnce) {
 			// Hanya mulai countdown jika siswa SUDAH PERNAH masuk fullscreen sebelumnya

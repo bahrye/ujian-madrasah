@@ -22,10 +22,9 @@ const load = async ({ platform, locals, params, cookies }) => {
     if (attempt.status !== "mengerjakan") {
       throw redirect(302, "/siswa");
     }
-    const isTokenStillReleased = attempt.token_is_released === 1;
     const cookieVal = cookies.get("exam_token_verified_" + parsedAttemptId);
     const isVerified = await verifyExamTokenSignature(cookieVal, parsedAttemptId, locals.user.id);
-    if (!isVerified || !isTokenStillReleased) {
+    if (!isVerified) {
       cookies.delete("exam_token_verified_" + parsedAttemptId, { path: "/" });
       throw redirect(302, `/siswa/ujian?exam_id=${attempt.exam_id}`);
     }

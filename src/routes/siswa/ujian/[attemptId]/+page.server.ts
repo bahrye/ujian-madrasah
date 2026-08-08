@@ -29,16 +29,19 @@ export const load: PageServerLoad = async ({ platform, locals, params, cookies }
 		throw redirect(302, '/siswa');
 	}
 
-	// Untuk siswa yang SUDAH mengerjakan (status 'mengerjakan'), hanya cek apakah token masih dirilis
-	// JANGAN cek jendela 15 menit karena siswa bisa mengerjakan lebih dari 15 menit
-	const isTokenStillReleased = attempt.token_is_released === 1;
-
+	// Verifikasi cookie sesi ujian
 	const cookieVal = cookies.get('exam_token_verified_' + parsedAttemptId);
 	const isVerified = await verifyExamTokenSignature(cookieVal, parsedAttemptId, locals.user.id);
-	if (!isVerified || !isTokenStillReleased) {
+	
+	if (!isVerified) {
+		// Cookie tidak ada/tidak valid - siswa harus memasukkan token untuk masuk
+		// Di sini baru cek apakah token masih dirilis
 		cookies.delete('exam_token_verified_' + parsedAttemptId, { path: '/' });
 		throw redirect(302, `/siswa/ujian?exam_id=${attempt.exam_id}`);
 	}
+	// Cookie valid = siswa sudah pernah diotorisasi masuk ujian ini
+	// Biarkan lanjut mengerjakan tanpa mengecek status token lagi
+	// Token revocation hanya berlaku saat siswa MENCOBA MASUK BARU (tanpa cookie)
 
 	// Ambil soal
 	let questions = await db.prepare(`
