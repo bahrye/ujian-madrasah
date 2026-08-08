@@ -245,6 +245,7 @@
 	// Local answer state
 	let localAnswers: Record<number, string> = {};
 	let localDoubts: Record<number, boolean> = {};
+	let lastSavedPayload: string | null = null;
 
 	// Initialize from server data
 	$: {
@@ -254,6 +255,14 @@
 				localAnswers[q.id] = ans.answer_given || '';
 				localDoubts[q.id] = ans.is_doubted === 1;
 			}
+		}
+		if (lastSavedPayload === null && Object.keys(localAnswers).length > 0) {
+			lastSavedPayload = JSON.stringify({
+				answers: localAnswers,
+				doubts: localDoubts,
+				warnings: warnings,
+				warningLogs: warningLogs
+			});
 		}
 	}
 
@@ -276,7 +285,7 @@
 	$: unansweredCount = questions.length - answeredCount;
 
 	function goToQuestion(index: number) {
-		// Save current before navigating
+		// Save current only if there are changes before navigating
 		saveCurrentAnswer();
 		currentIndex = index;
 		localStorage.setItem(`currentIndex_${attempt.id}`, currentIndex.toString());
@@ -313,9 +322,22 @@
 		triggerAutoSave();
 	}
 
-	async function saveCurrentAnswer() {
+	async function saveCurrentAnswer(force = false) {
 		if (isPausedByProctor) return;
 		if (saveTimeout) clearTimeout(saveTimeout);
+
+		const currentPayload = JSON.stringify({
+			answers: localAnswers,
+			doubts: localDoubts,
+			warnings: warnings,
+			warningLogs: warningLogs
+		});
+
+		// Jika data tidak berubah sama sekali sejak penyimpanan terakhir, jangan kirim request!
+		if (!force && lastSavedPayload === currentPayload) {
+			return;
+		}
+
 		isSaving = true;
 		const form = new FormData();
 		form.set('answers', JSON.stringify(localAnswers));
@@ -324,11 +346,14 @@
 		form.set('warningLogs', JSON.stringify(warningLogs));
 
 		try {
-			await fetch('?/saveAnswer', { 
+			const res = await fetch('?/saveAnswer', { 
 				method: 'POST', 
 				body: form,
 				headers: { 'x-sveltekit-action': 'true' } 
 			});
+			if (res.ok) {
+				lastSavedPayload = currentPayload;
+			}
 		} catch (err) {
 			console.error('Save error:', err);
 		} finally {

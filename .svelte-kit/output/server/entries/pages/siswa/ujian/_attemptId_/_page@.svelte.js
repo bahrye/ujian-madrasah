@@ -45,6 +45,8 @@ function _page_($$renderer, $$props) {
     let currentIndex = 0;
     let currentEndTime = data.attempt.end_time;
     let isPausedByProctor = data.attempt.is_paused === 1;
+    let warnings = 0;
+    let warningLogs = [];
     onDestroy(() => {
       if (typeof document !== "undefined" && document.fullscreenElement) {
         document.exitFullscreen().catch(() => {
@@ -53,6 +55,7 @@ function _page_($$renderer, $$props) {
     });
     let localAnswers = {};
     let localDoubts = {};
+    let lastSavedPayload = null;
     attempt = data.attempt;
     questions = data.questions;
     answerMap = data.answerMap;
@@ -63,6 +66,14 @@ function _page_($$renderer, $$props) {
           localAnswers[q.id] = ans.answer_given || "";
           localDoubts[q.id] = ans.is_doubted === 1;
         }
+      }
+      if (lastSavedPayload === null && Object.keys(localAnswers).length > 0) {
+        lastSavedPayload = JSON.stringify({
+          answers: localAnswers,
+          doubts: localDoubts,
+          warnings,
+          warningLogs
+        });
       }
     }
     currentQuestion = questions[currentIndex];

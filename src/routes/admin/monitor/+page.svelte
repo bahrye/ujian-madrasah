@@ -28,7 +28,7 @@
 		interval = setInterval(() => {
 			currentTime = Date.now();
 			invalidateAll();
-		}, 10000); // 10 seconds is good for monitoring
+		}, 5000); // 5 detik lebih cepat dan responsif untuk admin
 	});
 
 	onDestroy(() => {
