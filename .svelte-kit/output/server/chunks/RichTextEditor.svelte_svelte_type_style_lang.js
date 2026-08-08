@@ -31,6 +31,7 @@ function ImportWordModal($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let show = fallback($$props["show"], false);
     let parsedData = [];
+    let isImporting = false;
     public_env.PUBLIC_CLOUDINARY_CLOUD_NAME || "dfhtjgwcz";
     public_env.PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ujian-madrasah";
     if (show) {
@@ -63,7 +64,12 @@ function ImportWordModal($$renderer, $$props) {
       } else {
         $$renderer2.push("<!--[-1-->");
       }
-      $$renderer2.push(`<!--]--></div> <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3 rounded-b-2xl"><button type="button" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-200 hover:text-slate-900 transition-colors">Batal</button> <button type="button" class="btn btn-primary rounded-xl px-6 py-2.5 shadow-sm flex items-center gap-2"${attr("disabled", parsedData.length === 0, true)}><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg> Import ${escape_html(parsedData.length > 0 ? `${parsedData.length} Soal` : "")}</button></div></div></div>`);
+      $$renderer2.push(`<!--]--></div> <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3 rounded-b-2xl"><button type="button" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-200 hover:text-slate-900 transition-colors">Batal</button> <button type="button" class="btn btn-primary rounded-xl px-6 py-2.5 shadow-sm flex items-center gap-2"${attr("disabled", parsedData.length === 0 || isImporting, true)}>`);
+      {
+        $$renderer2.push("<!--[-1-->");
+        $$renderer2.push(`<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg> Import ${escape_html(parsedData.length > 0 ? `${parsedData.length} Soal` : "")}`);
+      }
+      $$renderer2.push(`<!--]--></button></div></div></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
