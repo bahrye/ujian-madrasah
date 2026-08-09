@@ -22,7 +22,9 @@
 
 	/* Table styles for rendered questions */
 	.prose table {
-		@apply border-collapse my-4;
+		@apply border-collapse my-4 block overflow-auto;
+		max-width: 100%;
+		max-height: 70vh;
 	}
 	.prose th,
 	.prose td {
