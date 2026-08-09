@@ -818,7 +818,6 @@
 								const parsed = JSON.parse(q.options_json);
 								if (parsed.left) editMenjodohkanCount = parsed.left.length;
 							}
-							window.scrollTo({ top: 0, behavior: 'smooth' });
 						}}>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.edit} />
