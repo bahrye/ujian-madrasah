@@ -105,6 +105,9 @@ function _page($$renderer, $$props) {
       $$renderer3.option({ value: "pengawas", selected: data.roleFilter === "pengawas" }, ($$renderer4) => {
         $$renderer4.push(`Pengawas`);
       });
+      $$renderer3.option({ value: "panitia", selected: data.roleFilter === "panitia" }, ($$renderer4) => {
+        $$renderer4.push(`Panitia Ujian`);
+      });
       $$renderer3.push(`</select> <button type="submit" class="btn-secondary btn-sm">Cari</button></form></div> <div class="card overflow-hidden"><div class="table-container border-0 rounded-none"><table class="table"><thead><tr class="bg-slate-50 text-slate-500 text-sm"><th class="p-4 font-semibold whitespace-nowrap">Nama</th><th class="p-4 font-semibold whitespace-nowrap">Username</th><th class="p-4 font-semibold whitespace-nowrap">Role</th><th class="p-4 font-semibold whitespace-nowrap">Status</th><th class="p-4 font-semibold whitespace-nowrap">Dibuat</th><th class="p-4 font-semibold text-right whitespace-nowrap">Aksi</th></tr></thead><tbody class="divide-y divide-slate-100 text-slate-700">`);
       const each_array = ensure_array_like(data.users);
       if (each_array.length !== 0) {
@@ -152,6 +155,9 @@ function _page($$renderer, $$props) {
         });
         $$renderer3.option({ value: "pengawas" }, ($$renderer4) => {
           $$renderer4.push(`Pengawas`);
+        });
+        $$renderer3.option({ value: "panitia" }, ($$renderer4) => {
+          $$renderer4.push(`Panitia Ujian`);
         });
         $$renderer3.push(`</select></div> <div class="flex gap-3 pt-2"><button type="button" class="btn-ghost flex-1">Batal</button> <button type="submit" class="btn-primary flex-1">Simpan</button></div></form></div></div>`);
       } else {

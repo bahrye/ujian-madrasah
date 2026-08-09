@@ -1,0 +1,17 @@
+PRAGMA defer_foreign_keys = TRUE;
+DROP TABLE IF EXISTS d1_migrations;
+DROP TABLE IF EXISTS student_answers;
+DROP TABLE IF EXISTS exam_type_participants;
+DROP TABLE IF EXISTS exam_proctors;
+DROP TABLE IF EXISTS exam_teachers;
+DROP TABLE IF EXISTS exam_participants;
+DROP TABLE IF EXISTS student_attempts;
+DROP TABLE IF EXISTS questions;
+DROP TABLE IF EXISTS tokens;
+DROP TABLE IF EXISTS exams;
+DROP TABLE IF EXISTS exam_types;
+DROP TABLE IF EXISTS uploaded_media;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS subjects;
+DROP TABLE IF EXISTS classes;
+DROP TABLE IF EXISTS schools;

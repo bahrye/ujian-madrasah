@@ -3,14 +3,16 @@ const ROLE_LABELS = {
   admin: "Administrator Sekolah",
   guru: "Guru",
   pengawas: "Pengawas",
-  siswa: "Siswa"
+  siswa: "Siswa",
+  panitia: "Panitia Ujian"
 };
 const ROLE_COLORS = {
   superadmin: "badge-secondary",
   admin: "badge-danger",
   guru: "badge-primary",
   pengawas: "badge-warning",
-  siswa: "badge-info"
+  siswa: "badge-info",
+  panitia: "bg-emerald-100 text-emerald-800"
 };
 const QUESTION_TYPE_LABELS = {
   pilihan_ganda: "Pilihan Ganda",

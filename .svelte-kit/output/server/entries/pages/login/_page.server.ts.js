@@ -3,7 +3,8 @@ import { g as getDB } from "../../../chunks/db.js";
 import { a as verifyPassword, c as createToken, C as COOKIE_NAME } from "../../../chunks/auth.js";
 const load = async ({ locals }) => {
   if (locals.user) {
-    throw redirect(302, `/${locals.user.role}`);
+    const redirectRoute = locals.user.role === "panitia" ? "/admin" : `/${locals.user.role}`;
+    throw redirect(302, redirectRoute);
   }
 };
 const actions = {
@@ -41,7 +42,8 @@ const actions = {
         maxAge: 60 * 60 * 8
         // 8 jam
       });
-      throw redirect(302, `/${user.role}`);
+      const redirectRoute = user.role === "panitia" ? "/admin" : `/${user.role}`;
+      throw redirect(302, redirectRoute);
     } catch (e) {
       if (e && typeof e === "object" && "status" in e && e.status === 302) {
         throw e;

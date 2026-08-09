@@ -3,7 +3,7 @@ import { getDB } from '$lib/server/db';
 import { json } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ url, platform, locals }) => {
-	if (locals.user?.role !== 'admin') {
+	if (locals.user?.role !== 'admin' && locals.user?.role !== 'panitia') {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 

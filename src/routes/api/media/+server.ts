@@ -16,7 +16,7 @@ export const GET: RequestHandler = async ({ platform, locals }) => {
 		if (user.role === 'superadmin') {
 			query = 'SELECT url, name, media_type FROM uploaded_media ORDER BY id DESC';
 			result = await db.prepare(query).all<{url: string, name: string, media_type: string}>();
-		} else if (user.role === 'admin') {
+		} else if (user.role === 'admin' || user.role === 'panitia') {
 			query = 'SELECT url, name, media_type FROM uploaded_media WHERE school_id = ? ORDER BY id DESC';
 			result = await db.prepare(query).bind(user.school_id || -1).all<{url: string, name: string, media_type: string}>();
 		} else {

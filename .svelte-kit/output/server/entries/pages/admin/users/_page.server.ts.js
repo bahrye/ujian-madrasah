@@ -40,7 +40,7 @@ const actions = {
     if (!username || !password || !name || !role) {
       return fail(400, { error: "Semua field wajib diisi." });
     }
-    if (!["guru", "pengawas", "siswa"].includes(role)) {
+    if (!["guru", "pengawas", "siswa", "panitia"].includes(role)) {
       return fail(400, { error: "Role tidak valid." });
     }
     const existing = await db.prepare("SELECT id FROM users WHERE username = ?").bind(username).first();

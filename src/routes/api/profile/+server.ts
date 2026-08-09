@@ -4,7 +4,7 @@ import { hashPassword, createToken, COOKIE_NAME } from '$lib/server/auth';
 
 export const POST = async ({ request, platform, locals, cookies }: any) => {
 	// Only allow admin
-	if (!locals.user || locals.user.role !== 'admin') {
+	if (!locals.user || (locals.user.role !== 'admin' && locals.user.role !== 'panitia')) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 

@@ -4,7 +4,8 @@ const load = async ({ locals }) => {
     throw redirect(302, "/login");
   }
   if (locals.user.role !== "superadmin") {
-    throw redirect(302, `/${locals.user.role}`);
+    const redirectRoute = locals.user.role === "panitia" ? "/admin" : `/${locals.user.role}`;
+    throw redirect(302, redirectRoute);
   }
   return {
     user: locals.user

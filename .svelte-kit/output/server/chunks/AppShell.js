@@ -18,7 +18,8 @@ function Sidebar($$renderer, $$props) {
     let isOpen = fallback($$props["isOpen"], false);
     function isActive(href, path) {
       if (!href) return false;
-      if (href === `/${user?.role}`) {
+      const roleRoute = user?.role === "panitia" ? "/admin" : `/${user?.role}`;
+      if (href === roleRoute) {
         return path === href;
       }
       return path.startsWith(href);
@@ -82,7 +83,7 @@ function Sidebar($$renderer, $$props) {
         $$renderer3.push(`<!--]-->`);
       }
       $$renderer3.push(`<!--]--></nav> <div class="p-4 border-t border-primary-800/50"><div class="flex items-center gap-3 px-3 py-2">`);
-      if (user?.role === "admin") {
+      if (user?.role === "admin" || user?.role === "panitia") {
         $$renderer3.push("<!--[0-->");
         $$renderer3.push(`<button class="flex-1 flex items-center gap-3 min-w-0 hover:bg-white/10 p-1.5 -ml-1.5 rounded-xl transition-colors text-left" title="Edit Profil"><div${attr_class(`w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br ${stringify(roleGradients[user?.role ?? "siswa"])} flex items-center justify-center text-sm font-bold shadow-lg overflow-hidden`)}>`);
         if (user?.photo) {
@@ -142,7 +143,7 @@ function Sidebar($$renderer, $$props) {
           $$renderer3.push(`<!--]-->`);
         }
         $$renderer3.push(`<!--]--></nav> <div class="p-4 border-t border-primary-800/50"><div class="flex items-center gap-3 px-3 py-2">`);
-        if (user?.role === "admin") {
+        if (user?.role === "admin" || user?.role === "panitia") {
           $$renderer3.push("<!--[0-->");
           $$renderer3.push(`<button class="flex-1 flex items-center gap-3 min-w-0 hover:bg-white/10 p-1.5 -ml-1.5 rounded-xl transition-colors text-left" title="Edit Profil"><div${attr_class(`w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br ${stringify(roleGradients[user?.role ?? "siswa"])} flex items-center justify-center text-sm font-bold overflow-hidden`)}>`);
           if (user?.photo) {

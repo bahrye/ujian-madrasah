@@ -3,7 +3,7 @@ import { getDB } from '$lib/server/db';
 import { redirect } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ params, platform, locals }) => {
-	if (locals.user?.role !== 'admin') throw redirect(302, '/');
+	if (locals.user?.role !== 'admin' && locals.user?.role !== 'panitia') throw redirect(302, '/');
 
 	const db = getDB(platform);
 	const typeId = parseInt(params.typeId, 10);

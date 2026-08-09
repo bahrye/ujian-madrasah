@@ -9,7 +9,8 @@ export const load = async ({ locals }: Parameters<LayoutServerLoad>[0]) => {
 	}
 	if (locals.user.role !== 'superadmin') {
 		// Arahkan ke dashboard sesuai role jika bukan superadmin
-		throw redirect(302, `/${locals.user.role}`);
+		const redirectRoute = locals.user.role === 'panitia' ? '/admin' : `/${locals.user.role}`;
+		throw redirect(302, redirectRoute);
 	}
 	return {
 		user: locals.user

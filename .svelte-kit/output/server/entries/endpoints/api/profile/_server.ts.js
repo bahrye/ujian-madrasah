@@ -2,7 +2,7 @@ import { json } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
 import { h as hashPassword, c as createToken, C as COOKIE_NAME } from "../../../../chunks/auth.js";
 const POST = async ({ request, platform, locals, cookies }) => {
-  if (!locals.user || locals.user.role !== "admin") {
+  if (!locals.user || locals.user.role !== "admin" && locals.user.role !== "panitia") {
     return json({ error: "Unauthorized" }, { status: 401 });
   }
   const db = getDB(platform);

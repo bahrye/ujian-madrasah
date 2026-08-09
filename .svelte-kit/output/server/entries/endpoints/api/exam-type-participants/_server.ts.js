@@ -1,7 +1,7 @@
 import { g as getDB } from "../../../../chunks/db.js";
 import { json } from "@sveltejs/kit";
 const GET = async ({ url, platform, locals }) => {
-  if (locals.user?.role !== "admin") {
+  if (locals.user?.role !== "admin" && locals.user?.role !== "panitia") {
     return json({ error: "Unauthorized" }, { status: 401 });
   }
   const examTypeId = url.searchParams.get("exam_type_id");

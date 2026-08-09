@@ -5,7 +5,7 @@ import { getDB } from '$lib/server/db';
 import { env } from '$env/dynamic/private';
 
 export const POST: RequestHandler = async ({ request, locals, platform }) => {
-	if (!locals.user || !['superadmin', 'admin', 'guru'].includes(locals.user.role)) {
+	if (!locals.user || !['superadmin', 'admin', 'guru', 'panitia'].includes(locals.user.role)) {
 		return json({ success: false, error: 'Unauthorized' }, { status: 401 });
 	}
 

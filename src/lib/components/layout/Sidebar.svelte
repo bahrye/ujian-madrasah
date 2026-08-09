@@ -14,7 +14,8 @@
 
 	function isActive(href: string | undefined, path: string): boolean {
 		if (!href) return false;
-		if (href === `/${user?.role}`) {
+		const roleRoute = user?.role === 'panitia' ? '/admin' : `/${user?.role}`;
+		if (href === roleRoute) {
 			return path === href;
 		}
 		return path.startsWith(href);
@@ -163,7 +164,7 @@
 	<!-- User Info -->
 	<div class="p-4 border-t border-primary-800/50">
 		<div class="flex items-center gap-3 px-3 py-2">
-			{#if user?.role === 'admin'}
+			{#if user?.role === 'admin' || user?.role === 'panitia'}
 				<button class="flex-1 flex items-center gap-3 min-w-0 hover:bg-white/10 p-1.5 -ml-1.5 rounded-xl transition-colors text-left" on:click={openProfileModal} title="Edit Profil">
 					<div class="w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-sm font-bold shadow-lg overflow-hidden">
 						{#if user?.photo}
@@ -307,7 +308,7 @@
 			<!-- User + Logout -->
 			<div class="p-4 border-t border-primary-800/50">
 				<div class="flex items-center gap-3 px-3 py-2">
-					{#if user?.role === 'admin'}
+					{#if user?.role === 'admin' || user?.role === 'panitia'}
 						<button class="flex-1 flex items-center gap-3 min-w-0 hover:bg-white/10 p-1.5 -ml-1.5 rounded-xl transition-colors text-left" on:click={openProfileModal} title="Edit Profil">
 							<div class="w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-sm font-bold overflow-hidden">
 								{#if user?.photo}

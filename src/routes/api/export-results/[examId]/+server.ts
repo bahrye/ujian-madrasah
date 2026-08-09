@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import { getDB } from '$lib/server/db';
 
 export const GET = async ({ params, platform, locals }: any) => {
-	if (!locals.user || !['admin', 'superadmin', 'guru'].includes(locals.user.role)) {
+	if (!locals.user || !['admin', 'superadmin', 'guru', 'panitia'].includes(locals.user.role)) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 

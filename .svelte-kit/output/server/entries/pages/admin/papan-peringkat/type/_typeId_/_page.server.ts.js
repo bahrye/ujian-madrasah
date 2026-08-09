@@ -1,7 +1,7 @@
 import { g as getDB } from "../../../../../../chunks/db.js";
 import { redirect, error } from "@sveltejs/kit";
 const load = async ({ platform, locals, params, url }) => {
-  if (locals.user?.role !== "admin") throw redirect(302, "/");
+  if (locals.user?.role !== "admin" && locals.user?.role !== "panitia") throw redirect(302, "/");
   const db = getDB(platform);
   const typeId = params.typeId;
   const schoolId = locals.user.school_id;

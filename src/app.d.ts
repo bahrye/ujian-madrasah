@@ -20,7 +20,7 @@ declare global {
 				school_id: number | null;
 				username: string;
 				name: string;
-				role: 'superadmin' | 'admin' | 'guru' | 'pengawas' | 'siswa';
+				role: 'superadmin' | 'admin' | 'guru' | 'pengawas' | 'siswa' | 'panitia';
 				class_id?: number | null;
 				photo?: string | null;
 			} | null;

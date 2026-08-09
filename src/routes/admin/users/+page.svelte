@@ -67,6 +67,7 @@
 				<option value="">Semua Role</option>
 				<option value="guru" selected={data.roleFilter === 'guru'}>Guru</option>
 				<option value="pengawas" selected={data.roleFilter === 'pengawas'}>Pengawas</option>
+				<option value="panitia" selected={data.roleFilter === 'panitia'}>Panitia Ujian</option>
 			</select>
 			<button type="submit" class="btn-secondary btn-sm">Cari</button>
 		</form>
@@ -175,6 +176,7 @@
 						<option value="">Pilih role</option>
 						<option value="guru">Guru</option>
 						<option value="pengawas">Pengawas</option>
+						<option value="panitia">Panitia Ujian</option>
 					</select>
 				</div>
 				<div class="flex gap-3 pt-2">
@@ -204,6 +206,7 @@
 					<select id="edit-role" name="role" required class="select" bind:value={editingUser.role}>
 						<option value="guru">Guru</option>
 						<option value="pengawas">Pengawas</option>
+						<option value="panitia">Panitia Ujian</option>
 					</select>
 				</div>
 				<div>

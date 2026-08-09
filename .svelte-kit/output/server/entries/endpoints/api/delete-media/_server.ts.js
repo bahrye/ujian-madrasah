@@ -3,7 +3,7 @@ import { d as deleteFromCloudinary } from "../../../../chunks/cloudinary.js";
 import { g as getDB } from "../../../../chunks/db.js";
 import { b as private_env } from "../../../../chunks/shared-server.js";
 const POST = async ({ request, locals, platform }) => {
-  if (!locals.user || !["superadmin", "admin", "guru"].includes(locals.user.role)) {
+  if (!locals.user || !["superadmin", "admin", "guru", "panitia"].includes(locals.user.role)) {
     return json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
   try {

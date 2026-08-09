@@ -5,7 +5,8 @@ import { verifyPassword, createToken, COOKIE_NAME } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user) {
-		throw redirect(302, `/${locals.user.role}`);
+		const redirectRoute = locals.user.role === 'panitia' ? '/admin' : `/${locals.user.role}`;
+		throw redirect(302, redirectRoute);
 	}
 };
 
@@ -61,7 +62,8 @@ export const actions: Actions = {
 				maxAge: 60 * 60 * 8 // 8 jam
 			});
 
-			throw redirect(302, `/${user.role}`);
+			const redirectRoute = user.role === 'panitia' ? '/admin' : `/${user.role}`;
+			throw redirect(302, redirectRoute);
 		} catch (e) {
 			if (e && typeof e === 'object' && 'status' in e && (e as { status: number }).status === 302) {
 				throw e;

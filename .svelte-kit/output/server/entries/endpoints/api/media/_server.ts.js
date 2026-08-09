@@ -12,7 +12,7 @@ const GET = async ({ platform, locals }) => {
     if (user.role === "superadmin") {
       query = "SELECT url, name, media_type FROM uploaded_media ORDER BY id DESC";
       result = await db.prepare(query).all();
-    } else if (user.role === "admin") {
+    } else if (user.role === "admin" || user.role === "panitia") {
       query = "SELECT url, name, media_type FROM uploaded_media WHERE school_id = ? ORDER BY id DESC";
       result = await db.prepare(query).bind(user.school_id || -1).all();
     } else {

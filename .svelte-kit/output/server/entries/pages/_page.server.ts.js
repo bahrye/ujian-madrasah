@@ -1,7 +1,8 @@
 import { redirect } from "@sveltejs/kit";
 const load = async ({ locals }) => {
   if (locals.user) {
-    throw redirect(302, `/${locals.user.role}`);
+    const redirectRoute = locals.user.role === "panitia" ? "/admin" : `/${locals.user.role}`;
+    throw redirect(302, redirectRoute);
   }
   throw redirect(302, "/login");
 };

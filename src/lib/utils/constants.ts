@@ -3,7 +3,8 @@ export const ROLES = {
 	ADMIN: 'admin',
 	GURU: 'guru',
 	PENGAWAS: 'pengawas',
-	SISWA: 'siswa'
+	SISWA: 'siswa',
+	PANITIA: 'panitia'
 } as const;
 
 export const ROLE_LABELS: Record<string, string> = {
@@ -11,7 +12,8 @@ export const ROLE_LABELS: Record<string, string> = {
 	admin: 'Administrator Sekolah',
 	guru: 'Guru',
 	pengawas: 'Pengawas',
-	siswa: 'Siswa'
+	siswa: 'Siswa',
+	panitia: 'Panitia Ujian'
 };
 
 export const ROLE_COLORS: Record<string, string> = {
@@ -19,7 +21,8 @@ export const ROLE_COLORS: Record<string, string> = {
 	admin: 'badge-danger',
 	guru: 'badge-primary',
 	pengawas: 'badge-warning',
-	siswa: 'badge-info'
+	siswa: 'badge-info',
+	panitia: 'bg-emerald-100 text-emerald-800'
 };
 
 export const QUESTION_TYPES = {
