@@ -251,11 +251,12 @@
 									<p class="text-sm font-medium text-slate-700 line-clamp-1">{item.subject_name || 'Tidak ada'}</p>
 								</div>
 								<div>
-									<p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Ujian & Posisi</p>
-									<p class="text-sm text-slate-600 line-clamp-2">
-										<span class="font-medium">{item.exam_title}</span> <br/>
-										<span class="text-indigo-600 font-medium">Soal Nomor {item.question_number}</span>
-									</p>
+									<p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Ujian</p>
+									<p class="text-sm text-slate-700 font-medium line-clamp-1">{item.exam_title}</p>
+								</div>
+								<div>
+									<p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Posisi</p>
+									<p class="text-sm text-indigo-600 font-medium">Soal Nomor {item.question_number}</p>
 								</div>
 							{:else}
 								<div class="h-full flex flex-col items-center justify-center text-center space-y-2">
@@ -270,11 +271,8 @@
 							{/if}
 						</div>
 						
-						<div class="mt-3 mb-3 text-[11px] text-slate-500 bg-white p-2 rounded-lg flex justify-between items-center border border-slate-200 shadow-sm">
-							<span class="flex items-center gap-1">
-								<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-								Pengunggah:
-							</span>
+						<div class="mt-3 mb-3 text-[11px] text-slate-500 bg-white p-2 rounded-lg flex items-center gap-1.5 border border-slate-200 shadow-sm">
+							<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
 							<span class="font-bold text-slate-700">{item.uploader_name || 'Sistem'}</span>
 						</div>
 
