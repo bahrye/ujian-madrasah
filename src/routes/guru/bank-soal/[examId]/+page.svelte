@@ -529,6 +529,10 @@
 			</div>
 		</div>
 		<div class="grid grid-cols-2 sm:flex sm:items-center gap-2 pl-12 sm:pl-0">
+			<button class="btn bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm" on:click={() => showImportWordModal = true}>
+				<svg class="w-4 h-4 mr-1 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+				Import Word
+			</button>
 			{#if questions.length > 0}
 				<button class="btn px-2 sm:px-4 justify-center {isBulkSelectMode ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300'} transition-all shadow-sm" on:click={() => { isBulkSelectMode = !isBulkSelectMode; selectedQuestionIds.clear(); selectedQuestionIds = selectedQuestionIds; }}>
 					<svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
@@ -549,8 +553,8 @@
 	</div>
 
 	<!-- Import Modal -->
-	<ImportExcelModal bind:show={showImportModal} on:import={handleImportExcel} />
-	<ImportWordModal bind:show={showImportWordModal} on:import={handleImportExcel} />
+	<ImportExcelModal bind:show={showImportModal} on:import={handleImportExcel} on:close={() => showImportModal = false} />
+	<ImportWordModal bind:show={showImportWordModal} on:import={handleImportExcel} on:close={() => showImportWordModal = false} />
 
 	<!-- Create Form -->
 	{#if showCreateForm}
