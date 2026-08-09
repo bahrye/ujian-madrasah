@@ -1,10 +1,10 @@
-import * as server from '../entries/pages/pengawas/jadwal/saya/_page.server.ts.js';
+import * as server from '../entries/pages/pengawas/_page.server.ts.js';
 
 export const index = 45;
 let component_cache;
-export const component = async () => component_cache ??= (await import('../entries/pages/pengawas/jadwal/saya/_page.svelte.js')).default;
+export const component = async () => component_cache ??= (await import('../entries/pages/pengawas/_page.svelte.js')).default;
 export { server };
-export const server_id = "src/routes/pengawas/jadwal/saya/+page.server.ts";
-export const imports = ["_app/immutable/nodes/45.DbdTHXK0.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/DcQ_8zXo.js","_app/immutable/chunks/D4qA_8uZ.js","_app/immutable/chunks/B8nvzFA9.js","_app/immutable/chunks/CvD4UPcL.js","_app/immutable/chunks/C1IC1cMY.js","_app/immutable/chunks/DBitQRLM.js","_app/immutable/chunks/BGbsNJiS.js","_app/immutable/chunks/7Rd7Mpvn.js","_app/immutable/chunks/BnvTZMRs.js","_app/immutable/chunks/B8GwE7im.js","_app/immutable/chunks/Cn73aa_U.js","_app/immutable/chunks/4j8J6LnF.js","_app/immutable/chunks/Czq8_PJR.js"];
+export const server_id = "src/routes/pengawas/+page.server.ts";
+export const imports = ["_app/immutable/nodes/45.D6SANuL7.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/q3ZFHJDQ.js","_app/immutable/chunks/ClRrpZeN.js","_app/immutable/chunks/CiiCNIbB.js","_app/immutable/chunks/DbEAIv_x.js","_app/immutable/chunks/COlPN6dD.js","_app/immutable/chunks/BClyc7_g.js","_app/immutable/chunks/i_5gAELL.js","_app/immutable/chunks/CcEXiels.js","_app/immutable/chunks/Bfc47y5P.js","_app/immutable/chunks/oZ_RSl7A.js","_app/immutable/chunks/BE_QLVD7.js","_app/immutable/chunks/Uo-sFA6w.js","_app/immutable/chunks/CcPznuOH.js","_app/immutable/chunks/DeQQCbRh.js","_app/immutable/chunks/4j8J6LnF.js","_app/immutable/chunks/B8NmdwjS.js","_app/immutable/chunks/heyDCscg.js","_app/immutable/chunks/B5xf_oRu.js","_app/immutable/chunks/Czq8_PJR.js"];
 export const stylesheets = [];
 export const fonts = [];

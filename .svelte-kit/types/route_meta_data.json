@@ -125,6 +125,9 @@
 	"/api/export-results/[examId]": [
 		"src/routes/api/export-results/[examId]/+server.ts"
 	],
+	"/api/export/excel/[exam_id]": [
+		"src/routes/api/export/excel/[exam_id]/+server.ts"
+	],
 	"/api/logout": [
 		"src/routes/api/logout/+server.ts"
 	],
@@ -247,6 +250,25 @@
 	"/pengawas/tokens": [
 		"src/routes/pengawas/tokens/+page.server.ts",
 		"src/routes/pengawas/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/print": [
+		"src/routes/print/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/print/berita-acara/[exam_id]": [
+		"src/routes/print/berita-acara/[exam_id]/+page.server.ts",
+		"src/routes/print/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/print/kartu/[exam_id]": [
+		"src/routes/print/kartu/[exam_id]/+page.server.ts",
+		"src/routes/print/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/print/kehadiran/[exam_id]": [
+		"src/routes/print/kehadiran/[exam_id]/+page.server.ts",
+		"src/routes/print/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
 	"/siswa": [

@@ -29,7 +29,7 @@ declare module "$app/types" {
 	type MatcherParam<M> = M extends (param : string) => param is (infer U extends string) ? U : string;
 
 	export interface AppTypes {
-		RouteId(): "/" | "/admin" | "/admin/bank-soal" | "/admin/bank-soal/[examId]" | "/admin/bank-soal/[examId]/preview" | "/admin/classes" | "/admin/exams" | "/admin/exams/type" | "/admin/exams/type/[typeId]" | "/admin/exams/[id]" | "/admin/media-bank" | "/admin/monitor" | "/admin/papan-peringkat" | "/admin/papan-peringkat/type" | "/admin/papan-peringkat/type/[typeId]" | "/admin/papan-peringkat/type/[typeId]/exams" | "/admin/papan-peringkat/[examId]" | "/admin/results" | "/admin/results/[attemptId]" | "/admin/school-profile" | "/admin/students" | "/admin/subjects" | "/admin/tokens" | "/admin/users" | "/api" | "/api/attempt-status" | "/api/attempt-status/[id]" | "/api/delete-media" | "/api/exam-type-participants" | "/api/exams" | "/api/exams/[id]" | "/api/exams/[id]/questions" | "/api/export-results" | "/api/export-results/[examId]" | "/api/logout" | "/api/media" | "/api/profile" | "/api/proxy-media" | "/api/setup" | "/api/track-media" | "/guru" | "/guru/bank-soal" | "/guru/bank-soal/[examId]" | "/guru/bank-soal/[examId]/preview" | "/guru/media-bank" | "/guru/papan-peringkat" | "/guru/papan-peringkat/type" | "/guru/papan-peringkat/type/[typeId]" | "/guru/papan-peringkat/type/[typeId]/exams" | "/guru/papan-peringkat/[examId]" | "/guru/penilaian" | "/guru/remedial" | "/guru/remedial/[examId]" | "/guru/results" | "/guru/results/[attemptId]" | "/login" | "/pengawas" | "/pengawas/jadwal" | "/pengawas/jadwal/saya" | "/pengawas/jadwal/semua" | "/pengawas/monitor" | "/pengawas/tata-tertib" | "/pengawas/tokens" | "/siswa" | "/siswa/hasil-ujian" | "/siswa/jadwal" | "/siswa/papan-peringkat" | "/siswa/papan-peringkat/type" | "/siswa/papan-peringkat/type/[typeId]" | "/siswa/papan-peringkat/type/[typeId]/exams" | "/siswa/papan-peringkat/[examId]" | "/siswa/tata-tertib" | "/siswa/ujian" | "/siswa/ujian/[attemptId]" | "/superadmin" | "/superadmin/accounts" | "/superadmin/admins" | "/superadmin/schools";
+		RouteId(): "/" | "/admin" | "/admin/bank-soal" | "/admin/bank-soal/[examId]" | "/admin/bank-soal/[examId]/preview" | "/admin/classes" | "/admin/exams" | "/admin/exams/type" | "/admin/exams/type/[typeId]" | "/admin/exams/[id]" | "/admin/media-bank" | "/admin/monitor" | "/admin/papan-peringkat" | "/admin/papan-peringkat/type" | "/admin/papan-peringkat/type/[typeId]" | "/admin/papan-peringkat/type/[typeId]/exams" | "/admin/papan-peringkat/[examId]" | "/admin/results" | "/admin/results/[attemptId]" | "/admin/school-profile" | "/admin/students" | "/admin/subjects" | "/admin/tokens" | "/admin/users" | "/api" | "/api/attempt-status" | "/api/attempt-status/[id]" | "/api/delete-media" | "/api/exam-type-participants" | "/api/exams" | "/api/exams/[id]" | "/api/exams/[id]/questions" | "/api/export-results" | "/api/export-results/[examId]" | "/api/export" | "/api/export/excel" | "/api/export/excel/[exam_id]" | "/api/logout" | "/api/media" | "/api/profile" | "/api/proxy-media" | "/api/setup" | "/api/track-media" | "/guru" | "/guru/bank-soal" | "/guru/bank-soal/[examId]" | "/guru/bank-soal/[examId]/preview" | "/guru/media-bank" | "/guru/papan-peringkat" | "/guru/papan-peringkat/type" | "/guru/papan-peringkat/type/[typeId]" | "/guru/papan-peringkat/type/[typeId]/exams" | "/guru/papan-peringkat/[examId]" | "/guru/penilaian" | "/guru/remedial" | "/guru/remedial/[examId]" | "/guru/results" | "/guru/results/[attemptId]" | "/login" | "/pengawas" | "/pengawas/jadwal" | "/pengawas/jadwal/saya" | "/pengawas/jadwal/semua" | "/pengawas/monitor" | "/pengawas/tata-tertib" | "/pengawas/tokens" | "/print" | "/print/berita-acara" | "/print/berita-acara/[exam_id]" | "/print/kartu" | "/print/kartu/[exam_id]" | "/print/kehadiran" | "/print/kehadiran/[exam_id]" | "/siswa" | "/siswa/hasil-ujian" | "/siswa/jadwal" | "/siswa/papan-peringkat" | "/siswa/papan-peringkat/type" | "/siswa/papan-peringkat/type/[typeId]" | "/siswa/papan-peringkat/type/[typeId]/exams" | "/siswa/papan-peringkat/[examId]" | "/siswa/tata-tertib" | "/siswa/ujian" | "/siswa/ujian/[attemptId]" | "/superadmin" | "/superadmin/accounts" | "/superadmin/admins" | "/superadmin/schools";
 		RouteParams(): {
 			"/admin/bank-soal/[examId]": { examId: string };
 			"/admin/bank-soal/[examId]/preview": { examId: string };
@@ -43,6 +43,7 @@ declare module "$app/types" {
 			"/api/exams/[id]": { id: string };
 			"/api/exams/[id]/questions": { id: string };
 			"/api/export-results/[examId]": { examId: string };
+			"/api/export/excel/[exam_id]": { exam_id: string };
 			"/guru/bank-soal/[examId]": { examId: string };
 			"/guru/bank-soal/[examId]/preview": { examId: string };
 			"/guru/papan-peringkat/type/[typeId]": { typeId: string };
@@ -50,13 +51,16 @@ declare module "$app/types" {
 			"/guru/papan-peringkat/[examId]": { examId: string };
 			"/guru/remedial/[examId]": { examId: string };
 			"/guru/results/[attemptId]": { attemptId: string };
+			"/print/berita-acara/[exam_id]": { exam_id: string };
+			"/print/kartu/[exam_id]": { exam_id: string };
+			"/print/kehadiran/[exam_id]": { exam_id: string };
 			"/siswa/papan-peringkat/type/[typeId]": { typeId: string };
 			"/siswa/papan-peringkat/type/[typeId]/exams": { typeId: string };
 			"/siswa/papan-peringkat/[examId]": { examId: string };
 			"/siswa/ujian/[attemptId]": { attemptId: string }
 		};
 		LayoutParams(): {
-			"/": { examId?: string | undefined; typeId?: string | undefined; id?: string | undefined; attemptId?: string | undefined };
+			"/": { examId?: string | undefined; typeId?: string | undefined; id?: string | undefined; attemptId?: string | undefined; exam_id?: string | undefined };
 			"/admin": { examId?: string | undefined; typeId?: string | undefined; id?: string | undefined; attemptId?: string | undefined };
 			"/admin/bank-soal": { examId?: string | undefined };
 			"/admin/bank-soal/[examId]": { examId: string };
@@ -80,7 +84,7 @@ declare module "$app/types" {
 			"/admin/subjects": Record<string, never>;
 			"/admin/tokens": Record<string, never>;
 			"/admin/users": Record<string, never>;
-			"/api": { id?: string | undefined; examId?: string | undefined };
+			"/api": { id?: string | undefined; examId?: string | undefined; exam_id?: string | undefined };
 			"/api/attempt-status": { id?: string | undefined };
 			"/api/attempt-status/[id]": { id: string };
 			"/api/delete-media": Record<string, never>;
@@ -90,6 +94,9 @@ declare module "$app/types" {
 			"/api/exams/[id]/questions": { id: string };
 			"/api/export-results": { examId?: string | undefined };
 			"/api/export-results/[examId]": { examId: string };
+			"/api/export": { exam_id?: string | undefined };
+			"/api/export/excel": { exam_id?: string | undefined };
+			"/api/export/excel/[exam_id]": { exam_id: string };
 			"/api/logout": Record<string, never>;
 			"/api/media": Record<string, never>;
 			"/api/profile": Record<string, never>;
@@ -119,6 +126,13 @@ declare module "$app/types" {
 			"/pengawas/monitor": Record<string, never>;
 			"/pengawas/tata-tertib": Record<string, never>;
 			"/pengawas/tokens": Record<string, never>;
+			"/print": { exam_id?: string | undefined };
+			"/print/berita-acara": { exam_id?: string | undefined };
+			"/print/berita-acara/[exam_id]": { exam_id: string };
+			"/print/kartu": { exam_id?: string | undefined };
+			"/print/kartu/[exam_id]": { exam_id: string };
+			"/print/kehadiran": { exam_id?: string | undefined };
+			"/print/kehadiran/[exam_id]": { exam_id: string };
 			"/siswa": { typeId?: string | undefined; examId?: string | undefined; attemptId?: string | undefined };
 			"/siswa/hasil-ujian": Record<string, never>;
 			"/siswa/jadwal": Record<string, never>;
@@ -135,7 +149,7 @@ declare module "$app/types" {
 			"/superadmin/admins": Record<string, never>;
 			"/superadmin/schools": Record<string, never>
 		};
-		Pathname(): "/" | "/admin" | "/admin/bank-soal" | `/admin/bank-soal/${string}` & {} | `/admin/bank-soal/${string}/preview` & {} | "/admin/classes" | "/admin/exams" | `/admin/exams/type/${string}` & {} | `/admin/exams/${string}` & {} | "/admin/media-bank" | "/admin/monitor" | "/admin/papan-peringkat" | `/admin/papan-peringkat/type/${string}` & {} | `/admin/papan-peringkat/type/${string}/exams` & {} | `/admin/papan-peringkat/${string}` & {} | "/admin/results" | `/admin/results/${string}` & {} | "/admin/school-profile" | "/admin/students" | "/admin/subjects" | "/admin/tokens" | "/admin/users" | `/api/attempt-status/${string}` & {} | "/api/delete-media" | "/api/exam-type-participants" | `/api/exams/${string}/questions` & {} | `/api/export-results/${string}` & {} | "/api/logout" | "/api/media" | "/api/profile" | "/api/proxy-media" | "/api/setup" | "/api/track-media" | "/guru" | "/guru/bank-soal" | `/guru/bank-soal/${string}` & {} | `/guru/bank-soal/${string}/preview` & {} | "/guru/media-bank" | "/guru/papan-peringkat" | `/guru/papan-peringkat/type/${string}` & {} | `/guru/papan-peringkat/type/${string}/exams` & {} | `/guru/papan-peringkat/${string}` & {} | "/guru/penilaian" | "/guru/remedial" | `/guru/remedial/${string}` & {} | "/guru/results" | `/guru/results/${string}` & {} | "/login" | "/pengawas" | "/pengawas/jadwal/saya" | "/pengawas/jadwal/semua" | "/pengawas/monitor" | "/pengawas/tata-tertib" | "/pengawas/tokens" | "/siswa" | "/siswa/hasil-ujian" | "/siswa/jadwal" | "/siswa/papan-peringkat" | `/siswa/papan-peringkat/type/${string}` & {} | `/siswa/papan-peringkat/type/${string}/exams` & {} | `/siswa/papan-peringkat/${string}` & {} | "/siswa/tata-tertib" | "/siswa/ujian" | `/siswa/ujian/${string}` & {} | "/superadmin" | "/superadmin/accounts" | "/superadmin/admins" | "/superadmin/schools";
+		Pathname(): "/" | "/admin" | "/admin/bank-soal" | `/admin/bank-soal/${string}` & {} | `/admin/bank-soal/${string}/preview` & {} | "/admin/classes" | "/admin/exams" | `/admin/exams/type/${string}` & {} | `/admin/exams/${string}` & {} | "/admin/media-bank" | "/admin/monitor" | "/admin/papan-peringkat" | `/admin/papan-peringkat/type/${string}` & {} | `/admin/papan-peringkat/type/${string}/exams` & {} | `/admin/papan-peringkat/${string}` & {} | "/admin/results" | `/admin/results/${string}` & {} | "/admin/school-profile" | "/admin/students" | "/admin/subjects" | "/admin/tokens" | "/admin/users" | `/api/attempt-status/${string}` & {} | "/api/delete-media" | "/api/exam-type-participants" | `/api/exams/${string}/questions` & {} | `/api/export-results/${string}` & {} | `/api/export/excel/${string}` & {} | "/api/logout" | "/api/media" | "/api/profile" | "/api/proxy-media" | "/api/setup" | "/api/track-media" | "/guru" | "/guru/bank-soal" | `/guru/bank-soal/${string}` & {} | `/guru/bank-soal/${string}/preview` & {} | "/guru/media-bank" | "/guru/papan-peringkat" | `/guru/papan-peringkat/type/${string}` & {} | `/guru/papan-peringkat/type/${string}/exams` & {} | `/guru/papan-peringkat/${string}` & {} | "/guru/penilaian" | "/guru/remedial" | `/guru/remedial/${string}` & {} | "/guru/results" | `/guru/results/${string}` & {} | "/login" | "/pengawas" | "/pengawas/jadwal/saya" | "/pengawas/jadwal/semua" | "/pengawas/monitor" | "/pengawas/tata-tertib" | "/pengawas/tokens" | `/print/berita-acara/${string}` & {} | `/print/kartu/${string}` & {} | `/print/kehadiran/${string}` & {} | "/siswa" | "/siswa/hasil-ujian" | "/siswa/jadwal" | "/siswa/papan-peringkat" | `/siswa/papan-peringkat/type/${string}` & {} | `/siswa/papan-peringkat/type/${string}/exams` & {} | `/siswa/papan-peringkat/${string}` & {} | "/siswa/tata-tertib" | "/siswa/ujian" | `/siswa/ujian/${string}` & {} | "/superadmin" | "/superadmin/accounts" | "/superadmin/admins" | "/superadmin/schools";
 		ResolvedPathname(): `${"" | `/${string}`}${ReturnType<AppTypes['Pathname']>}`;
 		Asset(): "/favicon.svg" | "/panduan-ui-ujian.jpeg" | "/template_soal_ujian.docx" | string & {};
 	}

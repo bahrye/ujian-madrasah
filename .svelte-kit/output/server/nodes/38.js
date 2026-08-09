@@ -1,10 +1,10 @@
-import * as server from '../entries/pages/guru/penilaian/_page.server.ts.js';
+import * as server from '../entries/pages/guru/papan-peringkat/_examId_/_page.server.ts.js';
 
 export const index = 38;
 let component_cache;
-export const component = async () => component_cache ??= (await import('../entries/pages/guru/penilaian/_page.svelte.js')).default;
+export const component = async () => component_cache ??= (await import('../entries/pages/guru/papan-peringkat/_examId_/_page.svelte.js')).default;
 export { server };
-export const server_id = "src/routes/guru/penilaian/+page.server.ts";
-export const imports = ["_app/immutable/nodes/38.XQIl0uXZ.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/DcQ_8zXo.js","_app/immutable/chunks/D4qA_8uZ.js","_app/immutable/chunks/B8nvzFA9.js","_app/immutable/chunks/CvD4UPcL.js","_app/immutable/chunks/C1IC1cMY.js","_app/immutable/chunks/DBitQRLM.js","_app/immutable/chunks/CVx8fJzC.js","_app/immutable/chunks/BGbsNJiS.js","_app/immutable/chunks/CXmMC8jQ.js","_app/immutable/chunks/B5xf_oRu.js","_app/immutable/chunks/7Rd7Mpvn.js","_app/immutable/chunks/BnvTZMRs.js","_app/immutable/chunks/B8GwE7im.js","_app/immutable/chunks/Cn73aa_U.js","_app/immutable/chunks/DDm8Wjal.js","_app/immutable/chunks/Bjhz7Gm2.js","_app/immutable/chunks/DefmdQD4.js","_app/immutable/chunks/CSfQBWu7.js","_app/immutable/chunks/Czq8_PJR.js","_app/immutable/chunks/DYRMyRBk.js","_app/immutable/chunks/WOw1egtm.js"];
+export const server_id = "src/routes/guru/papan-peringkat/[examId]/+page.server.ts";
+export const imports = ["_app/immutable/nodes/38.D8gO-7gp.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/q3ZFHJDQ.js","_app/immutable/chunks/ClRrpZeN.js","_app/immutable/chunks/DbEAIv_x.js","_app/immutable/chunks/COlPN6dD.js","_app/immutable/chunks/BClyc7_g.js","_app/immutable/chunks/i_5gAELL.js","_app/immutable/chunks/CcEXiels.js","_app/immutable/chunks/oZ_RSl7A.js","_app/immutable/chunks/Uo-sFA6w.js","_app/immutable/chunks/CcPznuOH.js","_app/immutable/chunks/DeQQCbRh.js","_app/immutable/chunks/4j8J6LnF.js"];
 export const stylesheets = [];
 export const fonts = [];

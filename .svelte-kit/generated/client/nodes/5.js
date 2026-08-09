@@ -1,1 +1,1 @@
-export { default as component } from "../../../../src/routes/siswa/+layout.svelte";
+export { default as component } from "../../../../src/routes/print/+layout.svelte";

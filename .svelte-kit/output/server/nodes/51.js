@@ -1,10 +1,10 @@
-import * as server from '../entries/pages/siswa/hasil-ujian/_page.server.ts.js';
+import * as server from '../entries/pages/print/berita-acara/_exam_id_/_page.server.ts.js';
 
 export const index = 51;
 let component_cache;
-export const component = async () => component_cache ??= (await import('../entries/pages/siswa/hasil-ujian/_page.svelte.js')).default;
+export const component = async () => component_cache ??= (await import('../entries/pages/print/berita-acara/_exam_id_/_page.svelte.js')).default;
 export { server };
-export const server_id = "src/routes/siswa/hasil-ujian/+page.server.ts";
-export const imports = ["_app/immutable/nodes/51.CEcPx0Ap.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/DcQ_8zXo.js","_app/immutable/chunks/D4qA_8uZ.js","_app/immutable/chunks/DefmdQD4.js","_app/immutable/chunks/B8nvzFA9.js","_app/immutable/chunks/CvD4UPcL.js","_app/immutable/chunks/C1IC1cMY.js","_app/immutable/chunks/DBitQRLM.js","_app/immutable/chunks/BGbsNJiS.js","_app/immutable/chunks/CXmMC8jQ.js","_app/immutable/chunks/B5xf_oRu.js","_app/immutable/chunks/7Rd7Mpvn.js","_app/immutable/chunks/BnvTZMRs.js","_app/immutable/chunks/B8GwE7im.js","_app/immutable/chunks/Cn73aa_U.js","_app/immutable/chunks/4j8J6LnF.js","_app/immutable/chunks/Czq8_PJR.js","_app/immutable/chunks/DOBSvi06.js"];
+export const server_id = "src/routes/print/berita-acara/[exam_id]/+page.server.ts";
+export const imports = ["_app/immutable/nodes/51.Cn7zSwJ6.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/q3ZFHJDQ.js","_app/immutable/chunks/ClRrpZeN.js","_app/immutable/chunks/DbEAIv_x.js","_app/immutable/chunks/COlPN6dD.js","_app/immutable/chunks/i_5gAELL.js","_app/immutable/chunks/CcEXiels.js","_app/immutable/chunks/oZ_RSl7A.js","_app/immutable/chunks/Uo-sFA6w.js","_app/immutable/chunks/CcPznuOH.js","_app/immutable/chunks/DeQQCbRh.js","_app/immutable/chunks/4j8J6LnF.js"];
 export const stylesheets = [];
 export const fonts = [];
