@@ -57,11 +57,12 @@ function AudioPlayer($$renderer, $$props) {
 }
 function QuestionRenderer($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
-    let options, matchingLeft, matchingRight, directMediaUrl;
+    let safeType, matchingLeft, matchingRight, directMediaUrl;
     let question = $$props["question"];
     let answer = fallback($$props["answer"], "");
     let isDoubted = fallback($$props["isDoubted"], false);
     let displayNumber = fallback($$props["displayNumber"], void 0);
+    let options = [];
     let matchingAnswers = {};
     let complexAnswers = [];
     const optionLetters = ["A", "B", "C", "D", "E", "F", "G", "H"];
@@ -86,17 +87,29 @@ function QuestionRenderer($$renderer, $$props) {
       }
       return url;
     }
-    options = question.options_json ? JSON.parse(question.options_json) : [];
-    matchingLeft = question.type === "menjodohkan" && options?.left ? options.left : [];
-    matchingRight = question.type === "menjodohkan" && options?.right ? options.right : [];
-    if (question.type === "menjodohkan" && answer) {
+    {
+      if (question.options_json) {
+        try {
+          options = JSON.parse(question.options_json);
+        } catch (e) {
+          console.error("Invalid options_json for question", question.id, e);
+          options = [];
+        }
+      } else {
+        options = [];
+      }
+    }
+    safeType = (question.type || "").trim().toLowerCase();
+    matchingLeft = safeType === "menjodohkan" && options?.left ? options.left : [];
+    matchingRight = safeType === "menjodohkan" && options?.right ? options.right : [];
+    if (safeType === "menjodohkan" && answer) {
       try {
         matchingAnswers = JSON.parse(answer);
       } catch {
         matchingAnswers = {};
       }
     }
-    if (question.type === "pilihan_ganda_kompleks") {
+    if (safeType === "pilihan_ganda_kompleks") {
       if (answer) {
         try {
           const parsed = JSON.parse(answer);
@@ -127,15 +140,15 @@ function QuestionRenderer($$renderer, $$props) {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]--> <div class="text-base text-slate-800 leading-relaxed font-medium prose prose-sm max-w-none">${html(question.question_text)}</div> <div class="space-y-2">`);
-    if (question.type === "pilihan_ganda" || question.type === "pilihan_ganda_kompleks") {
+    if (safeType === "pilihan_ganda" || safeType === "pilihan_ganda_kompleks") {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<!--[-->`);
       const each_array = ensure_array_like(options);
       for (let i = 0, $$length = each_array.length; i < $$length; i++) {
         let option = each_array[i];
-        const isSelected = question.type === "pilihan_ganda_kompleks" ? complexAnswers.includes(optionLetters[i]) : answer === optionLetters[i];
+        const isSelected = safeType === "pilihan_ganda_kompleks" ? complexAnswers.includes(optionLetters[i]) : answer === optionLetters[i];
         $$renderer2.push(`<div role="button" tabindex="0"${attr_class(`w-full flex items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer ${isSelected ? "border-indigo-500 bg-indigo-50 shadow-md shadow-indigo-500/10" : "border-slate-200 hover:border-indigo-300 hover:bg-slate-50"}`)}>`);
-        if (question.type === "pilihan_ganda_kompleks") {
+        if (safeType === "pilihan_ganda_kompleks") {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<div${attr_class(`flex items-center justify-center w-6 h-6 rounded border-2 flex-shrink-0 transition-colors mr-1 ${isSelected ? "bg-indigo-500 border-indigo-500 text-white" : "border-slate-300 bg-white"}`)}>`);
           if (isSelected) {
@@ -151,7 +164,7 @@ function QuestionRenderer($$renderer, $$props) {
         $$renderer2.push(`<!--]--> <span${attr_class(`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0 transition-colors ${isSelected ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white" : "bg-slate-100 text-slate-500"}`)}>${escape_html(optionLetters[i])}</span> <div${attr_class(`option-content text-sm prose prose-sm max-w-none flex-1 ${isSelected ? "text-indigo-700 font-medium" : "text-slate-700"}`, "svelte-v7h8kb")}>${html(option.replace(/^(<br\s*\/?>\s*)+/i, ""))}</div></div>`);
       }
       $$renderer2.push(`<!--]-->`);
-    } else if (question.type === "benar_salah") {
+    } else if (safeType === "benar_salah") {
       $$renderer2.push("<!--[1-->");
       $$renderer2.push(`<div class="grid grid-cols-2 gap-3"><!--[-->`);
       const each_array_1 = ensure_array_like(["Benar", "Salah"]);
@@ -160,10 +173,10 @@ function QuestionRenderer($$renderer, $$props) {
         $$renderer2.push(`<button${attr_class(`p-4 rounded-xl border-2 text-center font-semibold transition-all duration-200 ${answer === opt ? "border-indigo-500 bg-indigo-50 text-indigo-700 shadow-md shadow-indigo-500/10" : "border-slate-200 text-slate-600 hover:border-indigo-300 hover:bg-slate-50"}`)}>${escape_html(opt)}</button>`);
       }
       $$renderer2.push(`<!--]--></div>`);
-    } else if (question.type === "isian_singkat") {
+    } else if (safeType === "isian_singkat") {
       $$renderer2.push("<!--[2-->");
       $$renderer2.push(`<input type="search"${attr("name", `jawaban_siswa_${stringify(question.id)}_${stringify(Date.now())}`)}${attr("id", `jawaban_siswa_${stringify(question.id)}`)} data-lpignore="true" data-form-type="other" class="input text-base appearance-none" placeholder="Ketik jawaban singkat di sini..."${attr("value", answer)} autocomplete="do-not-autofill" autocorrect="off" autocapitalize="off" spellcheck="false"/>`);
-    } else if (question.type === "essay") {
+    } else if (safeType === "essay") {
       $$renderer2.push("<!--[3-->");
       $$renderer2.push(`<textarea${attr("name", `jawaban_uraian_${stringify(question.id)}_${stringify(Date.now())}`)}${attr("id", `jawaban_uraian_${stringify(question.id)}`)} data-lpignore="true" data-form-type="other" class="input text-base min-h-[200px] resize-y appearance-none" placeholder="Tulis jawaban uraian di sini..." rows="8" autocomplete="do-not-autofill" autocorrect="off" autocapitalize="off" spellcheck="false">`);
       const $$body = escape_html(answer);
@@ -171,7 +184,7 @@ function QuestionRenderer($$renderer, $$props) {
         $$renderer2.push(`${$$body}`);
       }
       $$renderer2.push(`</textarea>`);
-    } else if (question.type === "menjodohkan") {
+    } else if (safeType === "menjodohkan") {
       $$renderer2.push("<!--[4-->");
       $$renderer2.push(`<div class="space-y-3"><!--[-->`);
       const each_array_2 = ensure_array_like(matchingLeft);

@@ -23,13 +23,27 @@
 
 	const dispatch = createEventDispatcher();
 
-	$: options = question.options_json ? JSON.parse(question.options_json) : [];
-	$: matchingLeft = question.type === 'menjodohkan' && options?.left ? options.left : [];
-	$: matchingRight = question.type === 'menjodohkan' && options?.right ? options.right : [];
+	let options: any = [];
+	$: {
+		if (question.options_json) {
+			try {
+				options = JSON.parse(question.options_json);
+			} catch (e) {
+				console.error("Invalid options_json for question", question.id, e);
+				options = [];
+			}
+		} else {
+			options = [];
+		}
+	}
+	
+	$: safeType = (question.type || '').trim().toLowerCase();
+	$: matchingLeft = safeType === 'menjodohkan' && options?.left ? options.left : [];
+	$: matchingRight = safeType === 'menjodohkan' && options?.right ? options.right : [];
 
 	// Untuk menjodohkan, answer disimpan sebagai JSON string mapping
 	let matchingAnswers: Record<string, string> = {};
-	$: if (question.type === 'menjodohkan' && answer) {
+	$: if (safeType === 'menjodohkan' && answer) {
 		try {
 			matchingAnswers = JSON.parse(answer);
 		} catch {
@@ -38,7 +52,7 @@
 	}
 
 	let complexAnswers: string[] = [];
-	$: if (question.type === 'pilihan_ganda_kompleks') {
+	$: if (safeType === 'pilihan_ganda_kompleks') {
 		if (answer) {
 			try {
 				const parsed = JSON.parse(answer);
@@ -156,10 +170,10 @@
 
 	<!-- Answer Area -->
 	<div class="space-y-2">
-		{#if question.type === 'pilihan_ganda' || question.type === 'pilihan_ganda_kompleks'}
+		{#if safeType === 'pilihan_ganda' || safeType === 'pilihan_ganda_kompleks'}
 			<!-- Multiple Choice -->
 			{#each options as option, i}
-				{@const isSelected = question.type === 'pilihan_ganda_kompleks' ? complexAnswers.includes(optionLetters[i]) : answer === optionLetters[i]}
+				{@const isSelected = safeType === 'pilihan_ganda_kompleks' ? complexAnswers.includes(optionLetters[i]) : answer === optionLetters[i]}
 				<div
 					role="button"
 					tabindex="0"
@@ -171,7 +185,7 @@
 						const target = e.target;
 						if (target.tagName === 'AUDIO' || target.closest('audio')) return;
 						if (target.tagName === 'IMG') return; // let the lightbox handle it
-						if (question.type === 'pilihan_ganda_kompleks') {
+						if (safeType === 'pilihan_ganda_kompleks') {
 							handleComplexAnswer(optionLetters[i]);
 						} else {
 							handleAnswer(optionLetters[i]);
@@ -179,7 +193,7 @@
 					}}
 					on:keydown={(e) => {
 						if (e.key === 'Enter') {
-							if (question.type === 'pilihan_ganda_kompleks') {
+							if (safeType === 'pilihan_ganda_kompleks') {
 								handleComplexAnswer(optionLetters[i]);
 							} else {
 								handleAnswer(optionLetters[i]);
@@ -187,7 +201,7 @@
 						}
 					}}
 				>
-					{#if question.type === 'pilihan_ganda_kompleks'}
+					{#if safeType === 'pilihan_ganda_kompleks'}
 						<div class="flex items-center justify-center w-6 h-6 rounded border-2 flex-shrink-0 transition-colors mr-1
 							{isSelected ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-slate-300 bg-white'}">
 							{#if isSelected}
@@ -209,7 +223,7 @@
 				</div>
 			{/each}
 
-		{:else if question.type === 'benar_salah'}
+		{:else if safeType === 'benar_salah'}
 			<!-- True / False -->
 			<div class="grid grid-cols-2 gap-3">
 				{#each ['Benar', 'Salah'] as opt}
@@ -225,7 +239,7 @@
 				{/each}
 			</div>
 
-		{:else if question.type === 'isian_singkat'}
+		{:else if safeType === 'isian_singkat'}
 			<!-- Short Answer -->
 			<input
 				type="search"
@@ -243,7 +257,7 @@
 				spellcheck="false"
 			/>
 
-		{:else if question.type === 'essay'}
+		{:else if safeType === 'essay'}
 			<!-- Essay -->
 			<textarea
 				name="jawaban_uraian_{question.id}_{Date.now()}"
@@ -261,7 +275,7 @@
 				spellcheck="false"
 			></textarea>
 
-		{:else if question.type === 'menjodohkan'}
+		{:else if safeType === 'menjodohkan'}
 			<!-- Matching -->
 			<div class="space-y-3">
 				{#each matchingLeft as leftItem, leftIdx}
