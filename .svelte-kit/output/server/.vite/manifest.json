@@ -514,7 +514,7 @@
       "_stores.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.K55p4WKL.css"
+      "_app/immutable/assets/_layout.yVv30BCq.css"
     ],
     "assets": [
       "_app/immutable/assets/KaTeX_AMS-Regular.BQhdFMY1.woff2",
@@ -779,6 +779,26 @@
       "_ConfirmForm.js",
       "_constants.js",
       "_toast.js"
+    ]
+  },
+  "src/routes/admin/exams/[id]/analisis/+page.server.ts": {
+    "file": "entries/pages/admin/exams/_id_/analisis/_page.server.ts.js",
+    "name": "entries/pages/admin/exams/_id_/analisis/_page.server.ts",
+    "src": "src/routes/admin/exams/[id]/analisis/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/admin/exams/[id]/analisis/+page.svelte": {
+    "file": "entries/pages/admin/exams/_id_/analisis/_page.svelte.js",
+    "name": "entries/pages/admin/exams/_id_/analisis/_page.svelte",
+    "src": "src/routes/admin/exams/[id]/analisis/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_constants.js",
+      "_html.js"
     ]
   },
   "src/routes/admin/exams/type/[typeId]/+page.server.ts": {

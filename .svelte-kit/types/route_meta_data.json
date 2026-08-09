@@ -45,6 +45,11 @@
 		"src/routes/admin/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/admin/exams/[id]/analisis": [
+		"src/routes/admin/exams/[id]/analisis/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/admin/media-bank": [
 		"src/routes/admin/media-bank/+page.server.ts",
 		"src/routes/admin/+layout.server.ts",

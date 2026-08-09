@@ -315,7 +315,10 @@
 	<div class="card overflow-hidden mb-6">
 		<div class="p-5 border-b border-slate-100 flex items-center justify-between">
 			<h2 class="text-lg font-bold text-slate-800">Daftar Soal</h2>
-			<a href="/admin/bank-soal/{exam.id}" class="btn-sm btn-outline">Kelola Soal</a>
+			<div class="flex items-center gap-3">
+				<a href="/admin/exams/{exam.id}/analisis" class="btn-sm btn-outline text-indigo-600 border-indigo-200 hover:bg-indigo-50">Analisis Butir Soal</a>
+				<a href="/admin/bank-soal/{exam.id}" class="btn-sm btn-primary">Kelola Soal</a>
+			</div>
 		</div>
 		{#if questions.length === 0}
 			<div class="p-8 text-center text-slate-400 text-sm">Belum ada soal untuk ujian ini.</div>
