@@ -383,6 +383,7 @@
 						</th>
 						<th class="p-4 font-semibold whitespace-nowrap">Siswa</th>
 						<th class="p-4 font-semibold whitespace-nowrap">No. Peserta</th>
+						<th class="p-4 font-semibold whitespace-nowrap">NISN</th>
 						<th class="p-4 font-semibold whitespace-nowrap">Kelas</th>
 						<th class="p-4 font-semibold whitespace-nowrap text-center">JK</th>
 						<th class="p-4 font-semibold whitespace-nowrap">Tempat, Tgl Lahir</th>
@@ -433,6 +434,9 @@
 							</td>
 							<td class="p-4 whitespace-nowrap">
 								<span class="text-slate-700">{user.nomor_peserta || '-'}</span>
+							</td>
+							<td class="p-4 whitespace-nowrap">
+								<span class="text-slate-700">{user.nisn || user.username}</span>
 							</td>
 							<td class="p-4 whitespace-nowrap">
 								{#if user.class_name}
