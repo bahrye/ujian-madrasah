@@ -56,18 +56,12 @@
 	>
 		Desain 2 (Kartu Login)
 	</button>
-	<button
-		class="ml-auto px-4 py-2 rounded-lg text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-all shadow-sm"
-		on:click={() => window.print()}
-	>
-		🖨️ Cetak
-	</button>
 </div>
 
-<div class="p-8">
+<div class="p-4 sm:p-8 overflow-x-auto w-full">
 	<!-- ===== DESIGN 1: DEFAULT ===== -->
 	{#if selectedDesign === 'default'}
-	<div class="grid grid-cols-2 gap-6">
+	<div class="grid grid-cols-2 gap-6 min-w-[700px] sm:min-w-[800px]">
 		{#each participants as p}
 			<div class="border-2 border-slate-800 p-0 rounded-lg overflow-hidden break-inside-avoid shadow-sm h-auto min-h-[11cm] flex flex-col">
 				<!-- Header Kop Sekolah -->
@@ -151,7 +145,7 @@
 
 	<!-- ===== DESIGN 2: KARTU LOGIN (ANBK STYLE) ===== -->
 	{#if selectedDesign === 'kartu-login'}
-	<div class="grid grid-cols-2 gap-5">
+	<div class="grid grid-cols-2 gap-5 min-w-[700px] sm:min-w-[800px]">
 		{#each participants as p}
 			<div class="border border-slate-700 break-inside-avoid bg-white" style="page-break-inside: avoid;">
 				<!-- Header -->
