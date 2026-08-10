@@ -11,10 +11,10 @@ function _page($$renderer, $$props) {
         $$renderer4.push(`<title>Cetak Kartu Peserta Ujian - ${escape_html(examType.name)}</title>`);
       });
     });
-    $$renderer2.push(`<div class="print:hidden p-4 bg-white border-b border-slate-200 flex items-center gap-4 sticky top-0 z-10 shadow-sm"><span class="text-sm font-medium text-slate-700">Pilih Desain:</span> <button${attr_class(`px-4 py-2 rounded-lg text-sm font-medium transition-all ${"bg-blue-600 text-white shadow-md"}`)}>Desain 1 (Default)</button> <button${attr_class(`px-4 py-2 rounded-lg text-sm font-medium transition-all ${"bg-slate-100 text-slate-600 hover:bg-slate-200"}`)}>Desain 2 (Kartu Login)</button></div> <div class="p-4 sm:p-8 overflow-x-auto w-full">`);
+    $$renderer2.push(`<div class="print:hidden p-4 bg-white border-b border-slate-200 flex items-center gap-4 sticky top-0 z-10 shadow-sm"><span class="text-sm font-medium text-slate-700">Pilih Desain:</span> <button${attr_class(`px-4 py-2 rounded-lg text-sm font-medium transition-all ${"bg-blue-600 text-white shadow-md"}`)}>Desain 1 (Default)</button> <button${attr_class(`px-4 py-2 rounded-lg text-sm font-medium transition-all ${"bg-slate-100 text-slate-600 hover:bg-slate-200"}`)}>Desain 2 (Kartu Login)</button></div> <div class="p-4 sm:p-8 overflow-x-auto print:overflow-visible w-full">`);
     {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="grid grid-cols-2 gap-6 min-w-[700px] sm:min-w-[800px]"><!--[-->`);
+      $$renderer2.push(`<div class="grid grid-cols-2 gap-6 min-w-[700px] sm:min-w-[800px] print:min-w-0 print:w-full"><!--[-->`);
       const each_array = ensure_array_like(participants);
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
         let p = each_array[$$index];
