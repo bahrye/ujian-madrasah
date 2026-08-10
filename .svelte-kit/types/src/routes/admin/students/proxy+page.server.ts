@@ -29,12 +29,18 @@ export const load = async ({ locals, url, platform }: Parameters<PageServerLoad>
 		params.push(classFilter);
 	}
 
-	query += ' ORDER BY c.name ASC, u.name ASC LIMIT 500';
+	query += ` ORDER BY CASE c.level
+		WHEN 'I' THEN 1 WHEN 'II' THEN 2 WHEN 'III' THEN 3 WHEN 'IV' THEN 4 WHEN 'V' THEN 5 WHEN 'VI' THEN 6 WHEN 'VII' THEN 7 WHEN 'VIII' THEN 8 WHEN 'IX' THEN 9 WHEN 'X' THEN 10 WHEN 'XI' THEN 11 WHEN 'XII' THEN 12
+		WHEN '1' THEN 1 WHEN '2' THEN 2 WHEN '3' THEN 3 WHEN '4' THEN 4 WHEN '5' THEN 5 WHEN '6' THEN 6 WHEN '7' THEN 7 WHEN '8' THEN 8 WHEN '9' THEN 9 WHEN '10' THEN 10 WHEN '11' THEN 11 WHEN '12' THEN 12
+		ELSE 99 END ASC, c.name ASC, u.name ASC LIMIT 500`;
 
 	try {
 		const [usersResult, classesResult, school] = await Promise.all([
 			db.prepare(query).bind(...params).all(),
-			db.prepare('SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC').bind(locals.user.school_id).all(),
+			db.prepare(`SELECT id, name FROM classes WHERE school_id = ? ORDER BY CASE level
+		WHEN 'I' THEN 1 WHEN 'II' THEN 2 WHEN 'III' THEN 3 WHEN 'IV' THEN 4 WHEN 'V' THEN 5 WHEN 'VI' THEN 6 WHEN 'VII' THEN 7 WHEN 'VIII' THEN 8 WHEN 'IX' THEN 9 WHEN 'X' THEN 10 WHEN 'XI' THEN 11 WHEN 'XII' THEN 12
+		WHEN '1' THEN 1 WHEN '2' THEN 2 WHEN '3' THEN 3 WHEN '4' THEN 4 WHEN '5' THEN 5 WHEN '6' THEN 6 WHEN '7' THEN 7 WHEN '8' THEN 8 WHEN '9' THEN 9 WHEN '10' THEN 10 WHEN '11' THEN 11 WHEN '12' THEN 12
+		ELSE 99 END ASC, name ASC`).bind(locals.user.school_id).all(),
 			db.prepare('SELECT name, logo_url FROM schools WHERE id = ?').bind(locals.user.school_id).first()
 		]);
 
