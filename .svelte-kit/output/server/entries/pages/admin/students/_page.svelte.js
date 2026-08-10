@@ -82,8 +82,9 @@ function _page($$renderer, $$props) {
     let showImportModal = false;
     let showLoginCardModal = false;
     let showBulkDeleteModal = false;
-    let showLoginModeModal = false;
-    let loginModeSelection = "nisn";
+    let showGenerateModal = false;
+    let generateFormat = "PAT-2026-VII-01-[nomor]";
+    let generateClass = "";
     let editingUser = null;
     let filterClass = "";
     let selectedIds = [];
@@ -125,7 +126,7 @@ function _page($$renderer, $$props) {
       isAdding = false;
       showImportModal = false;
       showBulkDeleteModal = false;
-      showLoginModeModal = false;
+      showGenerateModal = false;
       editingUser = null;
       selectedIds = [];
     }
@@ -145,10 +146,10 @@ function _page($$renderer, $$props) {
       } else {
         $$renderer3.push("<!--[-1-->");
       }
-      $$renderer3.push(`<!--]--> <button class="btn btn-secondary flex-1 sm:flex-none"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Mode Login</button> <button class="btn flex-1 sm:flex-none" style="background: linear-gradient(135deg,#f59e0b,#f97316); color:#fff; box-shadow: 0 4px 15px rgba(245,158,11,.3);"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"></path></svg> Kartu Login</button> <button class="btn btn-secondary flex-1 sm:flex-none"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg> Import Excel</button> <button class="btn btn-primary flex-1 sm:flex-none"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg> Tambah Siswa</button></div></div> `);
+      $$renderer3.push(`<!--]--> <button class="btn btn-secondary flex-1 sm:flex-none"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg> Generate No. Peserta</button> <button class="btn flex-1 sm:flex-none" style="background: linear-gradient(135deg,#f59e0b,#f97316); color:#fff; box-shadow: 0 4px 15px rgba(245,158,11,.3);"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"></path></svg> Kartu Login</button> <button class="btn btn-secondary flex-1 sm:flex-none"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg> Import Excel</button> <button class="btn btn-primary flex-1 sm:flex-none"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg> Tambah Siswa</button></div></div> `);
       if (isAdding) {
         $$renderer3.push("<!--[0-->");
-        $$renderer3.push(`<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"><div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 max-h-[90vh] overflow-y-auto w-full max-w-lg animate-bounce-in"><h2 class="text-xl font-bold text-slate-800 mb-4">Tambah Siswa Baru</h2> <form method="POST" action="?/add" class="space-y-4 max-w-lg"><div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label for="name" class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label> <input type="text" id="name" name="name" class="input" required="" placeholder="Nama Siswa"/></div> <div><label for="nisn" class="block text-sm font-medium text-slate-700 mb-1">NISN <span class="text-red-500">*</span></label> <input type="text" id="nisn" name="nisn" class="input" required="" placeholder="10 Digit NISN"/> <p class="text-xs text-slate-500 mt-1">NISN akan menjadi Password login.</p></div></div> <div><label for="nomor_peserta" class="block text-sm font-medium text-slate-700 mb-1">Nomor Peserta (Opsional)</label> <input type="text" id="nomor_peserta" name="nomor_peserta" class="input" placeholder="Opsional, wajib jika sekolah menggunakan mode Nomor Peserta"/></div> <div><label for="gender" class="block text-sm font-medium text-slate-700 mb-1">Jenis Kelamin</label> <select id="gender" name="gender" class="input">`);
+        $$renderer3.push(`<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"><div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 max-h-[90vh] overflow-y-auto w-full max-w-lg animate-bounce-in"><h2 class="text-xl font-bold text-slate-800 mb-4">Tambah Siswa Baru</h2> <form method="POST" action="?/add" class="space-y-4 max-w-lg"><div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label for="name" class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label> <input type="text" id="name" name="name" class="input" required="" placeholder="Nama Siswa"/></div> <div><label for="nisn" class="block text-sm font-medium text-slate-700 mb-1">NISN <span class="text-red-500">*</span></label> <input type="text" id="nisn" name="nisn" class="input" required="" placeholder="10 Digit NISN"/> <p class="text-xs text-slate-500 mt-1">NISN akan menjadi Password login.</p></div></div> <div><label for="nomor_peserta" class="block text-sm font-medium text-slate-700 mb-1">Nomor Peserta <span class="text-red-500">*</span></label> <input type="text" id="nomor_peserta" name="nomor_peserta" class="input" required="" placeholder="Contoh: PAT-2026-VII-01-001"/></div> <div><label for="gender" class="block text-sm font-medium text-slate-700 mb-1">Jenis Kelamin</label> <select id="gender" name="gender" class="input">`);
         $$renderer3.option({ value: "" }, ($$renderer4) => {
           $$renderer4.push(`Pilih Jenis Kelamin (Opsional)`);
         });
@@ -177,7 +178,7 @@ function _page($$renderer, $$props) {
       $$renderer3.push(`<!--]--> `);
       if (editingUser) {
         $$renderer3.push("<!--[0-->");
-        $$renderer3.push(`<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"><div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 max-h-[90vh] overflow-y-auto w-full max-w-lg animate-bounce-in"><h2 class="text-xl font-bold text-slate-800 mb-4">Edit Siswa</h2> <form method="POST" action="?/edit" class="space-y-4 max-w-lg"><input type="hidden" name="id"${attr("value", editingUser.id)}/> <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label for="e-name" class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label> <input type="text" id="e-name" name="name" class="input" required=""${attr("value", editingUser.name)}/></div> <div><label for="e-nisn" class="block text-sm font-medium text-slate-700 mb-1">NISN <span class="text-red-500">*</span></label> <input type="text" id="e-nisn" name="nisn" class="input" required=""${attr("value", editingUser.nisn || editingUser.username)}/> <p class="text-xs text-slate-500 mt-1">Mengubah NISN akan mereset Password.</p></div></div> <div><label for="e-nomor_peserta" class="block text-sm font-medium text-slate-700 mb-1">Nomor Peserta (Opsional)</label> <input type="text" id="e-nomor_peserta" name="nomor_peserta" class="input"${attr("value", editingUser.nomor_peserta || "")} placeholder="Opsional, wajib jika mode Nomor Peserta aktif"/></div> <div><label for="e-gender" class="block text-sm font-medium text-slate-700 mb-1">Jenis Kelamin</label> <select id="e-gender" name="gender" class="input">`);
+        $$renderer3.push(`<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"><div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 max-h-[90vh] overflow-y-auto w-full max-w-lg animate-bounce-in"><h2 class="text-xl font-bold text-slate-800 mb-4">Edit Siswa</h2> <form method="POST" action="?/edit" class="space-y-4 max-w-lg"><input type="hidden" name="id"${attr("value", editingUser.id)}/> <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label for="e-name" class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label> <input type="text" id="e-name" name="name" class="input" required=""${attr("value", editingUser.name)}/></div> <div><label for="e-nisn" class="block text-sm font-medium text-slate-700 mb-1">NISN <span class="text-red-500">*</span></label> <input type="text" id="e-nisn" name="nisn" class="input" required=""${attr("value", editingUser.nisn || editingUser.username)}/> <p class="text-xs text-slate-500 mt-1">Mengubah NISN akan mereset Password.</p></div></div> <div><label for="edit_nomor_peserta" class="block text-sm font-medium text-slate-700 mb-1">Nomor Peserta <span class="text-red-500">*</span></label> <input type="text" id="edit_nomor_peserta" name="nomor_peserta" class="input" required="" placeholder="Contoh: PAT-2026-VII-01-001"${attr("value", editingUser.nomor_peserta || "")}/></div> <div><label for="e-gender" class="block text-sm font-medium text-slate-700 mb-1">Jenis Kelamin</label> <select id="e-gender" name="gender" class="input">`);
         $$renderer3.option({ value: "", selected: !editingUser.gender }, ($$renderer4) => {
           $$renderer4.push(`Pilih Jenis Kelamin (Opsional)`);
         });
@@ -340,9 +341,33 @@ function _page($$renderer, $$props) {
         $$renderer3.push("<!--[-1-->");
       }
       $$renderer3.push(`<!--]--> `);
-      if (showLoginModeModal) {
+      if (showGenerateModal) {
         $$renderer3.push("<!--[0-->");
-        $$renderer3.push(`<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"><div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 max-h-[90vh] overflow-y-auto w-full max-w-md animate-bounce-in"><h2 class="text-xl font-bold text-slate-800 mb-2">Atur Mode Login Siswa</h2> <p class="text-sm text-slate-500 mb-6">Pilih format data yang akan digunakan siswa saat masuk ke ujian. Ini akan mengubah akun seluruh siswa di sekolah Anda.</p> <form method="POST" action="?/setLoginMode"><div class="space-y-4 mb-6"><label${attr_class(`flex items-start gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors ${"border-indigo-500 bg-indigo-50/50"}`)}><input type="radio" name="mode" value="nisn"${attr("checked", loginModeSelection === "nisn", true)} class="mt-1 w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-slate-300"/> <div><span class="block font-semibold text-slate-800">Gunakan NISN</span> <span class="block text-sm text-slate-500 mt-1">Username = NISN<br/>Password = NISN</span></div></label> <label${attr_class(`flex items-start gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors ${""}`)}><input type="radio" name="mode" value="nomor_peserta"${attr("checked", loginModeSelection === "nomor_peserta", true)} class="mt-1 w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-slate-300"/> <div><span class="block font-semibold text-slate-800">Gunakan Nomor Peserta</span> <span class="block text-sm text-slate-500 mt-1">Username = Nomor Peserta<br/>Password = NISN</span></div></label></div> <div class="flex space-x-3"><button type="button" class="btn btn-secondary flex-1">Batal</button> <button type="submit" class="btn btn-primary flex-1">Simpan Mode</button></div></form></div></div>`);
+        $$renderer3.push(`<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"><div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 max-h-[90vh] overflow-y-auto w-full max-w-md animate-bounce-in"><h2 class="text-xl font-bold text-slate-800 mb-2">Generate Nomor Peserta Ujian</h2> <p class="text-sm text-slate-500 mb-6">Nomor peserta akan di-generate berurutan otomatis (A-Z) untuk semua siswa di kelas yang dipilih.</p> <form method="POST" action="?/generate_peserta"><div class="space-y-4 mb-6"><div><label for="generateClass" class="block text-sm font-medium text-slate-700 mb-1">Pilih Kelas</label> `);
+        $$renderer3.select(
+          {
+            id: "generateClass",
+            name: "class_id",
+            class: "input",
+            value: generateClass,
+            required: true
+          },
+          ($$renderer4) => {
+            $$renderer4.option({ value: "" }, ($$renderer5) => {
+              $$renderer5.push(`-- Pilih Kelas --`);
+            });
+            $$renderer4.push(`<!--[-->`);
+            const each_array_4 = ensure_array_like(data.classes);
+            for (let $$index_4 = 0, $$length = each_array_4.length; $$index_4 < $$length; $$index_4++) {
+              let cls = each_array_4[$$index_4];
+              $$renderer4.option({ value: cls.id }, ($$renderer5) => {
+                $$renderer5.push(`${escape_html(cls.name)}`);
+              });
+            }
+            $$renderer4.push(`<!--]-->`);
+          }
+        );
+        $$renderer3.push(`</div> <div><label for="generateFormat" class="block text-sm font-medium text-slate-700 mb-1">Format Penomoran</label> <input type="text" id="generateFormat" name="format" class="input font-mono"${attr("value", generateFormat)} required="" placeholder="Misal: PAT-2026-VII-01-[nomor]"/> <p class="text-xs text-slate-500 mt-1">Gunakan <strong>[nomor]</strong> sebagai tempat angka urut otomatis (contoh: 001, 002, dst).</p></div></div> <div class="flex space-x-3"><button type="button" class="btn btn-secondary flex-1">Batal</button> <button type="submit" class="btn btn-primary flex-1">Generate Sekarang</button></div></form></div></div>`);
       } else {
         $$renderer3.push("<!--[-1-->");
       }

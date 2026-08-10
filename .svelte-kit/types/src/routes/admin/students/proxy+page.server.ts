@@ -62,36 +62,26 @@ export const actions = {
 		const data = await request.formData();
 		const name = data.get('name')?.toString().trim();
 		const nisn = data.get('nisn')?.toString().trim();
-		const nomor_peserta = data.get('nomor_peserta')?.toString().trim() || null;
+		const nomor_peserta = data.get('nomor_peserta')?.toString().trim();
 		const class_id = data.get('class_id')?.toString() || null;
 		const place_of_birth = data.get('place_of_birth')?.toString().trim() || null;
 		const date_of_birth = data.get('date_of_birth')?.toString() || null;
 		const gender = data.get('gender')?.toString() || null;
 
-		if (!name || !nisn) {
-			return fail(400, { error: 'Nama dan NISN wajib diisi' });
+		if (!name || !nisn || !nomor_peserta) {
+			return fail(400, { error: 'Nama, NISN, dan Nomor Peserta wajib diisi' });
 		}
 
 		try {
-			// Cek mode login
-			const sample = await db.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(locals.user.school_id).first();
-			const isNomorPesertaMode = (sample && sample.username === sample.nomor_peserta);
-			
-			if (isNomorPesertaMode && !nomor_peserta) {
-				return fail(400, { error: 'Mode login sekolah saat ini menggunakan Nomor Peserta. Nomor Peserta wajib diisi.' });
-			}
-
-			const username = (isNomorPesertaMode && nomor_peserta) ? nomor_peserta : nisn;
+			const username = nomor_peserta;
 
 			const existingNisn = await db.prepare('SELECT id FROM users WHERE nisn = ? OR username = ?').bind(nisn, username).first();
 			if (existingNisn) {
 				return fail(400, { error: 'NISN atau Username sudah terdaftar' });
 			}
-			if (nomor_peserta) {
-				const existingNo = await db.prepare('SELECT id FROM users WHERE nomor_peserta = ?').bind(nomor_peserta).first();
-				if (existingNo) {
-					return fail(400, { error: 'Nomor Peserta sudah terdaftar' });
-				}
+			const existingNo = await db.prepare('SELECT id FROM users WHERE nomor_peserta = ?').bind(nomor_peserta).first();
+			if (existingNo) {
+				return fail(400, { error: 'Nomor Peserta sudah terdaftar' });
 			}
 
 			const passwordHash = await hashPassword(nisn);
@@ -113,36 +103,27 @@ export const actions = {
 		const idStr = data.get('id')?.toString();
 		const name = data.get('name')?.toString().trim();
 		const nisn = data.get('nisn')?.toString().trim();
-		const nomor_peserta = data.get('nomor_peserta')?.toString().trim() || null;
+		const nomor_peserta = data.get('nomor_peserta')?.toString().trim();
 		const class_id = data.get('class_id')?.toString() || null;
 		const place_of_birth = data.get('place_of_birth')?.toString().trim() || null;
 		const date_of_birth = data.get('date_of_birth')?.toString() || null;
 		const gender = data.get('gender')?.toString() || null;
 		const parsedId = parseInt(idStr || '', 10);
 
-		if (isNaN(parsedId) || !name || !nisn) {
-			return fail(400, { error: 'ID, Nama dan NISN wajib diisi' });
+		if (isNaN(parsedId) || !name || !nisn || !nomor_peserta) {
+			return fail(400, { error: 'ID, Nama, NISN, dan Nomor Peserta wajib diisi' });
 		}
 
 		try {
-			const sample = await db.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(locals.user.school_id).first();
-			const isNomorPesertaMode = (sample && sample.username === sample.nomor_peserta);
-			
-			if (isNomorPesertaMode && !nomor_peserta) {
-				return fail(400, { error: 'Mode login sekolah saat ini menggunakan Nomor Peserta. Nomor Peserta wajib diisi.' });
-			}
-
-			const username = (isNomorPesertaMode && nomor_peserta) ? nomor_peserta : nisn;
+			const username = nomor_peserta;
 
 			const existing = await db.prepare('SELECT id FROM users WHERE (nisn = ? OR username = ?) AND id != ?').bind(nisn, username, parsedId).first();
 			if (existing) {
 				return fail(400, { error: 'NISN atau Username sudah digunakan siswa lain' });
 			}
-			if (nomor_peserta) {
-				const existingNo = await db.prepare('SELECT id FROM users WHERE nomor_peserta = ? AND id != ?').bind(nomor_peserta, parsedId).first();
-				if (existingNo) {
-					return fail(400, { error: 'Nomor Peserta sudah terdaftar' });
-				}
+			const existingNo = await db.prepare('SELECT id FROM users WHERE nomor_peserta = ? AND id != ?').bind(nomor_peserta, parsedId).first();
+			if (existingNo) {
+				return fail(400, { error: 'Nomor Peserta sudah terdaftar' });
 			}
 
 			const passwordHash = await hashPassword(nisn);
@@ -233,10 +214,7 @@ export const actions = {
 
 			const stmts = [];
 			let skippedCount = 0;
-			let modeError = false;
-
-			const sample = await db.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(locals.user.school_id).first();
-			const isNomorPesertaMode = (sample && sample.username === sample.nomor_peserta);
+			let errorMsg = '';
 
 			for (const student of students) {
 				const nisn = String(student.nisn || '').trim();
@@ -247,12 +225,12 @@ export const actions = {
 				
 				if (!nisn || !name) continue;
 				
-				if (isNomorPesertaMode && !nomor_peserta) {
-					modeError = true;
+				if (!nomor_peserta) {
+					errorMsg = 'Kolom NOMOR PESERTA wajib diisi di semua baris Excel.';
 					break;
 				}
 				
-				const username = (isNomorPesertaMode && nomor_peserta) ? nomor_peserta : nisn;
+				const username = nomor_peserta;
 
 				if (existingUsernames.has(username.toLowerCase())) {
 					skippedCount++;
@@ -267,8 +245,8 @@ export const actions = {
 				);
 			}
 			
-			if (modeError) {
-				return fail(400, { error: 'Mode login sekolah saat ini menggunakan Nomor Peserta. Kolom NOMOR PESERTA wajib diisi di semua baris Excel.' });
+			if (errorMsg) {
+				return fail(400, { error: errorMsg });
 			}
 
 			if (stmts.length > 0) {
@@ -368,37 +346,51 @@ export const actions = {
 			return fail(500, { error: e.message || 'Gagal merubah foto' });
 		}
 	},
-	setLoginMode: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+	generate_peserta: async ({ request, locals, platform }: import('./$types').RequestEvent) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const data = await request.formData();
-		const mode = data.get('mode')?.toString(); // 'nisn' or 'nomor_peserta'
-		
-		if (mode !== 'nisn' && mode !== 'nomor_peserta') {
-			return fail(400, { error: 'Mode tidak valid' });
+		const class_id = data.get('class_id')?.toString();
+		const format = data.get('format')?.toString();
+
+		if (!class_id || !format) {
+			return fail(400, { error: 'Kelas dan Format wajib diisi' });
 		}
-		
+		if (!format.includes('[nomor]')) {
+			return fail(400, { error: 'Format harus mengandung variabel [nomor]' });
+		}
+
 		try {
-			if (mode === 'nomor_peserta') {
-				// Validasi: pastikan semua siswa memiliki nomor peserta
-				const missing = await db.prepare("SELECT id FROM users WHERE school_id = ? AND role = 'siswa' AND (nomor_peserta IS NULL OR nomor_peserta = '') LIMIT 1").bind(locals.user.school_id).first();
-				if (missing) {
-					return fail(400, { error: 'Gagal merubah mode: Terdapat siswa yang belum memiliki Nomor Peserta. Lengkapi data Nomor Peserta untuk semua siswa terlebih dahulu.' });
-				}
+			const students = await db.prepare("SELECT id, name FROM users WHERE school_id = ? AND class_id = ? AND role = 'siswa' ORDER BY name ASC").bind(locals.user.school_id, class_id).all();
+			
+			if (!students.results || students.results.length === 0) {
+				return fail(400, { error: 'Tidak ada siswa di kelas tersebut' });
+			}
+
+			const stmts = [];
+			let count = 1;
+			for (const student of students.results) {
+				const paddedNomor = count.toString().padStart(3, '0');
+				const nomorPeserta = format.replace('[nomor]', paddedNomor);
 				
-				// Update semua siswa: username = nomor_peserta
-				await db.prepare("UPDATE users SET username = nomor_peserta, updated_at = datetime('now') WHERE school_id = ? AND role = 'siswa'")
-					.bind(locals.user.school_id).run();
-			} else {
-				// Update semua siswa: username = nisn
-				await db.prepare("UPDATE users SET username = nisn, updated_at = datetime('now') WHERE school_id = ? AND role = 'siswa'")
-					.bind(locals.user.school_id).run();
+				stmts.push(
+					db.prepare("UPDATE users SET nomor_peserta = ?, username = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?")
+						.bind(nomorPeserta, nomorPeserta, student.id, locals.user.school_id)
+				);
+				count++;
+			}
+
+			if (stmts.length > 0) {
+				const chunkSize = 50;
+				for (let i = 0; i < stmts.length; i += chunkSize) {
+					await db.batch(stmts.slice(i, i + chunkSize));
+				}
 			}
 			
-			return { success: true, message: 'Berhasil mengubah mode login siswa.' };
+			return { success: true, message: `Berhasil men-generate Nomor Peserta untuk ${stmts.length} siswa.` };
 		} catch (e: any) {
-			console.error('Set login mode error:', e);
-			return fail(500, { error: 'Terjadi kesalahan pada database (Mungkin ada Nomor Peserta/NISN duplikat)' });
+			console.error('Generate peserta error:', e);
+			return fail(500, { error: 'Terjadi kesalahan pada database saat generate nomor peserta' });
 		}
 	}
 };
