@@ -16,8 +16,9 @@
 	let showImportModal = false;
 	let showLoginCardModal = false;
 	let showBulkDeleteModal = false;
-	let showLoginModeModal = false;
-	let loginModeSelection = 'nisn';
+	let showGenerateModal = false;
+	let generateFormat = 'PAT-2026-VII-01-[nomor]';
+	let generateClass = '';
 	let editingUser: any = null;
 	let filterClass = '';
 	let selectedIds: number[] = [];
@@ -54,7 +55,7 @@
 		isAdding = false;
 		showImportModal = false;
 		showBulkDeleteModal = false;
-		showLoginModeModal = false;
+		showGenerateModal = false;
 		editingUser = null;
 		selectedIds = [];
 	}
@@ -185,12 +186,11 @@
 					Hapus Massal ({selectedIds.length})
 				</button>
 			{/if}
-			<button class="btn btn-secondary flex-1 sm:flex-none" on:click={() => (showLoginModeModal = true)}>
+			<button class="btn btn-secondary flex-1 sm:flex-none" on:click={() => (showGenerateModal = true)}>
 				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-					<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+					<path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
 				</svg>
-				Mode Login
+				Generate No. Peserta
 			</button>
 			<button class="btn flex-1 sm:flex-none" style="background: linear-gradient(135deg,#f59e0b,#f97316); color:#fff; box-shadow: 0 4px 15px rgba(245,158,11,.3);" on:click={() => (showLoginCardModal = true)}>
 				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -232,8 +232,8 @@
 					</div>
 				</div>
 				<div>
-					<label for="nomor_peserta" class="block text-sm font-medium text-slate-700 mb-1">Nomor Peserta (Opsional)</label>
-					<input type="text" id="nomor_peserta" name="nomor_peserta" class="input" placeholder="Opsional, wajib jika sekolah menggunakan mode Nomor Peserta" />
+					<label for="nomor_peserta" class="block text-sm font-medium text-slate-700 mb-1">Nomor Peserta <span class="text-red-500">*</span></label>
+					<input type="text" id="nomor_peserta" name="nomor_peserta" class="input" required placeholder="Contoh: PAT-2026-VII-01-001" />
 				</div>
 				<div>
 					<label for="gender" class="block text-sm font-medium text-slate-700 mb-1">Jenis Kelamin</label>
@@ -291,8 +291,8 @@
 					</div>
 				</div>
 				<div>
-					<label for="e-nomor_peserta" class="block text-sm font-medium text-slate-700 mb-1">Nomor Peserta (Opsional)</label>
-					<input type="text" id="e-nomor_peserta" name="nomor_peserta" class="input" value={editingUser.nomor_peserta || ''} placeholder="Opsional, wajib jika mode Nomor Peserta aktif" />
+					<label for="edit_nomor_peserta" class="block text-sm font-medium text-slate-700 mb-1">Nomor Peserta <span class="text-red-500">*</span></label>
+					<input type="text" id="edit_nomor_peserta" name="nomor_peserta" class="input" required placeholder="Contoh: PAT-2026-VII-01-001" value={editingUser.nomor_peserta || ''} />
 				</div>
 				<div>
 					<label for="e-gender" class="block text-sm font-medium text-slate-700 mb-1">Jenis Kelamin</label>
@@ -578,36 +578,36 @@
 	</div>
 {/if}
 
-{#if showLoginModeModal}
+{#if showGenerateModal}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => (showLoginModeModal = false)}>
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => (showGenerateModal = false)}>
 		<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 max-h-[90vh] overflow-y-auto w-full max-w-md animate-bounce-in" on:click|stopPropagation>
-			<h2 class="text-xl font-bold text-slate-800 mb-2">Atur Mode Login Siswa</h2>
-			<p class="text-sm text-slate-500 mb-6">Pilih format data yang akan digunakan siswa saat masuk ke ujian. Ini akan mengubah akun seluruh siswa di sekolah Anda.</p>
+			<h2 class="text-xl font-bold text-slate-800 mb-2">Generate Nomor Peserta Ujian</h2>
+			<p class="text-sm text-slate-500 mb-6">Nomor peserta akan di-generate berurutan otomatis (A-Z) untuk semua siswa di kelas yang dipilih.</p>
 			
-			<form method="POST" action="?/setLoginMode" use:enhance={() => { return async ({ update }) => { showLoginModeModal = false; await update(); }; }}>
+			<form method="POST" action="?/generate_peserta" use:enhance={() => { return async ({ update }) => { showGenerateModal = false; await update(); }; }}>
 				<div class="space-y-4 mb-6">
-					<label class="flex items-start gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors {loginModeSelection === 'nisn' ? 'border-indigo-500 bg-indigo-50/50' : ''}">
-						<input type="radio" name="mode" value="nisn" bind:group={loginModeSelection} class="mt-1 w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-slate-300" />
-						<div>
-							<span class="block font-semibold text-slate-800">Gunakan NISN</span>
-							<span class="block text-sm text-slate-500 mt-1">Username = NISN<br/>Password = NISN</span>
-						</div>
-					</label>
+					<div>
+						<label for="generateClass" class="block text-sm font-medium text-slate-700 mb-1">Pilih Kelas</label>
+						<select id="generateClass" name="class_id" class="input" bind:value={generateClass} required>
+							<option value="">-- Pilih Kelas --</option>
+							{#each data.classes as cls}
+								<option value={cls.id}>{cls.name}</option>
+							{/each}
+						</select>
+					</div>
 
-					<label class="flex items-start gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors {loginModeSelection === 'nomor_peserta' ? 'border-indigo-500 bg-indigo-50/50' : ''}">
-						<input type="radio" name="mode" value="nomor_peserta" bind:group={loginModeSelection} class="mt-1 w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-slate-300" />
-						<div>
-							<span class="block font-semibold text-slate-800">Gunakan Nomor Peserta</span>
-							<span class="block text-sm text-slate-500 mt-1">Username = Nomor Peserta<br/>Password = NISN</span>
-						</div>
-					</label>
+					<div>
+						<label for="generateFormat" class="block text-sm font-medium text-slate-700 mb-1">Format Penomoran</label>
+						<input type="text" id="generateFormat" name="format" class="input font-mono" bind:value={generateFormat} required placeholder="Misal: PAT-2026-VII-01-[nomor]" />
+						<p class="text-xs text-slate-500 mt-1">Gunakan <strong>[nomor]</strong> sebagai tempat angka urut otomatis (contoh: 001, 002, dst).</p>
+					</div>
 				</div>
 				
 				<div class="flex space-x-3">
-					<button type="button" class="btn btn-secondary flex-1" on:click={() => (showLoginModeModal = false)}>Batal</button>
-					<button type="submit" class="btn btn-primary flex-1">Simpan Mode</button>
+					<button type="button" class="btn btn-secondary flex-1" on:click={() => (showGenerateModal = false)}>Batal</button>
+					<button type="submit" class="btn btn-primary flex-1">Generate Sekarang</button>
 				</div>
 			</form>
 		</div>
