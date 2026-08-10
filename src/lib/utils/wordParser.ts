@@ -221,6 +221,12 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 				questionElements[0] = cloned;
 			}
 		}
+
+		// Remove { and } markers used to protect statements
+		questionElements = questionElements.filter(el => {
+			const text = el.textContent?.trim();
+			return text !== '{' && text !== '}';
+		});
 		
 		// Convert any orphaned LI elements in questionElements to DIV to prevent black bullet points
 		for (let i = 0; i < questionElements.length; i++) {
