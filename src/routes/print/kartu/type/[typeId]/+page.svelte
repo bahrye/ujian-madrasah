@@ -74,9 +74,13 @@
 					</div>
 					
 					<div class="mt-4 flex justify-between items-end">
-						<div class="w-[3cm] h-[4cm] border-2 border-slate-300 flex items-center justify-center bg-slate-50 text-slate-400 text-xs text-center p-2">
-							Pas Foto<br/>3 x 4
-						</div>
+						{#if p.photo}
+							<img src={p.photo} alt="Foto {p.student_name}" class="w-[3cm] h-[4cm] border-2 border-slate-300 object-cover bg-slate-50" />
+						{:else}
+							<div class="w-[3cm] h-[4cm] border-2 border-slate-300 flex items-center justify-center bg-slate-50 text-slate-400 text-xs text-center p-2">
+								Pas Foto<br/>3 x 4
+							</div>
+						{/if}
 						<div class="text-center">
 							<p class="text-xs mb-10">Panitia Ujian</p>
 							<p class="text-xs font-bold border-b border-slate-800 inline-block px-4">......................................</p>

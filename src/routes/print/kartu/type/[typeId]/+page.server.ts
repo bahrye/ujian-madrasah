@@ -20,7 +20,7 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 	// Get all active students for this school
 	// Including both username (which can be NISN or Nomor Peserta) and the explicit fields
 	const participants = await db.prepare(`
-		SELECT u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, c.name as class_name
+		SELECT u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, u.photo, c.name as class_name
 		FROM users u
 		LEFT JOIN classes c ON u.class_id = c.id
 		WHERE u.school_id = ? AND u.role = 'siswa' AND u.is_active = 1
