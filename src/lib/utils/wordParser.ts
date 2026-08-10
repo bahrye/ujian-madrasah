@@ -13,7 +13,18 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 	const doc = parser.parseFromString(html, 'text/html');
 	
 	// Step 1: Chunk elements by KUNCI
-	const elements = Array.from(doc.body.children);
+	let elements = Array.from(doc.body.children);
+	
+	// Ignore any preamble instructions if [MULAI SOAL] marker is found
+	let startIdx = 0;
+	for (let i = 0; i < elements.length; i++) {
+		if (/^\[MULAI SOAL\]/i.test(elements[i].textContent?.trim() || '')) {
+			startIdx = i + 1;
+			break;
+		}
+	}
+	elements = elements.slice(startIdx);
+	
 	const chunks: Element[][] = [];
 	let currentChunk: Element[] = [];
 	

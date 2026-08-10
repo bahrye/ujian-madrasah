@@ -257,6 +257,7 @@
 						<li><b>Benar Salah:</b> Opsi tidak perlu ditulis, cukup <code>KUNCI: Benar</code> atau <code>KUNCI: Salah</code></li>
 						<li><b>Isian Singkat:</b> Opsi tidak perlu ditulis, cukup <code>KUNCI: [jawaban Anda]</code></li>
 						<li><b>Esai:</b> Opsi tidak perlu ditulis, cukup <code>KUNCI: ESSAY</code></li>
+						<li><b>Pernyataan Bersusun:</b> Apit pernyataan bernomor dengan kurung kurawal <code>&#123;</code> dan <code>&#125;</code> di baris tersendiri agar formatnya tidak rusak (contoh lihat template).</li>
 						<li><b>Tips Kualitas Gambar:</b> Di Word: <b>File > Options > Advanced > Image Size and Quality</b> centang <b>"Do not compress images in file"</b>.</li>
 						<li><b>Rumus & Teks Arab:</b> Fitur <i>Equation</i> tidak didukung. Untuk rumus, gunakan LaTeX (contoh: <code>$$ x = \frac{1}{2} $$</code>) atau jadikan gambar. Untuk teks Arab, gunakan font Unicode biasa (Arial/Times New Roman), jangan gunakan <i>Equation</i>.</li>
 					</ul>
@@ -273,7 +274,17 @@
 						KUNCI: Jakarta<br>
 						<br>
 						3. Jelaskan proses terjadinya hujan!<br>
-						KUNCI: ESSAY
+						KUNCI: ESSAY<br>
+						<br>
+						4. Perhatikan pernyataan berikut!<br>
+						&#123;<br>
+						1. Pernyataan satu<br>
+						2. Pernyataan dua<br>
+						&#125;<br>
+						Pernyataan yang benar adalah...<br>
+						A. 1<br>
+						B. 2<br>
+						KUNCI: A
 					</div>
 
 					<a href="/template_soal_ujian.docx" download class="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700 bg-white px-3 py-1.5 rounded-lg border border-indigo-200 shadow-sm transition-all hover:shadow">
