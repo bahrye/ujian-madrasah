@@ -73,8 +73,16 @@
 					</div>
 					
 					<div class="mt-4 flex justify-between items-end">
-						<div class="w-[3cm] h-[4cm] border-2 border-slate-300 flex items-center justify-center bg-slate-50 text-slate-400 text-xs text-center p-2">
-							Pas Foto<br/>3 x 4
+						<div class="flex gap-3 items-end">
+							{#if p.photo}
+								<img src={p.photo} alt="Foto {p.student_name}" class="w-[2cm] h-[3cm] border-2 border-slate-300 object-cover bg-slate-50" />
+							{:else}
+								<div class="w-[2cm] h-[3cm] border-2 border-slate-300 flex items-center justify-center bg-slate-50 text-slate-400 text-[10px] text-center p-1">
+									Pas Foto<br/>2 x 3
+								</div>
+							{/if}
+							<!-- QR Code -->
+							<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://ujian-madrasah.pages.dev" alt="QR Code" class="w-[2cm] h-[2cm] border border-slate-300 object-cover bg-slate-50" title="Scan untuk akses" />
 						</div>
 						<div class="text-center">
 							<p class="text-xs mb-10">Panitia Ujian</p>
