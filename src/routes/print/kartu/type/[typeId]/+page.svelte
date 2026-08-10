@@ -63,7 +63,7 @@
 	{#if selectedDesign === 'default'}
 	<div class="grid grid-cols-2 gap-6 min-w-[750px] print:min-w-0 print:w-full">
 		{#each participants as p}
-			<div class="border-2 border-slate-800 p-0 rounded-lg overflow-hidden break-inside-avoid shadow-sm h-auto min-h-[11cm] flex flex-col">
+			<div class="border-2 border-slate-800 p-0 rounded-lg overflow-hidden break-inside-avoid shadow-sm h-auto flex flex-col">
 				<!-- Header Kop Sekolah -->
 				<div class="flex items-center gap-4 p-3 border-b-2 border-slate-800 bg-slate-100">
 					{#if school?.logo_url}
@@ -78,8 +78,8 @@
 							<p class="text-[10px] text-slate-700 leading-tight mt-1">{school.address}</p>
 						{/if}
 					</div>
-					<!-- Placeholder for balance -->
-					<div class="w-14 h-14"></div>
+					<!-- QR Code (berada di kanan atas) -->
+					<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://ujian-madrasah.pages.dev" alt="QR Code" class="w-14 h-14 object-contain mix-blend-multiply" title="Scan untuk akses" />
 				</div>
 
 				<!-- Body Kartu -->
@@ -103,7 +103,7 @@
 								<tr>
 									<td class="py-1 align-top font-medium text-slate-700">Nama</td>
 									<td class="py-1 align-top text-center">:</td>
-									<td class="py-1 align-top font-bold">{p.student_name}</td>
+									<td class="py-1 align-top font-bold"><div class="line-clamp-2 leading-tight pr-1">{p.student_name}</div></td>
 								</tr>
 								<tr>
 									<td class="py-1 align-top font-medium text-slate-700">Kelas / Ruang</td>
@@ -137,8 +137,6 @@
 									Pas Foto<br/>2 x 3
 								</div>
 							{/if}
-							<!-- QR Code -->
-							<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://ujian-madrasah.pages.dev" alt="QR Code" class="w-[2cm] h-[2cm] border border-slate-300 object-cover bg-slate-50" title="Scan untuk akses" />
 						</div>
 						<div class="text-center">
 							<p class="text-xs mb-10">Panitia Ujian</p>
