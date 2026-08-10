@@ -1805,7 +1805,7 @@
       "_index.js"
     ],
     "css": [
-      "_app/immutable/assets/_page.GgOn9hB9.css"
+      "_app/immutable/assets/_page.CEdj3m4r.css"
     ]
   },
   "src/routes/print/kartu/type/[typeId]/+page.server.ts": {
@@ -1826,7 +1826,7 @@
       "_index.js"
     ],
     "css": [
-      "_app/immutable/assets/_page.GgOn9hB9.css"
+      "_app/immutable/assets/_page.CEdj3m4r.css"
     ]
   },
   "src/routes/print/kehadiran/[exam_id]/+page.server.ts": {
