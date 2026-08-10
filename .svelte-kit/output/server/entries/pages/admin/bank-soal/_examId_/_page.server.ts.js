@@ -213,7 +213,7 @@ const actions = {
         });
         await db.batch(statements);
       }
-      return { success: "Soal berhasil dihapus." };
+      return { success: "Soal berhasil dihapus.", deletedIds: [parsedId] };
     } catch (e) {
       console.error(e);
       return fail(500, { error: e.message || "Gagal menghapus soal" });
@@ -322,7 +322,7 @@ const actions = {
         });
         await db.batch(statements);
       }
-      return { success: `${validIds.length} soal berhasil dihapus.` };
+      return { success: `${validIds.length} soal berhasil dihapus.`, deletedIds: validIds };
     } catch (e) {
       console.error("Error delete bulk:", e);
       return fail(500, { error: "Gagal menghapus soal secara massal." });

@@ -17,18 +17,29 @@ import { h as html } from "../../../../../chunks/html.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     var $$store_subs;
-    let questions, totalSelectedAnswers, exam;
+    let questions, totalSelectedAnswers, isAllSelected, exam;
     let data = $$props["data"];
     let form = $$props["form"];
     let showImportModal = false;
     let showImportWordModal = false;
+    let isBulkSelectMode = false;
     let selectedQuestionIds = /* @__PURE__ */ new Set();
     public_env.PUBLIC_CLOUDINARY_CLOUD_NAME || "dfhtjgwcz";
     public_env.PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ujian-madrasah";
-    questions = data.questions;
+    let deletedLocalIds = /* @__PURE__ */ new Set();
+    if (form?.success) {
+      toasts.success(form.success);
+      if (form.deletedIds) {
+        form.deletedIds.forEach((id) => deletedLocalIds.add(id));
+        deletedLocalIds = deletedLocalIds;
+        selectedQuestionIds.clear();
+        selectedQuestionIds = selectedQuestionIds;
+        isBulkSelectMode = false;
+      }
+    }
+    questions = data.questions.filter((q) => !deletedLocalIds.has(q.id));
     totalSelectedAnswers = questions.filter((q) => selectedQuestionIds.has(q.id)).reduce((sum, q) => sum + (q.answers_count || 0), 0);
-    questions.length > 0 && selectedQuestionIds.size === questions.length;
-    if (form?.success) toasts.success(form.success);
+    isAllSelected = questions.length > 0 && selectedQuestionIds.size === questions.length;
     if (form?.error) toasts.error(form.error);
     exam = data.exam;
     let $$settled = true;
@@ -42,7 +53,7 @@ function _page($$renderer, $$props) {
       $$renderer3.push(`<div class="space-y-6 animate-in"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div class="flex items-start sm:items-center gap-3"><a${attr("href", store_get($$store_subs ??= {}, "$page", page).url.searchParams.get("from") === "bank" ? "/admin/bank-soal" : `/admin/exams/${exam.id}`)} class="btn-ghost btn-sm mt-1 sm:mt-0"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.chevronLeft)}></path></svg></a> <div><h1 class="text-2xl font-bold text-slate-800 leading-tight">${escape_html(exam.title)}</h1> <p class="text-sm text-slate-500 mt-1">${escape_html(exam.subject || "Umum")} · ${escape_html(questions.length)} soal</p></div></div> <div class="grid grid-cols-2 sm:flex sm:items-center gap-2 pl-12 sm:pl-0"><button class="btn bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm"><svg class="w-4 h-4 mr-1 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg> Import Word</button> `);
       if (questions.length > 0) {
         $$renderer3.push("<!--[0-->");
-        $$renderer3.push(`<button${attr_class(`btn px-2 sm:px-4 justify-center ${"bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300"} transition-all shadow-sm`)}><svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg> <span class="text-[13px] sm:text-sm font-semibold">${escape_html("Pilih Massal")}</span></button>`);
+        $$renderer3.push(`<button${attr_class(`btn px-2 sm:px-4 justify-center ${isBulkSelectMode ? "bg-indigo-100 text-indigo-700 border-indigo-300" : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300"} transition-all shadow-sm`)}><svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg> <span class="text-[13px] sm:text-sm font-semibold">${escape_html(isBulkSelectMode ? "Batal Pilih" : "Pilih Massal")}</span></button>`);
       } else {
         $$renderer3.push("<!--[-1-->");
       }
@@ -71,7 +82,10 @@ function _page($$renderer, $$props) {
         $$renderer3.push("<!--[-1-->");
       }
       $$renderer3.push(`<!--]--> `);
-      {
+      if (isBulkSelectMode && questions.length > 0) {
+        $$renderer3.push("<!--[0-->");
+        $$renderer3.push(`<div class="flex justify-between items-center bg-slate-50 border border-slate-200 p-3 rounded-xl mb-4"><label class="flex items-center gap-2 cursor-pointer select-none"><input type="checkbox" class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"${attr("checked", isAllSelected, true)}/> <span class="font-medium text-slate-700">Pilih Semua (${escape_html(questions.length)} soal)</span></label> <span class="text-sm text-slate-500">${escape_html(selectedQuestionIds.size)} terpilih</span></div>`);
+      } else {
         $$renderer3.push("<!--[-1-->");
       }
       $$renderer3.push(`<!--]--> <div class="space-y-3">`);
@@ -81,7 +95,10 @@ function _page($$renderer, $$props) {
         for (let idx = 0, $$length = each_array_4.length; idx < $$length; idx++) {
           let q = each_array_4[idx];
           $$renderer3.push(`<div${attr_class(`card p-4 flex items-start gap-4 group ${selectedQuestionIds.has(q.id) ? "ring-2 ring-indigo-500 bg-indigo-50/20" : ""}`)}>`);
-          {
+          if (isBulkSelectMode) {
+            $$renderer3.push("<!--[0-->");
+            $$renderer3.push(`<div class="flex flex-col items-center justify-center pt-2"><input type="checkbox" class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"${attr("checked", selectedQuestionIds.has(q.id), true)}/></div>`);
+          } else {
             $$renderer3.push("<!--[-1-->");
           }
           $$renderer3.push(`<!--]--> <span class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-md shadow-indigo-500/20">${escape_html(q.question_number)}</span> <div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1"><span class="badge-primary text-[10px]">${escape_html(QUESTION_TYPE_LABELS[q.type] || q.type)}</span> <span class="text-xs text-slate-400">${escape_html(q.points)} poin</span> `);

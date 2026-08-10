@@ -507,10 +507,20 @@
 		}
 	}
 
-	$: if (form?.success) toasts.success(form.success);
+	let deletedLocalIds = new Set<number>();
+	$: if (form?.success) {
+		toasts.success(form.success);
+		if (form.deletedIds) {
+			form.deletedIds.forEach((id: number) => deletedLocalIds.add(id));
+			deletedLocalIds = deletedLocalIds;
+			selectedQuestionIds.clear();
+			selectedQuestionIds = selectedQuestionIds;
+			isBulkSelectMode = false;
+		}
+	}
 	$: if (form?.error) toasts.error(form.error);
 	$: exam = data.exam as any;
-	$: questions = data.questions as any[];
+	$: questions = (data.questions as any[]).filter(q => !deletedLocalIds.has(q.id));
 </script>
 
 <svelte:head><title>Soal - {exam.title} — Ujian Online Madrasah</title></svelte:head>
