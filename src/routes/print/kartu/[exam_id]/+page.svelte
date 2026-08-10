@@ -55,9 +55,9 @@
 									<td class="py-1 font-bold">{p.class_name || '-'} / ..........</td>
 								</tr>
 								<tr>
-									<td class="py-1 font-medium text-slate-700">Tempat, Tgl Lahir</td>
+									<td class="py-1 font-medium text-slate-700">TTL</td>
 									<td class="py-1 text-center">:</td>
-									<td class="py-1 font-bold">{p.place_of_birth || '-'}, {p.date_of_birth ? new Date(p.date_of_birth).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) : '-'}</td>
+									<td class="py-1 font-bold">{p.place_of_birth || '-'}, {p.date_of_birth ? new Date(p.date_of_birth).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) : '-'}</td>
 								</tr>
 								<tr>
 									<td class="py-1 font-medium text-slate-700">Link Akses</td>
