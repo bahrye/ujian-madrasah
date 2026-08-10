@@ -20,13 +20,17 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 
 	// Get participants grouped by class (actually just ordered by class)
 	const participants = await db.prepare(`
-		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username as nisn, c.name as class_name
+		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, c.name as class_name
 		FROM exam_participants p
 		JOIN users u ON p.student_id = u.id
 		LEFT JOIN classes c ON u.class_id = c.id
 		WHERE p.exam_id = ?
 		ORDER BY c.name, u.name
 	`).bind(examId).all();
+
+	// Check login mode
+	const sample = await db.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(locals.user!.school_id).first();
+	const isNomorPesertaMode = (sample && sample.username === sample.nomor_peserta);
 
 	// Group participants by class
 	const results = participants.results as any[];
@@ -42,6 +46,7 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 	return { 
 		school,
 		exam, 
-		participantsByClass
+		participantsByClass,
+		isNomorPesertaMode
 	};
 };

@@ -2,11 +2,12 @@ import { h as head, i as ensure_array_like, j as attr_class, l as clsx, k as att
 import { p as parseDate } from "../../../../../chunks/date.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
-    let school, exam, participantsByClass;
+    let school, exam, participantsByClass, isNomorPesertaMode;
     let data = $$props["data"];
     school = data.school;
     exam = data.exam;
     participantsByClass = data.participantsByClass;
+    isNomorPesertaMode = data.isNomorPesertaMode;
     head("5lujtk", $$renderer2, ($$renderer3) => {
       $$renderer3.title(($$renderer4) => {
         $$renderer4.push(`<title>Daftar Hadir Ujian - ${escape_html(exam.title)}</title>`);
@@ -35,11 +36,11 @@ function _page($$renderer, $$props) {
         year: "numeric",
         month: "long",
         day: "numeric"
-      }) : "......................")}</td></tr><tr><td class="py-1 font-medium">Waktu</td><td>:</td><td>${escape_html(exam.start_time ? parseDate(exam.start_time).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "....")} - ${escape_html(exam.end_time ? parseDate(exam.end_time).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "....")}</td></tr></tbody></table></div> <table class="w-full border-collapse border border-black mb-8 text-sm"><thead><tr><th class="border border-black p-2 w-12 text-center">No</th><th class="border border-black p-2 w-32">No. Peserta</th><th class="border border-black p-2 text-left">Nama Peserta</th><th class="border border-black p-2 w-48 text-center" colspan="2">Tanda Tangan</th><th class="border border-black p-2 w-24 text-center">Ket.</th></tr></thead><tbody><!--[-->`);
+      }) : "......................")}</td></tr><tr><td class="py-1 font-medium">Waktu</td><td>:</td><td>${escape_html(exam.start_time ? parseDate(exam.start_time).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "....")} - ${escape_html(exam.end_time ? parseDate(exam.end_time).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "....")}</td></tr></tbody></table></div> <table class="w-full border-collapse border border-black mb-8 text-sm"><thead><tr><th class="border border-black p-2 w-12 text-center">No</th><th class="border border-black p-2 w-32">${escape_html(isNomorPesertaMode ? "No. Peserta" : "NISN")}</th><th class="border border-black p-2 text-left">Nama Peserta</th><th class="border border-black p-2 w-48 text-center" colspan="2">Tanda Tangan</th><th class="border border-black p-2 w-24 text-center">Ket.</th></tr></thead><tbody><!--[-->`);
       const each_array_1 = ensure_array_like(students);
       for (let i = 0, $$length2 = each_array_1.length; i < $$length2; i++) {
         let p = each_array_1[i];
-        $$renderer2.push(`<tr><td class="border border-black p-2 text-center">${escape_html(i + 1)}</td><td class="border border-black p-2 text-center font-mono">${escape_html(p.nisn)}</td><td class="border border-black p-2">${escape_html(p.student_name)}</td><td class="border-b border-black p-2 w-24 align-top h-12">`);
+        $$renderer2.push(`<tr><td class="border border-black p-2 text-center">${escape_html(i + 1)}</td><td class="border border-black p-2 text-center font-mono">${escape_html(isNomorPesertaMode ? p.nomor_peserta || "-" : p.nisn || p.username)}</td><td class="border border-black p-2">${escape_html(p.student_name)}</td><td class="border-b border-black p-2 w-24 align-top h-12">`);
         if ((i + 1) % 2 !== 0) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<span class="text-xs text-slate-500">${escape_html(i + 1)}.</span>`);

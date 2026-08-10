@@ -11,9 +11,13 @@ const GET = async ({ params, platform, locals }) => {
   if (isNaN(examId)) throw error(400, "Invalid Exam ID");
   const exam = await db.prepare("SELECT e.*, s.name as subject_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id WHERE e.id = ? AND e.school_id = ?").bind(examId, locals.user.school_id).first();
   if (!exam) throw error(404, "Ujian tidak ditemukan");
+  const sample = await db.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(locals.user.school_id).first();
+  const isNomorPesertaMode = sample && sample.username === sample.nomor_peserta;
   const results = await db.prepare(`
 		SELECT 
-			u.username as nisn,
+			u.username,
+			u.nisn,
+			u.nomor_peserta,
 			u.name as student_name, 
 			c.name as class_name,
 			sa.status,
@@ -38,7 +42,7 @@ const GET = async ({ params, platform, locals }) => {
     const endTimeStr = row.end_time ? parseDate(row.end_time).toLocaleString("id-ID") : "-";
     return {
       "No": index + 1,
-      "NISN/Username": row.nisn,
+      [isNomorPesertaMode ? "Nomor Peserta" : "NISN"]: isNomorPesertaMode ? row.nomor_peserta || "-" : row.nisn || row.username,
       "Nama Siswa": row.student_name,
       "Kelas": row.class_name || "-",
       "Status Ujian": statusLabel,

@@ -20,10 +20,16 @@ export const GET: RequestHandler = async ({ params, platform, locals }) => {
 	
 	if (!exam) throw error(404, 'Ujian tidak ditemukan');
 
+	// Check login mode
+	const sample = await db.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(locals.user.school_id).first() as any;
+	const isNomorPesertaMode = (sample && sample.username === sample.nomor_peserta);
+
 	// Get all participants and their attempt status/score
 	const results = await db.prepare(`
 		SELECT 
-			u.username as nisn,
+			u.username,
+			u.nisn,
+			u.nomor_peserta,
 			u.name as student_name, 
 			c.name as class_name,
 			sa.status,
@@ -52,7 +58,7 @@ export const GET: RequestHandler = async ({ params, platform, locals }) => {
 
 		return {
 			'No': index + 1,
-			'NISN/Username': row.nisn,
+			[isNomorPesertaMode ? 'Nomor Peserta' : 'NISN']: isNomorPesertaMode ? (row.nomor_peserta || '-') : (row.nisn || row.username),
 			'Nama Siswa': row.student_name,
 			'Kelas': row.class_name || '-',
 			'Status Ujian': statusLabel,

@@ -4,6 +4,7 @@
 	$: school = data.school as any;
 	$: exam = data.exam as any;
 	$: participantsByClass = data.participantsByClass as Record<string, any[]>;
+	$: isNomorPesertaMode = data.isNomorPesertaMode;
 </script>
 
 <svelte:head>
@@ -50,7 +51,7 @@
 				<thead>
 					<tr>
 						<th class="border border-black p-2 w-12 text-center">No</th>
-						<th class="border border-black p-2 w-32">No. Peserta</th>
+						<th class="border border-black p-2 w-32">{isNomorPesertaMode ? 'No. Peserta' : 'NISN'}</th>
 						<th class="border border-black p-2 text-left">Nama Peserta</th>
 						<th class="border border-black p-2 w-48 text-center" colspan="2">Tanda Tangan</th>
 						<th class="border border-black p-2 w-24 text-center">Ket.</th>
@@ -60,7 +61,7 @@
 					{#each students as p, i}
 						<tr>
 							<td class="border border-black p-2 text-center">{i + 1}</td>
-							<td class="border border-black p-2 text-center font-mono">{p.nisn}</td>
+							<td class="border border-black p-2 text-center font-mono">{isNomorPesertaMode ? (p.nomor_peserta || '-') : (p.nisn || p.username)}</td>
 							<td class="border border-black p-2">{p.student_name}</td>
 							<td class="border-b border-black p-2 w-24 align-top h-12">
 								{#if (i + 1) % 2 !== 0}

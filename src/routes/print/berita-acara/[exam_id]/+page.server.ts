@@ -20,9 +20,14 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 	// Get participants count
 	const participantCount = await db.prepare('SELECT COUNT(*) as count FROM exam_participants WHERE exam_id = ?').bind(examId).first();
 
+	// Check login mode
+	const sample = await db.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(locals.user!.school_id).first();
+	const isNomorPesertaMode = (sample && sample.username === sample.nomor_peserta);
+
 	return { 
 		school,
 		exam, 
-		totalParticipants: participantCount?.count || 0
+		totalParticipants: participantCount?.count || 0,
+		isNomorPesertaMode
 	};
 };

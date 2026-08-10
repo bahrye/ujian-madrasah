@@ -4,6 +4,7 @@
 	$: school = data.school as any;
 	$: exam = data.exam as any;
 	$: totalParticipants = data.totalParticipants as number;
+	$: isNomorPesertaMode = data.isNomorPesertaMode;
 </script>
 
 <svelte:head>
@@ -77,7 +78,7 @@
 				</tr>
 				<tr>
 					<td class="py-2 align-top">7.</td>
-					<td class="py-2 align-top">Nomor Peserta Tidak Hadir</td>
+					<td class="py-2 align-top">{isNomorPesertaMode ? 'Nomor Peserta Tidak Hadir' : 'NISN Tidak Hadir'}</td>
 					<td class="py-2 align-top">:</td>
 					<td class="py-2 align-top text-slate-400 italic">.......................................................................................<br/><br/>.......................................................................................</td>
 				</tr>
