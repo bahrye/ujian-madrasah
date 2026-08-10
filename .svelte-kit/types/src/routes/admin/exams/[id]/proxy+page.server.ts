@@ -29,8 +29,8 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 		ORDER BY c.name, u.name
 	`).bind(examId).all();
 
-	let classes = [];
-	let allStudents = [];
+	let classes: any[] = [];
+	let allStudents: any[] = [];
 	if (exam.exam_type_id) {
 		const classesQuery = await db.prepare(`
 			SELECT c.id, c.name FROM classes c
