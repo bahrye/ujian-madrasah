@@ -96,9 +96,12 @@ export const actions: Actions = {
 			// Auto-populate peserta dari exam_type_participants
 			const newExamId = result.meta?.last_row_id;
 			if (newExamId) {
-				const typeParticipants = await db.prepare(
-					'SELECT student_id FROM exam_type_participants WHERE exam_type_id = ?'
-				).bind(parsedTypeId).all<{ student_id: number }>();
+				const typeParticipants = await db.prepare(`
+					SELECT u.id as student_id 
+					FROM users u 
+					JOIN exam_type_classes etc ON etc.class_id = u.class_id 
+					WHERE etc.exam_type_id = ? AND u.role = 'siswa' AND u.is_active = 1
+				`).bind(parsedTypeId).all<{ student_id: number }>();
 
 				if (typeParticipants.results.length > 0) {
 					const insertBatch = typeParticipants.results.map(p =>

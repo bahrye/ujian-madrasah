@@ -28,8 +28,25 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 		ORDER BY c.name, u.name
 	`).bind(examId).all();
 
-	const classes = await db.prepare('SELECT id, name FROM classes WHERE school_id = ? ORDER BY name').bind(locals.user!.school_id).all();
-	const allStudents = await db.prepare('SELECT id, name, username, class_id FROM users WHERE school_id = ? AND role = "siswa" ORDER BY name').bind(locals.user!.school_id).all();
+	let classes = [];
+	let allStudents = [];
+	if (exam.exam_type_id) {
+		const classesQuery = await db.prepare(`
+			SELECT c.id, c.name FROM classes c
+			JOIN exam_type_classes etc ON etc.class_id = c.id
+			WHERE etc.exam_type_id = ? AND c.school_id = ?
+			ORDER BY c.name
+		`).bind(exam.exam_type_id, locals.user!.school_id).all();
+		classes = classesQuery.results;
+
+		const studentsQuery = await db.prepare(`
+			SELECT u.id, u.name, u.username, u.class_id FROM users u
+			JOIN exam_type_classes etc ON etc.class_id = u.class_id
+			WHERE etc.exam_type_id = ? AND u.school_id = ? AND u.role = 'siswa' AND u.is_active = 1
+			ORDER BY u.name
+		`).bind(exam.exam_type_id, locals.user!.school_id).all();
+		allStudents = studentsQuery.results;
+	}
 	
 	const allTeachers = await db.prepare('SELECT id, name, username FROM users WHERE school_id = ? AND role = "guru" ORDER BY name').bind(locals.user!.school_id).all();
 	const examTeachers = await db.prepare(`
@@ -55,8 +72,8 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 		attempts: attempts.results, 
 		tokens: tokens.results,
 		participants: participants.results,
-		classes: classes.results,
-		allStudents: allStudents.results,
+		classes,
+		allStudents,
 		allTeachers: allTeachers.results,
 		examTeachers: examTeachers.results,
 		allProctors: allProctors.results,
@@ -76,11 +93,16 @@ export const actions: Actions = {
 		if (isNaN(parsedClassId) || isNaN(parsedExamId)) return fail(400, { error: 'Data tidak valid' });
 
 		// Verifikasi kepemilikan ujian dan kelas
-		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(parsedExamId, locals.user.school_id).first();
+		const exam = await db.prepare('SELECT id, exam_type_id FROM exams WHERE id = ? AND school_id = ?').bind(parsedExamId, locals.user.school_id).first();
 		if (!exam) return fail(403, { error: 'Ujian tidak ditemukan atau bukan milik sekolah Anda.' });
 
 		const validClass = await db.prepare('SELECT id FROM classes WHERE id = ? AND school_id = ?').bind(parsedClassId, locals.user.school_id).first();
 		if (!validClass) return fail(403, { error: 'Kelas tidak ditemukan.' });
+
+		if (exam.exam_type_id) {
+			const isAllowed = await db.prepare('SELECT 1 FROM exam_type_classes WHERE exam_type_id = ? AND class_id = ?').bind(exam.exam_type_id, parsedClassId).first();
+			if (!isAllowed) return fail(403, { error: 'Kelas ini tidak termasuk dalam kelas yang diizinkan untuk tipe ujian ini.' });
+		}
 
 		const students = await db.prepare('SELECT id FROM users WHERE class_id = ? AND school_id = ? AND role = "siswa"')
 			.bind(parsedClassId, locals.user.school_id).all<{ id: number }>();
@@ -108,11 +130,16 @@ export const actions: Actions = {
 
 		if (parsedStudentIds.length === 0 || isNaN(parsedExamId)) return fail(400, { error: 'Data tidak valid' });
 
-		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(parsedExamId, locals.user.school_id).first();
+		const exam = await db.prepare('SELECT id, exam_type_id FROM exams WHERE id = ? AND school_id = ?').bind(parsedExamId, locals.user.school_id).first();
 		if (!exam) return fail(403, { error: 'Ujian tidak ditemukan atau bukan milik sekolah Anda.' });
 
+		let classFilterSql = '';
+		if (exam.exam_type_id) {
+			classFilterSql = ` AND class_id IN (SELECT class_id FROM exam_type_classes WHERE exam_type_id = ${exam.exam_type_id})`;
+		}
+
 		const placeholders = parsedStudentIds.map(() => '?').join(',');
-		const validStudents = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "siswa"`)
+		const validStudents = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "siswa" ${classFilterSql}`)
 			.bind(...parsedStudentIds, locals.user.school_id).all<{ id: number }>();
 
 		if (validStudents.results.length === 0) {
