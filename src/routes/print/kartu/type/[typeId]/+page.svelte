@@ -230,3 +230,18 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	@page {
+		size: A4;
+		margin: 5mm;
+	}
+	@media print {
+		:global(body) {
+			margin: 0 !important;
+			padding: 0 !important;
+			-webkit-print-color-adjust: exact !important;
+			print-color-adjust: exact !important;
+		}
+	}
+</style>
