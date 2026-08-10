@@ -13,9 +13,9 @@ const load = async ({ platform, params, locals, url }) => {
   let query = `
 		SELECT u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name
 		FROM users u
-		LEFT JOIN classes c ON u.class_id = c.id
-		INNER JOIN exam_type_participants etp ON etp.student_id = u.id
-		WHERE u.school_id = ? AND u.role = 'siswa' AND u.is_active = 1 AND etp.exam_type_id = ?
+		JOIN classes c ON u.class_id = c.id
+		JOIN exam_type_classes etc ON etc.class_id = u.class_id
+		WHERE u.school_id = ? AND u.role = 'siswa' AND u.is_active = 1 AND etc.exam_type_id = ?
 	`;
   let paramsArr = [locals.user.school_id, typeId];
   if (!isNaN(classId)) {

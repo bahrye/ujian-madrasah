@@ -171,7 +171,6 @@ export const actions = {
 				db.prepare('DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)').bind(parsedId),
 				db.prepare('DELETE FROM student_attempts WHERE student_id = ?').bind(parsedId),
 				db.prepare('DELETE FROM exam_participants WHERE student_id = ?').bind(parsedId),
-				db.prepare('DELETE FROM exam_type_participants WHERE student_id = ?').bind(parsedId),
 				db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(parsedId, locals.user.school_id)
 			]);
 			return { success: true, message: 'Berhasil menghapus data siswa.' };
@@ -200,7 +199,6 @@ export const actions = {
 					db.prepare('DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)').bind(id),
 					db.prepare('DELETE FROM student_attempts WHERE student_id = ?').bind(id),
 					db.prepare('DELETE FROM exam_participants WHERE student_id = ?').bind(id),
-					db.prepare('DELETE FROM exam_type_participants WHERE student_id = ?').bind(id),
 					db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(id, locals.user.school_id)
 				);
 			}
