@@ -181,11 +181,30 @@ export const actions: Actions = {
 
 		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid.' });
 
-		// Pastikan record terhubung ke exam_type milik sekolah ini
-		await db.prepare(`
-			DELETE FROM exam_type_classes 
+		// Dapatkan detail data kelas dan tipe ujian
+		const etc = await db.prepare(`
+			SELECT class_id, exam_type_id 
+			FROM exam_type_classes 
 			WHERE id = ? AND exam_type_id IN (SELECT id FROM exam_types WHERE school_id = ?)
-		`).bind(parsedId, locals.user!.school_id).run();
+		`).bind(parsedId, locals.user!.school_id).first<{ class_id: number; exam_type_id: number }>();
+
+		if (!etc) return fail(404, { error: 'Data kelas tidak ditemukan.' });
+
+		// Cek apakah ada siswa dari kelas ini yang terdaftar di ujian dengan tipe ini
+		const conflict = await db.prepare(`
+			SELECT 1
+			FROM exam_participants ep
+			JOIN exams e ON ep.exam_id = e.id
+			JOIN users u ON ep.student_id = u.id
+			WHERE e.exam_type_id = ? AND u.class_id = ?
+			LIMIT 1
+		`).bind(etc.exam_type_id, etc.class_id).first();
+
+		if (conflict) {
+			return fail(400, { error: 'Tidak dapat menghapus kelas. Terdapat siswa dari kelas ini yang telah terdaftar pada ujian.' });
+		}
+
+		await db.prepare('DELETE FROM exam_type_classes WHERE id = ?').bind(parsedId).run();
 
 		return { success: 'Kelas berhasil dihapus dari daftar peserta.' };
 	},
@@ -201,6 +220,21 @@ export const actions: Actions = {
 		const examType = await db.prepare('SELECT id FROM exam_types WHERE id = ? AND school_id = ?')
 			.bind(parsedExamTypeId, locals.user!.school_id).first();
 		if (!examType) return fail(404, { error: 'Tipe ujian tidak ditemukan.' });
+
+		// Cek apakah ada siswa dari kelas mana pun di tipe ini yang terdaftar di ujian
+		const conflict = await db.prepare(`
+			SELECT 1
+			FROM exam_participants ep
+			JOIN exams e ON ep.exam_id = e.id
+			JOIN users u ON ep.student_id = u.id
+			JOIN exam_type_classes etc ON etc.exam_type_id = e.exam_type_id AND etc.class_id = u.class_id
+			WHERE etc.exam_type_id = ?
+			LIMIT 1
+		`).bind(parsedExamTypeId).first();
+
+		if (conflict) {
+			return fail(400, { error: 'Tidak dapat menghapus semua kelas. Beberapa kelas masih memiliki siswa yang terdaftar pada ujian.' });
+		}
 
 		await db.prepare('DELETE FROM exam_type_classes WHERE exam_type_id = ?').bind(parsedExamTypeId).run();
 		return { success: 'Semua kelas berhasil dihapus dari tipe ujian ini.' };
