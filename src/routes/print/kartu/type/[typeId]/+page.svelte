@@ -234,7 +234,7 @@
 <style>
 	@page {
 		size: A4;
-		margin: 5mm;
+		margin: 0;
 	}
 	@media print {
 		:global(body) {
