@@ -77,7 +77,7 @@ const actions = {
       await db.prepare("DELETE FROM uploaded_media WHERE url = ? AND school_id = ?").bind(mediaUrl, schoolId).run();
     }
     await db.prepare("UPDATE questions SET media_url = NULL, media_type = NULL WHERE media_url = ?").bind(mediaUrl).run();
-    return { success: "Media berhasil dihapus dari Cloudinary dan Database." };
+    return { success: "Media berhasil dihapus dari Cloudinary dan Database.", deletedUrls: [mediaUrl] };
   },
   toggleVisibility: async ({ request, platform, locals }) => {
     const schoolId = locals.user?.school_id || -1;
@@ -123,25 +123,45 @@ const actions = {
       return fail(400, { error: "Tidak ada media yang dipilih." });
     }
     let successCount = 0;
-    for (const url of urls) {
-      if (url.includes("res.cloudinary.com")) {
-        if (locals.user?.role !== "superadmin") {
-          const check = await db.prepare("SELECT id FROM uploaded_media WHERE url = ? AND school_id = ?").bind(url, schoolId).first();
-          if (!check) continue;
-        }
-        const deleteResult = await deleteFromCloudinary(url, private_env);
-        if (deleteResult.success) {
-          if (locals.user?.role === "superadmin") {
-            await db.prepare("DELETE FROM uploaded_media WHERE url = ?").bind(url).run();
-          } else {
-            await db.prepare("DELETE FROM uploaded_media WHERE url = ? AND school_id = ?").bind(url, schoolId).run();
-          }
-          await db.prepare("UPDATE questions SET media_url = NULL, media_type = NULL WHERE media_url = ?").bind(url).run();
-          successCount++;
-        }
+    const validUrls = [];
+    const cloudinaryUrls = urls.filter((url) => url.includes("res.cloudinary.com"));
+    if (cloudinaryUrls.length === 0) return fail(400, { error: "Tidak ada media Cloudinary yang valid." });
+    if (locals.user?.role !== "superadmin") {
+      const placeholders = cloudinaryUrls.map(() => "?").join(",");
+      const checkQuery = `SELECT url FROM uploaded_media WHERE url IN (${placeholders}) AND school_id = ?`;
+      const checks = await db.prepare(checkQuery).bind(...cloudinaryUrls, schoolId).all();
+      if (checks.results) {
+        checks.results.forEach((row) => validUrls.push(row.url));
       }
+    } else {
+      validUrls.push(...cloudinaryUrls);
     }
-    return { success: `${successCount} media berhasil dihapus secara massal.` };
+    if (validUrls.length === 0) {
+      return fail(403, { error: "Tidak ada media valid yang dapat dihapus." });
+    }
+    const deletePromises = validUrls.map((url) => deleteFromCloudinary(url, private_env));
+    const deleteResults = await Promise.allSettled(deletePromises);
+    const successfullyDeletedUrls = [];
+    deleteResults.forEach((result, index) => {
+      if (result.status === "fulfilled" && result.value.success) {
+        successfullyDeletedUrls.push(validUrls[index]);
+      }
+    });
+    if (successfullyDeletedUrls.length > 0) {
+      const batchStatements = [];
+      if (locals.user?.role === "superadmin") {
+        const stmt = db.prepare("DELETE FROM uploaded_media WHERE url = ?");
+        successfullyDeletedUrls.forEach((url) => batchStatements.push(stmt.bind(url)));
+      } else {
+        const stmt = db.prepare("DELETE FROM uploaded_media WHERE url = ? AND school_id = ?");
+        successfullyDeletedUrls.forEach((url) => batchStatements.push(stmt.bind(url, schoolId)));
+      }
+      const qStmt = db.prepare("UPDATE questions SET media_url = NULL, media_type = NULL WHERE media_url = ?");
+      successfullyDeletedUrls.forEach((url) => batchStatements.push(qStmt.bind(url)));
+      await db.batch(batchStatements);
+      successCount = successfullyDeletedUrls.length;
+    }
+    return { success: `${successCount} media berhasil dihapus secara massal.`, deletedUrls: successfullyDeletedUrls };
   }
 };
 export {
