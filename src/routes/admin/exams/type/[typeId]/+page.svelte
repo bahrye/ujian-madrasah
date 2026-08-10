@@ -9,6 +9,8 @@
 	export let form: { error?: string; success?: string } | null;
 
 	let showCreateModal = false;
+	let showPrintModal = false;
+	let selectedPrintClassId = '';
 	let editingExam: any = null;
 	let deleteConfirm: number | null = null;
 	let editingRoomName = '';
@@ -52,10 +54,10 @@
 			</div>
 		</div>
 		<div class="w-full sm:w-auto sm:ml-auto flex flex-col sm:flex-row gap-2">
-			<a href="/print/kartu/type/{data.examType.id}" target="_blank" class="btn-outline w-full sm:w-auto justify-center text-indigo-600 border-indigo-200 hover:bg-indigo-50">
+			<button class="btn-outline w-full sm:w-auto justify-center text-indigo-600 border-indigo-200 hover:bg-indigo-50" on:click={() => { showPrintModal = true; selectedPrintClassId = ''; }}>
 				<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" /></svg>
 				Cetak Kartu Peserta
-			</a>
+			</button>
 			<button class="btn-primary w-full sm:w-auto justify-center" on:click={() => (showCreateModal = true)}>
 				<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
@@ -359,6 +361,39 @@
 					<button type="submit" class="btn-danger flex-1">Hapus</button>
 				</div>
 			</form>
+		</div>
+	</div>
+{/if}
+
+<!-- Print Options Modal -->
+{#if showPrintModal}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => (showPrintModal = false)}>
+		<div class="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] flex flex-col" on:click|stopPropagation>
+			<div class="p-6 border-b border-slate-100 flex items-center justify-between">
+				<h3 class="text-lg font-bold text-slate-800">Cetak Kartu Peserta</h3>
+				<button class="text-slate-400 hover:text-slate-600 transition-colors" on:click={() => showPrintModal = false}>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+				</button>
+			</div>
+			<div class="p-6 overflow-y-auto">
+				<label class="block text-sm font-medium text-slate-700 mb-2">Pilih Kelas</label>
+				<select bind:value={selectedPrintClassId} class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+					<option value="">Semua Kelas (Seluruh Peserta)</option>
+					{#each data.classes as c}
+						<option value={c.id}>{c.name}</option>
+					{/each}
+				</select>
+			</div>
+			<div class="p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50 rounded-b-xl">
+				<button type="button" class="btn-ghost text-slate-600 hover:bg-slate-200" on:click={() => showPrintModal = false}>
+					Batal
+				</button>
+				<a href="/print/kartu/type/{data.examType.id}{selectedPrintClassId ? `?class_id=${selectedPrintClassId}` : ''}" target="_blank" class="btn-primary" on:click={() => showPrintModal = false}>
+					Buka Cetak Kartu
+				</a>
+			</div>
 		</div>
 	</div>
 {/if}

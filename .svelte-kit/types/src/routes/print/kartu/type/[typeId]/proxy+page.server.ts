@@ -3,7 +3,7 @@ import type { PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { error } from '@sveltejs/kit';
 
-export const load = async ({ platform, params, locals }: Parameters<PageServerLoad>[0]) => {
+export const load = async ({ platform, params, locals, url }: Parameters<PageServerLoad>[0]) => {
 	const db = getDB(platform);
 	const typeIdStr = params.typeId;
 	const typeId = parseInt(typeIdStr, 10);
@@ -20,13 +20,24 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 
 	// Get all active students for this school
 	// Including both username (which can be NISN or Nomor Peserta) and the explicit fields
-	const participants = await db.prepare(`
+	const classIdStr = url.searchParams.get('class_id');
+	const classId = parseInt(classIdStr || '', 10);
+	let query = `
 		SELECT u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name
 		FROM users u
 		LEFT JOIN classes c ON u.class_id = c.id
 		WHERE u.school_id = ? AND u.role = 'siswa' AND u.is_active = 1
-		ORDER BY c.name, u.name
-	`).bind(locals.user!.school_id).all();
+	`;
+	let paramsArr: any[] = [locals.user!.school_id];
+
+	if (!isNaN(classId)) {
+		query += ` AND u.class_id = ?`;
+		paramsArr.push(classId);
+	}
+
+	query += ` ORDER BY c.name, u.name`;
+
+	const participants = await db.prepare(query).bind(...paramsArr).all();
 
 	// Calculate login info for each participant based on what's available
 	const formattedParticipants = participants.results.map((p: any) => {
