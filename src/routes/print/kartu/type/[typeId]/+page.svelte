@@ -61,7 +61,7 @@
 <div class="p-4 sm:p-8 overflow-x-auto print:overflow-visible w-full">
 	<!-- ===== DESIGN 1: DEFAULT ===== -->
 	{#if selectedDesign === 'default'}
-	<div class="grid grid-cols-2 gap-6 min-w-[700px] sm:min-w-[800px] print:min-w-0 print:w-full">
+	<div class="grid grid-cols-2 gap-6 min-w-[750px] print:min-w-0 print:w-full">
 		{#each participants as p}
 			<div class="border-2 border-slate-800 p-0 rounded-lg overflow-hidden break-inside-avoid shadow-sm h-auto min-h-[11cm] flex flex-col">
 				<!-- Header Kop Sekolah -->
@@ -145,7 +145,7 @@
 
 	<!-- ===== DESIGN 2: KARTU LOGIN (ANBK STYLE) ===== -->
 	{#if selectedDesign === 'kartu-login'}
-	<div class="grid grid-cols-2 gap-5 min-w-[700px] sm:min-w-[800px] print:min-w-0 print:w-full">
+	<div class="grid grid-cols-2 gap-5 min-w-[750px] print:min-w-0 print:w-full">
 		{#each participants as p}
 			<div class="border border-slate-700 break-inside-avoid bg-white" style="page-break-inside: avoid;">
 				<!-- Header -->
