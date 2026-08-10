@@ -198,9 +198,18 @@ const actions = {
     const parsedId = parseInt(idStr || "", 10);
     if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
     try {
-      const q = await db.prepare("SELECT media_url FROM questions WHERE id = ?").bind(parsedId).first();
-      if (q && q.media_url && q.media_url.includes("res.cloudinary.com")) {
-        await deleteFromCloudinary(q.media_url, private_env);
+      const q = await db.prepare("SELECT media_url, question_text, options FROM questions WHERE id = ?").bind(parsedId).first();
+      if (q) {
+        const urlsToDelete = /* @__PURE__ */ new Set();
+        if (q.media_url && q.media_url.includes("res.cloudinary.com")) {
+          urlsToDelete.add(q.media_url);
+        }
+        const combinedHtml = (q.question_text || "") + " " + (q.options || "");
+        const embeddedUrls = combinedHtml.match(/https:\/\/res\.cloudinary\.com\/[^\s'"]+/g) || [];
+        for (const url of embeddedUrls) urlsToDelete.add(url);
+        urlsToDelete.forEach((url) => {
+          deleteFromCloudinary(url, private_env).catch((e) => console.error("Background delete failed:", e));
+        });
       }
       await db.prepare("DELETE FROM student_answers WHERE question_id = ?").bind(parsedId).run();
       await db.prepare("DELETE FROM questions WHERE id = ?").bind(parsedId).run();
@@ -295,7 +304,7 @@ const actions = {
       if (!Array.isArray(rawIds) || rawIds.length === 0) return fail(400, { error: "Daftar ID tidak valid." });
       const placeholders = rawIds.map(() => "?").join(",");
       const validQuestions = await db.prepare(`
-				SELECT q.id, q.media_url 
+				SELECT q.id, q.media_url, q.question_text, q.options 
 				FROM questions q
 				WHERE q.id IN (${placeholders}) AND q.exam_id = ?
 			`).bind(...rawIds, parsedExamId).all();
@@ -304,11 +313,18 @@ const actions = {
       }
       const validIds = validQuestions.results.map((q) => q.id);
       const validPlaceholders = validIds.map(() => "?").join(",");
+      const urlsToDelete = /* @__PURE__ */ new Set();
       for (const q of validQuestions.results) {
         if (q.media_url && q.media_url.includes("res.cloudinary.com")) {
-          await deleteFromCloudinary(q.media_url, private_env);
+          urlsToDelete.add(q.media_url);
         }
+        const combinedHtml = (q.question_text || "") + " " + (q.options || "");
+        const embeddedUrls = combinedHtml.match(/https:\/\/res\.cloudinary\.com\/[^\s'"]+/g) || [];
+        for (const url of embeddedUrls) urlsToDelete.add(url);
       }
+      urlsToDelete.forEach((url) => {
+        deleteFromCloudinary(url, private_env).catch((e) => console.error("Background delete failed:", e));
+      });
       await db.batch([
         db.prepare(`DELETE FROM student_answers WHERE question_id IN (${validPlaceholders})`).bind(...validIds),
         db.prepare(`DELETE FROM questions WHERE id IN (${validPlaceholders}) AND exam_id = ?`).bind(...validIds, parsedExamId)
