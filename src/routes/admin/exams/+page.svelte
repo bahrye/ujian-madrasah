@@ -108,6 +108,14 @@
 							<span class="text-indigo-600 font-semibold">{type.participant_count} Peserta</span>
 						</div>
 					</div>
+					{#if type.class_names}
+						<div class="mt-2 text-slate-500 flex items-start gap-1.5 pt-2 border-t border-slate-100 border-dashed">
+							<svg class="w-3.5 h-3.5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+							</svg>
+							<span class="leading-snug line-clamp-2" title={type.class_names}>{type.class_names}</span>
+						</div>
+					{/if}
 				</div>
 
 				<div class="mt-auto flex items-center gap-2 pt-3 border-t border-slate-100">

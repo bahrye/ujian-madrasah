@@ -120,6 +120,14 @@
 						</svg>
 						{exam.proctor_count} pengawas
 					</span>
+					{#if exam.class_names}
+					<span class="flex items-start gap-1 w-full mt-1">
+						<svg class="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+						</svg>
+						<span class="leading-snug line-clamp-2" title={exam.class_names}>{exam.class_names}</span>
+					</span>
+					{/if}
 					<span class="flex items-center gap-1 w-full mt-1">
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
