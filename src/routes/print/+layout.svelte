@@ -38,7 +38,7 @@
 
 <div class="bg-white min-h-screen text-slate-900 print:bg-white print:text-black">
 	<!-- A print button that only shows on screen, hidden on print -->
-	<div class="fixed top-4 right-4 no-print z-50 flex gap-2">
+	<div class="no-print p-4 bg-white border-b border-slate-200 flex flex-wrap justify-end gap-2 shadow-sm relative z-50">
 		<button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow font-medium flex items-center gap-2 transition-colors" on:click={() => window.print()}>
 			<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 				<path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
