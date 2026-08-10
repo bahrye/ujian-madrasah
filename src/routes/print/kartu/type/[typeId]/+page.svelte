@@ -155,7 +155,7 @@
 						<p class="font-bold text-xs uppercase leading-tight">{examType.name || 'UJIAN'}</p>
 						<p class="font-bold text-xs uppercase leading-tight">{school?.name || 'NAMA SEKOLAH'}</p>
 					</div>
-					<div class="w-10 h-10 flex-shrink-0"></div>
+					<img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data={encodeURIComponent(p.login_username)}" alt="QR" class="w-10 h-10 flex-shrink-0" />
 				</div>
 
 				<!-- Body: Data full-width -->
@@ -165,7 +165,7 @@
 							<tr>
 								<td class="py-[2px] w-[90px] align-top font-medium text-slate-700 whitespace-nowrap">Nama Peserta</td>
 								<td class="py-[2px] w-3 align-top text-center">:</td>
-								<td class="py-[2px] font-bold align-top truncate max-w-[180px]" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px;">{p.student_name}</td>
+								<td class="py-[2px] font-bold align-top">{p.student_name}</td>
 							</tr>
 							<tr>
 								<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">NISN</td>
@@ -182,7 +182,7 @@
 							<tr>
 								<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">TTL</td>
 								<td class="py-[2px] align-top text-center">:</td>
-								<td class="py-[2px] font-bold align-top" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px;">{getTtl(p)}</td>
+								<td class="py-[2px] font-bold align-top">{getTtl(p)}</td>
 							</tr>
 							<tr>
 								<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">Kelas</td>
