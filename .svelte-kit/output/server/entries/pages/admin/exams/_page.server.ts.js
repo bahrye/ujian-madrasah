@@ -5,7 +5,7 @@ const load = async ({ platform, locals }) => {
   const examTypes = await db.prepare(`
 		SELECT et.*, 
 			(SELECT COUNT(*) FROM exams WHERE exam_type_id = et.id) as exam_count,
-			(SELECT COUNT(*) FROM exam_type_participants WHERE exam_type_id = et.id) as participant_count
+			(SELECT COUNT(u.id) FROM users u JOIN exam_type_classes etc ON etc.class_id = u.class_id WHERE etc.exam_type_id = et.id AND u.role = 'siswa' AND u.is_active = 1) as participant_count
 		FROM exam_types et
 		WHERE et.school_id = ?
 		ORDER BY et.created_at DESC

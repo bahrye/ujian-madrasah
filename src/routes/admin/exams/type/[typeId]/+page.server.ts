@@ -31,11 +31,10 @@ export const load: PageServerLoad = async ({ params, platform, locals }) => {
 	const subjects = await db.prepare('SELECT id, name FROM subjects WHERE school_id = ? ORDER BY name').bind(locals.user!.school_id).all();
 
 	const classes = await db.prepare(`
-		SELECT DISTINCT c.id, c.name 
+		SELECT c.id, c.name 
 		FROM classes c
-		INNER JOIN users u ON u.class_id = c.id
-		INNER JOIN exam_type_participants etp ON etp.student_id = u.id
-		WHERE etp.exam_type_id = ? AND u.school_id = ?
+		INNER JOIN exam_type_classes etc ON etc.class_id = c.id
+		WHERE etc.exam_type_id = ? AND c.school_id = ?
 		ORDER BY c.name
 	`).bind(typeId, locals.user!.school_id).all();
 
