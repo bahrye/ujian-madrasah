@@ -14,7 +14,6 @@ function _page($$renderer, $$props) {
     let form = $$props["form"];
     if (form?.success) toasts.success(form.success);
     if (form?.error) toasts.error(form.error);
-    data.students;
     head("x07xsv", $$renderer2, ($$renderer3) => {
       $$renderer3.title(($$renderer4) => {
         $$renderer4.push(`<title>Manajemen Tipe Ujian — Ujian Online Madrasah</title>`);

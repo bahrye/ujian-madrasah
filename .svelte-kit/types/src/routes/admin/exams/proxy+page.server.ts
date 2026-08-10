@@ -142,74 +142,39 @@ export const actions = {
 
 	// ── Peserta Default Tipe Ujian ──────────────────────────────────────────
 
-	addTypeParticipantClass: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+	addTypeClass: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
 		const form = await request.formData();
 		const examTypeIdStr = form.get('exam_type_id')?.toString();
-		const classIdStr = form.get('class_id')?.toString();
+		const classIdsStr = form.getAll('class_ids').map(id => id.toString());
 		const parsedExamTypeId = parseInt(examTypeIdStr || '', 10);
-		const parsedClassId = parseInt(classIdStr || '', 10);
+		const parsedClassIds = classIdsStr.map(id => parseInt(id, 10)).filter(id => !isNaN(id));
 
-		if (isNaN(parsedExamTypeId) || isNaN(parsedClassId)) return fail(400, { error: 'Data tidak lengkap.' });
+		if (isNaN(parsedExamTypeId) || parsedClassIds.length === 0) return fail(400, { error: 'Data tidak lengkap.' });
 
 		// Verifikasi tipe ujian dan kelas milik sekolah ini
 		const examType = await db.prepare('SELECT id FROM exam_types WHERE id = ? AND school_id = ?')
 			.bind(parsedExamTypeId, locals.user!.school_id).first();
 		if (!examType) return fail(404, { error: 'Tipe ujian tidak ditemukan.' });
 
-		const validClass = await db.prepare('SELECT id FROM classes WHERE id = ? AND school_id = ?')
-			.bind(parsedClassId, locals.user!.school_id).first();
-		if (!validClass) return fail(404, { error: 'Kelas tidak ditemukan.' });
+		const placeholders = parsedClassIds.map(() => '?').join(',');
+		const validClasses = await db.prepare(`SELECT id FROM classes WHERE id IN (${placeholders}) AND school_id = ?`)
+			.bind(...parsedClassIds, locals.user!.school_id).all<{ id: number }>();
 
-		const students = await db.prepare('SELECT id FROM users WHERE class_id = ? AND school_id = ? AND role = "siswa"')
-			.bind(parsedClassId, locals.user!.school_id).all<{ id: number }>();
-
-		if (students.results.length === 0) {
-			return { success: 'Tidak ada siswa di kelas ini.' };
+		if (validClasses.results.length === 0) {
+			return fail(400, { error: 'Kelas yang dipilih tidak valid.' });
 		}
 
-		const insertStmts = students.results.map(student =>
-			db.prepare('INSERT OR IGNORE INTO exam_type_participants (exam_type_id, student_id) VALUES (?, ?)')
-				.bind(parsedExamTypeId, student.id)
+		const insertStmts = validClasses.results.map(cls =>
+			db.prepare('INSERT OR IGNORE INTO exam_type_classes (exam_type_id, class_id) VALUES (?, ?)')
+				.bind(parsedExamTypeId, cls.id)
 		);
 
 		await db.batch(insertStmts);
-		return { success: `Berhasil menambahkan ${students.results.length} siswa dari kelas sebagai peserta default.` };
+		return { success: `Berhasil menambahkan ${validClasses.results.length} kelas sebagai peserta ujian.` };
 	},
 
-	addTypeParticipantStudent: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
-		const db = getDB(platform);
-		const form = await request.formData();
-		const examTypeIdStr = form.get('exam_type_id')?.toString();
-		const studentIdsStr = form.getAll('student_ids').map(id => id.toString());
-		const parsedExamTypeId = parseInt(examTypeIdStr || '', 10);
-		const parsedStudentIds = studentIdsStr.map(id => parseInt(id, 10)).filter(id => !isNaN(id));
-
-		if (isNaN(parsedExamTypeId) || parsedStudentIds.length === 0) return fail(400, { error: 'Data tidak lengkap.' });
-
-		const examType = await db.prepare('SELECT id FROM exam_types WHERE id = ? AND school_id = ?')
-			.bind(parsedExamTypeId, locals.user!.school_id).first();
-		if (!examType) return fail(404, { error: 'Tipe ujian tidak ditemukan.' });
-
-		// Verifikasi siswa milik sekolah yang sama
-		const placeholders = parsedStudentIds.map(() => '?').join(',');
-		const validStudents = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "siswa"`)
-			.bind(...parsedStudentIds, locals.user!.school_id).all<{ id: number }>();
-
-		if (validStudents.results.length === 0) {
-			return fail(400, { error: 'Siswa yang dipilih tidak valid.' });
-		}
-
-		const insertStmts = validStudents.results.map(s =>
-			db.prepare('INSERT OR IGNORE INTO exam_type_participants (exam_type_id, student_id) VALUES (?, ?)')
-				.bind(parsedExamTypeId, s.id)
-		);
-
-		await db.batch(insertStmts);
-		return { success: `Berhasil menambahkan ${validStudents.results.length} siswa sebagai peserta default.` };
-	},
-
-	removeTypeParticipant: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+	removeTypeClass: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
 		const form = await request.formData();
 		const idStr = form.get('id')?.toString();
@@ -217,16 +182,16 @@ export const actions = {
 
 		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid.' });
 
-		// Pastikan participant terhubung ke exam_type milik sekolah ini
+		// Pastikan record terhubung ke exam_type milik sekolah ini
 		await db.prepare(`
-			DELETE FROM exam_type_participants 
+			DELETE FROM exam_type_classes 
 			WHERE id = ? AND exam_type_id IN (SELECT id FROM exam_types WHERE school_id = ?)
 		`).bind(parsedId, locals.user!.school_id).run();
 
-		return { success: 'Peserta default berhasil dihapus.' };
+		return { success: 'Kelas berhasil dihapus dari daftar peserta.' };
 	},
 
-	clearTypeParticipants: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+	clearTypeClasses: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
 		const form = await request.formData();
 		const examTypeIdStr = form.get('exam_type_id')?.toString();
@@ -238,11 +203,11 @@ export const actions = {
 			.bind(parsedExamTypeId, locals.user!.school_id).first();
 		if (!examType) return fail(404, { error: 'Tipe ujian tidak ditemukan.' });
 
-		await db.prepare('DELETE FROM exam_type_participants WHERE exam_type_id = ?').bind(parsedExamTypeId).run();
-		return { success: 'Semua peserta default berhasil dihapus.' };
+		await db.prepare('DELETE FROM exam_type_classes WHERE exam_type_id = ?').bind(parsedExamTypeId).run();
+		return { success: 'Semua kelas berhasil dihapus dari tipe ujian ini.' };
 	},
 
-	getTypeParticipants: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
+	getTypeClasses: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
 		const form = await request.formData();
 		const examTypeIdStr = form.get('exam_type_id')?.toString();
@@ -255,16 +220,40 @@ export const actions = {
 			.bind(parsedExamTypeId, locals.user!.school_id).first();
 		if (!examType) return fail(404, { error: 'Tipe ujian tidak ditemukan.' });
 
-		const participants = await db.prepare(`
-			SELECT etp.id, u.name as student_name, u.username as nisn, c.name as class_name
-			FROM exam_type_participants etp
-			JOIN users u ON etp.student_id = u.id
-			LEFT JOIN classes c ON u.class_id = c.id
-			WHERE etp.exam_type_id = ? AND u.school_id = ?
-			ORDER BY c.name, u.name
+		// Dapatkan kelas-kelas yang terdaftar
+		const classes = await db.prepare(`
+			SELECT etc.id as relation_id, c.id, c.name,
+				(SELECT COUNT(*) FROM users u WHERE u.class_id = c.id AND u.role = 'siswa' AND u.is_active = 1) as student_count
+			FROM exam_type_classes etc
+			JOIN classes c ON etc.class_id = c.id
+			WHERE etc.exam_type_id = ? AND c.school_id = ?
+			ORDER BY c.name
 		`).bind(parsedExamTypeId, locals.user!.school_id).all();
 
-		return { participants: participants.results };
+		// Untuk setiap kelas, dapatkan daftar siswa secara opsional jika diperlukan oleh UI (atau bisa di-fetch terpisah). 
+		// Lebih baik kita kirimkan data siswa sekalian karena jumlahnya relatif kecil per kelas.
+		const classIds = classes.results.map((c: any) => c.id);
+		let students: any[] = [];
+		if (classIds.length > 0) {
+			const placeholders = classIds.map(() => '?').join(',');
+			const studentsQuery = await db.prepare(`
+				SELECT id, name, username as nisn, class_id 
+				FROM users 
+				WHERE class_id IN (${placeholders}) AND role = 'siswa' AND is_active = 1
+				ORDER BY name
+			`).bind(...classIds).all();
+			students = studentsQuery.results;
+		}
+
+		// Group students by class
+		const formattedClasses = classes.results.map((c: any) => {
+			return {
+				...c,
+				students: students.filter((s: any) => s.class_id === c.id)
+			};
+		});
+
+		return { classes: formattedClasses };
 	}
 };
 ;null as any as Actions;

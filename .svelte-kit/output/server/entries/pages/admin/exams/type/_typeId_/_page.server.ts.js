@@ -72,9 +72,12 @@ const actions = {
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(locals.user.school_id, parsedTypeId, title, description, parsedSubjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, showScoreType, locals.user?.id).run();
       const newExamId = result.meta?.last_row_id;
       if (newExamId) {
-        const typeParticipants = await db.prepare(
-          "SELECT student_id FROM exam_type_participants WHERE exam_type_id = ?"
-        ).bind(parsedTypeId).all();
+        const typeParticipants = await db.prepare(`
+					SELECT u.id as student_id 
+					FROM users u 
+					JOIN exam_type_classes etc ON etc.class_id = u.class_id 
+					WHERE etc.exam_type_id = ? AND u.role = 'siswa' AND u.is_active = 1
+				`).bind(parsedTypeId).all();
         if (typeParticipants.results.length > 0) {
           const insertBatch = typeParticipants.results.map(
             (p) => db.prepare("INSERT OR IGNORE INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(newExamId, p.student_id)

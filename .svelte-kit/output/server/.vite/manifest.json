@@ -514,7 +514,7 @@
       "_stores.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.BplL9EBu.css"
+      "_app/immutable/assets/_layout.zz411E9r.css"
     ],
     "assets": [
       "_app/immutable/assets/KaTeX_AMS-Regular.BQhdFMY1.woff2",
@@ -1159,10 +1159,10 @@
       "_shared-server.js"
     ]
   },
-  "src/routes/api/exam-type-participants/+server.ts": {
-    "file": "entries/endpoints/api/exam-type-participants/_server.ts.js",
-    "name": "entries/endpoints/api/exam-type-participants/_server.ts",
-    "src": "src/routes/api/exam-type-participants/+server.ts",
+  "src/routes/api/exam-type-classes/+server.ts": {
+    "file": "entries/endpoints/api/exam-type-classes/_server.ts.js",
+    "name": "entries/endpoints/api/exam-type-classes/_server.ts",
+    "src": "src/routes/api/exam-type-classes/+server.ts",
     "isEntry": true,
     "imports": [
       "_db.js"
