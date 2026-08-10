@@ -21,10 +21,10 @@
 						<div class="w-14 h-14 bg-white border border-slate-300 rounded flex items-center justify-center text-[10px] text-center p-1 text-slate-500 font-bold">LOGO</div>
 					{/if}
 					<div class="flex-1 text-center">
-						<h2 class="font-bold text-sm tracking-wide uppercase">KARTU PESERTA UJIAN</h2>
-						<h3 class="font-bold text-sm uppercase">{school?.name || 'NAMA SEKOLAH'}</h3>
+						<h2 class="font-bold text-xs tracking-wide uppercase">KARTU PESERTA UJIAN</h2>
+						<h3 class="font-bold text-xs uppercase">{school?.name || 'NAMA SEKOLAH'}</h3>
 						{#if school?.address}
-							<p class="text-[10px] text-slate-700 leading-tight mt-1">{school.address}</p>
+							<p class="text-[9px] text-slate-700 leading-tight mt-0.5">{school.address}</p>
 						{/if}
 					</div>
 					<!-- QR Code (berada di kanan atas) -->
@@ -34,10 +34,10 @@
 				<!-- Body Kartu -->
 				<div class="p-4 flex-1 flex flex-col justify-between">
 					<div>
-						<div class="text-center font-bold text-sm mb-4 pb-2 border-b border-slate-300">
+						<div class="text-center font-bold text-xs mb-3 pb-2 border-b border-slate-300">
 							{exam.exam_type_name || 'Ujian'} - {exam.subject_name || 'Umum'}
 						</div>
-						<table class="w-full text-sm">
+						<table class="w-full text-[11px] leading-snug">
 							<tbody>
 								<tr>
 									<td class="py-1 w-24 font-medium text-slate-700">No. Peserta</td>
@@ -82,9 +82,9 @@
 								</div>
 							{/if}
 						</div>
-						<div class="text-center">
-							<p class="text-xs mb-10">Panitia Ujian</p>
-							<p class="text-xs font-bold border-b border-slate-800 inline-block px-4">......................................</p>
+						<div class="text-center mt-3">
+							<p class="text-[10px] mb-8">Panitia Ujian</p>
+							<p class="text-[10px] font-bold border-b border-slate-800 inline-block px-4">......................................</p>
 						</div>
 					</div>
 				</div>
