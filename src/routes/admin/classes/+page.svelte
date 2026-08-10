@@ -50,8 +50,13 @@
 						<input type="text" id="name" name="name" class="input" required placeholder="Contoh: X IPA 1" />
 					</div>
 					<div>
-						<label for="level" class="block text-sm font-medium text-slate-700 mb-1">Tingkat</label>
-						<input type="text" id="level" name="level" class="input" placeholder="Contoh: 10, X, atau VII" />
+						<label for="level" class="block text-sm font-medium text-slate-700 mb-1">Tingkat <span class="text-red-500">*</span></label>
+						<select id="level" name="level" class="input" required>
+							<option value="">Pilih Tingkat (1-12)</option>
+							{#each Array(12) as _, i}
+								<option value={i + 1}>Tingkat {i + 1}</option>
+							{/each}
+						</select>
 					</div>
 				</div>
 				<div class="flex space-x-3 pt-2">
@@ -77,8 +82,13 @@
 						<input type="text" id="e-name" name="name" class="input" required value={editingClass.name} />
 					</div>
 					<div>
-						<label for="e-level" class="block text-sm font-medium text-slate-700 mb-1">Tingkat</label>
-						<input type="text" id="e-level" name="level" class="input" value={editingClass.level || ''} />
+						<label for="e-level" class="block text-sm font-medium text-slate-700 mb-1">Tingkat <span class="text-red-500">*</span></label>
+						<select id="e-level" name="level" class="input" required>
+							<option value="">Pilih Tingkat (1-12)</option>
+							{#each Array(12) as _, i}
+								<option value={i + 1} selected={editingClass.level == (i + 1)}>Tingkat {i + 1}</option>
+							{/each}
+						</select>
 					</div>
 				</div>
 				<div class="flex space-x-3 pt-2">
