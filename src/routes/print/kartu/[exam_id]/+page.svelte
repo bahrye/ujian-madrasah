@@ -32,9 +32,8 @@
 				</div>
 
 				<!-- Body Kartu -->
-				<div class="p-4 flex-1 flex flex-col justify-between">
-					<div>
-						<div class="text-center font-bold text-xs mb-3 pb-2 border-b border-slate-300">
+				<div class="p-4 flex-1 flex flex-col">
+					<div class="text-center font-bold text-xs mb-3 pb-2 border-b border-slate-300">
 							{exam.exam_type_name || 'Ujian'} - {exam.subject_name || 'Umum'}
 						</div>
 						<table class="w-full text-[11px] leading-snug">
@@ -47,7 +46,7 @@
 								<tr>
 									<td class="py-1 font-medium text-slate-700">Nama</td>
 									<td class="py-1 text-center">:</td>
-									<td class="py-1 font-bold"><div class="line-clamp-2 leading-tight pr-1 h-8">{p.student_name}</div></td>
+									<td class="py-1 font-bold"><div class="line-clamp-2 leading-tight pr-1">{p.student_name}</div></td>
 								</tr>
 								<tr>
 									<td class="py-1 font-medium text-slate-700">Kelas / Ruang</td>
@@ -67,10 +66,12 @@
 							</tbody>
 						</table>
 						
+						<!-- Spacer to push bottom content down evenly -->
+						<div class="flex-1 min-h-[0.5rem]"></div>
+
 						<div class="mt-3 text-[11px] bg-slate-50 border border-slate-200 p-1.5 rounded text-slate-700 text-center font-medium">
 							Gunakan <span class="font-bold">No. Peserta</span> sebagai Username dan <span class="font-bold">NISN</span> sebagai Password.
 						</div>
-					</div>
 					
 					<div class="mt-4 flex justify-between items-end">
 						<div class="flex gap-3 items-end">
