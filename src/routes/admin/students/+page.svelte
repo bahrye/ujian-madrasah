@@ -227,7 +227,7 @@
 					</div>
 					<div>
 						<label for="nisn" class="block text-sm font-medium text-slate-700 mb-1">NISN <span class="text-red-500">*</span></label>
-						<input type="text" id="nisn" name="nisn" class="input" required placeholder="10 Digit NISN" />
+						<input type="text" id="nisn" name="nisn" class="input" required placeholder="10 Digit NISN" pattern="[0-9]{10}" minlength="10" maxlength="10" inputmode="numeric" on:input={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '').slice(0, 10)} />
 						<p class="text-xs text-slate-500 mt-1">NISN akan menjadi Password login.</p>
 					</div>
 				</div>
@@ -286,7 +286,7 @@
 					</div>
 					<div>
 						<label for="e-nisn" class="block text-sm font-medium text-slate-700 mb-1">NISN <span class="text-red-500">*</span></label>
-						<input type="text" id="e-nisn" name="nisn" class="input" required value={editingUser.nisn || editingUser.username} />
+						<input type="text" id="e-nisn" name="nisn" class="input" required value={editingUser.nisn || editingUser.username} pattern="[0-9]{10}" minlength="10" maxlength="10" inputmode="numeric" on:input={(e) => e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '').slice(0, 10)} />
 						<p class="text-xs text-slate-500 mt-1">Mengubah NISN akan mereset Password.</p>
 					</div>
 				</div>
