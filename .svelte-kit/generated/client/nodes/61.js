@@ -1,1 +1,1 @@
-export { default as component } from "../../../../src/routes/siswa/papan-peringkat/[examId]/+page.svelte";
+export { default as component } from "../../../../src/routes/siswa/papan-peringkat/type/[typeId]/exams/+page.svelte";

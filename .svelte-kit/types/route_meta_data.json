@@ -266,6 +266,11 @@
 		"src/routes/print/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/print/kartu/type/[typeId]": [
+		"src/routes/print/kartu/type/[typeId]/+page.server.ts",
+		"src/routes/print/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/print/kartu/[exam_id]": [
 		"src/routes/print/kartu/[exam_id]/+page.server.ts",
 		"src/routes/print/+layout.server.ts",
