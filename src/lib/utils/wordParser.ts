@@ -190,7 +190,22 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 		}
 		
 		if (questionElements.length > 0) {
-			const firstEl = questionElements[0];
+			let firstEl = questionElements[0];
+			
+			if (firstEl.tagName === 'OL' || firstEl.tagName === 'UL') {
+				const liChildren = Array.from(firstEl.children).filter(c => c.tagName === 'LI');
+				const newElements = [];
+				for (const li of liChildren) {
+					const div = document.createElement('div');
+					div.innerHTML = li.innerHTML;
+					newElements.push(div);
+				}
+				questionElements.splice(0, 1, ...newElements);
+				if (questionElements.length > 0) {
+					firstEl = questionElements[0];
+				}
+			}
+
 			const text = firstEl.textContent?.trim() || '';
 			if (/^\d+[\.\)]\s/.test(text)) {
 				const cloned = firstEl.cloneNode(true) as Element;
