@@ -9,10 +9,10 @@
 	<title>Cetak Kartu Peserta Ujian - {exam.title}</title>
 </svelte:head>
 
-<div class="p-4 sm:p-8 overflow-x-auto print:overflow-visible w-full">
+<div class="p-4 sm:p-8 print:p-0 overflow-x-auto print:overflow-visible w-full">
 	<div class="print:w-full min-w-[750px] print:min-w-0">
 		{#each Array(Math.ceil(participants.length / 4)) as _, pageIndex}
-		<div class="grid grid-cols-2 grid-rows-2 gap-6 print:h-[282mm] break-after-page mb-6 print:mb-0">
+		<div class="grid grid-cols-2 grid-rows-2 gap-6 print:h-[275mm] break-after-page mb-6 print:mb-0">
 			{#each participants.slice(pageIndex * 4, pageIndex * 4 + 4) as p}
 				<div class="border-2 border-slate-800 p-0 rounded-lg overflow-hidden break-inside-avoid shadow-sm h-full flex flex-col">
 				<!-- Header Kop Sekolah -->
