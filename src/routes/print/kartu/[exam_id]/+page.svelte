@@ -102,7 +102,7 @@
 <style>
 	@page {
 		size: A4;
-		margin: 1cm;
+		margin: 0.5cm;
 	}
 	@media print {
 		:global(body) {
