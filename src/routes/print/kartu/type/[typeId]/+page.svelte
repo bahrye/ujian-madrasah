@@ -24,6 +24,17 @@
 		if (date) return date;
 		return '-';
 	}
+
+	function getQrData(p: any): string {
+		let qr = `Nama: ${p.student_name}\n`;
+		qr += `TTL: ${getTtl(p)}\n`;
+		qr += `Kelas: ${p.class_name || '-'}\n`;
+		if (p.display_nomor_peserta && p.display_nomor_peserta !== '-') {
+			qr += `No. Peserta: ${p.display_nomor_peserta}\n`;
+		}
+		qr += `NISN: ${p.display_nisn}`;
+		return qr;
+	}
 </script>
 
 <svelte:head>
@@ -155,7 +166,7 @@
 						<p class="font-bold text-xs uppercase leading-tight">{examType.name || 'UJIAN'}</p>
 						<p class="font-bold text-xs uppercase leading-tight">{school?.name || 'NAMA SEKOLAH'}</p>
 					</div>
-					<img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data={encodeURIComponent(p.login_username)}" alt="QR" class="w-10 h-10 flex-shrink-0" />
+					<img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data={encodeURIComponent(getQrData(p))}" alt="QR" class="w-10 h-10 flex-shrink-0" />
 				</div>
 
 				<!-- Body: Data full-width -->
