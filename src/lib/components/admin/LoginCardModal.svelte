@@ -1,7 +1,7 @@
 <script lang="ts">
   export let show = false;
   export let classes: { id: number | string; name: string }[] = [];
-  export let students: { id: number | string; name: string; username: string; class_id: number | string | null; class_name: string | null; place_of_birth?: string | null; date_of_birth?: string | null; photo?: string | null }[] = [];
+  export let students: { id: number | string; name: string; username: string; class_id: number | string | null; class_name: string | null; place_of_birth?: string | null; date_of_birth?: string | null; photo?: string | null; nisn?: string | null; nomor_peserta?: string | null; }[] = [];
   export let schoolName: string = '';
   export let schoolLogo: string = '';
 
@@ -105,7 +105,7 @@
                 <span class="cred-icon">&#128273;</span>
                 <div class="cred-info">
                   <div class="cred-label">Password</div>
-                  <div class="cred-value">${escapeHtml(s.username)}</div>
+                  <div class="cred-value">${escapeHtml(s.nisn || s.username)}</div>
                 </div>
               </div>
             </div>
@@ -358,7 +358,7 @@
                       <span class="text-sm flex-shrink-0">🔑</span>
                       <div class="min-w-0">
                         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Password</p>
-                        <p class="text-sm font-bold text-slate-800 truncate">{filteredStudents[0].username}</p>
+                        <p class="text-sm font-bold text-slate-800 truncate">{filteredStudents[0].nisn || filteredStudents[0].username}</p>
                       </div>
                     </div>
                     <div class="bg-indigo-50 border border-indigo-100 rounded-xl px-3 py-2 text-center">

@@ -52,6 +52,8 @@ CREATE TABLE IF NOT EXISTS users (
     place_of_birth TEXT,
     date_of_birth TEXT,
     photo TEXT,
+    nisn TEXT,
+    nomor_peserta TEXT,
     is_active INTEGER NOT NULL DEFAULT 1,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))

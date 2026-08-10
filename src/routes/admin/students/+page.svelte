@@ -16,6 +16,8 @@
 	let showImportModal = false;
 	let showLoginCardModal = false;
 	let showBulkDeleteModal = false;
+	let showLoginModeModal = false;
+	let loginModeSelection = 'nisn';
 	let editingUser: any = null;
 	let filterClass = '';
 	let selectedIds: number[] = [];
@@ -52,6 +54,7 @@
 		isAdding = false;
 		showImportModal = false;
 		showBulkDeleteModal = false;
+		showLoginModeModal = false;
 		editingUser = null;
 		selectedIds = [];
 	}
@@ -182,6 +185,13 @@
 					Hapus Massal ({selectedIds.length})
 				</button>
 			{/if}
+			<button class="btn btn-secondary flex-1 sm:flex-none" on:click={() => (showLoginModeModal = true)}>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+					<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+				</svg>
+				Mode Login
+			</button>
 			<button class="btn flex-1 sm:flex-none" style="background: linear-gradient(135deg,#f59e0b,#f97316); color:#fff; box-shadow: 0 4px 15px rgba(245,158,11,.3);" on:click={() => (showLoginCardModal = true)}>
 				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0" />
@@ -218,8 +228,12 @@
 					<div>
 						<label for="nisn" class="block text-sm font-medium text-slate-700 mb-1">NISN <span class="text-red-500">*</span></label>
 						<input type="text" id="nisn" name="nisn" class="input" required placeholder="10 Digit NISN" />
-						<p class="text-xs text-slate-500 mt-1">NISN juga akan menjadi Password login.</p>
+						<p class="text-xs text-slate-500 mt-1">NISN akan menjadi Password login.</p>
 					</div>
+				</div>
+				<div>
+					<label for="nomor_peserta" class="block text-sm font-medium text-slate-700 mb-1">Nomor Peserta (Opsional)</label>
+					<input type="text" id="nomor_peserta" name="nomor_peserta" class="input" placeholder="Opsional, wajib jika sekolah menggunakan mode Nomor Peserta" />
 				</div>
 				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 					<div>
@@ -264,9 +278,13 @@
 					</div>
 					<div>
 						<label for="e-nisn" class="block text-sm font-medium text-slate-700 mb-1">NISN <span class="text-red-500">*</span></label>
-						<input type="text" id="e-nisn" name="nisn" class="input" required value={editingUser.username} />
+						<input type="text" id="e-nisn" name="nisn" class="input" required value={editingUser.nisn || editingUser.username} />
 						<p class="text-xs text-slate-500 mt-1">Mengubah NISN akan mereset Password.</p>
 					</div>
+				</div>
+				<div>
+					<label for="e-nomor_peserta" class="block text-sm font-medium text-slate-700 mb-1">Nomor Peserta (Opsional)</label>
+					<input type="text" id="e-nomor_peserta" name="nomor_peserta" class="input" value={editingUser.nomor_peserta || ''} placeholder="Opsional, wajib jika mode Nomor Peserta aktif" />
 				</div>
 				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 					<div>
@@ -520,6 +538,42 @@
 				<div class="flex space-x-3">
 					<button type="button" class="btn btn-secondary flex-1" on:click={() => (showBulkDeleteModal = false)}>Batal</button>
 					<button type="submit" class="btn btn-danger flex-1">Ya, Hapus Semua</button>
+				</div>
+			</form>
+		</div>
+	</div>
+{/if}
+
+{#if showLoginModeModal}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => (showLoginModeModal = false)}>
+		<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 max-h-[90vh] overflow-y-auto w-full max-w-md animate-bounce-in" on:click|stopPropagation>
+			<h2 class="text-xl font-bold text-slate-800 mb-2">Atur Mode Login Siswa</h2>
+			<p class="text-sm text-slate-500 mb-6">Pilih format data yang akan digunakan siswa saat masuk ke ujian. Ini akan mengubah akun seluruh siswa di sekolah Anda.</p>
+			
+			<form method="POST" action="?/setLoginMode" use:enhance={() => { return async ({ update }) => { showLoginModeModal = false; await update(); }; }}>
+				<div class="space-y-4 mb-6">
+					<label class="flex items-start gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors {loginModeSelection === 'nisn' ? 'border-indigo-500 bg-indigo-50/50' : ''}">
+						<input type="radio" name="mode" value="nisn" bind:group={loginModeSelection} class="mt-1 w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-slate-300" />
+						<div>
+							<span class="block font-semibold text-slate-800">Gunakan NISN</span>
+							<span class="block text-sm text-slate-500 mt-1">Username = NISN<br/>Password = NISN</span>
+						</div>
+					</label>
+
+					<label class="flex items-start gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors {loginModeSelection === 'nomor_peserta' ? 'border-indigo-500 bg-indigo-50/50' : ''}">
+						<input type="radio" name="mode" value="nomor_peserta" bind:group={loginModeSelection} class="mt-1 w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-slate-300" />
+						<div>
+							<span class="block font-semibold text-slate-800">Gunakan Nomor Peserta</span>
+							<span class="block text-sm text-slate-500 mt-1">Username = Nomor Peserta<br/>Password = NISN</span>
+						</div>
+					</label>
+				</div>
+				
+				<div class="flex space-x-3">
+					<button type="button" class="btn btn-secondary flex-1" on:click={() => (showLoginModeModal = false)}>Batal</button>
+					<button type="submit" class="btn btn-primary flex-1">Simpan Mode</button>
 				</div>
 			</form>
 		</div>

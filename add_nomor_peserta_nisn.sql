@@ -1,0 +1,2 @@
+ALTER TABLE users ADD COLUMN nisn TEXT;
+ALTER TABLE users ADD COLUMN nomor_peserta TEXT;
