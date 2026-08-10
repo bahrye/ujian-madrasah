@@ -158,62 +158,65 @@
 					<div class="w-10 h-10 flex-shrink-0"></div>
 				</div>
 
-				<!-- Body -->
-				<div class="px-3 py-2 flex gap-3">
-					<!-- Left: Photo -->
+				<!-- Body: Data full-width -->
+				<div class="px-3 py-2">
+					<table class="w-full text-[11px] leading-snug">
+						<tbody>
+							<tr>
+								<td class="py-[2px] w-[90px] align-top font-medium text-slate-700 whitespace-nowrap">Nama Peserta</td>
+								<td class="py-[2px] w-3 align-top text-center">:</td>
+								<td class="py-[2px] font-bold align-top truncate max-w-[180px]" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px;">{p.student_name}</td>
+							</tr>
+							<tr>
+								<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">NISN</td>
+								<td class="py-[2px] align-top text-center">:</td>
+								<td class="py-[2px] font-bold align-top">{p.display_nisn}</td>
+							</tr>
+							{#if p.display_nomor_peserta && p.display_nomor_peserta !== '-'}
+							<tr>
+								<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">No. Peserta</td>
+								<td class="py-[2px] align-top text-center">:</td>
+								<td class="py-[2px] font-bold align-top">{p.display_nomor_peserta}</td>
+							</tr>
+							{/if}
+							<tr>
+								<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">TTL</td>
+								<td class="py-[2px] align-top text-center">:</td>
+								<td class="py-[2px] font-bold align-top" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px;">{getTtl(p)}</td>
+							</tr>
+							<tr>
+								<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">Kelas</td>
+								<td class="py-[2px] align-top text-center">:</td>
+								<td class="py-[2px] font-bold align-top">{p.class_name || '-'}</td>
+							</tr>
+							<tr class="border-t border-slate-300">
+								<td class="py-[2px] pt-1 align-top font-medium text-slate-700 whitespace-nowrap">Username</td>
+								<td class="py-[2px] pt-1 align-top text-center">:</td>
+								<td class="py-[2px] pt-1 font-bold font-mono tracking-wide align-top">{p.login_username}</td>
+							</tr>
+							<tr>
+								<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">Password</td>
+								<td class="py-[2px] align-top text-center">:</td>
+								<td class="py-[2px] font-bold font-mono tracking-wide align-top">{p.login_password}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<!-- Footer: Photo + TTD Panitia -->
+				<div class="px-3 pb-3 flex justify-between items-end">
 					<div class="flex-shrink-0">
 						{#if p.photo}
-							<img src={p.photo} alt="Foto {p.student_name}" class="w-[2.2cm] h-[2.8cm] border border-slate-400 object-cover bg-slate-50" />
+							<img src={p.photo} alt="Foto {p.student_name}" class="w-[2cm] h-[2.5cm] border border-slate-400 object-cover bg-slate-50" />
 						{:else}
-							<div class="w-[2.2cm] h-[2.8cm] border border-slate-400 flex items-center justify-center bg-slate-50 text-slate-400 text-[9px] text-center p-1">
+							<div class="w-[2cm] h-[2.5cm] border border-slate-400 flex items-center justify-center bg-slate-50 text-slate-400 text-[9px] text-center p-1">
 								Foto<br/>2x3
 							</div>
 						{/if}
 					</div>
-
-					<!-- Right: Info -->
-					<div class="flex-1 min-w-0">
-						<table class="w-full text-[11px] leading-snug">
-							<tbody>
-								<tr>
-									<td class="py-[2px] w-[90px] align-top font-medium text-slate-700 whitespace-nowrap">Nama Peserta</td>
-									<td class="py-[2px] w-3 align-top text-center">:</td>
-									<td class="py-[2px] font-bold align-top">{p.student_name}</td>
-								</tr>
-								<tr>
-									<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">NISN</td>
-									<td class="py-[2px] align-top text-center">:</td>
-									<td class="py-[2px] font-bold align-top">{p.display_nisn}</td>
-								</tr>
-								{#if p.display_nomor_peserta && p.display_nomor_peserta !== '-'}
-								<tr>
-									<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">No. Peserta</td>
-									<td class="py-[2px] align-top text-center">:</td>
-									<td class="py-[2px] font-bold align-top">{p.display_nomor_peserta}</td>
-								</tr>
-								{/if}
-								<tr>
-									<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">TTL</td>
-									<td class="py-[2px] align-top text-center">:</td>
-									<td class="py-[2px] font-bold align-top">{getTtl(p)}</td>
-								</tr>
-								<tr>
-									<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">Kelas</td>
-									<td class="py-[2px] align-top text-center">:</td>
-									<td class="py-[2px] font-bold align-top">{p.class_name || '-'}</td>
-								</tr>
-								<tr class="border-t border-slate-300">
-									<td class="py-[2px] pt-1 align-top font-medium text-slate-700 whitespace-nowrap">Username</td>
-									<td class="py-[2px] pt-1 align-top text-center">:</td>
-									<td class="py-[2px] pt-1 font-bold font-mono tracking-wide align-top">{p.login_username}</td>
-								</tr>
-								<tr>
-									<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">Password</td>
-									<td class="py-[2px] align-top text-center">:</td>
-									<td class="py-[2px] font-bold font-mono tracking-wide align-top">{p.login_password}</td>
-								</tr>
-							</tbody>
-						</table>
+					<div class="text-center">
+						<p class="text-[10px] mb-6">Panitia Ujian</p>
+						<p class="text-[10px] font-bold border-b border-slate-700 inline-block px-3">..............................</p>
 					</div>
 				</div>
 			</div>
