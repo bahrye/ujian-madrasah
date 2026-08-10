@@ -12,7 +12,7 @@
 <div class="p-8">
 	<div class="grid grid-cols-2 gap-6">
 		{#each participants as p}
-			<div class="border-2 border-slate-800 p-0 rounded-lg overflow-hidden break-inside-avoid shadow-sm h-[8.5cm] flex flex-col">
+			<div class="border-2 border-slate-800 p-0 rounded-lg overflow-hidden break-inside-avoid shadow-sm h-auto min-h-[11cm] flex flex-col">
 				<!-- Header Kop Sekolah -->
 				<div class="flex items-center gap-4 p-3 border-b-2 border-slate-800 bg-slate-100">
 					{#if school?.logo_url}
@@ -40,34 +40,34 @@
 						<table class="w-full text-sm">
 							<tbody>
 								<tr>
-									<td class="py-1 w-24 font-medium text-slate-700">No. Peserta</td>
-									<td class="py-1 w-4 text-center">:</td>
-									<td class="py-1 font-bold">{p.display_nomor_peserta}</td>
+									<td class="py-1 w-28 align-top font-medium text-slate-700">No. Peserta</td>
+									<td class="py-1 w-4 align-top text-center">:</td>
+									<td class="py-1 font-bold align-top">{p.display_nomor_peserta}</td>
 								</tr>
 								<tr>
-									<td class="py-1 font-medium text-slate-700">NISN</td>
-									<td class="py-1 text-center">:</td>
-									<td class="py-1 font-bold">{p.display_nisn}</td>
+									<td class="py-1 align-top font-medium text-slate-700">NISN</td>
+									<td class="py-1 align-top text-center">:</td>
+									<td class="py-1 align-top font-bold">{p.display_nisn}</td>
 								</tr>
 								<tr>
-									<td class="py-1 font-medium text-slate-700">Nama</td>
-									<td class="py-1 text-center">:</td>
-									<td class="py-1 font-bold">{p.student_name}</td>
+									<td class="py-1 align-top font-medium text-slate-700">Nama</td>
+									<td class="py-1 align-top text-center">:</td>
+									<td class="py-1 align-top font-bold">{p.student_name}</td>
 								</tr>
 								<tr>
-									<td class="py-1 font-medium text-slate-700">Kelas / Ruang</td>
-									<td class="py-1 text-center">:</td>
-									<td class="py-1 font-bold">{p.class_name || '-'} / ..........</td>
+									<td class="py-1 align-top font-medium text-slate-700">Kelas / Ruang</td>
+									<td class="py-1 align-top text-center">:</td>
+									<td class="py-1 align-top font-bold">{p.class_name || '-'} / ..........</td>
 								</tr>
 								<tr>
-									<td class="py-1 font-medium text-slate-700">Username</td>
-									<td class="py-1 text-center">:</td>
-									<td class="py-1 font-mono font-bold tracking-wider">{p.login_username}</td>
+									<td class="py-1 align-top font-medium text-slate-700">Username</td>
+									<td class="py-1 align-top text-center">:</td>
+									<td class="py-1 align-top font-mono font-bold tracking-wider">{p.login_username}</td>
 								</tr>
 								<tr>
-									<td class="py-1 font-medium text-slate-700">Password</td>
-									<td class="py-1 text-center">:</td>
-									<td class="py-1 font-mono font-bold tracking-wider">{p.login_password}</td>
+									<td class="py-1 align-top font-medium text-slate-700">Password</td>
+									<td class="py-1 align-top text-center">:</td>
+									<td class="py-1 align-top font-mono font-bold tracking-wider">{p.login_password}</td>
 								</tr>
 							</tbody>
 						</table>
