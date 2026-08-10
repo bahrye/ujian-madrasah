@@ -20,8 +20,8 @@ export const actions = {
 		const name = data.get('name')?.toString().trim();
 		const level = data.get('level')?.toString().trim() || null;
 
-		if (!name) {
-			return fail(400, { error: 'Nama kelas wajib diisi' });
+		if (!name || !level) {
+			return fail(400, { error: 'Nama dan Tingkat kelas wajib diisi' });
 		}
 
 		try {
@@ -43,7 +43,7 @@ export const actions = {
 		const level = data.get('level')?.toString().trim() || null;
 		const parsedId = parseInt(idStr || '', 10);
 
-		if (isNaN(parsedId) || !name) return fail(400, { error: 'ID dan Nama kelas wajib diisi' });
+		if (isNaN(parsedId) || !name || !level) return fail(400, { error: 'ID, Nama, dan Tingkat kelas wajib diisi' });
 
 		try {
 			await db.prepare('UPDATE classes SET name = ?, level = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?')
