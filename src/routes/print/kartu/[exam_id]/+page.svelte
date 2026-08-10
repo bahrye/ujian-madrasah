@@ -47,7 +47,7 @@
 								<tr>
 									<td class="py-1 font-medium text-slate-700">Nama</td>
 									<td class="py-1 text-center">:</td>
-									<td class="py-1 font-bold"><div class="line-clamp-2 leading-tight pr-1">{p.student_name}</div></td>
+									<td class="py-1 font-bold"><div class="line-clamp-2 leading-tight pr-1 h-8">{p.student_name}</div></td>
 								</tr>
 								<tr>
 									<td class="py-1 font-medium text-slate-700">Kelas / Ruang</td>
