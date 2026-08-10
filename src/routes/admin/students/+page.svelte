@@ -235,6 +235,14 @@
 					<label for="nomor_peserta" class="block text-sm font-medium text-slate-700 mb-1">Nomor Peserta (Opsional)</label>
 					<input type="text" id="nomor_peserta" name="nomor_peserta" class="input" placeholder="Opsional, wajib jika sekolah menggunakan mode Nomor Peserta" />
 				</div>
+				<div>
+					<label for="gender" class="block text-sm font-medium text-slate-700 mb-1">Jenis Kelamin</label>
+					<select id="gender" name="gender" class="input">
+						<option value="">Pilih Jenis Kelamin (Opsional)</option>
+						<option value="L">Laki-Laki (L)</option>
+						<option value="P">Perempuan (P)</option>
+					</select>
+				</div>
 				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 					<div>
 						<label for="place_of_birth" class="block text-sm font-medium text-slate-700 mb-1">Tempat Lahir</label>
@@ -285,6 +293,14 @@
 				<div>
 					<label for="e-nomor_peserta" class="block text-sm font-medium text-slate-700 mb-1">Nomor Peserta (Opsional)</label>
 					<input type="text" id="e-nomor_peserta" name="nomor_peserta" class="input" value={editingUser.nomor_peserta || ''} placeholder="Opsional, wajib jika mode Nomor Peserta aktif" />
+				</div>
+				<div>
+					<label for="e-gender" class="block text-sm font-medium text-slate-700 mb-1">Jenis Kelamin</label>
+					<select id="e-gender" name="gender" class="input">
+						<option value="" selected={!editingUser.gender}>Pilih Jenis Kelamin (Opsional)</option>
+						<option value="L" selected={editingUser.gender === 'L'}>Laki-Laki (L)</option>
+						<option value="P" selected={editingUser.gender === 'P'}>Perempuan (P)</option>
+					</select>
 				</div>
 				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 					<div>
@@ -366,7 +382,9 @@
 							/>
 						</th>
 						<th class="p-4 font-semibold whitespace-nowrap">Siswa</th>
+						<th class="p-4 font-semibold whitespace-nowrap">No. Peserta</th>
 						<th class="p-4 font-semibold whitespace-nowrap">Kelas</th>
+						<th class="p-4 font-semibold whitespace-nowrap text-center">JK</th>
 						<th class="p-4 font-semibold whitespace-nowrap">Tempat, Tgl Lahir</th>
 						<th class="p-4 font-semibold whitespace-nowrap">Status</th>
 						<th class="p-4 font-semibold text-right whitespace-nowrap">Aksi</th>
@@ -414,12 +432,24 @@
 								</div>
 							</td>
 							<td class="p-4 whitespace-nowrap">
+								<span class="text-slate-700">{user.nomor_peserta || '-'}</span>
+							</td>
+							<td class="p-4 whitespace-nowrap">
 								{#if user.class_name}
 									<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap {getClassColor(user.class_id)}">
 										{user.class_name}
 									</span>
 								{:else}
 									<span class="text-sm text-slate-400 whitespace-nowrap">-</span>
+								{/if}
+							</td>
+							<td class="p-4 whitespace-nowrap text-center">
+								{#if user.gender === 'L'}
+									<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 font-bold text-xs" title="Laki-Laki">L</span>
+								{:else if user.gender === 'P'}
+									<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-pink-100 text-pink-700 font-bold text-xs" title="Perempuan">P</span>
+								{:else}
+									<span class="text-slate-400">-</span>
 								{/if}
 							</td>
 							<td class="p-4 text-sm text-slate-600 whitespace-nowrap">

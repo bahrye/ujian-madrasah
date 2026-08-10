@@ -12,7 +12,7 @@ export const load: PageServerLoad = async ({ locals, url, platform }) => {
 	const classFilter = url.searchParams.get('class') || '';
 
 	let query = `
-		SELECT u.id, u.username, u.name, u.is_active, u.created_at, u.class_id, c.name as class_name, u.place_of_birth, u.date_of_birth, u.photo, u.nisn, u.nomor_peserta 
+		SELECT u.id, u.username, u.name, u.is_active, u.created_at, u.class_id, c.name as class_name, u.place_of_birth, u.date_of_birth, u.photo, u.nisn, u.nomor_peserta, u.gender 
 		FROM users u 
 		LEFT JOIN classes c ON u.class_id = c.id 
 		WHERE u.school_id = ? AND u.role = 'siswa'
@@ -65,6 +65,7 @@ export const actions: Actions = {
 		const class_id = data.get('class_id')?.toString() || null;
 		const place_of_birth = data.get('place_of_birth')?.toString().trim() || null;
 		const date_of_birth = data.get('date_of_birth')?.toString() || null;
+		const gender = data.get('gender')?.toString() || null;
 
 		if (!name || !nisn) {
 			return fail(400, { error: 'Nama dan NISN wajib diisi' });
@@ -94,8 +95,8 @@ export const actions: Actions = {
 
 			const passwordHash = await hashPassword(nisn);
 			
-			await db.prepare('INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth, nisn, nomor_peserta) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-				.bind(locals.user.school_id, class_id, username, passwordHash, name, 'siswa', place_of_birth, date_of_birth, nisn, nomor_peserta)
+			await db.prepare('INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth, nisn, nomor_peserta, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+				.bind(locals.user.school_id, class_id, username, passwordHash, name, 'siswa', place_of_birth, date_of_birth, nisn, nomor_peserta, gender)
 				.run();
 			
 			return { success: true };
@@ -115,6 +116,7 @@ export const actions: Actions = {
 		const class_id = data.get('class_id')?.toString() || null;
 		const place_of_birth = data.get('place_of_birth')?.toString().trim() || null;
 		const date_of_birth = data.get('date_of_birth')?.toString() || null;
+		const gender = data.get('gender')?.toString() || null;
 		const parsedId = parseInt(idStr || '', 10);
 
 		if (isNaN(parsedId) || !name || !nisn) {
@@ -144,8 +146,8 @@ export const actions: Actions = {
 
 			const passwordHash = await hashPassword(nisn);
 			
-			await db.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, class_id = ?, place_of_birth = ?, date_of_birth = ?, nisn = ?, nomor_peserta = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?')
-				.bind(name, username, passwordHash, class_id, place_of_birth, date_of_birth, nisn, nomor_peserta, parsedId, locals.user.school_id)
+			await db.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, class_id = ?, place_of_birth = ?, date_of_birth = ?, nisn = ?, nomor_peserta = ?, gender = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?')
+				.bind(name, username, passwordHash, class_id, place_of_birth, date_of_birth, nisn, nomor_peserta, gender, parsedId, locals.user.school_id)
 				.run();
 			
 			return { success: true };
@@ -241,6 +243,9 @@ export const actions: Actions = {
 				const nisn = String(student.nisn || '').trim();
 				const name = String(student.name || '').trim();
 				const nomor_peserta = student.nomor_peserta ? String(student.nomor_peserta).trim() : null;
+				let gender = student.gender ? String(student.gender).toUpperCase().trim() : null;
+				if (gender !== 'L' && gender !== 'P') gender = null;
+				
 				if (!nisn || !name) continue;
 				
 				if (isNomorPesertaMode && !nomor_peserta) {
@@ -258,8 +263,8 @@ export const actions: Actions = {
 				existingUsernames.add(username.toLowerCase());
 				const passwordHash = await hashPassword(nisn);
 				stmts.push(
-					db.prepare('INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth, nisn, nomor_peserta) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-						.bind(locals.user.school_id, student.class_id || null, username, passwordHash, name, 'siswa', student.place_of_birth || null, student.date_of_birth || null, nisn, nomor_peserta)
+					db.prepare('INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth, nisn, nomor_peserta, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+						.bind(locals.user.school_id, student.class_id || null, username, passwordHash, name, 'siswa', student.place_of_birth || null, student.date_of_birth || null, nisn, nomor_peserta, gender)
 				);
 			}
 			

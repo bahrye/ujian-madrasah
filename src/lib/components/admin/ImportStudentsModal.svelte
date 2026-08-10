@@ -60,7 +60,7 @@
         throw new Error("File Excel kosong atau tidak memiliki baris data setelah header.");
       }
 
-      // Format: [NOMOR PESERTA, NISN, NAMA LENGKAP, NAMA KELAS, TEMPAT LAHIR, TANGGAL LAHIR]
+      // Format: [NOMOR PESERTA, NISN, NAMA LENGKAP, JK (L/P), NAMA KELAS, TEMPAT LAHIR, TANGGAL LAHIR]
       const results = [];
       for (let i = 1; i < rawData.length; i++) {
         const row = rawData[i] as any[];
@@ -70,9 +70,10 @@
         const nomor_peserta = row[0] ? String(row[0]).trim() : '';
         const nisn = row[1] ? String(row[1]).trim() : '';
         const name = row[2] ? String(row[2]).trim() : '';
-        const classNameStr = row[3] ? String(row[3]).trim() : '';
-        const placeOfBirth = row[4] ? String(row[4]).trim() : '';
-        const dateOfBirth = row[5] ? String(row[5]).trim() : '';
+        const gender = row[3] ? String(row[3]).toUpperCase().trim() : '';
+        const classNameStr = row[4] ? String(row[4]).trim() : '';
+        const placeOfBirth = row[5] ? String(row[5]).trim() : '';
+        const dateOfBirth = row[6] ? String(row[6]).trim() : '';
         
         let classId: number | null = null;
         if (classNameStr) {
@@ -88,6 +89,7 @@
             nomor_peserta,
             nisn, 
             name, 
+            gender: (gender === 'L' || gender === 'P') ? gender : null,
             class_id: classId, 
             class_name: classNameStr,
             place_of_birth: placeOfBirth,
@@ -119,11 +121,11 @@
     const workbook = XLSX.utils.book_new();
     
     // Sheet 1: Data Siswa
-    const headers = ["NOMOR PESERTA", "NISN", "NAMA LENGKAP", "NAMA KELAS", "TEMPAT LAHIR", "TANGGAL LAHIR"];
-    const sampleRow = ["01-02-03", "1234567890", "Budi Santoso", classes.length > 0 ? classes[0].name : "X MIPA 1", "Jakarta", "2005-08-17"];
+    const headers = ["NOMOR PESERTA", "NISN", "NAMA LENGKAP", "JK (L/P)", "NAMA KELAS", "TEMPAT LAHIR", "TANGGAL LAHIR"];
+    const sampleRow = ["01-02-03", "1234567890", "Budi Santoso", "L", classes.length > 0 ? classes[0].name : "X MIPA 1", "Jakarta", "2005-08-17"];
     const wsData = XLSX.utils.aoa_to_sheet([headers, sampleRow]);
     
-    wsData['!cols'] = [{ wch: 18 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 20 }, { wch: 15 }];
+    wsData['!cols'] = [{ wch: 18 }, { wch: 15 }, { wch: 30 }, { wch: 10 }, { wch: 20 }, { wch: 20 }, { wch: 15 }];
     XLSX.utils.book_append_sheet(workbook, wsData, "Data Siswa");
     
     // Sheet 2: Referensi Kelas
@@ -170,7 +172,7 @@
             </h3>
             <ol class="list-decimal list-inside text-sm text-indigo-800 space-y-2 ml-1">
               <li>Unduh template Excel yang disediakan.</li>
-              <li>Isi data siswa sesuai format (Kolom <strong>NOMOR PESERTA</strong>, <strong>NISN</strong>, <strong>NAMA LENGKAP</strong>, <strong>NAMA KELAS</strong>, <strong>TEMPAT LAHIR</strong>, <strong>TANGGAL LAHIR</strong>).</li>
+              <li>Isi data siswa sesuai format (Kolom <strong>NOMOR PESERTA</strong>, <strong>NISN</strong>, <strong>NAMA LENGKAP</strong>, <strong>JK (L/P)</strong>, <strong>NAMA KELAS</strong>, <strong>TEMPAT LAHIR</strong>, <strong>TANGGAL LAHIR</strong>).</li>
               <li>Lihat sheet <strong>Referensi Kelas</strong> untuk panduan nama kelas.</li>
               <li>Simpan dan unggah kembali file Excel tersebut.</li>
             </ol>
