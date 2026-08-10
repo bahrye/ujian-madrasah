@@ -11,11 +11,11 @@ function _page($$renderer, $$props) {
         $$renderer4.push(`<title>Cetak Kartu Peserta Ujian - ${escape_html(exam.title)}</title>`);
       });
     });
-    $$renderer2.push(`<div class="p-4 sm:p-8 overflow-x-auto print:overflow-visible w-full"><div class="print:w-full min-w-[750px] print:min-w-0"><!--[-->`);
+    $$renderer2.push(`<div class="p-4 sm:p-8 print:p-0 overflow-x-auto print:overflow-visible w-full"><div class="print:w-full min-w-[750px] print:min-w-0"><!--[-->`);
     const each_array = ensure_array_like(Array(Math.ceil(participants.length / 4)));
     for (let pageIndex = 0, $$length = each_array.length; pageIndex < $$length; pageIndex++) {
       each_array[pageIndex];
-      $$renderer2.push(`<div class="grid grid-cols-2 grid-rows-2 gap-6 print:h-[282mm] break-after-page mb-6 print:mb-0"><!--[-->`);
+      $$renderer2.push(`<div class="grid grid-cols-2 grid-rows-2 gap-6 print:h-[275mm] break-after-page mb-6 print:mb-0"><!--[-->`);
       const each_array_1 = ensure_array_like(participants.slice(pageIndex * 4, pageIndex * 4 + 4));
       for (let $$index = 0, $$length2 = each_array_1.length; $$index < $$length2; $$index++) {
         let p = each_array_1[$$index];
