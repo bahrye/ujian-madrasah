@@ -170,24 +170,24 @@
 							<tr>
 								<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">NISN</td>
 								<td class="py-[2px] align-top text-center">:</td>
-								<td class="py-[2px] font-bold align-top">{p.display_nisn}</td>
+								<td class="py-[2px] align-top">{p.display_nisn}</td>
 							</tr>
 							{#if p.display_nomor_peserta && p.display_nomor_peserta !== '-'}
 							<tr>
 								<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">No. Peserta</td>
 								<td class="py-[2px] align-top text-center">:</td>
-								<td class="py-[2px] font-bold align-top">{p.display_nomor_peserta}</td>
+								<td class="py-[2px] align-top">{p.display_nomor_peserta}</td>
 							</tr>
 							{/if}
 							<tr>
 								<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">TTL</td>
 								<td class="py-[2px] align-top text-center">:</td>
-								<td class="py-[2px] font-bold align-top">{getTtl(p)}</td>
+								<td class="py-[2px] align-top">{getTtl(p)}</td>
 							</tr>
 							<tr>
 								<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">Kelas</td>
 								<td class="py-[2px] align-top text-center">:</td>
-								<td class="py-[2px] font-bold align-top">{p.class_name || '-'}</td>
+								<td class="py-[2px] align-top">{p.class_name || '-'}</td>
 							</tr>
 							<tr class="border-t border-slate-300">
 								<td class="py-[2px] pt-1 align-top font-medium text-slate-700 whitespace-nowrap">Username</td>
@@ -198,6 +198,11 @@
 								<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">Password</td>
 								<td class="py-[2px] align-top text-center">:</td>
 								<td class="py-[2px] font-bold font-mono tracking-wide align-top">{p.login_password}</td>
+							</tr>
+							<tr>
+								<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">Link Akses</td>
+								<td class="py-[2px] align-top text-center">:</td>
+								<td class="py-[2px] font-bold align-top">https://ujian-madrasah.pages.dev</td>
 							</tr>
 						</tbody>
 					</table>
