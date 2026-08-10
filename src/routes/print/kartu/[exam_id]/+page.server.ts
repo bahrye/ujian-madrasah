@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 
 	// Get participants
 	const participants = await db.prepare(`
-		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username as nisn, c.name as class_name
+		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name
 		FROM exam_participants p
 		JOIN users u ON p.student_id = u.id
 		LEFT JOIN classes c ON u.class_id = c.id
@@ -27,9 +27,23 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 		ORDER BY c.name, u.name
 	`).bind(examId).all();
 
+	// Calculate login info for each participant based on what's available
+	const formattedParticipants = participants.results.map((p: any) => {
+		const isNomorPesertaMode = p.username === p.nomor_peserta;
+		
+		return {
+			...p,
+			login_username: p.username,
+			login_password: p.nisn, // Password is always NISN in this system
+			login_mode_label: isNomorPesertaMode ? 'No. Peserta' : 'NISN',
+			display_nisn: p.nisn,
+			display_nomor_peserta: p.nomor_peserta || '-'
+		};
+	});
+
 	return { 
 		school,
 		exam, 
-		participants: participants.results
+		participants: formattedParticipants
 	};
 };

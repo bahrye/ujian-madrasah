@@ -55,17 +55,21 @@
 									<td class="py-1 font-bold">{p.class_name || '-'} / ..........</td>
 								</tr>
 								<tr>
-									<td class="py-1 font-medium text-slate-700">Username</td>
+									<td class="py-1 font-medium text-slate-700">Tempat, Tgl Lahir</td>
 									<td class="py-1 text-center">:</td>
-									<td class="py-1 font-mono font-bold tracking-wider">{p.nisn}</td>
+									<td class="py-1 font-bold">{p.place_of_birth || '-'}, {p.date_of_birth ? new Date(p.date_of_birth).toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'}) : '-'}</td>
 								</tr>
 								<tr>
-									<td class="py-1 font-medium text-slate-700">Password</td>
+									<td class="py-1 font-medium text-slate-700">Link Akses</td>
 									<td class="py-1 text-center">:</td>
-									<td class="py-1 font-mono font-bold tracking-wider">{p.nisn}</td>
+									<td class="py-1 font-bold">https://ujian-madrasah.pages.dev</td>
 								</tr>
 							</tbody>
 						</table>
+						
+						<div class="mt-3 text-[11px] bg-slate-50 border border-slate-200 p-1.5 rounded text-slate-700 text-center font-medium">
+							Gunakan <span class="font-bold">No. Peserta</span> sebagai Username dan <span class="font-bold">NISN</span> sebagai Password.
+						</div>
 					</div>
 					
 					<div class="mt-4 flex justify-between items-end">
