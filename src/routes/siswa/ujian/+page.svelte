@@ -235,9 +235,9 @@
 				</div>
 			</div>
 
-			<form method="POST" action="?/startExam" use:enhance={() => { 
+			<form method="POST" action="?/startExam" use:enhance={({ formData }) => { 
 				starting = true; 
-				signatureData = canvas.toDataURL('image/png');
+				formData.set('signature', canvas.toDataURL('image/png'));
 				return async ({ update }) => { 
 					starting = false; 
 					await update(); 
