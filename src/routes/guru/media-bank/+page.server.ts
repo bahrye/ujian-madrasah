@@ -66,7 +66,8 @@ export const actions: Actions = {
 		}
 
 		// Delete from Cloudinary
-		const deleteResult = await deleteFromCloudinary(mediaUrl, env);
+		const mergedEnv = platform?.env || env;
+		const deleteResult = await deleteFromCloudinary(mediaUrl, mergedEnv);
 
 		if (!deleteResult.success) {
 			return fail(500, { error: `Gagal menghapus dari Cloudinary. Pesan: ${deleteResult.error}` });
@@ -149,7 +150,8 @@ export const actions: Actions = {
 					continue;
 				}
 
-				const deleteResult = await deleteFromCloudinary(url, env);
+				const mergedEnv = platform?.env || env;
+				const deleteResult = await deleteFromCloudinary(url, mergedEnv);
 				if (deleteResult.success) {
 					await db.prepare('DELETE FROM uploaded_media WHERE url = ? AND school_id = ?').bind(url, schoolId).run();
 					await db.prepare('UPDATE questions SET media_url = NULL, media_type = NULL WHERE media_url = ?').bind(url).run();

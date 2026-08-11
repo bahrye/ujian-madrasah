@@ -72,11 +72,13 @@
 		if (!isDrawing) return;
 		isDrawing = false;
 		ctx.closePath();
+		signatureData = canvas.toDataURL('image/png');
 	}
 
 	function clearSignature() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		signatureEmpty = true;
+		signatureData = '';
 	}
 </script>
 
@@ -235,9 +237,8 @@
 				</div>
 			</div>
 
-			<form method="POST" action="?/startExam" use:enhance={({ formData }) => { 
+			<form method="POST" action="?/startExam" use:enhance={() => { 
 				starting = true; 
-				formData.set('signature', canvas.toDataURL('image/png'));
 				return async ({ update }) => { 
 					starting = false; 
 					await update(); 

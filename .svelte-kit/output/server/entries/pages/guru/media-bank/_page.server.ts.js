@@ -52,7 +52,8 @@ const actions = {
     if (row.uploaded_by !== locals.user?.id && locals.user?.role !== "admin" && locals.user?.role !== "superadmin") {
       return fail(403, { error: "Anda tidak berhak menghapus media ini." });
     }
-    const deleteResult = await deleteFromCloudinary(mediaUrl, private_env);
+    const mergedEnv = platform?.env || private_env;
+    const deleteResult = await deleteFromCloudinary(mediaUrl, mergedEnv);
     if (!deleteResult.success) {
       return fail(500, { error: `Gagal menghapus dari Cloudinary. Pesan: ${deleteResult.error}` });
     }
@@ -106,7 +107,8 @@ const actions = {
         if (!row || row.uploaded_by !== locals.user?.id && locals.user?.role !== "admin" && locals.user?.role !== "superadmin") {
           continue;
         }
-        const deleteResult = await deleteFromCloudinary(url, private_env);
+        const mergedEnv = platform?.env || private_env;
+        const deleteResult = await deleteFromCloudinary(url, mergedEnv);
         if (deleteResult.success) {
           await db.prepare("DELETE FROM uploaded_media WHERE url = ? AND school_id = ?").bind(url, schoolId).run();
           await db.prepare("UPDATE questions SET media_url = NULL, media_type = NULL WHERE media_url = ?").bind(url).run();

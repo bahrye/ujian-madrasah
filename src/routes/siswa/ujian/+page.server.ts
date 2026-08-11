@@ -167,13 +167,24 @@ export const actions: Actions = {
 
 			let signatureStr = form.get('signature')?.toString() || '';
 			
+			console.log('Signature length from form:', signatureStr.length);
+
 			// Upload signature to Cloudinary if it's base64
 			if (signatureStr.startsWith('data:image/')) {
-				const uploadResult = await uploadToCloudinary(signatureStr, env);
+				const mergedEnv = platform?.env || env;
+				const uploadResult = await uploadToCloudinary(signatureStr, mergedEnv);
+				console.log('Cloudinary Upload Result:', uploadResult);
 				if (uploadResult.success && uploadResult.url) {
 					signatureStr = uploadResult.url;
+				} else {
+					console.error('Cloudinary Upload Failed:', uploadResult.error);
+					return fail(500, { error: 'Gagal menyimpan tanda tangan ke server (Cloudinary error). Silakan coba lagi.' });
 				}
+			} else {
+				console.log('Signature is not base64. Starts with:', signatureStr.substring(0, 30));
 			}
+
+			console.log('Final signature to DB:', signatureStr.substring(0, 100) + '...');
 
 			const result = await db.prepare(`INSERT INTO student_attempts (student_id, exam_id, token_id, end_time, status, signature) VALUES (?, ?, ?, ?, 'mengerjakan', ?)`)
 				.bind(locals.user!.id, token.exam_id, token.id, endTime, signatureStr).run();

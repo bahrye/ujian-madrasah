@@ -199,7 +199,8 @@ export const actions: Actions = {
 
 			// Delete signature from Cloudinary if exists
 			if (attemptCheck.signature && attemptCheck.signature.includes('res.cloudinary.com')) {
-				await deleteFromCloudinary(attemptCheck.signature, env);
+				const mergedEnv = platform?.env || env;
+				await deleteFromCloudinary(attemptCheck.signature, mergedEnv);
 			}
 
 			// Delete all answers and reset attempt

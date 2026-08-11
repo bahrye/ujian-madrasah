@@ -174,7 +174,8 @@ const actions = {
         return fail(403, { error: "Sesi ujian tidak ditemukan atau bukan milik sekolah Anda." });
       }
       if (attemptCheck.signature && attemptCheck.signature.includes("res.cloudinary.com")) {
-        await deleteFromCloudinary(attemptCheck.signature, private_env);
+        const mergedEnv = platform?.env || private_env;
+        await deleteFromCloudinary(attemptCheck.signature, mergedEnv);
       }
       await db.batch([
         db.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(parsedAttemptId),
