@@ -33,7 +33,7 @@
 			<div class="grid grid-cols-2 gap-4 mb-4 text-sm">
 				<table class="w-full">
 					<tbody>
-						<tr><td class="py-1 w-32 font-medium">Ujian</td><td class="w-4">:</td><td>{exam.title}</td></tr>
+						<tr><td class="py-1 w-32 font-medium">Ujian</td><td class="w-4">:</td><td>{exam.exam_type_name || exam.title}</td></tr>
 						<tr><td class="py-1 font-medium">Mata Pelajaran</td><td>:</td><td>{exam.subject_name || 'Umum'}</td></tr>
 						<tr><td class="py-1 font-medium">Kelas / Ruang</td><td>:</td><td>{className} / ....................</td></tr>
 					</tbody>
@@ -51,7 +51,7 @@
 				<thead>
 					<tr>
 						<th class="border border-black p-2 w-12 text-center">No</th>
-						<th class="border border-black p-2 w-32">{isNomorPesertaMode ? 'No. Peserta' : 'NISN'}</th>
+						<th class="border border-black p-2 px-4 whitespace-nowrap">{isNomorPesertaMode ? 'No. Peserta' : 'NISN'}</th>
 						<th class="border border-black p-2 text-left">Nama Peserta</th>
 						<th class="border border-black p-2 w-48 text-center" colspan="2">Tanda Tangan</th>
 						<th class="border border-black p-2 w-24 text-center">Ket.</th>
@@ -61,23 +61,21 @@
 					{#each students as p, i}
 						<tr>
 							<td class="border border-black p-2 text-center">{i + 1}</td>
-							<td class="border border-black p-2 text-center font-mono">{isNomorPesertaMode ? (p.nomor_peserta || '-') : (p.nisn || p.username)}</td>
+							<td class="border border-black p-2 text-center font-mono whitespace-nowrap text-[11px] leading-tight">{isNomorPesertaMode ? (p.nomor_peserta || '-') : (p.nisn || p.username)}</td>
 							<td class="border border-black p-2">{p.student_name}</td>
 							<td class="border-b border-black p-2 w-24 align-top h-12 relative text-center">
 								{#if (i + 1) % 2 !== 0}
+									<span class="text-xs text-slate-500 text-left absolute top-1 left-1 z-10">{i + 1}.</span>
 									{#if p.signature}
-										<img src={p.signature} alt="TTD" class="absolute inset-1 w-[90%] h-[90%] object-contain" />
-									{:else}
-										<span class="text-xs text-slate-500 text-left absolute top-1 left-1">{i + 1}.</span>
+										<img src={p.signature} alt="TTD" class="absolute inset-1 w-[90%] h-[90%] object-contain z-0 opacity-80 mix-blend-multiply" />
 									{/if}
 								{/if}
 							</td>
 							<td class="border-b border-r border-black p-2 w-24 align-top h-12 relative text-center">
 								{#if (i + 1) % 2 === 0}
+									<span class="text-xs text-slate-500 text-left absolute top-1 left-1 z-10">{i + 1}.</span>
 									{#if p.signature}
-										<img src={p.signature} alt="TTD" class="absolute inset-1 w-[90%] h-[90%] object-contain" />
-									{:else}
-										<span class="text-xs text-slate-500 text-left absolute top-1 left-1">{i + 1}.</span>
+										<img src={p.signature} alt="TTD" class="absolute inset-1 w-[90%] h-[90%] object-contain z-0 opacity-80 mix-blend-multiply" />
 									{/if}
 								{/if}
 							</td>
@@ -95,12 +93,12 @@
 			<!-- Tanda Tangan -->
 			<div class="flex justify-between mt-8 text-sm px-10">
 				<div class="text-center">
-					<p class="mb-20">Pengawas Ruang</p>
+					<p class="mb-20">Pengawas 1</p>
 					<p class="font-bold border-b border-black inline-block px-4">........................................</p>
 					<p class="mt-1">NIP. ........................................</p>
 				</div>
 				<div class="text-center">
-					<p class="mb-20">Proktor / Teknisi</p>
+					<p class="mb-20">Pengawas 2</p>
 					<p class="font-bold border-b border-black inline-block px-4">........................................</p>
 					<p class="mt-1">NIP. ........................................</p>
 				</div>
