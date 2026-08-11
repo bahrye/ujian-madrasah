@@ -10,6 +10,65 @@
 	let showModal = false;
 	let tokenCode = '';
 	let agreed = false;
+
+	// Signature Pad Logic
+	let canvas: HTMLCanvasElement;
+	let ctx: CanvasRenderingContext2D;
+	let isDrawing = false;
+	let signatureEmpty = true;
+	let signatureData = '';
+
+	$: if (canvas && showModal) {
+		ctx = canvas.getContext('2d')!;
+		ctx.strokeStyle = '#000000';
+		ctx.lineWidth = 2;
+		ctx.lineCap = 'round';
+		ctx.lineJoin = 'round';
+	}
+
+	function getCoordinates(e: MouseEvent | TouchEvent) {
+		const rect = canvas.getBoundingClientRect();
+		if (e.type.includes('touch')) {
+			const touch = (e as TouchEvent).touches[0];
+			return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+		} else {
+			return { x: (e as MouseEvent).clientX - rect.left, y: (e as MouseEvent).clientY - rect.top };
+		}
+	}
+
+	function startDrawing(e: MouseEvent | TouchEvent) {
+		isDrawing = true;
+		signatureEmpty = false;
+		const { x, y } = getCoordinates(e);
+		ctx.beginPath();
+		ctx.moveTo(x, y);
+	}
+
+	function startDrawingTouch(e: TouchEvent) {
+		startDrawing(e);
+	}
+
+	function draw(e: MouseEvent | TouchEvent) {
+		if (!isDrawing) return;
+		const { x, y } = getCoordinates(e);
+		ctx.lineTo(x, y);
+		ctx.stroke();
+	}
+
+	function drawTouch(e: TouchEvent) {
+		draw(e);
+	}
+
+	function stopDrawing() {
+		if (!isDrawing) return;
+		isDrawing = false;
+		ctx.closePath();
+	}
+
+	function clearSignature() {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		signatureEmpty = true;
+	}
 </script>
 
 <svelte:head><title>Mulai Ujian — Ujian Online Madrasah</title></svelte:head>
@@ -132,20 +191,56 @@
 				</ul>
 			</div>
 
-			<label class="flex items-start gap-3 p-3 mb-6 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
+			<label class="flex items-start gap-3 p-3 mb-4 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
 				<input type="checkbox" bind:checked={agreed} class="mt-1 w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500" />
 				<span class="text-sm font-medium text-slate-700 leading-tight">
 					Saya telah membaca peraturan ujian dan paham bahwa segala bentuk kecurangan akan tercatat secara otomatis.
 				</span>
 			</label>
 
-			<form method="POST" action="?/startExam" use:enhance={() => { starting = true; return async ({ update }) => { starting = false; await update(); }; }}>
+			<!-- Signature Pad -->
+			<div class="mb-6">
+				<p class="text-sm font-bold text-slate-700 mb-2">Tanda Tangan (Wajib)</p>
+				<p class="text-xs text-slate-500 mb-2">Silakan tanda tangan pada kotak di bawah ini menggunakan mouse atau jari (layar sentuh) sebagai bukti kehadiran.</p>
+				<div class="border-2 border-dashed border-slate-300 rounded-lg overflow-hidden bg-white relative">
+					<canvas 
+						bind:this={canvas} 
+						width="400" 
+						height="150" 
+						class="w-full h-[150px] cursor-crosshair touch-none"
+						on:mousedown={startDrawing}
+						on:mousemove={draw}
+						on:mouseup={stopDrawing}
+						on:mouseleave={stopDrawing}
+						on:touchstart|preventDefault={startDrawingTouch}
+						on:touchmove|preventDefault={drawTouch}
+						on:touchend|preventDefault={stopDrawing}
+						on:touchcancel|preventDefault={stopDrawing}
+					></canvas>
+					{#if signatureEmpty}
+						<div class="absolute inset-0 flex items-center justify-center pointer-events-none text-slate-300 text-sm">
+							Tanda Tangan di sini
+						</div>
+					{/if}
+					<button type="button" class="absolute top-2 right-2 p-1.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 text-xs font-medium" on:click={clearSignature}>Hapus</button>
+				</div>
+			</div>
+
+			<form method="POST" action="?/startExam" use:enhance={() => { 
+				starting = true; 
+				signatureData = canvas.toDataURL('image/png');
+				return async ({ update }) => { 
+					starting = false; 
+					await update(); 
+				}; 
+			}}>
 				<input type="hidden" name="token" value={tokenCode} />
 				<input type="hidden" name="exam_id" value={data.exam.id} />
+				<input type="hidden" name="signature" value={signatureData} />
 				
 				<div class="flex gap-3">
 					<button type="button" class="btn-ghost flex-1 justify-center" on:click={() => (showModal = false)} disabled={starting}>Batal</button>
-					<button type="submit" class="btn-primary flex-1 justify-center" disabled={!agreed || starting}>
+					<button type="submit" class="btn-primary flex-1 justify-center" disabled={!agreed || starting || signatureEmpty}>
 						{#if starting}
 							Memulai...
 						{:else}

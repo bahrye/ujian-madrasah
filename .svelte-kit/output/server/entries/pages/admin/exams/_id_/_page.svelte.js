@@ -193,11 +193,19 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<div class="p-8 text-center text-slate-400 text-sm">Belum ada peserta yang mengerjakan ujian ini.</div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Siswa</th><th>Status</th><th>Nilai</th><th>Waktu Mulai</th></tr></thead><tbody><!--[-->`);
+      $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Siswa</th><th>Status</th><th>Nilai</th><th>Waktu Mulai</th><th>TTD</th></tr></thead><tbody><!--[-->`);
       const each_array_4 = ensure_array_like(attempts);
       for (let $$index_4 = 0, $$length = each_array_4.length; $$index_4 < $$length; $$index_4++) {
         let a = each_array_4[$$index_4];
-        $$renderer2.push(`<tr><td class="font-medium">${escape_html(a.student_name)}</td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[a.status] || "badge-info"))}>${escape_html(ATTEMPT_STATUS_LABELS[a.status] || a.status)}</span></td><td class="font-semibold">${escape_html(a.score != null ? a.score : "-")}</td><td class="text-xs text-slate-500">${escape_html(parseDate(a.start_time).toLocaleString("id-ID"))}</td></tr>`);
+        $$renderer2.push(`<tr><td class="font-medium">${escape_html(a.student_name)}</td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[a.status] || "badge-info"))}>${escape_html(ATTEMPT_STATUS_LABELS[a.status] || a.status)}</span></td><td class="font-semibold">${escape_html(a.score != null ? a.score : "-")}</td><td class="text-xs text-slate-500">${escape_html(parseDate(a.start_time).toLocaleString("id-ID"))}</td><td>`);
+        if (a.signature) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<img${attr("src", a.signature)}${attr("alt", `TTD ${stringify(a.student_name)}`)} class="h-8 object-contain bg-white rounded border border-slate-200 p-0.5"/>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<span class="text-xs text-slate-400 italic">-</span>`);
+        }
+        $$renderer2.push(`<!--]--></td></tr>`);
       }
       $$renderer2.push(`<!--]--></tbody></table></div>`);
     }

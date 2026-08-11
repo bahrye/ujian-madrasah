@@ -133,7 +133,8 @@ const actions = {
         return fail(400, { error: "Anda sudah pernah mengerjakan ujian ini." });
       }
       const endTime = new Date(Date.now() + token.duration_minutes * 60 * 1e3).toISOString();
-      const result = await db.prepare(`INSERT INTO student_attempts (student_id, exam_id, token_id, end_time, status) VALUES (?, ?, ?, ?, 'mengerjakan')`).bind(locals.user.id, token.exam_id, token.id, endTime).run();
+      const signatureStr = form.get("signature")?.toString() || "";
+      const result = await db.prepare(`INSERT INTO student_attempts (student_id, exam_id, token_id, end_time, status, signature) VALUES (?, ?, ?, ?, 'mengerjakan', ?)`).bind(locals.user.id, token.exam_id, token.id, endTime, signatureStr).run();
       const attemptId = result.meta.last_row_id;
       const signedCookie = await signExamToken(attemptId, locals.user.id);
       cookies.set("exam_token_verified_" + attemptId, signedCookie, { path: "/", httpOnly: true, sameSite: "lax" });

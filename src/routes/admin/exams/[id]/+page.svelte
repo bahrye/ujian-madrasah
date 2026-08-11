@@ -345,7 +345,7 @@
 		{:else}
 			<div class="table-container border-0 rounded-none">
 				<table class="table">
-					<thead><tr><th>Siswa</th><th>Status</th><th>Nilai</th><th>Waktu Mulai</th></tr></thead>
+					<thead><tr><th>Siswa</th><th>Status</th><th>Nilai</th><th>Waktu Mulai</th><th>TTD</th></tr></thead>
 					<tbody>
 						{#each attempts as a}
 							<tr>
@@ -353,6 +353,13 @@
 								<td><span class={ATTEMPT_STATUS_COLORS[a.status] || 'badge-info'}>{ATTEMPT_STATUS_LABELS[a.status] || a.status}</span></td>
 								<td class="font-semibold">{a.score != null ? a.score : '-'}</td>
 								<td class="text-xs text-slate-500">{parseDate(a.start_time).toLocaleString('id-ID')}</td>
+								<td>
+									{#if a.signature}
+										<img src={a.signature} alt="TTD {a.student_name}" class="h-8 object-contain bg-white rounded border border-slate-200 p-0.5" />
+									{:else}
+										<span class="text-xs text-slate-400 italic">-</span>
+									{/if}
+								</td>
 							</tr>
 						{/each}
 					</tbody>

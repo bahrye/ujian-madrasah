@@ -63,14 +63,22 @@
 							<td class="border border-black p-2 text-center">{i + 1}</td>
 							<td class="border border-black p-2 text-center font-mono">{isNomorPesertaMode ? (p.nomor_peserta || '-') : (p.nisn || p.username)}</td>
 							<td class="border border-black p-2">{p.student_name}</td>
-							<td class="border-b border-black p-2 w-24 align-top h-12">
+							<td class="border-b border-black p-2 w-24 align-top h-12 relative text-center">
 								{#if (i + 1) % 2 !== 0}
-									<span class="text-xs text-slate-500">{i + 1}.</span>
+									{#if p.signature}
+										<img src={p.signature} alt="TTD" class="absolute inset-1 w-[90%] h-[90%] object-contain" />
+									{:else}
+										<span class="text-xs text-slate-500 text-left absolute top-1 left-1">{i + 1}.</span>
+									{/if}
 								{/if}
 							</td>
-							<td class="border-b border-r border-black p-2 w-24 align-top h-12">
+							<td class="border-b border-r border-black p-2 w-24 align-top h-12 relative text-center">
 								{#if (i + 1) % 2 === 0}
-									<span class="text-xs text-slate-500">{i + 1}.</span>
+									{#if p.signature}
+										<img src={p.signature} alt="TTD" class="absolute inset-1 w-[90%] h-[90%] object-contain" />
+									{:else}
+										<span class="text-xs text-slate-500 text-left absolute top-1 left-1">{i + 1}.</span>
+									{/if}
 								{/if}
 							</td>
 							<td class="border border-black p-2 text-center"></td>

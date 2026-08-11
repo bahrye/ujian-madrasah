@@ -313,6 +313,7 @@ CREATE TABLE IF NOT EXISTS student_attempts (
     violation_logs TEXT,
     is_paused INTEGER NOT NULL DEFAULT 0,
     paused_at TEXT,
+    signature TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 

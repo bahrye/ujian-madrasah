@@ -40,17 +40,31 @@ function _page($$renderer, $$props) {
       const each_array_1 = ensure_array_like(students);
       for (let i = 0, $$length2 = each_array_1.length; i < $$length2; i++) {
         let p = each_array_1[i];
-        $$renderer2.push(`<tr><td class="border border-black p-2 text-center">${escape_html(i + 1)}</td><td class="border border-black p-2 text-center font-mono">${escape_html(isNomorPesertaMode ? p.nomor_peserta || "-" : p.nisn || p.username)}</td><td class="border border-black p-2">${escape_html(p.student_name)}</td><td class="border-b border-black p-2 w-24 align-top h-12">`);
+        $$renderer2.push(`<tr><td class="border border-black p-2 text-center">${escape_html(i + 1)}</td><td class="border border-black p-2 text-center font-mono">${escape_html(isNomorPesertaMode ? p.nomor_peserta || "-" : p.nisn || p.username)}</td><td class="border border-black p-2">${escape_html(p.student_name)}</td><td class="border-b border-black p-2 w-24 align-top h-12 relative text-center">`);
         if ((i + 1) % 2 !== 0) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<span class="text-xs text-slate-500">${escape_html(i + 1)}.</span>`);
+          if (p.signature) {
+            $$renderer2.push("<!--[0-->");
+            $$renderer2.push(`<img${attr("src", p.signature)} alt="TTD" class="absolute inset-1 w-[90%] h-[90%] object-contain"/>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+            $$renderer2.push(`<span class="text-xs text-slate-500 text-left absolute top-1 left-1">${escape_html(i + 1)}.</span>`);
+          }
+          $$renderer2.push(`<!--]-->`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
-        $$renderer2.push(`<!--]--></td><td class="border-b border-r border-black p-2 w-24 align-top h-12">`);
+        $$renderer2.push(`<!--]--></td><td class="border-b border-r border-black p-2 w-24 align-top h-12 relative text-center">`);
         if ((i + 1) % 2 === 0) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<span class="text-xs text-slate-500">${escape_html(i + 1)}.</span>`);
+          if (p.signature) {
+            $$renderer2.push("<!--[0-->");
+            $$renderer2.push(`<img${attr("src", p.signature)} alt="TTD" class="absolute inset-1 w-[90%] h-[90%] object-contain"/>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+            $$renderer2.push(`<span class="text-xs text-slate-500 text-left absolute top-1 left-1">${escape_html(i + 1)}.</span>`);
+          }
+          $$renderer2.push(`<!--]-->`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
