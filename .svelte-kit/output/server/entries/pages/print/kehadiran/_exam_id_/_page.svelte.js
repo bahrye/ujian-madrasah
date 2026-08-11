@@ -13,7 +13,7 @@ function _page($$renderer, $$props) {
         $$renderer4.push(`<title>Daftar Hadir Ujian - ${escape_html(exam.title)}</title>`);
       });
     });
-    $$renderer2.push(`<div class="p-8"><!--[-->`);
+    $$renderer2.push(`<div class="p-8 print:p-12 max-w-[21cm] mx-auto bg-white"><!--[-->`);
     const each_array = ensure_array_like(Object.entries(participantsByClass));
     for (let classIdx = 0, $$length = each_array.length; classIdx < $$length; classIdx++) {
       let [className, students] = each_array[classIdx];

@@ -11,7 +11,20 @@
 	<title>Daftar Hadir Ujian - {exam.title}</title>
 </svelte:head>
 
-<div class="p-8">
+<style>
+	@media print {
+		@page {
+			margin: 0;
+		}
+		:global(body) {
+			margin: 0;
+			-webkit-print-color-adjust: exact;
+			print-color-adjust: exact;
+		}
+	}
+</style>
+
+<div class="p-8 print:p-12 max-w-[21cm] mx-auto bg-white">
 	<!-- Print each class on a new page if necessary, but here we just list them -->
 	{#each Object.entries(participantsByClass) as [className, students], classIdx}
 		<div class={classIdx > 0 ? "break-before-page pt-8" : ""}>

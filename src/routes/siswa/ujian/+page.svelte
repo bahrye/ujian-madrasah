@@ -209,6 +209,15 @@
 				</span>
 			</label>
 
+			{#if form?.error}
+				<div class="mb-6 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-medium text-left flex items-center gap-2 animate-in fade-in">
+					<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.warning} />
+					</svg>
+					{form.error}
+				</div>
+			{/if}
+
 			<!-- Signature Pad -->
 			<div class="mb-6">
 				<p class="text-sm font-bold text-slate-700 mb-2">Tanda Tangan (Wajib)</p>

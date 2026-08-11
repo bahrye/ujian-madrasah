@@ -145,7 +145,7 @@ const actions = {
           signatureStr = uploadResult.url;
         } else {
           console.error("Cloudinary Upload Failed:", uploadResult.error);
-          return fail(500, { error: "Gagal menyimpan tanda tangan ke server (Cloudinary error). Silakan coba lagi." });
+          return fail(500, { error: `Gagal menyimpan tanda tangan ke server (Cloudinary error: ${uploadResult.error}). Silakan coba lagi.` });
         }
       } else {
         console.log("Signature is not base64. Starts with:", signatureStr.substring(0, 30));

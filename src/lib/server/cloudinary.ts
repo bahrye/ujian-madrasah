@@ -1,9 +1,9 @@
 export async function deleteFromCloudinary(url: string | null, env: Record<string, string | undefined> | any): Promise<{success: boolean, error?: string}> {
 	if (!url || !url.includes('res.cloudinary.com')) return { success: false, error: 'Bukan URL Cloudinary valid' };
 
-	const cloudName = env.PUBLIC_CLOUDINARY_CLOUD_NAME || env.CLOUDINARY_CLOUD_NAME || 'dfhtjgwcz';
-	const apiKey = env.CLOUDINARY_API_KEY;
-	const apiSecret = env.CLOUDINARY_API_SECRET;
+	const cloudName = (env.PUBLIC_CLOUDINARY_CLOUD_NAME || env.CLOUDINARY_CLOUD_NAME || 'dfhtjgwcz').trim();
+	const apiKey = env.CLOUDINARY_API_KEY?.trim();
+	const apiSecret = env.CLOUDINARY_API_SECRET?.trim();
 
 	if (!apiKey || !apiSecret) {
 		console.warn('Cloudinary API credentials missing. Skipping automatic deletion.');
@@ -64,12 +64,16 @@ export async function deleteFromCloudinary(url: string | null, env: Record<strin
 }
 
 export async function uploadToCloudinary(base64Image: string, env: Record<string, string | undefined> | any): Promise<{success: boolean, url?: string, error?: string}> {
-	const cloudName = env.PUBLIC_CLOUDINARY_CLOUD_NAME || env.CLOUDINARY_CLOUD_NAME;
-	const apiKey = env.CLOUDINARY_API_KEY;
-	const apiSecret = env.CLOUDINARY_API_SECRET;
+	const cloudName = (env.PUBLIC_CLOUDINARY_CLOUD_NAME || env.CLOUDINARY_CLOUD_NAME || 'dfhtjgwcz').trim();
+	const apiKey = env.CLOUDINARY_API_KEY?.trim();
+	const apiSecret = env.CLOUDINARY_API_SECRET?.trim();
 
 	if (!cloudName || !apiKey || !apiSecret) {
-		return { success: false, error: 'Cloudinary credentials missing' };
+		const missing = [];
+		if (!cloudName) missing.push('CLOUD_NAME');
+		if (!apiKey) missing.push('API_KEY');
+		if (!apiSecret) missing.push('API_SECRET');
+		return { success: false, error: `Kredensial Cloudinary belum lengkap: ${missing.join(', ')}` };
 	}
 
 	try {

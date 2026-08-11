@@ -1,8 +1,8 @@
 async function deleteFromCloudinary(url, env) {
   if (!url || !url.includes("res.cloudinary.com")) return { success: false, error: "Bukan URL Cloudinary valid" };
-  const cloudName = env.PUBLIC_CLOUDINARY_CLOUD_NAME || env.CLOUDINARY_CLOUD_NAME || "dfhtjgwcz";
-  const apiKey = env.CLOUDINARY_API_KEY;
-  const apiSecret = env.CLOUDINARY_API_SECRET;
+  const cloudName = (env.PUBLIC_CLOUDINARY_CLOUD_NAME || env.CLOUDINARY_CLOUD_NAME || "dfhtjgwcz").trim();
+  const apiKey = env.CLOUDINARY_API_KEY?.trim();
+  const apiSecret = env.CLOUDINARY_API_SECRET?.trim();
   if (!apiKey || !apiSecret) {
     console.warn("Cloudinary API credentials missing. Skipping automatic deletion.");
     return { success: false, error: "API Key atau Secret Cloudinary belum diatur di Cloudflare Pages (Environment Variables)" };
@@ -46,11 +46,15 @@ async function deleteFromCloudinary(url, env) {
   }
 }
 async function uploadToCloudinary(base64Image, env) {
-  const cloudName = env.PUBLIC_CLOUDINARY_CLOUD_NAME || env.CLOUDINARY_CLOUD_NAME;
-  const apiKey = env.CLOUDINARY_API_KEY;
-  const apiSecret = env.CLOUDINARY_API_SECRET;
+  const cloudName = (env.PUBLIC_CLOUDINARY_CLOUD_NAME || env.CLOUDINARY_CLOUD_NAME || "dfhtjgwcz").trim();
+  const apiKey = env.CLOUDINARY_API_KEY?.trim();
+  const apiSecret = env.CLOUDINARY_API_SECRET?.trim();
   if (!cloudName || !apiKey || !apiSecret) {
-    return { success: false, error: "Cloudinary credentials missing" };
+    const missing = [];
+    if (!cloudName) missing.push("CLOUD_NAME");
+    if (!apiKey) missing.push("API_KEY");
+    if (!apiSecret) missing.push("API_SECRET");
+    return { success: false, error: `Kredensial Cloudinary belum lengkap: ${missing.join(", ")}` };
   }
   try {
     const timestamp = Math.round((/* @__PURE__ */ new Date()).getTime() / 1e3).toString();
