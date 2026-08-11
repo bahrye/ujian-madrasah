@@ -136,23 +136,29 @@ const actions = {
       }
       const endTime = new Date(Date.now() + token.duration_minutes * 60 * 1e3).toISOString();
       let signatureStr = form.get("signature")?.toString() || "";
-      console.log("Signature length from form:", signatureStr.length);
-      if (signatureStr.startsWith("data:image/")) {
-        const mergedEnv = platform?.env || private_env;
-        const uploadResult = await uploadToCloudinary(signatureStr, mergedEnv);
-        console.log("Cloudinary Upload Result:", uploadResult);
-        if (uploadResult.success && uploadResult.url) {
-          signatureStr = uploadResult.url;
-        } else {
-          console.error("Cloudinary Upload Failed:", uploadResult.error);
-          return fail(500, { error: `Gagal menyimpan tanda tangan ke server (Cloudinary error: ${uploadResult.error}). Silakan coba lagi.` });
-        }
-      } else {
-        console.log("Signature is not base64. Starts with:", signatureStr.substring(0, 30));
-      }
-      console.log("Final signature to DB:", signatureStr.substring(0, 100) + "...");
       const result = await db.prepare(`INSERT INTO student_attempts (student_id, exam_id, token_id, end_time, status, signature) VALUES (?, ?, ?, ?, 'mengerjakan', ?)`).bind(locals.user.id, token.exam_id, token.id, endTime, signatureStr).run();
       const attemptId = result.meta.last_row_id;
+      if (signatureStr.startsWith("data:image/")) {
+        const mergedEnv = platform?.env || private_env;
+        const backgroundUpload = async () => {
+          try {
+            const uploadResult = await uploadToCloudinary(signatureStr, mergedEnv);
+            if (uploadResult.success && uploadResult.url) {
+              await db.prepare(`UPDATE student_attempts SET signature = ? WHERE id = ?`).bind(uploadResult.url, attemptId).run();
+              console.log("Background upload success for attempt", attemptId);
+            } else {
+              console.error("Background upload failed for attempt", attemptId, "Error:", uploadResult.error);
+            }
+          } catch (err) {
+            console.error("Background upload exception:", err);
+          }
+        };
+        if (platform?.context?.waitUntil) {
+          platform.context.waitUntil(backgroundUpload());
+        } else {
+          backgroundUpload();
+        }
+      }
       const signedCookie = await signExamToken(attemptId, locals.user.id);
       cookies.set("exam_token_verified_" + attemptId, signedCookie, { path: "/", httpOnly: true, sameSite: "lax" });
       throw redirect(302, `/siswa/ujian/${attemptId}`);

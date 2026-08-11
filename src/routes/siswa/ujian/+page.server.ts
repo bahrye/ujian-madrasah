@@ -167,30 +167,40 @@ export const actions: Actions = {
 
 			let signatureStr = form.get('signature')?.toString() || '';
 			
-			console.log('Signature length from form:', signatureStr.length);
-
-			// Upload signature to Cloudinary if it's base64
-			if (signatureStr.startsWith('data:image/')) {
-				const mergedEnv = platform?.env || env;
-				const uploadResult = await uploadToCloudinary(signatureStr, mergedEnv);
-				console.log('Cloudinary Upload Result:', uploadResult);
-				if (uploadResult.success && uploadResult.url) {
-					signatureStr = uploadResult.url;
-				} else {
-					console.error('Cloudinary Upload Failed:', uploadResult.error);
-					return fail(500, { error: `Gagal menyimpan tanda tangan ke server (Cloudinary error: ${uploadResult.error}). Silakan coba lagi.` });
-				}
-			} else {
-				console.log('Signature is not base64. Starts with:', signatureStr.substring(0, 30));
-			}
-
-			console.log('Final signature to DB:', signatureStr.substring(0, 100) + '...');
-
+			// Insert the base64 signature immediately to allow the student to start the exam instantly.
 			const result = await db.prepare(`INSERT INTO student_attempts (student_id, exam_id, token_id, end_time, status, signature) VALUES (?, ?, ?, ?, 'mengerjakan', ?)`)
 				.bind(locals.user!.id, token.exam_id, token.id, endTime, signatureStr).run();
 
 			const attemptId = result.meta.last_row_id;
-			
+
+			// Background task to upload signature to Cloudinary
+			if (signatureStr.startsWith('data:image/')) {
+				const mergedEnv = platform?.env || env;
+				
+				const backgroundUpload = async () => {
+					try {
+						const uploadResult = await uploadToCloudinary(signatureStr, mergedEnv);
+						if (uploadResult.success && uploadResult.url) {
+							// Update DB with the secure Cloudinary URL, replacing the heavy base64 string
+							await db.prepare(`UPDATE student_attempts SET signature = ? WHERE id = ?`)
+								.bind(uploadResult.url, attemptId).run();
+							console.log('Background upload success for attempt', attemptId);
+						} else {
+							console.error('Background upload failed for attempt', attemptId, 'Error:', uploadResult.error);
+						}
+					} catch (err) {
+						console.error('Background upload exception:', err);
+					}
+				};
+
+				// Use Cloudflare's waitUntil to run after response, or fire-and-forget in Node dev
+				if (platform?.context?.waitUntil) {
+					platform.context.waitUntil(backgroundUpload());
+				} else {
+					backgroundUpload();
+				}
+			}
+
 			const signedCookie = await signExamToken(attemptId, locals.user!.id);
 			cookies.set('exam_token_verified_' + attemptId, signedCookie, { path: '/', httpOnly: true, sameSite: 'lax' });
 			throw redirect(302, `/siswa/ujian/${attemptId}`);
