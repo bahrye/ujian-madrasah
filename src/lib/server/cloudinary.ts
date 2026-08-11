@@ -62,3 +62,46 @@ export async function deleteFromCloudinary(url: string | null, env: Record<strin
 		return { success: false, error: err.message || 'Kesalahan koneksi ke Cloudinary API' };
 	}
 }
+
+export async function uploadToCloudinary(base64Image: string, env: Record<string, string | undefined> | any): Promise<{success: boolean, url?: string, error?: string}> {
+	const cloudName = env.PUBLIC_CLOUDINARY_CLOUD_NAME || env.CLOUDINARY_CLOUD_NAME;
+	const apiKey = env.CLOUDINARY_API_KEY;
+	const apiSecret = env.CLOUDINARY_API_SECRET;
+
+	if (!cloudName || !apiKey || !apiSecret) {
+		return { success: false, error: 'Cloudinary credentials missing' };
+	}
+
+	try {
+		const timestamp = Math.round(new Date().getTime() / 1000).toString();
+		const folder = 'ujian_signatures';
+		
+		const strToSign = `folder=${folder}&timestamp=${timestamp}${apiSecret}`;
+		const encoder = new TextEncoder();
+		const data = encoder.encode(strToSign);
+		const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+		const hashArray = Array.from(new Uint8Array(hashBuffer));
+		const signature = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+		const formData = new FormData();
+		formData.append('file', base64Image);
+		formData.append('api_key', apiKey);
+		formData.append('timestamp', timestamp);
+		formData.append('signature', signature);
+		formData.append('folder', folder);
+
+		const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+			method: 'POST',
+			body: formData
+		});
+
+		const result = await res.json() as any;
+		if (result.secure_url) {
+			return { success: true, url: result.secure_url };
+		} else {
+			return { success: false, error: result.error?.message || 'Upload failed' };
+		}
+	} catch (e: any) {
+		return { success: false, error: e.message };
+	}
+}

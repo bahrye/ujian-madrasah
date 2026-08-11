@@ -150,20 +150,18 @@
 			</div>
 		{/each}
 	</div>
-</div>
-
-<!-- ── Participants Modal ─────────────────────────────────────────────── -->
+</div>	<!-- ── Participants Modal ─────────────────────────────────────────────── -->
 {#if participantsModal}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => { participantsModal = null; addMode = null; }}>
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => { participantsModal = null; }}>
 		<div class="max-h-[90vh] overflow-y-auto card p-6 w-full max-w-2xl animate-bounce-in" on:click|stopPropagation>
 			<div class="flex items-center justify-between mb-5">
 				<div>
 					<h2 class="text-lg font-bold text-slate-800">Peserta Default — {participantsModal.name}</h2>
 					<p class="text-xs text-slate-500 mt-0.5">Peserta ini akan otomatis ditambahkan saat ujian baru dibuat di tipe ini.</p>
 				</div>
-				<button class="text-slate-400 hover:text-slate-600" on:click={() => { participantsModal = null; addMode = null; }}>
+				<button class="text-slate-400 hover:text-slate-600" on:click={() => { participantsModal = null; }}>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
 				</button>
 			</div>

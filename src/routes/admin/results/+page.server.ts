@@ -1,6 +1,8 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { getDB } from '$lib/server/db';
+import { deleteFromCloudinary } from '$lib/server/cloudinary';
+import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async ({ platform, url, locals }) => {
 	if (!locals.user) throw redirect(302, '/login');
@@ -47,13 +49,18 @@ export const actions: Actions = {
 		try {
 			// Verifikasi attempt milik sekolah ini
 			const attemptCheck = await db.prepare(`
-				SELECT sa.id FROM student_attempts sa
+				SELECT sa.id, sa.signature FROM student_attempts sa
 				JOIN exams e ON sa.exam_id = e.id
 				WHERE sa.id = ? AND e.school_id = ?
-			`).bind(parsedId, locals.user.school_id).first();
+			`).bind(parsedId, locals.user.school_id).first<{id: number, signature: string | null}>();
 
 			if (!attemptCheck) {
 				return fail(403, { error: 'Data hasil ujian tidak ditemukan atau bukan milik sekolah Anda.' });
+			}
+
+			// Delete signature from Cloudinary if exists
+			if (attemptCheck.signature && attemptCheck.signature.includes('res.cloudinary.com')) {
+				await deleteFromCloudinary(attemptCheck.signature, env);
 			}
 
 			// Hapus data answers dan attempt dalam batch

@@ -4,6 +4,8 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { signExamToken } from '$lib/server/auth';
+import { uploadToCloudinary } from '$lib/server/cloudinary';
+import { env } from '$env/dynamic/private';
 
 export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>[0]) => {
 	const db = getDB(platform);
@@ -164,7 +166,15 @@ export const actions = {
 
 			const endTime = new Date(Date.now() + token.duration_minutes * 60 * 1000).toISOString();
 
-			const signatureStr = form.get('signature')?.toString() || '';
+			let signatureStr = form.get('signature')?.toString() || '';
+			
+			// Upload signature to Cloudinary if it's base64
+			if (signatureStr.startsWith('data:image/')) {
+				const uploadResult = await uploadToCloudinary(signatureStr, env);
+				if (uploadResult.success && uploadResult.url) {
+					signatureStr = uploadResult.url;
+				}
+			}
 
 			const result = await db.prepare(`INSERT INTO student_attempts (student_id, exam_id, token_id, end_time, status, signature) VALUES (?, ?, ?, ?, 'mengerjakan', ?)`)
 				.bind(locals.user!.id, token.exam_id, token.id, endTime, signatureStr).run();

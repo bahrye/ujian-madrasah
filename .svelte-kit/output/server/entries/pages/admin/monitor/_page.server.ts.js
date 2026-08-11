@@ -1,5 +1,7 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
+import { d as deleteFromCloudinary } from "../../../../chunks/cloudinary.js";
+import { b as private_env } from "../../../../chunks/shared-server.js";
 const load = async ({ platform, url, locals }) => {
   if (!locals.user) throw redirect(302, "/login");
   try {
@@ -164,12 +166,15 @@ const actions = {
     if (isNaN(parsedAttemptId)) return fail(400, { error: "ID tidak valid." });
     try {
       const attemptCheck = await db.prepare(`
-			SELECT sa.id FROM student_attempts sa
+			SELECT sa.id, sa.signature FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
 			WHERE sa.id = ? AND e.school_id = ?
 		`).bind(parsedAttemptId, locals.user.school_id).first();
       if (!attemptCheck) {
         return fail(403, { error: "Sesi ujian tidak ditemukan atau bukan milik sekolah Anda." });
+      }
+      if (attemptCheck.signature && attemptCheck.signature.includes("res.cloudinary.com")) {
+        await deleteFromCloudinary(attemptCheck.signature, private_env);
       }
       await db.batch([
         db.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(parsedAttemptId),

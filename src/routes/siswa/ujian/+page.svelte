@@ -28,11 +28,20 @@
 
 	function getCoordinates(e: MouseEvent | TouchEvent) {
 		const rect = canvas.getBoundingClientRect();
+		const scaleX = canvas.width / rect.width;
+		const scaleY = canvas.height / rect.height;
+		
 		if (e.type.includes('touch')) {
 			const touch = (e as TouchEvent).touches[0];
-			return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+			return { 
+				x: (touch.clientX - rect.left) * scaleX, 
+				y: (touch.clientY - rect.top) * scaleY 
+			};
 		} else {
-			return { x: (e as MouseEvent).clientX - rect.left, y: (e as MouseEvent).clientY - rect.top };
+			return { 
+				x: ((e as MouseEvent).clientX - rect.left) * scaleX, 
+				y: ((e as MouseEvent).clientY - rect.top) * scaleY 
+			};
 		}
 	}
 
@@ -205,8 +214,8 @@
 				<div class="border-2 border-dashed border-slate-300 rounded-lg overflow-hidden bg-white relative">
 					<canvas 
 						bind:this={canvas} 
-						width="400" 
-						height="150" 
+						width="1200" 
+						height="450" 
 						class="w-full h-[150px] cursor-crosshair touch-none"
 						on:mousedown={startDrawing}
 						on:mousemove={draw}

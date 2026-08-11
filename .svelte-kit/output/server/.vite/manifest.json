@@ -858,7 +858,9 @@
     "src": "src/routes/admin/monitor/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_cloudinary.js",
+      "_shared-server.js"
     ]
   },
   "src/routes/admin/monitor/+page.svelte": {
@@ -961,7 +963,9 @@
     "src": "src/routes/admin/results/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_cloudinary.js",
+      "_shared-server.js"
     ]
   },
   "src/routes/admin/results/+page.svelte": {
@@ -1697,7 +1701,9 @@
     "src": "src/routes/pengawas/monitor/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_cloudinary.js",
+      "_shared-server.js"
     ]
   },
   "src/routes/pengawas/monitor/+page.svelte": {
@@ -2018,7 +2024,9 @@
     "imports": [
       "_date.js",
       "_db.js",
-      "_auth.js"
+      "_auth.js",
+      "_cloudinary.js",
+      "_shared-server.js"
     ]
   },
   "src/routes/siswa/ujian/+page.svelte": {

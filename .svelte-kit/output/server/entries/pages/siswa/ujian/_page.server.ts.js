@@ -2,6 +2,8 @@ import { p as parseDate } from "../../../../chunks/date.js";
 import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
 import { s as signExamToken } from "../../../../chunks/auth.js";
+import { u as uploadToCloudinary } from "../../../../chunks/cloudinary.js";
+import { b as private_env } from "../../../../chunks/shared-server.js";
 const load = async ({ platform, locals, url }) => {
   const db = getDB(platform);
   const examIdStr = url.searchParams.get("exam_id");
@@ -133,7 +135,13 @@ const actions = {
         return fail(400, { error: "Anda sudah pernah mengerjakan ujian ini." });
       }
       const endTime = new Date(Date.now() + token.duration_minutes * 60 * 1e3).toISOString();
-      const signatureStr = form.get("signature")?.toString() || "";
+      let signatureStr = form.get("signature")?.toString() || "";
+      if (signatureStr.startsWith("data:image/")) {
+        const uploadResult = await uploadToCloudinary(signatureStr, private_env);
+        if (uploadResult.success && uploadResult.url) {
+          signatureStr = uploadResult.url;
+        }
+      }
       const result = await db.prepare(`INSERT INTO student_attempts (student_id, exam_id, token_id, end_time, status, signature) VALUES (?, ?, ?, ?, 'mengerjakan', ?)`).bind(locals.user.id, token.exam_id, token.id, endTime, signatureStr).run();
       const attemptId = result.meta.last_row_id;
       const signedCookie = await signExamToken(attemptId, locals.user.id);

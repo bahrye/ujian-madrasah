@@ -68,6 +68,16 @@
 					{attempt.violation_count} kali
 				</p>
 			</div>
+			<div>
+				<p class="text-slate-500 mb-1">Tanda Tangan</p>
+				<div class="h-12">
+					{#if attempt.signature}
+						<img src={attempt.signature} alt="TTD Siswa" class="h-full object-contain" />
+					{:else}
+						<span class="text-slate-400 italic font-medium">-</span>
+					{/if}
+				</div>
+			</div>
 		</div>
 	</div>
 
