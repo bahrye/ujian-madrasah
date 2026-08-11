@@ -21,7 +21,7 @@
 	$: if (canvas && showModal) {
 		ctx = canvas.getContext('2d')!;
 		ctx.strokeStyle = '#000000';
-		ctx.lineWidth = 2;
+		ctx.lineWidth = 6;
 		ctx.lineCap = 'round';
 		ctx.lineJoin = 'round';
 	}
