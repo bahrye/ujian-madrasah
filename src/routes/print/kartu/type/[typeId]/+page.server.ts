@@ -22,13 +22,21 @@ export const load: PageServerLoad = async ({ platform, params, locals, url }) =>
 	const classIdStr = url.searchParams.get('class_id');
 	const classId = parseInt(classIdStr || '', 10);
 	let query = `
-		SELECT u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name, u.session_number
+		SELECT u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name, u.session_number,
+		(
+			SELECT r.name 
+			FROM exam_participants ep 
+			JOIN exam_rooms r ON ep.room_id = r.id 
+			JOIN exams e ON ep.exam_id = e.id 
+			WHERE ep.student_id = u.id AND e.exam_type_id = ? AND e.school_id = ?
+			LIMIT 1
+		) as room_name
 		FROM users u
 		JOIN classes c ON u.class_id = c.id
 		JOIN exam_type_classes etc ON etc.class_id = u.class_id
 		WHERE u.school_id = ? AND u.role = 'siswa' AND u.is_active = 1 AND etc.exam_type_id = ?
 	`;
-	let paramsArr: any[] = [locals.user!.school_id, typeId];
+	let paramsArr: any[] = [typeId, locals.user!.school_id, locals.user!.school_id, typeId];
 
 	if (!isNaN(classId)) {
 		query += ` AND u.class_id = ?`;

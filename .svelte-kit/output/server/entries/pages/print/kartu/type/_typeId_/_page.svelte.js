@@ -43,10 +43,10 @@ function _page($$renderer, $$props) {
             $$renderer2.push(`<tr><td class="py-1 align-top font-medium text-slate-700">${escape_html(data.hasRooms && data.hasSessions ? "Ruang / Sesi" : data.hasRooms ? "Ruang" : "Sesi")}</td><td class="py-1 align-top text-center">:</td><td class="py-1 align-top font-bold">`);
             if (data.hasRooms && data.hasSessions) {
               $$renderer2.push("<!--[0-->");
-              $$renderer2.push(`.......... / Sesi ${escape_html(p.session_number)}`);
+              $$renderer2.push(`${escape_html(p.room_name || "..........")} / Sesi ${escape_html(p.session_number)}`);
             } else if (data.hasRooms) {
               $$renderer2.push("<!--[1-->");
-              $$renderer2.push(`..........`);
+              $$renderer2.push(`${escape_html(p.room_name || "..........")}`);
             } else {
               $$renderer2.push("<!--[-1-->");
               $$renderer2.push(`Sesi ${escape_html(p.session_number)}`);

@@ -117,9 +117,9 @@
 									<td class="py-1 align-top text-center">:</td>
 									<td class="py-1 align-top font-bold">
 										{#if data.hasRooms && data.hasSessions}
-											.......... / Sesi {p.session_number}
+											{p.room_name || '..........'} / Sesi {p.session_number}
 										{:else if data.hasRooms}
-											..........
+											{p.room_name || '..........'}
 										{:else}
 											Sesi {p.session_number}
 										{/if}
@@ -226,9 +226,9 @@
 								<td class="py-[2px] align-top text-center">:</td>
 								<td class="py-[2px] font-bold align-top">
 									{#if data.hasRooms && data.hasSessions}
-										.......... / Sesi {p.session_number}
+										{p.room_name || '..........'} / Sesi {p.session_number}
 									{:else if data.hasRooms}
-										..........
+										{p.room_name || '..........'}
 									{:else}
 										Sesi {p.session_number}
 									{/if}
