@@ -9,7 +9,7 @@ const load = async ({ platform, params, locals }) => {
   const exam = await db.prepare("SELECT e.*, s.name as subject_name, et.name as exam_type_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id LEFT JOIN exam_types et ON e.exam_type_id = et.id WHERE e.id = ? AND e.school_id = ?").bind(examId, locals.user.school_id).first();
   if (!exam) throw error(404, "Ujian tidak ditemukan");
   const participants = await db.prepare(`
-		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name
+		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name, u.session_number
 		FROM exam_participants p
 		JOIN users u ON p.student_id = u.id
 		LEFT JOIN classes c ON u.class_id = c.id
@@ -19,8 +19,10 @@ const load = async ({ platform, params, locals }) => {
 			WHEN '1' THEN 1 WHEN '2' THEN 2 WHEN '3' THEN 3 WHEN '4' THEN 4 WHEN '5' THEN 5 WHEN '6' THEN 6 WHEN '7' THEN 7 WHEN '8' THEN 8 WHEN '9' THEN 9 WHEN '10' THEN 10 WHEN '11' THEN 11 WHEN '12' THEN 12
 			ELSE 99 END ASC, c.name ASC, u.name ASC
 	`).bind(examId).all();
+  const sessions = await db.prepare("SELECT * FROM exam_sessions WHERE exam_id = ?").bind(examId).all();
   const formattedParticipants = participants.results.map((p) => {
     const isNomorPesertaMode = p.username === p.nomor_peserta;
+    const sessionRecord = sessions.results.find((s) => s.session_number === p.session_number);
     return {
       ...p,
       login_username: p.username,
@@ -28,13 +30,15 @@ const load = async ({ platform, params, locals }) => {
       // Password is always NISN in this system
       login_mode_label: isNomorPesertaMode ? "No. Peserta" : "NISN",
       display_nisn: p.nisn,
-      display_nomor_peserta: p.nomor_peserta || "-"
+      display_nomor_peserta: p.nomor_peserta || "-",
+      session_time: sessionRecord ? `${sessionRecord.start_time?.slice(11, 16) || "?"} - ${sessionRecord.end_time?.slice(11, 16) || "?"}` : null
     };
   });
   return {
     school,
     exam,
-    participants: formattedParticipants
+    participants: formattedParticipants,
+    hasSessions: sessions.results.length > 0
   };
 };
 export {

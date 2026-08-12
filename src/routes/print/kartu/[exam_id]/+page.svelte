@@ -55,6 +55,13 @@
 									<td class="py-1 text-center">:</td>
 									<td class="py-1 font-bold">{p.class_name || '-'} / ..........</td>
 								</tr>
+								{#if data.hasSessions}
+								<tr>
+									<td class="py-1 font-medium text-slate-700">Sesi & Waktu</td>
+									<td class="py-1 text-center">:</td>
+									<td class="py-1 font-bold">Sesi {p.session_number} ({p.session_time || '-'})</td>
+								</tr>
+								{/if}
 								<tr>
 									<td class="py-1 font-medium text-slate-700">TTL</td>
 									<td class="py-1 text-center">:</td>

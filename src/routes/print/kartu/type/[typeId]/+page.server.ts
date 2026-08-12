@@ -22,7 +22,7 @@ export const load: PageServerLoad = async ({ platform, params, locals, url }) =>
 	const classIdStr = url.searchParams.get('class_id');
 	const classId = parseInt(classIdStr || '', 10);
 	let query = `
-		SELECT u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name
+		SELECT u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name, u.session_number
 		FROM users u
 		JOIN classes c ON u.class_id = c.id
 		JOIN exam_type_classes etc ON etc.class_id = u.class_id

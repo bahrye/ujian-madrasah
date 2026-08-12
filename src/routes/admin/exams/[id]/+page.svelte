@@ -275,13 +275,14 @@
 		{:else}
 			<div class="table-container border-0 rounded-none max-h-96 overflow-y-auto">
 				<table class="table">
-					<thead class="sticky top-0 bg-white"><tr><th>NISN</th><th>Nama Siswa</th><th>Kelas</th><th>Sesi</th><th>Aksi</th></tr></thead>
+					<thead class="sticky top-0 bg-white"><tr><th>NISN</th><th>Nama Siswa</th><th>Kelas</th>{#if data.hasSessions}<th>Sesi</th>{/if}<th>Aksi</th></tr></thead>
 					<tbody>
 						{#each participants as p}
 							<tr>
 								<td class="text-xs font-mono">{p.nisn}</td>
 								<td class="font-medium">{p.student_name}</td>
 								<td>{p.class_name || '-'}</td>
+								{#if data.hasSessions}
 								<td>
 									<form method="POST" action="?/updateStudentSession" use:enhance>
 										<input type="hidden" name="user_id" value={p.user_id} />
@@ -293,6 +294,7 @@
 										</select>
 									</form>
 								</td>
+								{/if}
 								<td>
 									<ConfirmForm 
 										action="?/removeParticipant"

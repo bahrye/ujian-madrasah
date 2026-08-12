@@ -13,6 +13,8 @@ const load = async ({ platform, params, locals }) => {
 		JOIN users u ON sa.student_id = u.id WHERE sa.exam_id = ? ORDER BY sa.created_at DESC
 	`).bind(examId).all();
   const tokens = await db.prepare("SELECT * FROM tokens WHERE exam_id = ? ORDER BY created_at DESC").bind(examId).all();
+  const sessionsCount = await db.prepare("SELECT COUNT(*) as count FROM exam_sessions WHERE exam_id = ?").bind(examId).first();
+  const hasSessions = (sessionsCount?.count || 0) > 0;
   const participants = await db.prepare(`
 		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username as nisn, c.name as class_name, u.session_number
 		FROM exam_participants p
@@ -66,7 +68,8 @@ const load = async ({ platform, params, locals }) => {
     allTeachers: allTeachers.results,
     examTeachers: examTeachers.results,
     allProctors: allProctors.results,
-    examProctors: examProctors.results
+    examProctors: examProctors.results,
+    hasSessions
   };
 };
 const actions = {

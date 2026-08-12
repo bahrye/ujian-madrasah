@@ -112,6 +112,11 @@
 									<td class="py-1 align-top font-bold">{p.class_name || '-'} / ..........</td>
 								</tr>
 								<tr>
+									<td class="py-1 align-top font-medium text-slate-700">Sesi</td>
+									<td class="py-1 align-top text-center">:</td>
+									<td class="py-1 align-top font-bold">Sesi {p.session_number}</td>
+								</tr>
+								<tr>
 									<td class="py-1 align-top font-medium text-slate-700">TTL</td>
 									<td class="py-1 align-top text-center">:</td>
 									<td class="py-1 align-top font-bold">{p.place_of_birth || '-'}, {p.date_of_birth ? new Date(p.date_of_birth).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) : '-'}</td>
@@ -204,6 +209,11 @@
 								<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">Kelas</td>
 								<td class="py-[2px] align-top text-center">:</td>
 								<td class="py-[2px] font-bold align-top">{p.class_name || '-'}</td>
+							</tr>
+							<tr>
+								<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">Sesi</td>
+								<td class="py-[2px] align-top text-center">:</td>
+								<td class="py-[2px] font-bold align-top">Sesi {p.session_number}</td>
 							</tr>
 							<tr class="border-t border-slate-300">
 								<td class="py-[2px] pt-1 align-top font-medium text-slate-700 whitespace-nowrap">Username</td>

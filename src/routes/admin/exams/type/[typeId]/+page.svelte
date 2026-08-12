@@ -14,6 +14,9 @@
 	let editingExam: any = null;
 	let deleteConfirm: number | null = null;
 	let editingRoomName = '';
+	
+	let useSessionsCreate = false;
+	let useSessionsEdit = false;
 
 	$: if (editingExam && data.subjects && data.examType) {
 		const subject = data.subjects.find(s => s.id === editingExam.subject_id);
@@ -162,7 +165,7 @@
 
 				<div class="mt-auto flex items-center gap-2 pt-3 border-t border-slate-100">
 					<a href="/admin/exams/{exam.id}" class="btn-sm btn-outline flex-1 text-center">Detail</a>
-					<button class="btn-sm btn-ghost" on:click={() => (editingExam = { ...exam })} title="Edit">
+					<button class="btn-sm btn-ghost" on:click={() => { editingExam = { ...exam }; useSessionsEdit = (exam.sessions?.length || 0) > 0; }} title="Edit">
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.edit} />
 						</svg>
@@ -235,14 +238,19 @@
 					<label class="label" for="c-desc">Deskripsi</label>
 					<textarea id="c-desc" name="description" class="input" rows="2" placeholder="Deskripsi ujian (opsional)"></textarea>
 				</div>
-				<div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+				<div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100 relative">
+					{#if useSessionsCreate}
+						<div class="absolute inset-0 bg-slate-100/60 z-10 rounded-lg flex items-center justify-center backdrop-blur-[1px]">
+							<span class="bg-white px-3 py-1 rounded shadow-sm text-xs font-semibold text-slate-500">Waktu default dinonaktifkan (Gunakan Jadwal Per Sesi)</span>
+						</div>
+					{/if}
 					<div>
 						<label class="label" for="c-start">Waktu Mulai</label>
-						<input id="c-start" name="start_time" type="datetime-local" class="input" value={data.examType.start_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
+						<input id="c-start" name="start_time" type="datetime-local" class="input" disabled={useSessionsCreate} value={data.examType.start_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
 					</div>
 					<div>
 						<label class="label" for="c-end">Waktu Selesai</label>
-						<input id="c-end" name="end_time" type="datetime-local" class="input" value={data.examType.end_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
+						<input id="c-end" name="end_time" type="datetime-local" class="input" disabled={useSessionsCreate} value={data.examType.end_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
 					</div>
 					<div class="col-span-2 text-xs text-slate-500 mt-1 mb-2">
 						Pastikan waktu berada di dalam rentang: <br/> 
@@ -251,11 +259,11 @@
 					</div>
 					
 					<div class="col-span-2 border-t border-slate-200 pt-3 mt-1">
-						<label class="flex items-center gap-2 mb-3">
-							<input type="checkbox" name="use_sessions" class="rounded border-slate-300 text-indigo-600" on:change={(e) => document.getElementById('c-sessions-container')?.classList.toggle('hidden', !e.target.checked)} />
+						<label class="flex items-center gap-2 mb-3 cursor-pointer select-none">
+							<input type="checkbox" name="use_sessions" bind:checked={useSessionsCreate} class="rounded border-slate-300 text-indigo-600" />
 							<span class="text-sm font-semibold text-slate-700">Aktifkan Jadwal Per Sesi (Opsional)</span>
 						</label>
-						<div id="c-sessions-container" class="hidden grid grid-cols-2 gap-3 pl-6 border-l-2 border-indigo-100">
+						<div class="grid grid-cols-2 gap-3 pl-6 border-l-2 border-indigo-100" class:hidden={!useSessionsCreate}>
 							{#each [1, 2, 3, 4] as sessionNum}
 								<div class="col-span-2 bg-white p-3 rounded border border-slate-100 grid grid-cols-2 gap-3">
 									<div class="col-span-2 text-sm font-medium text-slate-700">Sesi {sessionNum}</div>
@@ -331,21 +339,26 @@
 					<label class="label" for="e-desc">Deskripsi</label>
 					<textarea id="e-desc" name="description" class="input" rows="2" value={editingExam.description}></textarea>
 				</div>
-				<div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+				<div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100 relative">
+					{#if useSessionsEdit}
+						<div class="absolute inset-0 bg-slate-100/60 z-10 rounded-lg flex items-center justify-center backdrop-blur-[1px]">
+							<span class="bg-white px-3 py-1 rounded shadow-sm text-xs font-semibold text-slate-500">Waktu default dinonaktifkan (Gunakan Jadwal Per Sesi)</span>
+						</div>
+					{/if}
 					<div>
 						<label class="label" for="e-start">Waktu Mulai</label>
-						<input id="e-start" name="start_time" type="datetime-local" class="input" value={editingExam.start_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
+						<input id="e-start" name="start_time" type="datetime-local" class="input" disabled={useSessionsEdit} value={editingExam.start_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
 					</div>
 					<div>
 						<label class="label" for="e-end">Waktu Selesai (Default)</label>
-						<input id="e-end" name="end_time" type="datetime-local" class="input" value={editingExam.end_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
+						<input id="e-end" name="end_time" type="datetime-local" class="input" disabled={useSessionsEdit} value={editingExam.end_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
 					</div>
 					<div class="col-span-2 border-t border-slate-200 pt-3 mt-1">
-						<label class="flex items-center gap-2 mb-3">
-							<input type="checkbox" name="use_sessions" class="rounded border-slate-300 text-indigo-600" checked={editingExam.sessions && editingExam.sessions.length > 0} on:change={(e) => document.getElementById('e-sessions-container')?.classList.toggle('hidden', !e.target.checked)} />
+						<label class="flex items-center gap-2 mb-3 cursor-pointer select-none">
+							<input type="checkbox" name="use_sessions" bind:checked={useSessionsEdit} class="rounded border-slate-300 text-indigo-600" />
 							<span class="text-sm font-semibold text-slate-700">Aktifkan Jadwal Per Sesi (Opsional)</span>
 						</label>
-						<div id="e-sessions-container" class="{editingExam.sessions && editingExam.sessions.length > 0 ? '' : 'hidden'} grid grid-cols-2 gap-3 pl-6 border-l-2 border-indigo-100">
+						<div class="grid grid-cols-2 gap-3 pl-6 border-l-2 border-indigo-100" class:hidden={!useSessionsEdit}>
 							{#each [1, 2, 3, 4] as sessionNum}
 								{@const session = editingExam.sessions?.find(s => s.session_number === sessionNum) || {}}
 								<div class="col-span-2 bg-white p-3 rounded border border-slate-100 grid grid-cols-2 gap-3">

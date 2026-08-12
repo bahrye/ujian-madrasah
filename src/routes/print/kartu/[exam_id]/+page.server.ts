@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 
 	// Get participants
 	const participants = await db.prepare(`
-		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name
+		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name, u.session_number
 		FROM exam_participants p
 		JOIN users u ON p.student_id = u.id
 		LEFT JOIN classes c ON u.class_id = c.id
@@ -30,9 +30,12 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 			ELSE 99 END ASC, c.name ASC, u.name ASC
 	`).bind(examId).all();
 
+	const sessions = await db.prepare('SELECT * FROM exam_sessions WHERE exam_id = ?').bind(examId).all();
+
 	// Calculate login info for each participant based on what's available
 	const formattedParticipants = participants.results.map((p: any) => {
 		const isNomorPesertaMode = p.username === p.nomor_peserta;
+		const sessionRecord = sessions.results.find((s: any) => s.session_number === p.session_number);
 		
 		return {
 			...p,
@@ -40,13 +43,15 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 			login_password: p.nisn, // Password is always NISN in this system
 			login_mode_label: isNomorPesertaMode ? 'No. Peserta' : 'NISN',
 			display_nisn: p.nisn,
-			display_nomor_peserta: p.nomor_peserta || '-'
+			display_nomor_peserta: p.nomor_peserta || '-',
+			session_time: sessionRecord ? `${(sessionRecord.start_time as string)?.slice(11, 16) || '?'} - ${(sessionRecord.end_time as string)?.slice(11, 16) || '?'}` : null
 		};
 	});
 
 	return { 
 		school,
 		exam, 
-		participants: formattedParticipants
+		participants: formattedParticipants,
+		hasSessions: sessions.results.length > 0
 	};
 };
