@@ -9,7 +9,7 @@ const load = async ({ locals, url, platform }) => {
   const search = url.searchParams.get("search") || "";
   const classFilter = url.searchParams.get("class") || "";
   let query = `
-		SELECT u.id, u.username, u.name, u.is_active, u.created_at, u.class_id, c.name as class_name, u.place_of_birth, u.date_of_birth, u.photo, u.nisn, u.nomor_peserta, u.gender 
+		SELECT u.id, u.username, u.name, u.is_active, u.created_at, u.class_id, c.name as class_name, u.place_of_birth, u.date_of_birth, u.photo, u.nisn, u.nomor_peserta, u.gender, u.session_number 
 		FROM users u 
 		LEFT JOIN classes c ON u.class_id = c.id 
 		WHERE u.school_id = ? AND u.role = 'siswa'
@@ -64,6 +64,7 @@ const actions = {
     const place_of_birth = data.get("place_of_birth")?.toString().trim() || null;
     const date_of_birth = data.get("date_of_birth")?.toString() || null;
     const gender = data.get("gender")?.toString() || null;
+    const session_number = parseInt(data.get("session_number")?.toString() || "1", 10);
     if (!name || !nisn) {
       return fail(400, { error: "Nama dan NISN wajib diisi" });
     }
@@ -81,7 +82,7 @@ const actions = {
         return fail(400, { error: "Nomor Peserta sudah terdaftar" });
       }
       const passwordHash = await hashPassword(nisn);
-      await db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth, nisn, nomor_peserta, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(locals.user.school_id, class_id, username, passwordHash, name, "siswa", place_of_birth, date_of_birth, nisn, nomor_peserta, gender).run();
+      await db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth, nisn, nomor_peserta, gender, session_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(locals.user.school_id, class_id, username, passwordHash, name, "siswa", place_of_birth, date_of_birth, nisn, nomor_peserta, gender, session_number).run();
       return { success: true };
     } catch (e) {
       console.error(e);
@@ -100,6 +101,7 @@ const actions = {
     const place_of_birth = data.get("place_of_birth")?.toString().trim() || null;
     const date_of_birth = data.get("date_of_birth")?.toString() || null;
     const gender = data.get("gender")?.toString() || null;
+    const session_number = parseInt(data.get("session_number")?.toString() || "1", 10);
     const parsedId = parseInt(idStr || "", 10);
     if (isNaN(parsedId) || !name || !nisn) {
       return fail(400, { error: "ID, Nama, dan NISN wajib diisi" });
@@ -118,7 +120,7 @@ const actions = {
         return fail(400, { error: "Nomor Peserta sudah terdaftar" });
       }
       const passwordHash = await hashPassword(nisn);
-      await db.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, class_id = ?, place_of_birth = ?, date_of_birth = ?, nisn = ?, nomor_peserta = ?, gender = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, username, passwordHash, class_id, place_of_birth, date_of_birth, nisn, nomor_peserta, gender, parsedId, locals.user.school_id).run();
+      await db.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, class_id = ?, place_of_birth = ?, date_of_birth = ?, nisn = ?, nomor_peserta = ?, gender = ?, session_number = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, username, passwordHash, class_id, place_of_birth, date_of_birth, nisn, nomor_peserta, gender, session_number, parsedId, locals.user.school_id).run();
       return { success: true };
     } catch (e) {
       console.error(e);
@@ -196,6 +198,7 @@ const actions = {
         let nomor_peserta = student.nomor_peserta ? String(student.nomor_peserta).trim() : null;
         let gender = student.gender ? String(student.gender).toUpperCase().trim() : null;
         if (gender !== "L" && gender !== "P") gender = null;
+        const session_number = student.session_number ? parseInt(student.session_number, 10) : 1;
         if (!nisn || !name) continue;
         if (!nomor_peserta) {
           nomor_peserta = `AUTO-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1e3).toString().padStart(3, "0")}`;
@@ -208,7 +211,7 @@ const actions = {
         existingUsernames.add(username.toLowerCase());
         const passwordHash = await hashPassword(nisn);
         stmts.push(
-          db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth, nisn, nomor_peserta, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(locals.user.school_id, student.class_id || null, username, passwordHash, name, "siswa", student.place_of_birth || null, student.date_of_birth || null, nisn, nomor_peserta, gender)
+          db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth, nisn, nomor_peserta, gender, session_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(locals.user.school_id, student.class_id || null, username, passwordHash, name, "siswa", student.place_of_birth || null, student.date_of_birth || null, nisn, nomor_peserta, gender, session_number)
         );
       }
       if (errorMsg) ;

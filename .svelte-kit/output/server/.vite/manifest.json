@@ -514,7 +514,7 @@
       "_stores.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.DiLYKKZs.css"
+      "_app/immutable/assets/_layout.CwgZEe4f.css"
     ],
     "assets": [
       "_app/immutable/assets/KaTeX_AMS-Regular.BQhdFMY1.woff2",
@@ -1213,6 +1213,15 @@
     "file": "entries/endpoints/api/media/_server.ts.js",
     "name": "entries/endpoints/api/media/_server.ts",
     "src": "src/routes/api/media/+server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/api/migrate-sessions/+server.ts": {
+    "file": "entries/endpoints/api/migrate-sessions/_server.ts.js",
+    "name": "entries/endpoints/api/migrate-sessions/_server.ts",
+    "src": "src/routes/api/migrate-sessions/+server.ts",
     "isEntry": true,
     "imports": [
       "_db.js"

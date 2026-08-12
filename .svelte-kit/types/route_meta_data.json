@@ -139,6 +139,9 @@
 	"/api/media": [
 		"src/routes/api/media/+server.ts"
 	],
+	"/api/migrate-sessions": [
+		"src/routes/api/migrate-sessions/+server.ts"
+	],
 	"/api/profile": [
 		"src/routes/api/profile/+server.ts"
 	],

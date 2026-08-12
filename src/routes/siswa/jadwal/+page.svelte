@@ -105,7 +105,15 @@
 					{:else}
 						<h3 class="font-bold text-slate-800 text-lg mb-1">{exam.title}</h3>
 					{/if}
-					<p class="text-sm text-slate-500 mb-4">{exam.subject || 'Umum'}</p>
+					<p class="text-sm text-slate-500 mb-2">{exam.subject || 'Umum'}</p>
+					
+					{#if exam.session_number}
+						<div class="mb-4">
+							<span class="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-md">
+								Sesi {exam.session_number}
+							</span>
+						</div>
+					{/if}
 					
 					<div class="space-y-2 mb-4">
 						<div class="flex items-center text-sm text-slate-600">

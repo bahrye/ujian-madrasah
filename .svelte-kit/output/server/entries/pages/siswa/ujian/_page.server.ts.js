@@ -46,25 +46,39 @@ const actions = {
     if (!tokenCode || isNaN(parsedExamId)) return fail(400, { error: "Data tidak lengkap." });
     try {
       const token = await db.prepare(`
-				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
+				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active,
+				e.start_time as exam_start_time, e.end_time as exam_end_time,
+				u.session_number
 				FROM tokens t 
 				JOIN exams e ON t.exam_id = e.id
 				JOIN exam_types et ON e.exam_type_id = et.id
+				JOIN users u ON u.id = ?
 				WHERE t.token_code = ? AND t.exam_id = ? AND et.is_active = 1
-			`).bind(tokenCode, parsedExamId).first();
+			`).bind(locals.user.id, tokenCode, parsedExamId).first();
       if (!token) {
         return fail(400, { error: "Token tidak valid untuk ujian ini." });
       }
       if (!token.is_active) {
         return fail(400, { error: "Ujian saat ini tidak aktif." });
       }
+      const studentSession = token.session_number || 1;
+      const sessionRecord = await db.prepare("SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?").bind(parsedExamId, studentSession).first();
+      const startTimeStr = sessionRecord?.start_time || token.exam_start_time;
+      const endTimeStr = sessionRecord?.end_time || token.exam_end_time;
+      const now = /* @__PURE__ */ new Date();
+      if (startTimeStr && now < new Date(startTimeStr)) {
+        return fail(400, { error: "Waktu ujian belum dimulai untuk sesi Anda." });
+      }
+      if (endTimeStr && now > new Date(endTimeStr)) {
+        return fail(400, { error: "Waktu ujian telah berakhir untuk sesi Anda." });
+      }
       if (!token.is_released) {
         return fail(400, { error: "Token ujian ini sudah ditarik atau belum dirilis oleh pengawas." });
       }
       if (token.released_at) {
         const releasedAt = parseDate(token.released_at).getTime();
-        const now = (/* @__PURE__ */ new Date()).getTime();
-        if (now - releasedAt > 15 * 60 * 1e3) {
+        const now2 = (/* @__PURE__ */ new Date()).getTime();
+        if (now2 - releasedAt > 15 * 60 * 1e3) {
           return fail(400, { error: "Token sudah kedaluwarsa / ditarik otomatis (melewati batas waktu 15 menit)." });
         }
       } else {
@@ -98,25 +112,39 @@ const actions = {
     if (!tokenCode || isNaN(parsedExamId)) return fail(400, { error: "Data tidak lengkap." });
     try {
       const token = await db.prepare(`
-				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
+				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active,
+				e.start_time as exam_start_time, e.end_time as exam_end_time,
+				u.session_number
 				FROM tokens t 
 				JOIN exams e ON t.exam_id = e.id
 				JOIN exam_types et ON e.exam_type_id = et.id
+				JOIN users u ON u.id = ?
 				WHERE t.token_code = ? AND t.exam_id = ? AND et.is_active = 1
-			`).bind(tokenCode, parsedExamId).first();
+			`).bind(locals.user.id, tokenCode, parsedExamId).first();
       if (!token) {
         return fail(400, { error: "Token tidak valid untuk ujian ini." });
       }
       if (!token.is_active) {
         return fail(400, { error: "Ujian saat ini tidak aktif." });
       }
+      const studentSession = token.session_number || 1;
+      const sessionRecord = await db.prepare("SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?").bind(parsedExamId, studentSession).first();
+      const startTimeStr = sessionRecord?.start_time || token.exam_start_time;
+      const endTimeStr = sessionRecord?.end_time || token.exam_end_time;
+      const now = /* @__PURE__ */ new Date();
+      if (startTimeStr && now < new Date(startTimeStr)) {
+        return fail(400, { error: "Waktu ujian belum dimulai untuk sesi Anda." });
+      }
+      if (endTimeStr && now > new Date(endTimeStr)) {
+        return fail(400, { error: "Waktu ujian telah berakhir untuk sesi Anda." });
+      }
       if (!token.is_released) {
         return fail(400, { error: "Token ujian ini sudah ditarik atau belum dirilis oleh pengawas." });
       }
       if (token.released_at) {
         const releasedAt = parseDate(token.released_at).getTime();
-        const now = (/* @__PURE__ */ new Date()).getTime();
-        if (now - releasedAt > 15 * 60 * 1e3) {
+        const now2 = (/* @__PURE__ */ new Date()).getTime();
+        if (now2 - releasedAt > 15 * 60 * 1e3) {
           return fail(400, { error: "Token sudah kedaluwarsa / ditarik otomatis (melewati batas waktu 15 menit)." });
         }
       } else {

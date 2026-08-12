@@ -30,6 +30,19 @@ export const load = async ({ params, platform, locals }: Parameters<PageServerLo
 		ORDER BY e.created_at DESC
 	`).bind(locals.user!.school_id, typeId).all();
 
+	const examIds = exams.results.map((e: any) => e.id);
+	let allSessions: any[] = [];
+	if (examIds.length > 0) {
+		const placeholders = examIds.map(() => '?').join(',');
+		const sessionsResult = await db.prepare(`SELECT * FROM exam_sessions WHERE exam_id IN (${placeholders})`).bind(...examIds).all();
+		allSessions = sessionsResult.results;
+	}
+
+	const examsWithSessions = exams.results.map((e: any) => ({
+		...e,
+		sessions: allSessions.filter(s => s.exam_id === e.id)
+	}));
+
 	const subjects = await db.prepare('SELECT id, name FROM subjects WHERE school_id = ? ORDER BY name').bind(locals.user!.school_id).all();
 
 	const classes = await db.prepare(`
@@ -40,7 +53,7 @@ export const load = async ({ params, platform, locals }: Parameters<PageServerLo
 		ORDER BY c.name
 	`).bind(typeId, locals.user!.school_id).all();
 
-	return { examType, exams: exams.results, subjects: subjects.results, classes: classes.results };
+	return { examType, exams: examsWithSessions, subjects: subjects.results, classes: classes.results };
 };
 
 export const actions = {
@@ -119,6 +132,24 @@ export const actions = {
 				}
 			}
 
+			// Save sessions if use_sessions is checked
+			if (form.get('use_sessions')) {
+				const sessionBatch = [];
+				for (let i = 1; i <= 4; i++) {
+					const sStart = form.get(`session_${i}_start`)?.toString() || null;
+					const sEnd = form.get(`session_${i}_end`)?.toString() || null;
+					if (sStart || sEnd) {
+						sessionBatch.push(
+							db.prepare('INSERT INTO exam_sessions (exam_id, session_number, start_time, end_time) VALUES (?, ?, ?, ?)')
+								.bind(newExamId, i, sStart, sEnd)
+						);
+					}
+				}
+				if (sessionBatch.length > 0) {
+					await db.batch(sessionBatch);
+				}
+			}
+
 			return { success: 'Ujian berhasil dibuat.' };
 		} catch (e: any) {
 			console.error(e);
@@ -180,6 +211,26 @@ export const actions = {
 				.bind(title, description, parsedSubjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, showScoreType, parsedId, locals.user!.school_id)
 				.run();
 
+			// Handle sessions
+			await db.prepare('DELETE FROM exam_sessions WHERE exam_id = ?').bind(parsedId).run();
+			
+			if (form.get('use_sessions')) {
+				const sessionBatch = [];
+				for (let i = 1; i <= 4; i++) {
+					const sStart = form.get(`session_${i}_start`)?.toString() || null;
+					const sEnd = form.get(`session_${i}_end`)?.toString() || null;
+					if (sStart || sEnd) {
+						sessionBatch.push(
+							db.prepare('INSERT INTO exam_sessions (exam_id, session_number, start_time, end_time) VALUES (?, ?, ?, ?)')
+								.bind(parsedId, i, sStart, sEnd)
+						);
+					}
+				}
+				if (sessionBatch.length > 0) {
+					await db.batch(sessionBatch);
+				}
+			}
+
 			return { success: 'Ujian berhasil diperbarui.' };
 		} catch (e: any) {
 			console.error(e);
@@ -213,6 +264,7 @@ export const actions = {
 			batch.push(db.prepare('DELETE FROM exam_proctors WHERE exam_id = ?').bind(parsedId));
 			batch.push(db.prepare('DELETE FROM exam_teachers WHERE exam_id = ?').bind(parsedId));
 
+			batch.push(db.prepare('DELETE FROM exam_sessions WHERE exam_id = ?').bind(parsedId));
 			batch.push(db.prepare('DELETE FROM exams WHERE id = ? AND school_id = ?').bind(parsedId, locals.user!.school_id));
 
 			await db.batch(batch);

@@ -7751,9 +7751,9 @@ function getDB(platform) {
   }
   return platform.env.DB;
 }
-async function dbRun(db, query, ...params) {
+async function dbRun(db2, query, ...params) {
   try {
-    return await db.prepare(query).bind(...params).run();
+    return await db2.prepare(query).bind(...params).run();
   } catch (err) {
     console.error("DB Error:", err);
     throw err;
@@ -7776,14 +7776,14 @@ var init_layout_server_ts = __esm({
     load = async ({ locals, platform }) => {
       let userInfo = null;
       if (locals.user && platform) {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         userInfo = {};
         if (locals.user.school_id) {
-          const school = await db.prepare("SELECT name FROM schools WHERE id = ?").bind(locals.user.school_id).first();
+          const school = await db2.prepare("SELECT name FROM schools WHERE id = ?").bind(locals.user.school_id).first();
           if (school) userInfo.school_name = school.name;
         }
         if (locals.user.role === "siswa") {
-          const student = await db.prepare("SELECT place_of_birth, date_of_birth FROM users WHERE id = ?").bind(locals.user.id).first();
+          const student = await db2.prepare("SELECT place_of_birth, date_of_birth FROM users WHERE id = ?").bind(locals.user.id).first();
           if (student) {
             userInfo.place_of_birth = student.place_of_birth;
             userInfo.date_of_birth = student.date_of_birth;
@@ -7944,8 +7944,8 @@ var init__ = __esm({
     index = 0;
     component = async () => component_cache ??= (await Promise.resolve().then(() => (init_layout_svelte(), layout_svelte_exports))).default;
     server_id = "src/routes/+layout.server.ts";
-    imports = ["_app/immutable/nodes/0.BS_Afdeg.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/SeINawUV.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/_KaSKy70.js"];
-    stylesheets = ["_app/immutable/assets/0.Cko9xomd.css"];
+    imports = ["_app/immutable/nodes/0.BFZqw-Lp.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/DwRR9HPj.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/D0YHghFF.js"];
+    stylesheets = ["_app/immutable/assets/0.CCL3Jdxq.css"];
     fonts = ["_app/immutable/assets/KaTeX_AMS-Regular.BQhdFMY1.woff2", "_app/immutable/assets/KaTeX_AMS-Regular.DMm9YOAa.woff", "_app/immutable/assets/KaTeX_AMS-Regular.DRggAlZN.ttf", "_app/immutable/assets/KaTeX_Caligraphic-Bold.Dq_IR9rO.woff2", "_app/immutable/assets/KaTeX_Caligraphic-Bold.BEiXGLvX.woff", "_app/immutable/assets/KaTeX_Caligraphic-Bold.ATXxdsX0.ttf", "_app/immutable/assets/KaTeX_Caligraphic-Regular.Di6jR-x-.woff2", "_app/immutable/assets/KaTeX_Caligraphic-Regular.CTRA-rTL.woff", "_app/immutable/assets/KaTeX_Caligraphic-Regular.wX97UBjC.ttf", "_app/immutable/assets/KaTeX_Fraktur-Bold.CL6g_b3V.woff2", "_app/immutable/assets/KaTeX_Fraktur-Bold.BsDP51OF.woff", "_app/immutable/assets/KaTeX_Fraktur-Bold.BdnERNNW.ttf", "_app/immutable/assets/KaTeX_Fraktur-Regular.CTYiF6lA.woff2", "_app/immutable/assets/KaTeX_Fraktur-Regular.Dxdc4cR9.woff", "_app/immutable/assets/KaTeX_Fraktur-Regular.CB_wures.ttf", "_app/immutable/assets/KaTeX_Main-Bold.Cx986IdX.woff2", "_app/immutable/assets/KaTeX_Main-Bold.Jm3AIy58.woff", "_app/immutable/assets/KaTeX_Main-Bold.waoOVXN0.ttf", "_app/immutable/assets/KaTeX_Main-BoldItalic.DxDJ3AOS.woff2", "_app/immutable/assets/KaTeX_Main-BoldItalic.SpSLRI95.woff", "_app/immutable/assets/KaTeX_Main-BoldItalic.DzxPMmG6.ttf", "_app/immutable/assets/KaTeX_Main-Italic.NWA7e6Wa.woff2", "_app/immutable/assets/KaTeX_Main-Italic.BMLOBm91.woff", "_app/immutable/assets/KaTeX_Main-Italic.3WenGoN9.ttf", "_app/immutable/assets/KaTeX_Main-Regular.B22Nviop.woff2", "_app/immutable/assets/KaTeX_Main-Regular.Dr94JaBh.woff", "_app/immutable/assets/KaTeX_Main-Regular.ypZvNtVU.ttf", "_app/immutable/assets/KaTeX_Math-BoldItalic.CZnvNsCZ.woff2", "_app/immutable/assets/KaTeX_Math-BoldItalic.iY-2wyZ7.woff", "_app/immutable/assets/KaTeX_Math-BoldItalic.B3XSjfu4.ttf", "_app/immutable/assets/KaTeX_Math-Italic.t53AETM-.woff2", "_app/immutable/assets/KaTeX_Math-Italic.DA0__PXp.woff", "_app/immutable/assets/KaTeX_Math-Italic.flOr_0UB.ttf", "_app/immutable/assets/KaTeX_SansSerif-Bold.D1sUS0GD.woff2", "_app/immutable/assets/KaTeX_SansSerif-Bold.DbIhKOiC.woff", "_app/immutable/assets/KaTeX_SansSerif-Bold.CFMepnvq.ttf", "_app/immutable/assets/KaTeX_SansSerif-Italic.C3H0VqGB.woff2", "_app/immutable/assets/KaTeX_SansSerif-Italic.DN2j7dab.woff", "_app/immutable/assets/KaTeX_SansSerif-Italic.YYjJ1zSn.ttf", "_app/immutable/assets/KaTeX_SansSerif-Regular.DDBCnlJ7.woff2", "_app/immutable/assets/KaTeX_SansSerif-Regular.CS6fqUqJ.woff", "_app/immutable/assets/KaTeX_SansSerif-Regular.BNo7hRIc.ttf", "_app/immutable/assets/KaTeX_Script-Regular.D3wIWfF6.woff2", "_app/immutable/assets/KaTeX_Script-Regular.D5yQViql.woff", "_app/immutable/assets/KaTeX_Script-Regular.C5JkGWo-.ttf", "_app/immutable/assets/KaTeX_Size1-Regular.mCD8mA8B.woff2", "_app/immutable/assets/KaTeX_Size1-Regular.C195tn64.woff", "_app/immutable/assets/KaTeX_Size1-Regular.Dbsnue_I.ttf", "_app/immutable/assets/KaTeX_Size2-Regular.Dy4dx90m.woff2", "_app/immutable/assets/KaTeX_Size2-Regular.oD1tc_U0.woff", "_app/immutable/assets/KaTeX_Size2-Regular.B7gKUWhC.ttf", "_app/immutable/assets/KaTeX_Size3-Regular.CTq5MqoE.woff", "_app/immutable/assets/KaTeX_Size3-Regular.DgpXs0kz.ttf", "_app/immutable/assets/KaTeX_Size4-Regular.Dl5lxZxV.woff2", "_app/immutable/assets/KaTeX_Size4-Regular.BF-4gkZK.woff", "_app/immutable/assets/KaTeX_Size4-Regular.DWFBv043.ttf", "_app/immutable/assets/KaTeX_Typewriter-Regular.CO6r4hn1.woff2", "_app/immutable/assets/KaTeX_Typewriter-Regular.C0xS9mPB.woff", "_app/immutable/assets/KaTeX_Typewriter-Regular.D3Ib7_Hf.ttf"];
   }
 });
@@ -8017,7 +8017,7 @@ var init__2 = __esm({
   ".svelte-kit/output/server/nodes/1.js"() {
     index2 = 1;
     component2 = async () => component_cache2 ??= (await Promise.resolve().then(() => (init_error_svelte(), error_svelte_exports))).default;
-    imports2 = ["_app/immutable/nodes/1.DlHx78e6.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/sK17VQQP.js"];
+    imports2 = ["_app/immutable/nodes/1.BPhovPWl.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/wzo6IUc5.js"];
     stylesheets2 = [];
     fonts2 = [];
   }
@@ -8574,7 +8574,7 @@ var init__3 = __esm({
     index3 = 2;
     component3 = async () => component_cache3 ??= (await Promise.resolve().then(() => (init_layout_svelte2(), layout_svelte_exports2))).default;
     server_id2 = "src/routes/admin/+layout.server.ts";
-    imports3 = ["_app/immutable/nodes/2.DSWMyZxL.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/DXC3xB5u.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/SeINawUV.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/B_fGxkjt.js", "_app/immutable/chunks/CpJ3s9VQ.js"];
+    imports3 = ["_app/immutable/nodes/2.DVBLeDwo.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/CYPTLQAF.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/DwRR9HPj.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/B_fGxkjt.js", "_app/immutable/chunks/CpJ3s9VQ.js"];
     stylesheets3 = [];
     fonts3 = [];
   }
@@ -8646,7 +8646,7 @@ var init__4 = __esm({
     index4 = 3;
     component4 = async () => component_cache4 ??= (await Promise.resolve().then(() => (init_layout_svelte3(), layout_svelte_exports3))).default;
     server_id3 = "src/routes/guru/+layout.server.ts";
-    imports4 = ["_app/immutable/nodes/3.BLwSEwJi.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/DXC3xB5u.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/SeINawUV.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/B_fGxkjt.js", "_app/immutable/chunks/CpJ3s9VQ.js"];
+    imports4 = ["_app/immutable/nodes/3.D1pSOHAA.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/CYPTLQAF.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/DwRR9HPj.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/B_fGxkjt.js", "_app/immutable/chunks/CpJ3s9VQ.js"];
     stylesheets4 = [];
     fonts4 = [];
   }
@@ -8716,7 +8716,7 @@ var init__5 = __esm({
     index5 = 4;
     component5 = async () => component_cache5 ??= (await Promise.resolve().then(() => (init_layout_svelte4(), layout_svelte_exports4))).default;
     server_id4 = "src/routes/pengawas/+layout.server.ts";
-    imports5 = ["_app/immutable/nodes/4.CvnNPtjO.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/DXC3xB5u.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/SeINawUV.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/B_fGxkjt.js", "_app/immutable/chunks/CpJ3s9VQ.js"];
+    imports5 = ["_app/immutable/nodes/4.BeL7MFR8.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/CYPTLQAF.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/DwRR9HPj.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/B_fGxkjt.js", "_app/immutable/chunks/CpJ3s9VQ.js"];
     stylesheets5 = [];
     fonts5 = [];
   }
@@ -8871,7 +8871,7 @@ var init__7 = __esm({
     index7 = 6;
     component7 = async () => component_cache7 ??= (await Promise.resolve().then(() => (init_layout_svelte6(), layout_svelte_exports6))).default;
     server_id6 = "src/routes/siswa/+layout.server.ts";
-    imports7 = ["_app/immutable/nodes/6.QWj593so.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/DXC3xB5u.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/SeINawUV.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/B_fGxkjt.js", "_app/immutable/chunks/CpJ3s9VQ.js"];
+    imports7 = ["_app/immutable/nodes/6.BYd-mpuN.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/CYPTLQAF.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/DwRR9HPj.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/B_fGxkjt.js", "_app/immutable/chunks/CpJ3s9VQ.js"];
     stylesheets7 = [];
     fonts7 = [];
   }
@@ -8948,7 +8948,7 @@ var init__8 = __esm({
     index8 = 7;
     component8 = async () => component_cache8 ??= (await Promise.resolve().then(() => (init_layout_svelte7(), layout_svelte_exports7))).default;
     server_id7 = "src/routes/superadmin/+layout.server.ts";
-    imports8 = ["_app/immutable/nodes/7.C81_ob1m.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/DXC3xB5u.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/SeINawUV.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/B_fGxkjt.js", "_app/immutable/chunks/CpJ3s9VQ.js"];
+    imports8 = ["_app/immutable/nodes/7.DFjythZ2.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/CYPTLQAF.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/DwRR9HPj.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/B_fGxkjt.js", "_app/immutable/chunks/CpJ3s9VQ.js"];
     stylesheets8 = [];
     fonts8 = [];
   }
@@ -9021,22 +9021,22 @@ var init_page_server_ts2 = __esm({
   ".svelte-kit/output/server/entries/pages/admin/_page.server.ts.js"() {
     init_db();
     load9 = async ({ platform, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const schoolId = locals.user?.school_id;
       const [userCounts, examStats, attemptStats, recentAttempts] = await Promise.all([
-        db.prepare(`SELECT role, COUNT(*) as count FROM users WHERE school_id = ? GROUP BY role`).bind(schoolId).all(),
-        db.prepare(`SELECT
+        db2.prepare(`SELECT role, COUNT(*) as count FROM users WHERE school_id = ? GROUP BY role`).bind(schoolId).all(),
+        db2.prepare(`SELECT
 			COUNT(*) as total,
 			SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active
 			FROM exams WHERE school_id = ?`).bind(schoolId).first(),
-        db.prepare(`SELECT
+        db2.prepare(`SELECT
 			COUNT(*) as total,
 			SUM(CASE WHEN status = 'mengerjakan' THEN 1 ELSE 0 END) as sedang_mengerjakan,
 			SUM(CASE WHEN status = 'selesai' THEN 1 ELSE 0 END) as selesai
 			FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
 			WHERE e.school_id = ?`).bind(schoolId).first(),
-        db.prepare(`SELECT sa.*, u.name as student_name, e.title as exam_title
+        db2.prepare(`SELECT sa.*, u.name as student_name, e.title as exam_title
 			FROM student_attempts sa
 			JOIN users u ON sa.student_id = u.id
 			JOIN exams e ON sa.exam_id = e.id
@@ -9265,8 +9265,8 @@ var init_page_server_ts3 = __esm({
     init_exports();
     init_db();
     load10 = async ({ platform, locals }) => {
-      const db = getDB(platform);
-      const exams = await db.prepare(`
+      const db2 = getDB(platform);
+      const exams = await db2.prepare(`
 		SELECT e.*, s.name as subject, (SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count
 		FROM exams e 
 		LEFT JOIN subjects s ON e.subject_id = s.id
@@ -9276,7 +9276,7 @@ var init_page_server_ts3 = __esm({
     };
     actions = {
       copyQuestions: async ({ request, locals, platform }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const targetExamIdStr = data.get("target_exam_id")?.toString();
         const questionIdsStr = data.get("question_ids")?.toString();
@@ -9284,12 +9284,12 @@ var init_page_server_ts3 = __esm({
         if (isNaN(parsedTargetExamId) || !questionIdsStr) return fail(400, { error: "Data tidak lengkap" });
         const questionIds = questionIdsStr.split(",").map((id) => parseInt(id.trim())).filter((id) => !isNaN(id));
         if (questionIds.length === 0) return fail(400, { error: "Tidak ada soal yang dipilih" });
-        const target = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedTargetExamId, locals.user.school_id).first();
+        const target = await db2.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedTargetExamId, locals.user.school_id).first();
         if (!target) return fail(403, { error: "Ujian tujuan tidak valid" });
-        const maxQ = await db.prepare("SELECT MAX(question_number) as m FROM questions WHERE exam_id = ?").bind(parsedTargetExamId).first();
+        const maxQ = await db2.prepare("SELECT MAX(question_number) as m FROM questions WHERE exam_id = ?").bind(parsedTargetExamId).first();
         let nextNumber = (maxQ?.m || 0) + 1;
         const placeholders = questionIds.map(() => "?").join(",");
-        const questionsToCopy = await db.prepare(`
+        const questionsToCopy = await db2.prepare(`
 			SELECT q.type, q.question_text, q.points, q.media_type, q.media_url, q.audio_max_plays, q.options_json, q.correct_answer_json 
 			FROM questions q
 			JOIN exams e ON q.exam_id = e.id
@@ -9299,7 +9299,7 @@ var init_page_server_ts3 = __esm({
           return fail(400, { error: "Soal tidak ditemukan atau tidak valid" });
         }
         const stmts = questionsToCopy.results.map((q) => {
-          return db.prepare(`
+          return db2.prepare(`
 				INSERT INTO questions (exam_id, type, question_text, question_number, points, media_type, media_url, audio_max_plays, options_json, correct_answer_json)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			`).bind(
@@ -9316,7 +9316,7 @@ var init_page_server_ts3 = __esm({
           );
         });
         try {
-          await db.batch(stmts);
+          await db2.batch(stmts);
           return { success: true };
         } catch (e3) {
           console.error(e3);
@@ -9405,7 +9405,7 @@ var init__11 = __esm({
     index11 = 10;
     component11 = async () => component_cache11 ??= (await Promise.resolve().then(() => (init_page_svelte3(), page_svelte_exports3))).default;
     server_id10 = "src/routes/admin/bank-soal/+page.server.ts";
-    imports11 = ["_app/immutable/nodes/10.CRjeBDDz.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js"];
+    imports11 = ["_app/immutable/nodes/10.Djr3QzIA.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js"];
     stylesheets11 = [];
     fonts11 = [];
   }
@@ -9518,13 +9518,13 @@ var init_page_server_ts4 = __esm({
     init_cloudinary();
     init_shared_server();
     load11 = async ({ platform, params, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examIdStr = params.examId;
       const parsedExamId = parseInt(examIdStr, 10);
       if (isNaN(parsedExamId)) throw error(400, "ID Ujian tidak valid");
-      const exam = await db.prepare("SELECT * FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+      const exam = await db2.prepare("SELECT * FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
       if (!exam) throw error(404, "Ujian tidak ditemukan");
-      const questions = await db.prepare(`
+      const questions = await db2.prepare(`
 		SELECT q.*, (SELECT COUNT(*) FROM student_answers sa WHERE sa.question_id = q.id) as answers_count 
 		FROM questions q 
 		WHERE q.exam_id = ? 
@@ -9534,11 +9534,11 @@ var init_page_server_ts4 = __esm({
     };
     actions2 = {
       create: async ({ request, platform, params, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const examIdStr = params.examId;
         const parsedExamId = parseInt(examIdStr, 10);
         if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid" });
-        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+        const exam = await db2.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
         if (!exam) return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         const form = await request.formData();
         const type = form.get("type")?.toString();
@@ -9548,7 +9548,7 @@ var init_page_server_ts4 = __esm({
         const mediaUrl = form.get("media_url")?.toString().trim() || null;
         const audioMaxPlays = parseInt(form.get("audio_max_plays")?.toString() || "3");
         if (!type || !questionText) return fail(400, { error: "Tipe dan teks soal wajib diisi." });
-        const last = await db.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(parsedExamId).first();
+        const last = await db2.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(parsedExamId).first();
         const nextNum = (last?.max_num ?? 0) + 1;
         let optionsJson = null;
         let correctAnswerJson = null;
@@ -9598,7 +9598,7 @@ var init_page_server_ts4 = __esm({
           correctAnswerJson = JSON.stringify(mapping);
         }
         try {
-          await db.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points,
+          await db2.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points,
 				media_type, media_url, audio_max_plays, options_json, correct_answer_json)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
             parsedExamId,
@@ -9619,11 +9619,11 @@ var init_page_server_ts4 = __esm({
         }
       },
       edit: async ({ request, platform, params, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const examIdStr = params.examId;
         const parsedExamId = parseInt(examIdStr, 10);
         if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid" });
-        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+        const exam = await db2.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
         if (!exam) return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         const form = await request.formData();
         const idStr = form.get("id")?.toString();
@@ -9675,7 +9675,7 @@ var init_page_server_ts4 = __esm({
             }
           }
           optionsJson = JSON.stringify({ left: leftItems, right: rightItems });
-          const prevMap = await db.prepare("SELECT correct_answer_json FROM questions WHERE id = ?").bind(parsedId).first();
+          const prevMap = await db2.prepare("SELECT correct_answer_json FROM questions WHERE id = ?").bind(parsedId).first();
           if (prevMap && prevMap.correct_answer_json) {
             correctAnswerJson = prevMap.correct_answer_json;
           } else {
@@ -9687,11 +9687,11 @@ var init_page_server_ts4 = __esm({
           }
         }
         try {
-          const prevMedia = await db.prepare("SELECT media_url FROM questions WHERE id = ?").bind(parsedId).first();
+          const prevMedia = await db2.prepare("SELECT media_url FROM questions WHERE id = ?").bind(parsedId).first();
           if (prevMedia && prevMedia.media_url && prevMedia.media_url !== mediaUrl && prevMedia.media_url.includes("res.cloudinary.com")) {
             await deleteFromCloudinary(prevMedia.media_url, private_env);
           }
-          await db.prepare(`UPDATE questions SET 
+          await db2.prepare(`UPDATE questions SET 
 				question_text = ?, points = ?, media_type = ?, media_url = ?, 
 				options_json = ?, correct_answer_json = ? 
 				WHERE id = ?`).bind(questionText, points, mediaType === "none" ? null : mediaType, mediaUrl, optionsJson, correctAnswerJson, parsedId).run();
@@ -9702,18 +9702,18 @@ var init_page_server_ts4 = __esm({
         }
       },
       delete: async ({ request, platform, params, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const examIdStr = params.examId;
         const parsedExamId = parseInt(examIdStr, 10);
         if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid" });
-        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+        const exam = await db2.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
         if (!exam) return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         const form = await request.formData();
         const idStr = form.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
         try {
-          const q = await db.prepare("SELECT media_url, question_text, options FROM questions WHERE id = ?").bind(parsedId).first();
+          const q = await db2.prepare("SELECT media_url, question_text, options FROM questions WHERE id = ?").bind(parsedId).first();
           if (q) {
             const urlsToDelete = /* @__PURE__ */ new Set();
             if (q.media_url && q.media_url.includes("res.cloudinary.com")) {
@@ -9726,16 +9726,16 @@ var init_page_server_ts4 = __esm({
               deleteFromCloudinary(url, private_env).catch((e3) => console.error("Background delete failed:", e3));
             });
           }
-          await db.prepare("DELETE FROM student_answers WHERE question_id = ?").bind(parsedId).run();
-          await db.prepare("DELETE FROM questions WHERE id = ?").bind(parsedId).run();
-          const remainingQuestions = await db.prepare("SELECT id FROM questions WHERE exam_id = ? ORDER BY question_number ASC, id ASC").bind(parsedExamId).all();
+          await db2.prepare("DELETE FROM student_answers WHERE question_id = ?").bind(parsedId).run();
+          await db2.prepare("DELETE FROM questions WHERE id = ?").bind(parsedId).run();
+          const remainingQuestions = await db2.prepare("SELECT id FROM questions WHERE exam_id = ? ORDER BY question_number ASC, id ASC").bind(parsedExamId).all();
           if (remainingQuestions.results.length > 0) {
             const statements = [];
-            const stmt = db.prepare("UPDATE questions SET question_number = ? WHERE id = ?");
+            const stmt = db2.prepare("UPDATE questions SET question_number = ? WHERE id = ?");
             remainingQuestions.results.forEach((q2, idx) => {
               statements.push(stmt.bind(idx + 1, q2.id));
             });
-            await db.batch(statements);
+            await db2.batch(statements);
           }
           return { success: "Soal berhasil dihapus.", deletedIds: [parsedId] };
         } catch (e3) {
@@ -9744,11 +9744,11 @@ var init_page_server_ts4 = __esm({
         }
       },
       importExcel: async ({ request, platform, params, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const examIdStr = params.examId;
         const parsedExamId = parseInt(examIdStr, 10);
         if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid" });
-        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+        const exam = await db2.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
         if (!exam) return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         const form = await request.formData();
         const questionsJson = form.get("questions_json")?.toString();
@@ -9762,10 +9762,10 @@ var init_page_server_ts4 = __esm({
         if (!Array.isArray(parsedQuestions) || parsedQuestions.length === 0) {
           return fail(400, { error: "Tidak ada soal yang ditemukan." });
         }
-        const last = await db.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(parsedExamId).first();
+        const last = await db2.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(parsedExamId).first();
         let nextNum = (last?.max_num ?? 0) + 1;
         const statements = [];
-        const stmt = db.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points, options_json, correct_answer_json) VALUES (?, ?, ?, ?, ?, ?, ?)`);
+        const stmt = db2.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points, options_json, correct_answer_json) VALUES (?, ?, ?, ?, ?, ?, ?)`);
         const cloudinaryRegex = /https:\/\/res\.cloudinary\.com\/[^"'\s>]+/g;
         const mediaUrlsToInsert = /* @__PURE__ */ new Set();
         for (const q of parsedQuestions) {
@@ -9783,9 +9783,9 @@ var init_page_server_ts4 = __esm({
           }
         }
         try {
-          await db.batch(statements);
+          await db2.batch(statements);
           if (mediaUrlsToInsert.size > 0) {
-            const mediaStmt = db.prepare(`
+            const mediaStmt = db2.prepare(`
 					INSERT INTO uploaded_media (url, name, media_type, uploaded_by, school_id)
 					VALUES (?, ?, ?, ?, ?)
 				`);
@@ -9793,7 +9793,7 @@ var init_page_server_ts4 = __esm({
               (url) => mediaStmt.bind(url, "Gambar Import Word", "image", locals.user.id, locals.user.school_id)
             );
             try {
-              await db.batch(mediaBatch);
+              await db2.batch(mediaBatch);
             } catch (e3) {
               console.warn("Sebagian gambar mungkin sudah ada di media bank:", e3);
             }
@@ -9805,11 +9805,11 @@ var init_page_server_ts4 = __esm({
         return { success: `Berhasil mengimpor ${parsedQuestions.length} soal.` };
       },
       deleteBulk: async ({ request, platform, params, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const examIdStr = params.examId;
         const parsedExamId = parseInt(examIdStr, 10);
         if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid" });
-        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+        const exam = await db2.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
         if (!exam) return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         const form = await request.formData();
         const idsStr = form.get("ids")?.toString();
@@ -9818,7 +9818,7 @@ var init_page_server_ts4 = __esm({
           const rawIds = JSON.parse(idsStr);
           if (!Array.isArray(rawIds) || rawIds.length === 0) return fail(400, { error: "Daftar ID tidak valid." });
           const placeholders = rawIds.map(() => "?").join(",");
-          const validQuestions = await db.prepare(`
+          const validQuestions = await db2.prepare(`
 				SELECT q.id, q.media_url, q.question_text, q.options 
 				FROM questions q
 				WHERE q.id IN (${placeholders}) AND q.exam_id = ?
@@ -9840,18 +9840,18 @@ var init_page_server_ts4 = __esm({
           urlsToDelete.forEach((url) => {
             deleteFromCloudinary(url, private_env).catch((e3) => console.error("Background delete failed:", e3));
           });
-          await db.batch([
-            db.prepare(`DELETE FROM student_answers WHERE question_id IN (${validPlaceholders})`).bind(...validIds),
-            db.prepare(`DELETE FROM questions WHERE id IN (${validPlaceholders}) AND exam_id = ?`).bind(...validIds, parsedExamId)
+          await db2.batch([
+            db2.prepare(`DELETE FROM student_answers WHERE question_id IN (${validPlaceholders})`).bind(...validIds),
+            db2.prepare(`DELETE FROM questions WHERE id IN (${validPlaceholders}) AND exam_id = ?`).bind(...validIds, parsedExamId)
           ]);
-          const remainingQuestions = await db.prepare("SELECT id FROM questions WHERE exam_id = ? ORDER BY question_number ASC, id ASC").bind(parsedExamId).all();
+          const remainingQuestions = await db2.prepare("SELECT id FROM questions WHERE exam_id = ? ORDER BY question_number ASC, id ASC").bind(parsedExamId).all();
           if (remainingQuestions.results.length > 0) {
             const statements = [];
-            const stmt = db.prepare("UPDATE questions SET question_number = ? WHERE id = ?");
+            const stmt = db2.prepare("UPDATE questions SET question_number = ? WHERE id = ?");
             remainingQuestions.results.forEach((q, idx) => {
               statements.push(stmt.bind(idx + 1, q.id));
             });
-            await db.batch(statements);
+            await db2.batch(statements);
           }
           return { success: `${validIds.length} soal berhasil dihapus.`, deletedIds: validIds };
         } catch (e3) {
@@ -46098,7 +46098,7 @@ var init__12 = __esm({
     index12 = 11;
     component12 = async () => component_cache12 ??= (await Promise.resolve().then(() => (init_page_svelte4(), page_svelte_exports4))).default;
     server_id11 = "src/routes/admin/bank-soal/[examId]/+page.server.ts";
-    imports12 = ["_app/immutable/nodes/11.BsJKzpiE.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/0WrWfAVQ.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/ChUQfART.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/BGXjXNkc.js", "_app/immutable/chunks/B0y2EvEz.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/Dyd_-2iH.js", "_app/immutable/chunks/09QYUleA.js", "_app/immutable/chunks/Dod_M3Am.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/SeINawUV.js"];
+    imports12 = ["_app/immutable/nodes/11.B9wOdS7-.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/w5hoNK1W.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/2tT41R4y.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/BL4i29cp.js", "_app/immutable/chunks/B0y2EvEz.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/Dyd_-2iH.js", "_app/immutable/chunks/09QYUleA.js", "_app/immutable/chunks/C3mpY5J1.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/DwRR9HPj.js"];
     stylesheets12 = ["_app/immutable/assets/QuestionRenderer.CwYmYea-.css", "_app/immutable/assets/RichTextEditor.DLtijARe.css"];
     fonts12 = [];
   }
@@ -46115,13 +46115,13 @@ var init_page_server_ts5 = __esm({
     init_exports();
     init_db();
     load12 = async ({ platform, locals, params }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examId = params.examId;
-      const exam = await db.prepare("SELECT id, title, duration_minutes FROM exams WHERE id = ? AND school_id = ?").bind(examId, locals.user.school_id).first();
+      const exam = await db2.prepare("SELECT id, title, duration_minutes FROM exams WHERE id = ? AND school_id = ?").bind(examId, locals.user.school_id).first();
       if (!exam) {
         throw redirect(302, "/admin/bank-soal");
       }
-      const questions = await db.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number ASC").bind(examId).all();
+      const questions = await db2.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number ASC").bind(examId).all();
       return {
         exam,
         questions: questions.results
@@ -46454,7 +46454,7 @@ var init__13 = __esm({
     index13 = 12;
     component13 = async () => component_cache13 ??= (await Promise.resolve().then(() => (init_page_svelte5(), page_svelte_exports5))).default;
     server_id12 = "src/routes/admin/bank-soal/[examId]/preview/+page.server.ts";
-    imports13 = ["_app/immutable/nodes/12.DkAdbNt2.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/B0y2EvEz.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/Dyd_-2iH.js", "_app/immutable/chunks/09QYUleA.js", "_app/immutable/chunks/CtwkWTFm.js", "_app/immutable/chunks/SeINawUV.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/_KaSKy70.js"];
+    imports13 = ["_app/immutable/nodes/12.BPHYjfB0.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/B0y2EvEz.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/Dyd_-2iH.js", "_app/immutable/chunks/09QYUleA.js", "_app/immutable/chunks/CtwkWTFm.js", "_app/immutable/chunks/DwRR9HPj.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/D0YHghFF.js"];
     stylesheets13 = ["_app/immutable/assets/QuestionRenderer.CwYmYea-.css"];
     fonts13 = [];
   }
@@ -46472,8 +46472,8 @@ var init_page_server_ts6 = __esm({
     init_exports();
     init_db();
     load13 = async ({ locals, platform }) => {
-      const db = getDB(platform);
-      const { results: classes } = await db.prepare(
+      const db2 = getDB(platform);
+      const { results: classes } = await db2.prepare(
         `SELECT c.*, COUNT(u.id) as student_count FROM classes c LEFT JOIN users u ON c.id = u.class_id WHERE c.school_id = ? GROUP BY c.id 
 		ORDER BY CASE c.level
 			WHEN 'I' THEN 1 WHEN 'II' THEN 2 WHEN 'III' THEN 3 WHEN 'IV' THEN 4 WHEN 'V' THEN 5 WHEN 'VI' THEN 6 WHEN 'VII' THEN 7 WHEN 'VIII' THEN 8 WHEN 'IX' THEN 9 WHEN 'X' THEN 10 WHEN 'XI' THEN 11 WHEN 'XII' THEN 12
@@ -46484,7 +46484,7 @@ var init_page_server_ts6 = __esm({
     };
     actions3 = {
       add: async ({ request, locals, platform }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const name = data.get("name")?.toString().trim();
         const level = data.get("level")?.toString().trim() || null;
@@ -46492,7 +46492,7 @@ var init_page_server_ts6 = __esm({
           return fail(400, { error: "Nama dan Tingkat kelas wajib diisi" });
         }
         try {
-          await db.prepare("INSERT INTO classes (school_id, name, level) VALUES (?, ?, ?)").bind(locals.user.school_id, name, level).run();
+          await db2.prepare("INSERT INTO classes (school_id, name, level) VALUES (?, ?, ?)").bind(locals.user.school_id, name, level).run();
           return { success: true };
         } catch (e3) {
           console.error(e3);
@@ -46500,7 +46500,7 @@ var init_page_server_ts6 = __esm({
         }
       },
       edit: async ({ request, locals, platform }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const idStr = data.get("id")?.toString();
         const name = data.get("name")?.toString().trim();
@@ -46508,7 +46508,7 @@ var init_page_server_ts6 = __esm({
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId) || !name || !level) return fail(400, { error: "ID, Nama, dan Tingkat kelas wajib diisi" });
         try {
-          await db.prepare('UPDATE classes SET name = ?, level = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, level, parsedId, locals.user.school_id).run();
+          await db2.prepare('UPDATE classes SET name = ?, level = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, level, parsedId, locals.user.school_id).run();
           return { success: true };
         } catch (e3) {
           console.error(e3);
@@ -46516,15 +46516,15 @@ var init_page_server_ts6 = __esm({
         }
       },
       delete: async ({ request, locals, platform }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const idStr = data.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid" });
         try {
-          await db.batch([
-            db.prepare("UPDATE users SET class_id = NULL WHERE class_id = ? AND school_id = ?").bind(parsedId, locals.user.school_id),
-            db.prepare("DELETE FROM classes WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id)
+          await db2.batch([
+            db2.prepare("UPDATE users SET class_id = NULL WHERE class_id = ? AND school_id = ?").bind(parsedId, locals.user.school_id),
+            db2.prepare("DELETE FROM classes WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id)
           ]);
           return { success: true };
         } catch (e3) {
@@ -46665,7 +46665,7 @@ var init__14 = __esm({
     index14 = 13;
     component14 = async () => component_cache14 ??= (await Promise.resolve().then(() => (init_page_svelte6(), page_svelte_exports6))).default;
     server_id13 = "src/routes/admin/classes/+page.server.ts";
-    imports14 = ["_app/immutable/nodes/13.CMmWOtPG.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/0WrWfAVQ.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/A1P7O0DF.js"];
+    imports14 = ["_app/immutable/nodes/13.BobX-9Xo.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/w5hoNK1W.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/A1P7O0DF.js"];
     stylesheets14 = [];
     fonts14 = [];
   }
@@ -46683,8 +46683,8 @@ var init_page_server_ts7 = __esm({
     init_exports();
     init_db();
     load14 = async ({ platform, locals }) => {
-      const db = getDB(platform);
-      const examTypes = await db.prepare(`
+      const db2 = getDB(platform);
+      const examTypes = await db2.prepare(`
 		SELECT et.*, 
 			(SELECT COUNT(*) FROM exams WHERE exam_type_id = et.id) as exam_count,
 			(SELECT COUNT(u.id) FROM users u JOIN exam_type_classes etc ON etc.class_id = u.class_id WHERE etc.exam_type_id = et.id AND u.role = 'siswa' AND u.is_active = 1) as participant_count,
@@ -46693,8 +46693,8 @@ var init_page_server_ts7 = __esm({
 		WHERE et.school_id = ?
 		ORDER BY et.created_at DESC
 	`).bind(locals.user.school_id).all();
-      const classes = await db.prepare("SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC").bind(locals.user.school_id).all();
-      const students = await db.prepare(
+      const classes = await db2.prepare("SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC").bind(locals.user.school_id).all();
+      const students = await db2.prepare(
         'SELECT id, name, username, class_id FROM users WHERE school_id = ? AND role = "siswa" ORDER BY name ASC'
       ).bind(locals.user.school_id).all();
       return {
@@ -46705,7 +46705,7 @@ var init_page_server_ts7 = __esm({
     };
     actions4 = {
       create: async ({ request, platform, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const code = form.get("code")?.toString().trim();
         const name = form.get("name")?.toString().trim();
@@ -46715,7 +46715,7 @@ var init_page_server_ts7 = __esm({
         const isActive = 1;
         if (!code || !name) return fail(400, { error: "Kode dan Nama Tipe Ujian wajib diisi." });
         try {
-          await db.prepare(`INSERT INTO exam_types (school_id, code, name, description, start_time, end_time, is_active)
+          await db2.prepare(`INSERT INTO exam_types (school_id, code, name, description, start_time, end_time, is_active)
 				VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(locals.user.school_id, code, name, description, startTime, endTime, isActive).run();
           return { success: "Tipe Ujian berhasil dibuat." };
         } catch (e3) {
@@ -46724,7 +46724,7 @@ var init_page_server_ts7 = __esm({
         }
       },
       update: async ({ request, platform, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const idStr = form.get("id")?.toString();
         const code = form.get("code")?.toString().trim();
@@ -46736,10 +46736,10 @@ var init_page_server_ts7 = __esm({
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId) || !code || !name) return fail(400, { error: "Data tidak lengkap." });
         try {
-          const oldType = await db.prepare("SELECT code FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).first();
-          await db.prepare(`UPDATE exam_types SET code=?, name=?, description=?, start_time=?, end_time=?, is_active=? WHERE id=? AND school_id=?`).bind(code, name, description, startTime, endTime, isActive, parsedId, locals.user.school_id).run();
+          const oldType = await db2.prepare("SELECT code FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).first();
+          await db2.prepare(`UPDATE exam_types SET code=?, name=?, description=?, start_time=?, end_time=?, is_active=? WHERE id=? AND school_id=?`).bind(code, name, description, startTime, endTime, isActive, parsedId, locals.user.school_id).run();
           if (oldType && oldType.code !== code) {
-            const linkedExams = await db.prepare(`
+            const linkedExams = await db2.prepare(`
 					SELECT e.id, s.name as subject_name
 					FROM exams e
 					LEFT JOIN subjects s ON e.subject_id = s.id
@@ -46747,13 +46747,13 @@ var init_page_server_ts7 = __esm({
 				`).bind(parsedId, locals.user.school_id).all();
             if (linkedExams.results.length > 0) {
               const updateBatch = linkedExams.results.map(
-                (exam) => db.prepare(`UPDATE exams SET title = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?`).bind(`${code} - ${exam.subject_name || "Ujian"}`, exam.id, locals.user.school_id)
+                (exam) => db2.prepare(`UPDATE exams SET title = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?`).bind(`${code} - ${exam.subject_name || "Ujian"}`, exam.id, locals.user.school_id)
               );
-              await db.batch(updateBatch);
+              await db2.batch(updateBatch);
             }
           }
           if (startTime && endTime) {
-            await db.prepare(`
+            await db2.prepare(`
 					UPDATE exams 
 					SET is_active = 0 
 					WHERE exam_type_id = ? AND school_id = ?
@@ -46770,17 +46770,17 @@ var init_page_server_ts7 = __esm({
         }
       },
       delete: async ({ request, platform, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const idStr = form.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
         try {
-          const exams = await db.prepare("SELECT COUNT(*) as count FROM exams WHERE exam_type_id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).first();
+          const exams = await db2.prepare("SELECT COUNT(*) as count FROM exams WHERE exam_type_id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).first();
           if (exams && exams.count > 0) {
             return fail(400, { error: "Gagal dihapus: Masih ada ujian yang terikat pada tipe ini." });
           }
-          await db.prepare("DELETE FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).run();
+          await db2.prepare("DELETE FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).run();
           return { success: "Tipe Ujian berhasil dihapus." };
         } catch (e3) {
           console.error(e3);
@@ -46789,39 +46789,39 @@ var init_page_server_ts7 = __esm({
       },
       // ── Peserta Default Tipe Ujian ──────────────────────────────────────────
       addTypeClass: async ({ request, platform, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const examTypeIdStr = form.get("exam_type_id")?.toString();
         const classIdsStr = form.getAll("class_ids").map((id) => id.toString());
         const parsedExamTypeId = parseInt(examTypeIdStr || "", 10);
         const parsedClassIds = classIdsStr.map((id) => parseInt(id, 10)).filter((id) => !isNaN(id));
         if (isNaN(parsedExamTypeId) || parsedClassIds.length === 0) return fail(400, { error: "Data tidak lengkap." });
-        const examType = await db.prepare("SELECT id FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedExamTypeId, locals.user.school_id).first();
+        const examType = await db2.prepare("SELECT id FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedExamTypeId, locals.user.school_id).first();
         if (!examType) return fail(404, { error: "Tipe ujian tidak ditemukan." });
         const placeholders = parsedClassIds.map(() => "?").join(",");
-        const validClasses = await db.prepare(`SELECT id FROM classes WHERE id IN (${placeholders}) AND school_id = ?`).bind(...parsedClassIds, locals.user.school_id).all();
+        const validClasses = await db2.prepare(`SELECT id FROM classes WHERE id IN (${placeholders}) AND school_id = ?`).bind(...parsedClassIds, locals.user.school_id).all();
         if (validClasses.results.length === 0) {
           return fail(400, { error: "Kelas yang dipilih tidak valid." });
         }
         const insertStmts = validClasses.results.map(
-          (cls) => db.prepare("INSERT OR IGNORE INTO exam_type_classes (exam_type_id, class_id) VALUES (?, ?)").bind(parsedExamTypeId, cls.id)
+          (cls) => db2.prepare("INSERT OR IGNORE INTO exam_type_classes (exam_type_id, class_id) VALUES (?, ?)").bind(parsedExamTypeId, cls.id)
         );
-        await db.batch(insertStmts);
+        await db2.batch(insertStmts);
         return { success: `Berhasil menambahkan ${validClasses.results.length} kelas sebagai peserta ujian.` };
       },
       removeTypeClass: async ({ request, platform, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const idStr = form.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
-        const etc = await db.prepare(`
+        const etc = await db2.prepare(`
 			SELECT class_id, exam_type_id 
 			FROM exam_type_classes 
 			WHERE id = ? AND exam_type_id IN (SELECT id FROM exam_types WHERE school_id = ?)
 		`).bind(parsedId, locals.user.school_id).first();
         if (!etc) return fail(404, { error: "Data kelas tidak ditemukan." });
-        const conflict = await db.prepare(`
+        const conflict = await db2.prepare(`
 			SELECT 1
 			FROM exam_participants ep
 			JOIN exams e ON ep.exam_id = e.id
@@ -46832,18 +46832,18 @@ var init_page_server_ts7 = __esm({
         if (conflict) {
           return fail(400, { error: "Tidak dapat menghapus kelas. Terdapat siswa dari kelas ini yang telah terdaftar pada ujian." });
         }
-        await db.prepare("DELETE FROM exam_type_classes WHERE id = ?").bind(parsedId).run();
+        await db2.prepare("DELETE FROM exam_type_classes WHERE id = ?").bind(parsedId).run();
         return { success: "Kelas berhasil dihapus dari daftar peserta." };
       },
       clearTypeClasses: async ({ request, platform, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const examTypeIdStr = form.get("exam_type_id")?.toString();
         const parsedExamTypeId = parseInt(examTypeIdStr || "", 10);
         if (isNaN(parsedExamTypeId)) return fail(400, { error: "ID tidak valid." });
-        const examType = await db.prepare("SELECT id FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedExamTypeId, locals.user.school_id).first();
+        const examType = await db2.prepare("SELECT id FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedExamTypeId, locals.user.school_id).first();
         if (!examType) return fail(404, { error: "Tipe ujian tidak ditemukan." });
-        const conflict = await db.prepare(`
+        const conflict = await db2.prepare(`
 			SELECT 1
 			FROM exam_participants ep
 			JOIN exams e ON ep.exam_id = e.id
@@ -46855,18 +46855,18 @@ var init_page_server_ts7 = __esm({
         if (conflict) {
           return fail(400, { error: "Tidak dapat menghapus semua kelas. Beberapa kelas masih memiliki siswa yang terdaftar pada ujian." });
         }
-        await db.prepare("DELETE FROM exam_type_classes WHERE exam_type_id = ?").bind(parsedExamTypeId).run();
+        await db2.prepare("DELETE FROM exam_type_classes WHERE exam_type_id = ?").bind(parsedExamTypeId).run();
         return { success: "Semua kelas berhasil dihapus dari tipe ujian ini." };
       },
       getTypeClasses: async ({ request, platform, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const examTypeIdStr = form.get("exam_type_id")?.toString();
         const parsedExamTypeId = parseInt(examTypeIdStr || "", 10);
         if (isNaN(parsedExamTypeId)) return fail(400, { error: "ID tidak valid." });
-        const examType = await db.prepare("SELECT id FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedExamTypeId, locals.user.school_id).first();
+        const examType = await db2.prepare("SELECT id FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedExamTypeId, locals.user.school_id).first();
         if (!examType) return fail(404, { error: "Tipe ujian tidak ditemukan." });
-        const classes = await db.prepare(`
+        const classes = await db2.prepare(`
 			SELECT etc.id as relation_id, c.id, c.name,
 				(SELECT COUNT(*) FROM users u WHERE u.class_id = c.id AND u.role = 'siswa' AND u.is_active = 1) as student_count
 			FROM exam_type_classes etc
@@ -46878,7 +46878,7 @@ var init_page_server_ts7 = __esm({
         let students = [];
         if (classIds.length > 0) {
           const placeholders = classIds.map(() => "?").join(",");
-          const studentsQuery = await db.prepare(`
+          const studentsQuery = await db2.prepare(`
 				SELECT id, name, username as nisn, class_id 
 				FROM users 
 				WHERE class_id IN (${placeholders}) AND role = 'siswa' AND is_active = 1
@@ -46993,7 +46993,7 @@ var init__15 = __esm({
     index15 = 14;
     component15 = async () => component_cache15 ??= (await Promise.resolve().then(() => (init_page_svelte7(), page_svelte_exports7))).default;
     server_id14 = "src/routes/admin/exams/+page.server.ts";
-    imports15 = ["_app/immutable/nodes/14.Cf2MjNfG.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js"];
+    imports15 = ["_app/immutable/nodes/14.2jbyVAgw.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js"];
     stylesheets15 = [];
     fonts15 = [];
   }
@@ -47011,15 +47011,15 @@ var init_page_server_ts8 = __esm({
     init_exports();
     init_db();
     load15 = async ({ params, platform, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const typeIdStr = params.typeId;
       const typeId = parseInt(typeIdStr, 10);
       if (isNaN(typeId)) throw new Error("ID Tipe Ujian tidak valid");
-      const examType = await db.prepare("SELECT * FROM exam_types WHERE id = ? AND school_id = ?").bind(typeId, locals.user.school_id).first();
+      const examType = await db2.prepare("SELECT * FROM exam_types WHERE id = ? AND school_id = ?").bind(typeId, locals.user.school_id).first();
       if (!examType) {
         throw new Error("Tipe Ujian tidak ditemukan");
       }
-      const exams = await db.prepare(`
+      const exams = await db2.prepare(`
 		SELECT e.*, u.name as creator_name, s.name as subject_name,
 			(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count,
 			(SELECT COUNT(*) FROM exam_participants WHERE exam_id = e.id) as participant_count,
@@ -47032,29 +47032,40 @@ var init_page_server_ts8 = __esm({
 		WHERE e.school_id = ? AND e.exam_type_id = ?
 		ORDER BY e.created_at DESC
 	`).bind(locals.user.school_id, typeId).all();
-      const subjects = await db.prepare("SELECT id, name FROM subjects WHERE school_id = ? ORDER BY name").bind(locals.user.school_id).all();
-      const classes = await db.prepare(`
+      const examIds = exams.results.map((e3) => e3.id);
+      let allSessions = [];
+      if (examIds.length > 0) {
+        const placeholders = examIds.map(() => "?").join(",");
+        const sessionsResult = await db2.prepare(`SELECT * FROM exam_sessions WHERE exam_id IN (${placeholders})`).bind(...examIds).all();
+        allSessions = sessionsResult.results;
+      }
+      const examsWithSessions = exams.results.map((e3) => ({
+        ...e3,
+        sessions: allSessions.filter((s3) => s3.exam_id === e3.id)
+      }));
+      const subjects = await db2.prepare("SELECT id, name FROM subjects WHERE school_id = ? ORDER BY name").bind(locals.user.school_id).all();
+      const classes = await db2.prepare(`
 		SELECT c.id, c.name 
 		FROM classes c
 		INNER JOIN exam_type_classes etc ON etc.class_id = c.id
 		WHERE etc.exam_type_id = ? AND c.school_id = ?
 		ORDER BY c.name
 	`).bind(typeId, locals.user.school_id).all();
-      return { examType, exams: exams.results, subjects: subjects.results, classes: classes.results };
+      return { examType, exams: examsWithSessions, subjects: subjects.results, classes: classes.results };
     };
     actions5 = {
       create: async ({ request, params, platform, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const typeIdStr = params.typeId;
         const parsedTypeId = parseInt(typeIdStr, 10);
         if (isNaN(parsedTypeId)) return fail(400, { error: "ID Tipe Ujian tidak valid" });
-        const examType = await db.prepare("SELECT * FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedTypeId, locals.user.school_id).first();
+        const examType = await db2.prepare("SELECT * FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedTypeId, locals.user.school_id).first();
         if (!examType) return fail(400, { error: "Tipe Ujian tidak valid." });
         const subjectIdStr = form.get("subject_id")?.toString() || null;
         const parsedSubjectId = parseInt(subjectIdStr || "", 10);
         if (isNaN(parsedSubjectId)) return fail(400, { error: "Mata Pelajaran wajib dipilih." });
-        const subject = await db.prepare("SELECT name FROM subjects WHERE id = ?").bind(parsedSubjectId).first();
+        const subject = await db2.prepare("SELECT name FROM subjects WHERE id = ?").bind(parsedSubjectId).first();
         const roomName = form.get("room_name")?.toString().trim();
         let title = `${examType.code} - ${subject.name}`;
         if (roomName) {
@@ -47078,15 +47089,15 @@ var init_page_server_ts8 = __esm({
           }
         }
         try {
-          const result = await db.prepare(`INSERT INTO exams (school_id, exam_type_id, title, description, subject_id, duration_minutes, start_time, end_time, is_active, shuffle_questions, show_score_type, created_by)
+          const result = await db2.prepare(`INSERT INTO exams (school_id, exam_type_id, title, description, subject_id, duration_minutes, start_time, end_time, is_active, shuffle_questions, show_score_type, created_by)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(locals.user.school_id, parsedTypeId, title, description, parsedSubjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, showScoreType, locals.user?.id).run();
           const newExamId = result.meta?.last_row_id;
           if (newExamId) {
-            const classCountResult = await db.prepare(
+            const classCountResult = await db2.prepare(
               "SELECT COUNT(*) as count FROM exam_type_classes WHERE exam_type_id = ?"
             ).bind(parsedTypeId).first();
             if (classCountResult && classCountResult.count === 1) {
-              const typeParticipants = await db.prepare(`
+              const typeParticipants = await db2.prepare(`
 						SELECT u.id as student_id 
 						FROM users u 
 						JOIN exam_type_classes etc ON etc.class_id = u.class_id 
@@ -47094,10 +47105,25 @@ var init_page_server_ts8 = __esm({
 					`).bind(parsedTypeId).all();
               if (typeParticipants.results.length > 0) {
                 const insertBatch = typeParticipants.results.map(
-                  (p) => db.prepare("INSERT OR IGNORE INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(newExamId, p.student_id)
+                  (p) => db2.prepare("INSERT OR IGNORE INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(newExamId, p.student_id)
                 );
-                await db.batch(insertBatch);
+                await db2.batch(insertBatch);
               }
+            }
+          }
+          if (form.get("use_sessions")) {
+            const sessionBatch = [];
+            for (let i = 1; i <= 4; i++) {
+              const sStart = form.get(`session_${i}_start`)?.toString() || null;
+              const sEnd = form.get(`session_${i}_end`)?.toString() || null;
+              if (sStart || sEnd) {
+                sessionBatch.push(
+                  db2.prepare("INSERT INTO exam_sessions (exam_id, session_number, start_time, end_time) VALUES (?, ?, ?, ?)").bind(newExamId, i, sStart, sEnd)
+                );
+              }
+            }
+            if (sessionBatch.length > 0) {
+              await db2.batch(sessionBatch);
             }
           }
           return { success: "Ujian berhasil dibuat." };
@@ -47107,12 +47133,12 @@ var init_page_server_ts8 = __esm({
         }
       },
       update: async ({ request, platform, locals, params }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const typeIdStr = params.typeId;
         const parsedTypeId = parseInt(typeIdStr, 10);
         if (isNaN(parsedTypeId)) return fail(400, { error: "ID Tipe Ujian tidak valid." });
-        const examType = await db.prepare("SELECT * FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedTypeId, locals.user.school_id).first();
+        const examType = await db2.prepare("SELECT * FROM exam_types WHERE id = ? AND school_id = ?").bind(parsedTypeId, locals.user.school_id).first();
         if (!examType) return fail(400, { error: "Tipe Ujian tidak valid." });
         const idStr = form.get("id")?.toString();
         const subjectIdStr = form.get("subject_id")?.toString() || null;
@@ -47120,7 +47146,7 @@ var init_page_server_ts8 = __esm({
         const parsedSubjectId = parseInt(subjectIdStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "Data tidak lengkap." });
         if (isNaN(parsedSubjectId)) return fail(400, { error: "Mata pelajaran wajib diisi." });
-        const subject = await db.prepare("SELECT name FROM subjects WHERE id = ?").bind(parsedSubjectId).first();
+        const subject = await db2.prepare("SELECT name FROM subjects WHERE id = ?").bind(parsedSubjectId).first();
         const roomName = form.get("room_name")?.toString().trim();
         let title = subject ? `${examType.code} - ${subject.name}` : void 0;
         if (title && roomName) {
@@ -47144,8 +47170,24 @@ var init_page_server_ts8 = __esm({
           }
         }
         try {
-          await db.prepare(`UPDATE exams SET title=?, description=?, subject_id=?, duration_minutes=?,
+          await db2.prepare(`UPDATE exams SET title=?, description=?, subject_id=?, duration_minutes=?,
 				start_time=?, end_time=?, is_active=?, shuffle_questions=?, show_score_type=?, updated_at=datetime('now') WHERE id=? AND school_id=?`).bind(title, description, parsedSubjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, showScoreType, parsedId, locals.user.school_id).run();
+          await db2.prepare("DELETE FROM exam_sessions WHERE exam_id = ?").bind(parsedId).run();
+          if (form.get("use_sessions")) {
+            const sessionBatch = [];
+            for (let i = 1; i <= 4; i++) {
+              const sStart = form.get(`session_${i}_start`)?.toString() || null;
+              const sEnd = form.get(`session_${i}_end`)?.toString() || null;
+              if (sStart || sEnd) {
+                sessionBatch.push(
+                  db2.prepare("INSERT INTO exam_sessions (exam_id, session_number, start_time, end_time) VALUES (?, ?, ?, ?)").bind(parsedId, i, sStart, sEnd)
+                );
+              }
+            }
+            if (sessionBatch.length > 0) {
+              await db2.batch(sessionBatch);
+            }
+          }
           return { success: "Ujian berhasil diperbarui." };
         } catch (e3) {
           console.error(e3);
@@ -47153,27 +47195,28 @@ var init_page_server_ts8 = __esm({
         }
       },
       delete: async ({ request, platform, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const idStr = form.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
         try {
-          const attempts = await db.prepare("SELECT id FROM student_attempts WHERE exam_id = ?").bind(parsedId).all();
+          const attempts = await db2.prepare("SELECT id FROM student_attempts WHERE exam_id = ?").bind(parsedId).all();
           const attemptIds = attempts.results.map((a) => a.id);
           const batch = [];
           if (attemptIds.length > 0) {
             const placeholders = attemptIds.map(() => "?").join(",");
-            batch.push(db.prepare(`DELETE FROM student_answers WHERE attempt_id IN (${placeholders})`).bind(...attemptIds));
-            batch.push(db.prepare("DELETE FROM student_attempts WHERE exam_id = ?").bind(parsedId));
+            batch.push(db2.prepare(`DELETE FROM student_answers WHERE attempt_id IN (${placeholders})`).bind(...attemptIds));
+            batch.push(db2.prepare("DELETE FROM student_attempts WHERE exam_id = ?").bind(parsedId));
           }
-          batch.push(db.prepare("DELETE FROM questions WHERE exam_id = ?").bind(parsedId));
-          batch.push(db.prepare("DELETE FROM tokens WHERE exam_id = ?").bind(parsedId));
-          batch.push(db.prepare("DELETE FROM exam_participants WHERE exam_id = ?").bind(parsedId));
-          batch.push(db.prepare("DELETE FROM exam_proctors WHERE exam_id = ?").bind(parsedId));
-          batch.push(db.prepare("DELETE FROM exam_teachers WHERE exam_id = ?").bind(parsedId));
-          batch.push(db.prepare("DELETE FROM exams WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id));
-          await db.batch(batch);
+          batch.push(db2.prepare("DELETE FROM questions WHERE exam_id = ?").bind(parsedId));
+          batch.push(db2.prepare("DELETE FROM tokens WHERE exam_id = ?").bind(parsedId));
+          batch.push(db2.prepare("DELETE FROM exam_participants WHERE exam_id = ?").bind(parsedId));
+          batch.push(db2.prepare("DELETE FROM exam_proctors WHERE exam_id = ?").bind(parsedId));
+          batch.push(db2.prepare("DELETE FROM exam_teachers WHERE exam_id = ?").bind(parsedId));
+          batch.push(db2.prepare("DELETE FROM exam_sessions WHERE exam_id = ?").bind(parsedId));
+          batch.push(db2.prepare("DELETE FROM exams WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id));
+          await db2.batch(batch);
           return { success: "Ujian berhasil dihapus." };
         } catch (e3) {
           console.error("Delete error:", e3);
@@ -47181,13 +47224,13 @@ var init_page_server_ts8 = __esm({
         }
       },
       toggleActive: async ({ request, platform, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const idStr = form.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
         try {
-          await db.prepare(`UPDATE exams SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END, updated_at=datetime('now') WHERE id = ? AND school_id = ?`).bind(parsedId, locals.user.school_id).run();
+          await db2.prepare(`UPDATE exams SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END, updated_at=datetime('now') WHERE id = ? AND school_id = ?`).bind(parsedId, locals.user.school_id).run();
           return { success: "Status ujian berhasil diperbarui." };
         } catch (e3) {
           console.error(e3);
@@ -47331,7 +47374,7 @@ var init__16 = __esm({
     index16 = 15;
     component16 = async () => component_cache16 ??= (await Promise.resolve().then(() => (init_page_svelte8(), page_svelte_exports8))).default;
     server_id15 = "src/routes/admin/exams/type/[typeId]/+page.server.ts";
-    imports16 = ["_app/immutable/nodes/15.DralCBJ8.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js"];
+    imports16 = ["_app/immutable/nodes/15.CYPxS4mC.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js"];
     stylesheets16 = [];
     fonts16 = [];
   }
@@ -47349,19 +47392,19 @@ var init_page_server_ts9 = __esm({
     init_db();
     init_exports();
     load16 = async ({ platform, params, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examIdStr = params.id;
       const examId = parseInt(examIdStr, 10);
       if (isNaN(examId)) throw error(400, "ID Ujian tidak valid");
-      const exam = await db.prepare("SELECT e.*, s.name as subject_name, et.code as exam_type_code, et.name as exam_type_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id LEFT JOIN exam_types et ON e.exam_type_id = et.id WHERE e.id = ? AND e.school_id = ?").bind(examId, locals.user.school_id).first();
+      const exam = await db2.prepare("SELECT e.*, s.name as subject_name, et.code as exam_type_code, et.name as exam_type_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id LEFT JOIN exam_types et ON e.exam_type_id = et.id WHERE e.id = ? AND e.school_id = ?").bind(examId, locals.user.school_id).first();
       if (!exam) throw error(404, "Ujian tidak ditemukan");
-      const questions = await db.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number").bind(examId).all();
-      const attempts = await db.prepare(`
+      const questions = await db2.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number").bind(examId).all();
+      const attempts = await db2.prepare(`
 		SELECT sa.*, u.name as student_name FROM student_attempts sa
 		JOIN users u ON sa.student_id = u.id WHERE sa.exam_id = ? ORDER BY sa.created_at DESC
 	`).bind(examId).all();
-      const tokens = await db.prepare("SELECT * FROM tokens WHERE exam_id = ? ORDER BY created_at DESC").bind(examId).all();
-      const participants = await db.prepare(`
+      const tokens = await db2.prepare("SELECT * FROM tokens WHERE exam_id = ? ORDER BY created_at DESC").bind(examId).all();
+      const participants = await db2.prepare(`
 		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username as nisn, c.name as class_name
 		FROM exam_participants p
 		JOIN users u ON p.student_id = u.id
@@ -47372,14 +47415,14 @@ var init_page_server_ts9 = __esm({
       let classes = [];
       let allStudents = [];
       if (exam.exam_type_id) {
-        const classesQuery = await db.prepare(`
+        const classesQuery = await db2.prepare(`
 			SELECT c.id, c.name FROM classes c
 			JOIN exam_type_classes etc ON etc.class_id = c.id
 			WHERE etc.exam_type_id = ? AND c.school_id = ?
 			ORDER BY c.name
 		`).bind(exam.exam_type_id, locals.user.school_id).all();
         classes = classesQuery.results;
-        const studentsQuery = await db.prepare(`
+        const studentsQuery = await db2.prepare(`
 			SELECT u.id, u.name, u.username, u.class_id FROM users u
 			JOIN exam_type_classes etc ON etc.class_id = u.class_id
 			WHERE etc.exam_type_id = ? AND u.school_id = ? AND u.role = 'siswa' AND u.is_active = 1
@@ -47387,16 +47430,16 @@ var init_page_server_ts9 = __esm({
 		`).bind(exam.exam_type_id, locals.user.school_id).all();
         allStudents = studentsQuery.results;
       }
-      const allTeachers = await db.prepare('SELECT id, name, username FROM users WHERE school_id = ? AND role = "guru" ORDER BY name').bind(locals.user.school_id).all();
-      const examTeachers = await db.prepare(`
+      const allTeachers = await db2.prepare('SELECT id, name, username FROM users WHERE school_id = ? AND role = "guru" ORDER BY name').bind(locals.user.school_id).all();
+      const examTeachers = await db2.prepare(`
 		SELECT et.id as exam_teacher_id, u.id as user_id, u.name, u.username
 		FROM exam_teachers et
 		JOIN users u ON et.teacher_id = u.id
 		WHERE et.exam_id = ?
 		ORDER BY u.name
 	`).bind(examId).all();
-      const allProctors = await db.prepare('SELECT id, name, username FROM users WHERE school_id = ? AND role = "pengawas" ORDER BY name').bind(locals.user.school_id).all();
-      const examProctors = await db.prepare(`
+      const allProctors = await db2.prepare('SELECT id, name, username FROM users WHERE school_id = ? AND role = "pengawas" ORDER BY name').bind(locals.user.school_id).all();
+      const examProctors = await db2.prepare(`
 		SELECT ep.id as exam_proctor_id, u.id as user_id, u.name, u.username
 		FROM exam_proctors ep
 		JOIN users u ON ep.proctor_id = u.id
@@ -47420,64 +47463,64 @@ var init_page_server_ts9 = __esm({
     actions6 = {
       addParticipantClass: async ({ request, platform, params, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const classIdStr = form.get("class_id")?.toString();
         const parsedClassId = parseInt(classIdStr || "", 10);
         const parsedExamId = parseInt(params.id, 10);
         if (isNaN(parsedClassId) || isNaN(parsedExamId)) return fail(400, { error: "Data tidak valid" });
-        const exam = await db.prepare("SELECT id, exam_type_id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+        const exam = await db2.prepare("SELECT id, exam_type_id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
         if (!exam) return fail(403, { error: "Ujian tidak ditemukan atau bukan milik sekolah Anda." });
-        const validClass = await db.prepare("SELECT id FROM classes WHERE id = ? AND school_id = ?").bind(parsedClassId, locals.user.school_id).first();
+        const validClass = await db2.prepare("SELECT id FROM classes WHERE id = ? AND school_id = ?").bind(parsedClassId, locals.user.school_id).first();
         if (!validClass) return fail(403, { error: "Kelas tidak ditemukan." });
         if (exam.exam_type_id) {
-          const isAllowed = await db.prepare("SELECT 1 FROM exam_type_classes WHERE exam_type_id = ? AND class_id = ?").bind(exam.exam_type_id, parsedClassId).first();
+          const isAllowed = await db2.prepare("SELECT 1 FROM exam_type_classes WHERE exam_type_id = ? AND class_id = ?").bind(exam.exam_type_id, parsedClassId).first();
           if (!isAllowed) return fail(403, { error: "Kelas ini tidak termasuk dalam kelas yang diizinkan untuk tipe ujian ini." });
         }
-        const students = await db.prepare('SELECT id FROM users WHERE class_id = ? AND school_id = ? AND role = "siswa"').bind(parsedClassId, locals.user.school_id).all();
+        const students = await db2.prepare('SELECT id FROM users WHERE class_id = ? AND school_id = ? AND role = "siswa"').bind(parsedClassId, locals.user.school_id).all();
         if (students.results.length === 0) {
           return { success: "Tidak ada siswa di kelas ini." };
         }
         const insertStmts = students.results.map(
-          (student) => db.prepare("INSERT OR IGNORE INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(parsedExamId, student.id)
+          (student) => db2.prepare("INSERT OR IGNORE INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(parsedExamId, student.id)
         );
-        await db.batch(insertStmts);
+        await db2.batch(insertStmts);
         return { success: `Berhasil menambahkan ${students.results.length} siswa dari kelas ke peserta ujian.` };
       },
       addParticipantStudent: async ({ request, platform, params, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const studentIdsStr = form.getAll("student_ids").map((id) => id.toString());
         const parsedStudentIds = studentIdsStr.map((id) => parseInt(id, 10)).filter((id) => !isNaN(id));
         const parsedExamId = parseInt(params.id, 10);
         if (parsedStudentIds.length === 0 || isNaN(parsedExamId)) return fail(400, { error: "Data tidak valid" });
-        const exam = await db.prepare("SELECT id, exam_type_id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+        const exam = await db2.prepare("SELECT id, exam_type_id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
         if (!exam) return fail(403, { error: "Ujian tidak ditemukan atau bukan milik sekolah Anda." });
         let classFilterSql = "";
         if (exam.exam_type_id) {
           classFilterSql = ` AND class_id IN (SELECT class_id FROM exam_type_classes WHERE exam_type_id = ${exam.exam_type_id})`;
         }
         const placeholders = parsedStudentIds.map(() => "?").join(",");
-        const validStudents = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "siswa" ${classFilterSql}`).bind(...parsedStudentIds, locals.user.school_id).all();
+        const validStudents = await db2.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "siswa" ${classFilterSql}`).bind(...parsedStudentIds, locals.user.school_id).all();
         if (validStudents.results.length === 0) {
           return fail(400, { error: "Siswa tidak valid." });
         }
         const insertStmts = validStudents.results.map(
-          (s3) => db.prepare("INSERT OR IGNORE INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(parsedExamId, s3.id)
+          (s3) => db2.prepare("INSERT OR IGNORE INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(parsedExamId, s3.id)
         );
-        await db.batch(insertStmts);
+        await db2.batch(insertStmts);
         return { success: `Berhasil menambahkan ${validStudents.results.length} siswa ke peserta ujian.` };
       },
       removeParticipant: async ({ request, platform, params, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const participantIdStr = form.get("participant_id")?.toString();
         const parsedParticipantId = parseInt(participantIdStr || "", 10);
         const parsedExamId = parseInt(params.id, 10);
         if (isNaN(parsedParticipantId) || isNaN(parsedExamId)) return fail(400, { error: "ID peserta tidak valid" });
-        await db.prepare(`
+        await db2.prepare(`
 			DELETE FROM exam_participants 
 			WHERE id = ? AND exam_id = ? AND exam_id IN (SELECT id FROM exams WHERE school_id = ?)
 		`).bind(parsedParticipantId, parsedExamId, locals.user.school_id).run();
@@ -47485,34 +47528,34 @@ var init_page_server_ts9 = __esm({
       },
       addTeacher: async ({ request, platform, params, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const teacherIdsStr = form.getAll("teacher_ids").map((id) => id.toString());
         const parsedTeacherIds = teacherIdsStr.map((id) => parseInt(id, 10)).filter((id) => !isNaN(id));
         const parsedExamId = parseInt(params.id, 10);
         if (parsedTeacherIds.length === 0 || isNaN(parsedExamId)) return fail(400, { error: "Data tidak valid" });
-        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+        const exam = await db2.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
         if (!exam) return fail(403, { error: "Ujian tidak ditemukan atau bukan milik sekolah Anda." });
         const placeholders = parsedTeacherIds.map(() => "?").join(",");
-        const validTeachers = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "guru"`).bind(...parsedTeacherIds, locals.user.school_id).all();
+        const validTeachers = await db2.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "guru"`).bind(...parsedTeacherIds, locals.user.school_id).all();
         if (validTeachers.results.length === 0) {
           return fail(400, { error: "Guru tidak valid." });
         }
         const insertStmts = validTeachers.results.map(
-          (t2) => db.prepare("INSERT OR IGNORE INTO exam_teachers (exam_id, teacher_id) VALUES (?, ?)").bind(parsedExamId, t2.id)
+          (t2) => db2.prepare("INSERT OR IGNORE INTO exam_teachers (exam_id, teacher_id) VALUES (?, ?)").bind(parsedExamId, t2.id)
         );
-        await db.batch(insertStmts);
+        await db2.batch(insertStmts);
         return { success: `Berhasil menambahkan ${validTeachers.results.length} guru pengajar ujian.` };
       },
       removeTeacher: async ({ request, platform, params, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const examTeacherIdStr = form.get("exam_teacher_id")?.toString();
         const parsedExamTeacherId = parseInt(examTeacherIdStr || "", 10);
         const parsedExamId = parseInt(params.id, 10);
         if (isNaN(parsedExamTeacherId) || isNaN(parsedExamId)) return fail(400, { error: "ID pengajar tidak valid" });
-        await db.prepare(`
+        await db2.prepare(`
 			DELETE FROM exam_teachers 
 			WHERE id = ? AND exam_id = ? AND exam_id IN (SELECT id FROM exams WHERE school_id = ?)
 		`).bind(parsedExamTeacherId, parsedExamId, locals.user.school_id).run();
@@ -47520,34 +47563,34 @@ var init_page_server_ts9 = __esm({
       },
       addProctor: async ({ request, platform, params, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const proctorIdsStr = form.getAll("proctor_ids").map((id) => id.toString());
         const parsedProctorIds = proctorIdsStr.map((id) => parseInt(id, 10)).filter((id) => !isNaN(id));
         const parsedExamId = parseInt(params.id, 10);
         if (parsedProctorIds.length === 0 || isNaN(parsedExamId)) return fail(400, { error: "Data tidak valid" });
-        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+        const exam = await db2.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
         if (!exam) return fail(403, { error: "Ujian tidak ditemukan atau bukan milik sekolah Anda." });
         const placeholders = parsedProctorIds.map(() => "?").join(",");
-        const validProctors = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "pengawas"`).bind(...parsedProctorIds, locals.user.school_id).all();
+        const validProctors = await db2.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "pengawas"`).bind(...parsedProctorIds, locals.user.school_id).all();
         if (validProctors.results.length === 0) {
           return fail(400, { error: "Pengawas tidak valid." });
         }
         const insertStmts = validProctors.results.map(
-          (p) => db.prepare("INSERT OR IGNORE INTO exam_proctors (exam_id, proctor_id) VALUES (?, ?)").bind(parsedExamId, p.id)
+          (p) => db2.prepare("INSERT OR IGNORE INTO exam_proctors (exam_id, proctor_id) VALUES (?, ?)").bind(parsedExamId, p.id)
         );
-        await db.batch(insertStmts);
+        await db2.batch(insertStmts);
         return { success: `Berhasil menambahkan ${validProctors.results.length} pengawas ujian.` };
       },
       removeProctor: async ({ request, platform, params, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const examProctorIdStr = form.get("exam_proctor_id")?.toString();
         const parsedExamProctorId = parseInt(examProctorIdStr || "", 10);
         const parsedExamId = parseInt(params.id, 10);
         if (isNaN(parsedExamProctorId) || isNaN(parsedExamId)) return fail(400, { error: "ID pengawas tidak valid" });
-        await db.prepare(`
+        await db2.prepare(`
 			DELETE FROM exam_proctors 
 			WHERE id = ? AND exam_id = ? AND exam_id IN (SELECT id FROM exams WHERE school_id = ?)
 		`).bind(parsedExamProctorId, parsedExamId, locals.user.school_id).run();
@@ -47555,10 +47598,10 @@ var init_page_server_ts9 = __esm({
       },
       toggleScoreRelease: async ({ request, platform, params, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const parsedId = parseInt(params.id, 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid" });
-        await db.prepare(`
+        await db2.prepare(`
 			UPDATE exams 
 			SET is_score_released = CASE WHEN is_score_released = 1 THEN 0 ELSE 1 END, updated_at = datetime('now') 
 			WHERE id = ? AND school_id = ?
@@ -47824,7 +47867,7 @@ var init__17 = __esm({
     index17 = 16;
     component17 = async () => component_cache17 ??= (await Promise.resolve().then(() => (init_page_svelte9(), page_svelte_exports9))).default;
     server_id16 = "src/routes/admin/exams/[id]/+page.server.ts";
-    imports17 = ["_app/immutable/nodes/16.0bB2FDyp.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/0WrWfAVQ.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/Dyd_-2iH.js", "_app/immutable/chunks/09QYUleA.js", "_app/immutable/chunks/A1P7O0DF.js"];
+    imports17 = ["_app/immutable/nodes/16.DAYcf_o7.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/w5hoNK1W.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/Dyd_-2iH.js", "_app/immutable/chunks/09QYUleA.js", "_app/immutable/chunks/A1P7O0DF.js"];
     stylesheets17 = [];
     fonts17 = [];
   }
@@ -47842,14 +47885,14 @@ var init_page_server_ts10 = __esm({
     init_db();
     load17 = async ({ params, platform, locals }) => {
       if (!locals.user) throw redirect(302, "/login");
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examId = parseInt(params.id, 10);
       if (isNaN(examId)) throw error(400, "Invalid Exam ID");
-      const exam = await db.prepare("SELECT * FROM exams WHERE id = ? AND school_id = ?").bind(examId, locals.user.school_id).first();
+      const exam = await db2.prepare("SELECT * FROM exams WHERE id = ? AND school_id = ?").bind(examId, locals.user.school_id).first();
       if (!exam) throw error(404, "Ujian tidak ditemukan");
-      const questionsReq = db.prepare("SELECT id, question_number, type, question_text FROM questions WHERE exam_id = ? ORDER BY question_number").bind(examId).all();
-      const attemptsReq = db.prepare('SELECT id, student_id, score FROM student_attempts WHERE exam_id = ? AND status IN ("selesai", "waktu_habis") ORDER BY score DESC, id ASC').bind(examId).all();
-      const answersReq = db.prepare("SELECT sa.attempt_id, sa.question_id, sa.is_correct, sa.answer_given FROM student_answers sa JOIN student_attempts a ON sa.attempt_id = a.id WHERE a.exam_id = ?").bind(examId).all();
+      const questionsReq = db2.prepare("SELECT id, question_number, type, question_text FROM questions WHERE exam_id = ? ORDER BY question_number").bind(examId).all();
+      const attemptsReq = db2.prepare('SELECT id, student_id, score FROM student_attempts WHERE exam_id = ? AND status IN ("selesai", "waktu_habis") ORDER BY score DESC, id ASC').bind(examId).all();
+      const answersReq = db2.prepare("SELECT sa.attempt_id, sa.question_id, sa.is_correct, sa.answer_given FROM student_answers sa JOIN student_attempts a ON sa.attempt_id = a.id WHERE a.exam_id = ?").bind(examId).all();
       const [questionsRes, attemptsRes, answersRes] = await Promise.all([questionsReq, attemptsReq, answersReq]);
       const questions = questionsRes.results;
       const attempts = attemptsRes.results;
@@ -48048,7 +48091,7 @@ var init_page_server_ts11 = __esm({
     init_cloudinary();
     init_shared_server();
     load18 = async ({ platform, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const isSuperAdmin = locals.user?.role === "superadmin";
       const schoolId = locals.user?.school_id || -1;
       const query = isSuperAdmin ? `
@@ -48092,7 +48135,7 @@ var init_page_server_ts11 = __esm({
 			ORDER BY u.id DESC
 		`;
       try {
-        const result = isSuperAdmin ? await db.prepare(query).all() : await db.prepare(query).bind(schoolId).all();
+        const result = isSuperAdmin ? await db2.prepare(query).all() : await db2.prepare(query).bind(schoolId).all();
         return { mediaItems: result.results || [] };
       } catch (e3) {
         console.error("Fetch uploaded_media error:", e3.message, e3);
@@ -48102,14 +48145,14 @@ var init_page_server_ts11 = __esm({
     actions7 = {
       deleteMedia: async ({ request, platform, locals }) => {
         const schoolId = locals.user?.school_id || -1;
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const mediaUrl = form.get("media_url")?.toString();
         if (!mediaUrl || !mediaUrl.includes("res.cloudinary.com")) {
           return fail(400, { error: "URL Media tidak valid." });
         }
         if (locals.user?.role !== "superadmin") {
-          const check = await db.prepare("SELECT id FROM uploaded_media WHERE url = ? AND school_id = ?").bind(mediaUrl, schoolId).first();
+          const check = await db2.prepare("SELECT id FROM uploaded_media WHERE url = ? AND school_id = ?").bind(mediaUrl, schoolId).first();
           if (!check) return fail(403, { error: "Media tidak ditemukan atau milik sekolah lain." });
         }
         const deleteResult = await deleteFromCloudinary(mediaUrl, private_env);
@@ -48117,44 +48160,44 @@ var init_page_server_ts11 = __esm({
           return fail(500, { error: `Gagal menghapus dari Cloudinary. Pesan: ${deleteResult.error}` });
         }
         if (locals.user?.role === "superadmin") {
-          await db.prepare("DELETE FROM uploaded_media WHERE url = ?").bind(mediaUrl).run();
+          await db2.prepare("DELETE FROM uploaded_media WHERE url = ?").bind(mediaUrl).run();
         } else {
-          await db.prepare("DELETE FROM uploaded_media WHERE url = ? AND school_id = ?").bind(mediaUrl, schoolId).run();
+          await db2.prepare("DELETE FROM uploaded_media WHERE url = ? AND school_id = ?").bind(mediaUrl, schoolId).run();
         }
-        await db.prepare("UPDATE questions SET media_url = NULL, media_type = NULL WHERE media_url = ?").bind(mediaUrl).run();
+        await db2.prepare("UPDATE questions SET media_url = NULL, media_type = NULL WHERE media_url = ?").bind(mediaUrl).run();
         return { success: "Media berhasil dihapus dari Cloudinary dan Database.", deletedUrls: [mediaUrl] };
       },
       toggleVisibility: async ({ request, platform, locals }) => {
         const schoolId = locals.user?.school_id || -1;
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const mediaUrl = form.get("media_url")?.toString();
         const isPublic = form.get("is_public")?.toString() === "1" ? 1 : 0;
         if (!mediaUrl) return fail(400, { error: "URL Media tidak valid." });
         if (locals.user?.role === "superadmin") {
-          await db.prepare("UPDATE uploaded_media SET is_public = ? WHERE url = ?").bind(isPublic, mediaUrl).run();
+          await db2.prepare("UPDATE uploaded_media SET is_public = ? WHERE url = ?").bind(isPublic, mediaUrl).run();
         } else {
-          await db.prepare("UPDATE uploaded_media SET is_public = ? WHERE url = ? AND school_id = ?").bind(isPublic, mediaUrl, schoolId).run();
+          await db2.prepare("UPDATE uploaded_media SET is_public = ? WHERE url = ? AND school_id = ?").bind(isPublic, mediaUrl, schoolId).run();
         }
         return { success: isPublic ? "Media berhasil ditampilkan untuk semua guru." : "Media berhasil disembunyikan (Privat)." };
       },
       updateName: async ({ request, platform, locals }) => {
         const schoolId = locals.user?.school_id || -1;
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const mediaUrl = form.get("media_url")?.toString();
         const name = form.get("name")?.toString() || null;
         if (!mediaUrl) return fail(400, { error: "URL Media tidak valid." });
         if (locals.user?.role === "superadmin") {
-          await db.prepare("UPDATE uploaded_media SET name = ? WHERE url = ?").bind(name, mediaUrl).run();
+          await db2.prepare("UPDATE uploaded_media SET name = ? WHERE url = ?").bind(name, mediaUrl).run();
         } else {
-          await db.prepare("UPDATE uploaded_media SET name = ? WHERE url = ? AND school_id = ?").bind(name, mediaUrl, schoolId).run();
+          await db2.prepare("UPDATE uploaded_media SET name = ? WHERE url = ? AND school_id = ?").bind(name, mediaUrl, schoolId).run();
         }
         return { success: "Nama berkas berhasil diperbarui." };
       },
       deleteBulk: async ({ request, platform, locals }) => {
         const schoolId = locals.user?.school_id || -1;
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const urlsStr = form.get("urls")?.toString();
         if (!urlsStr) return fail(400, { error: "Data tidak valid." });
@@ -48174,7 +48217,7 @@ var init_page_server_ts11 = __esm({
         if (locals.user?.role !== "superadmin") {
           const placeholders = cloudinaryUrls.map(() => "?").join(",");
           const checkQuery = `SELECT url FROM uploaded_media WHERE url IN (${placeholders}) AND school_id = ?`;
-          const checks = await db.prepare(checkQuery).bind(...cloudinaryUrls, schoolId).all();
+          const checks = await db2.prepare(checkQuery).bind(...cloudinaryUrls, schoolId).all();
           if (checks.results) {
             checks.results.forEach((row) => validUrls.push(row.url));
           }
@@ -48195,15 +48238,15 @@ var init_page_server_ts11 = __esm({
         if (successfullyDeletedUrls.length > 0) {
           const batchStatements = [];
           if (locals.user?.role === "superadmin") {
-            const stmt = db.prepare("DELETE FROM uploaded_media WHERE url = ?");
+            const stmt = db2.prepare("DELETE FROM uploaded_media WHERE url = ?");
             successfullyDeletedUrls.forEach((url) => batchStatements.push(stmt.bind(url)));
           } else {
-            const stmt = db.prepare("DELETE FROM uploaded_media WHERE url = ? AND school_id = ?");
+            const stmt = db2.prepare("DELETE FROM uploaded_media WHERE url = ? AND school_id = ?");
             successfullyDeletedUrls.forEach((url) => batchStatements.push(stmt.bind(url, schoolId)));
           }
-          const qStmt = db.prepare("UPDATE questions SET media_url = NULL, media_type = NULL WHERE media_url = ?");
+          const qStmt = db2.prepare("UPDATE questions SET media_url = NULL, media_type = NULL WHERE media_url = ?");
           successfullyDeletedUrls.forEach((url) => batchStatements.push(qStmt.bind(url)));
-          await db.batch(batchStatements);
+          await db2.batch(batchStatements);
           successCount = successfullyDeletedUrls.length;
         }
         return { success: `${successCount} media berhasil dihapus secara massal.`, deletedUrls: successfullyDeletedUrls };
@@ -48456,7 +48499,7 @@ var init__19 = __esm({
     index19 = 18;
     component19 = async () => component_cache19 ??= (await Promise.resolve().then(() => (init_page_svelte11(), page_svelte_exports11))).default;
     server_id18 = "src/routes/admin/media-bank/+page.server.ts";
-    imports19 = ["_app/immutable/nodes/18.BktB9x6G.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/ChUQfART.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/BGXjXNkc.js", "_app/immutable/chunks/0WrWfAVQ.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/Czq8_PJR.js"];
+    imports19 = ["_app/immutable/nodes/18.CXRDqGXX.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/2tT41R4y.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/BL4i29cp.js", "_app/immutable/chunks/w5hoNK1W.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/Czq8_PJR.js"];
     stylesheets19 = [];
     fonts19 = [];
   }
@@ -48478,10 +48521,10 @@ var init_page_server_ts12 = __esm({
     load19 = async ({ platform, url, locals }) => {
       if (!locals.user) throw redirect(302, "/login");
       try {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const examFilterStr = url.searchParams.get("exam_id") || "";
         const examFilter = parseInt(examFilterStr, 10);
-        const exams = await db.prepare(`
+        const exams = await db2.prepare(`
 		SELECT e.id, e.title 
 		FROM exams e 
 		WHERE e.is_active = 1 AND e.school_id = ?
@@ -48489,7 +48532,7 @@ var init_page_server_ts12 = __esm({
 	`).bind(locals.user.school_id).all();
         let attempts = [];
         if (!isNaN(examFilter)) {
-          const result = await db.prepare(`
+          const result = await db2.prepare(`
 			SELECT 
 				epart.student_id,
 				u.name as student_name, 
@@ -48524,7 +48567,7 @@ var init_page_server_ts12 = __esm({
         let answeredCountsMap = {};
         const attemptIds = attempts.map((a) => a.attempt_id).filter((id) => id);
         if (attemptIds.length > 0) {
-          const countsResult = await db.prepare(`
+          const countsResult = await db2.prepare(`
 			SELECT sa.attempt_id, COUNT(*) as c
 			FROM student_answers sa
 			JOIN student_attempts st ON sa.attempt_id = st.id
@@ -48593,25 +48636,25 @@ var init_page_server_ts12 = __esm({
     actions8 = {
       togglePause: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const attemptIdStr = form.get("attempt_id")?.toString();
         const action = form.get("action")?.toString();
         const parsedAttemptId = parseInt(attemptIdStr || "", 10);
         if (isNaN(parsedAttemptId) || !action) return fail(400, { error: "Data tidak valid." });
         try {
-          const attemptData = await db.prepare(`
+          const attemptData = await db2.prepare(`
 			SELECT sa.id, sa.is_paused, sa.paused_at, sa.end_time FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
 			WHERE sa.id = ? AND e.school_id = ?
 		`).bind(parsedAttemptId, locals.user.school_id).first();
           if (!attemptData) return fail(403, { error: "Sesi ujian tidak ditemukan atau bukan milik sekolah Anda." });
           if (action === "pause") {
-            await db.prepare(`UPDATE student_attempts SET is_paused = 1, paused_at = datetime('now') WHERE id = ?`).bind(parsedAttemptId).run();
+            await db2.prepare(`UPDATE student_attempts SET is_paused = 1, paused_at = datetime('now') WHERE id = ?`).bind(parsedAttemptId).run();
             return { success: "Ujian berhasil ditahan." };
           } else if (action === "resume") {
             if (attemptData.paused_at && attemptData.end_time) {
-              await db.prepare(`
+              await db2.prepare(`
 					UPDATE student_attempts 
 					SET 
 						is_paused = 0, 
@@ -48620,7 +48663,7 @@ var init_page_server_ts12 = __esm({
 					WHERE id = ?
 				`).bind(parsedAttemptId).run();
             } else {
-              await db.prepare(`UPDATE student_attempts SET is_paused = 0, paused_at = NULL WHERE id = ?`).bind(parsedAttemptId).run();
+              await db2.prepare(`UPDATE student_attempts SET is_paused = 0, paused_at = NULL WHERE id = ?`).bind(parsedAttemptId).run();
             }
             return { success: "Ujian berhasil dilanjutkan." };
           }
@@ -48632,13 +48675,13 @@ var init_page_server_ts12 = __esm({
       },
       resetAttempt: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const attemptIdStr = form.get("attempt_id")?.toString();
         const parsedAttemptId = parseInt(attemptIdStr || "", 10);
         if (isNaN(parsedAttemptId)) return fail(400, { error: "ID tidak valid." });
         try {
-          const attemptCheck = await db.prepare(`
+          const attemptCheck = await db2.prepare(`
 			SELECT sa.id, sa.signature FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
 			WHERE sa.id = ? AND e.school_id = ?
@@ -48650,9 +48693,9 @@ var init_page_server_ts12 = __esm({
             const mergedEnv = platform?.env || private_env;
             await deleteFromCloudinary(attemptCheck.signature, mergedEnv);
           }
-          await db.batch([
-            db.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(parsedAttemptId),
-            db.prepare("DELETE FROM student_attempts WHERE id = ?").bind(parsedAttemptId)
+          await db2.batch([
+            db2.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(parsedAttemptId),
+            db2.prepare("DELETE FROM student_attempts WHERE id = ?").bind(parsedAttemptId)
           ]);
           return { success: "Sesi ujian siswa berhasil direset." };
         } catch (e3) {
@@ -48901,7 +48944,7 @@ var init__20 = __esm({
     index20 = 19;
     component20 = async () => component_cache20 ??= (await Promise.resolve().then(() => (init_page_svelte12(), page_svelte_exports12))).default;
     server_id19 = "src/routes/admin/monitor/+page.server.ts";
-    imports20 = ["_app/immutable/nodes/19.BEPALigJ.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js"];
+    imports20 = ["_app/immutable/nodes/19.U2tIOIyx.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js"];
     stylesheets20 = [];
     fonts20 = [];
   }
@@ -48919,9 +48962,9 @@ var init_page_server_ts13 = __esm({
     init_exports();
     load20 = async ({ platform, locals }) => {
       if (locals.user?.role !== "admin" && locals.user?.role !== "panitia") throw redirect(302, "/");
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const schoolId = locals.user.school_id;
-      const examsQuery = await db.prepare(`
+      const examsQuery = await db2.prepare(`
 		SELECT 
 			e.id,
 			e.title,
@@ -48934,7 +48977,7 @@ var init_page_server_ts13 = __esm({
 		WHERE e.school_id = ? AND e.is_active = 1
 		ORDER BY e.created_at DESC
 	`).bind(schoolId).all();
-      const examTypesQuery = await db.prepare(`
+      const examTypesQuery = await db2.prepare(`
 		SELECT id, name as type_name, code
 		FROM exam_types
 		WHERE school_id = ? AND is_active = 1
@@ -49021,17 +49064,17 @@ var init_page_server_ts14 = __esm({
     init_exports();
     load21 = async ({ platform, locals, params, url }) => {
       if (locals.user?.role !== "admin" && locals.user?.role !== "panitia") throw redirect(302, "/");
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const typeId = params.typeId;
       const schoolId = locals.user.school_id;
       const classFilter = url.searchParams.get("class_id") || "";
-      const examType = await db.prepare(`
+      const examType = await db2.prepare(`
 		SELECT id, name, code FROM exam_types WHERE id = ? AND school_id = ?
 	`).bind(typeId, schoolId).first();
       if (!examType) {
         throw error(404, "Tipe ujian tidak ditemukan.");
       }
-      const classesQuery = await db.prepare(`
+      const classesQuery = await db2.prepare(`
 		SELECT DISTINCT c.id, c.name
 		FROM classes c
 		JOIN users u ON u.class_id = c.id
@@ -49063,7 +49106,7 @@ var init_page_server_ts14 = __esm({
         leaderboardParams.push(classFilter);
       }
       leaderboardSQL += " GROUP BY u.id ORDER BY total_score DESC, avg_score DESC, total_time ASC";
-      const leaderboardQuery = await db.prepare(leaderboardSQL).bind(...leaderboardParams).all();
+      const leaderboardQuery = await db2.prepare(leaderboardSQL).bind(...leaderboardParams).all();
       let detailSQL = `
 		SELECT 
 			u.id as student_id,
@@ -49081,7 +49124,7 @@ var init_page_server_ts14 = __esm({
         detailParams.push(classFilter);
       }
       detailSQL += " ORDER BY u.id, e.title ASC";
-      const detailQuery = await db.prepare(detailSQL).bind(...detailParams).all();
+      const detailQuery = await db2.prepare(detailSQL).bind(...detailParams).all();
       const detailMap = {};
       for (const row of detailQuery.results || []) {
         if (!detailMap[row.student_id]) detailMap[row.student_id] = [];
@@ -49226,7 +49269,7 @@ var init__22 = __esm({
     index22 = 21;
     component22 = async () => component_cache22 ??= (await Promise.resolve().then(() => (init_page_svelte14(), page_svelte_exports14))).default;
     server_id21 = "src/routes/admin/papan-peringkat/type/[typeId]/+page.server.ts";
-    imports22 = ["_app/immutable/nodes/21.NxYxygVX.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/SeINawUV.js"];
+    imports22 = ["_app/immutable/nodes/21.BNrGgl9e.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/DwRR9HPj.js"];
     stylesheets22 = [];
     fonts22 = [];
   }
@@ -49244,15 +49287,15 @@ var init_page_server_ts15 = __esm({
     init_exports();
     load22 = async ({ params, platform, locals }) => {
       if (locals.user?.role !== "admin" && locals.user?.role !== "panitia") throw redirect(302, "/");
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const typeId = parseInt(params.typeId, 10);
       const schoolId = locals.user.school_id;
       if (isNaN(typeId)) throw redirect(302, "/admin/papan-peringkat");
-      const typeQuery = await db.prepare(`
+      const typeQuery = await db2.prepare(`
 		SELECT name as type_name FROM exam_types WHERE id = ? AND school_id = ?
 	`).bind(typeId, schoolId).first();
       if (!typeQuery) throw redirect(302, "/admin/papan-peringkat");
-      const examsQuery = await db.prepare(`
+      const examsQuery = await db2.prepare(`
 		SELECT 
 			e.id,
 			e.title,
@@ -49353,19 +49396,19 @@ var init_page_server_ts16 = __esm({
     init_exports();
     load23 = async ({ platform, locals, params }) => {
       if (locals.user?.role !== "admin" && locals.user?.role !== "panitia") throw redirect(302, "/");
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examId = params.examId;
       const schoolId = locals.user.school_id;
-      const exam = await db.prepare(`
+      const exam = await db2.prepare(`
 		SELECT id, title, subject_id, exam_type_id FROM exams WHERE id = ? AND school_id = ?
 	`).bind(examId, schoolId).first();
       if (!exam) {
         throw error(404, "Ujian tidak ditemukan.");
       }
-      const subject = await db.prepare(`
+      const subject = await db2.prepare(`
 		SELECT name FROM subjects WHERE id = ?
 	`).bind(exam.subject_id).first();
-      const leaderboardQuery = await db.prepare(`
+      const leaderboardQuery = await db2.prepare(`
 		SELECT 
 			u.name as student_name,
 			u.photo,
@@ -49497,10 +49540,10 @@ var init_page_server_ts17 = __esm({
     init_shared_server();
     load24 = async ({ platform, url, locals }) => {
       if (!locals.user) throw redirect(302, "/login");
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examFilterStr = url.searchParams.get("exam_id") || "";
       const examFilter = parseInt(examFilterStr, 10);
-      const exams = await db.prepare("SELECT id, title FROM exams WHERE school_id = ? ORDER BY title").bind(locals.user.school_id).all();
+      const exams = await db2.prepare("SELECT id, title FROM exams WHERE school_id = ? ORDER BY title").bind(locals.user.school_id).all();
       let query = `
 		SELECT sa.*, u.name as student_name, e.title as exam_title, s.name as subject
 		FROM student_attempts sa
@@ -49515,13 +49558,13 @@ var init_page_server_ts17 = __esm({
         params.push(examFilter);
       }
       query += " ORDER BY sa.submit_time DESC";
-      const results = await db.prepare(query).bind(...params).all();
+      const results = await db2.prepare(query).bind(...params).all();
       return { results: results.results, exams: exams.results, examFilter };
     };
     actions9 = {
       delete: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const attemptIdStr = form.get("attempt_id")?.toString();
         const parsedId = parseInt(attemptIdStr || "", 10);
@@ -49529,7 +49572,7 @@ var init_page_server_ts17 = __esm({
           return fail(400, { error: "ID tidak valid" });
         }
         try {
-          const attemptCheck = await db.prepare(`
+          const attemptCheck = await db2.prepare(`
 				SELECT sa.id, sa.signature FROM student_attempts sa
 				JOIN exams e ON sa.exam_id = e.id
 				WHERE sa.id = ? AND e.school_id = ?
@@ -49541,9 +49584,9 @@ var init_page_server_ts17 = __esm({
             const mergedEnv = platform?.env || private_env;
             await deleteFromCloudinary(attemptCheck.signature, mergedEnv);
           }
-          await db.batch([
-            db.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(parsedId),
-            db.prepare("DELETE FROM student_attempts WHERE id = ?").bind(parsedId)
+          await db2.batch([
+            db2.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(parsedId),
+            db2.prepare("DELETE FROM student_attempts WHERE id = ?").bind(parsedId)
           ]);
           return { success: true };
         } catch (e3) {
@@ -49676,7 +49719,7 @@ var init__25 = __esm({
     index25 = 24;
     component25 = async () => component_cache25 ??= (await Promise.resolve().then(() => (init_page_svelte17(), page_svelte_exports17))).default;
     server_id24 = "src/routes/admin/results/+page.server.ts";
-    imports25 = ["_app/immutable/nodes/24.DbnvqKtx.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/0WrWfAVQ.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/Bkgixz-K.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/A1P7O0DF.js"];
+    imports25 = ["_app/immutable/nodes/24.CfNVkYgx.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/w5hoNK1W.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/Bkgixz-K.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/A1P7O0DF.js"];
     stylesheets25 = [];
     fonts25 = [];
   }
@@ -49693,9 +49736,9 @@ var init_page_server_ts18 = __esm({
     init_exports();
     init_db();
     load25 = async ({ params, platform, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const attemptId = params.attemptId;
-      const attempt = await db.prepare(`
+      const attempt = await db2.prepare(`
 		SELECT sa.*, u.name as student_name, u.username as nisn, c.name as class_name, e.title as exam_title, s.name as subject_name, e.duration_minutes
 		FROM student_attempts sa
 		JOIN users u ON sa.student_id = u.id
@@ -49705,7 +49748,7 @@ var init_page_server_ts18 = __esm({
 		WHERE sa.id = ? AND e.school_id = ?
 	`).bind(attemptId, locals.user.school_id).first();
       if (!attempt) throw error(404, "Data hasil ujian tidak ditemukan atau Anda tidak memiliki akses ke data ini.");
-      const answers = await db.prepare(`
+      const answers = await db2.prepare(`
 		SELECT q.question_number, q.question_text, q.type, q.options_json, q.correct_answer_json, q.points as max_points,
 		       sa.answer_given, sa.score_given, sa.is_correct, sa.is_doubted
 		FROM student_answers sa
@@ -49941,18 +49984,18 @@ var init_page_server_ts19 = __esm({
     init_exports();
     init_db();
     load26 = async ({ locals, platform }) => {
-      const db = getDB(platform);
-      const school = await db.prepare("SELECT * FROM schools WHERE id = ?").bind(locals.user.school_id).first();
+      const db2 = getDB(platform);
+      const school = await db2.prepare("SELECT * FROM schools WHERE id = ?").bind(locals.user.school_id).first();
       return { school };
     };
     actions10 = {
       // Simpan logo saja — dipanggil segera setelah upload ke Cloudinary berhasil
       saveLogo: async ({ request, locals, platform }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const logo_url = data.get("logo_url")?.toString().trim() || null;
         try {
-          await db.prepare(`UPDATE schools SET logo_url = ?, updated_at = datetime('now') WHERE id = ?`).bind(logo_url, locals.user.school_id).run();
+          await db2.prepare(`UPDATE schools SET logo_url = ?, updated_at = datetime('now') WHERE id = ?`).bind(logo_url, locals.user.school_id).run();
           return { success: true, message: "Logo berhasil disimpan." };
         } catch (e3) {
           console.error(e3);
@@ -49960,7 +50003,7 @@ var init_page_server_ts19 = __esm({
         }
       },
       update: async ({ request, locals, platform }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const name = data.get("name")?.toString().trim();
         const principal_name = data.get("principal_name")?.toString().trim() || null;
@@ -49975,7 +50018,7 @@ var init_page_server_ts19 = __esm({
           return fail(400, { error: "Nama sekolah wajib diisi." });
         }
         try {
-          await db.prepare(
+          await db2.prepare(
             `UPDATE schools SET
 						name = ?, principal_name = ?, npsn = ?, phone = ?, email = ?,
 						address = ?, accreditation = ?, website = ?, logo_url = ?,
@@ -50125,7 +50168,7 @@ var init__27 = __esm({
     index27 = 26;
     component27 = async () => component_cache27 ??= (await Promise.resolve().then(() => (init_page_svelte19(), page_svelte_exports19))).default;
     server_id26 = "src/routes/admin/school-profile/+page.server.ts";
-    imports27 = ["_app/immutable/nodes/26.CTMdAUi2.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/BGXjXNkc.js"];
+    imports27 = ["_app/immutable/nodes/26.BcrzpSb8.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/BL4i29cp.js"];
     stylesheets27 = [];
     fonts27 = [];
   }
@@ -50147,11 +50190,11 @@ var init_page_server_ts20 = __esm({
     init_shared_server();
     load27 = async ({ locals, url, platform }) => {
       if (!locals.user) throw redirect(302, "/login");
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const search = url.searchParams.get("search") || "";
       const classFilter = url.searchParams.get("class") || "";
       let query = `
-		SELECT u.id, u.username, u.name, u.is_active, u.created_at, u.class_id, c.name as class_name, u.place_of_birth, u.date_of_birth, u.photo, u.nisn, u.nomor_peserta, u.gender 
+		SELECT u.id, u.username, u.name, u.is_active, u.created_at, u.class_id, c.name as class_name, u.place_of_birth, u.date_of_birth, u.photo, u.nisn, u.nomor_peserta, u.gender, u.session_number 
 		FROM users u 
 		LEFT JOIN classes c ON u.class_id = c.id 
 		WHERE u.school_id = ? AND u.role = 'siswa'
@@ -50171,12 +50214,12 @@ var init_page_server_ts20 = __esm({
 		ELSE 99 END ASC, c.name ASC, u.name ASC LIMIT 500`;
       try {
         const [usersResult, classesResult, school] = await Promise.all([
-          db.prepare(query).bind(...params).all(),
-          db.prepare(`SELECT id, name FROM classes WHERE school_id = ? ORDER BY CASE level
+          db2.prepare(query).bind(...params).all(),
+          db2.prepare(`SELECT id, name FROM classes WHERE school_id = ? ORDER BY CASE level
 		WHEN 'I' THEN 1 WHEN 'II' THEN 2 WHEN 'III' THEN 3 WHEN 'IV' THEN 4 WHEN 'V' THEN 5 WHEN 'VI' THEN 6 WHEN 'VII' THEN 7 WHEN 'VIII' THEN 8 WHEN 'IX' THEN 9 WHEN 'X' THEN 10 WHEN 'XI' THEN 11 WHEN 'XII' THEN 12
 		WHEN '1' THEN 1 WHEN '2' THEN 2 WHEN '3' THEN 3 WHEN '4' THEN 4 WHEN '5' THEN 5 WHEN '6' THEN 6 WHEN '7' THEN 7 WHEN '8' THEN 8 WHEN '9' THEN 9 WHEN '10' THEN 10 WHEN '11' THEN 11 WHEN '12' THEN 12
 		ELSE 99 END ASC, name ASC`).bind(locals.user.school_id).all(),
-          db.prepare("SELECT name, logo_url FROM schools WHERE id = ?").bind(locals.user.school_id).first()
+          db2.prepare("SELECT name, logo_url FROM schools WHERE id = ?").bind(locals.user.school_id).first()
         ]);
         return {
           users: usersResult.results || [],
@@ -50197,7 +50240,7 @@ var init_page_server_ts20 = __esm({
     actions11 = {
       add: async ({ request, locals, platform }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const name = data.get("name")?.toString().trim();
         const nisn = data.get("nisn")?.toString().trim();
@@ -50206,6 +50249,7 @@ var init_page_server_ts20 = __esm({
         const place_of_birth = data.get("place_of_birth")?.toString().trim() || null;
         const date_of_birth = data.get("date_of_birth")?.toString() || null;
         const gender = data.get("gender")?.toString() || null;
+        const session_number = parseInt(data.get("session_number")?.toString() || "1", 10);
         if (!name || !nisn) {
           return fail(400, { error: "Nama dan NISN wajib diisi" });
         }
@@ -50214,16 +50258,16 @@ var init_page_server_ts20 = __esm({
         }
         try {
           const username = nomor_peserta;
-          const existingNisn = await db.prepare("SELECT id FROM users WHERE nisn = ? OR username = ?").bind(nisn, username).first();
+          const existingNisn = await db2.prepare("SELECT id FROM users WHERE nisn = ? OR username = ?").bind(nisn, username).first();
           if (existingNisn) {
             return fail(400, { error: "NISN atau Username sudah terdaftar" });
           }
-          const existingNo = await db.prepare("SELECT id FROM users WHERE nomor_peserta = ?").bind(nomor_peserta).first();
+          const existingNo = await db2.prepare("SELECT id FROM users WHERE nomor_peserta = ?").bind(nomor_peserta).first();
           if (existingNo) {
             return fail(400, { error: "Nomor Peserta sudah terdaftar" });
           }
           const passwordHash = await hashPassword(nisn);
-          await db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth, nisn, nomor_peserta, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(locals.user.school_id, class_id, username, passwordHash, name, "siswa", place_of_birth, date_of_birth, nisn, nomor_peserta, gender).run();
+          await db2.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth, nisn, nomor_peserta, gender, session_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(locals.user.school_id, class_id, username, passwordHash, name, "siswa", place_of_birth, date_of_birth, nisn, nomor_peserta, gender, session_number).run();
           return { success: true };
         } catch (e3) {
           console.error(e3);
@@ -50232,7 +50276,7 @@ var init_page_server_ts20 = __esm({
       },
       edit: async ({ request, locals, platform }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const idStr = data.get("id")?.toString();
         const name = data.get("name")?.toString().trim();
@@ -50242,6 +50286,7 @@ var init_page_server_ts20 = __esm({
         const place_of_birth = data.get("place_of_birth")?.toString().trim() || null;
         const date_of_birth = data.get("date_of_birth")?.toString() || null;
         const gender = data.get("gender")?.toString() || null;
+        const session_number = parseInt(data.get("session_number")?.toString() || "1", 10);
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId) || !name || !nisn) {
           return fail(400, { error: "ID, Nama, dan NISN wajib diisi" });
@@ -50251,16 +50296,16 @@ var init_page_server_ts20 = __esm({
         }
         try {
           const username = nomor_peserta;
-          const existing = await db.prepare("SELECT id FROM users WHERE (nisn = ? OR username = ?) AND id != ?").bind(nisn, username, parsedId).first();
+          const existing = await db2.prepare("SELECT id FROM users WHERE (nisn = ? OR username = ?) AND id != ?").bind(nisn, username, parsedId).first();
           if (existing) {
             return fail(400, { error: "NISN atau Username sudah digunakan siswa lain" });
           }
-          const existingNo = await db.prepare("SELECT id FROM users WHERE nomor_peserta = ? AND id != ?").bind(nomor_peserta, parsedId).first();
+          const existingNo = await db2.prepare("SELECT id FROM users WHERE nomor_peserta = ? AND id != ?").bind(nomor_peserta, parsedId).first();
           if (existingNo) {
             return fail(400, { error: "Nomor Peserta sudah terdaftar" });
           }
           const passwordHash = await hashPassword(nisn);
-          await db.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, class_id = ?, place_of_birth = ?, date_of_birth = ?, nisn = ?, nomor_peserta = ?, gender = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, username, passwordHash, class_id, place_of_birth, date_of_birth, nisn, nomor_peserta, gender, parsedId, locals.user.school_id).run();
+          await db2.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, class_id = ?, place_of_birth = ?, date_of_birth = ?, nisn = ?, nomor_peserta = ?, gender = ?, session_number = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, username, passwordHash, class_id, place_of_birth, date_of_birth, nisn, nomor_peserta, gender, session_number, parsedId, locals.user.school_id).run();
           return { success: true };
         } catch (e3) {
           console.error(e3);
@@ -50269,17 +50314,17 @@ var init_page_server_ts20 = __esm({
       },
       delete: async ({ request, locals, platform }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const idStr = data.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid" });
         try {
-          await db.batch([
-            db.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)").bind(parsedId),
-            db.prepare("DELETE FROM student_attempts WHERE student_id = ?").bind(parsedId),
-            db.prepare("DELETE FROM exam_participants WHERE student_id = ?").bind(parsedId),
-            db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(parsedId, locals.user.school_id)
+          await db2.batch([
+            db2.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)").bind(parsedId),
+            db2.prepare("DELETE FROM student_attempts WHERE student_id = ?").bind(parsedId),
+            db2.prepare("DELETE FROM exam_participants WHERE student_id = ?").bind(parsedId),
+            db2.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(parsedId, locals.user.school_id)
           ]);
           return { success: true, message: "Berhasil menghapus data siswa." };
         } catch (e3) {
@@ -50289,7 +50334,7 @@ var init_page_server_ts20 = __esm({
       },
       deleteBulk: async ({ request, locals, platform }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const idsJson = data.get("ids")?.toString();
         if (!idsJson) return fail(400, { error: "Pilih minimal satu siswa." });
@@ -50301,14 +50346,14 @@ var init_page_server_ts20 = __esm({
           const stmts = [];
           for (const id of ids) {
             stmts.push(
-              db.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)").bind(id),
-              db.prepare("DELETE FROM student_attempts WHERE student_id = ?").bind(id),
-              db.prepare("DELETE FROM exam_participants WHERE student_id = ?").bind(id),
-              db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(id, locals.user.school_id)
+              db2.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)").bind(id),
+              db2.prepare("DELETE FROM student_attempts WHERE student_id = ?").bind(id),
+              db2.prepare("DELETE FROM exam_participants WHERE student_id = ?").bind(id),
+              db2.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(id, locals.user.school_id)
             );
           }
           if (stmts.length > 0) {
-            await db.batch(stmts);
+            await db2.batch(stmts);
           }
           return { success: true, message: `Berhasil menghapus ${ids.length} siswa terpilih.` };
         } catch (e3) {
@@ -50318,7 +50363,7 @@ var init_page_server_ts20 = __esm({
       },
       importExcel: async ({ request, locals, platform }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const studentsJson = data.get("students_json")?.toString();
         if (!studentsJson) {
@@ -50327,7 +50372,7 @@ var init_page_server_ts20 = __esm({
         try {
           const students = JSON.parse(studentsJson);
           if (students.length === 0) return fail(400, { error: "Tidak ada data siswa" });
-          const existingUsersResult = await db.prepare("SELECT username FROM users").all();
+          const existingUsersResult = await db2.prepare("SELECT username FROM users").all();
           const existingUsernames = new Set(existingUsersResult.results.map((u) => u.username.toLowerCase()));
           const stmts = [];
           let skippedCount = 0;
@@ -50338,6 +50383,7 @@ var init_page_server_ts20 = __esm({
             let nomor_peserta = student.nomor_peserta ? String(student.nomor_peserta).trim() : null;
             let gender = student.gender ? String(student.gender).toUpperCase().trim() : null;
             if (gender !== "L" && gender !== "P") gender = null;
+            const session_number = student.session_number ? parseInt(student.session_number, 10) : 1;
             if (!nisn || !name) continue;
             if (!nomor_peserta) {
               nomor_peserta = `AUTO-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1e3).toString().padStart(3, "0")}`;
@@ -50350,14 +50396,14 @@ var init_page_server_ts20 = __esm({
             existingUsernames.add(username.toLowerCase());
             const passwordHash = await hashPassword(nisn);
             stmts.push(
-              db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth, nisn, nomor_peserta, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(locals.user.school_id, student.class_id || null, username, passwordHash, name, "siswa", student.place_of_birth || null, student.date_of_birth || null, nisn, nomor_peserta, gender)
+              db2.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth, nisn, nomor_peserta, gender, session_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(locals.user.school_id, student.class_id || null, username, passwordHash, name, "siswa", student.place_of_birth || null, student.date_of_birth || null, nisn, nomor_peserta, gender, session_number)
             );
           }
           if (errorMsg) ;
           if (stmts.length > 0) {
             const chunkSize = 50;
             for (let i = 0; i < stmts.length; i += chunkSize) {
-              await db.batch(stmts.slice(i, i + chunkSize));
+              await db2.batch(stmts.slice(i, i + chunkSize));
             }
           }
           const successCount = stmts.length;
@@ -50373,7 +50419,7 @@ var init_page_server_ts20 = __esm({
       },
       toggleStatus: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const idStr = data.get("id")?.toString();
         const currentStatus = data.get("is_active")?.toString();
@@ -50381,7 +50427,7 @@ var init_page_server_ts20 = __esm({
         if (isNaN(parsedId) || !currentStatus) return fail(400, { error: "Data tidak valid" });
         const newStatus = currentStatus === "1" ? 0 : 1;
         try {
-          await db.prepare('UPDATE users SET is_active = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ? AND role = "siswa"').bind(newStatus, parsedId, locals.user.school_id).run();
+          await db2.prepare('UPDATE users SET is_active = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ? AND role = "siswa"').bind(newStatus, parsedId, locals.user.school_id).run();
           return { success: true };
         } catch (e3) {
           console.error(e3);
@@ -50390,27 +50436,27 @@ var init_page_server_ts20 = __esm({
       },
       updatePhoto: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const idStr = data.get("id")?.toString();
         const photo = data.get("photo")?.toString() || null;
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid" });
         try {
-          const oldUser = await db.prepare('SELECT photo FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(parsedId, locals.user.school_id).first();
+          const oldUser = await db2.prepare('SELECT photo FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(parsedId, locals.user.school_id).first();
           const oldPhoto = oldUser?.photo;
           if (oldPhoto && oldPhoto.includes("res.cloudinary.com") && oldPhoto !== photo) {
             try {
               await deleteFromCloudinary(oldPhoto, private_env);
-              await db.prepare("DELETE FROM uploaded_media WHERE url = ? AND school_id = ?").bind(oldPhoto, locals.user.school_id).run();
+              await db2.prepare("DELETE FROM uploaded_media WHERE url = ? AND school_id = ?").bind(oldPhoto, locals.user.school_id).run();
             } catch (err) {
               console.error("Failed to delete old photo from Cloudinary:", err);
             }
           }
-          await db.prepare('UPDATE users SET photo = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ? AND role = "siswa"').bind(photo, parsedId, locals.user.school_id).run();
+          await db2.prepare('UPDATE users SET photo = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ? AND role = "siswa"').bind(photo, parsedId, locals.user.school_id).run();
           if (photo && photo.includes("res.cloudinary.com")) {
             try {
-              await db.prepare(`
+              await db2.prepare(`
 						INSERT INTO uploaded_media (url, name, media_type, uploaded_by, school_id, is_public) 
 						VALUES (?, ?, 'image', ?, ?, 0)
 						ON CONFLICT(url) DO UPDATE SET school_id = excluded.school_id
@@ -50427,7 +50473,7 @@ var init_page_server_ts20 = __esm({
       },
       generate_peserta: async ({ request, locals, platform }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const class_id = data.get("class_id")?.toString();
         const format = data.get("format")?.toString();
@@ -50438,7 +50484,7 @@ var init_page_server_ts20 = __esm({
           return fail(400, { error: "Format harus mengandung variabel [nomor]" });
         }
         try {
-          const students = await db.prepare("SELECT id, name FROM users WHERE school_id = ? AND class_id = ? AND role = 'siswa' ORDER BY name ASC").bind(locals.user.school_id, class_id).all();
+          const students = await db2.prepare("SELECT id, name FROM users WHERE school_id = ? AND class_id = ? AND role = 'siswa' ORDER BY name ASC").bind(locals.user.school_id, class_id).all();
           if (!students.results || students.results.length === 0) {
             return fail(400, { error: "Tidak ada siswa di kelas tersebut" });
           }
@@ -50448,14 +50494,14 @@ var init_page_server_ts20 = __esm({
             const paddedNomor = count.toString().padStart(3, "0");
             const nomorPeserta = format.replace("[nomor]", paddedNomor);
             stmts.push(
-              db.prepare("UPDATE users SET nomor_peserta = ?, username = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(nomorPeserta, nomorPeserta, student.id, locals.user.school_id)
+              db2.prepare("UPDATE users SET nomor_peserta = ?, username = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(nomorPeserta, nomorPeserta, student.id, locals.user.school_id)
             );
             count++;
           }
           if (stmts.length > 0) {
             const chunkSize = 50;
             for (let i = 0; i < stmts.length; i += chunkSize) {
-              await db.batch(stmts.slice(i, i + chunkSize));
+              await db2.batch(stmts.slice(i, i + chunkSize));
             }
           }
           return { success: true, message: `Berhasil men-generate Nomor Peserta untuk ${stmts.length} siswa.` };
@@ -50485,7 +50531,7 @@ function ImportStudentsModal($$renderer, $$props) {
       {
         $$renderer2.push("<!--[-1-->");
       }
-      $$renderer2.push(`<!--]--> <div class="space-y-6"><div class="bg-gradient-to-br from-indigo-50 to-violet-50 border border-indigo-100 rounded-2xl p-5"><h3 class="font-bold text-indigo-900 mb-2 flex items-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Langkah Import</h3> <ol class="list-decimal list-inside text-sm text-indigo-800 space-y-2 ml-1"><li>Unduh template Excel yang disediakan.</li> <li>Isi data siswa sesuai format (Kolom <strong>NOMOR PESERTA (Opsional)</strong>, <strong>NISN</strong>, <strong>NAMA LENGKAP</strong>, <strong>JK (L/P)</strong>, <strong>NAMA KELAS</strong>, <strong>TEMPAT LAHIR</strong>, <strong>TANGGAL LAHIR</strong>).</li> <li>Lihat sheet <strong>Referensi Kelas</strong> untuk panduan nama kelas.</li> <li>Simpan dan unggah kembali file Excel tersebut.</li></ol> <button class="mt-5 w-full group relative overflow-hidden rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-4 p-4 text-left"><div class="flex-shrink-0 w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg></div> <div class="flex-1 min-w-0"><p class="font-bold text-white text-sm">Unduh Template Excel</p> <p class="text-indigo-200 text-xs mt-0.5">Format siap pakai dengan Referensi Kelas</p></div> <svg class="w-5 h-5 text-indigo-200 group-hover:text-white group-hover:translate-x-1 transition-all flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-700 ease-in-out pointer-events-none"></div></button></div> <div><label class="block text-sm font-medium text-slate-700 mb-2">Pilih File Excel (.xlsx)</label> <input type="file" accept=".xlsx, .xls" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 border border-slate-200 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"${attr("disabled", isParsing, true)}/></div></div> <form method="POST" action="?/importExcel" class="hidden"><input type="hidden" name="students_json"${attr("value", JSON.stringify(parsedData))}/> <button type="submit" id="submit-import-students-btn" aria-label="Submit Form"></button></form></div> <div class="p-6 border-t border-slate-100 bg-slate-50/50 rounded-b-2xl flex justify-end gap-3 sticky bottom-0"><button class="btn btn-secondary"${attr("disabled", isParsing, true)}>Batal</button> <button class="btn btn-primary min-w-[120px]"${attr("disabled", true, true)}>`);
+      $$renderer2.push(`<!--]--> <div class="space-y-6"><div class="bg-gradient-to-br from-indigo-50 to-violet-50 border border-indigo-100 rounded-2xl p-5"><h3 class="font-bold text-indigo-900 mb-2 flex items-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Langkah Import</h3> <ol class="list-decimal list-inside text-sm text-indigo-800 space-y-2 ml-1"><li>Unduh template Excel yang disediakan.</li> <li>Isi data siswa sesuai format (Kolom <strong>NOMOR PESERTA (Opsional)</strong>, <strong>NISN</strong>, <strong>NAMA LENGKAP</strong>, <strong>JK (L/P)</strong>, <strong>NAMA KELAS</strong>, <strong>TEMPAT LAHIR</strong>, <strong>TANGGAL LAHIR</strong>, <strong>SESI</strong>).</li> <li>Lihat sheet <strong>Referensi Kelas</strong> untuk panduan nama kelas.</li> <li>Simpan dan unggah kembali file Excel tersebut.</li></ol> <button class="mt-5 w-full group relative overflow-hidden rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-4 p-4 text-left"><div class="flex-shrink-0 w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg></div> <div class="flex-1 min-w-0"><p class="font-bold text-white text-sm">Unduh Template Excel</p> <p class="text-indigo-200 text-xs mt-0.5">Format siap pakai dengan Referensi Kelas</p></div> <svg class="w-5 h-5 text-indigo-200 group-hover:text-white group-hover:translate-x-1 transition-all flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-700 ease-in-out pointer-events-none"></div></button></div> <div><label class="block text-sm font-medium text-slate-700 mb-2">Pilih File Excel (.xlsx)</label> <input type="file" accept=".xlsx, .xls" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 border border-slate-200 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"${attr("disabled", isParsing, true)}/></div></div> <form method="POST" action="?/importExcel" class="hidden"><input type="hidden" name="students_json"${attr("value", JSON.stringify(parsedData))}/> <button type="submit" id="submit-import-students-btn" aria-label="Submit Form"></button></form></div> <div class="p-6 border-t border-slate-100 bg-slate-50/50 rounded-b-2xl flex justify-end gap-3 sticky bottom-0"><button class="btn btn-secondary"${attr("disabled", isParsing, true)}>Batal</button> <button class="btn btn-primary min-w-[120px]"${attr("disabled", true, true)}>`);
       {
         $$renderer2.push("<!--[-1-->");
         $$renderer2.push(`Import Data`);
@@ -50635,7 +50681,20 @@ function _page19($$renderer, $$props) {
             $$renderer4.push(`${escape_html2(cls.name)}`);
           });
         }
-        $$renderer3.push(`<!--]--></select></div> <div class="flex space-x-3 pt-2"><button type="submit" class="btn btn-primary">Simpan Siswa</button> <button type="button" class="btn btn-secondary">Batal</button></div></form></div></div>`);
+        $$renderer3.push(`<!--]--></select></div> <div><label for="session_number" class="block text-sm font-medium text-slate-700 mb-1">Sesi Ujian</label> <select id="session_number" name="session_number" class="input">`);
+        $$renderer3.option({ value: "1" }, ($$renderer4) => {
+          $$renderer4.push(`Sesi 1`);
+        });
+        $$renderer3.option({ value: "2" }, ($$renderer4) => {
+          $$renderer4.push(`Sesi 2`);
+        });
+        $$renderer3.option({ value: "3" }, ($$renderer4) => {
+          $$renderer4.push(`Sesi 3`);
+        });
+        $$renderer3.option({ value: "4" }, ($$renderer4) => {
+          $$renderer4.push(`Sesi 4`);
+        });
+        $$renderer3.push(`</select></div> <div class="flex space-x-3 pt-2"><button type="submit" class="btn btn-primary">Simpan Siswa</button> <button type="button" class="btn btn-secondary">Batal</button></div></form></div></div>`);
       } else {
         $$renderer3.push("<!--[-1-->");
       }
@@ -50664,7 +50723,26 @@ function _page19($$renderer, $$props) {
             $$renderer4.push(`${escape_html2(cls.name)}`);
           });
         }
-        $$renderer3.push(`<!--]--></select></div> <div class="flex space-x-3 pt-2"><button type="submit" class="btn btn-primary">Simpan Perubahan</button> <button type="button" class="btn btn-secondary">Batal</button></div></form></div></div>`);
+        $$renderer3.push(`<!--]--></select></div> <div><label for="e-session_number" class="block text-sm font-medium text-slate-700 mb-1">Sesi Ujian</label> <select id="e-session_number" name="session_number" class="input">`);
+        $$renderer3.option(
+          {
+            value: "1",
+            selected: editingUser.session_number == 1 || !editingUser.session_number
+          },
+          ($$renderer4) => {
+            $$renderer4.push(`Sesi 1`);
+          }
+        );
+        $$renderer3.option({ value: "2", selected: editingUser.session_number == 2 }, ($$renderer4) => {
+          $$renderer4.push(`Sesi 2`);
+        });
+        $$renderer3.option({ value: "3", selected: editingUser.session_number == 3 }, ($$renderer4) => {
+          $$renderer4.push(`Sesi 3`);
+        });
+        $$renderer3.option({ value: "4", selected: editingUser.session_number == 4 }, ($$renderer4) => {
+          $$renderer4.push(`Sesi 4`);
+        });
+        $$renderer3.push(`</select></div> <div class="flex space-x-3 pt-2"><button type="submit" class="btn btn-primary">Simpan Perubahan</button> <button type="button" class="btn btn-secondary">Batal</button></div></form></div></div>`);
       } else {
         $$renderer3.push("<!--[-1-->");
       }
@@ -50690,7 +50768,7 @@ function _page19($$renderer, $$props) {
       } else {
         $$renderer3.push("<!--[-1-->");
       }
-      $$renderer3.push(`<!--]--> <div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 text-slate-500 text-sm"><th class="p-4 w-12 text-center whitespace-nowrap"><input type="checkbox"${attr("checked", isAllSelected, true)} class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer" title="Pilih Semua Siswa"/></th><th class="p-4 font-semibold whitespace-nowrap">Siswa</th><th class="p-4 font-semibold whitespace-nowrap">No. Peserta</th><th class="p-4 font-semibold whitespace-nowrap">NISN</th><th class="p-4 font-semibold whitespace-nowrap">Kelas</th><th class="p-4 font-semibold whitespace-nowrap text-center">JK</th><th class="p-4 font-semibold whitespace-nowrap">Tempat, Tgl Lahir</th><th class="p-4 font-semibold whitespace-nowrap">Status</th><th class="p-4 font-semibold text-right whitespace-nowrap">Aksi</th></tr></thead><tbody class="divide-y divide-slate-100 text-slate-700">`);
+      $$renderer3.push(`<!--]--> <div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 text-slate-500 text-sm"><th class="p-4 w-12 text-center whitespace-nowrap"><input type="checkbox"${attr("checked", isAllSelected, true)} class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer" title="Pilih Semua Siswa"/></th><th class="p-4 font-semibold whitespace-nowrap">Siswa</th><th class="p-4 font-semibold whitespace-nowrap">No. Peserta</th><th class="p-4 font-semibold whitespace-nowrap">NISN</th><th class="p-4 font-semibold whitespace-nowrap">Kelas / Sesi</th><th class="p-4 font-semibold whitespace-nowrap text-center">JK</th><th class="p-4 font-semibold whitespace-nowrap">Tempat, Tgl Lahir</th><th class="p-4 font-semibold whitespace-nowrap">Status</th><th class="p-4 font-semibold text-right whitespace-nowrap">Aksi</th></tr></thead><tbody class="divide-y divide-slate-100 text-slate-700">`);
       const each_array_3 = ensure_array_like(data.users);
       if (each_array_3.length !== 0) {
         $$renderer3.push("<!--[-->");
@@ -50714,10 +50792,10 @@ function _page19($$renderer, $$props) {
           $$renderer3.push(`<!--]--> <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div></button> <div class="whitespace-nowrap"><div${attr_class(`font-medium whitespace-nowrap ${user.class_id ? "text-slate-900" : "text-red-600 drop-shadow-sm"}`)}>${escape_html2(user.name)}</div> <div class="text-sm text-slate-500 whitespace-nowrap">@${escape_html2(user.username)}</div></div></div></td><td class="p-4 whitespace-nowrap"><span class="text-slate-700">${escape_html2(user.nomor_peserta || "-")}</span></td><td class="p-4 whitespace-nowrap"><span class="text-slate-700">${escape_html2(user.nisn || user.username)}</span></td><td class="p-4 whitespace-nowrap">`);
           if (user.class_name) {
             $$renderer3.push("<!--[0-->");
-            $$renderer3.push(`<span${attr_class(`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap ${stringify3(getClassColor(user.class_id))}`)}>${escape_html2(user.class_name)}</span>`);
+            $$renderer3.push(`<div class="flex flex-col gap-1"><span${attr_class(`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap ${stringify3(getClassColor(user.class_id))} w-fit`)}>${escape_html2(user.class_name)}</span> <span class="text-xs text-slate-500 font-medium">Sesi ${escape_html2(user.session_number || 1)}</span></div>`);
           } else {
             $$renderer3.push("<!--[-1-->");
-            $$renderer3.push(`<span class="text-sm text-slate-400 whitespace-nowrap">-</span>`);
+            $$renderer3.push(`<div class="flex flex-col gap-1"><span class="text-sm text-slate-400 whitespace-nowrap">-</span> <span class="text-xs text-slate-500 font-medium">Sesi ${escape_html2(user.session_number || 1)}</span></div>`);
           }
           $$renderer3.push(`<!--]--></td><td class="p-4 whitespace-nowrap text-center">`);
           if (user.gender === "L") {
@@ -50880,7 +50958,7 @@ var init__28 = __esm({
     index28 = 27;
     component28 = async () => component_cache28 ??= (await Promise.resolve().then(() => (init_page_svelte20(), page_svelte_exports20))).default;
     server_id27 = "src/routes/admin/students/+page.server.ts";
-    imports28 = ["_app/immutable/nodes/27.DVq8BHrs.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/0WrWfAVQ.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/BGXjXNkc.js"];
+    imports28 = ["_app/immutable/nodes/27.UQ53u5cz.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/w5hoNK1W.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/BL4i29cp.js"];
     stylesheets28 = ["_app/immutable/assets/27.VB0kvX3s.css"];
     fonts28 = [];
   }
@@ -50898,15 +50976,15 @@ var init_page_server_ts21 = __esm({
     init_exports();
     init_db();
     load28 = async ({ locals, platform }) => {
-      const db = getDB(platform);
-      const { results: subjects } = await db.prepare(
+      const db2 = getDB(platform);
+      const { results: subjects } = await db2.prepare(
         "SELECT * FROM subjects WHERE school_id = ? ORDER BY name ASC"
       ).bind(locals.user.school_id).all();
       return { subjects };
     };
     actions12 = {
       add: async ({ request, locals, platform }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const name = data.get("name")?.toString().trim();
         const code = data.get("code")?.toString().trim() || null;
@@ -50914,7 +50992,7 @@ var init_page_server_ts21 = __esm({
           return fail(400, { error: "Nama mata pelajaran wajib diisi" });
         }
         try {
-          await db.prepare("INSERT INTO subjects (school_id, name, code) VALUES (?, ?, ?)").bind(locals.user.school_id, name, code).run();
+          await db2.prepare("INSERT INTO subjects (school_id, name, code) VALUES (?, ?, ?)").bind(locals.user.school_id, name, code).run();
           return { success: true };
         } catch (e3) {
           console.error(e3);
@@ -50922,7 +51000,7 @@ var init_page_server_ts21 = __esm({
         }
       },
       edit: async ({ request, locals, platform }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const idStr = data.get("id")?.toString();
         const name = data.get("name")?.toString().trim();
@@ -50930,10 +51008,10 @@ var init_page_server_ts21 = __esm({
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId) || !name) return fail(400, { error: "ID dan Nama wajib diisi" });
         try {
-          const oldSubject = await db.prepare("SELECT name FROM subjects WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).first();
-          await db.prepare('UPDATE subjects SET name = ?, code = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, code, parsedId, locals.user.school_id).run();
+          const oldSubject = await db2.prepare("SELECT name FROM subjects WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).first();
+          await db2.prepare('UPDATE subjects SET name = ?, code = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, code, parsedId, locals.user.school_id).run();
           if (oldSubject && oldSubject.name !== name) {
-            const linkedExams = await db.prepare(`
+            const linkedExams = await db2.prepare(`
 					SELECT e.id, et.code as type_code
 					FROM exams e
 					LEFT JOIN exam_types et ON e.exam_type_id = et.id
@@ -50941,9 +51019,9 @@ var init_page_server_ts21 = __esm({
 				`).bind(parsedId).all();
             if (linkedExams.results.length > 0) {
               const updateBatch = linkedExams.results.map(
-                (exam) => db.prepare(`UPDATE exams SET title = ?, updated_at = datetime('now') WHERE id = ?`).bind(`${exam.type_code || "Ujian"} - ${name}`, exam.id)
+                (exam) => db2.prepare(`UPDATE exams SET title = ?, updated_at = datetime('now') WHERE id = ?`).bind(`${exam.type_code || "Ujian"} - ${name}`, exam.id)
               );
-              await db.batch(updateBatch);
+              await db2.batch(updateBatch);
             }
           }
           return { success: true };
@@ -50953,15 +51031,15 @@ var init_page_server_ts21 = __esm({
         }
       },
       delete: async ({ request, locals, platform }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const idStr = data.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid" });
         try {
-          await db.batch([
-            db.prepare("UPDATE exams SET subject_id = NULL WHERE subject_id = ? AND school_id = ?").bind(parsedId, locals.user.school_id),
-            db.prepare("DELETE FROM subjects WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id)
+          await db2.batch([
+            db2.prepare("UPDATE exams SET subject_id = NULL WHERE subject_id = ? AND school_id = ?").bind(parsedId, locals.user.school_id),
+            db2.prepare("DELETE FROM subjects WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id)
           ]);
           return { success: true };
         } catch (e3) {
@@ -51078,7 +51156,7 @@ var init__29 = __esm({
     index29 = 28;
     component29 = async () => component_cache29 ??= (await Promise.resolve().then(() => (init_page_svelte21(), page_svelte_exports21))).default;
     server_id28 = "src/routes/admin/subjects/+page.server.ts";
-    imports29 = ["_app/immutable/nodes/28.DQz4BEjy.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/0WrWfAVQ.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/A1P7O0DF.js"];
+    imports29 = ["_app/immutable/nodes/28.68nakm6W.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/w5hoNK1W.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/A1P7O0DF.js"];
     stylesheets29 = [];
     fonts29 = [];
   }
@@ -51098,8 +51176,8 @@ var init_page_server_ts22 = __esm({
     init_auth();
     load29 = async ({ platform, locals }) => {
       if (!locals.user) throw redirect(302, "/login");
-      const db = getDB(platform);
-      const tokens = await db.prepare(`
+      const db2 = getDB(platform);
+      const tokens = await db2.prepare(`
 		SELECT t.*, e.title as exam_title,
 		COALESCE((
 			SELECT json_group_array(
@@ -51119,7 +51197,7 @@ var init_page_server_ts22 = __esm({
 		WHERE t.school_id = ?
 		ORDER BY t.created_at DESC
 	`).bind(locals.user.school_id).all();
-      const exams = await db.prepare(`
+      const exams = await db2.prepare(`
 		SELECT e.id, e.title, e.start_time, e.end_time
 		FROM exams e
 		JOIN exam_types et ON e.exam_type_id = et.id
@@ -51143,17 +51221,17 @@ var init_page_server_ts22 = __esm({
     actions13 = {
       generate: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const examIdStr = form.get("exam_id")?.toString();
         const durationHours = parseInt(form.get("duration_hours")?.toString() || "2");
         const parsedExamId = parseInt(examIdStr || "", 10);
         if (isNaN(parsedExamId)) return fail(400, { error: "Pilih ujian terlebih dahulu." });
-        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+        const exam = await db2.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
         if (!exam) return fail(400, { error: "Ujian tidak ditemukan." });
         const now = Date.now();
         const nowIso = new Date(now).toISOString();
-        const activeToken = await db.prepare(`
+        const activeToken = await db2.prepare(`
 			SELECT token_code FROM tokens 
 			WHERE exam_id = ? AND school_id = ? AND expires_at > ?
 		`).bind(parsedExamId, locals.user.school_id, nowIso).first();
@@ -51163,12 +51241,12 @@ var init_page_server_ts22 = __esm({
         const tokenCode = generateTokenCode(6);
         const expiresAt = new Date(now + durationHours * 60 * 60 * 1e3).toISOString();
         try {
-          await db.prepare(`
+          await db2.prepare(`
 				DELETE FROM tokens 
 				WHERE exam_id = ? AND school_id = ? 
 				  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
 			`).bind(parsedExamId, locals.user.school_id, parsedExamId).run();
-          await db.prepare("INSERT INTO tokens (school_id, exam_id, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?)").bind(locals.user.school_id, parsedExamId, tokenCode, locals.user.id, expiresAt).run();
+          await db2.prepare("INSERT INTO tokens (school_id, exam_id, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?)").bind(locals.user.school_id, parsedExamId, tokenCode, locals.user.id, expiresAt).run();
           return { success: `Token berhasil dibuat: ${tokenCode}` };
         } catch (e3) {
           console.error(e3);
@@ -51177,13 +51255,13 @@ var init_page_server_ts22 = __esm({
       },
       release: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const idStr = form.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
         try {
-          await db.prepare('UPDATE tokens SET is_released = 1, released_at = datetime("now") WHERE id = ? AND school_id = ?').bind(parsedId, locals.user.school_id).run();
+          await db2.prepare('UPDATE tokens SET is_released = 1, released_at = datetime("now") WHERE id = ? AND school_id = ?').bind(parsedId, locals.user.school_id).run();
           return { success: "Token berhasil dirilis ke siswa. Token akan ditarik otomatis dalam 15 menit." };
         } catch (e3) {
           console.error(e3);
@@ -51192,13 +51270,13 @@ var init_page_server_ts22 = __esm({
       },
       revoke: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const idStr = form.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
         try {
-          await db.prepare("UPDATE tokens SET is_released = 0 WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).run();
+          await db2.prepare("UPDATE tokens SET is_released = 0 WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).run();
           return { success: "Token berhasil ditarik." };
         } catch (e3) {
           console.error(e3);
@@ -51207,17 +51285,17 @@ var init_page_server_ts22 = __esm({
       },
       delete: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const idStr = form.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
         try {
-          const usage = await db.prepare("SELECT COUNT(*) as count FROM student_attempts WHERE token_id = ?").bind(parsedId).first();
+          const usage = await db2.prepare("SELECT COUNT(*) as count FROM student_attempts WHERE token_id = ?").bind(parsedId).first();
           if (usage && usage.count > 0) {
             return fail(400, { error: "Gagal dihapus: Token ini telah digunakan oleh peserta ujian." });
           }
-          await db.prepare("DELETE FROM tokens WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).run();
+          await db2.prepare("DELETE FROM tokens WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).run();
           return { success: "Token berhasil dihapus." };
         } catch (err) {
           console.error("Delete token error:", err);
@@ -51363,7 +51441,7 @@ var init__30 = __esm({
     index30 = 29;
     component30 = async () => component_cache30 ??= (await Promise.resolve().then(() => (init_page_svelte22(), page_svelte_exports22))).default;
     server_id29 = "src/routes/admin/tokens/+page.server.ts";
-    imports30 = ["_app/immutable/nodes/29.BT64SjXW.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/SeINawUV.js"];
+    imports30 = ["_app/immutable/nodes/29.YEXMztcj.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/DwRR9HPj.js"];
     stylesheets30 = [];
     fonts30 = [];
   }
@@ -51382,7 +51460,7 @@ var init_page_server_ts23 = __esm({
     init_db();
     init_auth();
     load30 = async ({ platform, url, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const search = url.searchParams.get("search") || "";
       const roleFilter = url.searchParams.get("role") || "";
       let query = 'SELECT id, username, name, role, is_active, created_at, photo FROM users WHERE school_id = ? AND role != "siswa" AND role != "superadmin" AND role != "admin"';
@@ -51397,8 +51475,8 @@ var init_page_server_ts23 = __esm({
       }
       query += " ORDER BY created_at DESC";
       const [usersResult, school] = await Promise.all([
-        db.prepare(query).bind(...params).all(),
-        db.prepare("SELECT name, logo_url FROM schools WHERE id = ?").bind(locals.user.school_id).first()
+        db2.prepare(query).bind(...params).all(),
+        db2.prepare("SELECT name, logo_url FROM schools WHERE id = ?").bind(locals.user.school_id).first()
       ]);
       return {
         users: usersResult.results || [],
@@ -51410,7 +51488,7 @@ var init_page_server_ts23 = __esm({
     };
     actions14 = {
       create: async ({ request, platform, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const schoolId = locals.user.school_id;
         const username = form.get("username")?.toString().trim();
@@ -51423,13 +51501,13 @@ var init_page_server_ts23 = __esm({
         if (!["guru", "pengawas", "siswa", "panitia"].includes(role)) {
           return fail(400, { error: "Role tidak valid." });
         }
-        const existing = await db.prepare("SELECT id FROM users WHERE username = ?").bind(username).first();
+        const existing = await db2.prepare("SELECT id FROM users WHERE username = ?").bind(username).first();
         if (existing) {
           return fail(400, { error: "Username sudah digunakan." });
         }
         try {
           const passwordHash = await hashPassword(password);
-          await db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(schoolId, username, passwordHash, name, role).run();
+          await db2.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(schoolId, username, passwordHash, name, role).run();
           return { success: "Pengguna berhasil ditambahkan." };
         } catch (e3) {
           console.error(e3);
@@ -51437,7 +51515,7 @@ var init_page_server_ts23 = __esm({
         }
       },
       update: async ({ request, platform, locals, cookies }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const schoolId = locals.user.school_id;
         const idStr = form.get("id")?.toString();
@@ -51452,9 +51530,9 @@ var init_page_server_ts23 = __esm({
         try {
           if (password) {
             const passwordHash = await hashPassword(password);
-            await db.prepare("UPDATE users SET name = ?, role = ?, password_hash = ?, is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, role, passwordHash, isActive === "1" ? 1 : 0, parsedId, schoolId).run();
+            await db2.prepare("UPDATE users SET name = ?, role = ?, password_hash = ?, is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, role, passwordHash, isActive === "1" ? 1 : 0, parsedId, schoolId).run();
           } else {
-            await db.prepare("UPDATE users SET name = ?, role = ?, is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, role, isActive === "1" ? 1 : 0, parsedId, schoolId).run();
+            await db2.prepare("UPDATE users SET name = ?, role = ?, is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, role, isActive === "1" ? 1 : 0, parsedId, schoolId).run();
           }
         } catch (e3) {
           console.error(e3);
@@ -51480,13 +51558,13 @@ var init_page_server_ts23 = __esm({
       },
       delete: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const idStr = form.get("id")?.toString();
         const schoolId = locals.user.school_id;
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
-        const userToDelete = await db.prepare("SELECT id, is_active, role FROM users WHERE id = ? AND school_id = ?").bind(parsedId, schoolId).first();
+        const userToDelete = await db2.prepare("SELECT id, is_active, role FROM users WHERE id = ? AND school_id = ?").bind(parsedId, schoolId).first();
         if (!userToDelete) {
           return fail(404, { error: "Pengguna tidak ditemukan." });
         }
@@ -51497,16 +51575,16 @@ var init_page_server_ts23 = __esm({
           return fail(400, { error: "Gagal dihapus: Pengguna masih AKTIF. Harap nonaktifkan pengguna terlebih dahulu!" });
         }
         try {
-          await db.batch([
-            db.prepare("UPDATE exams SET created_by = NULL WHERE created_by = ?").bind(parsedId),
-            db.prepare("UPDATE tokens SET created_by = NULL WHERE created_by = ?").bind(parsedId),
-            db.prepare("UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?").bind(parsedId),
-            db.prepare("DELETE FROM exam_teachers WHERE teacher_id = ?").bind(parsedId),
-            db.prepare("DELETE FROM exam_proctors WHERE proctor_id = ?").bind(parsedId),
-            db.prepare("DELETE FROM exam_participants WHERE student_id = ?").bind(parsedId),
-            db.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)").bind(parsedId),
-            db.prepare("DELETE FROM student_attempts WHERE student_id = ?").bind(parsedId),
-            db.prepare("DELETE FROM users WHERE id = ? AND school_id = ?").bind(parsedId, schoolId)
+          await db2.batch([
+            db2.prepare("UPDATE exams SET created_by = NULL WHERE created_by = ?").bind(parsedId),
+            db2.prepare("UPDATE tokens SET created_by = NULL WHERE created_by = ?").bind(parsedId),
+            db2.prepare("UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?").bind(parsedId),
+            db2.prepare("DELETE FROM exam_teachers WHERE teacher_id = ?").bind(parsedId),
+            db2.prepare("DELETE FROM exam_proctors WHERE proctor_id = ?").bind(parsedId),
+            db2.prepare("DELETE FROM exam_participants WHERE student_id = ?").bind(parsedId),
+            db2.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)").bind(parsedId),
+            db2.prepare("DELETE FROM student_attempts WHERE student_id = ?").bind(parsedId),
+            db2.prepare("DELETE FROM users WHERE id = ? AND school_id = ?").bind(parsedId, schoolId)
           ]);
           return { success: "Pengguna nonaktif berhasil dihapus." };
         } catch (err) {
@@ -51515,7 +51593,7 @@ var init_page_server_ts23 = __esm({
         }
       },
       importExcel: async ({ request, locals, platform }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const usersJson = data.get("users_json")?.toString();
         if (!usersJson) {
@@ -51524,7 +51602,7 @@ var init_page_server_ts23 = __esm({
         try {
           const users = JSON.parse(usersJson);
           if (!Array.isArray(users) || users.length === 0) return fail(400, { error: "Tidak ada data pengguna" });
-          const existingUsersResult = await db.prepare("SELECT username FROM users").all();
+          const existingUsersResult = await db2.prepare("SELECT username FROM users").all();
           const existingUsernames = new Set(existingUsersResult.results.map((u) => u.username.toLowerCase()));
           const stmts = [];
           let skippedCount = 0;
@@ -51541,13 +51619,13 @@ var init_page_server_ts23 = __esm({
             existingUsernames.add(username.toLowerCase());
             const passwordHash = await hashPassword(password);
             stmts.push(
-              db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(locals.user.school_id, username, passwordHash, name, role)
+              db2.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(locals.user.school_id, username, passwordHash, name, role)
             );
           }
           if (stmts.length > 0) {
             const chunkSize = 50;
             for (let i = 0; i < stmts.length; i += chunkSize) {
-              await db.batch(stmts.slice(i, i + chunkSize));
+              await db2.batch(stmts.slice(i, i + chunkSize));
             }
           }
           const successCount = stmts.length;
@@ -51840,7 +51918,7 @@ var init__31 = __esm({
     index31 = 30;
     component31 = async () => component_cache31 ??= (await Promise.resolve().then(() => (init_page_svelte23(), page_svelte_exports23))).default;
     server_id30 = "src/routes/admin/users/+page.server.ts";
-    imports31 = ["_app/immutable/nodes/30.almNHGVy.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/B_fGxkjt.js"];
+    imports31 = ["_app/immutable/nodes/30.Rm8eyiZk.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/B_fGxkjt.js"];
     stylesheets31 = ["_app/immutable/assets/30.DfiktKiO.css"];
     fonts31 = [];
   }
@@ -51856,23 +51934,23 @@ var init_page_server_ts24 = __esm({
   ".svelte-kit/output/server/entries/pages/guru/_page.server.ts.js"() {
     init_db();
     load31 = async ({ platform, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const schoolId = locals.user?.school_id;
       const [examCount, questionCount, pendingGrading] = await Promise.all([
-        db.prepare("SELECT COUNT(*) as c FROM exams e WHERE e.school_id = ? AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))").bind(schoolId, locals.user.id, locals.user.id).first(),
-        db.prepare(`
+        db2.prepare("SELECT COUNT(*) as c FROM exams e WHERE e.school_id = ? AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))").bind(schoolId, locals.user.id, locals.user.id).first(),
+        db2.prepare(`
 			SELECT COUNT(*) as c FROM questions q
 			JOIN exams e ON q.exam_id = e.id
 			WHERE e.school_id = ? AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))
 		`).bind(schoolId, locals.user.id, locals.user.id).first(),
-        db.prepare(`SELECT COUNT(*) as c FROM student_answers sa
+        db2.prepare(`SELECT COUNT(*) as c FROM student_answers sa
 			JOIN questions q ON sa.question_id = q.id
 			JOIN exams e ON q.exam_id = e.id
 			WHERE q.type IN ('essay', 'isian_singkat') AND sa.score_given IS NULL 
 			AND e.school_id = ? AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))
 		`).bind(schoolId, locals.user.id, locals.user.id).first()
       ]);
-      const recentExams = await db.prepare(`
+      const recentExams = await db2.prepare(`
 		SELECT e.*, (SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count
 		FROM exams e 
 		WHERE e.school_id = ? AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))
@@ -51984,8 +52062,8 @@ var init_page_server_ts25 = __esm({
     init_exports();
     init_db();
     load32 = async ({ platform, locals }) => {
-      const db = getDB(platform);
-      const exams = await db.prepare(`
+      const db2 = getDB(platform);
+      const exams = await db2.prepare(`
 		SELECT e.*, s.name as subject, (SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count
 		FROM exams e 
 		LEFT JOIN subjects s ON e.subject_id = s.id
@@ -51997,7 +52075,7 @@ var init_page_server_ts25 = __esm({
     };
     actions15 = {
       copyQuestions: async ({ request, locals, platform }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const targetExamIdStr = data.get("target_exam_id")?.toString();
         const questionIdsStr = data.get("question_ids")?.toString();
@@ -52005,16 +52083,16 @@ var init_page_server_ts25 = __esm({
         if (isNaN(parsedTargetExamId) || !questionIdsStr) return fail(400, { error: "Data tidak lengkap" });
         const questionIds = questionIdsStr.split(",").map((id) => parseInt(id.trim())).filter((id) => !isNaN(id));
         if (questionIds.length === 0) return fail(400, { error: "Tidak ada soal yang dipilih" });
-        const target = await db.prepare(`
+        const target = await db2.prepare(`
 			SELECT id FROM exams 
 			WHERE id = ? AND school_id = ? 
 			AND (created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = exams.id AND et.teacher_id = ?))
 		`).bind(parsedTargetExamId, locals.user.school_id, locals.user.id, locals.user.id).first();
         if (!target) return fail(403, { error: "Ujian tujuan tidak valid atau tidak memiliki akses" });
-        const maxQ = await db.prepare("SELECT MAX(question_number) as m FROM questions WHERE exam_id = ?").bind(parsedTargetExamId).first();
+        const maxQ = await db2.prepare("SELECT MAX(question_number) as m FROM questions WHERE exam_id = ?").bind(parsedTargetExamId).first();
         let nextNumber = (maxQ?.m || 0) + 1;
         const placeholders = questionIds.map(() => "?").join(",");
-        const questionsToCopy = await db.prepare(`
+        const questionsToCopy = await db2.prepare(`
 			SELECT q.type, q.question_text, q.points, q.media_type, q.media_url, q.audio_max_plays, q.options_json, q.correct_answer_json 
 			FROM questions q
 			JOIN exams e ON q.exam_id = e.id
@@ -52024,7 +52102,7 @@ var init_page_server_ts25 = __esm({
           return fail(400, { error: "Soal tidak ditemukan atau tidak valid" });
         }
         const stmts = questionsToCopy.results.map((q) => {
-          return db.prepare(`
+          return db2.prepare(`
 				INSERT INTO questions (exam_id, type, question_text, question_number, points, media_type, media_url, audio_max_plays, options_json, correct_answer_json)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			`).bind(
@@ -52041,7 +52119,7 @@ var init_page_server_ts25 = __esm({
           );
         });
         try {
-          await db.batch(stmts);
+          await db2.batch(stmts);
           return { success: true };
         } catch (e3) {
           console.error(e3);
@@ -52130,7 +52208,7 @@ var init__33 = __esm({
     index33 = 32;
     component33 = async () => component_cache33 ??= (await Promise.resolve().then(() => (init_page_svelte25(), page_svelte_exports25))).default;
     server_id32 = "src/routes/guru/bank-soal/+page.server.ts";
-    imports33 = ["_app/immutable/nodes/32.C7Goc71y.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js"];
+    imports33 = ["_app/immutable/nodes/32.DeWJL3pG.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js"];
     stylesheets33 = [];
     fonts33 = [];
   }
@@ -52150,17 +52228,17 @@ var init_page_server_ts26 = __esm({
     init_cloudinary();
     init_shared_server();
     load33 = async ({ platform, params, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examIdStr = params.examId;
       const parsedExamId = parseInt(examIdStr, 10);
       if (isNaN(parsedExamId)) throw error(400, "ID Ujian tidak valid");
-      const exam = await db.prepare("SELECT * FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+      const exam = await db2.prepare("SELECT * FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
       if (!exam) throw error(404, "Ujian tidak ditemukan");
-      const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(parsedExamId, locals.user.id).first();
+      const isTeacher = await db2.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(parsedExamId, locals.user.id).first();
       if (exam.created_by !== locals.user.id && !isTeacher) {
         throw error(403, "Anda tidak memiliki akses ke ujian ini.");
       }
-      const questions = await db.prepare(`
+      const questions = await db2.prepare(`
 		SELECT q.*, (SELECT COUNT(*) FROM student_answers sa WHERE sa.question_id = q.id) as answers_count 
 		FROM questions q 
 		WHERE q.exam_id = ? 
@@ -52170,12 +52248,12 @@ var init_page_server_ts26 = __esm({
     };
     actions16 = {
       create: async ({ request, platform, params, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const examIdStr = params.examId;
         const parsedExamId = parseInt(examIdStr, 10);
         if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid" });
-        const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
-        const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(parsedExamId, locals.user.id).first();
+        const exam = await db2.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+        const isTeacher = await db2.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(parsedExamId, locals.user.id).first();
         if (!exam || exam.created_by !== locals.user.id && !isTeacher) {
           return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         }
@@ -52187,7 +52265,7 @@ var init_page_server_ts26 = __esm({
         const mediaUrl = form.get("media_url")?.toString().trim() || null;
         const audioMaxPlays = parseInt(form.get("audio_max_plays")?.toString() || "3");
         if (!type || !questionText) return fail(400, { error: "Tipe dan teks soal wajib diisi." });
-        const last = await db.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(parsedExamId).first();
+        const last = await db2.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(parsedExamId).first();
         const nextNum = (last?.max_num ?? 0) + 1;
         let optionsJson = null;
         let correctAnswerJson = null;
@@ -52237,7 +52315,7 @@ var init_page_server_ts26 = __esm({
           correctAnswerJson = JSON.stringify(mapping);
         }
         try {
-          await db.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points,
+          await db2.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points,
 				media_type, media_url, audio_max_plays, options_json, correct_answer_json)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
             parsedExamId,
@@ -52258,12 +52336,12 @@ var init_page_server_ts26 = __esm({
         }
       },
       edit: async ({ request, platform, params, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const examIdStr = params.examId;
         const parsedExamId = parseInt(examIdStr, 10);
         if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid" });
-        const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
-        const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(parsedExamId, locals.user.id).first();
+        const exam = await db2.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+        const isTeacher = await db2.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(parsedExamId, locals.user.id).first();
         if (!exam || exam.created_by !== locals.user.id && !isTeacher) {
           return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         }
@@ -52317,7 +52395,7 @@ var init_page_server_ts26 = __esm({
             }
           }
           optionsJson = JSON.stringify({ left: leftItems, right: rightItems });
-          const prevMap = await db.prepare("SELECT correct_answer_json FROM questions WHERE id = ?").bind(parsedId).first();
+          const prevMap = await db2.prepare("SELECT correct_answer_json FROM questions WHERE id = ?").bind(parsedId).first();
           if (prevMap && prevMap.correct_answer_json) {
             correctAnswerJson = prevMap.correct_answer_json;
           } else {
@@ -52329,11 +52407,11 @@ var init_page_server_ts26 = __esm({
           }
         }
         try {
-          const prevMedia = await db.prepare("SELECT media_url FROM questions WHERE id = ?").bind(parsedId).first();
+          const prevMedia = await db2.prepare("SELECT media_url FROM questions WHERE id = ?").bind(parsedId).first();
           if (prevMedia && prevMedia.media_url && prevMedia.media_url !== mediaUrl && prevMedia.media_url.includes("res.cloudinary.com")) {
             await deleteFromCloudinary(prevMedia.media_url, private_env);
           }
-          await db.prepare(`UPDATE questions SET 
+          await db2.prepare(`UPDATE questions SET 
 				question_text = ?, points = ?, media_type = ?, media_url = ?, 
 				options_json = ?, correct_answer_json = ? 
 				WHERE id = ?`).bind(questionText, points, mediaType === "none" ? null : mediaType, mediaUrl, optionsJson, correctAnswerJson, parsedId).run();
@@ -52344,12 +52422,12 @@ var init_page_server_ts26 = __esm({
         }
       },
       delete: async ({ request, platform, params, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const examIdStr = params.examId;
         const parsedExamId = parseInt(examIdStr, 10);
         if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid" });
-        const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
-        const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(parsedExamId, locals.user.id).first();
+        const exam = await db2.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+        const isTeacher = await db2.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(parsedExamId, locals.user.id).first();
         if (!exam || exam.created_by !== locals.user.id && !isTeacher) {
           return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         }
@@ -52358,20 +52436,20 @@ var init_page_server_ts26 = __esm({
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
         try {
-          const q = await db.prepare("SELECT media_url FROM questions WHERE id = ?").bind(parsedId).first();
+          const q = await db2.prepare("SELECT media_url FROM questions WHERE id = ?").bind(parsedId).first();
           if (q && q.media_url && q.media_url.includes("res.cloudinary.com")) {
             await deleteFromCloudinary(q.media_url, private_env);
           }
-          await db.prepare("DELETE FROM student_answers WHERE question_id = ?").bind(parsedId).run();
-          await db.prepare("DELETE FROM questions WHERE id = ?").bind(parsedId).run();
-          const remainingQuestions = await db.prepare("SELECT id FROM questions WHERE exam_id = ? ORDER BY question_number ASC, id ASC").bind(parsedExamId).all();
+          await db2.prepare("DELETE FROM student_answers WHERE question_id = ?").bind(parsedId).run();
+          await db2.prepare("DELETE FROM questions WHERE id = ?").bind(parsedId).run();
+          const remainingQuestions = await db2.prepare("SELECT id FROM questions WHERE exam_id = ? ORDER BY question_number ASC, id ASC").bind(parsedExamId).all();
           if (remainingQuestions.results.length > 0) {
             const statements = [];
-            const stmt = db.prepare("UPDATE questions SET question_number = ? WHERE id = ?");
+            const stmt = db2.prepare("UPDATE questions SET question_number = ? WHERE id = ?");
             remainingQuestions.results.forEach((q2, idx) => {
               statements.push(stmt.bind(idx + 1, q2.id));
             });
-            await db.batch(statements);
+            await db2.batch(statements);
           }
           return { success: "Soal berhasil dihapus." };
         } catch (e3) {
@@ -52380,12 +52458,12 @@ var init_page_server_ts26 = __esm({
         }
       },
       importExcel: async ({ request, platform, params, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const examIdStr = params.examId;
         const parsedExamId = parseInt(examIdStr, 10);
         if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid" });
-        const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
-        const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(parsedExamId, locals.user.id).first();
+        const exam = await db2.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+        const isTeacher = await db2.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(parsedExamId, locals.user.id).first();
         if (!exam || exam.created_by !== locals.user.id && !isTeacher) {
           return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         }
@@ -52401,10 +52479,10 @@ var init_page_server_ts26 = __esm({
         if (!Array.isArray(parsedQuestions) || parsedQuestions.length === 0) {
           return fail(400, { error: "Tidak ada soal yang ditemukan." });
         }
-        const last = await db.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(parsedExamId).first();
+        const last = await db2.prepare("SELECT MAX(question_number) as max_num FROM questions WHERE exam_id = ?").bind(parsedExamId).first();
         let nextNum = (last?.max_num ?? 0) + 1;
         const statements = [];
-        const stmt = db.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points, options_json, correct_answer_json) VALUES (?, ?, ?, ?, ?, ?, ?)`);
+        const stmt = db2.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points, options_json, correct_answer_json) VALUES (?, ?, ?, ?, ?, ?, ?)`);
         const cloudinaryRegex = /https:\/\/res\.cloudinary\.com\/[^"'\s>]+/g;
         const mediaUrlsToInsert = /* @__PURE__ */ new Set();
         for (const q of parsedQuestions) {
@@ -52422,9 +52500,9 @@ var init_page_server_ts26 = __esm({
           }
         }
         try {
-          await db.batch(statements);
+          await db2.batch(statements);
           if (mediaUrlsToInsert.size > 0) {
-            const mediaStmt = db.prepare(`
+            const mediaStmt = db2.prepare(`
 					INSERT INTO uploaded_media (url, name, media_type, uploaded_by, school_id)
 					VALUES (?, ?, ?, ?, ?)
 				`);
@@ -52432,7 +52510,7 @@ var init_page_server_ts26 = __esm({
               (url) => mediaStmt.bind(url, "Gambar Import Word", "image", locals.user.id, locals.user.school_id)
             );
             try {
-              await db.batch(mediaBatch);
+              await db2.batch(mediaBatch);
             } catch (e3) {
               console.warn("Sebagian gambar mungkin sudah ada di media bank:", e3);
             }
@@ -52444,12 +52522,12 @@ var init_page_server_ts26 = __esm({
         return { success: `Berhasil mengimpor ${parsedQuestions.length} soal.` };
       },
       deleteBulk: async ({ request, platform, params, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const examIdStr = params.examId;
         const parsedExamId = parseInt(examIdStr, 10);
         if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid" });
-        const exam = await db.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
-        const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(parsedExamId, locals.user.id).first();
+        const exam = await db2.prepare("SELECT created_by FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+        const isTeacher = await db2.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(parsedExamId, locals.user.id).first();
         if (!exam || exam.created_by !== locals.user.id && !isTeacher) {
           return fail(403, { error: "Anda tidak memiliki akses ke ujian ini." });
         }
@@ -52460,22 +52538,22 @@ var init_page_server_ts26 = __esm({
           const ids = JSON.parse(idsStr);
           if (!Array.isArray(ids) || ids.length === 0) return fail(400, { error: "Daftar ID tidak valid." });
           const placeholders = ids.map(() => "?").join(",");
-          const questions = await db.prepare(`SELECT media_url FROM questions WHERE id IN (${placeholders})`).bind(...ids).all();
+          const questions = await db2.prepare(`SELECT media_url FROM questions WHERE id IN (${placeholders})`).bind(...ids).all();
           for (const q of questions.results) {
             if (q.media_url && q.media_url.includes("res.cloudinary.com")) {
               await deleteFromCloudinary(q.media_url, private_env);
             }
           }
-          await db.prepare(`DELETE FROM student_answers WHERE question_id IN (${placeholders})`).bind(...ids).run();
-          await db.prepare(`DELETE FROM questions WHERE id IN (${placeholders})`).bind(...ids).run();
-          const remainingQuestions = await db.prepare("SELECT id FROM questions WHERE exam_id = ? ORDER BY question_number ASC, id ASC").bind(parsedExamId).all();
+          await db2.prepare(`DELETE FROM student_answers WHERE question_id IN (${placeholders})`).bind(...ids).run();
+          await db2.prepare(`DELETE FROM questions WHERE id IN (${placeholders})`).bind(...ids).run();
+          const remainingQuestions = await db2.prepare("SELECT id FROM questions WHERE exam_id = ? ORDER BY question_number ASC, id ASC").bind(parsedExamId).all();
           if (remainingQuestions.results.length > 0) {
             const statements = [];
-            const stmt = db.prepare("UPDATE questions SET question_number = ? WHERE id = ?");
+            const stmt = db2.prepare("UPDATE questions SET question_number = ? WHERE id = ?");
             remainingQuestions.results.forEach((q, idx) => {
               statements.push(stmt.bind(idx + 1, q.id));
             });
-            await db.batch(statements);
+            await db2.batch(statements);
           }
           return { success: `${ids.length} soal berhasil dihapus.` };
         } catch (e3) {
@@ -52723,7 +52801,7 @@ var init__34 = __esm({
     index34 = 33;
     component34 = async () => component_cache34 ??= (await Promise.resolve().then(() => (init_page_svelte26(), page_svelte_exports26))).default;
     server_id33 = "src/routes/guru/bank-soal/[examId]/+page.server.ts";
-    imports34 = ["_app/immutable/nodes/33.DQF910xU.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/0WrWfAVQ.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/ChUQfART.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/BGXjXNkc.js", "_app/immutable/chunks/B0y2EvEz.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/Dyd_-2iH.js", "_app/immutable/chunks/09QYUleA.js", "_app/immutable/chunks/Dod_M3Am.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/A1P7O0DF.js"];
+    imports34 = ["_app/immutable/nodes/33.ECtqRnuq.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/w5hoNK1W.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/2tT41R4y.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/BL4i29cp.js", "_app/immutable/chunks/B0y2EvEz.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/Dyd_-2iH.js", "_app/immutable/chunks/09QYUleA.js", "_app/immutable/chunks/C3mpY5J1.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/A1P7O0DF.js"];
     stylesheets34 = ["_app/immutable/assets/QuestionRenderer.CwYmYea-.css", "_app/immutable/assets/RichTextEditor.DLtijARe.css"];
     fonts34 = [];
   }
@@ -52740,13 +52818,13 @@ var init_page_server_ts27 = __esm({
     init_exports();
     init_db();
     load34 = async ({ platform, locals, params }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examId = params.examId;
-      const exam = await db.prepare("SELECT id, title, duration_minutes FROM exams WHERE id = ? AND school_id = ? AND created_by = ?").bind(examId, locals.user.school_id, locals.user.id).first();
+      const exam = await db2.prepare("SELECT id, title, duration_minutes FROM exams WHERE id = ? AND school_id = ? AND created_by = ?").bind(examId, locals.user.school_id, locals.user.id).first();
       if (!exam) {
         throw redirect(302, "/guru/bank-soal");
       }
-      const questions = await db.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number ASC").bind(examId).all();
+      const questions = await db2.prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number ASC").bind(examId).all();
       return {
         exam,
         questions: questions.results
@@ -52847,7 +52925,7 @@ var init__35 = __esm({
     index35 = 34;
     component35 = async () => component_cache35 ??= (await Promise.resolve().then(() => (init_page_svelte27(), page_svelte_exports27))).default;
     server_id34 = "src/routes/guru/bank-soal/[examId]/preview/+page.server.ts";
-    imports35 = ["_app/immutable/nodes/34.89YHx-uq.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/B0y2EvEz.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/Dyd_-2iH.js", "_app/immutable/chunks/09QYUleA.js", "_app/immutable/chunks/CtwkWTFm.js", "_app/immutable/chunks/SeINawUV.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/_KaSKy70.js"];
+    imports35 = ["_app/immutable/nodes/34.B0P8n5VR.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/B0y2EvEz.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/Dyd_-2iH.js", "_app/immutable/chunks/09QYUleA.js", "_app/immutable/chunks/CtwkWTFm.js", "_app/immutable/chunks/DwRR9HPj.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/D0YHghFF.js"];
     stylesheets35 = ["_app/immutable/assets/QuestionRenderer.CwYmYea-.css"];
     fonts35 = [];
   }
@@ -52867,7 +52945,7 @@ var init_page_server_ts28 = __esm({
     init_cloudinary();
     init_shared_server();
     load35 = async ({ platform, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const schoolId = locals.user?.school_id || -1;
       const userId = locals.user?.id || -1;
       const query = `
@@ -52893,7 +52971,7 @@ var init_page_server_ts28 = __esm({
 		ORDER BY u.id DESC
 	`;
       try {
-        const result = await db.prepare(query).bind(schoolId, userId).all();
+        const result = await db2.prepare(query).bind(schoolId, userId).all();
         return { mediaItems: result.results || [] };
       } catch (e3) {
         console.error("Fetch uploaded_media error:", e3);
@@ -52903,13 +52981,13 @@ var init_page_server_ts28 = __esm({
     actions17 = {
       deleteMedia: async ({ request, platform, locals }) => {
         const schoolId = locals.user?.school_id || -1;
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const mediaUrl = form.get("media_url")?.toString();
         if (!mediaUrl || !mediaUrl.includes("res.cloudinary.com")) {
           return fail(400, { error: "URL Media tidak valid." });
         }
-        const row = await db.prepare("SELECT uploaded_by, school_id FROM uploaded_media WHERE url = ? AND school_id = ?").bind(mediaUrl, schoolId).first();
+        const row = await db2.prepare("SELECT uploaded_by, school_id FROM uploaded_media WHERE url = ? AND school_id = ?").bind(mediaUrl, schoolId).first();
         if (!row) {
           return fail(404, { error: "Media tidak ditemukan di sekolah Anda." });
         }
@@ -52921,37 +52999,37 @@ var init_page_server_ts28 = __esm({
         if (!deleteResult.success) {
           return fail(500, { error: `Gagal menghapus dari Cloudinary. Pesan: ${deleteResult.error}` });
         }
-        await db.prepare("DELETE FROM uploaded_media WHERE url = ? AND school_id = ?").bind(mediaUrl, schoolId).run();
-        await db.prepare("UPDATE questions SET media_url = NULL, media_type = NULL WHERE media_url = ?").bind(mediaUrl).run();
+        await db2.prepare("DELETE FROM uploaded_media WHERE url = ? AND school_id = ?").bind(mediaUrl, schoolId).run();
+        await db2.prepare("UPDATE questions SET media_url = NULL, media_type = NULL WHERE media_url = ?").bind(mediaUrl).run();
         return { success: "Media berhasil dihapus dari Cloudinary dan Database." };
       },
       toggleVisibility: async ({ request, platform, locals }) => {
         const schoolId = locals.user?.school_id || -1;
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const mediaUrl = form.get("media_url")?.toString();
         const isPublic = form.get("is_public")?.toString() === "1" ? 1 : 0;
         if (!mediaUrl) return fail(400, { error: "URL Media tidak valid." });
-        await db.prepare("UPDATE uploaded_media SET is_public = ? WHERE url = ? AND uploaded_by = ? AND school_id = ?").bind(isPublic, mediaUrl, locals.user?.id, schoolId).run();
+        await db2.prepare("UPDATE uploaded_media SET is_public = ? WHERE url = ? AND uploaded_by = ? AND school_id = ?").bind(isPublic, mediaUrl, locals.user?.id, schoolId).run();
         return { success: isPublic ? "Media berhasil ditampilkan untuk semua guru." : "Media berhasil disembunyikan (Privat)." };
       },
       updateName: async ({ request, platform, locals }) => {
         const schoolId = locals.user?.school_id || -1;
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const mediaUrl = form.get("media_url")?.toString();
         const name = form.get("name")?.toString() || null;
         if (!mediaUrl) return fail(400, { error: "URL Media tidak valid." });
-        const media = await db.prepare("SELECT uploaded_by FROM uploaded_media WHERE url = ? AND school_id = ?").bind(mediaUrl, schoolId).first();
+        const media = await db2.prepare("SELECT uploaded_by FROM uploaded_media WHERE url = ? AND school_id = ?").bind(mediaUrl, schoolId).first();
         if (!media || media.uploaded_by !== locals.user?.id) {
           return fail(403, { error: "Anda tidak berhak mengubah berkas ini." });
         }
-        await db.prepare("UPDATE uploaded_media SET name = ? WHERE url = ? AND school_id = ?").bind(name, mediaUrl, schoolId).run();
+        await db2.prepare("UPDATE uploaded_media SET name = ? WHERE url = ? AND school_id = ?").bind(name, mediaUrl, schoolId).run();
         return { success: "Nama berkas berhasil diperbarui." };
       },
       deleteBulk: async ({ request, platform, locals }) => {
         const schoolId = locals.user?.school_id || -1;
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const urlsStr = form.get("urls")?.toString();
         if (!urlsStr) return fail(400, { error: "Data tidak valid." });
@@ -52967,15 +53045,15 @@ var init_page_server_ts28 = __esm({
         let successCount = 0;
         for (const url of urls) {
           if (url.includes("res.cloudinary.com")) {
-            const row = await db.prepare("SELECT uploaded_by, school_id FROM uploaded_media WHERE url = ? AND school_id = ?").bind(url, schoolId).first();
+            const row = await db2.prepare("SELECT uploaded_by, school_id FROM uploaded_media WHERE url = ? AND school_id = ?").bind(url, schoolId).first();
             if (!row || row.uploaded_by !== locals.user?.id && locals.user?.role !== "admin" && locals.user?.role !== "superadmin") {
               continue;
             }
             const mergedEnv = platform?.env || private_env;
             const deleteResult = await deleteFromCloudinary(url, mergedEnv);
             if (deleteResult.success) {
-              await db.prepare("DELETE FROM uploaded_media WHERE url = ? AND school_id = ?").bind(url, schoolId).run();
-              await db.prepare("UPDATE questions SET media_url = NULL, media_type = NULL WHERE media_url = ?").bind(url).run();
+              await db2.prepare("DELETE FROM uploaded_media WHERE url = ? AND school_id = ?").bind(url, schoolId).run();
+              await db2.prepare("UPDATE questions SET media_url = NULL, media_type = NULL WHERE media_url = ?").bind(url).run();
               successCount++;
             }
           }
@@ -53236,7 +53314,7 @@ var init__36 = __esm({
     index36 = 35;
     component36 = async () => component_cache36 ??= (await Promise.resolve().then(() => (init_page_svelte28(), page_svelte_exports28))).default;
     server_id35 = "src/routes/guru/media-bank/+page.server.ts";
-    imports36 = ["_app/immutable/nodes/35.CodpYuUl.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/ChUQfART.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/BGXjXNkc.js", "_app/immutable/chunks/0WrWfAVQ.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/Czq8_PJR.js"];
+    imports36 = ["_app/immutable/nodes/35.CDYKfI5y.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/2tT41R4y.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/BL4i29cp.js", "_app/immutable/chunks/w5hoNK1W.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/Czq8_PJR.js"];
     stylesheets36 = [];
     fonts36 = [];
   }
@@ -53254,10 +53332,10 @@ var init_page_server_ts29 = __esm({
     init_exports();
     load36 = async ({ platform, locals }) => {
       if (locals.user?.role !== "guru") throw redirect(302, "/");
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const schoolId = locals.user.school_id;
       const userId = locals.user.id;
-      const examsQuery = await db.prepare(`
+      const examsQuery = await db2.prepare(`
 		SELECT 
 			e.id,
 			e.title,
@@ -53271,7 +53349,7 @@ var init_page_server_ts29 = __esm({
 		AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers teacher_join WHERE teacher_join.exam_id = e.id AND teacher_join.teacher_id = ?))
 		ORDER BY e.created_at DESC
 	`).bind(schoolId, userId, userId).all();
-      const examTypesQuery = await db.prepare(`
+      const examTypesQuery = await db2.prepare(`
 		SELECT DISTINCT
 			et.id,
 			et.name as type_name,
@@ -53363,12 +53441,12 @@ var init_page_server_ts30 = __esm({
     init_exports();
     load37 = async ({ platform, locals, params, url }) => {
       if (locals.user?.role !== "guru") throw redirect(302, "/");
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const typeId = params.typeId;
       const schoolId = locals.user.school_id;
       const userId = locals.user.id;
       const classFilter = url.searchParams.get("class_id") || "";
-      const examType = await db.prepare(`
+      const examType = await db2.prepare(`
 		SELECT DISTINCT et.id, et.name, et.code 
 		FROM exam_types et
 		JOIN exams e ON et.id = e.exam_type_id
@@ -53378,7 +53456,7 @@ var init_page_server_ts30 = __esm({
       if (!examType) {
         throw error(404, "Tipe ujian tidak ditemukan atau Anda tidak memiliki akses.");
       }
-      const classesQuery = await db.prepare(`
+      const classesQuery = await db2.prepare(`
 		SELECT DISTINCT c.id, c.name
 		FROM classes c
 		JOIN users u ON u.class_id = c.id
@@ -53411,7 +53489,7 @@ var init_page_server_ts30 = __esm({
         leaderboardParams.push(classFilter);
       }
       leaderboardSQL += " GROUP BY u.id ORDER BY total_score DESC, avg_score DESC";
-      const leaderboardQuery = await db.prepare(leaderboardSQL).bind(...leaderboardParams).all();
+      const leaderboardQuery = await db2.prepare(leaderboardSQL).bind(...leaderboardParams).all();
       let detailSQL = `
 		SELECT 
 			u.id as student_id,
@@ -53430,7 +53508,7 @@ var init_page_server_ts30 = __esm({
         detailParams.push(classFilter);
       }
       detailSQL += " ORDER BY u.id, e.title ASC";
-      const detailQuery = await db.prepare(detailSQL).bind(...detailParams).all();
+      const detailQuery = await db2.prepare(detailSQL).bind(...detailParams).all();
       const detailMap = {};
       for (const row of detailQuery.results || []) {
         if (!detailMap[row.student_id]) detailMap[row.student_id] = [];
@@ -53575,7 +53653,7 @@ var init__38 = __esm({
     index38 = 37;
     component38 = async () => component_cache38 ??= (await Promise.resolve().then(() => (init_page_svelte30(), page_svelte_exports30))).default;
     server_id37 = "src/routes/guru/papan-peringkat/type/[typeId]/+page.server.ts";
-    imports38 = ["_app/immutable/nodes/37.BlDHtGAB.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/SeINawUV.js"];
+    imports38 = ["_app/immutable/nodes/37.CYpUl4OK.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/DwRR9HPj.js"];
     stylesheets38 = [];
     fonts38 = [];
   }
@@ -53593,16 +53671,16 @@ var init_page_server_ts31 = __esm({
     init_exports();
     load38 = async ({ params, platform, locals }) => {
       if (locals.user?.role !== "guru") throw redirect(302, "/");
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const typeId = parseInt(params.typeId, 10);
       const schoolId = locals.user.school_id;
       const userId = locals.user.id;
       if (isNaN(typeId)) throw redirect(302, "/guru/papan-peringkat");
-      const typeQuery = await db.prepare(`
+      const typeQuery = await db2.prepare(`
 		SELECT name as type_name FROM exam_types WHERE id = ? AND school_id = ?
 	`).bind(typeId, schoolId).first();
       if (!typeQuery) throw redirect(302, "/guru/papan-peringkat");
-      const examsQuery = await db.prepare(`
+      const examsQuery = await db2.prepare(`
 		SELECT 
 			e.id,
 			e.title,
@@ -53704,11 +53782,11 @@ var init_page_server_ts32 = __esm({
     init_exports();
     load39 = async ({ platform, locals, params }) => {
       if (locals.user?.role !== "guru") throw redirect(302, "/");
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examId = params.examId;
       const schoolId = locals.user.school_id;
       const userId = locals.user.id;
-      const exam = await db.prepare(`
+      const exam = await db2.prepare(`
 		SELECT id, title, subject_id, exam_type_id FROM exams 
 		WHERE id = ? AND school_id = ? 
 		AND (created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers teacher_join WHERE teacher_join.exam_id = exams.id AND teacher_join.teacher_id = ?))
@@ -53716,10 +53794,10 @@ var init_page_server_ts32 = __esm({
       if (!exam) {
         throw error(404, "Ujian tidak ditemukan atau Anda tidak memiliki akses ke ujian ini.");
       }
-      const subject = await db.prepare(`
+      const subject = await db2.prepare(`
 		SELECT name FROM subjects WHERE id = ?
 	`).bind(exam.subject_id).first();
-      const leaderboardQuery = await db.prepare(`
+      const leaderboardQuery = await db2.prepare(`
 		SELECT 
 			u.name as student_name,
 			u.photo,
@@ -53848,7 +53926,7 @@ var init_page_server_ts33 = __esm({
     init_exports();
     init_db();
     load40 = async ({ platform, url, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examParam = url.searchParams.get("exam_id");
       const studentFilterStr = url.searchParams.get("student_id") || "";
       const studentFilter = parseInt(studentFilterStr, 10);
@@ -53856,7 +53934,7 @@ var init_page_server_ts33 = __esm({
         let answers = [];
         let students = [];
         let selectedExam = null;
-        const exams = await db.prepare(`
+        const exams = await db2.prepare(`
 		SELECT id, title FROM exams 
 		WHERE school_id = ? AND (created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = exams.id AND et.teacher_id = ?))
 		ORDER BY title
@@ -53874,10 +53952,10 @@ var init_page_server_ts33 = __esm({
           if (examFilter !== "") {
             studentQuery += ` AND e.id = ?`;
             studentParams.push(examFilter);
-            selectedExam = await db.prepare("SELECT id, title, show_score_type, is_score_released FROM exams WHERE id = ?").bind(examFilter).first();
+            selectedExam = await db2.prepare("SELECT id, title, show_score_type, is_score_released FROM exams WHERE id = ?").bind(examFilter).first();
           }
           studentQuery += ` ORDER BY u.name`;
-          const studentsResult = await db.prepare(studentQuery).bind(...studentParams).all();
+          const studentsResult = await db2.prepare(studentQuery).bind(...studentParams).all();
           students = studentsResult.results;
           let query = `SELECT sa.id as answer_id, sa.answer_given, sa.score_given, sa.is_correct,
 			q.id as question_id, q.question_text, q.type, q.points, q.correct_answer_json,
@@ -53901,7 +53979,7 @@ var init_page_server_ts33 = __esm({
             params.push(studentFilter);
           }
           query += " ORDER BY e.id, u.name, q.question_number";
-          const answersResult = await db.prepare(query).bind(...params).all();
+          const answersResult = await db2.prepare(query).bind(...params).all();
           answers = answersResult.results;
         }
         return { answers, exams: exams.results, students, examParam, studentFilter: isNaN(studentFilter) ? "" : studentFilter, selectedExam };
@@ -53913,7 +53991,7 @@ var init_page_server_ts33 = __esm({
     actions18 = {
       grade: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const answerIdStr = form.get("answer_id")?.toString();
         const parsedAnswerId = parseInt(answerIdStr || "", 10);
@@ -53922,7 +54000,7 @@ var init_page_server_ts33 = __esm({
         if (isNaN(parsedAnswerId)) return fail(400, { error: "ID jawaban tidak valid." });
         if (!scoreStr || scoreStr.trim() === "") return fail(400, { error: "Nilai tidak boleh kosong." });
         try {
-          const answerAuthCheck = await db.prepare(`
+          const answerAuthCheck = await db2.prepare(`
 				SELECT sa.id, sa.attempt_id
 				FROM student_answers sa
 				JOIN student_attempts st ON sa.attempt_id = st.id
@@ -53935,15 +54013,15 @@ var init_page_server_ts33 = __esm({
           }
           const scoreGiven = parseFloat(scoreStr);
           const isCorrect = scoreGiven >= maxPoints ? 1 : scoreGiven > 0 ? 0 : 0;
-          await db.prepare("UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?").bind(scoreGiven, isCorrect, parsedAnswerId).run();
-          const totalResult = await db.prepare(`
+          await db2.prepare("UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?").bind(scoreGiven, isCorrect, parsedAnswerId).run();
+          const totalResult = await db2.prepare(`
 				SELECT SUM(COALESCE(sa.score_given, 0)) as total_score, SUM(q.points) as total_points
 				FROM student_answers sa JOIN questions q ON sa.question_id = q.id
 				WHERE sa.attempt_id = ?
 			`).bind(answerAuthCheck.attempt_id).first();
           if (totalResult && totalResult.total_points > 0) {
             const score = totalResult.total_score / totalResult.total_points * 100;
-            await db.prepare("UPDATE student_attempts SET score = ? WHERE id = ?").bind(Math.round(score * 10) / 10, answerAuthCheck.attempt_id).run();
+            await db2.prepare("UPDATE student_attempts SET score = ? WHERE id = ?").bind(Math.round(score * 10) / 10, answerAuthCheck.attempt_id).run();
           }
           return { success: "Nilai berhasil disimpan." };
         } catch (e3) {
@@ -53953,13 +54031,13 @@ var init_page_server_ts33 = __esm({
       },
       toggleScoreRelease: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const examIdStr = form.get("exam_id")?.toString();
         const parsedExamId = parseInt(examIdStr || "", 10);
         if (isNaN(parsedExamId)) return fail(400, { error: "ID ujian tidak valid." });
         try {
-          const examAuthCheck = await db.prepare(`
+          const examAuthCheck = await db2.prepare(`
 				SELECT id FROM exams
 				WHERE id = ? AND school_id = ?
 				AND (created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = exams.id AND et.teacher_id = ?))
@@ -53967,7 +54045,7 @@ var init_page_server_ts33 = __esm({
           if (!examAuthCheck) {
             return fail(403, { error: "Anda tidak memiliki hak untuk mengubah pengaturan ujian ini." });
           }
-          await db.prepare(`
+          await db2.prepare(`
 				UPDATE exams 
 				SET is_score_released = CASE WHEN is_score_released = 1 THEN 0 ELSE 1 END, updated_at = datetime('now') 
 				WHERE id = ? AND school_id = ?
@@ -54109,7 +54187,7 @@ var init__41 = __esm({
     index41 = 40;
     component41 = async () => component_cache41 ??= (await Promise.resolve().then(() => (init_page_svelte33(), page_svelte_exports33))).default;
     server_id40 = "src/routes/guru/penilaian/+page.server.ts";
-    imports41 = ["_app/immutable/nodes/40.CEeWLfI2.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/Dyd_-2iH.js", "_app/immutable/chunks/09QYUleA.js"];
+    imports41 = ["_app/immutable/nodes/40._LObka0W.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/Dyd_-2iH.js", "_app/immutable/chunks/09QYUleA.js"];
     stylesheets41 = [];
     fonts41 = [];
   }
@@ -54127,8 +54205,8 @@ var init_page_server_ts34 = __esm({
     init_exports();
     init_db();
     load41 = async ({ platform, locals }) => {
-      const db = getDB(platform);
-      const exams = await db.prepare(`
+      const db2 = getDB(platform);
+      const exams = await db2.prepare(`
 		SELECT e.*, s.name as subject_name,
 			(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count,
 			(SELECT COUNT(*) FROM exam_participants WHERE exam_id = e.id) as participant_count
@@ -54137,12 +54215,12 @@ var init_page_server_ts34 = __esm({
 		WHERE e.school_id = ? AND e.created_by = ?
 		ORDER BY e.created_at DESC
 	`).bind(locals.user.school_id, locals.user.id).all();
-      const subjects = await db.prepare("SELECT id, name FROM subjects WHERE school_id = ? ORDER BY name").bind(locals.user.school_id).all();
+      const subjects = await db2.prepare("SELECT id, name FROM subjects WHERE school_id = ? ORDER BY name").bind(locals.user.school_id).all();
       return { exams: exams.results, subjects: subjects.results };
     };
     actions19 = {
       create: async ({ request, platform, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const title = form.get("title")?.toString().trim();
         const description = form.get("description")?.toString().trim() || "";
@@ -54153,12 +54231,12 @@ var init_page_server_ts34 = __esm({
         const shuffleQuestions = parseInt(form.get("shuffle_questions")?.toString() || "0");
         const showScoreType = form.get("show_score_type")?.toString() || "after_submit";
         if (!title) return fail(400, { error: "Judul ujian wajib diisi." });
-        await db.prepare(`INSERT INTO exams (school_id, title, description, subject_id, duration_minutes, start_time, end_time, shuffle_questions, show_score_type, created_by)
+        await db2.prepare(`INSERT INTO exams (school_id, title, description, subject_id, duration_minutes, start_time, end_time, shuffle_questions, show_score_type, created_by)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(locals.user.school_id, title, description, subjectId, durationMinutes, startTime, endTime, shuffleQuestions, showScoreType, locals.user.id).run();
         return { success: "Ujian Remedial berhasil dibuat." };
       },
       update: async ({ request, platform, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const idStr = form.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
@@ -54173,7 +54251,7 @@ var init_page_server_ts34 = __esm({
         const showScoreType = form.get("show_score_type")?.toString() || "after_submit";
         if (isNaN(parsedId) || !title) return fail(400, { error: "Data tidak lengkap." });
         try {
-          await db.prepare(`UPDATE exams SET title=?, description=?, subject_id=?, duration_minutes=?,
+          await db2.prepare(`UPDATE exams SET title=?, description=?, subject_id=?, duration_minutes=?,
 				start_time=?, end_time=?, is_active=?, shuffle_questions=?, show_score_type=?, updated_at=datetime('now') WHERE id=? AND school_id=? AND created_by=?`).bind(title, description, subjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, showScoreType, parsedId, locals.user.school_id, locals.user.id).run();
           return { success: "Ujian Remedial berhasil diperbarui." };
         } catch (e3) {
@@ -54182,19 +54260,19 @@ var init_page_server_ts34 = __esm({
         }
       },
       delete: async ({ request, platform, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const idStr = form.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
         try {
-          await db.batch([
-            db.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE exam_id = ?)").bind(parsedId),
-            db.prepare("DELETE FROM student_attempts WHERE exam_id = ?").bind(parsedId),
-            db.prepare("DELETE FROM exam_participants WHERE exam_id = ?").bind(parsedId),
-            db.prepare("DELETE FROM tokens WHERE exam_id = ?").bind(parsedId),
-            db.prepare("DELETE FROM questions WHERE exam_id = ?").bind(parsedId),
-            db.prepare("DELETE FROM exams WHERE id = ? AND school_id = ? AND created_by = ?").bind(parsedId, locals.user.school_id, locals.user.id)
+          await db2.batch([
+            db2.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE exam_id = ?)").bind(parsedId),
+            db2.prepare("DELETE FROM student_attempts WHERE exam_id = ?").bind(parsedId),
+            db2.prepare("DELETE FROM exam_participants WHERE exam_id = ?").bind(parsedId),
+            db2.prepare("DELETE FROM tokens WHERE exam_id = ?").bind(parsedId),
+            db2.prepare("DELETE FROM questions WHERE exam_id = ?").bind(parsedId),
+            db2.prepare("DELETE FROM exams WHERE id = ? AND school_id = ? AND created_by = ?").bind(parsedId, locals.user.school_id, locals.user.id)
           ]);
           return { success: "Ujian Remedial berhasil dihapus." };
         } catch (e3) {
@@ -54203,13 +54281,13 @@ var init_page_server_ts34 = __esm({
         }
       },
       toggleActive: async ({ request, platform, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const idStr = form.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
         try {
-          await db.prepare(`UPDATE exams SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END, updated_at=datetime('now') WHERE id = ? AND school_id = ? AND created_by = ?`).bind(parsedId, locals.user.school_id, locals.user.id).run();
+          await db2.prepare(`UPDATE exams SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END, updated_at=datetime('now') WHERE id = ? AND school_id = ? AND created_by = ?`).bind(parsedId, locals.user.school_id, locals.user.id).run();
           return { success: "Status ujian berhasil diperbarui." };
         } catch (e3) {
           console.error(e3);
@@ -54320,7 +54398,7 @@ var init__42 = __esm({
     index42 = 41;
     component42 = async () => component_cache42 ??= (await Promise.resolve().then(() => (init_page_svelte34(), page_svelte_exports34))).default;
     server_id41 = "src/routes/guru/remedial/+page.server.ts";
-    imports42 = ["_app/immutable/nodes/41.D_rRDN8d.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/0WrWfAVQ.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/C2PDlNHd.js"];
+    imports42 = ["_app/immutable/nodes/41.DN9tmmle.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/w5hoNK1W.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/C2PDlNHd.js"];
     stylesheets42 = [];
     fonts42 = [];
   }
@@ -54339,18 +54417,18 @@ var init_page_server_ts35 = __esm({
     init_db();
     init_auth();
     load42 = async ({ platform, params, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examIdStr = params.examId;
       const parsedExamId = parseInt(examIdStr, 10);
       if (isNaN(parsedExamId)) throw redirect(302, "/guru/remedial");
-      const exam = await db.prepare(`
+      const exam = await db2.prepare(`
 		SELECT e.*, s.name as subject_name
 		FROM exams e
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		WHERE e.id = ? AND e.school_id = ? AND e.created_by = ?
 	`).bind(parsedExamId, locals.user.school_id, locals.user.id).first();
       if (!exam) throw redirect(302, "/guru/remedial");
-      const participants = await db.prepare(`
+      const participants = await db2.prepare(`
 		SELECT ep.id as participant_id, u.username as nisn, u.name as student_name, c.name as class_name
 		FROM exam_participants ep
 		JOIN users u ON ep.student_id = u.id
@@ -54358,20 +54436,20 @@ var init_page_server_ts35 = __esm({
 		WHERE ep.exam_id = ?
 		ORDER BY c.name, u.name
 	`).bind(parsedExamId).all();
-      const allStudents = await db.prepare(`
+      const allStudents = await db2.prepare(`
 		SELECT u.id, u.username as nisn, u.name, c.name as class_name
 		FROM users u
 		LEFT JOIN classes c ON u.class_id = c.id
 		WHERE u.school_id = ? AND u.role = 'siswa'
 		ORDER BY c.name, u.name
 	`).bind(locals.user.school_id).all();
-      const activeToken = await db.prepare(`
+      const activeToken = await db2.prepare(`
 		SELECT id, token_code as token, expires_at, released_at
 		FROM tokens
 		WHERE exam_id = ? AND expires_at > datetime('now')
 		ORDER BY expires_at DESC LIMIT 1
 	`).bind(parsedExamId).first();
-      const rawAttempts = await db.prepare(`
+      const rawAttempts = await db2.prepare(`
 		SELECT sa.id, sa.status, sa.created_at as start_time, sa.submit_time,
 			   sa.violation_count, sa.violation_logs,
 			   u.name as student_name, c.name as class_name,
@@ -54403,7 +54481,7 @@ var init_page_server_ts35 = __esm({
             }
           }
           if (answeredCount === 0) {
-            const dbAnswers = await db.prepare('SELECT COUNT(*) as c FROM student_answers WHERE attempt_id = ? AND answer_given IS NOT NULL AND answer_given != ""').bind(a.id).first();
+            const dbAnswers = await db2.prepare('SELECT COUNT(*) as c FROM student_answers WHERE attempt_id = ? AND answer_given IS NOT NULL AND answer_given != ""').bind(a.id).first();
             if (dbAnswers && dbAnswers.c) answeredCount = dbAnswers.c;
           }
         } else {
@@ -54412,7 +54490,7 @@ var init_page_server_ts35 = __esm({
             warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : [];
           } catch (e3) {
           }
-          const dbAnswers = await db.prepare('SELECT COUNT(*) as c FROM student_answers WHERE attempt_id = ? AND answer_given IS NOT NULL AND answer_given != ""').bind(a.id).first();
+          const dbAnswers = await db2.prepare('SELECT COUNT(*) as c FROM student_answers WHERE attempt_id = ? AND answer_given IS NOT NULL AND answer_given != ""').bind(a.id).first();
           if (dbAnswers && dbAnswers.c) answeredCount = dbAnswers.c;
         }
         return { ...a, answeredCount, warnings, warningLogs };
@@ -54428,7 +54506,7 @@ var init_page_server_ts35 = __esm({
     actions20 = {
       // ===================== PARTICIPANTS =====================
       addParticipants: async ({ request, platform, params, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const studentIdsStr = form.getAll("student_ids").map((id) => id.toString());
         const parsedStudentIds = studentIdsStr.map((id) => parseInt(id, 10)).filter((id) => !isNaN(id));
@@ -54436,18 +54514,18 @@ var init_page_server_ts35 = __esm({
         const examIdStr = params.examId;
         const parsedExamId = parseInt(examIdStr, 10);
         if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid." });
-        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND created_by = ? AND school_id = ?").bind(parsedExamId, locals.user.id, locals.user.school_id).first();
+        const exam = await db2.prepare("SELECT id FROM exams WHERE id = ? AND created_by = ? AND school_id = ?").bind(parsedExamId, locals.user.id, locals.user.school_id).first();
         if (!exam) return fail(403, { error: "Akses ditolak." });
         const placeholders = parsedStudentIds.map(() => "?").join(",");
-        const validStudents = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "siswa"`).bind(...parsedStudentIds, locals.user.school_id).all();
+        const validStudents = await db2.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "siswa"`).bind(...parsedStudentIds, locals.user.school_id).all();
         if (validStudents.results.length === 0) {
           return fail(400, { error: "Siswa yang dipilih tidak valid." });
         }
         const batch = validStudents.results.map(
-          (s3) => db.prepare("INSERT OR IGNORE INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(parsedExamId, s3.id)
+          (s3) => db2.prepare("INSERT OR IGNORE INTO exam_participants (exam_id, student_id) VALUES (?, ?)").bind(parsedExamId, s3.id)
         );
         try {
-          await db.batch(batch);
+          await db2.batch(batch);
           return { success: `Berhasil menambahkan ${validStudents.results.length} peserta remedial.` };
         } catch (e3) {
           console.error(e3);
@@ -54455,19 +54533,19 @@ var init_page_server_ts35 = __esm({
         }
       },
       removeParticipant: async ({ request, platform, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const participantIdStr = form.get("participant_id")?.toString();
         const parsedParticipantId = parseInt(participantIdStr || "", 10);
         if (isNaN(parsedParticipantId)) return fail(400, { error: "ID tidak valid." });
-        const isOwner = await db.prepare(`
+        const isOwner = await db2.prepare(`
 			SELECT 1 FROM exam_participants ep 
 			JOIN exams e ON ep.exam_id = e.id 
 			WHERE ep.id = ? AND e.created_by = ? AND e.school_id = ?
 		`).bind(parsedParticipantId, locals.user.id, locals.user.school_id).first();
         if (!isOwner) return fail(403, { error: "Akses ditolak." });
         try {
-          await db.prepare("DELETE FROM exam_participants WHERE id = ?").bind(parsedParticipantId).run();
+          await db2.prepare("DELETE FROM exam_participants WHERE id = ?").bind(parsedParticipantId).run();
           return { success: "Peserta berhasil dihapus." };
         } catch (e3) {
           console.error(e3);
@@ -54476,17 +54554,17 @@ var init_page_server_ts35 = __esm({
       },
       // ===================== TOKENS =====================
       generateToken: async ({ request, platform, params, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         await request.formData();
         const examIdStr = params.examId;
         const parsedExamId = parseInt(examIdStr, 10);
         if (isNaN(parsedExamId)) return fail(400, { error: "ID Ujian tidak valid." });
-        const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND created_by = ? AND school_id = ?").bind(parsedExamId, locals.user.id, locals.user.school_id).first();
+        const exam = await db2.prepare("SELECT id FROM exams WHERE id = ? AND created_by = ? AND school_id = ?").bind(parsedExamId, locals.user.id, locals.user.school_id).first();
         if (!exam) return fail(403, { error: "Akses ditolak." });
         const now = Date.now();
         const expiresAt = new Date(now + 15 * 60 * 1e3).toISOString();
         try {
-          await db.prepare(`
+          await db2.prepare(`
 				DELETE FROM tokens 
 				WHERE exam_id = ? AND school_id = ? 
 				  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
@@ -54498,7 +54576,7 @@ var init_page_server_ts35 = __esm({
             attemptsCount++;
             token = generateTokenCode(6);
             try {
-              await db.prepare(`
+              await db2.prepare(`
 						INSERT INTO tokens (school_id, exam_id, created_by, token_code, is_released, expires_at, released_at)
 						VALUES (?, ?, ?, ?, 1, ?, datetime('now'))
 					`).bind(locals.user.school_id, parsedExamId, locals.user.id, token, expiresAt).run();
@@ -54520,19 +54598,19 @@ var init_page_server_ts35 = __esm({
         }
       },
       deleteToken: async ({ request, platform, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const idStr = form.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID Token tidak valid." });
-        const isOwner = await db.prepare(`
+        const isOwner = await db2.prepare(`
 			SELECT 1 FROM tokens t 
 			JOIN exams e ON t.exam_id = e.id 
 			WHERE t.id = ? AND e.created_by = ?
 		`).bind(parsedId, locals.user.id).first();
         if (!isOwner) return fail(403, { error: "Akses ditolak." });
         try {
-          await db.prepare("DELETE FROM tokens WHERE id = ?").bind(parsedId).run();
+          await db2.prepare("DELETE FROM tokens WHERE id = ?").bind(parsedId).run();
           return { success: "Token berhasil dicabut." };
         } catch (e3) {
           console.error(e3);
@@ -54541,19 +54619,19 @@ var init_page_server_ts35 = __esm({
       },
       // ===================== MONITORING =====================
       forceSubmit: async ({ request, platform, locals }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const attemptIdStr = form.get("attempt_id")?.toString();
         const parsedAttemptId = parseInt(attemptIdStr || "", 10);
         if (isNaN(parsedAttemptId)) return fail(400, { error: "ID Attempt tidak valid." });
-        const isOwner = await db.prepare(`
+        const isOwner = await db2.prepare(`
 			SELECT 1 FROM student_attempts sa 
 			JOIN exams e ON sa.exam_id = e.id 
 			WHERE sa.id = ? AND e.created_by = ?
 		`).bind(parsedAttemptId, locals.user.id).first();
         if (!isOwner) return fail(403, { error: "Akses ditolak." });
         try {
-          await db.prepare(`
+          await db2.prepare(`
 				UPDATE student_attempts 
 				SET status = 'waktu_habis', submit_time = datetime('now')
 				WHERE id = ? AND status = 'mengerjakan'
@@ -54825,7 +54903,7 @@ var init__43 = __esm({
     index43 = 42;
     component43 = async () => component_cache43 ??= (await Promise.resolve().then(() => (init_page_svelte35(), page_svelte_exports35))).default;
     server_id42 = "src/routes/guru/remedial/[examId]/+page.server.ts";
-    imports43 = ["_app/immutable/nodes/42.BbqTeEHt.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/0WrWfAVQ.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/C2PDlNHd.js"];
+    imports43 = ["_app/immutable/nodes/42.BCEGCxaz.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/w5hoNK1W.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/C2PDlNHd.js"];
     stylesheets43 = [];
     fonts43 = [];
   }
@@ -54841,9 +54919,9 @@ var init_page_server_ts36 = __esm({
   ".svelte-kit/output/server/entries/pages/guru/results/_page.server.ts.js"() {
     init_db();
     load43 = async ({ platform, url, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examFilter = url.searchParams.get("exam_id") || "";
-      const exams = await db.prepare(`
+      const exams = await db2.prepare(`
 		SELECT id, title FROM exams 
 		WHERE school_id = ? AND (created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = exams.id AND et.teacher_id = ?))
 		ORDER BY title
@@ -54864,7 +54942,7 @@ var init_page_server_ts36 = __esm({
         params.push(examFilter);
       }
       query += " ORDER BY sa.submit_time DESC";
-      const results = await db.prepare(query).bind(...params).all();
+      const results = await db2.prepare(query).bind(...params).all();
       return { results: results.results, exams: exams.results, examFilter };
     };
   }
@@ -54967,7 +55045,7 @@ var init__44 = __esm({
     index44 = 43;
     component44 = async () => component_cache44 ??= (await Promise.resolve().then(() => (init_page_svelte36(), page_svelte_exports36))).default;
     server_id43 = "src/routes/guru/results/+page.server.ts";
-    imports44 = ["_app/immutable/nodes/43.wkGCDgYY.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/Bkgixz-K.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/A1P7O0DF.js"];
+    imports44 = ["_app/immutable/nodes/43.UoEiJ5wn.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/Bkgixz-K.js", "_app/immutable/chunks/CKN5doRT.js", "_app/immutable/chunks/A1P7O0DF.js"];
     stylesheets44 = [];
     fonts44 = [];
   }
@@ -54984,9 +55062,9 @@ var init_page_server_ts37 = __esm({
     init_exports();
     init_db();
     load44 = async ({ params, platform, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const attemptId = params.attemptId;
-      const attempt = await db.prepare(`
+      const attempt = await db2.prepare(`
 		SELECT sa.*, u.name as student_name, u.username as nisn, c.name as class_name, e.title as exam_title, s.name as subject_name, e.duration_minutes
 		FROM student_attempts sa
 		JOIN users u ON sa.student_id = u.id
@@ -54997,7 +55075,7 @@ var init_page_server_ts37 = __esm({
 		AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))
 	`).bind(attemptId, locals.user.school_id, locals.user.id, locals.user.id).first();
       if (!attempt) throw error(404, "Data hasil ujian tidak ditemukan atau Anda tidak memiliki akses ke data ini.");
-      const answers = await db.prepare(`
+      const answers = await db2.prepare(`
 		SELECT q.question_number, q.question_text, q.type, q.options_json, q.correct_answer_json, q.points as max_points,
 		       sa.answer_given, sa.score_given, sa.is_correct, sa.is_doubted
 		FROM student_answers sa
@@ -55240,8 +55318,8 @@ var init_page_server_ts38 = __esm({
           return fail(400, { error: "Username dan kata sandi wajib diisi." });
         }
         try {
-          const db = getDB(platform);
-          const user = await db.prepare("SELECT * FROM users WHERE username = ? AND is_active = 1").bind(username).first();
+          const db2 = getDB(platform);
+          const user = await db2.prepare("SELECT * FROM users WHERE username = ? AND is_active = 1").bind(username).first();
           if (!user) {
             return fail(401, { error: "Username atau kata sandi salah." });
           }
@@ -55352,7 +55430,7 @@ var init__46 = __esm({
     index46 = 45;
     component46 = async () => component_cache46 ??= (await Promise.resolve().then(() => (init_page_svelte38(), page_svelte_exports38))).default;
     server_id45 = "src/routes/login/+page.server.ts";
-    imports46 = ["_app/immutable/nodes/45.S3jtJfAV.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/CpJ3s9VQ.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/B_fGxkjt.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/Bfc47y5P.js"];
+    imports46 = ["_app/immutable/nodes/45.CgdqQ5JM.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/CpJ3s9VQ.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/B_fGxkjt.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/Bfc47y5P.js"];
     stylesheets46 = [];
     fonts46 = [];
   }
@@ -55368,12 +55446,12 @@ var init_page_server_ts39 = __esm({
   ".svelte-kit/output/server/entries/pages/pengawas/_page.server.ts.js"() {
     init_db();
     load46 = async ({ platform, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const [activeExams, tokenCount, activeAttempts, schedules] = await Promise.all([
-        db.prepare("SELECT COUNT(*) as c FROM exams JOIN exam_types ON exams.exam_type_id = exam_types.id WHERE exams.is_active = 1 AND exam_types.is_active = 1 AND exams.school_id = ?").bind(locals.user.school_id).first(),
-        db.prepare("SELECT COUNT(*) as c FROM tokens WHERE school_id = ?").bind(locals.user.school_id).first(),
-        db.prepare("SELECT COUNT(*) as c FROM student_attempts sa JOIN exams e ON sa.exam_id = e.id WHERE sa.status = 'mengerjakan' AND e.school_id = ?").bind(locals.user.school_id).first(),
-        db.prepare(`
+        db2.prepare("SELECT COUNT(*) as c FROM exams JOIN exam_types ON exams.exam_type_id = exam_types.id WHERE exams.is_active = 1 AND exam_types.is_active = 1 AND exams.school_id = ?").bind(locals.user.school_id).first(),
+        db2.prepare("SELECT COUNT(*) as c FROM tokens WHERE school_id = ?").bind(locals.user.school_id).first(),
+        db2.prepare("SELECT COUNT(*) as c FROM student_attempts sa JOIN exams e ON sa.exam_id = e.id WHERE sa.status = 'mengerjakan' AND e.school_id = ?").bind(locals.user.school_id).first(),
+        db2.prepare(`
 			SELECT e.id as exam_id, e.title, e.start_time, e.end_time, e.duration_minutes, s.name as subject_name, e.is_active,
 			(SELECT token_code FROM tokens WHERE exam_id = e.id AND expires_at > datetime('now') LIMIT 1) as token_code
 			FROM exams e
@@ -55384,7 +55462,7 @@ var init_page_server_ts39 = __esm({
 			ORDER BY e.start_time ASC
 		`).bind(locals.user.id, locals.user.school_id).all()
       ]);
-      const participantsDb = await db.prepare(`
+      const participantsDb = await db2.prepare(`
 		SELECT ep.exam_id, u.name, c.name as class_name, u.username
 		FROM exam_participants ep
 		JOIN users u ON ep.student_id = u.id
@@ -55628,8 +55706,8 @@ var init_page_server_ts40 = __esm({
       if (!locals.user || locals.user.role !== "pengawas") {
         throw redirect(302, "/login");
       }
-      const db = getDB(platform);
-      const { results: schedules } = await db.prepare(`
+      const db2 = getDB(platform);
+      const { results: schedules } = await db2.prepare(`
 		SELECT e.*, s.name as subject_name, et.name as exam_type_name
 		FROM exams e
 		LEFT JOIN subjects s ON e.subject_id = s.id
@@ -55785,8 +55863,8 @@ var init_page_server_ts41 = __esm({
       if (!locals.user || locals.user.role !== "pengawas") {
         throw redirect(302, "/login");
       }
-      const db = getDB(platform);
-      const { results: schedules } = await db.prepare(`
+      const db2 = getDB(platform);
+      const { results: schedules } = await db2.prepare(`
 		SELECT 
 			e.*, 
 			s.name as subject_name, 
@@ -55815,7 +55893,7 @@ var init_page_server_ts41 = __esm({
 		WHERE e.school_id = ? AND e.is_active = 1
 		ORDER BY e.start_time ASC
 	`).bind(locals.user.school_id).all();
-      const { results: classes } = await db.prepare(`
+      const { results: classes } = await db2.prepare(`
 		SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC
 	`).bind(locals.user.school_id).all();
       return {
@@ -55990,10 +56068,10 @@ var init_page_server_ts42 = __esm({
     load49 = async ({ platform, url, locals }) => {
       if (!locals.user) throw redirect(302, "/login");
       try {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const examFilterStr = url.searchParams.get("exam_id") || "";
         const examFilter = parseInt(examFilterStr, 10);
-        const exams = await db.prepare(`
+        const exams = await db2.prepare(`
 		SELECT e.id, e.title 
 		FROM exams e 
 		JOIN exam_proctors ep ON e.id = ep.exam_id
@@ -56002,7 +56080,7 @@ var init_page_server_ts42 = __esm({
 	`).bind(locals.user.school_id, locals.user.id).all();
         let attempts = [];
         if (!isNaN(examFilter)) {
-          const result = await db.prepare(`
+          const result = await db2.prepare(`
 			SELECT 
 				epart.student_id,
 				u.name as student_name, 
@@ -56038,7 +56116,7 @@ var init_page_server_ts42 = __esm({
         let answeredCountsMap = {};
         const attemptIds = attempts.map((a) => a.attempt_id).filter((id) => id);
         if (attemptIds.length > 0) {
-          const countsResult = await db.prepare(`
+          const countsResult = await db2.prepare(`
 			SELECT sa.attempt_id, COUNT(*) as c
 			FROM student_answers sa
 			JOIN student_attempts st ON sa.attempt_id = st.id
@@ -56107,13 +56185,13 @@ var init_page_server_ts42 = __esm({
     actions22 = {
       togglePause: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const attemptIdStr = form.get("attempt_id")?.toString();
         const parsedAttemptId = parseInt(attemptIdStr || "", 10);
         const action = form.get("action")?.toString();
         if (isNaN(parsedAttemptId) || !action) return fail(400, { error: "Data tidak valid." });
-        const attemptData = await db.prepare(`
+        const attemptData = await db2.prepare(`
 			SELECT sa.id, sa.is_paused, sa.paused_at, sa.end_time FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
 			WHERE sa.id = ? AND e.school_id = ?
@@ -56121,11 +56199,11 @@ var init_page_server_ts42 = __esm({
         if (!attemptData) return fail(403, { error: "Sesi ujian tidak ditemukan atau bukan milik sekolah Anda." });
         try {
           if (action === "pause") {
-            await db.prepare(`UPDATE student_attempts SET is_paused = 1, paused_at = datetime('now') WHERE id = ?`).bind(parsedAttemptId).run();
+            await db2.prepare(`UPDATE student_attempts SET is_paused = 1, paused_at = datetime('now') WHERE id = ?`).bind(parsedAttemptId).run();
             return { success: "Ujian berhasil ditahan." };
           } else if (action === "resume") {
             if (attemptData.paused_at && attemptData.end_time) {
-              await db.prepare(`
+              await db2.prepare(`
 						UPDATE student_attempts 
 						SET 
 							is_paused = 0, 
@@ -56134,7 +56212,7 @@ var init_page_server_ts42 = __esm({
 						WHERE id = ?
 					`).bind(parsedAttemptId).run();
             } else {
-              await db.prepare(`UPDATE student_attempts SET is_paused = 0, paused_at = NULL WHERE id = ?`).bind(parsedAttemptId).run();
+              await db2.prepare(`UPDATE student_attempts SET is_paused = 0, paused_at = NULL WHERE id = ?`).bind(parsedAttemptId).run();
             }
             return { success: "Ujian berhasil dilanjutkan." };
           }
@@ -56146,12 +56224,12 @@ var init_page_server_ts42 = __esm({
       },
       resetAttempt: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const attemptIdStr = form.get("attempt_id")?.toString();
         const parsedAttemptId = parseInt(attemptIdStr || "", 10);
         if (isNaN(parsedAttemptId)) return fail(400, { error: "ID tidak valid." });
-        const attemptCheck = await db.prepare(`
+        const attemptCheck = await db2.prepare(`
 			SELECT sa.id, sa.signature FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
 			WHERE sa.id = ? AND e.school_id = ?
@@ -56164,9 +56242,9 @@ var init_page_server_ts42 = __esm({
             const mergedEnv = platform?.env || private_env;
             await deleteFromCloudinary(attemptCheck.signature, mergedEnv);
           }
-          await db.batch([
-            db.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(parsedAttemptId),
-            db.prepare("DELETE FROM student_attempts WHERE id = ?").bind(parsedAttemptId)
+          await db2.batch([
+            db2.prepare("DELETE FROM student_answers WHERE attempt_id = ?").bind(parsedAttemptId),
+            db2.prepare("DELETE FROM student_attempts WHERE id = ?").bind(parsedAttemptId)
           ]);
           return { success: "Sesi ujian siswa berhasil direset." };
         } catch (e3) {
@@ -56404,7 +56482,7 @@ var init__50 = __esm({
     index50 = 49;
     component50 = async () => component_cache50 ??= (await Promise.resolve().then(() => (init_page_svelte42(), page_svelte_exports42))).default;
     server_id49 = "src/routes/pengawas/monitor/+page.server.ts";
-    imports50 = ["_app/immutable/nodes/49.DLJBzcn2.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js"];
+    imports50 = ["_app/immutable/nodes/49.BOjfBKim.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js"];
     stylesheets50 = [];
     fonts50 = [];
   }
@@ -56545,8 +56623,8 @@ var init_page_server_ts43 = __esm({
     init_auth();
     load50 = async ({ platform, locals }) => {
       if (!locals.user) throw redirect(302, "/login");
-      const db = getDB(platform);
-      const tokens = await db.prepare(`
+      const db2 = getDB(platform);
+      const tokens = await db2.prepare(`
 		SELECT t.*, e.title as exam_title,
 		COALESCE((
 			SELECT json_group_array(
@@ -56567,7 +56645,7 @@ var init_page_server_ts43 = __esm({
 		WHERE t.school_id = ? AND ep.proctor_id = ?
 		ORDER BY t.created_at DESC
 	`).bind(locals.user.school_id, locals.user.id).all();
-      const exams = await db.prepare(`
+      const exams = await db2.prepare(`
 		SELECT e.id, e.title, e.start_time, e.end_time
 		FROM exams e
 		JOIN exam_proctors ep ON e.id = ep.exam_id
@@ -56592,13 +56670,13 @@ var init_page_server_ts43 = __esm({
     actions23 = {
       generate: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const examIdStr = form.get("exam_id")?.toString();
         const parsedExamId = parseInt(examIdStr || "", 10);
         const durationHours = parseInt(form.get("duration_hours")?.toString() || "2");
         if (isNaN(parsedExamId)) return fail(400, { error: "Pilih ujian terlebih dahulu." });
-        const exam = await db.prepare(`
+        const exam = await db2.prepare(`
 			SELECT e.id FROM exams e
 			JOIN exam_proctors ep ON e.id = ep.exam_id
 			WHERE e.id = ? AND e.school_id = ? AND ep.proctor_id = ?
@@ -56606,7 +56684,7 @@ var init_page_server_ts43 = __esm({
         if (!exam) return fail(403, { error: "Anda bukan pengawas yang ditugaskan untuk ujian ini." });
         const now = Date.now();
         const nowIso = new Date(now).toISOString();
-        const activeToken = await db.prepare(`
+        const activeToken = await db2.prepare(`
 			SELECT token_code FROM tokens 
 			WHERE exam_id = ? AND school_id = ? AND expires_at > ?
 		`).bind(parsedExamId, locals.user.school_id, nowIso).first();
@@ -56615,7 +56693,7 @@ var init_page_server_ts43 = __esm({
         }
         const expiresAt = new Date(now + durationHours * 60 * 60 * 1e3).toISOString();
         try {
-          await db.prepare(`
+          await db2.prepare(`
 				DELETE FROM tokens 
 				WHERE exam_id = ? AND school_id = ? 
 				  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
@@ -56627,7 +56705,7 @@ var init_page_server_ts43 = __esm({
             attemptsCount++;
             tokenCode = generateTokenCode(6);
             try {
-              await db.prepare("INSERT INTO tokens (school_id, exam_id, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?)").bind(locals.user.school_id, parsedExamId, tokenCode, locals.user.id, expiresAt).run();
+              await db2.prepare("INSERT INTO tokens (school_id, exam_id, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?)").bind(locals.user.school_id, parsedExamId, tokenCode, locals.user.id, expiresAt).run();
               inserted = true;
             } catch (err) {
               if (err.message && err.message.includes("UNIQUE")) {
@@ -56647,19 +56725,19 @@ var init_page_server_ts43 = __esm({
       },
       release: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const idStr = form.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
         try {
-          const tokenCheck = await db.prepare(`
+          const tokenCheck = await db2.prepare(`
 				SELECT t.id FROM tokens t
 				JOIN exam_proctors ep ON t.exam_id = ep.exam_id
 				WHERE t.id = ? AND t.school_id = ? AND ep.proctor_id = ?
 			`).bind(parsedId, locals.user.school_id, locals.user.id).first();
           if (!tokenCheck) return fail(403, { error: "Anda tidak memiliki hak untuk merilis token ini." });
-          await db.prepare('UPDATE tokens SET is_released = 1, released_at = datetime("now") WHERE id = ? AND school_id = ?').bind(parsedId, locals.user.school_id).run();
+          await db2.prepare('UPDATE tokens SET is_released = 1, released_at = datetime("now") WHERE id = ? AND school_id = ?').bind(parsedId, locals.user.school_id).run();
           return { success: "Token berhasil dirilis ke siswa." };
         } catch (e3) {
           console.error(e3);
@@ -56668,19 +56746,19 @@ var init_page_server_ts43 = __esm({
       },
       revoke: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const idStr = form.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
         try {
-          const tokenCheck = await db.prepare(`
+          const tokenCheck = await db2.prepare(`
 				SELECT t.id FROM tokens t
 				JOIN exam_proctors ep ON t.exam_id = ep.exam_id
 				WHERE t.id = ? AND t.school_id = ? AND ep.proctor_id = ?
 			`).bind(parsedId, locals.user.school_id, locals.user.id).first();
           if (!tokenCheck) return fail(403, { error: "Anda tidak memiliki hak untuk menarik token ini." });
-          await db.prepare("UPDATE tokens SET is_released = 0 WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).run();
+          await db2.prepare("UPDATE tokens SET is_released = 0 WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).run();
           return { success: "Token berhasil ditarik." };
         } catch (e3) {
           console.error(e3);
@@ -56689,23 +56767,23 @@ var init_page_server_ts43 = __esm({
       },
       delete: async ({ request, platform, locals }) => {
         if (!locals.user) return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const idStr = form.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid." });
         try {
-          const tokenCheck = await db.prepare(`
+          const tokenCheck = await db2.prepare(`
 				SELECT t.id FROM tokens t
 				JOIN exam_proctors ep ON t.exam_id = ep.exam_id
 				WHERE t.id = ? AND t.school_id = ? AND ep.proctor_id = ?
 			`).bind(parsedId, locals.user.school_id, locals.user.id).first();
           if (!tokenCheck) return fail(403, { error: "Anda tidak memiliki hak untuk menghapus token ini." });
-          const usage = await db.prepare("SELECT COUNT(*) as count FROM student_attempts WHERE token_id = ?").bind(parsedId).first();
+          const usage = await db2.prepare("SELECT COUNT(*) as count FROM student_attempts WHERE token_id = ?").bind(parsedId).first();
           if (usage && usage.count > 0) {
             return fail(400, { error: "Gagal dihapus: Token ini telah digunakan oleh peserta ujian." });
           }
-          await db.prepare("DELETE FROM tokens WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).run();
+          await db2.prepare("DELETE FROM tokens WHERE id = ? AND school_id = ?").bind(parsedId, locals.user.school_id).run();
           return { success: "Token berhasil dihapus." };
         } catch (err) {
           console.error("Delete token error:", err);
@@ -56851,7 +56929,7 @@ var init__52 = __esm({
     index52 = 51;
     component52 = async () => component_cache52 ??= (await Promise.resolve().then(() => (init_page_svelte44(), page_svelte_exports44))).default;
     server_id50 = "src/routes/pengawas/tokens/+page.server.ts";
-    imports52 = ["_app/immutable/nodes/51.D5FE-w0L.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/SeINawUV.js"];
+    imports52 = ["_app/immutable/nodes/51.xGLrLv-x.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/DwRR9HPj.js"];
     stylesheets52 = [];
     fonts52 = [];
   }
@@ -56868,15 +56946,15 @@ var init_page_server_ts44 = __esm({
     init_db();
     init_exports();
     load51 = async ({ platform, params, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examIdStr = params.exam_id;
       const examId = parseInt(examIdStr, 10);
       if (isNaN(examId)) throw error(400, "ID Ujian tidak valid");
-      const school = await db.prepare("SELECT * FROM schools WHERE id = ?").bind(locals.user.school_id).first();
-      const exam = await db.prepare("SELECT e.*, s.name as subject_name, et.name as exam_type_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id LEFT JOIN exam_types et ON e.exam_type_id = et.id WHERE e.id = ? AND e.school_id = ?").bind(examId, locals.user.school_id).first();
+      const school = await db2.prepare("SELECT * FROM schools WHERE id = ?").bind(locals.user.school_id).first();
+      const exam = await db2.prepare("SELECT e.*, s.name as subject_name, et.name as exam_type_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id LEFT JOIN exam_types et ON e.exam_type_id = et.id WHERE e.id = ? AND e.school_id = ?").bind(examId, locals.user.school_id).first();
       if (!exam) throw error(404, "Ujian tidak ditemukan");
-      const participantCount = await db.prepare("SELECT COUNT(*) as count FROM exam_participants WHERE exam_id = ?").bind(examId).first();
-      const sample = await db.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(locals.user.school_id).first();
+      const participantCount = await db2.prepare("SELECT COUNT(*) as count FROM exam_participants WHERE exam_id = ?").bind(examId).first();
+      const sample = await db2.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(locals.user.school_id).first();
       const isNomorPesertaMode = sample && sample.username === sample.nomor_peserta;
       return {
         school,
@@ -56973,12 +57051,12 @@ var init_page_server_ts45 = __esm({
     init_db();
     init_exports();
     load52 = async ({ platform, params, locals, url }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const typeIdStr = params.typeId;
       const typeId = parseInt(typeIdStr, 10);
       if (isNaN(typeId)) throw error(400, "ID Tipe Ujian tidak valid");
-      const school = await db.prepare("SELECT * FROM schools WHERE id = ?").bind(locals.user.school_id).first();
-      const examType = await db.prepare("SELECT * FROM exam_types WHERE id = ? AND school_id = ?").bind(typeId, locals.user.school_id).first();
+      const school = await db2.prepare("SELECT * FROM schools WHERE id = ?").bind(locals.user.school_id).first();
+      const examType = await db2.prepare("SELECT * FROM exam_types WHERE id = ? AND school_id = ?").bind(typeId, locals.user.school_id).first();
       if (!examType) throw error(404, "Tipe Ujian tidak ditemukan");
       const classIdStr = url.searchParams.get("class_id");
       const classId = parseInt(classIdStr || "", 10);
@@ -56998,7 +57076,7 @@ var init_page_server_ts45 = __esm({
 		WHEN 'I' THEN 1 WHEN 'II' THEN 2 WHEN 'III' THEN 3 WHEN 'IV' THEN 4 WHEN 'V' THEN 5 WHEN 'VI' THEN 6 WHEN 'VII' THEN 7 WHEN 'VIII' THEN 8 WHEN 'IX' THEN 9 WHEN 'X' THEN 10 WHEN 'XI' THEN 11 WHEN 'XII' THEN 12
 		WHEN '1' THEN 1 WHEN '2' THEN 2 WHEN '3' THEN 3 WHEN '4' THEN 4 WHEN '5' THEN 5 WHEN '6' THEN 6 WHEN '7' THEN 7 WHEN '8' THEN 8 WHEN '9' THEN 9 WHEN '10' THEN 10 WHEN '11' THEN 11 WHEN '12' THEN 12
 		ELSE 99 END ASC, c.name ASC, u.name ASC`;
-      const participants = await db.prepare(query).bind(...paramsArr).all();
+      const participants = await db2.prepare(query).bind(...paramsArr).all();
       const formattedParticipants = participants.results.map((p) => {
         const isNomorPesertaMode = p.username === p.nomor_peserta;
         return {
@@ -57133,14 +57211,14 @@ var init_page_server_ts46 = __esm({
     init_db();
     init_exports();
     load53 = async ({ platform, params, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examIdStr = params.exam_id;
       const examId = parseInt(examIdStr, 10);
       if (isNaN(examId)) throw error(400, "ID Ujian tidak valid");
-      const school = await db.prepare("SELECT * FROM schools WHERE id = ?").bind(locals.user.school_id).first();
-      const exam = await db.prepare("SELECT e.*, s.name as subject_name, et.name as exam_type_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id LEFT JOIN exam_types et ON e.exam_type_id = et.id WHERE e.id = ? AND e.school_id = ?").bind(examId, locals.user.school_id).first();
+      const school = await db2.prepare("SELECT * FROM schools WHERE id = ?").bind(locals.user.school_id).first();
+      const exam = await db2.prepare("SELECT e.*, s.name as subject_name, et.name as exam_type_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id LEFT JOIN exam_types et ON e.exam_type_id = et.id WHERE e.id = ? AND e.school_id = ?").bind(examId, locals.user.school_id).first();
       if (!exam) throw error(404, "Ujian tidak ditemukan");
-      const participants = await db.prepare(`
+      const participants = await db2.prepare(`
 		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name
 		FROM exam_participants p
 		JOIN users u ON p.student_id = u.id
@@ -57276,14 +57354,14 @@ var init_page_server_ts47 = __esm({
     init_db();
     init_exports();
     load54 = async ({ platform, params, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examIdStr = params.exam_id;
       const examId = parseInt(examIdStr, 10);
       if (isNaN(examId)) throw error(400, "ID Ujian tidak valid");
-      const school = await db.prepare("SELECT * FROM schools WHERE id = ?").bind(locals.user.school_id).first();
-      const exam = await db.prepare("SELECT e.*, s.name as subject_name, et.name as exam_type_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id LEFT JOIN exam_types et ON e.exam_type_id = et.id WHERE e.id = ? AND e.school_id = ?").bind(examId, locals.user.school_id).first();
+      const school = await db2.prepare("SELECT * FROM schools WHERE id = ?").bind(locals.user.school_id).first();
+      const exam = await db2.prepare("SELECT e.*, s.name as subject_name, et.name as exam_type_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id LEFT JOIN exam_types et ON e.exam_type_id = et.id WHERE e.id = ? AND e.school_id = ?").bind(examId, locals.user.school_id).first();
       if (!exam) throw error(404, "Ujian tidak ditemukan");
-      const participants = await db.prepare(`
+      const participants = await db2.prepare(`
 		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, c.name as class_name, sa.signature
 		FROM exam_participants p
 		JOIN users u ON p.student_id = u.id
@@ -57292,7 +57370,7 @@ var init_page_server_ts47 = __esm({
 		WHERE p.exam_id = ?
 		ORDER BY c.name, u.name
 	`).bind(examId).all();
-      const sample = await db.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(locals.user.school_id).first();
+      const sample = await db2.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(locals.user.school_id).first();
       const isNomorPesertaMode = sample && sample.username === sample.nomor_peserta;
       const results = participants.results;
       const participantsByClass = results.reduce((acc, p) => {
@@ -57449,9 +57527,9 @@ var init_page_server_ts48 = __esm({
   ".svelte-kit/output/server/entries/pages/siswa/_page.server.ts.js"() {
     init_db();
     load55 = async ({ platform, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const userId = locals.user.id;
-      const activeExams = await db.prepare(`
+      const activeExams = await db2.prepare(`
 		SELECT DISTINCT 
 			e.*, 
 			s.name as subject,
@@ -57475,7 +57553,7 @@ var init_page_server_ts48 = __esm({
 		AND e.school_id = ?
 		AND ep.student_id = ?
 	`).bind(locals.user.school_id, userId).all();
-      const myAttempts = await db.prepare(`
+      const myAttempts = await db2.prepare(`
 		SELECT sa.*, e.title as exam_title, s.name as subject, e.duration_minutes, e.show_score_type, e.is_score_released, e.end_time as exam_end_time, et.end_time as exam_type_end_time,
 		(SELECT SUM(points) FROM questions WHERE exam_id = e.id AND type IN ('pilihan_ganda', 'benar_salah', 'menjodohkan', 'pilihan_ganda_kompleks')) as objective_max_points,
 		(SELECT SUM(score_given) FROM student_answers sa2 JOIN questions q2 ON sa2.question_id = q2.id WHERE sa2.attempt_id = sa.id AND q2.type IN ('pilihan_ganda', 'benar_salah', 'menjodohkan', 'pilihan_ganda_kompleks')) as objective_earned_points
@@ -57486,13 +57564,13 @@ var init_page_server_ts48 = __esm({
 		WHERE sa.student_id = ?
 		ORDER BY sa.created_at DESC
 	`).bind(userId).all();
-      const activeAttempt = await db.prepare(`
+      const activeAttempt = await db2.prepare(`
 		SELECT sa.id, e.id as exam_id, e.title as exam_title, e.duration_minutes, sa.created_at
 		FROM student_attempts sa JOIN exams e ON sa.exam_id = e.id
 		WHERE sa.student_id = ? AND sa.status = 'mengerjakan'
 		LIMIT 1
 	`).bind(userId).first();
-      const schedules = await db.prepare(`
+      const schedules = await db2.prepare(`
 		SELECT 
 			e.id,
 			e.title,
@@ -57956,9 +58034,9 @@ var init_page_server_ts49 = __esm({
   ".svelte-kit/output/server/entries/pages/siswa/hasil-ujian/_page.server.ts.js"() {
     init_db();
     load56 = async ({ platform, locals }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const userId = locals.user.id;
-      const finishedAttempts = await db.prepare(`
+      const finishedAttempts = await db2.prepare(`
 		SELECT sa.*, 
 			   e.title as exam_title, 
 			   s.name as subject, 
@@ -58150,8 +58228,8 @@ var init_page_server_ts50 = __esm({
     init_exports();
     load57 = async ({ platform, locals }) => {
       if (locals.user?.role !== "siswa") throw redirect(302, "/");
-      const db = getDB(platform);
-      const examsQuery = await db.prepare(`
+      const db2 = getDB(platform);
+      const examsQuery = await db2.prepare(`
 		SELECT 
 			e.*, 
 			s.name as subject,
@@ -58174,8 +58252,35 @@ var init_page_server_ts50 = __esm({
 		WHERE ep.student_id = ? AND e.school_id = ? AND e.is_active = 1 AND et.is_active = 1
 		ORDER BY CASE WHEN e.start_time IS NULL THEN 1 ELSE 0 END, e.start_time ASC, e.created_at DESC
 	`).bind(locals.user.id, locals.user.school_id).all();
+      let schedules = examsQuery.results || [];
+      const studentRecord = await db2.prepare("SELECT session_number FROM users WHERE id = ?").bind(locals.user.id).first();
+      const studentSession = studentRecord?.session_number || 1;
+      if (schedules.length > 0) {
+        const examIds = schedules.map((s3) => s3.id);
+        const placeholders = examIds.map(() => "?").join(",");
+        const sessionsQuery = await db2.prepare(`SELECT * FROM exam_sessions WHERE exam_id IN (${placeholders}) AND session_number = ?`).bind(...examIds, studentSession).all();
+        const sessionMap = /* @__PURE__ */ new Map();
+        for (const row of sessionsQuery.results) {
+          sessionMap.set(row.exam_id, row);
+        }
+        schedules = schedules.map((schedule) => {
+          const session = sessionMap.get(schedule.id);
+          if (session) {
+            return {
+              ...schedule,
+              session_number: studentSession,
+              session_start_time: session.start_time,
+              session_end_time: session.end_time,
+              // Override main times for display and validation
+              start_time: session.start_time || schedule.start_time,
+              end_time: session.end_time || schedule.end_time
+            };
+          }
+          return { ...schedule, session_number: studentSession };
+        });
+      }
       return {
-        schedules: examsQuery.results || []
+        schedules
       };
     };
   }
@@ -58253,7 +58358,14 @@ function _page49($$renderer, $$props) {
           $$renderer2.push("<!--[-1-->");
           $$renderer2.push(`<h3 class="font-bold text-slate-800 text-lg mb-1">${escape_html2(exam.title)}</h3>`);
         }
-        $$renderer2.push(`<!--]--> <p class="text-sm text-slate-500 mb-4">${escape_html2(exam.subject || "Umum")}</p> <div class="space-y-2 mb-4"><div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> <span>Pukul: ${escape_html2(formatTimeRange(exam.start_time, exam.end_time))}</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg> <span>Durasi: ${escape_html2(exam.duration_minutes)} menit</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> <span>Soal: ${escape_html2(exam.question_count)}</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.users)}></path></svg> <span class="line-clamp-1"${attr("title", exam.proctors || "Belum ada pengawas")}>Pengawas: ${escape_html2(exam.proctors || "-")}</span></div></div></div> <div class="pt-4 border-t border-slate-100 mt-auto">`);
+        $$renderer2.push(`<!--]--> <p class="text-sm text-slate-500 mb-2">${escape_html2(exam.subject || "Umum")}</p> `);
+        if (exam.session_number) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<div class="mb-4"><span class="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-md">Sesi ${escape_html2(exam.session_number)}</span></div>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+        }
+        $$renderer2.push(`<!--]--> <div class="space-y-2 mb-4"><div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> <span>Pukul: ${escape_html2(formatTimeRange(exam.start_time, exam.end_time))}</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg> <span>Durasi: ${escape_html2(exam.duration_minutes)} menit</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> <span>Soal: ${escape_html2(exam.question_count)}</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.users)}></path></svg> <span class="line-clamp-1"${attr("title", exam.proctors || "Belum ada pengawas")}>Pengawas: ${escape_html2(exam.proctors || "-")}</span></div></div></div> <div class="pt-4 border-t border-slate-100 mt-auto">`);
         if (getExamStatus(exam) === "ended") {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<div class="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 cursor-not-allowed"><svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"></path></svg> <span class="font-semibold text-sm">Ujian Telah Berakhir</span></div>`);
@@ -58300,7 +58412,7 @@ var init__59 = __esm({
     index59 = 58;
     component59 = async () => component_cache59 ??= (await Promise.resolve().then(() => (init_page_svelte51(), page_svelte_exports51))).default;
     server_id57 = "src/routes/siswa/jadwal/+page.server.ts";
-    imports59 = ["_app/immutable/nodes/58.DvKhMYLW.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/Czq8_PJR.js"];
+    imports59 = ["_app/immutable/nodes/58.C8FeDuBd.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/Czq8_PJR.js"];
     stylesheets59 = [];
     fonts59 = [];
   }
@@ -58318,10 +58430,10 @@ var init_page_server_ts51 = __esm({
     init_exports();
     load58 = async ({ platform, locals }) => {
       if (locals.user?.role !== "siswa") throw redirect(302, "/");
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const userId = locals.user.id;
       const schoolId = locals.user.school_id;
-      const examsQuery = await db.prepare(`
+      const examsQuery = await db2.prepare(`
 		SELECT 
 			e.id,
 			e.title,
@@ -58335,7 +58447,7 @@ var init_page_server_ts51 = __esm({
 		WHERE ep.student_id = ? AND e.school_id = ? AND e.is_active = 1
 		ORDER BY e.created_at DESC
 	`).bind(userId, schoolId).all();
-      const examTypesQuery = await db.prepare(`
+      const examTypesQuery = await db2.prepare(`
 		SELECT DISTINCT 
 			et.id,
 			et.name as type_name,
@@ -58427,14 +58539,14 @@ var init_page_server_ts52 = __esm({
     init_exports();
     load59 = async ({ platform, locals, params }) => {
       if (locals.user?.role !== "siswa") throw redirect(302, "/");
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const typeId = params.typeId;
       const classId = locals.user.class_id;
       const schoolId = locals.user.school_id;
       if (!classId) {
         throw error(400, "Anda belum terdaftar dalam kelas mana pun.");
       }
-      const examType = await db.prepare(`
+      const examType = await db2.prepare(`
 		SELECT DISTINCT et.id, et.name, et.code 
 		FROM exam_types et
 		JOIN exams e ON et.id = e.exam_type_id
@@ -58444,7 +58556,7 @@ var init_page_server_ts52 = __esm({
       if (!examType) {
         throw error(404, "Tipe ujian tidak ditemukan atau Anda tidak terdaftar pada ujian jenis ini.");
       }
-      const leaderboardQuery = await db.prepare(`
+      const leaderboardQuery = await db2.prepare(`
 		SELECT 
 			u.name as student_name,
 			u.photo,
@@ -58562,16 +58674,16 @@ var init_page_server_ts53 = __esm({
     init_exports();
     load60 = async ({ params, platform, locals }) => {
       if (locals.user?.role !== "siswa") throw redirect(302, "/");
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const typeId = parseInt(params.typeId, 10);
       const userId = locals.user.id;
       const schoolId = locals.user.school_id;
       if (isNaN(typeId)) throw redirect(302, "/siswa/papan-peringkat");
-      const typeQuery = await db.prepare(`
+      const typeQuery = await db2.prepare(`
 		SELECT name as type_name FROM exam_types WHERE id = ? AND school_id = ?
 	`).bind(typeId, schoolId).first();
       if (!typeQuery) throw redirect(302, "/siswa/papan-peringkat");
-      const examsQuery = await db.prepare(`
+      const examsQuery = await db2.prepare(`
 		SELECT 
 			e.id,
 			e.title,
@@ -58673,14 +58785,14 @@ var init_page_server_ts54 = __esm({
     init_exports();
     load61 = async ({ platform, locals, params }) => {
       if (locals.user?.role !== "siswa") throw redirect(302, "/");
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examId = params.examId;
       const classId = locals.user.class_id;
       const schoolId = locals.user.school_id;
       if (!classId) {
         throw error(400, "Anda belum terdaftar dalam kelas mana pun.");
       }
-      const exam = await db.prepare(`
+      const exam = await db2.prepare(`
 		SELECT e.id, e.title, e.subject_id, e.exam_type_id 
 		FROM exams e
 		JOIN exam_participants ep ON e.id = ep.exam_id
@@ -58689,10 +58801,10 @@ var init_page_server_ts54 = __esm({
       if (!exam) {
         throw error(404, "Ujian tidak ditemukan atau Anda bukan peserta ujian ini.");
       }
-      const subject = await db.prepare(`
+      const subject = await db2.prepare(`
 		SELECT name FROM subjects WHERE id = ?
 	`).bind(exam.subject_id).first();
-      const leaderboardQuery = await db.prepare(`
+      const leaderboardQuery = await db2.prepare(`
 		SELECT 
 			u.name as student_name,
 			u.photo,
@@ -58991,12 +59103,12 @@ var init_page_server_ts55 = __esm({
     init_cloudinary();
     init_shared_server();
     load62 = async ({ platform, locals, url }) => {
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examIdStr = url.searchParams.get("exam_id");
       const parsedExamId = parseInt(examIdStr || "", 10);
       if (isNaN(parsedExamId)) throw redirect(302, "/siswa/jadwal");
       try {
-        const exam = await db.prepare(`
+        const exam = await db2.prepare(`
 		SELECT e.id, e.title, e.duration_minutes, e.start_time, e.end_time, s.name as subject,
 			COALESCE(
 				(
@@ -59024,33 +59136,47 @@ var init_page_server_ts55 = __esm({
     };
     actions24 = {
       validateToken: async ({ request, platform, locals, cookies }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const tokenCode = form.get("token")?.toString().trim().toUpperCase();
         const examIdStr = form.get("exam_id")?.toString();
         const parsedExamId = parseInt(examIdStr || "", 10);
         if (!tokenCode || isNaN(parsedExamId)) return fail(400, { error: "Data tidak lengkap." });
         try {
-          const token = await db.prepare(`
-				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
+          const token = await db2.prepare(`
+				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active,
+				e.start_time as exam_start_time, e.end_time as exam_end_time,
+				u.session_number
 				FROM tokens t 
 				JOIN exams e ON t.exam_id = e.id
 				JOIN exam_types et ON e.exam_type_id = et.id
+				JOIN users u ON u.id = ?
 				WHERE t.token_code = ? AND t.exam_id = ? AND et.is_active = 1
-			`).bind(tokenCode, parsedExamId).first();
+			`).bind(locals.user.id, tokenCode, parsedExamId).first();
           if (!token) {
             return fail(400, { error: "Token tidak valid untuk ujian ini." });
           }
           if (!token.is_active) {
             return fail(400, { error: "Ujian saat ini tidak aktif." });
           }
+          const studentSession = token.session_number || 1;
+          const sessionRecord = await db2.prepare("SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?").bind(parsedExamId, studentSession).first();
+          const startTimeStr = sessionRecord?.start_time || token.exam_start_time;
+          const endTimeStr = sessionRecord?.end_time || token.exam_end_time;
+          const now = /* @__PURE__ */ new Date();
+          if (startTimeStr && now < new Date(startTimeStr)) {
+            return fail(400, { error: "Waktu ujian belum dimulai untuk sesi Anda." });
+          }
+          if (endTimeStr && now > new Date(endTimeStr)) {
+            return fail(400, { error: "Waktu ujian telah berakhir untuk sesi Anda." });
+          }
           if (!token.is_released) {
             return fail(400, { error: "Token ujian ini sudah ditarik atau belum dirilis oleh pengawas." });
           }
           if (token.released_at) {
             const releasedAt = parseDate(token.released_at).getTime();
-            const now = (/* @__PURE__ */ new Date()).getTime();
-            if (now - releasedAt > 15 * 60 * 1e3) {
+            const now2 = (/* @__PURE__ */ new Date()).getTime();
+            if (now2 - releasedAt > 15 * 60 * 1e3) {
               return fail(400, { error: "Token sudah kedaluwarsa / ditarik otomatis (melewati batas waktu 15 menit)." });
             }
           } else {
@@ -59059,7 +59185,7 @@ var init_page_server_ts55 = __esm({
           if (parseDate(token.expires_at) < /* @__PURE__ */ new Date()) {
             return fail(400, { error: "Token sudah kedaluwarsa." });
           }
-          const existingAttempt = await db.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`).bind(locals.user.id, token.exam_id).first();
+          const existingAttempt = await db2.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`).bind(locals.user.id, token.exam_id).first();
           if (existingAttempt) {
             if (existingAttempt.status === "mengerjakan") {
               const signedCookie = await signExamToken(existingAttempt.id, locals.user.id);
@@ -59076,33 +59202,47 @@ var init_page_server_ts55 = __esm({
         }
       },
       startExam: async ({ request, platform, locals, cookies }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const tokenCode = form.get("token")?.toString().trim().toUpperCase();
         const examIdStr = form.get("exam_id")?.toString();
         const parsedExamId = parseInt(examIdStr || "", 10);
         if (!tokenCode || isNaN(parsedExamId)) return fail(400, { error: "Data tidak lengkap." });
         try {
-          const token = await db.prepare(`
-				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
+          const token = await db2.prepare(`
+				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active,
+				e.start_time as exam_start_time, e.end_time as exam_end_time,
+				u.session_number
 				FROM tokens t 
 				JOIN exams e ON t.exam_id = e.id
 				JOIN exam_types et ON e.exam_type_id = et.id
+				JOIN users u ON u.id = ?
 				WHERE t.token_code = ? AND t.exam_id = ? AND et.is_active = 1
-			`).bind(tokenCode, parsedExamId).first();
+			`).bind(locals.user.id, tokenCode, parsedExamId).first();
           if (!token) {
             return fail(400, { error: "Token tidak valid untuk ujian ini." });
           }
           if (!token.is_active) {
             return fail(400, { error: "Ujian saat ini tidak aktif." });
           }
+          const studentSession = token.session_number || 1;
+          const sessionRecord = await db2.prepare("SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?").bind(parsedExamId, studentSession).first();
+          const startTimeStr = sessionRecord?.start_time || token.exam_start_time;
+          const endTimeStr = sessionRecord?.end_time || token.exam_end_time;
+          const now = /* @__PURE__ */ new Date();
+          if (startTimeStr && now < new Date(startTimeStr)) {
+            return fail(400, { error: "Waktu ujian belum dimulai untuk sesi Anda." });
+          }
+          if (endTimeStr && now > new Date(endTimeStr)) {
+            return fail(400, { error: "Waktu ujian telah berakhir untuk sesi Anda." });
+          }
           if (!token.is_released) {
             return fail(400, { error: "Token ujian ini sudah ditarik atau belum dirilis oleh pengawas." });
           }
           if (token.released_at) {
             const releasedAt = parseDate(token.released_at).getTime();
-            const now = (/* @__PURE__ */ new Date()).getTime();
-            if (now - releasedAt > 15 * 60 * 1e3) {
+            const now2 = (/* @__PURE__ */ new Date()).getTime();
+            if (now2 - releasedAt > 15 * 60 * 1e3) {
               return fail(400, { error: "Token sudah kedaluwarsa / ditarik otomatis (melewati batas waktu 15 menit)." });
             }
           } else {
@@ -59111,7 +59251,7 @@ var init_page_server_ts55 = __esm({
           if (parseDate(token.expires_at) < /* @__PURE__ */ new Date()) {
             return fail(400, { error: "Token sudah kedaluwarsa." });
           }
-          const existingAttempt = await db.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`).bind(locals.user.id, token.exam_id).first();
+          const existingAttempt = await db2.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`).bind(locals.user.id, token.exam_id).first();
           if (existingAttempt) {
             if (existingAttempt.status === "mengerjakan") {
               const signedCookie2 = await signExamToken(existingAttempt.id, locals.user.id);
@@ -59122,7 +59262,7 @@ var init_page_server_ts55 = __esm({
           }
           const endTime = new Date(Date.now() + token.duration_minutes * 60 * 1e3).toISOString();
           let signatureStr = form.get("signature")?.toString() || "";
-          const result = await db.prepare(`INSERT INTO student_attempts (student_id, exam_id, token_id, end_time, status, signature) VALUES (?, ?, ?, ?, 'mengerjakan', ?)`).bind(locals.user.id, token.exam_id, token.id, endTime, signatureStr).run();
+          const result = await db2.prepare(`INSERT INTO student_attempts (student_id, exam_id, token_id, end_time, status, signature) VALUES (?, ?, ?, ?, 'mengerjakan', ?)`).bind(locals.user.id, token.exam_id, token.id, endTime, signatureStr).run();
           const attemptId = result.meta.last_row_id;
           if (signatureStr.startsWith("data:image/")) {
             const mergedEnv = platform?.env || private_env;
@@ -59130,7 +59270,7 @@ var init_page_server_ts55 = __esm({
               try {
                 const uploadResult = await uploadToCloudinary(signatureStr, mergedEnv);
                 if (uploadResult.success && uploadResult.url) {
-                  await db.prepare(`UPDATE student_attempts SET signature = ? WHERE id = ?`).bind(uploadResult.url, attemptId).run();
+                  await db2.prepare(`UPDATE student_attempts SET signature = ? WHERE id = ?`).bind(uploadResult.url, attemptId).run();
                   console.log("Background upload success for attempt", attemptId);
                 } else {
                   console.error("Background upload failed for attempt", attemptId, "Error:", uploadResult.error);
@@ -59224,7 +59364,7 @@ var init__65 = __esm({
     index65 = 64;
     component65 = async () => component_cache65 ??= (await Promise.resolve().then(() => (init_page_svelte57(), page_svelte_exports57))).default;
     server_id62 = "src/routes/siswa/ujian/+page.server.ts";
-    imports65 = ["_app/immutable/nodes/64.Ci6JTBEC.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/Czq8_PJR.js"];
+    imports65 = ["_app/immutable/nodes/64.DL24XqtG.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/Czq8_PJR.js"];
     stylesheets65 = [];
     fonts65 = [];
   }
@@ -59244,12 +59384,12 @@ var init_page_server_ts56 = __esm({
     init_auth();
     load63 = async ({ platform, locals, params, cookies }) => {
       if (!locals.user) throw redirect(302, "/login");
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const attemptIdStr = params.attemptId;
       const parsedAttemptId = parseInt(attemptIdStr, 10);
       if (isNaN(parsedAttemptId)) throw error(400, "ID Ujian tidak valid");
       try {
-        const attempt = await db.prepare(`
+        const attempt = await db2.prepare(`
 		SELECT sa.*, e.title as exam_title, s.name as subject, e.duration_minutes, e.shuffle_questions,
 		       t.is_released as token_is_released, t.released_at as token_released_at, t.expires_at as token_expires_at,
 		       e.is_active as exam_active
@@ -59269,7 +59409,7 @@ var init_page_server_ts56 = __esm({
           cookies.delete("exam_token_verified_" + parsedAttemptId, { path: "/" });
           throw redirect(302, `/siswa/ujian?exam_id=${attempt.exam_id}`);
         }
-        let questions = await db.prepare(`
+        let questions = await db2.prepare(`
 		SELECT q.* FROM questions q
 		WHERE q.exam_id = ?
 		ORDER BY q.question_number
@@ -59289,7 +59429,7 @@ var init_page_server_ts56 = __esm({
             [questionsList[i], questionsList[j]] = [questionsList[j], questionsList[i]];
           }
         }
-        const answers = await db.prepare(`
+        const answers = await db2.prepare(`
 		SELECT sa.* FROM student_answers sa
 		WHERE sa.attempt_id = ?
 	`).bind(parsedAttemptId).all();
@@ -59365,12 +59505,12 @@ var init_page_server_ts56 = __esm({
       },
       submit: async ({ request, platform, params, locals, cookies }) => {
         if (!locals.user) return fail(401, { error: "Sesi telah berakhir. Silakan login kembali." });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const attemptIdStr = params.attemptId;
         const parsedAttemptId = parseInt(attemptIdStr, 10);
         if (isNaN(parsedAttemptId)) return fail(400, { error: "ID tidak valid" });
         try {
-          const attempt = await db.prepare("SELECT * FROM student_attempts WHERE id = ? AND student_id = ?").bind(parsedAttemptId, locals.user.id).first();
+          const attempt = await db2.prepare("SELECT * FROM student_attempts WHERE id = ? AND student_id = ?").bind(parsedAttemptId, locals.user.id).first();
           if (!attempt || attempt.status !== "mengerjakan") {
             return fail(400, { error: "Sesi ujian tidak valid atau sudah selesai." });
           }
@@ -59420,8 +59560,8 @@ var init_page_server_ts56 = __esm({
               }
             }
           }
-          const examQuestions = await db.prepare("SELECT id FROM questions WHERE exam_id = ?").bind(attempt.exam_id).all();
-          const existingAnswers = await db.prepare("SELECT question_id, id FROM student_answers WHERE attempt_id = ?").bind(parsedAttemptId).all();
+          const examQuestions = await db2.prepare("SELECT id FROM questions WHERE exam_id = ?").bind(attempt.exam_id).all();
+          const existingAnswers = await db2.prepare("SELECT question_id, id FROM student_answers WHERE attempt_id = ?").bind(parsedAttemptId).all();
           const existingMap = new Map(existingAnswers.results.map((a) => [a.question_id, a.id]));
           const syncStmts = [];
           for (const q of examQuestions.results) {
@@ -59430,19 +59570,19 @@ var init_page_server_ts56 = __esm({
             if (existingMap.has(q.id)) {
               if (ansVal !== null) {
                 syncStmts.push(
-                  db.prepare(`UPDATE student_answers SET answer_given = ?, is_doubted = ?, answered_at = datetime('now') WHERE attempt_id = ? AND question_id = ?`).bind(ansVal, isDoubted, parsedAttemptId, q.id)
+                  db2.prepare(`UPDATE student_answers SET answer_given = ?, is_doubted = ?, answered_at = datetime('now') WHERE attempt_id = ? AND question_id = ?`).bind(ansVal, isDoubted, parsedAttemptId, q.id)
                 );
               }
             } else {
               syncStmts.push(
-                db.prepare(`INSERT INTO student_answers (attempt_id, question_id, answer_given, is_doubted, answered_at) VALUES (?, ?, ?, ?, datetime('now'))`).bind(parsedAttemptId, q.id, ansVal, isDoubted)
+                db2.prepare(`INSERT INTO student_answers (attempt_id, question_id, answer_given, is_doubted, answered_at) VALUES (?, ?, ?, ?, datetime('now'))`).bind(parsedAttemptId, q.id, ansVal, isDoubted)
               );
             }
           }
           if (syncStmts.length > 0) {
-            await db.batch(syncStmts);
+            await db2.batch(syncStmts);
           }
-          const answers = await db.prepare(`
+          const answers = await db2.prepare(`
 				SELECT sa.*, q.type, q.correct_answer_json, q.points
 				FROM student_answers sa
 				JOIN questions q ON sa.question_id = q.id
@@ -59458,7 +59598,7 @@ var init_page_server_ts56 = __esm({
             }
             if (!ans.correct_answer_json || !ans.answer_given) {
               updateStmts.push(
-                db.prepare("UPDATE student_answers SET score_given = 0, is_correct = 0 WHERE id = ?").bind(ans.id)
+                db2.prepare("UPDATE student_answers SET score_given = 0, is_correct = 0 WHERE id = ?").bind(ans.id)
               );
               continue;
             }
@@ -59521,15 +59661,15 @@ var init_page_server_ts56 = __esm({
             const scoreGiven = partialScore !== null ? partialScore : isCorrect ? ans.points : 0;
             totalScore += scoreGiven;
             updateStmts.push(
-              db.prepare("UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?").bind(scoreGiven, isCorrect ? 1 : 0, ans.id)
+              db2.prepare("UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?").bind(scoreGiven, isCorrect ? 1 : 0, ans.id)
             );
           }
           const finalScore = totalPoints > 0 ? Math.round(totalScore / totalPoints * 1e3) / 10 : 0;
           updateStmts.push(
-            db.prepare(`UPDATE student_attempts SET status = 'selesai', submit_time = datetime('now'),
+            db2.prepare(`UPDATE student_attempts SET status = 'selesai', submit_time = datetime('now'),
 					score = ?, total_points = ?, violation_count = ?, violation_logs = ? WHERE id = ?`).bind(finalScore, totalPoints, warnings, warningLogs, parsedAttemptId)
           );
-          await db.batch(updateStmts);
+          await db2.batch(updateStmts);
           cookies.delete("exam_token_verified_" + parsedAttemptId, { path: "/" });
           throw redirect(302, "/siswa");
         } catch (e3) {
@@ -59762,7 +59902,7 @@ var init__66 = __esm({
     index66 = 65;
     component66 = async () => component_cache66 ??= (await Promise.resolve().then(() => (init_page_svelte58(), page_svelte_exports58))).default;
     server_id63 = "src/routes/siswa/ujian/[attemptId]/+page.server.ts";
-    imports66 = ["_app/immutable/nodes/65.asTwc9kn.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/B0y2EvEz.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/Dyd_-2iH.js", "_app/immutable/chunks/09QYUleA.js", "_app/immutable/chunks/CtwkWTFm.js", "_app/immutable/chunks/CpJ3s9VQ.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/A1P7O0DF.js"];
+    imports66 = ["_app/immutable/nodes/65.DjGRcl4W.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/BnRiqNQm.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/B0y2EvEz.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/DyOTXvB3.js", "_app/immutable/chunks/Czq8_PJR.js", "_app/immutable/chunks/Dyd_-2iH.js", "_app/immutable/chunks/09QYUleA.js", "_app/immutable/chunks/CtwkWTFm.js", "_app/immutable/chunks/CpJ3s9VQ.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/A1P7O0DF.js"];
     stylesheets66 = ["_app/immutable/assets/QuestionRenderer.CwYmYea-.css"];
     fonts66 = [];
   }
@@ -59778,12 +59918,12 @@ var init_page_server_ts57 = __esm({
   ".svelte-kit/output/server/entries/pages/superadmin/_page.server.ts.js"() {
     init_db();
     load64 = async ({ platform }) => {
-      const db = getDB(platform);
-      const totalSchoolsRes = await db.prepare("SELECT COUNT(*) as count FROM schools").first();
+      const db2 = getDB(platform);
+      const totalSchoolsRes = await db2.prepare("SELECT COUNT(*) as count FROM schools").first();
       const totalSchools = totalSchoolsRes?.count || 0;
-      const totalAdminsRes = await db.prepare("SELECT COUNT(*) as count FROM users WHERE role = 'admin'").first();
+      const totalAdminsRes = await db2.prepare("SELECT COUNT(*) as count FROM users WHERE role = 'admin'").first();
       const totalAdmins = totalAdminsRes?.count || 0;
-      const { results: recentSchools } = await db.prepare("SELECT * FROM schools ORDER BY created_at DESC LIMIT 5").all();
+      const { results: recentSchools } = await db2.prepare("SELECT * FROM schools ORDER BY created_at DESC LIMIT 5").all();
       return {
         totalSchools,
         totalAdmins,
@@ -59894,8 +60034,8 @@ var init_page_server_ts58 = __esm({
       if (!locals.user || locals.user.role !== "superadmin") {
         throw redirect(302, "/login");
       }
-      const db = getDB(platform);
-      const { results: superadmins } = await db.prepare(`
+      const db2 = getDB(platform);
+      const { results: superadmins } = await db2.prepare(`
 		SELECT id, username, name, is_active, created_at
 		FROM users
 		WHERE role = 'superadmin'
@@ -59911,7 +60051,7 @@ var init_page_server_ts58 = __esm({
         if (!locals.user || locals.user.role !== "superadmin") {
           return fail(401, { error: "Unauthorized" });
         }
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const name = form.get("name")?.toString().trim();
         const username = form.get("username")?.toString().trim();
@@ -59919,7 +60059,7 @@ var init_page_server_ts58 = __esm({
         if (!name || !username) {
           return fail(400, { error: "Nama dan Username wajib diisi." });
         }
-        const existing = await db.prepare("SELECT id FROM users WHERE username = ? AND id != ?").bind(username, locals.user.id).first();
+        const existing = await db2.prepare("SELECT id FROM users WHERE username = ? AND id != ?").bind(username, locals.user.id).first();
         if (existing) {
           return fail(400, { error: "Username sudah digunakan oleh akun lain." });
         }
@@ -59929,9 +60069,9 @@ var init_page_server_ts58 = __esm({
               return fail(400, { error: "Kata sandi minimal 6 karakter." });
             }
             const passwordHash = await hashPassword(password);
-            await db.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, updated_at = datetime("now") WHERE id = ? AND role = "superadmin"').bind(name, username, passwordHash, locals.user.id).run();
+            await db2.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, updated_at = datetime("now") WHERE id = ? AND role = "superadmin"').bind(name, username, passwordHash, locals.user.id).run();
           } else {
-            await db.prepare('UPDATE users SET name = ?, username = ?, updated_at = datetime("now") WHERE id = ? AND role = "superadmin"').bind(name, username, locals.user.id).run();
+            await db2.prepare('UPDATE users SET name = ?, username = ?, updated_at = datetime("now") WHERE id = ? AND role = "superadmin"').bind(name, username, locals.user.id).run();
           }
           const updatedUser = {
             ...locals.user,
@@ -59956,7 +60096,7 @@ var init_page_server_ts58 = __esm({
         if (!locals.user || locals.user.role !== "superadmin") {
           return fail(401, { error: "Unauthorized" });
         }
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const name = form.get("name")?.toString().trim();
         const username = form.get("username")?.toString().trim();
@@ -59967,13 +60107,13 @@ var init_page_server_ts58 = __esm({
         if (password.length < 6) {
           return fail(400, { error: "Kata sandi minimal 6 karakter." });
         }
-        const existing = await db.prepare("SELECT id FROM users WHERE username = ?").bind(username).first();
+        const existing = await db2.prepare("SELECT id FROM users WHERE username = ?").bind(username).first();
         if (existing) {
           return fail(400, { error: "Username sudah digunakan." });
         }
         try {
           const passwordHash = await hashPassword(password);
-          await db.prepare('INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (NULL, NULL, ?, ?, ?, "superadmin")').bind(username, passwordHash, name).run();
+          await db2.prepare('INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (NULL, NULL, ?, ?, ?, "superadmin")').bind(username, passwordHash, name).run();
           return { success: "Akun Superadmin baru berhasil dibuat." };
         } catch (err) {
           console.error("Create superadmin error:", err);
@@ -59984,7 +60124,7 @@ var init_page_server_ts58 = __esm({
         if (!locals.user || locals.user.role !== "superadmin") {
           return fail(401, { error: "Unauthorized" });
         }
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const form = await request.formData();
         const idStr = form.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
@@ -59992,16 +60132,16 @@ var init_page_server_ts58 = __esm({
         if (parsedId === locals.user.id) {
           return fail(400, { error: "Anda tidak dapat menghapus akun Anda sendiri yang sedang aktif." });
         }
-        const countRes = await db.prepare('SELECT COUNT(*) as c FROM users WHERE role = "superadmin"').first();
+        const countRes = await db2.prepare('SELECT COUNT(*) as c FROM users WHERE role = "superadmin"').first();
         if (countRes && countRes.c <= 1) {
           return fail(400, { error: "Tidak dapat menghapus. Harus tersisa minimal 1 akun Superadmin di sistem." });
         }
         try {
-          await db.batch([
-            db.prepare("UPDATE exams SET created_by = NULL WHERE created_by = ?").bind(parsedId),
-            db.prepare("UPDATE tokens SET created_by = NULL WHERE created_by = ?").bind(parsedId),
-            db.prepare("UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?").bind(parsedId),
-            db.prepare('DELETE FROM users WHERE id = ? AND role = "superadmin"').bind(parsedId)
+          await db2.batch([
+            db2.prepare("UPDATE exams SET created_by = NULL WHERE created_by = ?").bind(parsedId),
+            db2.prepare("UPDATE tokens SET created_by = NULL WHERE created_by = ?").bind(parsedId),
+            db2.prepare("UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?").bind(parsedId),
+            db2.prepare('DELETE FROM users WHERE id = ? AND role = "superadmin"').bind(parsedId)
           ]);
           return { success: "Akun Superadmin berhasil dihapus." };
         } catch (err) {
@@ -60138,7 +60278,7 @@ var init__68 = __esm({
     index68 = 67;
     component68 = async () => component_cache68 ??= (await Promise.resolve().then(() => (init_page_svelte60(), page_svelte_exports60))).default;
     server_id65 = "src/routes/superadmin/accounts/+page.server.ts";
-    imports68 = ["_app/immutable/nodes/67.C17jWLb9.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/0WrWfAVQ.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/B_fGxkjt.js", "_app/immutable/chunks/A1P7O0DF.js"];
+    imports68 = ["_app/immutable/nodes/67.BT3JYsh9.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/Bfc47y5P.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/BE_QLVD7.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/w5hoNK1W.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/B_fGxkjt.js", "_app/immutable/chunks/A1P7O0DF.js"];
     stylesheets68 = [];
     fonts68 = [];
   }
@@ -60157,9 +60297,9 @@ var init_page_server_ts59 = __esm({
     init_db();
     init_auth();
     load66 = async ({ platform }) => {
-      const db = getDB(platform);
-      const { results: schools } = await db.prepare("SELECT id, name FROM schools ORDER BY name ASC").all();
-      const { results: admins } = await db.prepare(`
+      const db2 = getDB(platform);
+      const { results: schools } = await db2.prepare("SELECT id, name FROM schools ORDER BY name ASC").all();
+      const { results: admins } = await db2.prepare(`
 		SELECT u.id, u.username, u.name, u.is_active, u.created_at, s.name as school_name, s.id as school_id
 		FROM users u
 		LEFT JOIN schools s ON u.school_id = s.id
@@ -60170,7 +60310,7 @@ var init_page_server_ts59 = __esm({
     };
     actions27 = {
       add: async ({ request, platform }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const schoolIdStr = data.get("school_id")?.toString();
         const username = data.get("username")?.toString().trim();
@@ -60183,13 +60323,13 @@ var init_page_server_ts59 = __esm({
         if (password.length < 6) {
           return fail(400, { error: "Password minimal 6 karakter", school_id, username, name });
         }
-        const existingUser = await db.prepare("SELECT id FROM users WHERE username = ?").bind(username).first();
+        const existingUser = await db2.prepare("SELECT id FROM users WHERE username = ?").bind(username).first();
         if (existingUser) {
           return fail(400, { error: "Username sudah digunakan", school_id: schoolIdStr, username, name });
         }
         try {
           const password_hash = await hashPassword(password);
-          await db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(parsedSchoolId, username, password_hash, name, "admin").run();
+          await db2.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(parsedSchoolId, username, password_hash, name, "admin").run();
           return { success: true };
         } catch (e3) {
           console.error(e3);
@@ -60197,7 +60337,7 @@ var init_page_server_ts59 = __esm({
         }
       },
       toggleStatus: async ({ request, platform }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const idStr = data.get("id")?.toString();
         const currentStatus = data.get("is_active")?.toString();
@@ -60205,7 +60345,7 @@ var init_page_server_ts59 = __esm({
         if (isNaN(parsedId) || !currentStatus) return fail(400, { error: "Data tidak valid" });
         const newStatus = currentStatus === "1" ? 0 : 1;
         try {
-          await db.prepare('UPDATE users SET is_active = ?, updated_at = datetime("now") WHERE id = ? AND role = "admin"').bind(newStatus, parsedId).run();
+          await db2.prepare('UPDATE users SET is_active = ?, updated_at = datetime("now") WHERE id = ? AND role = "admin"').bind(newStatus, parsedId).run();
           return { success: true };
         } catch (e3) {
           console.error(e3);
@@ -60214,12 +60354,12 @@ var init_page_server_ts59 = __esm({
       },
       delete: async ({ request, platform, locals }) => {
         if (!locals.user || locals.user.role !== "superadmin") return fail(401, { error: "Unauthorized" });
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const idStr = data.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid" });
-        const userToDelete = await db.prepare('SELECT id, is_active FROM users WHERE id = ? AND role = "admin"').bind(parsedId).first();
+        const userToDelete = await db2.prepare('SELECT id, is_active FROM users WHERE id = ? AND role = "admin"').bind(parsedId).first();
         if (!userToDelete) {
           return fail(404, { error: "Admin tidak ditemukan" });
         }
@@ -60227,11 +60367,11 @@ var init_page_server_ts59 = __esm({
           return fail(400, { error: "Gagal dihapus: Admin masih AKTIF. Harap nonaktifkan admin terlebih dahulu!" });
         }
         try {
-          await db.batch([
-            db.prepare("UPDATE exams SET created_by = NULL WHERE created_by = ?").bind(parsedId),
-            db.prepare("UPDATE tokens SET created_by = NULL WHERE created_by = ?").bind(parsedId),
-            db.prepare("UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?").bind(parsedId),
-            db.prepare('DELETE FROM users WHERE id = ? AND role = "admin"').bind(parsedId)
+          await db2.batch([
+            db2.prepare("UPDATE exams SET created_by = NULL WHERE created_by = ?").bind(parsedId),
+            db2.prepare("UPDATE tokens SET created_by = NULL WHERE created_by = ?").bind(parsedId),
+            db2.prepare("UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?").bind(parsedId),
+            db2.prepare('DELETE FROM users WHERE id = ? AND role = "admin"').bind(parsedId)
           ]);
           return { success: true };
         } catch (e3) {
@@ -60374,7 +60514,7 @@ var init__69 = __esm({
     index69 = 68;
     component69 = async () => component_cache69 ??= (await Promise.resolve().then(() => (init_page_svelte61(), page_svelte_exports61))).default;
     server_id66 = "src/routes/superadmin/admins/+page.server.ts";
-    imports69 = ["_app/immutable/nodes/68.EBclXDU2.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/0WrWfAVQ.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/B_fGxkjt.js", "_app/immutable/chunks/Bfc47y5P.js"];
+    imports69 = ["_app/immutable/nodes/68.lOwnWkML.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/4j8J6LnF.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/w5hoNK1W.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/A1P7O0DF.js", "_app/immutable/chunks/B_fGxkjt.js", "_app/immutable/chunks/Bfc47y5P.js"];
     stylesheets69 = [];
     fonts69 = [];
   }
@@ -60392,13 +60532,13 @@ var init_page_server_ts60 = __esm({
     init_exports();
     init_db();
     load67 = async ({ platform }) => {
-      const db = getDB(platform);
-      const { results: schools } = await db.prepare("SELECT * FROM schools ORDER BY name ASC").all();
+      const db2 = getDB(platform);
+      const { results: schools } = await db2.prepare("SELECT * FROM schools ORDER BY name ASC").all();
       return { schools };
     };
     actions28 = {
       add: async ({ request, platform }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const name = data.get("name")?.toString().trim();
         const address = data.get("address")?.toString().trim() || null;
@@ -60406,7 +60546,7 @@ var init_page_server_ts60 = __esm({
           return fail(400, { error: "Nama sekolah wajib diisi", name, address });
         }
         try {
-          await db.prepare("INSERT INTO schools (name, address) VALUES (?, ?)").bind(name, address).run();
+          await db2.prepare("INSERT INTO schools (name, address) VALUES (?, ?)").bind(name, address).run();
           return { success: true };
         } catch (e3) {
           console.error(e3);
@@ -60414,7 +60554,7 @@ var init_page_server_ts60 = __esm({
         }
       },
       toggleStatus: async ({ request, platform }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const idStr = data.get("id")?.toString();
         const currentStatus = data.get("is_active")?.toString();
@@ -60422,7 +60562,7 @@ var init_page_server_ts60 = __esm({
         if (isNaN(parsedId) || !currentStatus) return fail(400, { error: "Data tidak valid" });
         const newStatus = currentStatus === "1" ? 0 : 1;
         try {
-          await db.prepare('UPDATE schools SET is_active = ?, updated_at = datetime("now") WHERE id = ?').bind(newStatus, parsedId).run();
+          await db2.prepare('UPDATE schools SET is_active = ?, updated_at = datetime("now") WHERE id = ?').bind(newStatus, parsedId).run();
           return { success: true };
         } catch (e3) {
           console.error(e3);
@@ -60430,7 +60570,7 @@ var init_page_server_ts60 = __esm({
         }
       },
       edit: async ({ request, platform }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const idStr = data.get("id")?.toString();
         const name = data.get("name")?.toString().trim();
@@ -60440,7 +60580,7 @@ var init_page_server_ts60 = __esm({
           return fail(400, { error: "ID dan Nama sekolah wajib diisi", name, address });
         }
         try {
-          await db.prepare('UPDATE schools SET name = ?, address = ?, updated_at = datetime("now") WHERE id = ?').bind(name, address, parsedId).run();
+          await db2.prepare('UPDATE schools SET name = ?, address = ?, updated_at = datetime("now") WHERE id = ?').bind(name, address, parsedId).run();
           return { success: true };
         } catch (e3) {
           console.error(e3);
@@ -60448,28 +60588,28 @@ var init_page_server_ts60 = __esm({
         }
       },
       delete: async ({ request, platform }) => {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const data = await request.formData();
         const idStr = data.get("id")?.toString();
         const parsedId = parseInt(idStr || "", 10);
         if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid" });
         try {
-          await db.batch([
-            db.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?))").bind(parsedId),
-            db.prepare("DELETE FROM student_attempts WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
-            db.prepare("DELETE FROM questions WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
-            db.prepare("DELETE FROM tokens WHERE school_id = ?").bind(parsedId),
-            db.prepare("DELETE FROM exam_participants WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
-            db.prepare("DELETE FROM exam_teachers WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
-            db.prepare("DELETE FROM exam_proctors WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
-            db.prepare("DELETE FROM exams WHERE school_id = ?").bind(parsedId),
-            db.prepare("DELETE FROM exam_type_classes WHERE exam_type_id IN (SELECT id FROM exam_types WHERE school_id = ?)").bind(parsedId),
-            db.prepare("DELETE FROM exam_types WHERE school_id = ?").bind(parsedId),
-            db.prepare("DELETE FROM users WHERE school_id = ?").bind(parsedId),
-            db.prepare("DELETE FROM subjects WHERE school_id = ?").bind(parsedId),
-            db.prepare("DELETE FROM classes WHERE school_id = ?").bind(parsedId),
-            db.prepare("DELETE FROM uploaded_media WHERE school_id = ?").bind(parsedId),
-            db.prepare("DELETE FROM schools WHERE id = ?").bind(parsedId)
+          await db2.batch([
+            db2.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?))").bind(parsedId),
+            db2.prepare("DELETE FROM student_attempts WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
+            db2.prepare("DELETE FROM questions WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
+            db2.prepare("DELETE FROM tokens WHERE school_id = ?").bind(parsedId),
+            db2.prepare("DELETE FROM exam_participants WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
+            db2.prepare("DELETE FROM exam_teachers WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
+            db2.prepare("DELETE FROM exam_proctors WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ?)").bind(parsedId),
+            db2.prepare("DELETE FROM exams WHERE school_id = ?").bind(parsedId),
+            db2.prepare("DELETE FROM exam_type_classes WHERE exam_type_id IN (SELECT id FROM exam_types WHERE school_id = ?)").bind(parsedId),
+            db2.prepare("DELETE FROM exam_types WHERE school_id = ?").bind(parsedId),
+            db2.prepare("DELETE FROM users WHERE school_id = ?").bind(parsedId),
+            db2.prepare("DELETE FROM subjects WHERE school_id = ?").bind(parsedId),
+            db2.prepare("DELETE FROM classes WHERE school_id = ?").bind(parsedId),
+            db2.prepare("DELETE FROM uploaded_media WHERE school_id = ?").bind(parsedId),
+            db2.prepare("DELETE FROM schools WHERE id = ?").bind(parsedId)
           ]);
           return { success: true };
         } catch (e3) {
@@ -60604,7 +60744,7 @@ var init__70 = __esm({
     index70 = 69;
     component70 = async () => component_cache70 ??= (await Promise.resolve().then(() => (init_page_svelte62(), page_svelte_exports62))).default;
     server_id67 = "src/routes/superadmin/schools/+page.server.ts";
-    imports70 = ["_app/immutable/nodes/69.Cx3MrRme.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/vkBtJl9B.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/0WrWfAVQ.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/A1P7O0DF.js"];
+    imports70 = ["_app/immutable/nodes/69.D7PzAZi_.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/q3ZFHJDQ.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/BClyc7_g.js", "_app/immutable/chunks/i_5gAELL.js", "_app/immutable/chunks/Cg1kvKM7.js", "_app/immutable/chunks/CcEXiels.js", "_app/immutable/chunks/heyDCscg.js", "_app/immutable/chunks/B5xf_oRu.js", "_app/immutable/chunks/oZ_RSl7A.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/chunks/B_ZpMkZX.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/w5hoNK1W.js", "_app/immutable/chunks/7QNsUWMk.js", "_app/immutable/chunks/BKlKzBv1.js", "_app/immutable/chunks/IIYE5jok.js", "_app/immutable/chunks/CNme0Hzl.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/A1P7O0DF.js"];
     stylesheets70 = [];
     fonts70 = [];
   }
@@ -60622,10 +60762,10 @@ var init_server_ts = __esm({
     init_db();
     GET = async ({ params, platform, locals }) => {
       if (!locals.user) return json({ error: "Unauthorized" }, { status: 401 });
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const attemptId = params.id;
       if (!attemptId) return json({ error: "ID tidak valid" }, { status: 400 });
-      const attempt = await db.prepare(`
+      const attempt = await db2.prepare(`
 		SELECT is_paused, status, end_time FROM student_attempts 
 		WHERE id = ? AND student_id = ?
 	`).bind(attemptId, locals.user.id).first();
@@ -60663,9 +60803,9 @@ var init_server_ts2 = __esm({
         if (!url.includes("res.cloudinary.com")) {
           return json({ success: true, message: "Not a Cloudinary URL, skipped." });
         }
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         if (locals.user.role !== "superadmin") {
-          const mediaRecord = await db.prepare("SELECT id, uploaded_by, school_id FROM uploaded_media WHERE url = ? AND school_id = ?").bind(url, locals.user.school_id).first();
+          const mediaRecord = await db2.prepare("SELECT id, uploaded_by, school_id FROM uploaded_media WHERE url = ? AND school_id = ?").bind(url, locals.user.school_id).first();
           if (mediaRecord) {
             if (locals.user.role === "guru" && mediaRecord.uploaded_by !== locals.user.id) {
               return json({ success: false, error: "Forbidden: You cannot delete media uploaded by others." }, { status: 403 });
@@ -60675,7 +60815,7 @@ var init_server_ts2 = __esm({
         const deleteResult = await deleteFromCloudinary(url, private_env);
         if (deleteResult.success) {
           if (locals.user.school_id) {
-            await db.prepare("DELETE FROM uploaded_media WHERE url = ? AND school_id = ?").bind(url, locals.user.school_id).run();
+            await db2.prepare("DELETE FROM uploaded_media WHERE url = ? AND school_id = ?").bind(url, locals.user.school_id).run();
           }
           return json({ success: true });
         } else {
@@ -60705,10 +60845,10 @@ var init_server_ts3 = __esm({
       }
       const examTypeId = url.searchParams.get("exam_type_id");
       if (!examTypeId) return json({ classes: [] });
-      const db = getDB(platform);
-      const examType = await db.prepare("SELECT id FROM exam_types WHERE id = ? AND school_id = ?").bind(examTypeId, locals.user.school_id).first();
+      const db2 = getDB(platform);
+      const examType = await db2.prepare("SELECT id FROM exam_types WHERE id = ? AND school_id = ?").bind(examTypeId, locals.user.school_id).first();
       if (!examType) return json({ classes: [] });
-      const classesQuery = await db.prepare(`
+      const classesQuery = await db2.prepare(`
 		SELECT etc.id as relation_id, c.id, c.name,
 			(SELECT COUNT(*) FROM users u WHERE u.class_id = c.id AND u.role = 'siswa' AND u.is_active = 1) as student_count
 		FROM exam_type_classes etc
@@ -60720,7 +60860,7 @@ var init_server_ts3 = __esm({
       let students = [];
       if (classIds.length > 0) {
         const placeholders = classIds.map(() => "?").join(",");
-        const studentsQuery = await db.prepare(`
+        const studentsQuery = await db2.prepare(`
 			SELECT id, name, username as nisn, class_id 
 			FROM users 
 			WHERE class_id IN (${placeholders}) AND role = 'siswa' AND is_active = 1
@@ -60754,14 +60894,14 @@ var init_server_ts4 = __esm({
       if (!user || !["admin", "superadmin", "guru", "pengawas", "panitia"].includes(user.role)) {
         return json({ error: "Unauthorized" }, { status: 401 });
       }
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examId = params.id;
       const isSuperAdmin = user.role === "superadmin";
-      const exam = isSuperAdmin ? await db.prepare("SELECT id FROM exams WHERE id = ?").bind(examId).first() : await db.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(examId, user.school_id).first();
+      const exam = isSuperAdmin ? await db2.prepare("SELECT id FROM exams WHERE id = ?").bind(examId).first() : await db2.prepare("SELECT id FROM exams WHERE id = ? AND school_id = ?").bind(examId, user.school_id).first();
       if (!exam) {
         return json({ error: "Exam not found or unauthorized" }, { status: 404 });
       }
-      const questionsResult = await db.prepare(`
+      const questionsResult = await db2.prepare(`
 		SELECT id, question_number, type, question_text, points
 		FROM questions
 		WHERE exam_id = ?
@@ -60786,18 +60926,18 @@ var init_server_ts5 = __esm({
       if (!locals.user || !["admin", "superadmin", "guru", "panitia"].includes(locals.user.role)) {
         return json({ error: "Unauthorized" }, { status: 401 });
       }
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examId = params.examId;
       let exam;
       if (locals.user.role === "superadmin") {
-        exam = await db.prepare(`
+        exam = await db2.prepare(`
 			SELECT e.*, s.name as subject_name 
 			FROM exams e
 			LEFT JOIN subjects s ON e.subject_id = s.id
 			WHERE e.id = ?
 		`).bind(examId).first();
       } else if (locals.user.role === "guru") {
-        exam = await db.prepare(`
+        exam = await db2.prepare(`
 			SELECT e.*, s.name as subject_name 
 			FROM exams e
 			LEFT JOIN subjects s ON e.subject_id = s.id
@@ -60805,7 +60945,7 @@ var init_server_ts5 = __esm({
 			AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))
 		`).bind(examId, locals.user.school_id, locals.user.id, locals.user.id).first();
       } else {
-        exam = await db.prepare(`
+        exam = await db2.prepare(`
 			SELECT e.*, s.name as subject_name 
 			FROM exams e
 			LEFT JOIN subjects s ON e.subject_id = s.id
@@ -60815,12 +60955,12 @@ var init_server_ts5 = __esm({
       if (!exam) {
         return json({ error: "Ujian tidak ditemukan atau Anda tidak memiliki akses." }, { status: 404 });
       }
-      const questions = await db.prepare(`
+      const questions = await db2.prepare(`
 		SELECT * FROM questions 
 		WHERE exam_id = ? 
 		ORDER BY question_number ASC
 	`).bind(examId).all();
-      const participants = await db.prepare(`
+      const participants = await db2.prepare(`
 		SELECT 
 			epart.student_id,
 			u.name as student_name, 
@@ -60839,7 +60979,7 @@ var init_server_ts5 = __esm({
 		WHERE epart.exam_id = ?
 		ORDER BY u.name ASC
 	`).bind(examId).all();
-      const allAnswersResult = await db.prepare(`
+      const allAnswersResult = await db2.prepare(`
 		SELECT an.attempt_id, an.question_id, an.answer_given, an.score_given, an.is_correct
 		FROM student_answers an
 		JOIN student_attempts sa ON an.attempt_id = sa.id
@@ -81393,14 +81533,14 @@ var init_server_ts6 = __esm({
       if (!locals.user || !["superadmin", "admin", "guru", "panitia"].includes(locals.user.role)) {
         throw error(401, "Unauthorized");
       }
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       const examId = parseInt(params.exam_id, 10);
       if (isNaN(examId)) throw error(400, "Invalid Exam ID");
-      const exam = await db.prepare("SELECT e.*, s.name as subject_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id WHERE e.id = ? AND e.school_id = ?").bind(examId, locals.user.school_id).first();
+      const exam = await db2.prepare("SELECT e.*, s.name as subject_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id WHERE e.id = ? AND e.school_id = ?").bind(examId, locals.user.school_id).first();
       if (!exam) throw error(404, "Ujian tidak ditemukan");
-      const sample = await db.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(locals.user.school_id).first();
+      const sample = await db2.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(locals.user.school_id).first();
       const isNomorPesertaMode = sample && sample.username === sample.nomor_peserta;
-      const results = await db.prepare(`
+      const results = await db2.prepare(`
 		SELECT 
 			u.username,
 			u.nisn,
@@ -81515,18 +81655,18 @@ var init_server_ts8 = __esm({
         return json({ error: "Unauthorized", media: [] }, { status: 401 });
       }
       try {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         let query = "";
         let result;
         if (user.role === "superadmin") {
           query = "SELECT url, name, media_type FROM uploaded_media ORDER BY id DESC";
-          result = await db.prepare(query).all();
+          result = await db2.prepare(query).all();
         } else if (user.role === "admin" || user.role === "panitia") {
           query = "SELECT url, name, media_type FROM uploaded_media WHERE school_id = ? ORDER BY id DESC";
-          result = await db.prepare(query).bind(user.school_id || -1).all();
+          result = await db2.prepare(query).bind(user.school_id || -1).all();
         } else {
           query = "SELECT url, name, media_type FROM uploaded_media WHERE school_id = ? AND (uploaded_by = ? OR is_public = 1) ORDER BY id DESC";
-          result = await db.prepare(query).bind(user.school_id || -1, user.id || -1).all();
+          result = await db2.prepare(query).bind(user.school_id || -1, user.id || -1).all();
         }
         return json({ success: true, media: result.results || [] });
       } catch (error3) {
@@ -81537,13 +81677,58 @@ var init_server_ts8 = __esm({
   }
 });
 
-// .svelte-kit/output/server/entries/endpoints/api/profile/_server.ts.js
+// .svelte-kit/output/server/entries/endpoints/api/migrate-sessions/_server.ts.js
 var server_ts_exports9 = {};
 __export(server_ts_exports9, {
+  GET: () => GET8
+});
+var GET8;
+var init_server_ts9 = __esm({
+  ".svelte-kit/output/server/entries/endpoints/api/migrate-sessions/_server.ts.js"() {
+    init_exports();
+    init_db();
+    GET8 = async ({ platform }) => {
+      try {
+        const db2 = getDB(platform);
+        await dbRun(db2, "ALTER TABLE users ADD COLUMN session_number INTEGER DEFAULT 1");
+        await dbRun(db2, `
+            CREATE TABLE IF NOT EXISTS exam_sessions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                exam_id INTEGER NOT NULL REFERENCES exams(id) ON DELETE CASCADE,
+                session_number INTEGER NOT NULL,
+                start_time TEXT,
+                end_time TEXT,
+                UNIQUE(exam_id, session_number)
+            )
+        `);
+        return json({ success: true, message: "Migration applied successfully" });
+      } catch (e3) {
+        if (e3.message.includes("duplicate column name")) {
+          await dbRun(db, `
+                CREATE TABLE IF NOT EXISTS exam_sessions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    exam_id INTEGER NOT NULL REFERENCES exams(id) ON DELETE CASCADE,
+                    session_number INTEGER NOT NULL,
+                    start_time TEXT,
+                    end_time TEXT,
+                    UNIQUE(exam_id, session_number)
+                )
+            `);
+          return json({ success: true, message: "Migration partially applied (column existed)" });
+        }
+        return json({ success: false, error: e3.message });
+      }
+    };
+  }
+});
+
+// .svelte-kit/output/server/entries/endpoints/api/profile/_server.ts.js
+var server_ts_exports10 = {};
+__export(server_ts_exports10, {
   POST: () => POST2
 });
 var POST2;
-var init_server_ts9 = __esm({
+var init_server_ts10 = __esm({
   ".svelte-kit/output/server/entries/endpoints/api/profile/_server.ts.js"() {
     init_exports();
     init_db();
@@ -81552,7 +81737,7 @@ var init_server_ts9 = __esm({
       if (!locals.user || locals.user.role !== "admin" && locals.user.role !== "panitia") {
         return json({ error: "Unauthorized" }, { status: 401 });
       }
-      const db = getDB(platform);
+      const db2 = getDB(platform);
       let data;
       try {
         data = await request.json();
@@ -81565,16 +81750,16 @@ var init_server_ts9 = __esm({
       if (!name || !username) {
         return json({ error: "Nama dan Username wajib diisi." }, { status: 400 });
       }
-      const existing = await db.prepare("SELECT id FROM users WHERE username = ? AND id != ?").bind(username, id).first();
+      const existing = await db2.prepare("SELECT id FROM users WHERE username = ? AND id != ?").bind(username, id).first();
       if (existing) {
         return json({ error: "Username sudah digunakan oleh pengguna lain." }, { status: 400 });
       }
       try {
         if (password && password.trim() !== "") {
           const passwordHash = await hashPassword(password);
-          await db.prepare("UPDATE users SET name = ?, username = ?, password_hash = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, username, passwordHash, id, schoolId).run();
+          await db2.prepare("UPDATE users SET name = ?, username = ?, password_hash = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, username, passwordHash, id, schoolId).run();
         } else {
-          await db.prepare("UPDATE users SET name = ?, username = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, username, id, schoolId).run();
+          await db2.prepare("UPDATE users SET name = ?, username = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, username, id, schoolId).run();
         }
         const updatedUser = {
           ...locals.user,
@@ -81600,15 +81785,15 @@ var init_server_ts9 = __esm({
 });
 
 // .svelte-kit/output/server/entries/endpoints/api/proxy-media/_server.ts.js
-var server_ts_exports10 = {};
-__export(server_ts_exports10, {
-  GET: () => GET8
+var server_ts_exports11 = {};
+__export(server_ts_exports11, {
+  GET: () => GET9
 });
-var GET8;
-var init_server_ts10 = __esm({
+var GET9;
+var init_server_ts11 = __esm({
   ".svelte-kit/output/server/entries/endpoints/api/proxy-media/_server.ts.js"() {
     init_exports();
-    GET8 = async ({ url, fetch: fetch2, locals }) => {
+    GET9 = async ({ url, fetch: fetch2, locals }) => {
       if (!locals.user) {
         throw error(401, "Unauthorized");
       }
@@ -81667,58 +81852,58 @@ ${text3}`, {
 });
 
 // .svelte-kit/output/server/entries/endpoints/api/setup/_server.ts.js
-var server_ts_exports11 = {};
-__export(server_ts_exports11, {
-  GET: () => GET9
+var server_ts_exports12 = {};
+__export(server_ts_exports12, {
+  GET: () => GET10
 });
-var GET9;
-var init_server_ts11 = __esm({
+var GET10;
+var init_server_ts12 = __esm({
   ".svelte-kit/output/server/entries/endpoints/api/setup/_server.ts.js"() {
     init_exports();
     init_db();
     init_auth();
-    GET9 = async ({ platform }) => {
+    GET10 = async ({ platform }) => {
       try {
-        const db = getDB(platform);
-        const existingSuperadmin = await db.prepare("SELECT id FROM users WHERE role = 'superadmin' LIMIT 1").first();
+        const db2 = getDB(platform);
+        const existingSuperadmin = await db2.prepare("SELECT id FROM users WHERE role = 'superadmin' LIMIT 1").first();
         if (existingSuperadmin) {
           return json({
             success: false,
             message: "Database sudah diinisialisasi. Superadmin sudah ada."
           }, { status: 400 });
         }
-        await db.batch([
-          db.prepare("INSERT INTO schools (name, address) VALUES (?, ?)").bind("Madrasah Aliyah Negeri 1", "Jl. Pendidikan No. 1"),
-          db.prepare("INSERT INTO schools (name, address) VALUES (?, ?)").bind("Madrasah Tsanawiyah Negeri 2", "Jl. Kebangsaan No. 2")
+        await db2.batch([
+          db2.prepare("INSERT INTO schools (name, address) VALUES (?, ?)").bind("Madrasah Aliyah Negeri 1", "Jl. Pendidikan No. 1"),
+          db2.prepare("INSERT INTO schools (name, address) VALUES (?, ?)").bind("Madrasah Tsanawiyah Negeri 2", "Jl. Kebangsaan No. 2")
         ]);
-        await db.batch([
-          db.prepare("INSERT INTO classes (school_id, name, level) VALUES (?, ?, ?)").bind(1, "X IPA 1", "X"),
-          db.prepare("INSERT INTO classes (school_id, name, level) VALUES (?, ?, ?)").bind(1, "XI IPS 2", "XI"),
-          db.prepare("INSERT INTO classes (school_id, name, level) VALUES (?, ?, ?)").bind(2, "VII A", "VII"),
-          db.prepare("INSERT INTO classes (school_id, name, level) VALUES (?, ?, ?)").bind(2, "VIII B", "VIII"),
-          db.prepare("INSERT INTO subjects (school_id, name, code) VALUES (?, ?, ?)").bind(1, "Matematika", "MTK"),
-          db.prepare("INSERT INTO subjects (school_id, name, code) VALUES (?, ?, ?)").bind(1, "Biologi", "BIO"),
-          db.prepare("INSERT INTO subjects (school_id, name, code) VALUES (?, ?, ?)").bind(2, "Bahasa Arab", "ARB"),
-          db.prepare("INSERT INTO subjects (school_id, name, code) VALUES (?, ?, ?)").bind(2, "Fiqih", "FIQ")
+        await db2.batch([
+          db2.prepare("INSERT INTO classes (school_id, name, level) VALUES (?, ?, ?)").bind(1, "X IPA 1", "X"),
+          db2.prepare("INSERT INTO classes (school_id, name, level) VALUES (?, ?, ?)").bind(1, "XI IPS 2", "XI"),
+          db2.prepare("INSERT INTO classes (school_id, name, level) VALUES (?, ?, ?)").bind(2, "VII A", "VII"),
+          db2.prepare("INSERT INTO classes (school_id, name, level) VALUES (?, ?, ?)").bind(2, "VIII B", "VIII"),
+          db2.prepare("INSERT INTO subjects (school_id, name, code) VALUES (?, ?, ?)").bind(1, "Matematika", "MTK"),
+          db2.prepare("INSERT INTO subjects (school_id, name, code) VALUES (?, ?, ?)").bind(1, "Biologi", "BIO"),
+          db2.prepare("INSERT INTO subjects (school_id, name, code) VALUES (?, ?, ?)").bind(2, "Bahasa Arab", "ARB"),
+          db2.prepare("INSERT INTO subjects (school_id, name, code) VALUES (?, ?, ?)").bind(2, "Fiqih", "FIQ")
         ]);
         const passHash = await hashPassword("password123");
-        await db.batch([
+        await db2.batch([
           // Superadmin (tanpa school_id)
-          db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (NULL, NULL, ?, ?, ?, ?)").bind("superadmin", passHash, "Sistem Superadmin", "superadmin"),
+          db2.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (NULL, NULL, ?, ?, ?, ?)").bind("superadmin", passHash, "Sistem Superadmin", "superadmin"),
           // Sekolah 1 (MAN 1)
-          db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, NULL, ?, ?, ?, ?)").bind(1, "admin1", passHash, "Admin MAN 1", "admin"),
-          db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, NULL, ?, ?, ?, ?)").bind(1, "guru1", passHash, "Bapak Ahmad", "guru"),
-          db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, NULL, ?, ?, ?, ?)").bind(1, "pengawas1", passHash, "Bapak Umar", "pengawas"),
-          db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?, ?)").bind(1, 1, "siswa1", passHash, "Ahmad Rizki", "siswa"),
+          db2.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, NULL, ?, ?, ?, ?)").bind(1, "admin1", passHash, "Admin MAN 1", "admin"),
+          db2.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, NULL, ?, ?, ?, ?)").bind(1, "guru1", passHash, "Bapak Ahmad", "guru"),
+          db2.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, NULL, ?, ?, ?, ?)").bind(1, "pengawas1", passHash, "Bapak Umar", "pengawas"),
+          db2.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?, ?)").bind(1, 1, "siswa1", passHash, "Ahmad Rizki", "siswa"),
           // Sekolah 2 (MTsN 2)
-          db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, NULL, ?, ?, ?, ?)").bind(2, "admin2", passHash, "Admin MTsN 2", "admin"),
-          db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, NULL, ?, ?, ?, ?)").bind(2, "guru2", passHash, "Ibu Fatimah", "guru"),
-          db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, NULL, ?, ?, ?, ?)").bind(2, "pengawas2", passHash, "Ibu Aisyah", "pengawas"),
-          db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?, ?)").bind(2, 3, "siswa2", passHash, "Siti Aisyah", "siswa")
+          db2.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, NULL, ?, ?, ?, ?)").bind(2, "admin2", passHash, "Admin MTsN 2", "admin"),
+          db2.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, NULL, ?, ?, ?, ?)").bind(2, "guru2", passHash, "Ibu Fatimah", "guru"),
+          db2.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, NULL, ?, ?, ?, ?)").bind(2, "pengawas2", passHash, "Ibu Aisyah", "pengawas"),
+          db2.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?, ?)").bind(2, 3, "siswa2", passHash, "Siti Aisyah", "siswa")
         ]);
-        await db.batch([
+        await db2.batch([
           // Ujian untuk Sekolah 1 (Matematika = subject_id 1)
-          db.prepare(`INSERT INTO exams (school_id, subject_id, title, description, duration_minutes, start_time, end_time, is_active, created_by)
+          db2.prepare(`INSERT INTO exams (school_id, subject_id, title, description, duration_minutes, start_time, end_time, is_active, created_by)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
             1,
             1,
@@ -81732,7 +81917,7 @@ var init_server_ts11 = __esm({
           ),
           // created_by = 2 (admin1)
           // Ujian untuk Sekolah 2 (Bahasa Arab = subject_id 3)
-          db.prepare(`INSERT INTO exams (school_id, subject_id, title, description, duration_minutes, start_time, end_time, is_active, created_by)
+          db2.prepare(`INSERT INTO exams (school_id, subject_id, title, description, duration_minutes, start_time, end_time, is_active, created_by)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
             2,
             3,
@@ -81746,9 +81931,9 @@ var init_server_ts11 = __esm({
           )
           // created_by = 6 (admin2)
         ]);
-        await db.batch([
+        await db2.batch([
           // Pilihan Ganda
-          db.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points, options_json, correct_answer_json)
+          db2.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points, options_json, correct_answer_json)
 				VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(
             1,
             "pilihan_ganda",
@@ -81759,7 +81944,7 @@ var init_server_ts11 = __esm({
             '"C"'
           ),
           // Benar / Salah
-          db.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points, options_json, correct_answer_json)
+          db2.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points, options_json, correct_answer_json)
 				VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(
             1,
             "benar_salah",
@@ -81770,11 +81955,11 @@ var init_server_ts11 = __esm({
             '"Salah"'
           ),
           // Isian Singkat
-          db.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points, options_json, correct_answer_json)
+          db2.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points, options_json, correct_answer_json)
 				VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(1, "isian_singkat", "Berapakah hasil dari \u221A144?", 3, 2, null, '"12"')
         ]);
-        await db.batch([
-          db.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points, options_json, correct_answer_json)
+        await db2.batch([
+          db2.prepare(`INSERT INTO questions (exam_id, type, question_text, question_number, points, options_json, correct_answer_json)
 				VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(
             2,
             "pilihan_ganda",
@@ -81785,9 +81970,9 @@ var init_server_ts11 = __esm({
             '"B"'
           )
         ]);
-        await db.prepare(`INSERT INTO tokens (school_id, exam_id, token_code, is_released, created_by, expires_at)
+        await db2.prepare(`INSERT INTO tokens (school_id, exam_id, token_code, is_released, created_by, expires_at)
 			VALUES (?, ?, ?, ?, ?, ?)`).bind(1, 1, "MTK2024", 1, 4, "2025-12-31T23:59:59Z").run();
-        await db.prepare(`INSERT INTO tokens (school_id, exam_id, token_code, is_released, created_by, expires_at)
+        await db2.prepare(`INSERT INTO tokens (school_id, exam_id, token_code, is_released, created_by, expires_at)
 			VALUES (?, ?, ?, ?, ?, ?)`).bind(2, 2, "ARB2024", 0, 8, "2025-12-31T23:59:59Z").run();
         return json({
           success: true,
@@ -81822,18 +82007,18 @@ var init_server_ts11 = __esm({
 });
 
 // .svelte-kit/output/server/entries/endpoints/api/track-media/_server.ts.js
-var server_ts_exports12 = {};
-__export(server_ts_exports12, {
+var server_ts_exports13 = {};
+__export(server_ts_exports13, {
   POST: () => POST3
 });
 var POST3;
-var init_server_ts12 = __esm({
+var init_server_ts13 = __esm({
   ".svelte-kit/output/server/entries/endpoints/api/track-media/_server.ts.js"() {
     init_exports();
     init_db();
     POST3 = async ({ request, platform, locals }) => {
       try {
-        const db = getDB(platform);
+        const db2 = getDB(platform);
         const { url, media_type, name } = await request.json();
         if (!url || !media_type) {
           return json({ success: false, error: "URL dan media_type wajib diisi" }, { status: 400 });
@@ -81847,7 +82032,7 @@ var init_server_ts12 = __esm({
 			VALUES (?, ?, ?, ?, ?, ?)
 			ON CONFLICT(url) DO NOTHING
 		`;
-        await dbRun(db, query, locals.user?.school_id || null, fileName, url, media_type, locals.user?.id || null, 0);
+        await dbRun(db2, query, locals.user?.school_id || null, fileName, url, media_type, locals.user?.id || null, 0);
         return json({ success: true });
       } catch (error3) {
         console.error("API /track-media error:", error3);
@@ -82822,7 +83007,7 @@ var options = {
     app: ({ head: head2, body, assets: assets2, nonce, env: env2 }) => '<!DOCTYPE html>\n<html lang="id">\n	<head>\n		<meta charset="utf-8" />\n		<meta name="viewport" content="width=device-width, initial-scale=1.0" />\n		<meta name="description" content="Aplikasi Ujian Online Madrasah \u2014 Platform ujian digital modern untuk madrasah" />\n		<meta name="theme-color" content="#4F46E5" />\n		<link rel="icon" href="' + assets2 + '/favicon.svg" type="image/svg+xml" />\n		<link rel="preconnect" href="https://fonts.googleapis.com" />\n		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />\n		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />\n		<title>Ujian Online Madrasah</title>\n		' + head2 + '\n	</head>\n	<body data-sveltekit-preload-data="hover">\n		<div style="display: contents">' + body + "</div>\n	</body>\n</html>\n",
     error: error2
   },
-  version_hash: "1j8lxuj"
+  version_hash: "d5t7lm"
 };
 async function get_hooks() {
   let handle2;
@@ -86806,7 +86991,7 @@ var manifest = (() => {
     assets: /* @__PURE__ */ new Set(["favicon.svg", "panduan-ui-ujian.jpeg", "template_soal_ujian.docx"]),
     mimeTypes: { ".svg": "image/svg+xml", ".jpeg": "image/jpeg" },
     _: {
-      client: { start: "_app/immutable/entry/start.D5NkAJY8.js", app: "_app/immutable/entry/app.D2QqL_nA.js", imports: ["_app/immutable/entry/start.D5NkAJY8.js", "_app/immutable/chunks/sK17VQQP.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/_KaSKy70.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/entry/app.D2QqL_nA.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js"], stylesheets: [], fonts: [], uses_env_dynamic_public: true },
+      client: { start: "_app/immutable/entry/start.BeysUM7G.js", app: "_app/immutable/entry/app.ZLDbe76Z.js", imports: ["_app/immutable/entry/start.BeysUM7G.js", "_app/immutable/chunks/wzo6IUc5.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/D0YHghFF.js", "_app/immutable/chunks/DeQQCbRh.js", "_app/immutable/entry/app.ZLDbe76Z.js", "_app/immutable/chunks/ClRrpZeN.js", "_app/immutable/chunks/DbEAIv_x.js", "_app/immutable/chunks/CWj6FrbW.js", "_app/immutable/chunks/CiiCNIbB.js", "_app/immutable/chunks/COlPN6dD.js", "_app/immutable/chunks/C2PDlNHd.js", "_app/immutable/chunks/Uo-sFA6w.js", "_app/immutable/chunks/CcPznuOH.js", "_app/immutable/chunks/DeQQCbRh.js"], stylesheets: [], fonts: [], uses_env_dynamic_public: true },
       nodes: [
         __memo(() => Promise.resolve().then(() => (init__(), __exports))),
         __memo(() => Promise.resolve().then(() => (init__2(), __exports2))),
@@ -87099,32 +87284,39 @@ var manifest = (() => {
           endpoint: __memo(() => Promise.resolve().then(() => (init_server_ts8(), server_ts_exports8)))
         },
         {
+          id: "/api/migrate-sessions",
+          pattern: /^\/api\/migrate-sessions\/?$/,
+          params: [],
+          page: null,
+          endpoint: __memo(() => Promise.resolve().then(() => (init_server_ts9(), server_ts_exports9)))
+        },
+        {
           id: "/api/profile",
           pattern: /^\/api\/profile\/?$/,
           params: [],
           page: null,
-          endpoint: __memo(() => Promise.resolve().then(() => (init_server_ts9(), server_ts_exports9)))
+          endpoint: __memo(() => Promise.resolve().then(() => (init_server_ts10(), server_ts_exports10)))
         },
         {
           id: "/api/proxy-media",
           pattern: /^\/api\/proxy-media\/?$/,
           params: [],
           page: null,
-          endpoint: __memo(() => Promise.resolve().then(() => (init_server_ts10(), server_ts_exports10)))
+          endpoint: __memo(() => Promise.resolve().then(() => (init_server_ts11(), server_ts_exports11)))
         },
         {
           id: "/api/setup",
           pattern: /^\/api\/setup\/?$/,
           params: [],
           page: null,
-          endpoint: __memo(() => Promise.resolve().then(() => (init_server_ts11(), server_ts_exports11)))
+          endpoint: __memo(() => Promise.resolve().then(() => (init_server_ts12(), server_ts_exports12)))
         },
         {
           id: "/api/track-media",
           pattern: /^\/api\/track-media\/?$/,
           params: [],
           page: null,
-          endpoint: __memo(() => Promise.resolve().then(() => (init_server_ts12(), server_ts_exports12)))
+          endpoint: __memo(() => Promise.resolve().then(() => (init_server_ts13(), server_ts_exports13)))
         },
         {
           id: "/guru",

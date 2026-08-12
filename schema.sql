@@ -227,6 +227,7 @@ CREATE TABLE IF NOT EXISTS uploaded_media (
     gender TEXT,
     nisn TEXT,
     nomor_peserta TEXT,
+    session_number INTEGER DEFAULT 1,
     is_active INTEGER NOT NULL DEFAULT 1,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -266,6 +267,16 @@ CREATE TABLE IF NOT EXISTS exams (
     created_by INTEGER REFERENCES users(id),
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Tabel Jadwal Sesi Ujian (Jika manajemen sesi per ujian diaktifkan)
+CREATE TABLE IF NOT EXISTS exam_sessions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    exam_id INTEGER NOT NULL REFERENCES exams(id) ON DELETE CASCADE,
+    session_number INTEGER NOT NULL,
+    start_time TEXT,
+    end_time TEXT,
+    UNIQUE(exam_id, session_number)
 );
 
 -- Tabel Token Ujian

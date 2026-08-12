@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg","panduan-ui-ujian.jpeg","template_soal_ujian.docx"]),
 	mimeTypes: {".svg":"image/svg+xml",".jpeg":"image/jpeg"},
 	_: {
-		client: {start:"_app/immutable/entry/start.D5NkAJY8.js",app:"_app/immutable/entry/app.D2QqL_nA.js",imports:["_app/immutable/entry/start.D5NkAJY8.js","_app/immutable/chunks/sK17VQQP.js","_app/immutable/chunks/CiiCNIbB.js","_app/immutable/chunks/ClRrpZeN.js","_app/immutable/chunks/DbEAIv_x.js","_app/immutable/chunks/_KaSKy70.js","_app/immutable/chunks/DeQQCbRh.js","_app/immutable/entry/app.D2QqL_nA.js","_app/immutable/chunks/ClRrpZeN.js","_app/immutable/chunks/DbEAIv_x.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CiiCNIbB.js","_app/immutable/chunks/COlPN6dD.js","_app/immutable/chunks/C2PDlNHd.js","_app/immutable/chunks/Uo-sFA6w.js","_app/immutable/chunks/CcPznuOH.js","_app/immutable/chunks/DeQQCbRh.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
+		client: {start:"_app/immutable/entry/start.BeysUM7G.js",app:"_app/immutable/entry/app.ZLDbe76Z.js",imports:["_app/immutable/entry/start.BeysUM7G.js","_app/immutable/chunks/wzo6IUc5.js","_app/immutable/chunks/CiiCNIbB.js","_app/immutable/chunks/ClRrpZeN.js","_app/immutable/chunks/DbEAIv_x.js","_app/immutable/chunks/D0YHghFF.js","_app/immutable/chunks/DeQQCbRh.js","_app/immutable/entry/app.ZLDbe76Z.js","_app/immutable/chunks/ClRrpZeN.js","_app/immutable/chunks/DbEAIv_x.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CiiCNIbB.js","_app/immutable/chunks/COlPN6dD.js","_app/immutable/chunks/C2PDlNHd.js","_app/immutable/chunks/Uo-sFA6w.js","_app/immutable/chunks/CcPznuOH.js","_app/immutable/chunks/DeQQCbRh.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
 		nodes: [
 			__memo(() => import('../output/server/nodes/0.js')),
 			__memo(() => import('../output/server/nodes/1.js')),
@@ -303,6 +303,13 @@ return {
 				params: [],
 				page: null,
 				endpoint: __memo(() => import('../output/server/entries/endpoints/api/media/_server.ts.js'))
+			},
+			{
+				id: "/api/migrate-sessions",
+				pattern: /^\/api\/migrate-sessions\/?$/,
+				params: [],
+				page: null,
+				endpoint: __memo(() => import('../output/server/entries/endpoints/api/migrate-sessions/_server.ts.js'))
 			},
 			{
 				id: "/api/profile",

@@ -21,7 +21,7 @@ function ImportStudentsModal($$renderer, $$props) {
       {
         $$renderer2.push("<!--[-1-->");
       }
-      $$renderer2.push(`<!--]--> <div class="space-y-6"><div class="bg-gradient-to-br from-indigo-50 to-violet-50 border border-indigo-100 rounded-2xl p-5"><h3 class="font-bold text-indigo-900 mb-2 flex items-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Langkah Import</h3> <ol class="list-decimal list-inside text-sm text-indigo-800 space-y-2 ml-1"><li>Unduh template Excel yang disediakan.</li> <li>Isi data siswa sesuai format (Kolom <strong>NOMOR PESERTA (Opsional)</strong>, <strong>NISN</strong>, <strong>NAMA LENGKAP</strong>, <strong>JK (L/P)</strong>, <strong>NAMA KELAS</strong>, <strong>TEMPAT LAHIR</strong>, <strong>TANGGAL LAHIR</strong>).</li> <li>Lihat sheet <strong>Referensi Kelas</strong> untuk panduan nama kelas.</li> <li>Simpan dan unggah kembali file Excel tersebut.</li></ol> <button class="mt-5 w-full group relative overflow-hidden rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-4 p-4 text-left"><div class="flex-shrink-0 w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg></div> <div class="flex-1 min-w-0"><p class="font-bold text-white text-sm">Unduh Template Excel</p> <p class="text-indigo-200 text-xs mt-0.5">Format siap pakai dengan Referensi Kelas</p></div> <svg class="w-5 h-5 text-indigo-200 group-hover:text-white group-hover:translate-x-1 transition-all flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-700 ease-in-out pointer-events-none"></div></button></div> <div><label class="block text-sm font-medium text-slate-700 mb-2">Pilih File Excel (.xlsx)</label> <input type="file" accept=".xlsx, .xls" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 border border-slate-200 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"${attr("disabled", isParsing, true)}/></div></div> <form method="POST" action="?/importExcel" class="hidden"><input type="hidden" name="students_json"${attr("value", JSON.stringify(parsedData))}/> <button type="submit" id="submit-import-students-btn" aria-label="Submit Form"></button></form></div> <div class="p-6 border-t border-slate-100 bg-slate-50/50 rounded-b-2xl flex justify-end gap-3 sticky bottom-0"><button class="btn btn-secondary"${attr("disabled", isParsing, true)}>Batal</button> <button class="btn btn-primary min-w-[120px]"${attr("disabled", true, true)}>`);
+      $$renderer2.push(`<!--]--> <div class="space-y-6"><div class="bg-gradient-to-br from-indigo-50 to-violet-50 border border-indigo-100 rounded-2xl p-5"><h3 class="font-bold text-indigo-900 mb-2 flex items-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Langkah Import</h3> <ol class="list-decimal list-inside text-sm text-indigo-800 space-y-2 ml-1"><li>Unduh template Excel yang disediakan.</li> <li>Isi data siswa sesuai format (Kolom <strong>NOMOR PESERTA (Opsional)</strong>, <strong>NISN</strong>, <strong>NAMA LENGKAP</strong>, <strong>JK (L/P)</strong>, <strong>NAMA KELAS</strong>, <strong>TEMPAT LAHIR</strong>, <strong>TANGGAL LAHIR</strong>, <strong>SESI</strong>).</li> <li>Lihat sheet <strong>Referensi Kelas</strong> untuk panduan nama kelas.</li> <li>Simpan dan unggah kembali file Excel tersebut.</li></ol> <button class="mt-5 w-full group relative overflow-hidden rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-4 p-4 text-left"><div class="flex-shrink-0 w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg></div> <div class="flex-1 min-w-0"><p class="font-bold text-white text-sm">Unduh Template Excel</p> <p class="text-indigo-200 text-xs mt-0.5">Format siap pakai dengan Referensi Kelas</p></div> <svg class="w-5 h-5 text-indigo-200 group-hover:text-white group-hover:translate-x-1 transition-all flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-700 ease-in-out pointer-events-none"></div></button></div> <div><label class="block text-sm font-medium text-slate-700 mb-2">Pilih File Excel (.xlsx)</label> <input type="file" accept=".xlsx, .xls" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 border border-slate-200 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"${attr("disabled", isParsing, true)}/></div></div> <form method="POST" action="?/importExcel" class="hidden"><input type="hidden" name="students_json"${attr("value", JSON.stringify(parsedData))}/> <button type="submit" id="submit-import-students-btn" aria-label="Submit Form"></button></form></div> <div class="p-6 border-t border-slate-100 bg-slate-50/50 rounded-b-2xl flex justify-end gap-3 sticky bottom-0"><button class="btn btn-secondary"${attr("disabled", isParsing, true)}>Batal</button> <button class="btn btn-primary min-w-[120px]"${attr("disabled", true, true)}>`);
       {
         $$renderer2.push("<!--[-1-->");
         $$renderer2.push(`Import Data`);
@@ -171,7 +171,20 @@ function _page($$renderer, $$props) {
             $$renderer4.push(`${escape_html(cls.name)}`);
           });
         }
-        $$renderer3.push(`<!--]--></select></div> <div class="flex space-x-3 pt-2"><button type="submit" class="btn btn-primary">Simpan Siswa</button> <button type="button" class="btn btn-secondary">Batal</button></div></form></div></div>`);
+        $$renderer3.push(`<!--]--></select></div> <div><label for="session_number" class="block text-sm font-medium text-slate-700 mb-1">Sesi Ujian</label> <select id="session_number" name="session_number" class="input">`);
+        $$renderer3.option({ value: "1" }, ($$renderer4) => {
+          $$renderer4.push(`Sesi 1`);
+        });
+        $$renderer3.option({ value: "2" }, ($$renderer4) => {
+          $$renderer4.push(`Sesi 2`);
+        });
+        $$renderer3.option({ value: "3" }, ($$renderer4) => {
+          $$renderer4.push(`Sesi 3`);
+        });
+        $$renderer3.option({ value: "4" }, ($$renderer4) => {
+          $$renderer4.push(`Sesi 4`);
+        });
+        $$renderer3.push(`</select></div> <div class="flex space-x-3 pt-2"><button type="submit" class="btn btn-primary">Simpan Siswa</button> <button type="button" class="btn btn-secondary">Batal</button></div></form></div></div>`);
       } else {
         $$renderer3.push("<!--[-1-->");
       }
@@ -200,7 +213,26 @@ function _page($$renderer, $$props) {
             $$renderer4.push(`${escape_html(cls.name)}`);
           });
         }
-        $$renderer3.push(`<!--]--></select></div> <div class="flex space-x-3 pt-2"><button type="submit" class="btn btn-primary">Simpan Perubahan</button> <button type="button" class="btn btn-secondary">Batal</button></div></form></div></div>`);
+        $$renderer3.push(`<!--]--></select></div> <div><label for="e-session_number" class="block text-sm font-medium text-slate-700 mb-1">Sesi Ujian</label> <select id="e-session_number" name="session_number" class="input">`);
+        $$renderer3.option(
+          {
+            value: "1",
+            selected: editingUser.session_number == 1 || !editingUser.session_number
+          },
+          ($$renderer4) => {
+            $$renderer4.push(`Sesi 1`);
+          }
+        );
+        $$renderer3.option({ value: "2", selected: editingUser.session_number == 2 }, ($$renderer4) => {
+          $$renderer4.push(`Sesi 2`);
+        });
+        $$renderer3.option({ value: "3", selected: editingUser.session_number == 3 }, ($$renderer4) => {
+          $$renderer4.push(`Sesi 3`);
+        });
+        $$renderer3.option({ value: "4", selected: editingUser.session_number == 4 }, ($$renderer4) => {
+          $$renderer4.push(`Sesi 4`);
+        });
+        $$renderer3.push(`</select></div> <div class="flex space-x-3 pt-2"><button type="submit" class="btn btn-primary">Simpan Perubahan</button> <button type="button" class="btn btn-secondary">Batal</button></div></form></div></div>`);
       } else {
         $$renderer3.push("<!--[-1-->");
       }
@@ -226,7 +258,7 @@ function _page($$renderer, $$props) {
       } else {
         $$renderer3.push("<!--[-1-->");
       }
-      $$renderer3.push(`<!--]--> <div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 text-slate-500 text-sm"><th class="p-4 w-12 text-center whitespace-nowrap"><input type="checkbox"${attr("checked", isAllSelected, true)} class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer" title="Pilih Semua Siswa"/></th><th class="p-4 font-semibold whitespace-nowrap">Siswa</th><th class="p-4 font-semibold whitespace-nowrap">No. Peserta</th><th class="p-4 font-semibold whitespace-nowrap">NISN</th><th class="p-4 font-semibold whitespace-nowrap">Kelas</th><th class="p-4 font-semibold whitespace-nowrap text-center">JK</th><th class="p-4 font-semibold whitespace-nowrap">Tempat, Tgl Lahir</th><th class="p-4 font-semibold whitespace-nowrap">Status</th><th class="p-4 font-semibold text-right whitespace-nowrap">Aksi</th></tr></thead><tbody class="divide-y divide-slate-100 text-slate-700">`);
+      $$renderer3.push(`<!--]--> <div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 text-slate-500 text-sm"><th class="p-4 w-12 text-center whitespace-nowrap"><input type="checkbox"${attr("checked", isAllSelected, true)} class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer" title="Pilih Semua Siswa"/></th><th class="p-4 font-semibold whitespace-nowrap">Siswa</th><th class="p-4 font-semibold whitespace-nowrap">No. Peserta</th><th class="p-4 font-semibold whitespace-nowrap">NISN</th><th class="p-4 font-semibold whitespace-nowrap">Kelas / Sesi</th><th class="p-4 font-semibold whitespace-nowrap text-center">JK</th><th class="p-4 font-semibold whitespace-nowrap">Tempat, Tgl Lahir</th><th class="p-4 font-semibold whitespace-nowrap">Status</th><th class="p-4 font-semibold text-right whitespace-nowrap">Aksi</th></tr></thead><tbody class="divide-y divide-slate-100 text-slate-700">`);
       const each_array_3 = ensure_array_like(data.users);
       if (each_array_3.length !== 0) {
         $$renderer3.push("<!--[-->");
@@ -250,10 +282,10 @@ function _page($$renderer, $$props) {
           $$renderer3.push(`<!--]--> <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div></button> <div class="whitespace-nowrap"><div${attr_class(`font-medium whitespace-nowrap ${user.class_id ? "text-slate-900" : "text-red-600 drop-shadow-sm"}`)}>${escape_html(user.name)}</div> <div class="text-sm text-slate-500 whitespace-nowrap">@${escape_html(user.username)}</div></div></div></td><td class="p-4 whitespace-nowrap"><span class="text-slate-700">${escape_html(user.nomor_peserta || "-")}</span></td><td class="p-4 whitespace-nowrap"><span class="text-slate-700">${escape_html(user.nisn || user.username)}</span></td><td class="p-4 whitespace-nowrap">`);
           if (user.class_name) {
             $$renderer3.push("<!--[0-->");
-            $$renderer3.push(`<span${attr_class(`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap ${stringify(getClassColor(user.class_id))}`)}>${escape_html(user.class_name)}</span>`);
+            $$renderer3.push(`<div class="flex flex-col gap-1"><span${attr_class(`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap ${stringify(getClassColor(user.class_id))} w-fit`)}>${escape_html(user.class_name)}</span> <span class="text-xs text-slate-500 font-medium">Sesi ${escape_html(user.session_number || 1)}</span></div>`);
           } else {
             $$renderer3.push("<!--[-1-->");
-            $$renderer3.push(`<span class="text-sm text-slate-400 whitespace-nowrap">-</span>`);
+            $$renderer3.push(`<div class="flex flex-col gap-1"><span class="text-sm text-slate-400 whitespace-nowrap">-</span> <span class="text-xs text-slate-500 font-medium">Sesi ${escape_html(user.session_number || 1)}</span></div>`);
           }
           $$renderer3.push(`<!--]--></td><td class="p-4 whitespace-nowrap text-center">`);
           if (user.gender === "L") {

@@ -58,12 +58,15 @@ export const actions = {
 
 		try {
 			const token = await db.prepare(`
-				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
+				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active,
+				e.start_time as exam_start_time, e.end_time as exam_end_time,
+				u.session_number
 				FROM tokens t 
 				JOIN exams e ON t.exam_id = e.id
 				JOIN exam_types et ON e.exam_type_id = et.id
+				JOIN users u ON u.id = ?
 				WHERE t.token_code = ? AND t.exam_id = ? AND et.is_active = 1
-			`).bind(tokenCode, parsedExamId).first<any>();
+			`).bind(locals.user!.id, tokenCode, parsedExamId).first<any>();
 
 			if (!token) {
 				return fail(400, { error: 'Token tidak valid untuk ujian ini.' });
@@ -73,6 +76,23 @@ export const actions = {
 			if (!token.is_active) {
 				return fail(400, { error: 'Ujian saat ini tidak aktif.' });
 			}
+			
+			// Validasi sesi dan waktu ujian
+			const studentSession = token.session_number || 1;
+			const sessionRecord = await db.prepare('SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?')
+				.bind(parsedExamId, studentSession).first<{ start_time: string | null, end_time: string | null }>();
+			
+			const startTimeStr = sessionRecord?.start_time || token.exam_start_time;
+			const endTimeStr = sessionRecord?.end_time || token.exam_end_time;
+			const now = new Date();
+			
+			if (startTimeStr && now < new Date(startTimeStr)) {
+				return fail(400, { error: 'Waktu ujian belum dimulai untuk sesi Anda.' });
+			}
+			if (endTimeStr && now > new Date(endTimeStr)) {
+				return fail(400, { error: 'Waktu ujian telah berakhir untuk sesi Anda.' });
+			}
+
 			if (!token.is_released) {
 				return fail(400, { error: 'Token ujian ini sudah ditarik atau belum dirilis oleh pengawas.' });
 			}
@@ -121,12 +141,15 @@ export const actions = {
 
 		try {
 			const token = await db.prepare(`
-				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active
+				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active,
+				e.start_time as exam_start_time, e.end_time as exam_end_time,
+				u.session_number
 				FROM tokens t 
 				JOIN exams e ON t.exam_id = e.id
 				JOIN exam_types et ON e.exam_type_id = et.id
+				JOIN users u ON u.id = ?
 				WHERE t.token_code = ? AND t.exam_id = ? AND et.is_active = 1
-			`).bind(tokenCode, parsedExamId).first<any>();
+			`).bind(locals.user!.id, tokenCode, parsedExamId).first<any>();
 
 			if (!token) {
 				return fail(400, { error: 'Token tidak valid untuk ujian ini.' });
@@ -136,6 +159,23 @@ export const actions = {
 			if (!token.is_active) {
 				return fail(400, { error: 'Ujian saat ini tidak aktif.' });
 			}
+
+			// Validasi sesi dan waktu ujian
+			const studentSession = token.session_number || 1;
+			const sessionRecord = await db.prepare('SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?')
+				.bind(parsedExamId, studentSession).first<{ start_time: string | null, end_time: string | null }>();
+			
+			const startTimeStr = sessionRecord?.start_time || token.exam_start_time;
+			const endTimeStr = sessionRecord?.end_time || token.exam_end_time;
+			const now = new Date();
+			
+			if (startTimeStr && now < new Date(startTimeStr)) {
+				return fail(400, { error: 'Waktu ujian belum dimulai untuk sesi Anda.' });
+			}
+			if (endTimeStr && now > new Date(endTimeStr)) {
+				return fail(400, { error: 'Waktu ujian telah berakhir untuk sesi Anda.' });
+			}
+
 			if (!token.is_released) {
 				return fail(400, { error: 'Token ujian ini sudah ditarik atau belum dirilis oleh pengawas.' });
 			}

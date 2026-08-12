@@ -244,10 +244,32 @@
 						<label class="label" for="c-end">Waktu Selesai</label>
 						<input id="c-end" name="end_time" type="datetime-local" class="input" value={data.examType.end_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
 					</div>
-					<div class="col-span-2 text-xs text-slate-500 mt-1">
+					<div class="col-span-2 text-xs text-slate-500 mt-1 mb-2">
 						Pastikan waktu berada di dalam rentang: <br/> 
 						{data.examType.start_time ? parseDate(data.examType.start_time).toLocaleString('id-ID') : '-'} s.d. 
 						{data.examType.end_time ? parseDate(data.examType.end_time).toLocaleString('id-ID') : '-'}
+					</div>
+					
+					<div class="col-span-2 border-t border-slate-200 pt-3 mt-1">
+						<label class="flex items-center gap-2 mb-3">
+							<input type="checkbox" name="use_sessions" class="rounded border-slate-300 text-indigo-600" on:change={(e) => document.getElementById('c-sessions-container')?.classList.toggle('hidden', !e.target.checked)} />
+							<span class="text-sm font-semibold text-slate-700">Aktifkan Jadwal Per Sesi (Opsional)</span>
+						</label>
+						<div id="c-sessions-container" class="hidden grid grid-cols-2 gap-3 pl-6 border-l-2 border-indigo-100">
+							{#each [1, 2, 3, 4] as sessionNum}
+								<div class="col-span-2 bg-white p-3 rounded border border-slate-100 grid grid-cols-2 gap-3">
+									<div class="col-span-2 text-sm font-medium text-slate-700">Sesi {sessionNum}</div>
+									<div>
+										<label class="text-xs text-slate-500 block mb-1">Mulai</label>
+										<input name={`session_${sessionNum}_start`} type="datetime-local" class="input text-sm py-1" min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
+									</div>
+									<div>
+										<label class="text-xs text-slate-500 block mb-1">Selesai</label>
+										<input name={`session_${sessionNum}_end`} type="datetime-local" class="input text-sm py-1" min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
+									</div>
+								</div>
+							{/each}
+						</div>
 					</div>
 				</div>
 				<div>
@@ -315,8 +337,30 @@
 						<input id="e-start" name="start_time" type="datetime-local" class="input" value={editingExam.start_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
 					</div>
 					<div>
-						<label class="label" for="e-end">Waktu Selesai</label>
+						<label class="label" for="e-end">Waktu Selesai (Default)</label>
 						<input id="e-end" name="end_time" type="datetime-local" class="input" value={editingExam.end_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
+					</div>
+					<div class="col-span-2 border-t border-slate-200 pt-3 mt-1">
+						<label class="flex items-center gap-2 mb-3">
+							<input type="checkbox" name="use_sessions" class="rounded border-slate-300 text-indigo-600" checked={editingExam.sessions && editingExam.sessions.length > 0} on:change={(e) => document.getElementById('e-sessions-container')?.classList.toggle('hidden', !e.target.checked)} />
+							<span class="text-sm font-semibold text-slate-700">Aktifkan Jadwal Per Sesi (Opsional)</span>
+						</label>
+						<div id="e-sessions-container" class="{editingExam.sessions && editingExam.sessions.length > 0 ? '' : 'hidden'} grid grid-cols-2 gap-3 pl-6 border-l-2 border-indigo-100">
+							{#each [1, 2, 3, 4] as sessionNum}
+								{@const session = editingExam.sessions?.find(s => s.session_number === sessionNum) || {}}
+								<div class="col-span-2 bg-white p-3 rounded border border-slate-100 grid grid-cols-2 gap-3">
+									<div class="col-span-2 text-sm font-medium text-slate-700">Sesi {sessionNum}</div>
+									<div>
+										<label class="text-xs text-slate-500 block mb-1">Mulai</label>
+										<input name={`session_${sessionNum}_start`} type="datetime-local" class="input text-sm py-1" value={session.start_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
+									</div>
+									<div>
+										<label class="text-xs text-slate-500 block mb-1">Selesai</label>
+										<input name={`session_${sessionNum}_end`} type="datetime-local" class="input text-sm py-1" value={session.end_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
+									</div>
+								</div>
+							{/each}
+						</div>
 					</div>
 				</div>
 				<div>

@@ -12,6 +12,9 @@ export interface StudentScheduleItem {
 	subject: string | null;
 	proctors: string | null;
 	question_count: number;
+	session_number?: number;
+	session_start_time?: string | null;
+	session_end_time?: string | null;
 }
 
 export const load: PageServerLoad = async ({ platform, locals }) => {
@@ -45,7 +48,42 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		ORDER BY CASE WHEN e.start_time IS NULL THEN 1 ELSE 0 END, e.start_time ASC, e.created_at DESC
 	`).bind(locals.user.id, locals.user.school_id).all<StudentScheduleItem>();
 
+	let schedules = examsQuery.results || [];
+	
+	// Fetch student's session_number
+	const studentRecord = await db.prepare('SELECT session_number FROM users WHERE id = ?').bind(locals.user.id).first<{ session_number: number }>();
+	const studentSession = studentRecord?.session_number || 1;
+
+	// Check for exam_sessions
+	if (schedules.length > 0) {
+		const examIds = schedules.map(s => s.id);
+		const placeholders = examIds.map(() => '?').join(',');
+		const sessionsQuery = await db.prepare(`SELECT * FROM exam_sessions WHERE exam_id IN (${placeholders}) AND session_number = ?`)
+			.bind(...examIds, studentSession).all<any>();
+		
+		const sessionMap = new Map();
+		for (const row of sessionsQuery.results) {
+			sessionMap.set(row.exam_id, row);
+		}
+
+		schedules = schedules.map(schedule => {
+			const session = sessionMap.get(schedule.id);
+			if (session) {
+				return {
+					...schedule,
+					session_number: studentSession,
+					session_start_time: session.start_time,
+					session_end_time: session.end_time,
+					// Override main times for display and validation
+					start_time: session.start_time || schedule.start_time,
+					end_time: session.end_time || schedule.end_time,
+				};
+			}
+			return { ...schedule, session_number: studentSession };
+		});
+	}
+
 	return {
-		schedules: examsQuery.results || []
+		schedules
 	};
 };

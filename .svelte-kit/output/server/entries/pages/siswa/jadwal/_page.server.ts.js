@@ -26,8 +26,35 @@ const load = async ({ platform, locals }) => {
 		WHERE ep.student_id = ? AND e.school_id = ? AND e.is_active = 1 AND et.is_active = 1
 		ORDER BY CASE WHEN e.start_time IS NULL THEN 1 ELSE 0 END, e.start_time ASC, e.created_at DESC
 	`).bind(locals.user.id, locals.user.school_id).all();
+  let schedules = examsQuery.results || [];
+  const studentRecord = await db.prepare("SELECT session_number FROM users WHERE id = ?").bind(locals.user.id).first();
+  const studentSession = studentRecord?.session_number || 1;
+  if (schedules.length > 0) {
+    const examIds = schedules.map((s) => s.id);
+    const placeholders = examIds.map(() => "?").join(",");
+    const sessionsQuery = await db.prepare(`SELECT * FROM exam_sessions WHERE exam_id IN (${placeholders}) AND session_number = ?`).bind(...examIds, studentSession).all();
+    const sessionMap = /* @__PURE__ */ new Map();
+    for (const row of sessionsQuery.results) {
+      sessionMap.set(row.exam_id, row);
+    }
+    schedules = schedules.map((schedule) => {
+      const session = sessionMap.get(schedule.id);
+      if (session) {
+        return {
+          ...schedule,
+          session_number: studentSession,
+          session_start_time: session.start_time,
+          session_end_time: session.end_time,
+          // Override main times for display and validation
+          start_time: session.start_time || schedule.start_time,
+          end_time: session.end_time || schedule.end_time
+        };
+      }
+      return { ...schedule, session_number: studentSession };
+    });
+  }
   return {
-    schedules: examsQuery.results || []
+    schedules
   };
 };
 export {
