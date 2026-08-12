@@ -35,11 +35,14 @@ const load = async ({ platform, params, locals }) => {
       session_time: sessionRecord ? `${sessionRecord.start_time?.slice(11, 16) || "?"} - ${sessionRecord.end_time?.slice(11, 16) || "?"}` : null
     };
   });
+  const roomsCount = await db.prepare("SELECT COUNT(*) as count FROM exam_rooms WHERE exam_id = ?").bind(examId).first();
+  const hasRooms = (roomsCount?.count || 0) > 0;
   return {
     school,
     exam,
     participants: formattedParticipants,
-    hasSessions: sessions.results.length > 0
+    hasSessions: sessions.results.length > 0,
+    hasRooms
   };
 };
 export {

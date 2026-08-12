@@ -107,15 +107,25 @@
 									<td class="py-1 align-top font-bold"><div class="line-clamp-2 leading-tight pr-1">{p.student_name}</div></td>
 								</tr>
 								<tr>
-									<td class="py-1 align-top font-medium text-slate-700">Kelas / Ruang</td>
+									<td class="py-1 align-top font-medium text-slate-700">Kelas</td>
 									<td class="py-1 align-top text-center">:</td>
-									<td class="py-1 align-top font-bold">{p.class_name || '-'} / ..........</td>
+									<td class="py-1 align-top font-bold">{p.class_name || '-'}</td>
 								</tr>
+								{#if data.hasRooms || data.hasSessions}
 								<tr>
-									<td class="py-1 align-top font-medium text-slate-700">Sesi</td>
+									<td class="py-1 align-top font-medium text-slate-700">{data.hasRooms && data.hasSessions ? 'Ruang / Sesi' : data.hasRooms ? 'Ruang' : 'Sesi'}</td>
 									<td class="py-1 align-top text-center">:</td>
-									<td class="py-1 align-top font-bold">Sesi {p.session_number}</td>
+									<td class="py-1 align-top font-bold">
+										{#if data.hasRooms && data.hasSessions}
+											.......... / Sesi {p.session_number}
+										{:else if data.hasRooms}
+											..........
+										{:else}
+											Sesi {p.session_number}
+										{/if}
+									</td>
 								</tr>
+								{/if}
 								<tr>
 									<td class="py-1 align-top font-medium text-slate-700">TTL</td>
 									<td class="py-1 align-top text-center">:</td>
@@ -210,11 +220,21 @@
 								<td class="py-[2px] align-top text-center">:</td>
 								<td class="py-[2px] font-bold align-top">{p.class_name || '-'}</td>
 							</tr>
+							{#if data.hasRooms || data.hasSessions}
 							<tr>
-								<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">Sesi</td>
+								<td class="py-[2px] align-top font-medium text-slate-700 whitespace-nowrap">{data.hasRooms && data.hasSessions ? 'Ruang / Sesi' : data.hasRooms ? 'Ruang' : 'Sesi'}</td>
 								<td class="py-[2px] align-top text-center">:</td>
-								<td class="py-[2px] font-bold align-top">Sesi {p.session_number}</td>
+								<td class="py-[2px] font-bold align-top">
+									{#if data.hasRooms && data.hasSessions}
+										.......... / Sesi {p.session_number}
+									{:else if data.hasRooms}
+										..........
+									{:else}
+										Sesi {p.session_number}
+									{/if}
+								</td>
 							</tr>
+							{/if}
 							<tr class="border-t border-slate-300">
 								<td class="py-[2px] pt-1 align-top font-medium text-slate-700 whitespace-nowrap">Username</td>
 								<td class="py-[2px] pt-1 align-top text-center">:</td>

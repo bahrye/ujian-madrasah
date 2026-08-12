@@ -33,6 +33,12 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 	const sample = await db.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(locals.user!.school_id).first();
 	const isNomorPesertaMode = (sample && sample.username === sample.nomor_peserta);
 
+	const sessionsCount = await db.prepare('SELECT COUNT(*) as count FROM exam_sessions WHERE exam_id = ?').bind(examId).first<{count: number}>();
+	const hasSessions = (sessionsCount?.count || 0) > 0;
+
+	const roomsCount = await db.prepare('SELECT COUNT(*) as count FROM exam_rooms WHERE exam_id = ?').bind(examId).first<{count: number}>();
+	const hasRooms = (roomsCount?.count || 0) > 0;
+
 	// Group participants by Room -> Session -> Class
 	const results = participants.results as any[];
 	const participantsGrouped = results.reduce<Record<string, Record<number, any[]>>>((acc, p) => {
@@ -50,6 +56,8 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 		school,
 		exam, 
 		participantsGrouped,
-		isNomorPesertaMode
+		isNomorPesertaMode,
+		hasSessions,
+		hasRooms
 	};
 };

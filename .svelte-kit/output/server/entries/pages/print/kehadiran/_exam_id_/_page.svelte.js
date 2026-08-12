@@ -36,7 +36,15 @@ function _page($$renderer, $$props) {
         } else {
           $$renderer2.push("<!--[-1-->");
         }
-        $$renderer2.push(`<!--]--></div></div> <div class="grid grid-cols-2 gap-4 mb-4 text-sm"><table class="w-full"><tbody><tr><td class="py-1 w-32 font-medium">Ujian</td><td class="w-4">:</td><td>${escape_html(exam.exam_type_name || exam.title)}</td></tr><tr><td class="py-1 font-medium">Mata Pelajaran</td><td>:</td><td>${escape_html(exam.subject_name || "Umum")}</td></tr><tr><td class="py-1 font-medium">Ruang / Sesi</td><td>:</td><td>${escape_html(roomName)} / Sesi ${escape_html(sessionNum)}</td></tr></tbody></table> <table class="w-full"><tbody><tr><td class="py-1 w-32 font-medium">Hari, Tanggal</td><td class="w-4">:</td><td>${escape_html(exam.start_time ? parseDate(exam.start_time).toLocaleDateString("id-ID", {
+        $$renderer2.push(`<!--]--></div></div> <div class="grid grid-cols-2 gap-4 mb-4 text-sm"><table class="w-full"><tbody><tr><td class="py-1 w-32 font-medium">Ujian</td><td class="w-4">:</td><td>${escape_html(exam.exam_type_name || exam.title)}</td></tr><tr><td class="py-1 font-medium">Mata Pelajaran</td><td>:</td><td>${escape_html(exam.subject_name || "Umum")}</td></tr>`);
+        if (data.hasSessions) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<tr><td class="py-1 font-medium">Ruang / Sesi</td><td>:</td><td>${escape_html(roomName)} / Sesi ${escape_html(sessionNum)}</td></tr>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<tr><td class="py-1 font-medium">Ruang</td><td>:</td><td>${escape_html(roomName)}</td></tr>`);
+        }
+        $$renderer2.push(`<!--]--></tbody></table> <table class="w-full"><tbody><tr><td class="py-1 w-32 font-medium">Hari, Tanggal</td><td class="w-4">:</td><td>${escape_html(exam.start_time ? parseDate(exam.start_time).toLocaleDateString("id-ID", {
           weekday: "long",
           year: "numeric",
           month: "long",

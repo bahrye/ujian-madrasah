@@ -50,7 +50,11 @@
 					<tbody>
 						<tr><td class="py-1 w-32 font-medium">Ujian</td><td class="w-4">:</td><td>{exam.exam_type_name || exam.title}</td></tr>
 						<tr><td class="py-1 font-medium">Mata Pelajaran</td><td>:</td><td>{exam.subject_name || 'Umum'}</td></tr>
+						{#if data.hasSessions}
 						<tr><td class="py-1 font-medium">Ruang / Sesi</td><td>:</td><td>{roomName} / Sesi {sessionNum}</td></tr>
+						{:else}
+						<tr><td class="py-1 font-medium">Ruang</td><td>:</td><td>{roomName}</td></tr>
+						{/if}
 					</tbody>
 				</table>
 				<table class="w-full">

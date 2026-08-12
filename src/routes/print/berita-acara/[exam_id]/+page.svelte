@@ -67,12 +67,21 @@
 					<td class="py-1">:</td>
 					<td class="py-1 font-bold">{exam.subject_name || 'Umum'}</td>
 				</tr>
+				{#if data.hasSessions}
 				<tr>
 					<td class="py-1">3.</td>
 					<td class="py-1">Ruang / Sesi</td>
 					<td class="py-1">:</td>
 					<td class="py-1 font-bold">{roomName} / Sesi {sessionNum}</td>
 				</tr>
+				{:else}
+				<tr>
+					<td class="py-1">3.</td>
+					<td class="py-1">Ruang</td>
+					<td class="py-1">:</td>
+					<td class="py-1 font-bold">{roomName}</td>
+				</tr>
+				{/if}
 				<tr>
 					<td class="py-1">4.</td>
 					<td class="py-1">Jumlah Peserta Seharusnya</td>

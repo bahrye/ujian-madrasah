@@ -39,10 +39,16 @@ const load = async ({ platform, params, locals, url }) => {
       display_nomor_peserta: p.nomor_peserta || "-"
     };
   });
+  const sessionsCount = await db.prepare("SELECT COUNT(*) as count FROM exam_sessions WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ? AND exam_type_id = ?)").bind(locals.user.school_id, typeId).first();
+  const hasSessions = (sessionsCount?.count || 0) > 0;
+  const roomsCount = await db.prepare("SELECT COUNT(*) as count FROM exam_rooms WHERE exam_id IN (SELECT id FROM exams WHERE school_id = ? AND exam_type_id = ?)").bind(locals.user.school_id, typeId).first();
+  const hasRooms = (roomsCount?.count || 0) > 0;
   return {
     school,
     examType,
-    participants: formattedParticipants
+    participants: formattedParticipants,
+    hasSessions,
+    hasRooms
   };
 };
 export {

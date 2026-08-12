@@ -49,10 +49,14 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 		};
 	});
 
+	const roomsCount = await db.prepare('SELECT COUNT(*) as count FROM exam_rooms WHERE exam_id = ?').bind(examId).first<{count: number}>();
+	const hasRooms = (roomsCount?.count || 0) > 0;
+
 	return { 
 		school,
 		exam, 
 		participants: formattedParticipants,
-		hasSessions: sessions.results.length > 0
+		hasSessions: sessions.results.length > 0,
+		hasRooms
 	};
 };

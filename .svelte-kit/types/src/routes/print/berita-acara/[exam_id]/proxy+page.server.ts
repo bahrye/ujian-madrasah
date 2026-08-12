@@ -41,10 +41,18 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 	const sample = await db.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(locals.user!.school_id).first();
 	const isNomorPesertaMode = (sample && sample.username === sample.nomor_peserta);
 
+	const sessionsCount = await db.prepare('SELECT COUNT(*) as count FROM exam_sessions WHERE exam_id = ?').bind(examId).first<{count: number}>();
+	const hasSessions = (sessionsCount?.count || 0) > 0;
+
+	const roomsCount = await db.prepare('SELECT COUNT(*) as count FROM exam_rooms WHERE exam_id = ?').bind(examId).first<{count: number}>();
+	const hasRooms = (roomsCount?.count || 0) > 0;
+
 	return { 
 		school,
 		exam, 
 		participantsGrouped,
-		isNomorPesertaMode
+		isNomorPesertaMode,
+		hasSessions,
+		hasRooms
 	};
 };

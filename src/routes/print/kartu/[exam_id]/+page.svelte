@@ -51,15 +51,23 @@
 									<td class="py-1 font-bold"><div class="line-clamp-2 leading-tight pr-1">{p.student_name}</div></td>
 								</tr>
 								<tr>
-									<td class="py-1 font-medium text-slate-700">Kelas / Ruang</td>
+									<td class="py-1 font-medium text-slate-700">Kelas</td>
 									<td class="py-1 text-center">:</td>
-									<td class="py-1 font-bold">{p.class_name || '-'} / {p.room_name || '..........'}</td>
+									<td class="py-1 font-bold">{p.class_name || '-'}</td>
 								</tr>
-								{#if data.hasSessions}
+								{#if data.hasRooms || data.hasSessions}
 								<tr>
-									<td class="py-1 font-medium text-slate-700">Sesi & Waktu</td>
+									<td class="py-1 font-medium text-slate-700">{data.hasRooms && data.hasSessions ? 'Ruang / Sesi' : data.hasRooms ? 'Ruang' : 'Sesi & Waktu'}</td>
 									<td class="py-1 text-center">:</td>
-									<td class="py-1 font-bold">Sesi {p.session_number} ({p.session_time || '-'})</td>
+									<td class="py-1 font-bold">
+										{#if data.hasRooms && data.hasSessions}
+											{p.room_name || '..........'} / Sesi {p.session_number} ({p.session_time || '-'})
+										{:else if data.hasRooms}
+											{p.room_name || '..........'}
+										{:else}
+											Sesi {p.session_number} ({p.session_time || '-'})
+										{/if}
+									</td>
 								</tr>
 								{/if}
 								<tr>
