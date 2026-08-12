@@ -147,7 +147,19 @@
 					<svg class="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.calendar} />
 					</svg>
-					{#if exam.start_time || exam.end_time}
+					{#if exam.sessions && exam.sessions.length > 0}
+						<div class="flex flex-col gap-1 min-w-0 flex-1">
+							{#each exam.sessions as s}
+								<div class="flex flex-col border border-slate-100 rounded px-2 py-1 bg-slate-50 relative group">
+									<span class="text-slate-700 text-[10px] font-bold border-b border-slate-200 mb-0.5 pb-0.5 flex justify-between items-center">
+										Sesi {s.session_number}
+									</span>
+									<span class="truncate text-[10px] mt-0.5">{s.start_time ? parseDate(s.start_time).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'} -</span>
+									<span class="truncate text-[10px]">{s.end_time ? parseDate(s.end_time).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'}</span>
+								</div>
+							{/each}
+						</div>
+					{:else if exam.start_time || exam.end_time}
 						<div class="flex flex-col gap-0.5 min-w-0 flex-1">
 							<span class="text-slate-400 text-[10px] font-medium">Mulai:</span>
 							<span class="truncate text-xs">{exam.start_time ? parseDate(exam.start_time).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'}</span>
