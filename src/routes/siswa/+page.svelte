@@ -327,6 +327,8 @@
 							<th class="border-2 border-slate-300 px-3 py-2 uppercase">NO</th>
 							<th class="border-2 border-slate-300 px-3 py-2 uppercase">HARI, TANGGAL</th>
 							<th class="border-2 border-slate-300 px-3 py-2 uppercase">JAM KE</th>
+							<th class="border-2 border-slate-300 px-3 py-2 uppercase">RUANG</th>
+							<th class="border-2 border-slate-300 px-3 py-2 uppercase">SESI</th>
 							<th class="border-2 border-slate-300 px-3 py-2 uppercase">WAKTU</th>
 							<th class="border-2 border-slate-300 px-3 py-2 uppercase">MATA PELAJARAN</th>
 							<th class="border-2 border-slate-300 px-3 py-2 uppercase">STATUS</th>
@@ -343,6 +345,8 @@
 										<td class="border-2 border-slate-300 px-3 py-2 text-center" rowspan={group.exams.length}>{group.dateStr}</td>
 									{/if}
 									<td class="border-2 border-slate-300 px-3 py-2 text-center">{eIdx + 1}</td>
+									<td class="border-2 border-slate-300 px-3 py-2 text-center">{exam.room_name || 'Ruang Ujian'}</td>
+									<td class="border-2 border-slate-300 px-3 py-2 text-center">{exam.has_sessions ? exam.session_number || 1 : '-'}</td>
 									<td class="border-2 border-slate-300 px-3 py-2 text-center tracking-wider">
 										{formatOnlyTime(exam.start_time || '')} - {formatOnlyTime(exam.end_time || '')}
 									</td>

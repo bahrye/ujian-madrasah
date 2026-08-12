@@ -69,9 +69,23 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<h3 class="font-bold text-slate-800 text-lg mb-1">${escape_html(exam.title)}</h3>`);
         }
         $$renderer2.push(`<!--]--> <p class="text-sm text-slate-500 mb-2">${escape_html(exam.subject || "Umum")}</p> `);
-        if (exam.session_number) {
+        if (exam.room_name || exam.session_number) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<div class="mb-4"><span class="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-md">Sesi ${escape_html(exam.session_number)}</span></div>`);
+          $$renderer2.push(`<div class="mb-4 flex items-center gap-2">`);
+          if (exam.room_name) {
+            $$renderer2.push("<!--[0-->");
+            $$renderer2.push(`<span class="text-xs font-semibold px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-100 rounded-md">${escape_html(exam.room_name)}</span>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+          }
+          $$renderer2.push(`<!--]--> `);
+          if (exam.session_number) {
+            $$renderer2.push("<!--[0-->");
+            $$renderer2.push(`<span class="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-md">Sesi ${escape_html(exam.session_number)}</span>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+          }
+          $$renderer2.push(`<!--]--></div>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }

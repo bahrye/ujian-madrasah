@@ -107,11 +107,18 @@
 					{/if}
 					<p class="text-sm text-slate-500 mb-2">{exam.subject || 'Umum'}</p>
 					
-					{#if exam.session_number}
-						<div class="mb-4">
-							<span class="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-md">
-								Sesi {exam.session_number}
-							</span>
+					{#if exam.room_name || exam.session_number}
+						<div class="mb-4 flex items-center gap-2">
+							{#if exam.room_name}
+								<span class="text-xs font-semibold px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-100 rounded-md">
+									{exam.room_name}
+								</span>
+							{/if}
+							{#if exam.session_number}
+								<span class="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-md">
+									Sesi {exam.session_number}
+								</span>
+							{/if}
 						</div>
 					{/if}
 					

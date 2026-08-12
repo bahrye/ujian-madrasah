@@ -15,6 +15,9 @@ export interface StudentScheduleItem {
 	session_number?: number;
 	session_start_time?: string | null;
 	session_end_time?: string | null;
+	room_name?: string | null;
+	has_sessions?: number;
+	ep_session_number?: number;
 }
 
 export const load: PageServerLoad = async ({ platform, locals }) => {
@@ -39,9 +42,12 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 					SELECT u.name FROM users u WHERE u.id = e.created_by AND u.role = 'guru'
 				)
 			) as proctors,
-			(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count
+			(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count,
+			ep.session_number as ep_session_number,
+			r.name as room_name
 		FROM exams e
 		JOIN exam_participants ep ON e.id = ep.exam_id
+		LEFT JOIN exam_rooms r ON ep.room_id = r.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		JOIN exam_types et ON e.exam_type_id = et.id
 		WHERE ep.student_id = ? AND e.school_id = ? AND e.is_active = 1 AND et.is_active = 1
@@ -80,19 +86,19 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		}
 
 		schedules = schedules.map(schedule => {
+			const usedSession = schedule.has_sessions ? (schedule.ep_session_number || studentSession) : null;
 			const session = sessionMap.get(schedule.id);
-			if (session) {
+			if (session && usedSession && session.session_number === usedSession) {
 				return {
 					...schedule,
-					session_number: studentSession,
+					session_number: usedSession,
 					session_start_time: session.start_time,
 					session_end_time: session.end_time,
-					// Override main times for display and validation
 					start_time: session.start_time || schedule.start_time,
 					end_time: session.end_time || schedule.end_time,
 				};
 			}
-			return { ...schedule, session_number: studentSession };
+			return { ...schedule, session_number: usedSession || undefined };
 		});
 	}
 

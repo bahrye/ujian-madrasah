@@ -68,6 +68,18 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 				ORDER BY created_at DESC LIMIT 1
 			) as attempt_status,
 			(
+				SELECT r.name 
+				FROM exam_participants ep2 
+				LEFT JOIN exam_rooms r ON ep2.room_id = r.id 
+				WHERE ep2.exam_id = e.id AND ep2.student_id = ?
+			) as room_name,
+			(
+				SELECT ep2.session_number 
+				FROM exam_participants ep2 
+				WHERE ep2.exam_id = e.id AND ep2.student_id = ?
+			) as session_number,
+			(SELECT COUNT(*) FROM exam_sessions WHERE exam_id = e.id) > 0 as has_sessions,
+			(
 				SELECT GROUP_CONCAT(u.name, '||')
 				FROM exam_proctors epr
 				JOIN users u ON epr.proctor_id = u.id
@@ -87,7 +99,7 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		  AND e.is_active = 1
 		  AND et.is_active = 1
 		ORDER BY et.id ASC, e.start_time ASC, e.id ASC
-	`).bind(userId, locals.user!.school_id, userId).all();
+	`).bind(userId, userId, userId, locals.user!.school_id, userId).all();
 
 	return {
 		activeExams: activeExams.results,
