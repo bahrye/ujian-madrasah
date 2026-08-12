@@ -79,8 +79,13 @@ export const actions = {
 			
 			// Validasi sesi dan waktu ujian
 			const studentSession = token.session_number || 1;
-			const sessionRecord = await db.prepare('SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?')
-				.bind(parsedExamId, studentSession).first<{ start_time: string | null, end_time: string | null }>();
+			let sessionRecord = null;
+			try {
+				sessionRecord = await db.prepare('SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?')
+					.bind(parsedExamId, studentSession).first<{ start_time: string | null, end_time: string | null }>();
+			} catch (e: any) {
+				console.warn('Failed to fetch exam_sessions:', e.message);
+			}
 			
 			const startTimeStr = sessionRecord?.start_time || token.exam_start_time;
 			const endTimeStr = sessionRecord?.end_time || token.exam_end_time;
@@ -162,8 +167,13 @@ export const actions = {
 
 			// Validasi sesi dan waktu ujian
 			const studentSession = token.session_number || 1;
-			const sessionRecord = await db.prepare('SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?')
-				.bind(parsedExamId, studentSession).first<{ start_time: string | null, end_time: string | null }>();
+			let sessionRecord = null;
+			try {
+				sessionRecord = await db.prepare('SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?')
+					.bind(parsedExamId, studentSession).first<{ start_time: string | null, end_time: string | null }>();
+			} catch (e: any) {
+				console.warn('Failed to fetch exam_sessions:', e.message);
+			}
 			
 			const startTimeStr = sessionRecord?.start_time || token.exam_start_time;
 			const endTimeStr = sessionRecord?.end_time || token.exam_end_time;

@@ -62,7 +62,12 @@ const actions = {
         return fail(400, { error: "Ujian saat ini tidak aktif." });
       }
       const studentSession = token.session_number || 1;
-      const sessionRecord = await db.prepare("SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?").bind(parsedExamId, studentSession).first();
+      let sessionRecord = null;
+      try {
+        sessionRecord = await db.prepare("SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?").bind(parsedExamId, studentSession).first();
+      } catch (e) {
+        console.warn("Failed to fetch exam_sessions:", e.message);
+      }
       const startTimeStr = sessionRecord?.start_time || token.exam_start_time;
       const endTimeStr = sessionRecord?.end_time || token.exam_end_time;
       const now = /* @__PURE__ */ new Date();
@@ -128,7 +133,12 @@ const actions = {
         return fail(400, { error: "Ujian saat ini tidak aktif." });
       }
       const studentSession = token.session_number || 1;
-      const sessionRecord = await db.prepare("SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?").bind(parsedExamId, studentSession).first();
+      let sessionRecord = null;
+      try {
+        sessionRecord = await db.prepare("SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?").bind(parsedExamId, studentSession).first();
+      } catch (e) {
+        console.warn("Failed to fetch exam_sessions:", e.message);
+      }
       const startTimeStr = sessionRecord?.start_time || token.exam_start_time;
       const endTimeStr = sessionRecord?.end_time || token.exam_end_time;
       const now = /* @__PURE__ */ new Date();

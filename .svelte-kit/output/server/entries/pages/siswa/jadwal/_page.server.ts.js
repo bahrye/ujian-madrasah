@@ -27,14 +27,27 @@ const load = async ({ platform, locals }) => {
 		ORDER BY CASE WHEN e.start_time IS NULL THEN 1 ELSE 0 END, e.start_time ASC, e.created_at DESC
 	`).bind(locals.user.id, locals.user.school_id).all();
   let schedules = examsQuery.results || [];
-  const studentRecord = await db.prepare("SELECT session_number FROM users WHERE id = ?").bind(locals.user.id).first();
-  const studentSession = studentRecord?.session_number || 1;
+  let studentSession = 1;
+  try {
+    const studentRecord = await db.prepare("SELECT session_number FROM users WHERE id = ?").bind(locals.user.id).first();
+    if (studentRecord && studentRecord.session_number) {
+      studentSession = studentRecord.session_number;
+    }
+  } catch (e) {
+    console.warn("Failed to fetch session_number:", e);
+  }
   if (schedules.length > 0) {
     const examIds = schedules.map((s) => s.id);
     const placeholders = examIds.map(() => "?").join(",");
-    const sessionsQuery = await db.prepare(`SELECT * FROM exam_sessions WHERE exam_id IN (${placeholders}) AND session_number = ?`).bind(...examIds, studentSession).all();
+    let sessionsResults = [];
+    try {
+      const sessionsQuery = await db.prepare(`SELECT * FROM exam_sessions WHERE exam_id IN (${placeholders}) AND session_number = ?`).bind(...examIds, studentSession).all();
+      sessionsResults = sessionsQuery.results;
+    } catch (e) {
+      console.warn("Failed to fetch exam_sessions:", e);
+    }
     const sessionMap = /* @__PURE__ */ new Map();
-    for (const row of sessionsQuery.results) {
+    for (const row of sessionsResults) {
       sessionMap.set(row.exam_id, row);
     }
     schedules = schedules.map((schedule) => {

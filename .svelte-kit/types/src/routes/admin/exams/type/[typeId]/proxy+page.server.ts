@@ -33,9 +33,13 @@ export const load = async ({ params, platform, locals }: Parameters<PageServerLo
 	const examIds = exams.results.map((e: any) => e.id);
 	let allSessions: any[] = [];
 	if (examIds.length > 0) {
-		const placeholders = examIds.map(() => '?').join(',');
-		const sessionsResult = await db.prepare(`SELECT * FROM exam_sessions WHERE exam_id IN (${placeholders})`).bind(...examIds).all();
-		allSessions = sessionsResult.results;
+		try {
+			const placeholders = examIds.map(() => '?').join(',');
+			const sessionsResult = await db.prepare(`SELECT * FROM exam_sessions WHERE exam_id IN (${placeholders})`).bind(...examIds).all();
+			allSessions = sessionsResult.results;
+		} catch (e: any) {
+			console.warn('Failed to fetch exam_sessions, table might not exist yet:', e.message);
+		}
 	}
 
 	const examsWithSessions = exams.results.map((e: any) => ({
