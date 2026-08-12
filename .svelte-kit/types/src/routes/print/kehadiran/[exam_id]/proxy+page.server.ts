@@ -18,36 +18,39 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 	
 	if (!exam) throw error(404, 'Ujian tidak ditemukan');
 
-	// Get participants grouped by class (actually just ordered by class)
+	// Get participants
 	const participants = await db.prepare(`
-		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, c.name as class_name, sa.signature
+		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, c.name as class_name, sa.signature, u.session_number, r.name as room_name
 		FROM exam_participants p
 		JOIN users u ON p.student_id = u.id
 		LEFT JOIN classes c ON u.class_id = c.id
+		LEFT JOIN exam_rooms r ON p.room_id = r.id
 		LEFT JOIN student_attempts sa ON sa.student_id = u.id AND sa.exam_id = p.exam_id
 		WHERE p.exam_id = ?
-		ORDER BY c.name, u.name
+		ORDER BY r.name, u.session_number, c.name, u.name
 	`).bind(examId).all();
 
 	// Check login mode
 	const sample = await db.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(locals.user!.school_id).first();
 	const isNomorPesertaMode = (sample && sample.username === sample.nomor_peserta);
 
-	// Group participants by class
+	// Group participants by Room -> Session -> Class
 	const results = participants.results as any[];
-	const participantsByClass = results.reduce<Record<string, any[]>>((acc, p) => {
-		const className = p.class_name || 'Tanpa Kelas';
-		if (!acc[className]) {
-			acc[className] = [];
-		}
-		acc[className].push(p);
+	const participantsGrouped = results.reduce<Record<string, Record<number, any[]>>>((acc, p) => {
+		const roomName = p.room_name || 'Ruang Default';
+		const sessionNumber = p.session_number || 1;
+		
+		if (!acc[roomName]) acc[roomName] = {};
+		if (!acc[roomName][sessionNumber]) acc[roomName][sessionNumber] = [];
+		
+		acc[roomName][sessionNumber].push(p);
 		return acc;
 	}, {});
 
 	return { 
 		school,
 		exam, 
-		participantsByClass,
+		participantsGrouped,
 		isNomorPesertaMode
 	};
 };

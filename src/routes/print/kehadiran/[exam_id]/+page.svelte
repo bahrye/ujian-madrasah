@@ -3,7 +3,7 @@
 	export let data;
 	$: school = data.school as any;
 	$: exam = data.exam as any;
-	$: participantsByClass = data.participantsByClass as Record<string, any[]>;
+	$: participantsGrouped = data.participantsGrouped as Record<string, Record<number, any[]>>;
 	$: isNomorPesertaMode = data.isNomorPesertaMode;
 </script>
 
@@ -25,9 +25,11 @@
 </style>
 
 <div class="p-8 print:p-12 max-w-[21cm] mx-auto bg-white">
-	<!-- Print each class on a new page if necessary, but here we just list them -->
-	{#each Object.entries(participantsByClass) as [className, students], classIdx}
-		<div class={classIdx > 0 ? "break-before-page pt-8" : ""}>
+	<!-- Print each room and session on a new page -->
+	{#each Object.entries(participantsGrouped) as [roomName, sessionsDict], roomIdx}
+		{#each Object.entries(sessionsDict) as [sessionNumStr, students], sessionIdx}
+			{@const sessionNum = parseInt(sessionNumStr)}
+		<div class={roomIdx > 0 || sessionIdx > 0 ? "break-before-page pt-8" : ""}>
 			<!-- Kop -->
 			<div class="text-center mb-6 pb-4 border-b-2 border-black flex items-center">
 				{#if school?.logo_url}
@@ -48,7 +50,7 @@
 					<tbody>
 						<tr><td class="py-1 w-32 font-medium">Ujian</td><td class="w-4">:</td><td>{exam.exam_type_name || exam.title}</td></tr>
 						<tr><td class="py-1 font-medium">Mata Pelajaran</td><td>:</td><td>{exam.subject_name || 'Umum'}</td></tr>
-						<tr><td class="py-1 font-medium">Kelas / Ruang</td><td>:</td><td>{className} / ....................</td></tr>
+						<tr><td class="py-1 font-medium">Ruang / Sesi</td><td>:</td><td>{roomName} / Sesi {sessionNum}</td></tr>
 					</tbody>
 				</table>
 				<table class="w-full">
@@ -66,6 +68,7 @@
 						<th class="border border-black p-2 w-12 text-center">No</th>
 						<th class="border border-black p-2 px-4 whitespace-nowrap">{isNomorPesertaMode ? 'No. Peserta' : 'NISN'}</th>
 						<th class="border border-black p-2 text-left">Nama Peserta</th>
+						<th class="border border-black p-2 text-left w-24">Kelas</th>
 						<th class="border border-black p-2 w-48 text-center" colspan="2">Tanda Tangan</th>
 						<th class="border border-black p-2 w-24 text-center">Ket.</th>
 					</tr>
@@ -76,6 +79,7 @@
 							<td class="border border-black p-2 text-center">{i + 1}</td>
 							<td class="border border-black p-2 text-center font-mono whitespace-nowrap text-[11px] leading-tight">{isNomorPesertaMode ? (p.nomor_peserta || '-') : (p.nisn || p.username)}</td>
 							<td class="border border-black p-2">{p.student_name}</td>
+							<td class="border border-black p-2 text-xs">{p.class_name || '-'}</td>
 							<td class="border-b border-black p-2 w-24 align-top h-12 relative text-center">
 								{#if (i + 1) % 2 !== 0}
 									<span class="text-xs text-slate-500 text-left absolute top-1 left-1 z-10">{i + 1}.</span>
@@ -97,7 +101,7 @@
 					{/each}
 					{#if students.length === 0}
 						<tr>
-							<td colspan="6" class="border border-black p-4 text-center italic">Tidak ada peserta di kelas ini.</td>
+							<td colspan="7" class="border border-black p-4 text-center italic">Tidak ada peserta.</td>
 						</tr>
 					{/if}
 				</tbody>
@@ -117,9 +121,10 @@
 				</div>
 			</div>
 		</div>
+		{/each}
 	{/each}
 
-	{#if Object.keys(participantsByClass).length === 0}
+	{#if Object.keys(participantsGrouped).length === 0}
 		<div class="text-center text-slate-500 py-10">
 			Belum ada peserta di ujian ini.
 		</div>

@@ -53,7 +53,7 @@
 								<tr>
 									<td class="py-1 font-medium text-slate-700">Kelas / Ruang</td>
 									<td class="py-1 text-center">:</td>
-									<td class="py-1 font-bold">{p.class_name || '-'} / ..........</td>
+									<td class="py-1 font-bold">{p.class_name || '-'} / {p.room_name || '..........'}</td>
 								</tr>
 								{#if data.hasSessions}
 								<tr>

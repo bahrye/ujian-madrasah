@@ -3,7 +3,7 @@
 	export let data;
 	$: school = data.school as any;
 	$: exam = data.exam as any;
-	$: totalParticipants = data.totalParticipants as number;
+	$: participantsGrouped = data.participantsGrouped as Record<string, Record<number, number>>;
 	$: isNomorPesertaMode = data.isNomorPesertaMode;
 </script>
 
@@ -11,7 +11,22 @@
 	<title>Berita Acara - {exam.exam_type_name || exam.title}</title>
 </svelte:head>
 
-<div class="p-4 md:p-8 max-w-4xl mx-auto font-serif text-[15px] leading-snug print:p-0 print:m-0">
+<style>
+	@media print {
+		@page { margin: 0; }
+		:global(body) {
+			margin: 0;
+			-webkit-print-color-adjust: exact;
+			print-color-adjust: exact;
+		}
+	}
+</style>
+
+<div class="p-4 md:p-8 max-w-4xl mx-auto font-serif text-[15px] leading-snug print:p-0 print:m-0 bg-white">
+{#each Object.entries(participantsGrouped) as [roomName, sessionsDict], roomIdx}
+	{#each Object.entries(sessionsDict) as [sessionNumStr, count], sessionIdx}
+		{@const sessionNum = parseInt(sessionNumStr)}
+		<div class={roomIdx > 0 || sessionIdx > 0 ? "break-before-page pt-8" : ""}>
 	<!-- Kop -->
 	<div class="text-center mb-4 pb-3 border-b-4 border-black flex items-center relative">
 		{#if school?.logo_url}
@@ -54,15 +69,15 @@
 				</tr>
 				<tr>
 					<td class="py-1">3.</td>
-					<td class="py-1">Ruang / Kelas</td>
+					<td class="py-1">Ruang / Sesi</td>
 					<td class="py-1">:</td>
-					<td class="py-1 font-bold">................................................</td>
+					<td class="py-1 font-bold">{roomName} / Sesi {sessionNum}</td>
 				</tr>
 				<tr>
 					<td class="py-1">4.</td>
 					<td class="py-1">Jumlah Peserta Seharusnya</td>
 					<td class="py-1">:</td>
-					<td class="py-1 font-bold">{totalParticipants} Orang</td>
+					<td class="py-1 font-bold">{count} Orang</td>
 				</tr>
 				<tr>
 					<td class="py-1">5.</td>
@@ -134,4 +149,13 @@
 			</div>
 		</div>
 	</div>
+		</div>
+	{/each}
+{/each}
+
+{#if Object.keys(participantsGrouped).length === 0}
+	<div class="text-center text-slate-500 py-10">
+		Belum ada peserta di ujian ini.
+	</div>
+{/if}
 </div>

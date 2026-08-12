@@ -160,6 +160,47 @@
 		</div>
 	</div>
 
+	<!-- Manajemen Ruang -->
+	<div class="card overflow-hidden mb-6">
+		<div class="p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-3">
+			<div>
+				<h2 class="text-lg font-bold text-slate-800">Manajemen Ruang</h2>
+				<p class="text-xs text-slate-500 mt-0.5">Bagi peserta dan pengawas ke dalam beberapa ruang (opsional).</p>
+			</div>
+			<form method="POST" action="?/addRoom" use:enhance class="flex items-center gap-2">
+				<input type="text" name="name" class="input py-1.5 text-sm w-48" placeholder="Nama Ruang (cth: LAB 1)" required />
+				<button type="submit" class="btn-sm btn-primary shrink-0">Tambah Ruang</button>
+			</form>
+		</div>
+		{#if data.examRooms.length === 0}
+			<div class="p-6 text-center text-slate-400 text-sm">Tidak ada pembagian ruang. Semua peserta berada dalam 1 ruang default.</div>
+		{:else}
+			<div class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+				{#each data.examRooms as room}
+					<div class="border border-slate-100 rounded-lg p-3 bg-slate-50 flex items-center justify-between">
+						<div class="font-medium text-slate-700 text-sm">{room.name}</div>
+						<ConfirmForm 
+							action="?/deleteRoom"
+							confirmTitle="Hapus Ruang"
+							confirmMessage="Hapus ruang ujian ini? Peserta dan pengawas di ruang ini tidak akan memiliki ruang yang spesifik."
+							buttonClass="text-rose-500 hover:text-rose-700 p-1"
+							buttonTitle="Hapus"
+						>
+							<svelte:fragment slot="inputs">
+								<input type="hidden" name="room_id" value={room.id} />
+							</svelte:fragment>
+							<svelte:fragment slot="buttonContent">
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
+								</svg>
+							</svelte:fragment>
+						</ConfirmForm>
+					</div>
+				{/each}
+			</div>
+		{/if}
+	</div>
+
 	<!-- Daftar Pengajar -->
 	<div class="card overflow-hidden mb-6">
 		<div class="p-5 border-b border-slate-100 flex items-center justify-between">
@@ -179,12 +220,25 @@
 		{:else}
 			<div class="table-container border-0 rounded-none">
 				<table class="table">
-					<thead><tr><th>Nama Guru</th><th>Username</th><th>Aksi</th></tr></thead>
+					<thead><tr><th>Nama Guru</th><th>Username</th>{#if data.examRooms.length > 0}<th>Ruang</th>{/if}<th>Aksi</th></tr></thead>
 					<tbody>
 						{#each examTeachers as teacher}
 							<tr>
 								<td class="font-medium text-slate-800">{teacher.name}</td>
 								<td class="font-mono text-sm text-slate-500">{teacher.username}</td>
+								{#if data.examRooms.length > 0}
+								<td>
+									<form method="POST" action="?/updateTeacherRoom" use:enhance>
+										<input type="hidden" name="exam_teacher_id" value={teacher.exam_teacher_id} />
+										<select name="room_id" class="select select-sm select-bordered w-full max-w-[120px]" on:change={(e) => e.currentTarget.form.requestSubmit()}>
+											<option value="">- Default -</option>
+											{#each data.examRooms as room}
+												<option value={room.id} selected={teacher.room_id === room.id}>{room.name}</option>
+											{/each}
+										</select>
+									</form>
+								</td>
+								{/if}
 								<td>
 									<ConfirmForm 
 										action="?/removeTeacher"
@@ -227,12 +281,25 @@
 		{:else}
 			<div class="table-container border-0 rounded-none max-h-64 overflow-y-auto">
 				<table class="table">
-					<thead class="sticky top-0 bg-white"><tr><th>Nama Pengawas</th><th>Username</th><th>Aksi</th></tr></thead>
+					<thead class="sticky top-0 bg-white"><tr><th>Nama Pengawas</th><th>Username</th>{#if data.examRooms.length > 0}<th>Ruang</th>{/if}<th>Aksi</th></tr></thead>
 					<tbody>
 						{#each examProctors as proctor}
 							<tr>
 								<td class="font-medium text-slate-800">{proctor.name}</td>
 								<td class="font-mono text-sm text-slate-500">{proctor.username}</td>
+								{#if data.examRooms.length > 0}
+								<td>
+									<form method="POST" action="?/updateProctorRoom" use:enhance>
+										<input type="hidden" name="exam_proctor_id" value={proctor.exam_proctor_id} />
+										<select name="room_id" class="select select-sm select-bordered w-full max-w-[120px]" on:change={(e) => e.currentTarget.form.requestSubmit()}>
+											<option value="">- Default -</option>
+											{#each data.examRooms as room}
+												<option value={room.id} selected={proctor.room_id === room.id}>{room.name}</option>
+											{/each}
+										</select>
+									</form>
+								</td>
+								{/if}
 								<td>
 									<ConfirmForm 
 										action="?/removeProctor"
@@ -275,7 +342,7 @@
 		{:else}
 			<div class="table-container border-0 rounded-none max-h-96 overflow-y-auto">
 				<table class="table">
-					<thead class="sticky top-0 bg-white"><tr><th>NISN</th><th>Nama Siswa</th><th>Kelas</th>{#if data.hasSessions}<th>Sesi</th>{/if}<th>Aksi</th></tr></thead>
+					<thead class="sticky top-0 bg-white"><tr><th>NISN</th><th>Nama Siswa</th><th>Kelas</th>{#if data.hasSessions}<th>Sesi</th>{/if}{#if data.examRooms.length > 0}<th>Ruang</th>{/if}<th>Aksi</th></tr></thead>
 					<tbody>
 						{#each participants as p}
 							<tr>
@@ -291,6 +358,19 @@
 											<option value="2" selected={p.session_number === 2}>Sesi 2</option>
 											<option value="3" selected={p.session_number === 3}>Sesi 3</option>
 											<option value="4" selected={p.session_number === 4}>Sesi 4</option>
+										</select>
+									</form>
+								</td>
+								{/if}
+								{#if data.examRooms.length > 0}
+								<td>
+									<form method="POST" action="?/updateParticipantRoom" use:enhance>
+										<input type="hidden" name="participant_id" value={p.participant_id} />
+										<select name="room_id" class="select select-sm select-bordered w-full max-w-[120px]" on:change={(e) => e.currentTarget.form.requestSubmit()}>
+											<option value="">- Default -</option>
+											{#each data.examRooms as room}
+												<option value={room.id} selected={p.room_id === room.id}>{room.name}</option>
+											{/each}
 										</select>
 									</form>
 								</td>

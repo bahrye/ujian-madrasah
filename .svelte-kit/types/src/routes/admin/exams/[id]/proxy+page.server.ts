@@ -23,8 +23,10 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 	const sessionsCount = await db.prepare('SELECT COUNT(*) as count FROM exam_sessions WHERE exam_id = ?').bind(examId).first<{count: number}>();
 	const hasSessions = (sessionsCount?.count || 0) > 0;
 
+	const examRooms = await db.prepare('SELECT * FROM exam_rooms WHERE exam_id = ? ORDER BY name').bind(examId).all();
+
 	const participants = await db.prepare(`
-		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username as nisn, c.name as class_name, u.session_number
+		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username as nisn, c.name as class_name, u.session_number, p.room_id
 		FROM exam_participants p
 		JOIN users u ON p.student_id = u.id
 		LEFT JOIN classes c ON u.class_id = c.id
@@ -54,7 +56,7 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 	
 	const allTeachers = await db.prepare('SELECT id, name, username FROM users WHERE school_id = ? AND role = "guru" ORDER BY name').bind(locals.user!.school_id).all();
 	const examTeachers = await db.prepare(`
-		SELECT et.id as exam_teacher_id, u.id as user_id, u.name, u.username
+		SELECT et.id as exam_teacher_id, u.id as user_id, u.name, u.username, et.room_id
 		FROM exam_teachers et
 		JOIN users u ON et.teacher_id = u.id
 		WHERE et.exam_id = ?
@@ -82,7 +84,8 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 		examTeachers: examTeachers.results,
 		allProctors: allProctors.results,
 		examProctors: examProctors.results,
-		hasSessions
+		hasSessions,
+		examRooms: examRooms.results
 	};
 };
 
@@ -193,6 +196,74 @@ export const actions = {
 			console.error(e);
 			return fail(500, { error: 'Gagal memperbarui sesi siswa.' });
 		}
+	},
+
+	addRoom: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
+		const db = getDB(platform);
+		const form = await request.formData();
+		const name = form.get('name')?.toString().trim();
+		const examId = parseInt(params.id, 10);
+
+		if (!name || isNaN(examId)) return fail(400, { error: 'Nama ruang tidak valid' });
+
+		await db.prepare('INSERT INTO exam_rooms (exam_id, name) VALUES (?, ?)').bind(examId, name).run();
+		return { success: 'Ruang ujian berhasil ditambahkan.' };
+	},
+
+	deleteRoom: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
+		const db = getDB(platform);
+		const form = await request.formData();
+		const roomId = parseInt(form.get('room_id')?.toString() || '', 10);
+		const examId = parseInt(params.id, 10);
+
+		if (isNaN(roomId) || isNaN(examId)) return fail(400, { error: 'ID ruang tidak valid' });
+
+		await db.prepare('DELETE FROM exam_rooms WHERE id = ? AND exam_id = ?').bind(roomId, examId).run();
+		return { success: 'Ruang ujian berhasil dihapus.' };
+	},
+
+	updateParticipantRoom: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
+		const db = getDB(platform);
+		const form = await request.formData();
+		const participantId = parseInt(form.get('participant_id')?.toString() || '', 10);
+		const roomIdStr = form.get('room_id')?.toString();
+		const roomId = roomIdStr ? parseInt(roomIdStr, 10) : null;
+
+		if (isNaN(participantId)) return fail(400, { error: 'Data tidak valid' });
+
+		await db.prepare('UPDATE exam_participants SET room_id = ? WHERE id = ? AND exam_id = ?')
+			.bind(roomId, participantId, parseInt(params.id, 10)).run();
+		return { success: 'Ruang peserta berhasil diperbarui.' };
+	},
+
+	updateTeacherRoom: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
+		const db = getDB(platform);
+		const form = await request.formData();
+		const examTeacherId = parseInt(form.get('exam_teacher_id')?.toString() || '', 10);
+		const roomIdStr = form.get('room_id')?.toString();
+		const roomId = roomIdStr ? parseInt(roomIdStr, 10) : null;
+
+		if (isNaN(examTeacherId)) return fail(400, { error: 'Data tidak valid' });
+
+		await db.prepare('UPDATE exam_teachers SET room_id = ? WHERE id = ? AND exam_id = ?')
+			.bind(roomId, examTeacherId, parseInt(params.id, 10)).run();
+		return { success: 'Ruang pengajar berhasil diperbarui.' };
+	},
+
+	updateProctorRoom: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {
+		const db = getDB(platform);
+		const form = await request.formData();
+		const examProctorId = parseInt(form.get('exam_proctor_id')?.toString() || '', 10);
+		const roomIdStr = form.get('room_id')?.toString();
+		const roomId = roomIdStr ? parseInt(roomIdStr, 10) : null;
+
+		if (isNaN(examProctorId)) return fail(400, { error: 'Data tidak valid' });
+
+		await db.prepare('UPDATE exam_proctors SET room_id = ? WHERE id = ? AND exam_id = ?')
+			.bind(roomId, examProctorId, parseInt(params.id, 10)).run();
+		return { success: 'Ruang pengawas berhasil diperbarui.' };
 	},
 
 	addTeacher: async ({ request, platform, params, locals }: import('./$types').RequestEvent) => {

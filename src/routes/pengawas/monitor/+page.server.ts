@@ -51,6 +51,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 			JOIN exam_proctors ep ON e.id = ep.exam_id
 			LEFT JOIN student_attempts sa ON sa.student_id = epart.student_id AND sa.exam_id = epart.exam_id
 			WHERE epart.exam_id = ? AND e.school_id = ? AND ep.proctor_id = ?
+			  AND (ep.room_id IS NULL OR ep.room_id = epart.room_id)
 			ORDER BY 
 				CASE WHEN sa.status = 'mengerjakan' THEN 1 
 					 WHEN sa.status IS NULL THEN 2 
@@ -144,12 +145,15 @@ export const actions: Actions = {
 		
 		if (isNaN(parsedAttemptId) || !action) return fail(400, { error: 'Data tidak valid.' });
 
-		// Verify attempt belongs to current user's school
+		// Verify attempt belongs to current user's school and proctor is assigned
 		const attemptData = await db.prepare(`
 			SELECT sa.id, sa.is_paused, sa.paused_at, sa.end_time FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
-			WHERE sa.id = ? AND e.school_id = ?
-		`).bind(parsedAttemptId, locals.user.school_id).first() as any;
+			JOIN exam_participants ep_part ON sa.student_id = ep_part.student_id AND sa.exam_id = ep_part.exam_id
+			JOIN exam_proctors ep ON e.id = ep.exam_id
+			WHERE sa.id = ? AND e.school_id = ? AND ep.proctor_id = ?
+			  AND (ep.room_id IS NULL OR ep.room_id = ep_part.room_id)
+		`).bind(parsedAttemptId, locals.user.school_id, locals.user.id).first() as any;
 
 		if (!attemptData) return fail(403, { error: 'Sesi ujian tidak ditemukan atau bukan milik sekolah Anda.' });
 
@@ -187,12 +191,15 @@ export const actions: Actions = {
 		const parsedAttemptId = parseInt(attemptIdStr || '', 10);
 		if (isNaN(parsedAttemptId)) return fail(400, { error: 'ID tidak valid.' });
 
-		// Verify attempt belongs to current user's school
+		// Verify attempt belongs to current user's school and proctor is assigned
 		const attemptCheck = await db.prepare(`
 			SELECT sa.id, sa.signature FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
-			WHERE sa.id = ? AND e.school_id = ?
-		`).bind(parsedAttemptId, locals.user.school_id).first<{id: number, signature: string | null}>();
+			JOIN exam_participants ep_part ON sa.student_id = ep_part.student_id AND sa.exam_id = ep_part.exam_id
+			JOIN exam_proctors ep ON e.id = ep.exam_id
+			WHERE sa.id = ? AND e.school_id = ? AND ep.proctor_id = ?
+			  AND (ep.room_id IS NULL OR ep.room_id = ep_part.room_id)
+		`).bind(parsedAttemptId, locals.user.school_id, locals.user.id).first<{id: number, signature: string | null}>();
 
 		if (!attemptCheck) {
 			return fail(403, { error: 'Sesi ujian tidak ditemukan atau bukan milik sekolah Anda.' });
