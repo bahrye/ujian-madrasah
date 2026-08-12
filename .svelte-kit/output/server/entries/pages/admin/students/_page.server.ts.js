@@ -101,7 +101,6 @@ const actions = {
     const place_of_birth = data.get("place_of_birth")?.toString().trim() || null;
     const date_of_birth = data.get("date_of_birth")?.toString() || null;
     const gender = data.get("gender")?.toString() || null;
-    const session_number = parseInt(data.get("session_number")?.toString() || "1", 10);
     const parsedId = parseInt(idStr || "", 10);
     if (isNaN(parsedId) || !name || !nisn) {
       return fail(400, { error: "ID, Nama, dan NISN wajib diisi" });
@@ -120,7 +119,7 @@ const actions = {
         return fail(400, { error: "Nomor Peserta sudah terdaftar" });
       }
       const passwordHash = await hashPassword(nisn);
-      await db.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, class_id = ?, place_of_birth = ?, date_of_birth = ?, nisn = ?, nomor_peserta = ?, gender = ?, session_number = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, username, passwordHash, class_id, place_of_birth, date_of_birth, nisn, nomor_peserta, gender, session_number, parsedId, locals.user.school_id).run();
+      await db.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, class_id = ?, place_of_birth = ?, date_of_birth = ?, nisn = ?, nomor_peserta = ?, gender = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ?').bind(name, username, passwordHash, class_id, place_of_birth, date_of_birth, nisn, nomor_peserta, gender, parsedId, locals.user.school_id).run();
       return { success: true };
     } catch (e) {
       console.error(e);

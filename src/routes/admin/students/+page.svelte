@@ -264,15 +264,6 @@
 						{/each}
 					</select>
 				</div>
-				<div>
-					<label for="session_number" class="block text-sm font-medium text-slate-700 mb-1">Sesi Ujian</label>
-					<select id="session_number" name="session_number" class="input">
-						<option value="1">Sesi 1</option>
-						<option value="2">Sesi 2</option>
-						<option value="3">Sesi 3</option>
-						<option value="4">Sesi 4</option>
-					</select>
-				</div>
 				<div class="flex space-x-3 pt-2">
 					<button type="submit" class="btn btn-primary">Simpan Siswa</button>
 					<button type="button" class="btn btn-secondary" on:click={() => (isAdding = false)}>Batal</button>
@@ -330,15 +321,6 @@
 						{#each data.classes as cls (cls.id)}
 							<option value={cls.id} selected={cls.id == editingUser.class_id}>{cls.name}</option>
 						{/each}
-					</select>
-				</div>
-				<div>
-					<label for="e-session_number" class="block text-sm font-medium text-slate-700 mb-1">Sesi Ujian</label>
-					<select id="e-session_number" name="session_number" class="input">
-						<option value="1" selected={editingUser.session_number == 1 || !editingUser.session_number}>Sesi 1</option>
-						<option value="2" selected={editingUser.session_number == 2}>Sesi 2</option>
-						<option value="3" selected={editingUser.session_number == 3}>Sesi 3</option>
-						<option value="4" selected={editingUser.session_number == 4}>Sesi 4</option>
 					</select>
 				</div>
 				<div class="flex space-x-3 pt-2">
@@ -404,7 +386,7 @@
 						<th class="p-4 font-semibold whitespace-nowrap">Siswa</th>
 						<th class="p-4 font-semibold whitespace-nowrap">No. Peserta</th>
 						<th class="p-4 font-semibold whitespace-nowrap">NISN</th>
-						<th class="p-4 font-semibold whitespace-nowrap">Kelas / Sesi</th>
+						<th class="p-4 font-semibold whitespace-nowrap">Kelas</th>
 						<th class="p-4 font-semibold whitespace-nowrap text-center">JK</th>
 						<th class="p-4 font-semibold whitespace-nowrap">Tempat, Tgl Lahir</th>
 						<th class="p-4 font-semibold whitespace-nowrap">Status</th>
@@ -460,17 +442,11 @@
 							</td>
 							<td class="p-4 whitespace-nowrap">
 								{#if user.class_name}
-									<div class="flex flex-col gap-1">
-										<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap {getClassColor(user.class_id)} w-fit">
-											{user.class_name}
-										</span>
-										<span class="text-xs text-slate-500 font-medium">Sesi {user.session_number || 1}</span>
-									</div>
+									<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap {getClassColor(user.class_id)}">
+										{user.class_name}
+									</span>
 								{:else}
-									<div class="flex flex-col gap-1">
-										<span class="text-sm text-slate-400 whitespace-nowrap">-</span>
-										<span class="text-xs text-slate-500 font-medium">Sesi {user.session_number || 1}</span>
-									</div>
+									<span class="text-sm text-slate-400 whitespace-nowrap">-</span>
 								{/if}
 							</td>
 							<td class="p-4 whitespace-nowrap text-center">
