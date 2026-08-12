@@ -28,9 +28,9 @@ const load = async ({ platform, params, locals, url }) => {
 		ELSE 99 END ASC, c.name ASC, u.name ASC`;
   const participants = await db.prepare(query).bind(...paramsArr).all();
   const scheduleQuery = `
-		SELECT ep.student_id, e.title, s.name as subject_name, e.date, 
+		SELECT ep.student_id, e.title, s.name as subject_name, substr(e.start_time, 1, 10) as date, 
            u.session_number as student_session_number, es.start_time as session_start_time, es.end_time as session_end_time, 
-           r.name as room_name, e.has_sessions, e.start_time as exam_start_time, e.end_time as exam_end_time
+           r.name as room_name, (SELECT COUNT(*) FROM exam_sessions WHERE exam_id = e.id) > 0 as has_sessions, e.start_time as exam_start_time, e.end_time as exam_end_time
     FROM exam_participants ep
     JOIN exams e ON ep.exam_id = e.id
     JOIN users u ON ep.student_id = u.id
@@ -38,7 +38,7 @@ const load = async ({ platform, params, locals, url }) => {
     LEFT JOIN exam_rooms r ON ep.room_id = r.id
     LEFT JOIN exam_sessions es ON e.id = es.exam_id AND es.session_number = u.session_number
     WHERE e.exam_type_id = ? AND e.school_id = ?
-		ORDER BY e.date ASC, e.start_time ASC
+		ORDER BY e.start_time ASC
 	`;
   const schedules = await db.prepare(scheduleQuery).bind(typeId, locals.user.school_id).all();
   const scheduleByStudent = {};
