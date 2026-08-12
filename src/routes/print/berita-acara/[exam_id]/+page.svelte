@@ -8,7 +8,7 @@
 </script>
 
 <svelte:head>
-	<title>Berita Acara - {exam.title}</title>
+	<title>Berita Acara - {exam.exam_type_name || exam.title}</title>
 </svelte:head>
 
 <div class="p-4 md:p-8 max-w-4xl mx-auto font-serif text-[15px] leading-snug print:p-0 print:m-0">
@@ -44,7 +44,7 @@
 					<td class="py-1 w-8">1.</td>
 					<td class="py-1 w-60">Nama Ujian</td>
 					<td class="py-1 w-4">:</td>
-					<td class="py-1 font-bold">{exam.title}</td>
+					<td class="py-1 font-bold">{exam.exam_type_name || exam.title}</td>
 				</tr>
 				<tr>
 					<td class="py-1">2.</td>
