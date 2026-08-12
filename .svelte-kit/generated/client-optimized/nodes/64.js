@@ -1,1 +1,1 @@
-export { default as component } from "../../../../src/routes/siswa/ujian/+page.svelte";
+export { default as component } from "../../../../src/routes/siswa/tata-tertib/+page.svelte";

@@ -467,8 +467,11 @@
 				<button type="button" class="btn-ghost text-slate-600 hover:bg-slate-200" on:click={() => showPrintModal = false}>
 					Batal
 				</button>
+				<a href="/print/jadwal/type/{data.examType.id}{selectedPrintClassId ? `?class_id=${selectedPrintClassId}` : ''}" target="_blank" class="btn-secondary bg-white border border-slate-300 text-slate-700 hover:bg-slate-50" on:click={() => showPrintModal = false}>
+					Cetak Jadwal Peserta
+				</a>
 				<a href="/print/kartu/type/{data.examType.id}{selectedPrintClassId ? `?class_id=${selectedPrintClassId}` : ''}" target="_blank" class="btn-primary" on:click={() => showPrintModal = false}>
-					Buka Cetak Kartu
+					Cetak Kartu Login
 				</a>
 			</div>
 		</div>

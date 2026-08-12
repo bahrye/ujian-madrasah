@@ -1,10 +1,10 @@
-import * as server from '../entries/pages/siswa/papan-peringkat/type/_typeId_/exams/_page.server.ts.js';
+import * as server from '../entries/pages/siswa/papan-peringkat/type/_typeId_/_page.server.ts.js';
 
 export const index = 61;
 let component_cache;
-export const component = async () => component_cache ??= (await import('../entries/pages/siswa/papan-peringkat/type/_typeId_/exams/_page.svelte.js')).default;
+export const component = async () => component_cache ??= (await import('../entries/pages/siswa/papan-peringkat/type/_typeId_/_page.svelte.js')).default;
 export { server };
-export const server_id = "src/routes/siswa/papan-peringkat/type/[typeId]/exams/+page.server.ts";
-export const imports = ["_app/immutable/nodes/61.DCP439Ux.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/q3ZFHJDQ.js","_app/immutable/chunks/ClRrpZeN.js","_app/immutable/chunks/DbEAIv_x.js","_app/immutable/chunks/COlPN6dD.js","_app/immutable/chunks/BClyc7_g.js","_app/immutable/chunks/i_5gAELL.js","_app/immutable/chunks/CcEXiels.js","_app/immutable/chunks/oZ_RSl7A.js","_app/immutable/chunks/Uo-sFA6w.js","_app/immutable/chunks/CcPznuOH.js","_app/immutable/chunks/DeQQCbRh.js"];
+export const server_id = "src/routes/siswa/papan-peringkat/type/[typeId]/+page.server.ts";
+export const imports = ["_app/immutable/nodes/61.cMDVGaJS.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/q3ZFHJDQ.js","_app/immutable/chunks/ClRrpZeN.js","_app/immutable/chunks/DbEAIv_x.js","_app/immutable/chunks/COlPN6dD.js","_app/immutable/chunks/BClyc7_g.js","_app/immutable/chunks/i_5gAELL.js","_app/immutable/chunks/CcEXiels.js","_app/immutable/chunks/oZ_RSl7A.js","_app/immutable/chunks/Uo-sFA6w.js","_app/immutable/chunks/CcPznuOH.js","_app/immutable/chunks/DeQQCbRh.js"];
 export const stylesheets = [];
 export const fonts = [];
