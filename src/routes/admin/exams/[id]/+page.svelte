@@ -220,25 +220,13 @@
 		{:else}
 			<div class="table-container border-0 rounded-none">
 				<table class="table">
-					<thead><tr><th>Nama Guru</th><th>Username</th>{#if data.examRooms.length > 0}<th>Ruang</th>{/if}<th>Aksi</th></tr></thead>
+					<thead><tr><th>Nama Guru</th><th>Username</th><th>Aksi</th></tr></thead>
 					<tbody>
 						{#each examTeachers as teacher}
 							<tr>
 								<td class="font-medium text-slate-800">{teacher.name}</td>
 								<td class="font-mono text-sm text-slate-500">{teacher.username}</td>
-								{#if data.examRooms.length > 0}
-								<td>
-									<form method="POST" action="?/updateTeacherRoom" use:enhance>
-										<input type="hidden" name="exam_teacher_id" value={teacher.exam_teacher_id} />
-										<select name="room_id" class="select select-sm select-bordered w-full max-w-[120px]" on:change={(e) => e.currentTarget.form.requestSubmit()}>
-											<option value="">- Default -</option>
-											{#each data.examRooms as room}
-												<option value={room.id} selected={teacher.room_id === room.id}>{room.name}</option>
-											{/each}
-										</select>
-									</form>
-								</td>
-								{/if}
+
 								<td>
 									<ConfirmForm 
 										action="?/removeTeacher"

@@ -64,7 +64,7 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 
 	const allProctors = await db.prepare('SELECT id, name, username FROM users WHERE school_id = ? AND role = "pengawas" ORDER BY name').bind(locals.user!.school_id).all();
 	const examProctors = await db.prepare(`
-		SELECT ep.id as exam_proctor_id, u.id as user_id, u.name, u.username
+		SELECT ep.id as exam_proctor_id, u.id as user_id, u.name, u.username, ep.room_id
 		FROM exam_proctors ep
 		JOIN users u ON ep.proctor_id = u.id
 		WHERE ep.exam_id = ?
@@ -237,19 +237,7 @@ export const actions: Actions = {
 		return { success: 'Ruang peserta berhasil diperbarui.' };
 	},
 
-	updateTeacherRoom: async ({ request, platform, params, locals }) => {
-		const db = getDB(platform);
-		const form = await request.formData();
-		const examTeacherId = parseInt(form.get('exam_teacher_id')?.toString() || '', 10);
-		const roomIdStr = form.get('room_id')?.toString();
-		const roomId = roomIdStr ? parseInt(roomIdStr, 10) : null;
 
-		if (isNaN(examTeacherId)) return fail(400, { error: 'Data tidak valid' });
-
-		await db.prepare('UPDATE exam_teachers SET room_id = ? WHERE id = ? AND exam_id = ?')
-			.bind(roomId, examTeacherId, parseInt(params.id, 10)).run();
-		return { success: 'Ruang pengajar berhasil diperbarui.' };
-	},
 
 	updateProctorRoom: async ({ request, platform, params, locals }) => {
 		const db = getDB(platform);

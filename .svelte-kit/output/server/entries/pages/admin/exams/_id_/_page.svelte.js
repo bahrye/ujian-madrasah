@@ -111,37 +111,11 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<div class="p-8 text-center text-slate-400 text-sm">Belum ada pengajar tambahan. Hanya pembuat ujian yang dapat mengelola soal.</div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Nama Guru</th><th>Username</th>`);
-      if (data.examRooms.length > 0) {
-        $$renderer2.push("<!--[0-->");
-        $$renderer2.push(`<th>Ruang</th>`);
-      } else {
-        $$renderer2.push("<!--[-1-->");
-      }
-      $$renderer2.push(`<!--]--><th>Aksi</th></tr></thead><tbody><!--[-->`);
+      $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Nama Guru</th><th>Username</th><th>Aksi</th></tr></thead><tbody><!--[-->`);
       const each_array_1 = ensure_array_like(examTeachers);
-      for (let $$index_2 = 0, $$length = each_array_1.length; $$index_2 < $$length; $$index_2++) {
-        let teacher = each_array_1[$$index_2];
-        $$renderer2.push(`<tr><td class="font-medium text-slate-800">${escape_html(teacher.name)}</td><td class="font-mono text-sm text-slate-500">${escape_html(teacher.username)}</td>`);
-        if (data.examRooms.length > 0) {
-          $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<td><form method="POST" action="?/updateTeacherRoom"><input type="hidden" name="exam_teacher_id"${attr("value", teacher.exam_teacher_id)}/> <select name="room_id" class="select select-sm select-bordered w-full max-w-[120px]">`);
-          $$renderer2.option({ value: "" }, ($$renderer3) => {
-            $$renderer3.push(`- Default -`);
-          });
-          $$renderer2.push(`<!--[-->`);
-          const each_array_2 = ensure_array_like(data.examRooms);
-          for (let $$index_1 = 0, $$length2 = each_array_2.length; $$index_1 < $$length2; $$index_1++) {
-            let room = each_array_2[$$index_1];
-            $$renderer2.option({ value: room.id, selected: teacher.room_id === room.id }, ($$renderer3) => {
-              $$renderer3.push(`${escape_html(room.name)}`);
-            });
-          }
-          $$renderer2.push(`<!--]--></select></form></td>`);
-        } else {
-          $$renderer2.push("<!--[-1-->");
-        }
-        $$renderer2.push(`<!--]--><td>`);
+      for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
+        let teacher = each_array_1[$$index_1];
+        $$renderer2.push(`<tr><td class="font-medium text-slate-800">${escape_html(teacher.name)}</td><td class="font-mono text-sm text-slate-500">${escape_html(teacher.username)}</td><td>`);
         ConfirmForm($$renderer2, {
           action: "?/removeTeacher",
           confirmTitle: "Hapus Pengajar",
@@ -179,9 +153,9 @@ function _page($$renderer, $$props) {
         $$renderer2.push("<!--[-1-->");
       }
       $$renderer2.push(`<!--]--><th>Aksi</th></tr></thead><tbody><!--[-->`);
-      const each_array_3 = ensure_array_like(examProctors);
-      for (let $$index_4 = 0, $$length = each_array_3.length; $$index_4 < $$length; $$index_4++) {
-        let proctor = each_array_3[$$index_4];
+      const each_array_2 = ensure_array_like(examProctors);
+      for (let $$index_3 = 0, $$length = each_array_2.length; $$index_3 < $$length; $$index_3++) {
+        let proctor = each_array_2[$$index_3];
         $$renderer2.push(`<tr><td class="font-medium text-slate-800">${escape_html(proctor.name)}</td><td class="font-mono text-sm text-slate-500">${escape_html(proctor.username)}</td>`);
         if (data.examRooms.length > 0) {
           $$renderer2.push("<!--[0-->");
@@ -190,9 +164,9 @@ function _page($$renderer, $$props) {
             $$renderer3.push(`- Default -`);
           });
           $$renderer2.push(`<!--[-->`);
-          const each_array_4 = ensure_array_like(data.examRooms);
-          for (let $$index_3 = 0, $$length2 = each_array_4.length; $$index_3 < $$length2; $$index_3++) {
-            let room = each_array_4[$$index_3];
+          const each_array_3 = ensure_array_like(data.examRooms);
+          for (let $$index_2 = 0, $$length2 = each_array_3.length; $$index_2 < $$length2; $$index_2++) {
+            let room = each_array_3[$$index_2];
             $$renderer2.option({ value: room.id, selected: proctor.room_id === room.id }, ($$renderer3) => {
               $$renderer3.push(`${escape_html(room.name)}`);
             });
@@ -246,9 +220,9 @@ function _page($$renderer, $$props) {
         $$renderer2.push("<!--[-1-->");
       }
       $$renderer2.push(`<!--]--><th>Aksi</th></tr></thead><tbody><!--[-->`);
-      const each_array_5 = ensure_array_like(participants);
-      for (let $$index_6 = 0, $$length = each_array_5.length; $$index_6 < $$length; $$index_6++) {
-        let p = each_array_5[$$index_6];
+      const each_array_4 = ensure_array_like(participants);
+      for (let $$index_5 = 0, $$length = each_array_4.length; $$index_5 < $$length; $$index_5++) {
+        let p = each_array_4[$$index_5];
         $$renderer2.push(`<tr><td class="text-xs font-mono">${escape_html(p.nisn)}</td><td class="font-medium">${escape_html(p.student_name)}</td><td>${escape_html(p.class_name || "-")}</td>`);
         if (data.hasSessions) {
           $$renderer2.push("<!--[0-->");
@@ -277,9 +251,9 @@ function _page($$renderer, $$props) {
             $$renderer3.push(`- Default -`);
           });
           $$renderer2.push(`<!--[-->`);
-          const each_array_6 = ensure_array_like(data.examRooms);
-          for (let $$index_5 = 0, $$length2 = each_array_6.length; $$index_5 < $$length2; $$index_5++) {
-            let room = each_array_6[$$index_5];
+          const each_array_5 = ensure_array_like(data.examRooms);
+          for (let $$index_4 = 0, $$length2 = each_array_5.length; $$index_4 < $$length2; $$index_4++) {
+            let room = each_array_5[$$index_4];
             $$renderer2.option({ value: room.id, selected: p.room_id === room.id }, ($$renderer3) => {
               $$renderer3.push(`${escape_html(room.name)}`);
             });
@@ -319,9 +293,9 @@ function _page($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
       $$renderer2.push(`<div class="divide-y divide-slate-100"><!--[-->`);
-      const each_array_7 = ensure_array_like(questions);
-      for (let $$index_7 = 0, $$length = each_array_7.length; $$index_7 < $$length; $$index_7++) {
-        let q = each_array_7[$$index_7];
+      const each_array_6 = ensure_array_like(questions);
+      for (let $$index_6 = 0, $$length = each_array_6.length; $$index_6 < $$length; $$index_6++) {
+        let q = each_array_6[$$index_6];
         $$renderer2.push(`<div class="p-4 flex items-center gap-3"><span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold flex-shrink-0">${escape_html(q.question_number)}</span> <div class="flex-1 min-w-0"><p class="text-sm text-slate-700 truncate">${escape_html(q.question_text)}</p> <span class="text-[10px] badge-primary mt-0.5">${escape_html(QUESTION_TYPE_LABELS[q.type] || q.type)}</span></div> <span class="text-xs text-slate-400">${escape_html(q.points)} poin</span></div>`);
       }
       $$renderer2.push(`<!--]--></div>`);
@@ -333,9 +307,9 @@ function _page($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
       $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Siswa</th><th>Status</th><th>Nilai</th><th>Waktu Mulai</th><th>TTD</th></tr></thead><tbody><!--[-->`);
-      const each_array_8 = ensure_array_like(attempts);
-      for (let $$index_8 = 0, $$length = each_array_8.length; $$index_8 < $$length; $$index_8++) {
-        let a = each_array_8[$$index_8];
+      const each_array_7 = ensure_array_like(attempts);
+      for (let $$index_7 = 0, $$length = each_array_7.length; $$index_7 < $$length; $$index_7++) {
+        let a = each_array_7[$$index_7];
         $$renderer2.push(`<tr><td class="font-medium">${escape_html(a.student_name)}</td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[a.status] || "badge-info"))}>${escape_html(ATTEMPT_STATUS_LABELS[a.status] || a.status)}</span></td><td class="font-semibold">${escape_html(a.score != null ? a.score : "-")}</td><td class="text-xs text-slate-500">${escape_html(parseDate(a.start_time).toLocaleString("id-ID"))}</td><td>`);
         if (a.signature) {
           $$renderer2.push("<!--[0-->");
