@@ -68,14 +68,18 @@ export const actions = {
 		const data = await request.formData();
 		const name = data.get('name')?.toString().trim();
 		const nisn = data.get('nisn')?.toString().trim();
-		const nomor_peserta = data.get('nomor_peserta')?.toString().trim();
+		let nomor_peserta = data.get('nomor_peserta')?.toString().trim();
 		const class_id = data.get('class_id')?.toString() || null;
 		const place_of_birth = data.get('place_of_birth')?.toString().trim() || null;
 		const date_of_birth = data.get('date_of_birth')?.toString() || null;
 		const gender = data.get('gender')?.toString() || null;
 
-		if (!name || !nisn || !nomor_peserta) {
-			return fail(400, { error: 'Nama, NISN, dan Nomor Peserta wajib diisi' });
+		if (!name || !nisn) {
+			return fail(400, { error: 'Nama dan NISN wajib diisi' });
+		}
+
+		if (!nomor_peserta) {
+			nomor_peserta = `AUTO-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
 		}
 
 		try {
@@ -109,15 +113,19 @@ export const actions = {
 		const idStr = data.get('id')?.toString();
 		const name = data.get('name')?.toString().trim();
 		const nisn = data.get('nisn')?.toString().trim();
-		const nomor_peserta = data.get('nomor_peserta')?.toString().trim();
+		let nomor_peserta = data.get('nomor_peserta')?.toString().trim();
 		const class_id = data.get('class_id')?.toString() || null;
 		const place_of_birth = data.get('place_of_birth')?.toString().trim() || null;
 		const date_of_birth = data.get('date_of_birth')?.toString() || null;
 		const gender = data.get('gender')?.toString() || null;
 		const parsedId = parseInt(idStr || '', 10);
 
-		if (isNaN(parsedId) || !name || !nisn || !nomor_peserta) {
-			return fail(400, { error: 'ID, Nama, NISN, dan Nomor Peserta wajib diisi' });
+		if (isNaN(parsedId) || !name || !nisn) {
+			return fail(400, { error: 'ID, Nama, dan NISN wajib diisi' });
+		}
+
+		if (!nomor_peserta) {
+			nomor_peserta = `AUTO-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
 		}
 
 		try {
@@ -225,15 +233,14 @@ export const actions = {
 			for (const student of students) {
 				const nisn = String(student.nisn || '').trim();
 				const name = String(student.name || '').trim();
-				const nomor_peserta = student.nomor_peserta ? String(student.nomor_peserta).trim() : null;
+				let nomor_peserta = student.nomor_peserta ? String(student.nomor_peserta).trim() : null;
 				let gender = student.gender ? String(student.gender).toUpperCase().trim() : null;
 				if (gender !== 'L' && gender !== 'P') gender = null;
 				
 				if (!nisn || !name) continue;
 				
 				if (!nomor_peserta) {
-					errorMsg = 'Kolom NOMOR PESERTA wajib diisi di semua baris Excel.';
-					break;
+					nomor_peserta = `AUTO-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
 				}
 				
 				const username = nomor_peserta;

@@ -59,13 +59,16 @@ const actions = {
     const data = await request.formData();
     const name = data.get("name")?.toString().trim();
     const nisn = data.get("nisn")?.toString().trim();
-    const nomor_peserta = data.get("nomor_peserta")?.toString().trim();
+    let nomor_peserta = data.get("nomor_peserta")?.toString().trim();
     const class_id = data.get("class_id")?.toString() || null;
     const place_of_birth = data.get("place_of_birth")?.toString().trim() || null;
     const date_of_birth = data.get("date_of_birth")?.toString() || null;
     const gender = data.get("gender")?.toString() || null;
-    if (!name || !nisn || !nomor_peserta) {
-      return fail(400, { error: "Nama, NISN, dan Nomor Peserta wajib diisi" });
+    if (!name || !nisn) {
+      return fail(400, { error: "Nama dan NISN wajib diisi" });
+    }
+    if (!nomor_peserta) {
+      nomor_peserta = `AUTO-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1e3).toString().padStart(3, "0")}`;
     }
     try {
       const username = nomor_peserta;
@@ -92,14 +95,17 @@ const actions = {
     const idStr = data.get("id")?.toString();
     const name = data.get("name")?.toString().trim();
     const nisn = data.get("nisn")?.toString().trim();
-    const nomor_peserta = data.get("nomor_peserta")?.toString().trim();
+    let nomor_peserta = data.get("nomor_peserta")?.toString().trim();
     const class_id = data.get("class_id")?.toString() || null;
     const place_of_birth = data.get("place_of_birth")?.toString().trim() || null;
     const date_of_birth = data.get("date_of_birth")?.toString() || null;
     const gender = data.get("gender")?.toString() || null;
     const parsedId = parseInt(idStr || "", 10);
-    if (isNaN(parsedId) || !name || !nisn || !nomor_peserta) {
-      return fail(400, { error: "ID, Nama, NISN, dan Nomor Peserta wajib diisi" });
+    if (isNaN(parsedId) || !name || !nisn) {
+      return fail(400, { error: "ID, Nama, dan NISN wajib diisi" });
+    }
+    if (!nomor_peserta) {
+      nomor_peserta = `AUTO-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1e3).toString().padStart(3, "0")}`;
     }
     try {
       const username = nomor_peserta;
@@ -187,13 +193,12 @@ const actions = {
       for (const student of students) {
         const nisn = String(student.nisn || "").trim();
         const name = String(student.name || "").trim();
-        const nomor_peserta = student.nomor_peserta ? String(student.nomor_peserta).trim() : null;
+        let nomor_peserta = student.nomor_peserta ? String(student.nomor_peserta).trim() : null;
         let gender = student.gender ? String(student.gender).toUpperCase().trim() : null;
         if (gender !== "L" && gender !== "P") gender = null;
         if (!nisn || !name) continue;
         if (!nomor_peserta) {
-          errorMsg = "Kolom NOMOR PESERTA wajib diisi di semua baris Excel.";
-          break;
+          nomor_peserta = `AUTO-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1e3).toString().padStart(3, "0")}`;
         }
         const username = nomor_peserta;
         if (existingUsernames.has(username.toLowerCase())) {
@@ -206,9 +211,7 @@ const actions = {
           db.prepare("INSERT INTO users (school_id, class_id, username, password_hash, name, role, place_of_birth, date_of_birth, nisn, nomor_peserta, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(locals.user.school_id, student.class_id || null, username, passwordHash, name, "siswa", student.place_of_birth || null, student.date_of_birth || null, nisn, nomor_peserta, gender)
         );
       }
-      if (errorMsg) {
-        return fail(400, { error: errorMsg });
-      }
+      if (errorMsg) ;
       if (stmts.length > 0) {
         const chunkSize = 50;
         for (let i = 0; i < stmts.length; i += chunkSize) {

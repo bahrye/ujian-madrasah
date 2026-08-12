@@ -121,7 +121,7 @@
     const workbook = XLSX.utils.book_new();
     
     // Sheet 1: Data Siswa
-    const headers = ["NOMOR PESERTA", "NISN", "NAMA LENGKAP", "JK (L/P)", "NAMA KELAS", "TEMPAT LAHIR", "TANGGAL LAHIR"];
+    const headers = ["NOMOR PESERTA (Opsional)", "NISN", "NAMA LENGKAP", "JK (L/P)", "NAMA KELAS", "TEMPAT LAHIR", "TANGGAL LAHIR"];
     const sampleRow = ["01-02-03", "1234567890", "Budi Santoso", "L", classes.length > 0 ? classes[0].name : "X MIPA 1", "Jakarta", "2005-08-17"];
     const wsData = XLSX.utils.aoa_to_sheet([headers, sampleRow]);
     
@@ -172,7 +172,7 @@
             </h3>
             <ol class="list-decimal list-inside text-sm text-indigo-800 space-y-2 ml-1">
               <li>Unduh template Excel yang disediakan.</li>
-              <li>Isi data siswa sesuai format (Kolom <strong>NOMOR PESERTA</strong>, <strong>NISN</strong>, <strong>NAMA LENGKAP</strong>, <strong>JK (L/P)</strong>, <strong>NAMA KELAS</strong>, <strong>TEMPAT LAHIR</strong>, <strong>TANGGAL LAHIR</strong>).</li>
+              <li>Isi data siswa sesuai format (Kolom <strong>NOMOR PESERTA (Opsional)</strong>, <strong>NISN</strong>, <strong>NAMA LENGKAP</strong>, <strong>JK (L/P)</strong>, <strong>NAMA KELAS</strong>, <strong>TEMPAT LAHIR</strong>, <strong>TANGGAL LAHIR</strong>).</li>
               <li>Lihat sheet <strong>Referensi Kelas</strong> untuk panduan nama kelas.</li>
               <li>Simpan dan unggah kembali file Excel tersebut.</li>
             </ol>

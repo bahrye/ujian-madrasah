@@ -234,8 +234,8 @@
 					</div>
 				</div>
 				<div>
-					<label for="nomor_peserta" class="block text-sm font-medium text-slate-700 mb-1">Nomor Peserta <span class="text-red-500">*</span></label>
-					<input type="text" id="nomor_peserta" name="nomor_peserta" class="input" required placeholder="Contoh: PAT-2026-VII-01-001" />
+					<label for="nomor_peserta" class="block text-sm font-medium text-slate-700 mb-1">Nomor Peserta (Opsional)</label>
+					<input type="text" id="nomor_peserta" name="nomor_peserta" class="input" placeholder="Contoh: PAT-2026-VII-01-001 (Kosongkan untuk otomatis)" />
 				</div>
 				<div>
 					<label for="gender" class="block text-sm font-medium text-slate-700 mb-1">Jenis Kelamin</label>
@@ -293,8 +293,8 @@
 					</div>
 				</div>
 				<div>
-					<label for="edit_nomor_peserta" class="block text-sm font-medium text-slate-700 mb-1">Nomor Peserta <span class="text-red-500">*</span></label>
-					<input type="text" id="edit_nomor_peserta" name="nomor_peserta" class="input" required placeholder="Contoh: PAT-2026-VII-01-001" value={editingUser.nomor_peserta || ''} />
+					<label for="edit_nomor_peserta" class="block text-sm font-medium text-slate-700 mb-1">Nomor Peserta (Opsional)</label>
+					<input type="text" id="edit_nomor_peserta" name="nomor_peserta" class="input" placeholder="Kosongkan untuk generate otomatis" value={editingUser.nomor_peserta || ''} />
 				</div>
 				<div>
 					<label for="e-gender" class="block text-sm font-medium text-slate-700 mb-1">Jenis Kelamin</label>
