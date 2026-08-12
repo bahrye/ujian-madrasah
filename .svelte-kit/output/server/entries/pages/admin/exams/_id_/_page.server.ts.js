@@ -14,7 +14,7 @@ const load = async ({ platform, params, locals }) => {
 	`).bind(examId).all();
   const tokens = await db.prepare("SELECT * FROM tokens WHERE exam_id = ? ORDER BY created_at DESC").bind(examId).all();
   const participants = await db.prepare(`
-		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username as nisn, c.name as class_name
+		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username as nisn, c.name as class_name, u.session_number
 		FROM exam_participants p
 		JOIN users u ON p.student_id = u.id
 		LEFT JOIN classes c ON u.class_id = c.id
@@ -121,19 +121,34 @@ const actions = {
     await db.batch(insertStmts);
     return { success: `Berhasil menambahkan ${validStudents.results.length} siswa ke peserta ujian.` };
   },
-  removeParticipant: async ({ request, platform, params, locals }) => {
-    if (!locals.user) return fail(401, { error: "Unauthorized" });
+  removeParticipant: async ({ request, platform, locals }) => {
     const db = getDB(platform);
     const form = await request.formData();
-    const participantIdStr = form.get("participant_id")?.toString();
-    const parsedParticipantId = parseInt(participantIdStr || "", 10);
-    const parsedExamId = parseInt(params.id, 10);
-    if (isNaN(parsedParticipantId) || isNaN(parsedExamId)) return fail(400, { error: "ID peserta tidak valid" });
-    await db.prepare(`
-			DELETE FROM exam_participants 
-			WHERE id = ? AND exam_id = ? AND exam_id IN (SELECT id FROM exams WHERE school_id = ?)
-		`).bind(parsedParticipantId, parsedExamId, locals.user.school_id).run();
-    return { success: "Peserta berhasil dihapus dari ujian." };
+    const pId = parseInt(form.get("participant_id")?.toString() || "", 10);
+    if (isNaN(pId)) return fail(400, { error: "ID tidak valid" });
+    try {
+      await db.prepare(`
+				DELETE FROM exam_participants 
+				WHERE id = ? AND exam_id IN (SELECT id FROM exams WHERE school_id = ?)
+			`).bind(pId, locals.user.school_id).run();
+      return { success: "Peserta berhasil dihapus." };
+    } catch (e) {
+      return fail(500, { error: "Gagal menghapus peserta." });
+    }
+  },
+  updateStudentSession: async ({ request, platform, locals }) => {
+    const db = getDB(platform);
+    const form = await request.formData();
+    const userId = parseInt(form.get("user_id")?.toString() || "", 10);
+    const sessionNumber = parseInt(form.get("session_number")?.toString() || "1", 10);
+    if (isNaN(userId) || isNaN(sessionNumber)) return fail(400, { error: "Data tidak valid" });
+    try {
+      await db.prepare('UPDATE users SET session_number = ?, updated_at=datetime("now") WHERE id = ? AND school_id = ?').bind(sessionNumber, userId, locals.user.school_id).run();
+      return { success: "Sesi siswa berhasil diperbarui." };
+    } catch (e) {
+      console.error(e);
+      return fail(500, { error: "Gagal memperbarui sesi siswa." });
+    }
   },
   addTeacher: async ({ request, platform, params, locals }) => {
     if (!locals.user) return fail(401, { error: "Unauthorized" });

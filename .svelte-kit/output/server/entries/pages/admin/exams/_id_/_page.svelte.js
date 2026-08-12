@@ -145,11 +145,24 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<div class="p-8 text-center text-slate-400 text-sm">Belum ada peserta yang ditambahkan ke ujian ini. Ujian tidak bisa diakses siswa.</div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="table-container border-0 rounded-none max-h-96 overflow-y-auto"><table class="table"><thead class="sticky top-0 bg-white"><tr><th>NISN</th><th>Nama Siswa</th><th>Kelas</th><th>Aksi</th></tr></thead><tbody><!--[-->`);
+      $$renderer2.push(`<div class="table-container border-0 rounded-none max-h-96 overflow-y-auto"><table class="table"><thead class="sticky top-0 bg-white"><tr><th>NISN</th><th>Nama Siswa</th><th>Kelas</th><th>Sesi</th><th>Aksi</th></tr></thead><tbody><!--[-->`);
       const each_array_2 = ensure_array_like(participants);
       for (let $$index_2 = 0, $$length = each_array_2.length; $$index_2 < $$length; $$index_2++) {
         let p = each_array_2[$$index_2];
-        $$renderer2.push(`<tr><td class="text-xs font-mono">${escape_html(p.nisn)}</td><td class="font-medium">${escape_html(p.student_name)}</td><td>${escape_html(p.class_name || "-")}</td><td>`);
+        $$renderer2.push(`<tr><td class="text-xs font-mono">${escape_html(p.nisn)}</td><td class="font-medium">${escape_html(p.student_name)}</td><td>${escape_html(p.class_name || "-")}</td><td><form method="POST" action="?/updateStudentSession"><input type="hidden" name="user_id"${attr("value", p.user_id)}/> <select name="session_number" class="select select-sm select-bordered w-full max-w-[120px]">`);
+        $$renderer2.option({ value: "1", selected: p.session_number === 1 }, ($$renderer3) => {
+          $$renderer3.push(`Sesi 1`);
+        });
+        $$renderer2.option({ value: "2", selected: p.session_number === 2 }, ($$renderer3) => {
+          $$renderer3.push(`Sesi 2`);
+        });
+        $$renderer2.option({ value: "3", selected: p.session_number === 3 }, ($$renderer3) => {
+          $$renderer3.push(`Sesi 3`);
+        });
+        $$renderer2.option({ value: "4", selected: p.session_number === 4 }, ($$renderer3) => {
+          $$renderer3.push(`Sesi 4`);
+        });
+        $$renderer2.push(`</select></form></td><td>`);
         ConfirmForm($$renderer2, {
           action: "?/removeParticipant",
           confirmTitle: "Hapus Siswa dari Ujian",

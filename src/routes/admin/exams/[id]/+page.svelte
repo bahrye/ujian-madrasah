@@ -275,13 +275,24 @@
 		{:else}
 			<div class="table-container border-0 rounded-none max-h-96 overflow-y-auto">
 				<table class="table">
-					<thead class="sticky top-0 bg-white"><tr><th>NISN</th><th>Nama Siswa</th><th>Kelas</th><th>Aksi</th></tr></thead>
+					<thead class="sticky top-0 bg-white"><tr><th>NISN</th><th>Nama Siswa</th><th>Kelas</th><th>Sesi</th><th>Aksi</th></tr></thead>
 					<tbody>
 						{#each participants as p}
 							<tr>
 								<td class="text-xs font-mono">{p.nisn}</td>
 								<td class="font-medium">{p.student_name}</td>
 								<td>{p.class_name || '-'}</td>
+								<td>
+									<form method="POST" action="?/updateStudentSession" use:enhance>
+										<input type="hidden" name="user_id" value={p.user_id} />
+										<select name="session_number" class="select select-sm select-bordered w-full max-w-[120px]" on:change={(e) => e.currentTarget.form.requestSubmit()}>
+											<option value="1" selected={p.session_number === 1}>Sesi 1</option>
+											<option value="2" selected={p.session_number === 2}>Sesi 2</option>
+											<option value="3" selected={p.session_number === 3}>Sesi 3</option>
+											<option value="4" selected={p.session_number === 4}>Sesi 4</option>
+										</select>
+									</form>
+								</td>
 								<td>
 									<ConfirmForm 
 										action="?/removeParticipant"
