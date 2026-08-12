@@ -60,9 +60,9 @@ function _page($$renderer, $$props) {
     for (let i = 0, $$length = each_array.length; i < $$length; i++) {
       let p = each_array[i];
       $$renderer2.push(`<div${attr_class(`p-8 print:p-0 ${i < participants.length - 1 ? "page-break mb-8 print:mb-0 border-b-8 print:border-b-0 border-slate-100" : ""}`)}><div class="flex items-center gap-6 border-b-[3px] border-black pb-4 mb-6">`);
-      if (school.logo) {
+      if (school.logo_url) {
         $$renderer2.push("<!--[0-->");
-        $$renderer2.push(`<img${attr("src", school.logo)} alt="Logo" class="w-20 h-20 object-contain"/>`);
+        $$renderer2.push(`<img${attr("src", school.logo_url)} alt="Logo" class="w-20 h-20 object-contain"/>`);
       } else {
         $$renderer2.push("<!--[-1-->");
         $$renderer2.push(`<div class="w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center text-slate-400 font-bold text-xl">${escape_html(school.name.charAt(0))}</div>`);

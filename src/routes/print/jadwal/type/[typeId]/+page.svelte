@@ -66,8 +66,8 @@
 		<div class="p-8 print:p-0 {i < participants.length - 1 ? 'page-break mb-8 print:mb-0 border-b-8 print:border-b-0 border-slate-100' : ''}">
 			<!-- Kop Surat -->
 			<div class="flex items-center gap-6 border-b-[3px] border-black pb-4 mb-6">
-				{#if school.logo}
-					<img src={school.logo} alt="Logo" class="w-20 h-20 object-contain" />
+				{#if school.logo_url}
+					<img src={school.logo_url} alt="Logo" class="w-20 h-20 object-contain" />
 				{:else}
 					<div class="w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center text-slate-400 font-bold text-xl">
 						{school.name.charAt(0)}
