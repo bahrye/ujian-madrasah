@@ -13,7 +13,10 @@
 
 <style>
 	@media print {
-		@page { margin: 0; }
+		@page { 
+			size: A4;
+			margin: 1.5cm; 
+		}
 		:global(body) {
 			margin: 0;
 			-webkit-print-color-adjust: exact;

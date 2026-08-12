@@ -14,7 +14,8 @@
 <style>
 	@media print {
 		@page {
-			margin: 0;
+			size: A4;
+			margin: 1.5cm;
 		}
 		:global(body) {
 			margin: 0;
