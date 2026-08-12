@@ -26,7 +26,7 @@ const load = async ({ platform, params, locals }) => {
   const hasRooms = (roomsCount?.count || 0) > 0;
   const results = participants.results;
   const participantsGrouped = results.reduce((acc, p) => {
-    const roomName = p.room_name || "Ruang Default";
+    const roomName = p.room_name || "Ruang Ujian";
     const sessionNumber = hasSessions ? p.session_number || 1 : 1;
     if (!acc[roomName]) acc[roomName] = {};
     if (!acc[roomName][sessionNumber]) acc[roomName][sessionNumber] = [];

@@ -22,7 +22,7 @@ const load = async ({ platform, params, locals }) => {
   const roomsCount = await db.prepare("SELECT COUNT(*) as count FROM exam_rooms WHERE exam_id = ?").bind(examId).first();
   const hasRooms = (roomsCount?.count || 0) > 0;
   const participantsGrouped = participantsGroupedRaw.results.reduce((acc, row) => {
-    const roomName = row.room_name || "Ruang Default";
+    const roomName = row.room_name || "Ruang Ujian";
     const sessionNumber = hasSessions ? row.session_number || 1 : 1;
     if (!acc[roomName]) acc[roomName] = {};
     acc[roomName][sessionNumber] = (acc[roomName][sessionNumber] || 0) + row.count;

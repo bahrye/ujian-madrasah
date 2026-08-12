@@ -42,7 +42,7 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 	// Group participants by Room -> Session -> Class
 	const results = participants.results as any[];
 	const participantsGrouped = results.reduce<Record<string, Record<number, any[]>>>((acc, p) => {
-		const roomName = p.room_name || 'Ruang Default';
+		const roomName = p.room_name || 'Ruang Ujian';
 		const sessionNumber = hasSessions ? (p.session_number || 1) : 1;
 		
 		if (!acc[roomName]) acc[roomName] = {};
