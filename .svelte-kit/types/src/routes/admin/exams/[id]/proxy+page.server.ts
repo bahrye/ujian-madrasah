@@ -85,6 +85,7 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 		allProctors: allProctors.results,
 		examProctors: examProctors.results,
 		hasSessions,
+		sessionsCount: sessionsCount?.count || 0,
 		examRooms: examRooms.results
 	};
 };

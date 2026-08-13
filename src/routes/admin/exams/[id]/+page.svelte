@@ -342,10 +342,9 @@
 									<form method="POST" action="?/updateStudentSession" use:enhance>
 										<input type="hidden" name="user_id" value={p.user_id} />
 										<select name="session_number" class="select select-sm select-bordered w-full max-w-[120px]" on:change={(e) => e.currentTarget.form.requestSubmit()}>
-											<option value="1" selected={p.session_number === 1}>Sesi 1</option>
-											<option value="2" selected={p.session_number === 2}>Sesi 2</option>
-											<option value="3" selected={p.session_number === 3}>Sesi 3</option>
-											<option value="4" selected={p.session_number === 4}>Sesi 4</option>
+											{#each Array(data.sessionsCount) as _, i}
+												<option value={i + 1} selected={p.session_number === i + 1}>Sesi {i + 1}</option>
+											{/each}
 										</select>
 									</form>
 								</td>
