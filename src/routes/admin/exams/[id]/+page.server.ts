@@ -64,7 +64,7 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 
 	const allProctors = await db.prepare('SELECT id, name, username FROM users WHERE school_id = ? AND role = "pengawas" ORDER BY name').bind(locals.user!.school_id).all();
 	const examProctors = await db.prepare(`
-		SELECT ep.id as exam_proctor_id, u.id as user_id, u.name, u.username, ep.room_id
+		SELECT ep.id as exam_proctor_id, u.id as user_id, u.name, u.username, ep.room_id, ep.sessions
 		FROM exam_proctors ep
 		JOIN users u ON ep.proctor_id = u.id
 		WHERE ep.exam_id = ?
@@ -241,6 +241,7 @@ export const actions: Actions = {
 
 
 	updateProctorRoom: async ({ request, platform, params, locals }) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const form = await request.formData();
 		const examProctorId = parseInt(form.get('exam_proctor_id')?.toString() || '', 10);
@@ -252,6 +253,22 @@ export const actions: Actions = {
 		await db.prepare('UPDATE exam_proctors SET room_id = ? WHERE id = ? AND exam_id = ?')
 			.bind(roomId, examProctorId, parseInt(params.id, 10)).run();
 		return { success: 'Ruang pengawas berhasil diperbarui.' };
+	},
+
+	updateProctorSessions: async ({ request, platform, params, locals }) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
+		const db = getDB(platform);
+		const form = await request.formData();
+		const examProctorId = parseInt(form.get('exam_proctor_id')?.toString() || '', 10);
+		
+		const sessionsArr = form.getAll('sessions').map(s => parseInt(s.toString(), 10)).filter(s => !isNaN(s));
+		const sessionsJson = sessionsArr.length > 0 ? JSON.stringify(sessionsArr) : null;
+
+		if (isNaN(examProctorId)) return fail(400, { error: 'Data tidak valid' });
+
+		await db.prepare('UPDATE exam_proctors SET sessions = ? WHERE id = ? AND exam_id = ?')
+			.bind(sessionsJson, examProctorId, parseInt(params.id, 10)).run();
+		return { success: 'Sesi pengawas berhasil diperbarui.' };
 	},
 
 	addTeacher: async ({ request, platform, params, locals }) => {

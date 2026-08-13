@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 			)
 			FROM student_attempts sa
 			JOIN users u ON sa.student_id = u.id
-			WHERE sa.token_id = t.id
+			WHERE sa.token_id = t.id AND (ep.sessions IS NULL OR ep.sessions = '[]' OR u.session_number IN (SELECT value FROM json_each(ep.sessions)))
 		), '[]') as used_by_students_json
 		FROM tokens t 
 		JOIN exams e ON t.exam_id = e.id

@@ -43,6 +43,7 @@ const load = async ({ platform, url, locals }) => {
 			LEFT JOIN student_attempts sa ON sa.student_id = epart.student_id AND sa.exam_id = epart.exam_id
 			WHERE epart.exam_id = ? AND e.school_id = ? AND ep.proctor_id = ?
 			  AND (ep.room_id IS NULL OR ep.room_id = epart.room_id)
+			  AND (ep.sessions IS NULL OR ep.sessions = '[]' OR u.session_number IN (SELECT value FROM json_each(ep.sessions)))
 			ORDER BY 
 				CASE WHEN sa.status = 'mengerjakan' THEN 1 
 					 WHEN sa.status IS NULL THEN 2 
@@ -133,9 +134,11 @@ const actions = {
 			SELECT sa.id, sa.is_paused, sa.paused_at, sa.end_time FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
 			JOIN exam_participants ep_part ON sa.student_id = ep_part.student_id AND sa.exam_id = ep_part.exam_id
+			JOIN users u ON ep_part.student_id = u.id
 			JOIN exam_proctors ep ON e.id = ep.exam_id
 			WHERE sa.id = ? AND e.school_id = ? AND ep.proctor_id = ?
 			  AND (ep.room_id IS NULL OR ep.room_id = ep_part.room_id)
+			  AND (ep.sessions IS NULL OR ep.sessions = '[]' OR u.session_number IN (SELECT value FROM json_each(ep.sessions)))
 		`).bind(parsedAttemptId, locals.user.school_id, locals.user.id).first();
     if (!attemptData) return fail(403, { error: "Sesi ujian tidak ditemukan atau bukan milik sekolah Anda." });
     try {
@@ -174,9 +177,11 @@ const actions = {
 			SELECT sa.id, sa.signature FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
 			JOIN exam_participants ep_part ON sa.student_id = ep_part.student_id AND sa.exam_id = ep_part.exam_id
+			JOIN users u ON ep_part.student_id = u.id
 			JOIN exam_proctors ep ON e.id = ep.exam_id
 			WHERE sa.id = ? AND e.school_id = ? AND ep.proctor_id = ?
 			  AND (ep.room_id IS NULL OR ep.room_id = ep_part.room_id)
+			  AND (ep.sessions IS NULL OR ep.sessions = '[]' OR u.session_number IN (SELECT value FROM json_each(ep.sessions)))
 		`).bind(parsedAttemptId, locals.user.school_id, locals.user.id).first();
     if (!attemptCheck) {
       return fail(403, { error: "Sesi ujian tidak ditemukan atau bukan milik sekolah Anda." });

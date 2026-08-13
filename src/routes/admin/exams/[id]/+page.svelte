@@ -269,12 +269,29 @@
 		{:else}
 			<div class="table-container border-0 rounded-none max-h-64 overflow-y-auto">
 				<table class="table">
-					<thead class="sticky top-0 bg-white"><tr><th>Nama Pengawas</th><th>Username</th>{#if data.examRooms.length > 0}<th>Ruang</th>{/if}<th>Aksi</th></tr></thead>
+					<thead class="sticky top-0 bg-white"><tr><th>Nama Pengawas</th><th>Username</th>{#if data.hasSessions}<th>Sesi</th>{/if}{#if data.examRooms.length > 0}<th>Ruang</th>{/if}<th>Aksi</th></tr></thead>
 					<tbody>
 						{#each examProctors as proctor}
 							<tr>
 								<td class="font-medium text-slate-800">{proctor.name}</td>
 								<td class="font-mono text-sm text-slate-500">{proctor.username}</td>
+								{#if data.hasSessions}
+								{@const sessionsArr = proctor.sessions ? JSON.parse(proctor.sessions) : []}
+								<td>
+									<form method="POST" action="?/updateProctorSessions" use:enhance>
+										<input type="hidden" name="exam_proctor_id" value={proctor.exam_proctor_id} />
+										<div class="flex flex-wrap gap-2">
+											{#each Array(data.sessionsCount) as _, i}
+												{@const sNum = i + 1}
+												<label class="flex items-center gap-1 cursor-pointer">
+													<input type="checkbox" name="sessions" value={sNum} checked={sessionsArr.includes(sNum)} class="w-3.5 h-3.5 text-indigo-600 rounded" on:change={(e) => e.currentTarget.form.requestSubmit()} />
+													<span class="text-xs font-medium text-slate-700">{sNum}</span>
+												</label>
+											{/each}
+										</div>
+									</form>
+								</td>
+								{/if}
 								{#if data.examRooms.length > 0}
 								<td>
 									<form method="POST" action="?/updateProctorRoom" use:enhance>

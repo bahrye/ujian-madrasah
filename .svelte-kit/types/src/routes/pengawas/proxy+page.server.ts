@@ -22,11 +22,14 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 	]);
 
 	const participantsDb = await db.prepare(`
-		SELECT ep.exam_id, u.name, c.name as class_name, u.username
-		FROM exam_participants ep
-		JOIN users u ON ep.student_id = u.id
+		SELECT epart.exam_id, u.name, c.name as class_name, u.username
+		FROM exam_participants epart
+		JOIN users u ON epart.student_id = u.id
 		LEFT JOIN classes c ON u.class_id = c.id
-		WHERE ep.exam_id IN (SELECT exam_id FROM exam_proctors WHERE proctor_id = ?)
+		JOIN exam_proctors ep ON epart.exam_id = ep.exam_id
+		WHERE ep.proctor_id = ?
+		  AND (ep.room_id IS NULL OR ep.room_id = epart.room_id)
+		  AND (ep.sessions IS NULL OR ep.sessions = '[]' OR u.session_number IN (SELECT value FROM json_each(ep.sessions)))
 		ORDER BY c.name, u.name
 	`).bind(locals.user!.id).all();
 
