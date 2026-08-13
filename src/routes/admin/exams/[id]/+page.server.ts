@@ -267,6 +267,46 @@ export const actions: Actions = {
 		return { success: 'Pengaturan pengawas berhasil disimpan.' };
 	},
 
+	updateAllParticipants: async ({ request, platform, params, locals }) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
+		const db = getDB(platform);
+		const form = await request.formData();
+		const examId = parseInt(params.id, 10);
+
+		const participantIds = form.getAll('participant_ids').map(id => parseInt(id.toString(), 10)).filter(id => !isNaN(id));
+		const userIds = form.getAll('user_ids').map(id => parseInt(id.toString(), 10)).filter(id => !isNaN(id));
+
+		if (participantIds.length === 0) {
+			return { success: 'Tidak ada peserta untuk diperbarui.' };
+		}
+
+		const statements: any[] = [];
+
+		participantIds.forEach(pId => {
+			const roomIdStr = form.get(`room_${pId}`)?.toString();
+			const roomId = roomIdStr ? parseInt(roomIdStr, 10) : null;
+			statements.push(
+				db.prepare('UPDATE exam_participants SET room_id = ? WHERE id = ? AND exam_id = ?')
+					.bind(roomId, pId, examId)
+			);
+		});
+
+		userIds.forEach(uId => {
+			const sessionNumStr = form.get(`session_${uId}`)?.toString();
+			const sessionNum = sessionNumStr ? parseInt(sessionNumStr, 10) : 1;
+			statements.push(
+				db.prepare('UPDATE users SET session_number = ? WHERE id = ?')
+					.bind(sessionNum, uId)
+			);
+		});
+
+		if (statements.length > 0) {
+			await db.batch(statements);
+		}
+
+		return { success: 'Pengaturan peserta berhasil disimpan.' };
+	},
+
 	addTeacher: async ({ request, platform, params, locals }) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);

@@ -293,7 +293,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							{#each examProctors as proctor}
+							{#each examProctors as proctor (proctor.exam_proctor_id)}
 								<tr>
 									<td class="font-medium text-slate-800">
 										<input type="hidden" name="exam_proctor_ids" value={proctor.exam_proctor_id} />
@@ -304,19 +304,21 @@
 										{@const sessionsArr = proctor.sessions ? JSON.parse(proctor.sessions) : []}
 										<td>
 											<div class="flex flex-wrap gap-2.5 items-center">
-												{#each Array(data.sessionsCount) as _, i}
-													{@const sNum = i + 1}
-													<label class="flex items-center gap-1.5 cursor-pointer bg-slate-50 hover:bg-indigo-50 px-2 py-1 rounded border border-slate-200 hover:border-indigo-200 transition-colors">
-														<input 
-															type="checkbox" 
-															name={`sessions_${proctor.exam_proctor_id}`} 
-															value={sNum} 
-															checked={sessionsArr.includes(sNum)} 
-															class="w-3.5 h-3.5 text-indigo-600 rounded focus:ring-indigo-500" 
-														/>
-														<span class="text-xs font-medium text-slate-700">Sesi {sNum}</span>
-													</label>
-												{/each}
+												{#key proctor.sessions}
+													{#each Array(data.sessionsCount) as _, i}
+														{@const sNum = i + 1}
+														<label class="flex items-center gap-1.5 cursor-pointer bg-slate-50 hover:bg-indigo-50 px-2 py-1 rounded border border-slate-200 hover:border-indigo-200 transition-colors">
+															<input 
+																type="checkbox" 
+																name={`sessions_${proctor.exam_proctor_id}`} 
+																value={sNum} 
+																checked={sessionsArr.includes(sNum)} 
+																class="w-3.5 h-3.5 text-indigo-600 rounded focus:ring-indigo-500" 
+															/>
+															<span class="text-xs font-medium text-slate-700">Sesi {sNum}</span>
+														</label>
+													{/each}
+												{/key}
 											</div>
 										</td>
 									{/if}
@@ -360,74 +362,96 @@
 	<!-- Participants Table -->
 	<div class="card overflow-hidden mb-6">
 		<div class="p-5 border-b border-slate-100 flex items-center justify-between">
-			<h2 class="text-lg font-bold text-slate-800">Daftar Peserta Ujian</h2>
-			<button class="btn-sm btn-primary" on:click={() => (showAddParticipantModal = true)}>
-				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
-				</svg>
-				Tambah Peserta
-			</button>
+			<div>
+				<h2 class="text-lg font-bold text-slate-800">Daftar Peserta Ujian</h2>
+				<p class="text-xs text-slate-500 mt-0.5">Tentukan sesi dan ruang untuk peserta ujian.</p>
+			</div>
+			<div class="flex items-center gap-2">
+				{#if participants.length > 0}
+					<button type="submit" form="participants-form" class="btn-sm btn-primary flex items-center gap-1.5 shadow-sm">
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+						</svg>
+						Simpan Sesi & Ruang Peserta
+					</button>
+				{/if}
+				<button class="btn-sm btn-secondary flex items-center gap-1.5" on:click={() => (showAddParticipantModal = true)}>
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
+					</svg>
+					Tambah Peserta
+				</button>
+			</div>
 		</div>
 		{#if participants.length === 0}
 			<div class="p-8 text-center text-slate-400 text-sm">Belum ada peserta yang ditambahkan ke ujian ini. Ujian tidak bisa diakses siswa.</div>
 		{:else}
-			<div class="table-container border-0 rounded-none max-h-96 overflow-y-auto">
-				<table class="table">
-					<thead class="sticky top-0 bg-white"><tr><th>NISN</th><th>Nama Siswa</th><th>Kelas</th>{#if data.hasSessions}<th>Sesi</th>{/if}{#if data.examRooms.length > 0}<th>Ruang</th>{/if}<th>Aksi</th></tr></thead>
-					<tbody>
-						{#each participants as p}
+			<form id="participants-form" method="POST" action="?/updateAllParticipants" use:enhance>
+				<div class="table-container border-0 rounded-none max-h-96 overflow-y-auto">
+					<table class="table">
+						<thead class="sticky top-0 bg-white z-10">
 							<tr>
-								<td class="text-xs font-mono">{p.nisn}</td>
-								<td class="font-medium">{p.student_name}</td>
-								<td>{p.class_name || '-'}</td>
-								{#if data.hasSessions}
-								<td>
-									<form method="POST" action="?/updateStudentSession" use:enhance>
-										<input type="hidden" name="user_id" value={p.user_id} />
-										<select name="session_number" class="select select-sm select-bordered w-full max-w-[120px]" on:change={(e) => e.currentTarget.form.requestSubmit()}>
-											{#each Array(data.sessionsCount) as _, i}
-												<option value={i + 1} selected={p.session_number === i + 1}>Sesi {i + 1}</option>
-											{/each}
-										</select>
-									</form>
-								</td>
-								{/if}
-								{#if data.examRooms.length > 0}
-								<td>
-									<form method="POST" action="?/updateParticipantRoom" use:enhance>
-										<input type="hidden" name="participant_id" value={p.participant_id} />
-										<select name="room_id" class="select select-sm select-bordered w-full max-w-[120px]" on:change={(e) => e.currentTarget.form.requestSubmit()}>
-											<option value="">- Default -</option>
-											{#each data.examRooms as room}
-												<option value={room.id} selected={p.room_id === room.id}>{room.name}</option>
-											{/each}
-										</select>
-									</form>
-								</td>
-								{/if}
-								<td>
-									<ConfirmForm 
-										action="?/removeParticipant"
-										confirmTitle="Hapus Siswa dari Ujian"
-										confirmMessage="Hapus siswa ini dari ujian?"
-										buttonClass="text-rose-500 hover:text-rose-700 p-1"
-										buttonTitle="Hapus dari ujian"
-									>
-										<svelte:fragment slot="inputs">
-											<input type="hidden" name="participant_id" value={p.participant_id} />
-										</svelte:fragment>
-										<svelte:fragment slot="buttonContent">
-											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-												<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
-											</svg>
-										</svelte:fragment>
-									</ConfirmForm>
-								</td>
+								<th>NISN</th>
+								<th>Nama Siswa</th>
+								<th>Kelas</th>
+								{#if data.hasSessions}<th>Sesi</th>{/if}
+								{#if data.examRooms.length > 0}<th>Ruang</th>{/if}
+								<th class="w-16">Aksi</th>
 							</tr>
-						{/each}
-					</tbody>
-				</table>
-			</div>
+						</thead>
+						<tbody>
+							{#each participants as p (p.participant_id)}
+								<tr>
+									<td class="text-xs font-mono">
+										<input type="hidden" name="participant_ids" value={p.participant_id} />
+										<input type="hidden" name="user_ids" value={p.user_id} />
+										{p.nisn}
+									</td>
+									<td class="font-medium">{p.student_name}</td>
+									<td>{p.class_name || '-'}</td>
+									{#if data.hasSessions}
+										<td>
+											<select name={`session_${p.user_id}`} class="select select-sm select-bordered w-full max-w-[120px]">
+												{#each Array(data.sessionsCount) as _, i}
+													<option value={i + 1} selected={p.session_number === i + 1}>Sesi {i + 1}</option>
+												{/each}
+											</select>
+										</td>
+									{/if}
+									{#if data.examRooms.length > 0}
+										<td>
+											<select name={`room_${p.participant_id}`} class="select select-sm select-bordered w-full max-w-[120px]">
+												<option value="">- Default -</option>
+												{#each data.examRooms as room}
+													<option value={room.id} selected={p.room_id === room.id}>{room.name}</option>
+												{/each}
+											</select>
+										</td>
+									{/if}
+									<td>
+										<ConfirmForm 
+											action="?/removeParticipant"
+											confirmTitle="Hapus Siswa dari Ujian"
+											confirmMessage="Hapus siswa ini dari ujian?"
+											buttonClass="text-rose-500 hover:text-rose-700 p-1"
+											buttonTitle="Hapus dari ujian"
+										>
+											<svelte:fragment slot="inputs">
+												<input type="hidden" name="participant_id" value={p.participant_id} />
+											</svelte:fragment>
+											<svelte:fragment slot="buttonContent">
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+													<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
+												</svg>
+											</svelte:fragment>
+										</ConfirmForm>
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			</form>
 		{/if}
 	</div>
 

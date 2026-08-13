@@ -174,14 +174,18 @@ function _page($$renderer, $$props) {
         if (data.hasSessions) {
           $$renderer2.push("<!--[0-->");
           const sessionsArr = proctor.sessions ? JSON.parse(proctor.sessions) : [];
-          $$renderer2.push(`<td><div class="flex flex-wrap gap-2.5 items-center"><!--[-->`);
-          const each_array_3 = ensure_array_like(Array(data.sessionsCount));
-          for (let i = 0, $$length2 = each_array_3.length; i < $$length2; i++) {
-            each_array_3[i];
-            const sNum = i + 1;
-            $$renderer2.push(`<label class="flex items-center gap-1.5 cursor-pointer bg-slate-50 hover:bg-indigo-50 px-2 py-1 rounded border border-slate-200 hover:border-indigo-200 transition-colors"><input type="checkbox"${attr("name", `sessions_${proctor.exam_proctor_id}`)}${attr("value", sNum)}${attr("checked", sessionsArr.includes(sNum), true)} class="w-3.5 h-3.5 text-indigo-600 rounded focus:ring-indigo-500"/> <span class="text-xs font-medium text-slate-700">Sesi ${escape_html(sNum)}</span></label>`);
+          $$renderer2.push(`<td><div class="flex flex-wrap gap-2.5 items-center"><!---->`);
+          {
+            $$renderer2.push(`<!--[-->`);
+            const each_array_3 = ensure_array_like(Array(data.sessionsCount));
+            for (let i = 0, $$length2 = each_array_3.length; i < $$length2; i++) {
+              each_array_3[i];
+              const sNum = i + 1;
+              $$renderer2.push(`<label class="flex items-center gap-1.5 cursor-pointer bg-slate-50 hover:bg-indigo-50 px-2 py-1 rounded border border-slate-200 hover:border-indigo-200 transition-colors"><input type="checkbox"${attr("name", `sessions_${proctor.exam_proctor_id}`)}${attr("value", sNum)}${attr("checked", sessionsArr.includes(sNum), true)} class="w-3.5 h-3.5 text-indigo-600 rounded focus:ring-indigo-500"/> <span class="text-xs font-medium text-slate-700">Sesi ${escape_html(sNum)}</span></label>`);
+            }
+            $$renderer2.push(`<!--]-->`);
           }
-          $$renderer2.push(`<!--]--></div></td>`);
+          $$renderer2.push(`<!----></div></td>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
@@ -228,13 +232,20 @@ function _page($$renderer, $$props) {
       }
       $$renderer2.push(`<!--]--></tbody></table></div></form>`);
     }
-    $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden mb-6"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><h2 class="text-lg font-bold text-slate-800">Daftar Peserta Ujian</h2> <button class="btn-sm btn-primary"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> Tambah Peserta</button></div> `);
+    $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden mb-6"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><div><h2 class="text-lg font-bold text-slate-800">Daftar Peserta Ujian</h2> <p class="text-xs text-slate-500 mt-0.5">Tentukan sesi dan ruang untuk peserta ujian.</p></div> <div class="flex items-center gap-2">`);
+    if (participants.length > 0) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<button type="submit" form="participants-form" class="btn-sm btn-primary flex items-center gap-1.5 shadow-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> Simpan Sesi &amp; Ruang Peserta</button>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--> <button class="btn-sm btn-secondary flex items-center gap-1.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> Tambah Peserta</button></div></div> `);
     if (participants.length === 0) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div class="p-8 text-center text-slate-400 text-sm">Belum ada peserta yang ditambahkan ke ujian ini. Ujian tidak bisa diakses siswa.</div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="table-container border-0 rounded-none max-h-96 overflow-y-auto"><table class="table"><thead class="sticky top-0 bg-white"><tr><th>NISN</th><th>Nama Siswa</th><th>Kelas</th>`);
+      $$renderer2.push(`<form id="participants-form" method="POST" action="?/updateAllParticipants"><div class="table-container border-0 rounded-none max-h-96 overflow-y-auto"><table class="table"><thead class="sticky top-0 bg-white z-10"><tr><th>NISN</th><th>Nama Siswa</th><th>Kelas</th>`);
       if (data.hasSessions) {
         $$renderer2.push("<!--[0-->");
         $$renderer2.push(`<th>Sesi</th>`);
@@ -248,14 +259,14 @@ function _page($$renderer, $$props) {
       } else {
         $$renderer2.push("<!--[-1-->");
       }
-      $$renderer2.push(`<!--]--><th>Aksi</th></tr></thead><tbody><!--[-->`);
+      $$renderer2.push(`<!--]--><th class="w-16">Aksi</th></tr></thead><tbody><!--[-->`);
       const each_array_5 = ensure_array_like(participants);
       for (let $$index_7 = 0, $$length = each_array_5.length; $$index_7 < $$length; $$index_7++) {
         let p = each_array_5[$$index_7];
-        $$renderer2.push(`<tr><td class="text-xs font-mono">${escape_html(p.nisn)}</td><td class="font-medium">${escape_html(p.student_name)}</td><td>${escape_html(p.class_name || "-")}</td>`);
+        $$renderer2.push(`<tr><td class="text-xs font-mono"><input type="hidden" name="participant_ids"${attr("value", p.participant_id)}/> <input type="hidden" name="user_ids"${attr("value", p.user_id)}/> ${escape_html(p.nisn)}</td><td class="font-medium">${escape_html(p.student_name)}</td><td>${escape_html(p.class_name || "-")}</td>`);
         if (data.hasSessions) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<td><form method="POST" action="?/updateStudentSession"><input type="hidden" name="user_id"${attr("value", p.user_id)}/> <select name="session_number" class="select select-sm select-bordered w-full max-w-[120px]"><!--[-->`);
+          $$renderer2.push(`<td><select${attr("name", `session_${p.user_id}`)} class="select select-sm select-bordered w-full max-w-[120px]"><!--[-->`);
           const each_array_6 = ensure_array_like(Array(data.sessionsCount));
           for (let i = 0, $$length2 = each_array_6.length; i < $$length2; i++) {
             each_array_6[i];
@@ -263,14 +274,14 @@ function _page($$renderer, $$props) {
               $$renderer3.push(`Sesi ${escape_html(i + 1)}`);
             });
           }
-          $$renderer2.push(`<!--]--></select></form></td>`);
+          $$renderer2.push(`<!--]--></select></td>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
         $$renderer2.push(`<!--]-->`);
         if (data.examRooms.length > 0) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<td><form method="POST" action="?/updateParticipantRoom"><input type="hidden" name="participant_id"${attr("value", p.participant_id)}/> <select name="room_id" class="select select-sm select-bordered w-full max-w-[120px]">`);
+          $$renderer2.push(`<td><select${attr("name", `room_${p.participant_id}`)} class="select select-sm select-bordered w-full max-w-[120px]">`);
           $$renderer2.option({ value: "" }, ($$renderer3) => {
             $$renderer3.push(`- Default -`);
           });
@@ -282,7 +293,7 @@ function _page($$renderer, $$props) {
               $$renderer3.push(`${escape_html(room.name)}`);
             });
           }
-          $$renderer2.push(`<!--]--></select></form></td>`);
+          $$renderer2.push(`<!--]--></select></td>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
@@ -308,7 +319,7 @@ function _page($$renderer, $$props) {
         });
         $$renderer2.push(`<!----></td></tr>`);
       }
-      $$renderer2.push(`<!--]--></tbody></table></div>`);
+      $$renderer2.push(`<!--]--></tbody></table></div></form>`);
     }
     $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden mb-6"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><h2 class="text-lg font-bold text-slate-800">Daftar Soal</h2> <div class="flex items-center gap-3"><a${attr("href", `/admin/exams/${stringify(exam.id)}/analisis`)} class="btn-sm btn-outline text-indigo-600 border-indigo-200 hover:bg-indigo-50">Analisis Butir Soal</a> <a${attr("href", `/admin/bank-soal/${stringify(exam.id)}`)} class="btn-sm btn-primary">Kelola Soal</a></div></div> `);
     if (questions.length === 0) {
