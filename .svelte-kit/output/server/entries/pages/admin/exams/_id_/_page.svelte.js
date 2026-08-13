@@ -16,6 +16,8 @@ function _page($$renderer, $$props) {
     let form = fallback($$props["form"], null);
     let data = $$props["data"];
     let studentSearch = "";
+    let isSavingProctors = false;
+    let isSavingParticipants = false;
     exam = data.exam;
     questions = data.questions;
     attempts = data.attempts;
@@ -142,7 +144,12 @@ function _page($$renderer, $$props) {
     $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden mb-6"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><div><h2 class="text-lg font-bold text-slate-800">Daftar Pengawas Ujian</h2> <p class="text-xs text-slate-500 mt-0.5">Tentukan sesi dan ruang mengawas untuk setiap pengawas.</p></div> <div class="flex items-center gap-2">`);
     if (examProctors.length > 0) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<button type="submit" form="proctors-form" class="btn-sm btn-primary flex items-center gap-1.5 shadow-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> Simpan Sesi &amp; Ruang</button>`);
+      $$renderer2.push(`<button type="submit" form="proctors-form"${attr("disabled", isSavingProctors, true)} class="btn-sm btn-primary flex items-center gap-1.5 shadow-sm">`);
+      {
+        $$renderer2.push("<!--[-1-->");
+        $$renderer2.push(`<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> Simpan Sesi &amp; Ruang`);
+      }
+      $$renderer2.push(`<!--]--></button>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
@@ -174,18 +181,14 @@ function _page($$renderer, $$props) {
         if (data.hasSessions) {
           $$renderer2.push("<!--[0-->");
           const sessionsArr = proctor.sessions ? JSON.parse(proctor.sessions) : [];
-          $$renderer2.push(`<td><div class="flex flex-wrap gap-2.5 items-center"><!---->`);
-          {
-            $$renderer2.push(`<!--[-->`);
-            const each_array_3 = ensure_array_like(Array(data.sessionsCount));
-            for (let i = 0, $$length2 = each_array_3.length; i < $$length2; i++) {
-              each_array_3[i];
-              const sNum = i + 1;
-              $$renderer2.push(`<label class="flex items-center gap-1.5 cursor-pointer bg-slate-50 hover:bg-indigo-50 px-2 py-1 rounded border border-slate-200 hover:border-indigo-200 transition-colors"><input type="checkbox"${attr("name", `sessions_${proctor.exam_proctor_id}`)}${attr("value", sNum)}${attr("checked", sessionsArr.includes(sNum), true)} class="w-3.5 h-3.5 text-indigo-600 rounded focus:ring-indigo-500"/> <span class="text-xs font-medium text-slate-700">Sesi ${escape_html(sNum)}</span></label>`);
-            }
-            $$renderer2.push(`<!--]-->`);
+          $$renderer2.push(`<td><div class="flex flex-wrap gap-2.5 items-center"><!--[-->`);
+          const each_array_3 = ensure_array_like(Array(data.sessionsCount));
+          for (let i = 0, $$length2 = each_array_3.length; i < $$length2; i++) {
+            each_array_3[i];
+            const sNum = i + 1;
+            $$renderer2.push(`<label class="flex items-center gap-1.5 cursor-pointer bg-slate-50 hover:bg-indigo-50 px-2 py-1 rounded border border-slate-200 hover:border-indigo-200 transition-colors"><input type="checkbox"${attr("name", `sessions_${proctor.exam_proctor_id}`)}${attr("value", sNum)}${attr("checked", sessionsArr.includes(sNum), true)} class="w-3.5 h-3.5 text-indigo-600 rounded focus:ring-indigo-500"/> <span class="text-xs font-medium text-slate-700">Sesi ${escape_html(sNum)}</span></label>`);
           }
-          $$renderer2.push(`<!----></div></td>`);
+          $$renderer2.push(`<!--]--></div></td>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
@@ -235,7 +238,12 @@ function _page($$renderer, $$props) {
     $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden mb-6"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><div><h2 class="text-lg font-bold text-slate-800">Daftar Peserta Ujian</h2> <p class="text-xs text-slate-500 mt-0.5">Tentukan sesi dan ruang untuk peserta ujian.</p></div> <div class="flex items-center gap-2">`);
     if (participants.length > 0) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<button type="submit" form="participants-form" class="btn-sm btn-primary flex items-center gap-1.5 shadow-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> Simpan Sesi &amp; Ruang Peserta</button>`);
+      $$renderer2.push(`<button type="submit" form="participants-form"${attr("disabled", isSavingParticipants, true)} class="btn-sm btn-primary flex items-center gap-1.5 shadow-sm">`);
+      {
+        $$renderer2.push("<!--[-1-->");
+        $$renderer2.push(`<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> Simpan Sesi &amp; Ruang Peserta`);
+      }
+      $$renderer2.push(`<!--]--></button>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }

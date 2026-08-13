@@ -28,6 +28,8 @@
 	let teacherSearch = '';
 	
 	let showAddProctorModal = false;
+	let isSavingProctors = false;
+	let isSavingParticipants = false;
 
 	let selectedClassId = '';
 	$: previewStudents = selectedClassId ? data.allStudents.filter((s: any) => s.class_id?.toString() === selectedClassId) : [];
@@ -262,11 +264,16 @@
 			</div>
 			<div class="flex items-center gap-2">
 				{#if examProctors.length > 0}
-					<button type="submit" form="proctors-form" class="btn-sm btn-primary flex items-center gap-1.5 shadow-sm">
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-						</svg>
-						Simpan Sesi & Ruang
+					<button type="submit" form="proctors-form" disabled={isSavingProctors} class="btn-sm btn-primary flex items-center gap-1.5 shadow-sm">
+						{#if isSavingProctors}
+							<span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+							Menyimpan...
+						{:else}
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+							Simpan Sesi & Ruang
+						{/if}
 					</button>
 				{/if}
 				<button class="btn-sm btn-secondary flex items-center gap-1.5" on:click={() => (showAddProctorModal = true)}>
@@ -280,7 +287,13 @@
 		{#if examProctors.length === 0}
 			<div class="p-8 text-center text-slate-400 text-sm">Belum ada pengawas yang ditugaskan untuk ujian ini.</div>
 		{:else}
-			<form id="proctors-form" method="POST" action="?/updateAllProctors" use:enhance>
+			<form id="proctors-form" method="POST" action="?/updateAllProctors" use:enhance={() => {
+				isSavingProctors = true;
+				return async ({ update }) => {
+					await update({ reset: false });
+					isSavingProctors = false;
+				};
+			}}>
 				<div class="table-container border-0 rounded-none max-h-80 overflow-y-auto">
 					<table class="table">
 						<thead class="sticky top-0 bg-white z-10">
@@ -304,21 +317,19 @@
 										{@const sessionsArr = proctor.sessions ? JSON.parse(proctor.sessions) : []}
 										<td>
 											<div class="flex flex-wrap gap-2.5 items-center">
-												{#key proctor.sessions}
-													{#each Array(data.sessionsCount) as _, i}
-														{@const sNum = i + 1}
-														<label class="flex items-center gap-1.5 cursor-pointer bg-slate-50 hover:bg-indigo-50 px-2 py-1 rounded border border-slate-200 hover:border-indigo-200 transition-colors">
-															<input 
-																type="checkbox" 
-																name={`sessions_${proctor.exam_proctor_id}`} 
-																value={sNum} 
-																checked={sessionsArr.includes(sNum)} 
-																class="w-3.5 h-3.5 text-indigo-600 rounded focus:ring-indigo-500" 
-															/>
-															<span class="text-xs font-medium text-slate-700">Sesi {sNum}</span>
-														</label>
-													{/each}
-												{/key}
+												{#each Array(data.sessionsCount) as _, i}
+													{@const sNum = i + 1}
+													<label class="flex items-center gap-1.5 cursor-pointer bg-slate-50 hover:bg-indigo-50 px-2 py-1 rounded border border-slate-200 hover:border-indigo-200 transition-colors">
+														<input 
+															type="checkbox" 
+															name={`sessions_${proctor.exam_proctor_id}`} 
+															value={sNum} 
+															checked={sessionsArr.includes(sNum)} 
+															class="w-3.5 h-3.5 text-indigo-600 rounded focus:ring-indigo-500" 
+														/>
+														<span class="text-xs font-medium text-slate-700">Sesi {sNum}</span>
+													</label>
+												{/each}
 											</div>
 										</td>
 									{/if}
@@ -368,11 +379,16 @@
 			</div>
 			<div class="flex items-center gap-2">
 				{#if participants.length > 0}
-					<button type="submit" form="participants-form" class="btn-sm btn-primary flex items-center gap-1.5 shadow-sm">
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-						</svg>
-						Simpan Sesi & Ruang Peserta
+					<button type="submit" form="participants-form" disabled={isSavingParticipants} class="btn-sm btn-primary flex items-center gap-1.5 shadow-sm">
+						{#if isSavingParticipants}
+							<span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+							Menyimpan...
+						{:else}
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+							Simpan Sesi & Ruang Peserta
+						{/if}
 					</button>
 				{/if}
 				<button class="btn-sm btn-secondary flex items-center gap-1.5" on:click={() => (showAddParticipantModal = true)}>
@@ -386,7 +402,13 @@
 		{#if participants.length === 0}
 			<div class="p-8 text-center text-slate-400 text-sm">Belum ada peserta yang ditambahkan ke ujian ini. Ujian tidak bisa diakses siswa.</div>
 		{:else}
-			<form id="participants-form" method="POST" action="?/updateAllParticipants" use:enhance>
+			<form id="participants-form" method="POST" action="?/updateAllParticipants" use:enhance={() => {
+				isSavingParticipants = true;
+				return async ({ update }) => {
+					await update({ reset: false });
+					isSavingParticipants = false;
+				};
+			}}>
 				<div class="table-container border-0 rounded-none max-h-96 overflow-y-auto">
 					<table class="table">
 						<thead class="sticky top-0 bg-white z-10">
