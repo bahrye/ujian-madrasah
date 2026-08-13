@@ -49,7 +49,7 @@
 
 <div class="space-y-6 animate-in">
 	<div class="flex items-center justify-between gap-3">
-		<a href="/admin/exams/type/{exam.exam_type_id}" class="btn-ghost btn-sm">
+		<a href={exam.class_id ? `/admin/exams/type/${exam.exam_type_id}/class/${exam.class_id}` : `/admin/exams/type/${exam.exam_type_id}`} class="btn-ghost btn-sm">
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 				<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.chevronLeft} />
 			</svg>
