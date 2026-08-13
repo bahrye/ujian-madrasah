@@ -490,7 +490,7 @@
 			<div class="p-8 text-center text-slate-400 text-sm">Belum ada soal untuk ujian ini.</div>
 		{:else}
 			<div class="divide-y divide-slate-100" use:mathRender={questions} use:arabicRender={questions}>
-				{#each questions as q}
+				{#each questions.slice(0, 5) as q}
 					<div class="p-4 flex items-center gap-3">
 						<span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold flex-shrink-0">{q.question_number}</span>
 						<div class="flex-1 min-w-0">
@@ -501,6 +501,17 @@
 					</div>
 				{/each}
 			</div>
+			{#if questions.length > 5}
+				<div class="p-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-slate-600">
+					<span>Menampilkan 5 dari <strong>{questions.length}</strong> soal (masih ada <strong>{questions.length - 5}</strong> soal lagi).</span>
+					<a href="/admin/bank-soal/{exam.id}" class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs flex items-center gap-1 hover:underline">
+						Buka Kelola Soal
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+						</svg>
+					</a>
+				</div>
+			{/if}
 		{/if}
 	</div>
 
