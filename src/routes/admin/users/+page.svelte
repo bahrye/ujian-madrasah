@@ -90,7 +90,10 @@
 				<tbody class="divide-y divide-slate-100 text-slate-700">
 					{#each data.users as user (user.id)}
 						<tr class="hover:bg-slate-50/80 transition-colors">
-							<td class="p-4 font-semibold text-slate-800 whitespace-nowrap">{user.name}</td>
+							<td class="p-4 whitespace-nowrap">
+								<div class="font-semibold text-slate-800">{user.name}</div>
+								{#if user.nip}<div class="text-xs text-slate-400 mt-0.5">NIP: {user.nip}</div>{/if}
+							</td>
 							<td class="p-4 text-slate-600 whitespace-nowrap">@{user.username}</td>
 							<td class="p-4 whitespace-nowrap"><span class="{ROLE_COLORS[user.role] || 'badge-info'} whitespace-nowrap">{ROLE_LABELS[user.role] || user.role}</span></td>
 							<td class="p-4 whitespace-nowrap">

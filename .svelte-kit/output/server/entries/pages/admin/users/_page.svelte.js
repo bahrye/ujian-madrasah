@@ -114,7 +114,14 @@ function _page($$renderer, $$props) {
         $$renderer3.push("<!--[-->");
         for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
           let user = each_array[$$index];
-          $$renderer3.push(`<tr class="hover:bg-slate-50/80 transition-colors"><td class="p-4 font-semibold text-slate-800 whitespace-nowrap">${escape_html(user.name)}</td><td class="p-4 text-slate-600 whitespace-nowrap">@${escape_html(user.username)}</td><td class="p-4 whitespace-nowrap"><span${attr_class(`${stringify(ROLE_COLORS[user.role] || "badge-info")} whitespace-nowrap`)}>${escape_html(ROLE_LABELS[user.role] || user.role)}</span></td><td class="p-4 whitespace-nowrap">`);
+          $$renderer3.push(`<tr class="hover:bg-slate-50/80 transition-colors"><td class="p-4 whitespace-nowrap"><div class="font-semibold text-slate-800">${escape_html(user.name)}</div> `);
+          if (user.nip) {
+            $$renderer3.push("<!--[0-->");
+            $$renderer3.push(`<div class="text-xs text-slate-400 mt-0.5">NIP: ${escape_html(user.nip)}</div>`);
+          } else {
+            $$renderer3.push("<!--[-1-->");
+          }
+          $$renderer3.push(`<!--]--></td><td class="p-4 text-slate-600 whitespace-nowrap">@${escape_html(user.username)}</td><td class="p-4 whitespace-nowrap"><span${attr_class(`${stringify(ROLE_COLORS[user.role] || "badge-info")} whitespace-nowrap`)}>${escape_html(ROLE_LABELS[user.role] || user.role)}</span></td><td class="p-4 whitespace-nowrap">`);
           if (user.is_active) {
             $$renderer3.push("<!--[0-->");
             $$renderer3.push(`<span class="badge-success whitespace-nowrap">Aktif</span>`);
