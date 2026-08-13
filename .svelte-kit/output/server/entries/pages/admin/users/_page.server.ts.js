@@ -5,7 +5,7 @@ const load = async ({ platform, url, locals }) => {
   const db = getDB(platform);
   const search = url.searchParams.get("search") || "";
   const roleFilter = url.searchParams.get("role") || "";
-  let query = 'SELECT id, username, name, role, is_active, created_at, photo FROM users WHERE school_id = ? AND role != "siswa" AND role != "superadmin" AND role != "admin"';
+  let query = 'SELECT id, username, name, nip, role, is_active, created_at, photo FROM users WHERE school_id = ? AND role != "siswa" AND role != "superadmin" AND role != "admin"';
   const params = [locals.user.school_id];
   if (search) {
     query += " AND (username LIKE ? OR name LIKE ?)";
@@ -36,6 +36,7 @@ const actions = {
     const username = form.get("username")?.toString().trim();
     const password = form.get("password")?.toString();
     const name = form.get("name")?.toString().trim();
+    const nip = form.get("nip")?.toString().trim() || null;
     const role = form.get("role")?.toString();
     if (!username || !password || !name || !role) {
       return fail(400, { error: "Semua field wajib diisi." });
@@ -49,7 +50,7 @@ const actions = {
     }
     try {
       const passwordHash = await hashPassword(password);
-      await db.prepare("INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)").bind(schoolId, username, passwordHash, name, role).run();
+      await db.prepare("INSERT INTO users (school_id, username, password_hash, name, nip, role) VALUES (?, ?, ?, ?, ?, ?)").bind(schoolId, username, passwordHash, name, nip, role).run();
       return { success: "Pengguna berhasil ditambahkan." };
     } catch (e) {
       console.error(e);
@@ -62,6 +63,7 @@ const actions = {
     const schoolId = locals.user.school_id;
     const idStr = form.get("id")?.toString();
     const name = form.get("name")?.toString().trim();
+    const nip = form.get("nip")?.toString().trim() || null;
     const role = form.get("role")?.toString();
     const password = form.get("password")?.toString();
     const isActive = form.get("is_active")?.toString();
@@ -72,9 +74,9 @@ const actions = {
     try {
       if (password) {
         const passwordHash = await hashPassword(password);
-        await db.prepare("UPDATE users SET name = ?, role = ?, password_hash = ?, is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, role, passwordHash, isActive === "1" ? 1 : 0, parsedId, schoolId).run();
+        await db.prepare("UPDATE users SET name = ?, nip = ?, role = ?, password_hash = ?, is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, nip, role, passwordHash, isActive === "1" ? 1 : 0, parsedId, schoolId).run();
       } else {
-        await db.prepare("UPDATE users SET name = ?, role = ?, is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, role, isActive === "1" ? 1 : 0, parsedId, schoolId).run();
+        await db.prepare("UPDATE users SET name = ?, nip = ?, role = ?, is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ?").bind(name, nip, role, isActive === "1" ? 1 : 0, parsedId, schoolId).run();
       }
     } catch (e) {
       console.error(e);

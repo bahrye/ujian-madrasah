@@ -163,6 +163,10 @@
 					<input id="create-name" name="name" type="text" required class="input" placeholder="Nama lengkap" />
 				</div>
 				<div>
+					<label for="create-nip" class="label">NIP <span class="text-slate-400 font-normal">(opsional)</span></label>
+					<input id="create-nip" name="nip" type="text" class="input" placeholder="19xxxxxxxxxxxxxx" />
+				</div>
+				<div>
 					<label for="create-username" class="label">Username</label>
 					<input id="create-username" name="username" type="text" required class="input" placeholder="Username untuk login" />
 				</div>
@@ -200,6 +204,10 @@
 				<div>
 					<label for="edit-name" class="label">Nama Lengkap</label>
 					<input id="edit-name" name="name" type="text" required class="input" bind:value={editingUser.name} />
+				</div>
+				<div>
+					<label for="edit-nip" class="label">NIP <span class="text-slate-400 font-normal">(opsional)</span></label>
+					<input id="edit-nip" name="nip" type="text" class="input" placeholder="19xxxxxxxxxxxxxx" bind:value={editingUser.nip} />
 				</div>
 				<div>
 					<label for="edit-role" class="label">Role</label>

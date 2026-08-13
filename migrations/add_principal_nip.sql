@@ -4,3 +4,4 @@ ALTER TABLE schools ADD COLUMN city TEXT;
 ALTER TABLE schools ADD COLUMN district TEXT;
 ALTER TABLE schools ADD COLUMN village TEXT;
 ALTER TABLE schools ADD COLUMN postal_code TEXT;
+ALTER TABLE users ADD COLUMN nip TEXT;
