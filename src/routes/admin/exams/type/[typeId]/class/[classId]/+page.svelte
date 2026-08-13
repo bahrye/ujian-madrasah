@@ -11,24 +11,8 @@
 	let showPrintModal = false;
 	let editingExam: any = null;
 	let deleteConfirm: number | null = null;
-	let editingRoomName = '';
-	
 	let useSessionsCreate = false;
 	let useSessionsEdit = false;
-
-	$: if (editingExam && data.subjects && data.examType) {
-		const subject = data.subjects.find(s => s.id === editingExam.subject_id);
-		if (subject) {
-			const prefix = `${data.examType.code} - ${subject.name}`;
-			if (editingExam.title.startsWith(prefix) && editingExam.title.length > prefix.length + 3) {
-				editingRoomName = editingExam.title.substring(prefix.length + 3);
-			} else {
-				editingRoomName = '';
-			}
-		} else {
-			editingRoomName = '';
-		}
-	}
 
 	$: if (form?.success) toasts.success(form.success);
 	$: if (form?.error) toasts.error(form.error);
@@ -216,10 +200,7 @@
 							{/each}
 						</select>
 					</div>
-					<div>
-						<label class="label" for="c-room">Nama Ruang/Sesi (Opsional)</label>
-						<input id="c-room" name="room_name" type="text" class="input" placeholder="Cth: Ruang 1" />
-					</div>
+
 					<div>
 						<label class="label" for="c-duration">Durasi (menit)</label>
 						<input id="c-duration" name="duration_minutes" type="number" min="1" class="input" value="60" />
@@ -322,10 +303,7 @@
 							{/each}
 						</select>
 					</div>
-					<div>
-						<label class="label" for="e-room">Nama Ruang/Sesi (Opsional)</label>
-						<input id="e-room" name="room_name" type="text" class="input" placeholder="Cth: Ruang 1" bind:value={editingRoomName} />
-					</div>
+
 					<div>
 						<label class="label" for="e-duration">Durasi (menit)</label>
 						<input id="e-duration" name="duration_minutes" type="number" min="1" class="input" value={editingExam.duration_minutes} />
