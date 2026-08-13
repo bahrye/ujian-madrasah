@@ -139,51 +139,58 @@ function _page($$renderer, $$props) {
       }
       $$renderer2.push(`<!--]--></tbody></table></div>`);
     }
-    $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden mb-6"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><h2 class="text-lg font-bold text-slate-800">Daftar Pengawas</h2> <button class="btn-sm btn-primary"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> Tambah Pengawas</button></div> `);
+    $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden mb-6"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><div><h2 class="text-lg font-bold text-slate-800">Daftar Pengawas Ujian</h2> <p class="text-xs text-slate-500 mt-0.5">Tentukan sesi dan ruang mengawas untuk setiap pengawas.</p></div> <div class="flex items-center gap-2">`);
+    if (examProctors.length > 0) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<button type="submit" form="proctors-form" class="btn-sm btn-primary flex items-center gap-1.5 shadow-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> Simpan Sesi &amp; Ruang</button>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--> <button class="btn-sm btn-secondary flex items-center gap-1.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> Tambah Pengawas</button></div></div> `);
     if (examProctors.length === 0) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div class="p-8 text-center text-slate-400 text-sm">Belum ada pengawas yang ditugaskan untuk ujian ini.</div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="table-container border-0 rounded-none max-h-64 overflow-y-auto"><table class="table"><thead class="sticky top-0 bg-white"><tr><th>Nama Pengawas</th><th>Username</th>`);
+      $$renderer2.push(`<form id="proctors-form" method="POST" action="?/updateAllProctors"><div class="table-container border-0 rounded-none max-h-80 overflow-y-auto"><table class="table"><thead class="sticky top-0 bg-white z-10"><tr><th>Nama Pengawas</th><th>Username</th>`);
       if (data.hasSessions) {
         $$renderer2.push("<!--[0-->");
-        $$renderer2.push(`<th>Sesi</th>`);
+        $$renderer2.push(`<th>Sesi Mengawas</th>`);
       } else {
         $$renderer2.push("<!--[-1-->");
       }
       $$renderer2.push(`<!--]-->`);
       if (data.examRooms.length > 0) {
         $$renderer2.push("<!--[0-->");
-        $$renderer2.push(`<th>Ruang</th>`);
+        $$renderer2.push(`<th>Ruang Ujian</th>`);
       } else {
         $$renderer2.push("<!--[-1-->");
       }
-      $$renderer2.push(`<!--]--><th>Aksi</th></tr></thead><tbody><!--[-->`);
+      $$renderer2.push(`<!--]--><th class="w-16">Aksi</th></tr></thead><tbody><!--[-->`);
       const each_array_2 = ensure_array_like(examProctors);
       for (let $$index_4 = 0, $$length = each_array_2.length; $$index_4 < $$length; $$index_4++) {
         let proctor = each_array_2[$$index_4];
-        $$renderer2.push(`<tr><td class="font-medium text-slate-800">${escape_html(proctor.name)}</td><td class="font-mono text-sm text-slate-500">${escape_html(proctor.username)}</td>`);
+        $$renderer2.push(`<tr><td class="font-medium text-slate-800"><input type="hidden" name="exam_proctor_ids"${attr("value", proctor.exam_proctor_id)}/> ${escape_html(proctor.name)}</td><td class="font-mono text-sm text-slate-500">${escape_html(proctor.username)}</td>`);
         if (data.hasSessions) {
           $$renderer2.push("<!--[0-->");
           const sessionsArr = proctor.sessions ? JSON.parse(proctor.sessions) : [];
-          $$renderer2.push(`<td><form method="POST" action="?/updateProctorSessions"><input type="hidden" name="exam_proctor_id"${attr("value", proctor.exam_proctor_id)}/> <div class="flex flex-wrap gap-2"><!--[-->`);
+          $$renderer2.push(`<td><div class="flex flex-wrap gap-2.5 items-center"><!--[-->`);
           const each_array_3 = ensure_array_like(Array(data.sessionsCount));
           for (let i = 0, $$length2 = each_array_3.length; i < $$length2; i++) {
             each_array_3[i];
             const sNum = i + 1;
-            $$renderer2.push(`<label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="sessions"${attr("value", sNum)}${attr("checked", sessionsArr.includes(sNum), true)} class="w-3.5 h-3.5 text-indigo-600 rounded"/> <span class="text-xs font-medium text-slate-700">${escape_html(sNum)}</span></label>`);
+            $$renderer2.push(`<label class="flex items-center gap-1.5 cursor-pointer bg-slate-50 hover:bg-indigo-50 px-2 py-1 rounded border border-slate-200 hover:border-indigo-200 transition-colors"><input type="checkbox"${attr("name", `sessions_${proctor.exam_proctor_id}`)}${attr("value", sNum)}${attr("checked", sessionsArr.includes(sNum), true)} class="w-3.5 h-3.5 text-indigo-600 rounded focus:ring-indigo-500"/> <span class="text-xs font-medium text-slate-700">Sesi ${escape_html(sNum)}</span></label>`);
           }
-          $$renderer2.push(`<!--]--></div></form></td>`);
+          $$renderer2.push(`<!--]--></div></td>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
         $$renderer2.push(`<!--]-->`);
         if (data.examRooms.length > 0) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<td><form method="POST" action="?/updateProctorRoom"><input type="hidden" name="exam_proctor_id"${attr("value", proctor.exam_proctor_id)}/> <select name="room_id" class="select select-sm select-bordered w-full max-w-[120px]">`);
+          $$renderer2.push(`<td><select${attr("name", `room_${proctor.exam_proctor_id}`)} class="select select-sm select-bordered w-full max-w-[140px]">`);
           $$renderer2.option({ value: "" }, ($$renderer3) => {
-            $$renderer3.push(`- Default -`);
+            $$renderer3.push(`- Semua Ruang -`);
           });
           $$renderer2.push(`<!--[-->`);
           const each_array_4 = ensure_array_like(data.examRooms);
@@ -193,7 +200,7 @@ function _page($$renderer, $$props) {
               $$renderer3.push(`${escape_html(room.name)}`);
             });
           }
-          $$renderer2.push(`<!--]--></select></form></td>`);
+          $$renderer2.push(`<!--]--></select></td>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
@@ -219,7 +226,7 @@ function _page($$renderer, $$props) {
         });
         $$renderer2.push(`<!----></td></tr>`);
       }
-      $$renderer2.push(`<!--]--></tbody></table></div>`);
+      $$renderer2.push(`<!--]--></tbody></table></div></form>`);
     }
     $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden mb-6"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><h2 class="text-lg font-bold text-slate-800">Daftar Peserta Ujian</h2> <button class="btn-sm btn-primary"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> Tambah Peserta</button></div> `);
     if (participants.length === 0) {

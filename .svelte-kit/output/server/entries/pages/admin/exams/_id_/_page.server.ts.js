@@ -186,27 +186,24 @@ const actions = {
     await db.prepare("UPDATE exam_participants SET room_id = ? WHERE id = ? AND exam_id = ?").bind(roomId, participantId, parseInt(params.id, 10)).run();
     return { success: "Ruang peserta berhasil diperbarui." };
   },
-  updateProctorRoom: async ({ request, platform, params, locals }) => {
+  updateAllProctors: async ({ request, platform, params, locals }) => {
     if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
     const form = await request.formData();
-    const examProctorId = parseInt(form.get("exam_proctor_id")?.toString() || "", 10);
-    const roomIdStr = form.get("room_id")?.toString();
-    const roomId = roomIdStr ? parseInt(roomIdStr, 10) : null;
-    if (isNaN(examProctorId)) return fail(400, { error: "Data tidak valid" });
-    await db.prepare("UPDATE exam_proctors SET room_id = ? WHERE id = ? AND exam_id = ?").bind(roomId, examProctorId, parseInt(params.id, 10)).run();
-    return { success: "Ruang pengawas berhasil diperbarui." };
-  },
-  updateProctorSessions: async ({ request, platform, params, locals }) => {
-    if (!locals.user) return fail(401, { error: "Unauthorized" });
-    const db = getDB(platform);
-    const form = await request.formData();
-    const examProctorId = parseInt(form.get("exam_proctor_id")?.toString() || "", 10);
-    const sessionsArr = form.getAll("sessions").map((s) => parseInt(s.toString(), 10)).filter((s) => !isNaN(s));
-    const sessionsJson = sessionsArr.length > 0 ? JSON.stringify(sessionsArr) : null;
-    if (isNaN(examProctorId)) return fail(400, { error: "Data tidak valid" });
-    await db.prepare("UPDATE exam_proctors SET sessions = ? WHERE id = ? AND exam_id = ?").bind(sessionsJson, examProctorId, parseInt(params.id, 10)).run();
-    return { success: "Sesi pengawas berhasil diperbarui." };
+    const examId = parseInt(params.id, 10);
+    const proctorIds = form.getAll("exam_proctor_ids").map((id) => parseInt(id.toString(), 10)).filter((id) => !isNaN(id));
+    if (proctorIds.length === 0) {
+      return { success: "Tidak ada pengawas untuk diperbarui." };
+    }
+    const statements = proctorIds.map((proctorId) => {
+      const roomIdStr = form.get(`room_${proctorId}`)?.toString();
+      const roomId = roomIdStr ? parseInt(roomIdStr, 10) : null;
+      const sessionsArr = form.getAll(`sessions_${proctorId}`).map((s) => parseInt(s.toString(), 10)).filter((s) => !isNaN(s));
+      const sessionsJson = sessionsArr.length > 0 ? JSON.stringify(sessionsArr) : null;
+      return db.prepare("UPDATE exam_proctors SET room_id = ?, sessions = ? WHERE id = ? AND exam_id = ?").bind(roomId, sessionsJson, proctorId, examId);
+    });
+    await db.batch(statements);
+    return { success: "Pengaturan pengawas berhasil disimpan." };
   },
   addTeacher: async ({ request, platform, params, locals }) => {
     if (!locals.user) return fail(401, { error: "Unauthorized" });
