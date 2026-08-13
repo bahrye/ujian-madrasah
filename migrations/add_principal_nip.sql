@@ -1,0 +1,6 @@
+ALTER TABLE schools ADD COLUMN principal_nip TEXT;
+ALTER TABLE schools ADD COLUMN province TEXT;
+ALTER TABLE schools ADD COLUMN city TEXT;
+ALTER TABLE schools ADD COLUMN district TEXT;
+ALTER TABLE schools ADD COLUMN village TEXT;
+ALTER TABLE schools ADD COLUMN postal_code TEXT;

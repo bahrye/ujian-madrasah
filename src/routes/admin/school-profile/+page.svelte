@@ -301,6 +301,17 @@
 							value={school?.principal_name || ''}
 						/>
 					</div>
+					<div class="sm:col-span-2">
+						<label for="principal_nip" class="block text-sm font-semibold text-slate-700 mb-1.5">NIP <span class="text-slate-400 font-normal">(opsional)</span></label>
+						<input
+							type="text"
+							id="principal_nip"
+							name="principal_nip"
+							class="input"
+							placeholder="19xxxxxxxxxxxxxx"
+							value={school?.principal_nip || ''}
+						/>
+					</div>
 					<div>
 						<label for="phone" class="block text-sm font-semibold text-slate-700 mb-1.5">Nomor Telepon</label>
 						<input
@@ -337,8 +348,7 @@
 				</div>
 			</div>
 
-			<!-- Alamat -->
-			<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+				<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
 				<h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
 					<div class="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center">
 						<svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -348,15 +358,72 @@
 					</div>
 					Alamat Sekolah
 				</h3>
-				<div>
-					<label for="address" class="block text-sm font-semibold text-slate-700 mb-1.5">Alamat Lengkap</label>
-					<textarea
-						id="address"
-						name="address"
-						rows="3"
-						class="input resize-none"
-						placeholder="Jl. Contoh No. 1, Kelurahan, Kecamatan, Kota, Provinsi"
-					>{school?.address || ''}</textarea>
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+					<div class="sm:col-span-2">
+						<label for="address" class="block text-sm font-semibold text-slate-700 mb-1.5">Alamat Lengkap</label>
+						<textarea
+							id="address"
+							name="address"
+							rows="3"
+							class="input resize-none"
+							placeholder="Jl. Contoh No. 1, RT/RW ..."
+						>{school?.address || ''}</textarea>
+					</div>
+					<div>
+						<label for="province" class="block text-sm font-semibold text-slate-700 mb-1.5">Provinsi</label>
+						<input
+							type="text"
+							id="province"
+							name="province"
+							class="input"
+							placeholder="Jawa Timur"
+							value={school?.province || ''}
+						/>
+					</div>
+					<div>
+						<label for="city" class="block text-sm font-semibold text-slate-700 mb-1.5">Kabupaten/Kota</label>
+						<input
+							type="text"
+							id="city"
+							name="city"
+							class="input"
+							placeholder="Kota Surabaya"
+							value={school?.city || ''}
+						/>
+					</div>
+					<div>
+						<label for="district" class="block text-sm font-semibold text-slate-700 mb-1.5">Kecamatan</label>
+						<input
+							type="text"
+							id="district"
+							name="district"
+							class="input"
+							placeholder="Gubeng"
+							value={school?.district || ''}
+						/>
+					</div>
+					<div>
+						<label for="village" class="block text-sm font-semibold text-slate-700 mb-1.5">Kelurahan/Desa</label>
+						<input
+							type="text"
+							id="village"
+							name="village"
+							class="input"
+							placeholder="Airlangga"
+							value={school?.village || ''}
+						/>
+					</div>
+					<div>
+						<label for="postal_code" class="block text-sm font-semibold text-slate-700 mb-1.5">Kode POS</label>
+						<input
+							type="text"
+							id="postal_code"
+							name="postal_code"
+							class="input"
+							placeholder="60286"
+							value={school?.postal_code || ''}
+						/>
+					</div>
 				</div>
 			</div>
 

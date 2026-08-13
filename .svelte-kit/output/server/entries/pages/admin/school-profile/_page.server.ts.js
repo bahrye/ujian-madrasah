@@ -24,10 +24,16 @@ const actions = {
     const data = await request.formData();
     const name = data.get("name")?.toString().trim();
     const principal_name = data.get("principal_name")?.toString().trim() || null;
+    const principal_nip = data.get("principal_nip")?.toString().trim() || null;
     const npsn = data.get("npsn")?.toString().trim() || null;
     const phone = data.get("phone")?.toString().trim() || null;
     const email = data.get("email")?.toString().trim() || null;
     const address = data.get("address")?.toString().trim() || null;
+    const province = data.get("province")?.toString().trim() || null;
+    const city = data.get("city")?.toString().trim() || null;
+    const district = data.get("district")?.toString().trim() || null;
+    const village = data.get("village")?.toString().trim() || null;
+    const postal_code = data.get("postal_code")?.toString().trim() || null;
     const accreditation = data.get("accreditation")?.toString().trim() || null;
     const website = data.get("website")?.toString().trim() || null;
     const logo_url = data.get("logo_url")?.toString().trim() || null;
@@ -37,17 +43,24 @@ const actions = {
     try {
       await db.prepare(
         `UPDATE schools SET
-						name = ?, principal_name = ?, npsn = ?, phone = ?, email = ?,
-						address = ?, accreditation = ?, website = ?, logo_url = ?,
+						name = ?, principal_name = ?, principal_nip = ?, npsn = ?, phone = ?, email = ?,
+						address = ?, province = ?, city = ?, district = ?, village = ?, postal_code = ?,
+						accreditation = ?, website = ?, logo_url = ?,
 						updated_at = datetime('now')
 					WHERE id = ?`
       ).bind(
         name,
         principal_name,
+        principal_nip,
         npsn,
         phone,
         email,
         address,
+        province,
+        city,
+        district,
+        village,
+        postal_code,
         accreditation,
         website,
         logo_url,
