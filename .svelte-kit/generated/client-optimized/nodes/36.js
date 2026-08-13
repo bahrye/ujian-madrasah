@@ -1,1 +1,1 @@
-export { default as component } from "../../../../src/routes/guru/papan-peringkat/+page.svelte";
+export { default as component } from "../../../../src/routes/guru/media-bank/+page.svelte";

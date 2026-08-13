@@ -817,6 +817,25 @@
     "isEntry": true,
     "imports": [
       "_index.js",
+      "_constants.js"
+    ]
+  },
+  "src/routes/admin/exams/type/[typeId]/class/[classId]/+page.server.ts": {
+    "file": "entries/pages/admin/exams/type/_typeId_/class/_classId_/_page.server.ts.js",
+    "name": "entries/pages/admin/exams/type/_typeId_/class/_classId_/_page.server.ts",
+    "src": "src/routes/admin/exams/type/[typeId]/class/[classId]/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/admin/exams/type/[typeId]/class/[classId]/+page.svelte": {
+    "file": "entries/pages/admin/exams/type/_typeId_/class/_classId_/_page.svelte.js",
+    "name": "entries/pages/admin/exams/type/_typeId_/class/_classId_/_page.svelte",
+    "src": "src/routes/admin/exams/type/[typeId]/class/[classId]/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
       "_date.js",
       "_exports.js",
       "_utils2.js",
