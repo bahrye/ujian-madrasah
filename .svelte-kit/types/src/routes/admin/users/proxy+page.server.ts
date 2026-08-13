@@ -199,6 +199,7 @@ export const actions = {
 			for (const user of users) {
 				const username = String(user.username || '').trim();
 				const name = String(user.name || '').trim();
+				const nip = user.nip ? String(user.nip).trim() : null;
 				const password = String(user.password || '').trim();
 				const role = String(user.role || '').trim();
 
@@ -212,8 +213,8 @@ export const actions = {
 				existingUsernames.add(username.toLowerCase());
 				const passwordHash = await hashPassword(password);
 				stmts.push(
-					db.prepare('INSERT INTO users (school_id, username, password_hash, name, role) VALUES (?, ?, ?, ?, ?)')
-						.bind(locals.user!.school_id, username, passwordHash, name, role)
+					db.prepare('INSERT INTO users (school_id, username, password_hash, name, nip, role) VALUES (?, ?, ?, ?, ?, ?)')
+						.bind(locals.user!.school_id, username, passwordHash, name, nip, role)
 				);
 			}
 

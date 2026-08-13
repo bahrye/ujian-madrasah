@@ -58,7 +58,7 @@
         throw new Error("File Excel kosong atau tidak memiliki baris data setelah header.");
       }
 
-      // Format: [USERNAME, NAMA LENGKAP, PASSWORD, ROLE]
+      // Format: [USERNAME, NAMA LENGKAP, NIP, PASSWORD, ROLE]
       const results = [];
       const allowedRoles = ['guru', 'pengawas'];
       
@@ -68,15 +68,16 @@
 
         const username = row[0] ? String(row[0]).trim() : '';
         const name = row[1] ? String(row[1]).trim() : '';
-        const password = row[2] ? String(row[2]).trim() : '';
-        let role = row[3] ? String(row[3]).trim().toLowerCase() : 'guru';
+        const nip = row[2] ? String(row[2]).trim() : '';
+        const password = row[3] ? String(row[3]).trim() : '';
+        let role = row[4] ? String(row[4]).trim().toLowerCase() : 'guru';
         
         if (!allowedRoles.includes(role)) {
           role = 'guru'; // default fallback
         }
 
         if (username && name && password) {
-          results.push({ username, name, password, role });
+          results.push({ username, name, nip: nip || null, password, role });
         }
       }
 
@@ -103,11 +104,11 @@
     const workbook = XLSX.utils.book_new();
     
     // Sheet 1: Data Pengguna
-    const headers = ["USERNAME", "NAMA LENGKAP", "PASSWORD", "ROLE"];
-    const sampleRow = ["guru_budi", "Budi Santoso", "rahasia123", "guru"];
+    const headers = ["USERNAME", "NAMA LENGKAP", "NIP", "PASSWORD", "ROLE"];
+    const sampleRow = ["guru_budi", "Budi Santoso", "197001012000121001", "rahasia123", "guru"];
     const wsData = XLSX.utils.aoa_to_sheet([headers, sampleRow]);
     
-    wsData['!cols'] = [{ wch: 20 }, { wch: 30 }, { wch: 20 }, { wch: 15 }];
+    wsData['!cols'] = [{ wch: 20 }, { wch: 30 }, { wch: 22 }, { wch: 20 }, { wch: 15 }];
     XLSX.utils.book_append_sheet(workbook, wsData, "Data Pengguna");
     
     // Sheet 2: Petunjuk
@@ -116,6 +117,7 @@
       [],
       ["USERNAME", "Unik untuk login, jangan ada spasi (cth: guru_budi)"],
       ["NAMA LENGKAP", "Nama lengkap pengguna"],
+      ["NIP", "Nomor Induk Pegawai, boleh dikosongkan (opsional)"],
       ["PASSWORD", "Kata sandi untuk login"],
       ["ROLE", "Pilih salah satu: guru atau pengawas"]
     ]);
@@ -154,7 +156,7 @@
             </h3>
             <ol class="list-decimal list-inside text-sm text-indigo-800 space-y-2 ml-1">
               <li>Unduh template Excel yang disediakan.</li>
-              <li>Isi data pengguna sesuai format (Username, Nama Lengkap, Password, Role).</li>
+              <li>Isi data pengguna sesuai format (Username, Nama Lengkap, NIP, Password, Role).</li>
               <li>Pastikan Role hanya berisi: <strong>guru</strong> atau <strong>pengawas</strong>.</li>
               <li>Simpan dan unggah kembali file Excel tersebut.</li>
             </ol>
