@@ -22,7 +22,7 @@ const load = async ({ platform, locals, params }) => {
 			u.name as student_name,
 			u.photo,
 			c.name as class_name,
-			sa.score,
+			MAX(sa.score) as score,
 			sa.total_points,
 			sa.submit_time,
 			sa.start_time
@@ -30,7 +30,8 @@ const load = async ({ platform, locals, params }) => {
 		JOIN users u ON sa.student_id = u.id
 		LEFT JOIN classes c ON u.class_id = c.id
 		WHERE sa.exam_id = ? AND sa.status = 'selesai'
-		ORDER BY sa.score DESC, (julianday(sa.submit_time) - julianday(sa.start_time)) ASC
+		GROUP BY u.id
+		ORDER BY score DESC, (julianday(sa.submit_time) - julianday(sa.start_time)) ASC
 	`).bind(examId).all();
   return {
     exam: {

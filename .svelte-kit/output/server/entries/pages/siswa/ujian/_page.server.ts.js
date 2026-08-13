@@ -47,7 +47,7 @@ const actions = {
     try {
       const token = await db.prepare(`
 				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active,
-				e.start_time as exam_start_time, e.end_time as exam_end_time,
+				e.start_time as exam_start_time, e.end_time as exam_end_time, e.max_attempts,
 				u.session_number
 				FROM tokens t 
 				JOIN exams e ON t.exam_id = e.id
@@ -92,14 +92,17 @@ const actions = {
       if (parseDate(token.expires_at) < /* @__PURE__ */ new Date()) {
         return fail(400, { error: "Token sudah kedaluwarsa." });
       }
-      const existingAttempt = await db.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`).bind(locals.user.id, token.exam_id).first();
-      if (existingAttempt) {
-        if (existingAttempt.status === "mengerjakan") {
-          const signedCookie = await signExamToken(existingAttempt.id, locals.user.id);
-          cookies.set("exam_token_verified_" + existingAttempt.id, signedCookie, { path: "/", httpOnly: true, sameSite: "lax" });
-          throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
+      const allAttempts = await db.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`).bind(locals.user.id, token.exam_id).all();
+      if (allAttempts.results && allAttempts.results.length > 0) {
+        const mengerjakanAttempt = allAttempts.results.find((a) => a.status === "mengerjakan");
+        if (mengerjakanAttempt) {
+          const signedCookie = await signExamToken(mengerjakanAttempt.id, locals.user.id);
+          cookies.set("exam_token_verified_" + mengerjakanAttempt.id, signedCookie, { path: "/", httpOnly: true, sameSite: "lax" });
+          throw redirect(302, `/siswa/ujian/${mengerjakanAttempt.id}`);
         }
-        return fail(400, { error: "Anda sudah pernah mengerjakan ujian ini." });
+        if (allAttempts.results.length >= (token.max_attempts || 1)) {
+          return fail(400, { error: "Anda sudah mencapai batas maksimal pengerjaan ujian ini." });
+        }
       }
       return { success: true, tokenCode, examId: parsedExamId };
     } catch (e) {
@@ -118,7 +121,7 @@ const actions = {
     try {
       const token = await db.prepare(`
 				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active,
-				e.start_time as exam_start_time, e.end_time as exam_end_time,
+				e.start_time as exam_start_time, e.end_time as exam_end_time, e.max_attempts,
 				u.session_number
 				FROM tokens t 
 				JOIN exams e ON t.exam_id = e.id
@@ -163,14 +166,17 @@ const actions = {
       if (parseDate(token.expires_at) < /* @__PURE__ */ new Date()) {
         return fail(400, { error: "Token sudah kedaluwarsa." });
       }
-      const existingAttempt = await db.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`).bind(locals.user.id, token.exam_id).first();
-      if (existingAttempt) {
-        if (existingAttempt.status === "mengerjakan") {
-          const signedCookie2 = await signExamToken(existingAttempt.id, locals.user.id);
-          cookies.set("exam_token_verified_" + existingAttempt.id, signedCookie2, { path: "/", httpOnly: true, sameSite: "lax" });
-          throw redirect(302, `/siswa/ujian/${existingAttempt.id}`);
+      const allAttempts = await db.prepare(`SELECT id, status FROM student_attempts WHERE student_id = ? AND exam_id = ?`).bind(locals.user.id, token.exam_id).all();
+      if (allAttempts.results && allAttempts.results.length > 0) {
+        const mengerjakanAttempt = allAttempts.results.find((a) => a.status === "mengerjakan");
+        if (mengerjakanAttempt) {
+          const signedCookie2 = await signExamToken(mengerjakanAttempt.id, locals.user.id);
+          cookies.set("exam_token_verified_" + mengerjakanAttempt.id, signedCookie2, { path: "/", httpOnly: true, sameSite: "lax" });
+          throw redirect(302, `/siswa/ujian/${mengerjakanAttempt.id}`);
         }
-        return fail(400, { error: "Anda sudah pernah mengerjakan ujian ini." });
+        if (allAttempts.results.length >= (token.max_attempts || 1)) {
+          return fail(400, { error: "Anda sudah mencapai batas maksimal pengerjaan ujian ini." });
+        }
       }
       const endTime = new Date(Date.now() + token.duration_minutes * 60 * 1e3).toISOString();
       let signatureStr = form.get("signature")?.toString() || "";

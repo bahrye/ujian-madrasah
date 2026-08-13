@@ -205,6 +205,14 @@
 						<label class="label" for="c-duration">Durasi (menit)</label>
 						<input id="c-duration" name="duration_minutes" type="number" min="1" class="input" value="60" />
 					</div>
+					<div>
+						<label class="label" for="c-max-attempts">Batas Pengerjaan</label>
+						<select id="c-max-attempts" name="max_attempts" class="input">
+							{#each [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as i}
+								<option value={i}>{i} Kali</option>
+							{/each}
+						</select>
+					</div>
 				</div>
 				<div>
 					<label class="label" for="c-desc">Deskripsi</label>
@@ -307,6 +315,14 @@
 					<div>
 						<label class="label" for="e-duration">Durasi (menit)</label>
 						<input id="e-duration" name="duration_minutes" type="number" min="1" class="input" value={editingExam.duration_minutes} />
+					</div>
+					<div>
+						<label class="label" for="e-max-attempts">Batas Pengerjaan</label>
+						<select id="e-max-attempts" name="max_attempts" class="input" value={editingExam.max_attempts || 1}>
+							{#each [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as i}
+								<option value={i}>{i} Kali</option>
+							{/each}
+						</select>
 					</div>
 				</div>
 				<div>

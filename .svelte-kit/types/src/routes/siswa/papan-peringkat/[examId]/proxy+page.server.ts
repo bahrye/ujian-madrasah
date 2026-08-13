@@ -40,7 +40,8 @@ export const load = async ({ platform, locals, params }: Parameters<PageServerLo
 		FROM student_attempts sa
 		JOIN users u ON sa.student_id = u.id
 		WHERE sa.exam_id = ? AND sa.status = 'selesai' AND u.class_id = ?
-		ORDER BY sa.score DESC, (julianday(sa.submit_time) - julianday(sa.start_time)) ASC
+		GROUP BY u.id
+		ORDER BY MAX(sa.score) DESC, (julianday(sa.submit_time) - julianday(sa.start_time)) ASC
 	`).bind(examId, classId).all<{ student_name: string; photo: string | null; submit_time: string }>();
 
 	return {

@@ -77,6 +77,7 @@ export const actions = {
 
 		const description = form.get('description')?.toString().trim() || '';
 		const durationMinutes = parseInt(form.get('duration_minutes')?.toString() || '60');
+		const maxAttempts = parseInt(form.get('max_attempts')?.toString() || '1');
 		const startTime = form.get('start_time')?.toString() || null;
 		const endTime = form.get('end_time')?.toString() || null;
 		const shuffleQuestions = parseInt(form.get('shuffle_questions')?.toString() || '0');
@@ -95,9 +96,9 @@ export const actions = {
 		}
 
 		try {
-			const result = await db.prepare(`INSERT INTO exams (school_id, exam_type_id, class_id, title, description, subject_id, duration_minutes, start_time, end_time, is_active, shuffle_questions, show_score_type, created_by)
-				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-				.bind(locals.user!.school_id, typeId, classId, title, description, parsedSubjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, showScoreType, locals.user?.id)
+			const result = await db.prepare(`INSERT INTO exams (school_id, exam_type_id, class_id, title, description, subject_id, duration_minutes, start_time, end_time, is_active, shuffle_questions, show_score_type, max_attempts, created_by)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+				.bind(locals.user!.school_id, typeId, classId, title, description, parsedSubjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, showScoreType, maxAttempts, locals.user?.id)
 				.run();
 
 			const newExamId = result.meta?.last_row_id;
@@ -165,6 +166,7 @@ export const actions = {
 
 		const description = form.get('description')?.toString().trim() || '';
 		const durationMinutes = parseInt(form.get('duration_minutes')?.toString() || '60');
+		const maxAttempts = parseInt(form.get('max_attempts')?.toString() || '1');
 		const startTime = form.get('start_time')?.toString() || null;
 		const endTime = form.get('end_time')?.toString() || null;
 		const isActive = form.get('is_active')?.toString() === '1' ? 1 : 0;
@@ -184,8 +186,8 @@ export const actions = {
 
 		try {
 			await db.prepare(`UPDATE exams SET title=?, description=?, subject_id=?, duration_minutes=?,
-				start_time=?, end_time=?, is_active=?, shuffle_questions=?, show_score_type=?, updated_at=datetime('now') WHERE id=? AND school_id=?`)
-				.bind(title, description, parsedSubjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, showScoreType, parsedId, locals.user!.school_id)
+				start_time=?, end_time=?, is_active=?, shuffle_questions=?, show_score_type=?, max_attempts=?, updated_at=datetime('now') WHERE id=? AND school_id=?`)
+				.bind(title, description, parsedSubjectId, durationMinutes, startTime, endTime, isActive, shuffleQuestions, showScoreType, maxAttempts, parsedId, locals.user!.school_id)
 				.run();
 
 			await db.prepare('DELETE FROM exam_sessions WHERE exam_id = ?').bind(parsedId).run();

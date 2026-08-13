@@ -44,15 +44,20 @@ export const load = async ({ platform, locals, params, url }: Parameters<PageSer
 			u.name as student_name,
 			u.photo,
 			c.name as class_name,
-			SUM(sa.total_points) as total_points,
-			SUM(sa.score) as total_score, 
-			AVG(sa.score) as avg_score,
-			COUNT(sa.id) as exams_completed
-		FROM student_attempts sa
-		JOIN users u ON sa.student_id = u.id
+			SUM(best_sa.total_points) as total_points,
+			SUM(best_sa.score) as total_score, 
+			AVG(best_sa.score) as avg_score,
+			COUNT(best_sa.exam_id) as exams_completed
+		FROM (
+			SELECT student_id, exam_id, MAX(score) as score, MAX(total_points) as total_points
+			FROM student_attempts 
+			WHERE status = 'selesai'
+			GROUP BY student_id, exam_id
+		) best_sa
+		JOIN users u ON best_sa.student_id = u.id
 		LEFT JOIN classes c ON u.class_id = c.id
-		JOIN exams e ON sa.exam_id = e.id
-		WHERE e.exam_type_id = ? AND sa.status = 'selesai'
+		JOIN exams e ON best_sa.exam_id = e.id
+		WHERE e.exam_type_id = ?
 		AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers teacher_join WHERE teacher_join.exam_id = e.id AND teacher_join.teacher_id = ?))
 	`;
 	const leaderboardParams: unknown[] = [typeId, userId, userId];

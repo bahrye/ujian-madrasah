@@ -31,14 +31,19 @@ export const load: PageServerLoad = async ({ platform, locals, params }) => {
 		SELECT 
 			u.name as student_name,
 			u.photo,
-			SUM(sa.score) as total_score, 
-			AVG(sa.score) as avg_score,
-			SUM(julianday(sa.submit_time) - julianday(sa.start_time)) as total_time,
-			COUNT(sa.id) as exams_completed
-		FROM student_attempts sa
-		JOIN users u ON sa.student_id = u.id
-		JOIN exams e ON sa.exam_id = e.id
-		WHERE e.exam_type_id = ? AND sa.status = 'selesai' AND u.class_id = ?
+			SUM(best_sa.score) as total_score, 
+			AVG(best_sa.score) as avg_score,
+			SUM(julianday(best_sa.submit_time) - julianday(best_sa.start_time)) as total_time,
+			COUNT(best_sa.exam_id) as exams_completed
+		FROM (
+			SELECT student_id, exam_id, MAX(score) as score, start_time, submit_time
+			FROM student_attempts 
+			WHERE status = 'selesai'
+			GROUP BY student_id, exam_id
+		) best_sa
+		JOIN users u ON best_sa.student_id = u.id
+		JOIN exams e ON best_sa.exam_id = e.id
+		WHERE e.exam_type_id = ? AND u.class_id = ?
 		GROUP BY u.id
 		ORDER BY total_score DESC, avg_score DESC, total_time ASC
 	`).bind(typeId, classId).all<{ student_name: string; photo: string | null; exams_completed: number }>();

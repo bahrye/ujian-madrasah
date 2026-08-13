@@ -91,6 +91,7 @@ CREATE TABLE IF NOT EXISTS exams (
     show_score_type TEXT DEFAULT 'after_submit',
     is_score_released INTEGER NOT NULL DEFAULT 0,
     show_result INTEGER NOT NULL DEFAULT 0,
+    max_attempts INTEGER NOT NULL DEFAULT 1,
     created_by INTEGER REFERENCES users(id),
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
