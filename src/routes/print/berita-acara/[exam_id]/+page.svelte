@@ -247,11 +247,11 @@
 		].filter(Boolean).join(', ')}
 		{@const locationCity = school?.city ? (school.city.toLowerCase().startsWith('kab') || school.city.toLowerCase().startsWith('kota') ? school.city : `Kab. ${school.city}`) : '....................'}
 		{@const activeOfficers = [
-			{ role: 'Pengawas I', data: proctor1, required: true },
-			{ role: 'Pengawas II', data: proctor2, required: false },
-			{ role: 'Proktor / Teknisi', data: proctorTech, required: false },
-			{ role: 'Panitia Ujian', data: committee, required: false }
-		].filter(o => o.required || o.data)}
+			{ role: 'Pengawas I', data: proctor1, id: 'p1' },
+			{ role: 'Pengawas II', data: proctor2, id: 'p2' },
+			{ role: 'Proktor / Teknisi', data: proctorTech, id: 'pt' },
+			{ role: 'Panitia Ujian', data: committee, id: 'cm' }
+		].filter(o => (o.id === 'p1' && proctor1Id) || (o.id !== 'p1' && o.data))}
 
 		<div class={roomIdx > 0 || sessionIdx > 0 ? "break-before-page pt-8" : ""}>
 			<!-- Kop Surat -->
@@ -347,24 +347,48 @@
 
 			<!-- TTD Petugas & Kepala Madrasah -->
 			<div class="mt-8 text-sm">
-				<div class="grid grid-cols-2 md:grid-cols-3 gap-6 text-center mb-8">
-					{#each activeOfficers as officer}
+				{#if activeOfficers.length <= 1}
+					<!-- 1 Officer (or default): Kepala Madrasah on Left, Pengawas Ruang on Right -->
+					<div class="grid grid-cols-2 gap-8 text-center">
 						<div>
-							<p class="font-medium mb-14">{officer.role},</p>
-							<p class="border-b border-black font-bold inline-block px-3">{officer.data?.name || '( .................................... )'}</p>
-							<p class="text-xs mt-1">NIP. {officer.data?.nip || '..............................'}</p>
+							<div class="h-5"></div>
+							<p class="font-medium mb-14">Kepala Madrasah,</p>
+							<p class="border-b border-black font-bold inline-block px-3">{school?.principal_name || '( .................................... )'}</p>
+							<p class="text-xs mt-1">NIP. {school?.principal_nip || '..............................'}</p>
 						</div>
-					{/each}
-				</div>
 
-				<div class="flex justify-end pt-2">
-					<div class="w-72 text-center">
-						<p class="text-xs text-slate-700 mb-1">{locationCity}, {formatDateFull(effectiveStart)}</p>
-						<p class="font-medium mb-14">Kepala Madrasah,</p>
-						<p class="border-b border-black font-bold inline-block px-3">{school?.principal_name || '( .................................... )'}</p>
-						<p class="text-xs mt-1">NIP. {school?.principal_nip || '..............................'}</p>
+						<div>
+							<p class="text-xs text-slate-700 mb-1">{locationCity}, {formatDateFull(effectiveStart)}</p>
+							<p class="font-medium mb-14">{activeOfficers[0]?.role === 'Pengawas I' ? 'Pengawas Ruang' : (activeOfficers[0]?.role || 'Pengawas Ruang')},</p>
+							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[0]?.data?.name || '( .................................... )'}</p>
+							<p class="text-xs mt-1">NIP. {activeOfficers[0]?.data?.nip || '..............................'}</p>
+						</div>
 					</div>
-				</div>
+				{:else}
+					<!-- 2+ Officers: Officers in top grid, Date above right-most officer, Kepala Madrasah in bottom row right -->
+					<div class="grid grid-cols-2 md:grid-cols-{Math.min(activeOfficers.length, 4)} gap-6 text-center mb-8">
+						{#each activeOfficers as officer, idx}
+							<div>
+								{#if idx === activeOfficers.length - 1}
+									<p class="text-xs text-slate-700 mb-1">{locationCity}, {formatDateFull(effectiveStart)}</p>
+								{:else}
+									<div class="h-5"></div>
+								{/if}
+								<p class="font-medium mb-14">{officer.role},</p>
+								<p class="border-b border-black font-bold inline-block px-3">{officer.data?.name || '( .................................... )'}</p>
+								<p class="text-xs mt-1">NIP. {officer.data?.nip || '..............................'}</p>
+							</div>
+						{/each}
+					</div>
+
+					<div class="flex justify-end pt-2">
+						<div class="w-64 md:w-72 text-center">
+							<p class="font-medium mb-14">Kepala Madrasah,</p>
+							<p class="border-b border-black font-bold inline-block px-3">{school?.principal_name || '( .................................... )'}</p>
+							<p class="text-xs mt-1">NIP. {school?.principal_nip || '..............................'}</p>
+						</div>
+					</div>
+				{/if}
 			</div>
 		</div>
 	{/each}

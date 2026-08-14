@@ -1,4 +1,4 @@
-import { h as head, i as ensure_array_like, e as escape_html, k as attr, j as attr_class, l as clsx, f as bind_props } from "../../../../../chunks/index.js";
+import { h as head, i as ensure_array_like, e as escape_html, k as attr, j as attr_class, l as clsx, c as stringify, f as bind_props } from "../../../../../chunks/index.js";
 import { p as parseDate } from "../../../../../chunks/date.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
@@ -220,15 +220,11 @@ function _page($$renderer, $$props) {
         ].filter(Boolean).join(", ");
         const locationCity = school?.city ? school.city.toLowerCase().startsWith("kab") || school.city.toLowerCase().startsWith("kota") ? school.city : `Kab. ${school.city}` : "....................";
         const activeOfficers = [
-          { role: "Pengawas I", data: proctor1, required: true },
-          { role: "Pengawas II", data: proctor2, required: false },
-          {
-            role: "Proktor / Teknisi",
-            data: proctorTech,
-            required: false
-          },
-          { role: "Panitia Ujian", data: committee, required: false }
-        ].filter((o) => o.required || o.data);
+          { role: "Pengawas I", data: proctor1, id: "p1" },
+          { role: "Pengawas II", data: proctor2, id: "p2" },
+          { role: "Proktor / Teknisi", data: proctorTech, id: "pt" },
+          { role: "Panitia Ujian", data: committee, id: "cm" }
+        ].filter((o) => o.id === "p1" && proctor1Id || o.id !== "p1" && o.data);
         $$renderer2.push(`<div${attr_class(clsx(roomIdx > 0 || sessionIdx > 0 ? "break-before-page pt-8" : ""), "svelte-npx4lb")}><div class="flex items-center justify-between gap-4 pb-2 relative"><img src="/kemenag.png" alt="Logo Kemenag" class="w-20 h-20 object-contain shrink-0"/> <div class="flex-1 text-center font-serif px-2"><h4 class="font-semibold text-sm uppercase tracking-wider text-black m-0 leading-tight">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h4> <h3 class="font-bold text-xl uppercase tracking-wide text-black m-0 my-0.5">${escape_html(school?.name || "NAMA SEKOLAH")}</h3> `);
         if (school?.address) {
           $$renderer2.push("<!--[0-->");
@@ -252,13 +248,29 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<div class="w-20 h-20 shrink-0"></div>`);
         }
         $$renderer2.push(`<!--]--></div> <div class="mt-2 mb-5"><div style="border-bottom: 1px solid #000;"></div> <div style="border-bottom: 2.5px solid #000; margin-top: 2px;"></div></div> <div class="text-center mb-6"><h1 class="font-bold text-lg uppercase underline tracking-wider mb-1">BERITA ACARA PELAKSANAAN UJIAN</h1> <p class="text-sm font-medium">Tahun Ajaran ${escape_html(getAcademicYear(effectiveStart))}</p></div> <p class="mb-4 text-justify">Pada hari ini <span class="border-b border-dotted border-black px-2">${escape_html(getDayName(effectiveStart))}</span> tanggal <span class="border-b border-dotted border-black px-2">${escape_html(getDayNumber(effectiveStart))}</span> bulan <span class="border-b border-dotted border-black px-2">${escape_html(getMonthName(effectiveStart))}</span> tahun <span class="border-b border-dotted border-black px-2">${escape_html(getYearNumber(effectiveStart))}</span>, 
-				telah diselenggarakan <strong class="uppercase">${escape_html(exam.exam_type_name || exam.title)}</strong> Mata Pelajaran <strong>${escape_html(exam.subject_name || "Umum")}</strong> untuk:</p> <div class="ml-4 mb-6"><table class="w-full"><tbody><tr class="align-top"><td class="w-48 py-1">a. Satuan Pendidikan</td><td class="w-4 py-1">:</td><td class="py-1 font-bold uppercase">${escape_html(school?.name || "-")}</td></tr><tr class="align-top"><td class="py-1">b. Ruang / Sesi Ujian</td><td class="py-1">:</td><td class="py-1 font-bold">${escape_html(roomName)} / Sesi ${escape_html(sessionNum)}</td></tr><tr class="align-top"><td class="py-1">c. Waktu Pelaksanaan</td><td class="py-1">:</td><td class="py-1">${escape_html(formatTime(effectiveStart))} s.d. ${escape_html(formatTime(effectiveEnd))} WIB</td></tr><tr class="align-top"><td class="py-1">d. Jumlah Peserta Seharusnya</td><td class="py-1">:</td><td class="py-1">${escape_html(count)} Orang</td></tr><tr class="align-top"><td class="py-1">e. Jumlah Peserta Hadir</td><td class="py-1">:</td><td class="py-1">........... Orang</td></tr><tr class="align-top"><td class="py-1">f. Jumlah Peserta Tidak Hadir</td><td class="py-1">:</td><td class="py-1">........... Orang</td></tr><tr class="align-top"><td class="py-1.5 pl-4 text-sm font-sans" colspan="3"><div class="flex items-baseline gap-2"><span>- Nomor Peserta yang Tidak Hadir:</span> <span class="border-b border-dotted border-black flex-1 min-h-[1.2rem]"></span></div> <div class="mt-1.5"><span class="border-b border-dotted border-black block w-full min-h-[1.2rem]"></span></div></td></tr></tbody></table></div> <div class="mb-6"><p class="mb-2 font-bold">Catatan / Kejadian Penting Selama Ujian Berlangsung:</p> <div class="border border-black p-3 min-h-[90px] text-xs font-mono text-slate-500 rounded"><span class="print:hidden">( Kosongkan jika pelaksanaan ujian berjalan tertib dan lancar )</span></div></div> <p class="mb-8">Demikian Berita Acara ini dibuat dengan sesungguhnya untuk dipergunakan sebagaimana mestinya.</p> <div class="mt-8 text-sm"><div class="grid grid-cols-2 md:grid-cols-3 gap-6 text-center mb-8"><!--[-->`);
-        const each_array_6 = ensure_array_like(activeOfficers);
-        for (let $$index_4 = 0, $$length3 = each_array_6.length; $$index_4 < $$length3; $$index_4++) {
-          let officer = each_array_6[$$index_4];
-          $$renderer2.push(`<div><p class="font-medium mb-14">${escape_html(officer.role)},</p> <p class="border-b border-black font-bold inline-block px-3">${escape_html(officer.data?.name || "( .................................... )")}</p> <p class="text-xs mt-1">NIP. ${escape_html(officer.data?.nip || "..............................")}</p></div>`);
+				telah diselenggarakan <strong class="uppercase">${escape_html(exam.exam_type_name || exam.title)}</strong> Mata Pelajaran <strong>${escape_html(exam.subject_name || "Umum")}</strong> untuk:</p> <div class="ml-4 mb-6"><table class="w-full"><tbody><tr class="align-top"><td class="w-48 py-1">a. Satuan Pendidikan</td><td class="w-4 py-1">:</td><td class="py-1 font-bold uppercase">${escape_html(school?.name || "-")}</td></tr><tr class="align-top"><td class="py-1">b. Ruang / Sesi Ujian</td><td class="py-1">:</td><td class="py-1 font-bold">${escape_html(roomName)} / Sesi ${escape_html(sessionNum)}</td></tr><tr class="align-top"><td class="py-1">c. Waktu Pelaksanaan</td><td class="py-1">:</td><td class="py-1">${escape_html(formatTime(effectiveStart))} s.d. ${escape_html(formatTime(effectiveEnd))} WIB</td></tr><tr class="align-top"><td class="py-1">d. Jumlah Peserta Seharusnya</td><td class="py-1">:</td><td class="py-1">${escape_html(count)} Orang</td></tr><tr class="align-top"><td class="py-1">e. Jumlah Peserta Hadir</td><td class="py-1">:</td><td class="py-1">........... Orang</td></tr><tr class="align-top"><td class="py-1">f. Jumlah Peserta Tidak Hadir</td><td class="py-1">:</td><td class="py-1">........... Orang</td></tr><tr class="align-top"><td class="py-1.5 pl-4 text-sm font-sans" colspan="3"><div class="flex items-baseline gap-2"><span>- Nomor Peserta yang Tidak Hadir:</span> <span class="border-b border-dotted border-black flex-1 min-h-[1.2rem]"></span></div> <div class="mt-1.5"><span class="border-b border-dotted border-black block w-full min-h-[1.2rem]"></span></div></td></tr></tbody></table></div> <div class="mb-6"><p class="mb-2 font-bold">Catatan / Kejadian Penting Selama Ujian Berlangsung:</p> <div class="border border-black p-3 min-h-[90px] text-xs font-mono text-slate-500 rounded"><span class="print:hidden">( Kosongkan jika pelaksanaan ujian berjalan tertib dan lancar )</span></div></div> <p class="mb-8">Demikian Berita Acara ini dibuat dengan sesungguhnya untuk dipergunakan sebagaimana mestinya.</p> <div class="mt-8 text-sm">`);
+        if (activeOfficers.length <= 1) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<div class="grid grid-cols-2 gap-8 text-center"><div><div class="h-5"></div> <p class="font-medium mb-14">Kepala Madrasah,</p> <p class="border-b border-black font-bold inline-block px-3">${escape_html(school?.principal_name || "( .................................... )")}</p> <p class="text-xs mt-1">NIP. ${escape_html(school?.principal_nip || "..............................")}</p></div> <div><p class="text-xs text-slate-700 mb-1">${escape_html(locationCity)}, ${escape_html(formatDateFull(effectiveStart))}</p> <p class="font-medium mb-14">${escape_html(activeOfficers[0]?.role === "Pengawas I" ? "Pengawas Ruang" : activeOfficers[0]?.role || "Pengawas Ruang")},</p> <p class="border-b border-black font-bold inline-block px-3">${escape_html(activeOfficers[0]?.data?.name || "( .................................... )")}</p> <p class="text-xs mt-1">NIP. ${escape_html(activeOfficers[0]?.data?.nip || "..............................")}</p></div></div>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<div${attr_class(`grid grid-cols-2 md:grid-cols-${stringify(Math.min(activeOfficers.length, 4))} gap-6 text-center mb-8`, "svelte-npx4lb")}><!--[-->`);
+          const each_array_6 = ensure_array_like(activeOfficers);
+          for (let idx = 0, $$length3 = each_array_6.length; idx < $$length3; idx++) {
+            let officer = each_array_6[idx];
+            $$renderer2.push(`<div>`);
+            if (idx === activeOfficers.length - 1) {
+              $$renderer2.push("<!--[0-->");
+              $$renderer2.push(`<p class="text-xs text-slate-700 mb-1">${escape_html(locationCity)}, ${escape_html(formatDateFull(effectiveStart))}</p>`);
+            } else {
+              $$renderer2.push("<!--[-1-->");
+              $$renderer2.push(`<div class="h-5"></div>`);
+            }
+            $$renderer2.push(`<!--]--> <p class="font-medium mb-14">${escape_html(officer.role)},</p> <p class="border-b border-black font-bold inline-block px-3">${escape_html(officer.data?.name || "( .................................... )")}</p> <p class="text-xs mt-1">NIP. ${escape_html(officer.data?.nip || "..............................")}</p></div>`);
+          }
+          $$renderer2.push(`<!--]--></div> <div class="flex justify-end pt-2"><div class="w-64 md:w-72 text-center"><p class="font-medium mb-14">Kepala Madrasah,</p> <p class="border-b border-black font-bold inline-block px-3">${escape_html(school?.principal_name || "( .................................... )")}</p> <p class="text-xs mt-1">NIP. ${escape_html(school?.principal_nip || "..............................")}</p></div></div>`);
         }
-        $$renderer2.push(`<!--]--></div> <div class="flex justify-end pt-2"><div class="w-72 text-center"><p class="text-xs text-slate-700 mb-1">${escape_html(locationCity)}, ${escape_html(formatDateFull(effectiveStart))}</p> <p class="font-medium mb-14">Kepala Madrasah,</p> <p class="border-b border-black font-bold inline-block px-3">${escape_html(school?.principal_name || "( .................................... )")}</p> <p class="text-xs mt-1">NIP. ${escape_html(school?.principal_nip || "..............................")}</p></div></div></div></div>`);
+        $$renderer2.push(`<!--]--></div></div>`);
       }
       $$renderer2.push(`<!--]-->`);
     }
