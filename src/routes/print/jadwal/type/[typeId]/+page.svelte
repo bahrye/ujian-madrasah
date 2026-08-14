@@ -115,7 +115,6 @@
 			<!-- Judul Dokumen -->
 			<div class="text-center mb-5 font-serif">
 				<h2 class="font-bold text-lg uppercase underline tracking-wider m-0">JADWAL UJIAN PESERTA</h2>
-				<p class="text-xs font-semibold text-slate-700 uppercase mt-0.5">{examType.name}</p>
 			</div>
 
 			<!-- Profil Siswa -->

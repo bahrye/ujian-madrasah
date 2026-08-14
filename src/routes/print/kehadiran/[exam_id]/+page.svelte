@@ -151,9 +151,6 @@
 			<!-- Judul Dokumen -->
 			<div class="text-center mb-5 font-serif">
 				<h2 class="font-bold text-lg uppercase underline tracking-wider m-0">DAFTAR HADIR PESERTA UJIAN</h2>
-				{#if exam.exam_type_name}
-					<p class="text-xs font-semibold text-slate-700 uppercase mt-0.5">{exam.exam_type_name}</p>
-				{/if}
 			</div>
 
 			<!-- Info Ujian -->
