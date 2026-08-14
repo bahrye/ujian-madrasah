@@ -141,7 +141,7 @@
 						</div>
 					{/if}
 
-					{#if type.proctor_names || type.committee_names || type.supervisor_names}
+					{#if type.proctor_names || type.committee_names}
 						<div class="mt-2 text-slate-600 flex flex-col gap-1.5 pt-2 border-t border-slate-100 border-dashed">
 							{#if type.proctor_names}
 								<div class="flex items-center gap-1.5 text-[11px]">
@@ -153,12 +153,6 @@
 								<div class="flex items-center gap-1.5 text-[11px]">
 									<span class="font-semibold text-indigo-800 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200 shrink-0">Panitia:</span>
 									<span class="leading-snug truncate font-medium text-slate-700" title={type.committee_names}>{type.committee_names}</span>
-								</div>
-							{/if}
-							{#if type.supervisor_names}
-								<div class="flex items-center gap-1.5 text-[11px]">
-									<span class="font-semibold text-emerald-800 bg-emerald-100/80 px-1.5 py-0.5 rounded border border-emerald-200 shrink-0">Pengawas:</span>
-									<span class="leading-snug truncate font-medium text-slate-700" title={type.supervisor_names}>{type.supervisor_names}</span>
 								</div>
 							{/if}
 						</div>
@@ -476,8 +470,6 @@
 						<select name="proctor_role" bind:value={selectedProctorRole} class="select select-sm select-bordered w-full bg-white text-xs">
 							<option value="pt">Proktor / Teknisi</option>
 							<option value="cm">Panitia Ujian</option>
-							<option value="p1">Pengawas 1</option>
-							<option value="p2">Pengawas 2</option>
 						</select>
 					</div>
 				</div>
