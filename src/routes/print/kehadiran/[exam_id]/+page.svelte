@@ -5,6 +5,22 @@
 	$: exam = data.exam as any;
 	$: participantsGrouped = data.participantsGrouped as Record<string, Record<number, any[]>>;
 	$: isNomorPesertaMode = data.isNomorPesertaMode;
+	$: sessionMap = data.sessionMap as Record<number, { start_time: string | null; end_time: string | null }>;
+
+	function formatDate(dateStr: string | null) {
+		if (!dateStr || dateStr === '-') return '......................';
+		const date = parseDate(dateStr);
+		if (isNaN(date.getTime())) return '......................';
+		return date.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+	}
+
+	function formatTime(timeStr: string | null) {
+		if (!timeStr) return '....';
+		if (timeStr.length <= 5) return timeStr;
+		if (timeStr.includes('T')) return timeStr.split('T')[1].slice(0, 5);
+		if (timeStr.includes(' ')) return timeStr.split(' ')[1].slice(0, 5);
+		return timeStr.slice(0, 5);
+	}
 </script>
 
 <svelte:head>
@@ -30,6 +46,10 @@
 	{#each Object.entries(participantsGrouped) as [roomName, sessionsDict], roomIdx}
 		{#each Object.entries(sessionsDict) as [sessionNumStr, students], sessionIdx}
 			{@const sessionNum = parseInt(sessionNumStr)}
+			{@const sessionData = sessionMap?.[sessionNum]}
+			{@const effectiveStart = sessionData?.start_time || exam.start_time}
+			{@const effectiveEnd = sessionData?.end_time || exam.end_time}
+			{@const effectiveDateStr = (effectiveStart && effectiveStart.includes('-')) ? effectiveStart : exam.start_time}
 		<div class={roomIdx > 0 || sessionIdx > 0 ? "break-before-page pt-8" : ""}>
 			<!-- Kop -->
 			<div class="text-center mb-6 pb-4 border-b-2 border-black flex items-center">
@@ -60,8 +80,8 @@
 				</table>
 				<table class="w-full">
 					<tbody>
-						<tr><td class="py-1 w-32 font-medium">Hari, Tanggal</td><td class="w-4">:</td><td>{exam.start_time ? parseDate(exam.start_time).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : '......................'}</td></tr>
-						<tr><td class="py-1 font-medium">Waktu</td><td>:</td><td>{exam.start_time ? parseDate(exam.start_time).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '....'} - {exam.end_time ? parseDate(exam.end_time).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '....'}</td></tr>
+						<tr><td class="py-1 w-32 font-medium">Hari, Tanggal</td><td class="w-4">:</td><td>{formatDate(effectiveDateStr)}</td></tr>
+						<tr><td class="py-1 font-medium">Waktu</td><td>:</td><td>{formatTime(effectiveStart)} - {formatTime(effectiveEnd)}</td></tr>
 					</tbody>
 				</table>
 			</div>
@@ -101,37 +121,29 @@
 									{/if}
 								{/if}
 							</td>
-							<td class="border border-black p-2 text-center"></td>
+							<td class="border border-black p-2 text-center text-xs"></td>
 						</tr>
 					{/each}
-					{#if students.length === 0}
-						<tr>
-							<td colspan="7" class="border border-black p-4 text-center italic">Tidak ada peserta.</td>
-						</tr>
-					{/if}
 				</tbody>
 			</table>
 
-			<!-- Tanda Tangan -->
-			<div class="flex justify-between mt-8 text-sm px-10">
-				<div class="text-center">
-					<p class="mb-20">Pengawas 1</p>
-					<p class="font-bold border-b border-black inline-block px-4">........................................</p>
-					<p class="mt-1">NIP. ........................................</p>
+			<div class="grid grid-cols-2 gap-8 text-sm">
+				<div>
+					<p class="font-medium mb-1">Keterangan:</p>
+					<ol class="list-decimal pl-4 text-xs space-y-1">
+						<li>Daftar Hadir dibuat rangkap 2 (dua), masing-masing untuk Panitia dan Sekolah.</li>
+						<li>Pengawas ruang menyilangkan nama peserta yang tidak hadir.</li>
+					</ol>
 				</div>
-				<div class="text-center">
-					<p class="mb-20">Pengawas 2</p>
-					<p class="font-bold border-b border-black inline-block px-4">........................................</p>
-					<p class="mt-1">NIP. ........................................</p>
+				<div class="text-center flex justify-end">
+					<div class="w-48">
+						<p class="mb-12">Pengawas Ruang,</p>
+						<p class="border-b border-black font-medium">( .................................... )</p>
+						<p class="text-xs mt-1">NIP. ..............................</p>
+					</div>
 				</div>
 			</div>
 		</div>
 		{/each}
 	{/each}
-
-	{#if Object.keys(participantsGrouped).length === 0}
-		<div class="text-center text-slate-500 py-10">
-			Belum ada peserta di ujian ini.
-		</div>
-	{/if}
 </div>

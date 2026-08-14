@@ -40,6 +40,14 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 	const roomsCount = await db.prepare('SELECT COUNT(*) as count FROM exam_rooms WHERE exam_id = ?').bind(examId).first<{count: number}>();
 	const hasRooms = (roomsCount?.count || 0) > 0;
 
+	const sessionRecords = await db.prepare('SELECT * FROM exam_sessions WHERE exam_id = ?').bind(examId).all();
+	const sessionMap: Record<number, { start_time: string | null; end_time: string | null }> = {};
+	if (sessionRecords.results) {
+		for (const s of sessionRecords.results as any[]) {
+			sessionMap[s.session_number] = s;
+		}
+	}
+
 	// Group participants by Room -> Session -> Class
 	const results = participants.results as any[];
 	const participantsGrouped = results.reduce<Record<string, Record<number, any[]>>>((acc, p) => {
@@ -59,6 +67,7 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 		participantsGrouped,
 		isNomorPesertaMode,
 		hasSessions,
-		hasRooms
+		hasRooms,
+		sessionMap
 	};
 };

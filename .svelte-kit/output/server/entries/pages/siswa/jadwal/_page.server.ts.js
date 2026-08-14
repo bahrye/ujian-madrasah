@@ -19,10 +19,12 @@ const load = async ({ platform, locals }) => {
 				)
 			) as proctors,
 			(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count,
-			ep.session_number as ep_session_number,
-			r.name as room_name
+			u.session_number as ep_session_number,
+			r.name as room_name,
+			(SELECT COUNT(*) FROM exam_sessions WHERE exam_id = e.id) > 0 as has_sessions
 		FROM exams e
 		JOIN exam_participants ep ON e.id = ep.exam_id
+		JOIN users u ON ep.student_id = u.id
 		LEFT JOIN exam_rooms r ON ep.room_id = r.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		JOIN exam_types et ON e.exam_type_id = et.id

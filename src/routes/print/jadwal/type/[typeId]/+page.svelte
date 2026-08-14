@@ -1,19 +1,23 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { page } from '$app/stores';
+	import { parseDate } from '$lib/utils/date';
 
 	export let data: PageData;
 	const { school, examType, participants } = data;
 
-	function formatDate(dateStr: string) {
-		if (!dateStr) return '-';
-		const date = new Date(dateStr);
+	function formatDate(dateStr: string | null) {
+		if (!dateStr || dateStr === '-') return '-';
+		const date = parseDate(dateStr);
+		if (isNaN(date.getTime())) return '-';
 		return date.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 	}
 
-	function formatTime(timeStr: string) {
-		if (!timeStr) return '-';
-		return timeStr.slice(11, 16);
+	function formatTime(timeStr: string | null) {
+		if (!timeStr) return '--:--';
+		if (timeStr.length <= 5) return timeStr;
+		if (timeStr.includes('T')) return timeStr.split('T')[1].slice(0, 5);
+		if (timeStr.includes(' ')) return timeStr.split(' ')[1].slice(0, 5);
+		return timeStr.slice(0, 5);
 	}
 </script>
 
@@ -66,18 +70,18 @@
 		<div class="p-8 print:p-0 {i < participants.length - 1 ? 'page-break mb-8 print:mb-0 border-b-8 print:border-b-0 border-slate-100' : ''}">
 			<!-- Kop Surat -->
 			<div class="flex items-center gap-6 border-b-[3px] border-black pb-4 mb-6">
-				{#if school.logo_url}
+				{#if school?.logo_url}
 					<img src={school.logo_url} alt="Logo" class="w-20 h-20 object-contain" />
 				{:else}
 					<div class="w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center text-slate-400 font-bold text-xl">
-						{school.name.charAt(0)}
+						{school?.name?.charAt(0) || 'M'}
 					</div>
 				{/if}
 				
 				<div class="text-center flex-1 pr-26">
-					<div class="font-bold text-xl uppercase leading-tight mb-1">{school.name}</div>
+					<div class="font-bold text-xl uppercase leading-tight mb-1">{school?.name || ''}</div>
 					<div class="text-sm font-medium uppercase mb-1">Jadwal {examType.name}</div>
-					{#if school.address}
+					{#if school?.address}
 						<div class="text-xs">{school.address}</div>
 					{/if}
 				</div>

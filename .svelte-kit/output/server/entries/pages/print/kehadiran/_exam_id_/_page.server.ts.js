@@ -24,6 +24,13 @@ const load = async ({ platform, params, locals }) => {
   const hasSessions = (sessionsCount?.count || 0) > 0;
   const roomsCount = await db.prepare("SELECT COUNT(*) as count FROM exam_rooms WHERE exam_id = ?").bind(examId).first();
   const hasRooms = (roomsCount?.count || 0) > 0;
+  const sessionRecords = await db.prepare("SELECT * FROM exam_sessions WHERE exam_id = ?").bind(examId).all();
+  const sessionMap = {};
+  if (sessionRecords.results) {
+    for (const s of sessionRecords.results) {
+      sessionMap[s.session_number] = s;
+    }
+  }
   const results = participants.results;
   const participantsGrouped = results.reduce((acc, p) => {
     const roomName = p.room_name || "Ruang Ujian";
@@ -39,7 +46,8 @@ const load = async ({ platform, params, locals }) => {
     participantsGrouped,
     isNomorPesertaMode,
     hasSessions,
-    hasRooms
+    hasRooms,
+    sessionMap
   };
 };
 export {

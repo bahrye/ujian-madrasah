@@ -74,10 +74,14 @@ export const load = async ({ platform, params, locals, url }: Parameters<PageSer
 			endTime = row.session_end_time || row.exam_end_time;
 		}
 
+		const effectiveDateStr = (row.session_start_time && row.session_start_time.includes('-')) 
+			? row.session_start_time 
+			: (row.exam_start_time || row.date);
+
 		scheduleByStudent[studentId].push({
 			exam_title: row.title,
 			subject_name: row.subject_name,
-			date: row.date,
+			date: effectiveDateStr,
 			start_time: startTime,
 			end_time: endTime,
 			room_name: row.room_name || '-',

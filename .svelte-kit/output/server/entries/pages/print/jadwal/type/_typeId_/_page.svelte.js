@@ -1,17 +1,13 @@
 import { h as head, i as ensure_array_like, j as attr_class, k as attr, e as escape_html, f as bind_props } from "../../../../../../chunks/index.js";
-import "@sveltejs/kit/internal";
-import "../../../../../../chunks/exports.js";
-import "../../../../../../chunks/utils2.js";
-import "@sveltejs/kit/internal/server";
-import "../../../../../../chunks/root.js";
-import "../../../../../../chunks/state.svelte.js";
+import { p as parseDate } from "../../../../../../chunks/date.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let data = $$props["data"];
     const { school, examType, participants } = data;
     function formatDate(dateStr) {
-      if (!dateStr) return "-";
-      const date = new Date(dateStr);
+      if (!dateStr || dateStr === "-") return "-";
+      const date = parseDate(dateStr);
+      if (isNaN(date.getTime())) return "-";
       return date.toLocaleDateString("id-ID", {
         weekday: "long",
         year: "numeric",
@@ -20,8 +16,11 @@ function _page($$renderer, $$props) {
       });
     }
     function formatTime(timeStr) {
-      if (!timeStr) return "-";
-      return timeStr.slice(11, 16);
+      if (!timeStr) return "--:--";
+      if (timeStr.length <= 5) return timeStr;
+      if (timeStr.includes("T")) return timeStr.split("T")[1].slice(0, 5);
+      if (timeStr.includes(" ")) return timeStr.split(" ")[1].slice(0, 5);
+      return timeStr.slice(0, 5);
     }
     head("26gna5", $$renderer2, ($$renderer3) => {
       $$renderer3.title(($$renderer4) => {
@@ -60,15 +59,15 @@ function _page($$renderer, $$props) {
     for (let i = 0, $$length = each_array.length; i < $$length; i++) {
       let p = each_array[i];
       $$renderer2.push(`<div${attr_class(`p-8 print:p-0 ${i < participants.length - 1 ? "page-break mb-8 print:mb-0 border-b-8 print:border-b-0 border-slate-100" : ""}`)}><div class="flex items-center gap-6 border-b-[3px] border-black pb-4 mb-6">`);
-      if (school.logo_url) {
+      if (school?.logo_url) {
         $$renderer2.push("<!--[0-->");
         $$renderer2.push(`<img${attr("src", school.logo_url)} alt="Logo" class="w-20 h-20 object-contain"/>`);
       } else {
         $$renderer2.push("<!--[-1-->");
-        $$renderer2.push(`<div class="w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center text-slate-400 font-bold text-xl">${escape_html(school.name.charAt(0))}</div>`);
+        $$renderer2.push(`<div class="w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center text-slate-400 font-bold text-xl">${escape_html(school?.name?.charAt(0) || "M")}</div>`);
       }
-      $$renderer2.push(`<!--]--> <div class="text-center flex-1 pr-26"><div class="font-bold text-xl uppercase leading-tight mb-1">${escape_html(school.name)}</div> <div class="text-sm font-medium uppercase mb-1">Jadwal ${escape_html(examType.name)}</div> `);
-      if (school.address) {
+      $$renderer2.push(`<!--]--> <div class="text-center flex-1 pr-26"><div class="font-bold text-xl uppercase leading-tight mb-1">${escape_html(school?.name || "")}</div> <div class="text-sm font-medium uppercase mb-1">Jadwal ${escape_html(examType.name)}</div> `);
+      if (school?.address) {
         $$renderer2.push("<!--[0-->");
         $$renderer2.push(`<div class="text-xs">${escape_html(school.address)}</div>`);
       } else {

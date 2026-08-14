@@ -52,59 +52,105 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		LIMIT 1
 	`).bind(userId).first();
 
+	// Fetch student's session_number
+	let studentSession = 1;
+	try {
+		const studentRecord = await db.prepare('SELECT session_number FROM users WHERE id = ?').bind(userId).first<{ session_number: number }>();
+		if (studentRecord && studentRecord.session_number) {
+			studentSession = studentRecord.session_number;
+		}
+	} catch (e) {
+		console.warn('Failed to fetch session_number:', e);
+	}
+
 	// Jadwal Ujian (berdasarkan tipe ujian yang ditugaskan ke siswa)
-	const schedules = await db.prepare(`
-		SELECT 
-			e.id,
-			e.title,
-			e.start_time,
-			e.end_time,
-			s.name as subject_name,
-			et.name as exam_type_name,
-			(
-				SELECT status 
-				FROM student_attempts 
-				WHERE exam_id = e.id AND student_id = ? 
-				ORDER BY created_at DESC LIMIT 1
-			) as attempt_status,
-			(
-				SELECT r.name 
-				FROM exam_participants ep2 
-				LEFT JOIN exam_rooms r ON ep2.room_id = r.id 
-				WHERE ep2.exam_id = e.id AND ep2.student_id = ?
-			) as room_name,
-			(
-				SELECT ep2.session_number 
-				FROM exam_participants ep2 
-				WHERE ep2.exam_id = e.id AND ep2.student_id = ?
-			) as session_number,
-			(SELECT COUNT(*) FROM exam_sessions WHERE exam_id = e.id) > 0 as has_sessions,
-			(
-				SELECT GROUP_CONCAT(u.name, '||')
-				FROM exam_proctors epr
-				JOIN users u ON epr.proctor_id = u.id
-				WHERE epr.exam_id = e.id
-			) as proctor_names
-		FROM exams e
-		JOIN exam_types et ON e.exam_type_id = et.id
-		LEFT JOIN subjects s ON e.subject_id = s.id
-		WHERE e.school_id = ? 
-		  AND e.exam_type_id IN (
-			  SELECT DISTINCT exam_type_id 
-			  FROM exams 
-			  WHERE id IN (
-				  SELECT exam_id FROM exam_participants WHERE student_id = ?
+	let rawSchedules: any[] = [];
+	try {
+		const schedulesRes = await db.prepare(`
+			SELECT 
+				e.id,
+				e.title,
+				e.start_time,
+				e.end_time,
+				s.name as subject_name,
+				et.name as exam_type_name,
+				(
+					SELECT status 
+					FROM student_attempts 
+					WHERE exam_id = e.id AND student_id = ? 
+					ORDER BY created_at DESC LIMIT 1
+				) as attempt_status,
+				(
+					SELECT r.name 
+					FROM exam_participants ep2 
+					LEFT JOIN exam_rooms r ON ep2.room_id = r.id 
+					WHERE ep2.exam_id = e.id AND ep2.student_id = ?
+				) as room_name,
+				? as session_number,
+				(SELECT COUNT(*) FROM exam_sessions WHERE exam_id = e.id) > 0 as has_sessions,
+				(
+					SELECT GROUP_CONCAT(u2.name, '||')
+					FROM exam_proctors epr
+					JOIN users u2 ON epr.proctor_id = u2.id
+					WHERE epr.exam_id = e.id
+				) as proctor_names
+			FROM exams e
+			JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			WHERE e.school_id = ? 
+			  AND e.exam_type_id IN (
+				  SELECT DISTINCT exam_type_id 
+				  FROM exams 
+				  WHERE id IN (
+					  SELECT exam_id FROM exam_participants WHERE student_id = ?
+				  )
 			  )
-		  )
-		  AND e.is_active = 1
-		  AND et.is_active = 1
-		ORDER BY et.id ASC, e.start_time ASC, e.id ASC
-	`).bind(userId, userId, userId, locals.user!.school_id, userId).all();
+			  AND e.is_active = 1
+			  AND et.is_active = 1
+			ORDER BY et.id ASC, e.start_time ASC, e.id ASC
+		`).bind(userId, userId, studentSession, locals.user!.school_id, userId).all();
+		rawSchedules = schedulesRes.results || [];
+	} catch (e) {
+		console.error('Error loading dashboard schedules:', e);
+	}
+
+	// Enrich with session times if exam has sessions
+	if (rawSchedules.length > 0) {
+		const examIds = rawSchedules.map(s => s.id);
+		const placeholders = examIds.map(() => '?').join(',');
+		let sessionsResults: any[] = [];
+		try {
+			const sessionsQuery = await db.prepare(`SELECT * FROM exam_sessions WHERE exam_id IN (${placeholders}) AND session_number = ?`)
+				.bind(...examIds, studentSession).all<any>();
+			sessionsResults = sessionsQuery.results;
+		} catch (e) {
+			console.warn('Failed to fetch exam_sessions:', e);
+		}
+		
+		const sessionMap = new Map();
+		for (const row of sessionsResults) {
+			sessionMap.set(row.exam_id, row);
+		}
+
+		rawSchedules = rawSchedules.map(schedule => {
+			const session = sessionMap.get(schedule.id);
+			if (session && schedule.has_sessions) {
+				return {
+					...schedule,
+					session_start_time: session.start_time,
+					session_end_time: session.end_time,
+					start_time: session.start_time || schedule.start_time,
+					end_time: session.end_time || schedule.end_time,
+				};
+			}
+			return schedule;
+		});
+	}
 
 	return {
 		activeExams: activeExams.results,
 		myAttempts: myAttempts.results,
 		activeAttempt,
-		schedules: schedules.results
+		schedules: rawSchedules
 	};
 };
