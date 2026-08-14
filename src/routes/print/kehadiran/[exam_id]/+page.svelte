@@ -94,7 +94,7 @@
 	</div>
 </div>
 
-<div class="p-8 print:p-8 max-w-[215.9mm] mx-auto bg-white" style="font-family: 'Times New Roman', Times, Georgia, serif;">
+<div class="p-4 md:p-8 print:p-0 print:m-0 max-w-[215.9mm] mx-auto bg-white" style="font-family: 'Times New Roman', Times, Georgia, serif;">
 	<!-- Print each room and session on a new page -->
 	{#each Object.entries(participantsGrouped) as [roomName, sessionsDict], roomIdx}
 		{#each Object.entries(sessionsDict) as [sessionNumStr, students], sessionIdx}
@@ -109,7 +109,7 @@
 				school?.city ? (school.city.toLowerCase().startsWith('kab') || school.city.toLowerCase().startsWith('kota') ? school.city : `Kabupaten ${school.city}`) : '',
 				school?.province ? school.province : ''
 			].filter(Boolean).join(', ')}
-		<div class={roomIdx > 0 || sessionIdx > 0 ? "break-before-page pt-8" : ""}>
+		<div class={roomIdx > 0 || sessionIdx > 0 ? "break-before-page pt-4 print:pt-0" : ""}>
 			<!-- Kop Surat -->
 			<div class="flex items-center justify-between gap-4 pb-2 relative">
 				<img 
