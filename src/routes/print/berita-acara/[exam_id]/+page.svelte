@@ -310,18 +310,20 @@
 				Demikian Berita Acara ini dibuat dengan sesungguhnya untuk dipergunakan sebagaimana mestinya.
 			</p>
 
-			<!-- TTD Petugas & Kepala Madrasah -->
-			<div class="mt-8 text-sm">
+			<!-- TTD Petugas & Kepala Madrasah (2-Column Grid Alignment System) -->
+			<div class="mt-8 text-sm font-serif">
 				{#if activeOfficers.length <= 1}
-					<!-- 1 Officer (or default): Kepala Madrasah on Left, Pengawas Ruang on Right -->
+					<!-- CASE 1: 1 Officer (Pengawas Ruang) -->
 					<div class="grid grid-cols-2 gap-8 text-center">
+						<!-- Left Column: Kepala Madrasah -->
 						<div>
-							<div class="h-5"></div>
+							<div class="h-6"></div>
 							<p class="font-medium mb-14">Kepala Madrasah,</p>
 							<p class="border-b border-black font-bold inline-block px-3">{school?.principal_name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {school?.principal_nip || '..............................'}</p>
 						</div>
 
+						<!-- Right Column: Date + Pengawas Ruang -->
 						<div>
 							<p class="text-xs text-slate-700 mb-1">{locationCity}, {formatDateFull(effectiveStart)}</p>
 							<p class="font-medium mb-14">{activeOfficers[0]?.role === 'Pengawas I' ? 'Pengawas Ruang' : (activeOfficers[0]?.role || 'Pengawas Ruang')},</p>
@@ -329,25 +331,109 @@
 							<p class="text-xs mt-1">NIP. {activeOfficers[0]?.data?.nip || '..............................'}</p>
 						</div>
 					</div>
-				{:else}
-					<!-- 2+ Officers: Officers in top grid, Date above right-most officer, Kepala Madrasah in bottom row right -->
-					<div class="grid grid-cols-2 md:grid-cols-{Math.min(activeOfficers.length, 4)} gap-6 text-center mb-8">
-						{#each activeOfficers as officer, idx}
-							<div>
-								{#if idx === activeOfficers.length - 1}
-									<p class="text-xs text-slate-700 mb-1">{locationCity}, {formatDateFull(effectiveStart)}</p>
-								{:else}
-									<div class="h-5"></div>
-								{/if}
-								<p class="font-medium mb-14">{officer.role},</p>
-								<p class="border-b border-black font-bold inline-block px-3">{officer.data?.name || '( .................................... )'}</p>
-								<p class="text-xs mt-1">NIP. {officer.data?.nip || '..............................'}</p>
-							</div>
-						{/each}
+
+				{:else if activeOfficers.length === 2}
+					<!-- CASE 2: 2 Officers (Pengawas I & Pengawas II) -->
+					<div class="grid grid-cols-2 gap-8 text-center">
+						<!-- Row 1 Left: Pengawas I -->
+						<div>
+							<div class="h-6"></div>
+							<p class="font-medium mb-14">{activeOfficers[0].role},</p>
+							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[0].data?.name || '( .................................... )'}</p>
+							<p class="text-xs mt-1">NIP. {activeOfficers[0].data?.nip || '..............................'}</p>
+						</div>
+
+						<!-- Row 1 Right: Date + Pengawas II -->
+						<div>
+							<p class="text-xs text-slate-700 mb-1">{locationCity}, {formatDateFull(effectiveStart)}</p>
+							<p class="font-medium mb-14">{activeOfficers[1].role},</p>
+							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[1].data?.name || '( .................................... )'}</p>
+							<p class="text-xs mt-1">NIP. {activeOfficers[1].data?.nip || '..............................'}</p>
+						</div>
+
+						<!-- Row 2 Left: Empty Spacer -->
+						<div></div>
+
+						<!-- Row 2 Right: Kepala Madrasah -->
+						<div class="mt-4">
+							<p class="font-medium mb-14">Kepala Madrasah,</p>
+							<p class="border-b border-black font-bold inline-block px-3">{school?.principal_name || '( .................................... )'}</p>
+							<p class="text-xs mt-1">NIP. {school?.principal_nip || '..............................'}</p>
+						</div>
 					</div>
 
-					<div class="flex justify-end pt-2">
-						<div class="w-64 md:w-72 text-center">
+				{:else if activeOfficers.length === 3}
+					<!-- CASE 3: 3 Officers (Pengawas I, Pengawas II, Panitia/Proktor) -->
+					<div class="grid grid-cols-2 gap-8 text-center">
+						<!-- Row 1 Left: Pengawas I -->
+						<div>
+							<div class="h-6"></div>
+							<p class="font-medium mb-14">{activeOfficers[0].role},</p>
+							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[0].data?.name || '( .................................... )'}</p>
+							<p class="text-xs mt-1">NIP. {activeOfficers[0].data?.nip || '..............................'}</p>
+						</div>
+
+						<!-- Row 1 Right: Date + Pengawas II -->
+						<div>
+							<p class="text-xs text-slate-700 mb-1">{locationCity}, {formatDateFull(effectiveStart)}</p>
+							<p class="font-medium mb-14">{activeOfficers[1].role},</p>
+							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[1].data?.name || '( .................................... )'}</p>
+							<p class="text-xs mt-1">NIP. {activeOfficers[1].data?.nip || '..............................'}</p>
+						</div>
+
+						<!-- Row 2 Left: Officer 3 (Panitia/Proktor) -->
+						<div class="mt-4">
+							<p class="font-medium mb-14">{activeOfficers[2].role},</p>
+							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[2].data?.name || '( .................................... )'}</p>
+							<p class="text-xs mt-1">NIP. {activeOfficers[2].data?.nip || '..............................'}</p>
+						</div>
+
+						<!-- Row 2 Right: Kepala Madrasah -->
+						<div class="mt-4">
+							<p class="font-medium mb-14">Kepala Madrasah,</p>
+							<p class="border-b border-black font-bold inline-block px-3">{school?.principal_name || '( .................................... )'}</p>
+							<p class="text-xs mt-1">NIP. {school?.principal_nip || '..............................'}</p>
+						</div>
+					</div>
+
+				{:else}
+					<!-- CASE 4: 4 Officers (Pengawas I, Pengawas II, Proktor, Panitia) -->
+					<div class="grid grid-cols-2 gap-8 text-center">
+						<!-- Row 1 Left: Pengawas I -->
+						<div>
+							<div class="h-6"></div>
+							<p class="font-medium mb-14">{activeOfficers[0].role},</p>
+							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[0].data?.name || '( .................................... )'}</p>
+							<p class="text-xs mt-1">NIP. {activeOfficers[0].data?.nip || '..............................'}</p>
+						</div>
+
+						<!-- Row 1 Right: Date + Pengawas II -->
+						<div>
+							<p class="text-xs text-slate-700 mb-1">{locationCity}, {formatDateFull(effectiveStart)}</p>
+							<p class="font-medium mb-14">{activeOfficers[1].role},</p>
+							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[1].data?.name || '( .................................... )'}</p>
+							<p class="text-xs mt-1">NIP. {activeOfficers[1].data?.nip || '..............................'}</p>
+						</div>
+
+						<!-- Row 2 Left: Proktor / Teknisi -->
+						<div class="mt-4">
+							<p class="font-medium mb-14">{activeOfficers[2].role},</p>
+							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[2].data?.name || '( .................................... )'}</p>
+							<p class="text-xs mt-1">NIP. {activeOfficers[2].data?.nip || '..............................'}</p>
+						</div>
+
+						<!-- Row 2 Right: Panitia Ujian -->
+						<div class="mt-4">
+							<p class="font-medium mb-14">{activeOfficers[3].role},</p>
+							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[3].data?.name || '( .................................... )'}</p>
+							<p class="text-xs mt-1">NIP. {activeOfficers[3].data?.nip || '..............................'}</p>
+						</div>
+
+						<!-- Row 3 Left: Empty Spacer -->
+						<div></div>
+
+						<!-- Row 3 Right: Kepala Madrasah -->
+						<div class="mt-4">
 							<p class="font-medium mb-14">Kepala Madrasah,</p>
 							<p class="border-b border-black font-bold inline-block px-3">{school?.principal_name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {school?.principal_nip || '..............................'}</p>
