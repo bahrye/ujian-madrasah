@@ -1,19 +1,27 @@
 // @ts-nocheck
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getDB } from '$lib/server/db';
+import { getDB, ensureTokenSessionColumn } from '$lib/server/db';
 import { generateTokenCode } from '$lib/server/auth';
+
+export interface ExamSessionItem {
+	session_number: number;
+	start_time: string | null;
+	end_time: string | null;
+}
 
 export interface ExamSelectItem {
 	id: number;
 	title: string;
 	start_time: string | null;
 	end_time: string | null;
+	sessions: ExamSessionItem[];
 }
 
 export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) => {
 	if (!locals.user) throw redirect(302, '/login');
 	const db = getDB(platform);
+	await ensureTokenSessionColumn(db);
 
 	const tokens = await db.prepare(`
 		SELECT t.*, e.title as exam_title,
@@ -36,13 +44,50 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 		ORDER BY t.created_at DESC
 	`).bind(locals.user.school_id).all();
 
-	const exams = await db.prepare(`
+	const examsRaw = await db.prepare(`
 		SELECT e.id, e.title, e.start_time, e.end_time
 		FROM exams e
 		JOIN exam_types et ON e.exam_type_id = et.id
 		WHERE e.is_active = 1 AND et.is_active = 1 AND e.school_id = ?
 		ORDER BY e.title
-	`).bind(locals.user.school_id).all<ExamSelectItem>();
+	`).bind(locals.user.school_id).all<any>();
+
+	const examIds = examsRaw.results.map((e: any) => e.id);
+	let dbSessions: any[] = [];
+	if (examIds.length > 0) {
+		const placeholders = examIds.map(() => '?').join(',');
+		const sessionsResult = await db.prepare(
+			`SELECT exam_id, session_number, start_time, end_time FROM exam_sessions WHERE exam_id IN (${placeholders}) ORDER BY session_number`
+		).bind(...examIds).all();
+		dbSessions = sessionsResult.results;
+	}
+
+	const processedExams: ExamSelectItem[] = examsRaw.results.map((exam: any) => {
+		const examDbSessions = dbSessions.filter((s: any) => s.exam_id === exam.id);
+		let finalSessions: ExamSessionItem[] = [];
+
+		if (examDbSessions.length > 0) {
+			finalSessions = examDbSessions.map((s: any) => ({
+				session_number: s.session_number,
+				start_time: s.start_time || exam.start_time,
+				end_time: s.end_time || exam.end_time
+			}));
+		} else {
+			finalSessions = [{
+				session_number: 1,
+				start_time: exam.start_time,
+				end_time: exam.end_time
+			}];
+		}
+
+		return {
+			id: exam.id,
+			title: exam.title,
+			start_time: exam.start_time,
+			end_time: exam.end_time,
+			sessions: finalSessions
+		};
+	});
 
 	const processedTokens = tokens.results.map((t: any) => {
 		let usedBy = [];
@@ -56,52 +101,80 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 		};
 	});
 
-	return { tokens: processedTokens, exams: exams.results };
+	return { tokens: processedTokens, exams: processedExams };
 };
 
 export const actions = {
 	generate: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
-		const form = await request.formData();
+		await ensureTokenSessionColumn(db);
 
+		const form = await request.formData();
 		const examIdStr = form.get('exam_id')?.toString();
-		const durationHours = parseInt(form.get('duration_hours')?.toString() || '2');
 		const parsedExamId = parseInt(examIdStr || '', 10);
+		const parsedSessionNumber = parseInt(form.get('session_number')?.toString() || '1', 10);
+		const durationHours = parseInt(form.get('duration_hours')?.toString() || '2');
 
 		if (isNaN(parsedExamId)) return fail(400, { error: 'Pilih ujian terlebih dahulu.' });
+		if (isNaN(parsedSessionNumber) || parsedSessionNumber < 1) return fail(400, { error: 'Pilih sesi ujian terlebih dahulu.' });
 
-		const exam = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(parsedExamId, locals.user.school_id).first() as any;
+		const exam = await db.prepare('SELECT id, start_time, end_time FROM exams WHERE id = ? AND school_id = ?').bind(parsedExamId, locals.user.school_id).first() as any;
 		if (!exam) return fail(400, { error: 'Ujian tidak ditemukan.' });
 
-		const now = Date.now();
-		const nowIso = new Date(now).toISOString();
+		// Ambil waktu sesi dari exam_sessions jika ada
+		const sessionRecord = await db.prepare(`
+			SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?
+		`).bind(parsedExamId, parsedSessionNumber).first<{ start_time: string | null; end_time: string | null }>();
 
-		// Check for active token
+		const startTimeStr = sessionRecord?.start_time || exam.start_time;
+		const endTimeStr = sessionRecord?.end_time || exam.end_time;
+		const nowMs = Date.now();
+
+		// Aturan 15 menit sebelum waktu sesi ujian
+		if (startTimeStr) {
+			const sessionStartTime = new Date(startTimeStr).getTime();
+			const earliestGenerateTime = sessionStartTime - 15 * 60 * 1000;
+			if (nowMs < earliestGenerateTime) {
+				const timeFormatted = new Date(startTimeStr).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+				return fail(400, { error: `Token Sesi ${parsedSessionNumber} baru dapat dibuat 15 menit sebelum waktu sesi ujian dimulai (mulai pukul ${timeFormatted}).` });
+			}
+		}
+
+		if (endTimeStr) {
+			const sessionEndTime = new Date(endTimeStr).getTime();
+			if (nowMs > sessionEndTime) {
+				return fail(400, { error: `Token tidak dapat dibuat karena Sesi ${parsedSessionNumber} telah berakhir.` });
+			}
+		}
+
+		const nowIso = new Date(nowMs).toISOString();
+
+		// Check for active token per exam AND session_number
 		const activeToken = await db.prepare(`
 			SELECT token_code FROM tokens 
-			WHERE exam_id = ? AND school_id = ? AND expires_at > ?
-		`).bind(parsedExamId, locals.user.school_id, nowIso).first() as { token_code: string } | null;
+			WHERE exam_id = ? AND (session_number = ? OR session_number IS NULL) AND school_id = ? AND expires_at > ?
+		`).bind(parsedExamId, parsedSessionNumber, locals.user.school_id, nowIso).first() as { token_code: string } | null;
 
 		if (activeToken) {
-			return fail(400, { error: `Gagal: Masih ada token aktif untuk ujian ini (${activeToken.token_code}). Harap hapus token tersebut dahulu jika ingin membuat yang baru.` });
+			return fail(400, { error: `Gagal: Masih ada token aktif untuk Sesi ${parsedSessionNumber} ujian ini (${activeToken.token_code}). Harap hapus token tersebut dahulu jika ingin membuat yang baru.` });
 		}
 
 		const tokenCode = generateTokenCode(6);
-		const expiresAt = new Date(now + durationHours * 60 * 60 * 1000).toISOString();
+		const expiresAt = new Date(nowMs + durationHours * 60 * 60 * 1000).toISOString();
 
 		try {
 			// Hapus token lama yang kadaluwarsa dan tidak pernah digunakan oleh siswa
 			await db.prepare(`
 				DELETE FROM tokens 
-				WHERE exam_id = ? AND school_id = ? 
+				WHERE exam_id = ? AND (session_number = ? OR session_number IS NULL) AND school_id = ? 
 				  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
-			`).bind(parsedExamId, locals.user.school_id, parsedExamId).run();
+			`).bind(parsedExamId, parsedSessionNumber, locals.user.school_id, parsedExamId).run();
 
-			await db.prepare('INSERT INTO tokens (school_id, exam_id, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?)')
-				.bind(locals.user.school_id, parsedExamId, tokenCode, locals.user.id, expiresAt).run();
+			await db.prepare('INSERT INTO tokens (school_id, exam_id, session_number, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?, ?)')
+				.bind(locals.user.school_id, parsedExamId, parsedSessionNumber, tokenCode, locals.user.id, expiresAt).run();
 
-			return { success: `Token berhasil dibuat: ${tokenCode}` };
+			return { success: `Token Sesi ${parsedSessionNumber} berhasil dibuat: ${tokenCode}` };
 		} catch (e: any) {
 			console.error(e);
 			return fail(500, { error: e.message || 'Gagal membuat token' });
@@ -164,4 +237,5 @@ export const actions = {
 		}
 	}
 };
+
 ;null as any as Actions;

@@ -48,7 +48,7 @@ const actions = {
       const token = await db.prepare(`
 				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active,
 				e.start_time as exam_start_time, e.end_time as exam_end_time, e.max_attempts,
-				u.session_number
+				u.session_number as student_session_number, t.session_number as token_session_number
 				FROM tokens t 
 				JOIN exams e ON t.exam_id = e.id
 				JOIN exam_types et ON e.exam_type_id = et.id
@@ -58,10 +58,14 @@ const actions = {
       if (!token) {
         return fail(400, { error: "Token tidak valid untuk ujian ini." });
       }
+      const studentSession = token.student_session_number || 1;
+      const tokenSession = token.token_session_number;
+      if (tokenSession && tokenSession !== studentSession) {
+        return fail(400, { error: `Token ini khusus untuk Sesi ${tokenSession}. Sesi Anda adalah Sesi ${studentSession}.` });
+      }
       if (!token.is_active) {
         return fail(400, { error: "Ujian saat ini tidak aktif." });
       }
-      const studentSession = token.session_number || 1;
       let sessionRecord = null;
       try {
         sessionRecord = await db.prepare("SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?").bind(parsedExamId, studentSession).first();
@@ -122,7 +126,7 @@ const actions = {
       const token = await db.prepare(`
 				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active,
 				e.start_time as exam_start_time, e.end_time as exam_end_time, e.max_attempts,
-				u.session_number
+				u.session_number as student_session_number, t.session_number as token_session_number
 				FROM tokens t 
 				JOIN exams e ON t.exam_id = e.id
 				JOIN exam_types et ON e.exam_type_id = et.id
@@ -132,10 +136,14 @@ const actions = {
       if (!token) {
         return fail(400, { error: "Token tidak valid untuk ujian ini." });
       }
+      const studentSession = token.student_session_number || 1;
+      const tokenSession = token.token_session_number;
+      if (tokenSession && tokenSession !== studentSession) {
+        return fail(400, { error: `Token ini khusus untuk Sesi ${tokenSession}. Sesi Anda adalah Sesi ${studentSession}.` });
+      }
       if (!token.is_active) {
         return fail(400, { error: "Ujian saat ini tidak aktif." });
       }
-      const studentSession = token.session_number || 1;
       let sessionRecord = null;
       try {
         sessionRecord = await db.prepare("SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?").bind(parsedExamId, studentSession).first();

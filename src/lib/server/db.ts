@@ -41,3 +41,12 @@ export async function dbAll<T = Record<string, unknown>>(db: D1Database, query: 
 		throw err;
 	}
 }
+
+export async function ensureTokenSessionColumn(db: D1Database) {
+	try {
+		await db.prepare('ALTER TABLE tokens ADD COLUMN session_number INTEGER DEFAULT 1').run();
+	} catch (e: any) {
+		// Ignore error if column already exists
+	}
+}
+

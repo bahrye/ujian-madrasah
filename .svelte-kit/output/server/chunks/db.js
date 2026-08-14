@@ -14,7 +14,14 @@ async function dbRun(db, query, ...params) {
     throw err;
   }
 }
+async function ensureTokenSessionColumn(db) {
+  try {
+    await db.prepare("ALTER TABLE tokens ADD COLUMN session_number INTEGER DEFAULT 1").run();
+  } catch (e) {
+  }
+}
 export {
   dbRun as d,
+  ensureTokenSessionColumn as e,
   getDB as g
 };

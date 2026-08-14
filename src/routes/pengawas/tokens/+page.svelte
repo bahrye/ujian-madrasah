@@ -14,8 +14,15 @@
 	let showStudentsModal = false;
 	let selectedToken: any = null;
 	let selectedExamId: number | '' = '';
+	let selectedSessionNumber: number | '' = '';
 	let currentTime = Date.now();
 	let intervalId: any;
+
+	$: selectedExam = data.exams.find((e: any) => e.id === Number(selectedExamId));
+	$: availableSessions = selectedExam?.sessions || [];
+	$: if (availableSessions.length > 0 && (!selectedSessionNumber || !availableSessions.some((s: any) => s.session_number === Number(selectedSessionNumber)))) {
+		selectedSessionNumber = availableSessions[0].session_number;
+	}
 
 	function openStudentsModal(token: any) {
 		selectedToken = token;
@@ -71,7 +78,7 @@
 	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 		<div>
 			<h1 class="text-2xl font-bold text-slate-800">Token Ujian</h1>
-			<p class="text-sm text-slate-500 mt-1">Generate dan kelola token akses ujian</p>
+			<p class="text-sm text-slate-500 mt-1">Generate dan kelola token akses ujian per sesi</p>
 		</div>
 		<button class="btn-primary" on:click={() => (showGenerate = !showGenerate)}>
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -86,22 +93,39 @@
 		<div class="card p-6 border-2 border-amber-200 animate-in">
 			<h2 class="text-lg font-bold text-slate-800 mb-4">Generate Token Baru</h2>
 			<form method="POST" action="?/generate" use:enhance={() => { return async ({ update }) => { showGenerate = false; await update(); }; }} class="space-y-4">
-				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+				<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
 					<div>
 						<label class="label" for="t-exam">Ujian</label>
 						<select id="t-exam" name="exam_id" required class="select" bind:value={selectedExamId}>
 							<option value="">Pilih ujian</option>
 							{#each data.exams as exam}
-								{@const start = exam.start_time ? parseDate(exam.start_time).getTime() : 0}
-								{@const end = exam.end_time ? parseDate(exam.end_time).getTime() : Infinity}
-								{@const isPastEnd = currentTime > end}
-								{@const isAllowed = (!exam.start_time || currentTime >= start - 15 * 60 * 1000) && !isPastEnd}
-								<option value={exam.id} disabled={!isAllowed}>
-									{exam.title} 
-									{!isAllowed && isPastEnd ? '(Sudah berakhir)' : ''}
-									{!isAllowed && !isPastEnd ? '(Belum waktu generate)' : ''}
+								<option value={exam.id}>
+									{exam.title}
 								</option>
 							{/each}
+						</select>
+					</div>
+					<div>
+						<label class="label" for="t-session">Sesi Ujian</label>
+						<select id="t-session" name="session_number" required class="select" bind:value={selectedSessionNumber} disabled={!selectedExamId || availableSessions.length === 0}>
+							{#if !selectedExamId}
+								<option value="">Pilih ujian dulu</option>
+							{:else}
+								{#each availableSessions as session}
+									{@const start = session.start_time ? parseDate(session.start_time).getTime() : 0}
+									{@const end = session.end_time ? parseDate(session.end_time).getTime() : Infinity}
+									{@const isPastEnd = currentTime > end}
+									{@const isAllowed = (!session.start_time || currentTime >= start - 15 * 60 * 1000) && !isPastEnd}
+									{@const startTimeFormatted = session.start_time ? parseDate(session.start_time).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : ''}
+									{@const endTimeFormatted = session.end_time ? parseDate(session.end_time).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : ''}
+									{@const timeLabel = startTimeFormatted ? ` (${startTimeFormatted}${endTimeFormatted ? ' - ' + endTimeFormatted : ''})` : ''}
+									<option value={session.session_number} disabled={!isAllowed}>
+										Sesi {session.session_number}{timeLabel}
+										{!isAllowed && isPastEnd ? ' (Sudah berakhir)' : ''}
+										{!isAllowed && !isPastEnd ? ' (Belum waktu generate)' : ''}
+									</option>
+								{/each}
+							{/if}
 						</select>
 					</div>
 					<div>
@@ -125,9 +149,12 @@
 			<div class="card p-5 {expired ? 'opacity-60' : ''}">
 				<div class="flex flex-col sm:flex-row sm:items-center gap-4">
 					<div class="flex-1 min-w-0">
-						<div class="flex items-center gap-3 mb-2">
+						<div class="flex items-center flex-wrap gap-3 mb-2">
 							<span class="text-2xl font-mono font-bold tracking-[0.2em] {status.active ? 'text-emerald-600' : 'text-slate-700'}">
 								{token.token_code}
+							</span>
+							<span class="badge bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold">
+								Sesi {token.session_number || 1}
 							</span>
 							{#if status.active}
 								<span class="badge-success">{status.label}</span>

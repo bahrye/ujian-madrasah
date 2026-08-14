@@ -11,9 +11,11 @@ import { I as ICONS } from "../../../../chunks/constants.js";
 import { t as toasts } from "../../../../chunks/toast.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
-    let tokens;
+    let selectedExam, availableSessions, tokens;
     let data = $$props["data"];
     let form = $$props["form"];
+    let selectedExamId = "";
+    let selectedSessionNumber = "";
     let currentTime = Date.now();
     onDestroy(() => {
     });
@@ -39,6 +41,11 @@ function _page($$renderer, $$props) {
       }
       return { active: false, label: "Belum dirilis", isAuto: false };
     }
+    selectedExam = data.exams.find((e) => e.id === Number(selectedExamId));
+    availableSessions = selectedExam?.sessions || [];
+    if (availableSessions.length > 0 && (!selectedSessionNumber || !availableSessions.some((s) => s.session_number === Number(selectedSessionNumber)))) {
+      selectedSessionNumber = availableSessions[0].session_number;
+    }
     if (form?.success) toasts.success(form.success);
     if (form?.error) toasts.error(form.error);
     tokens = data.tokens;
@@ -47,19 +54,19 @@ function _page($$renderer, $$props) {
         $$renderer4.push(`<title>Token Ujian — Ujian Online Madrasah</title>`);
       });
     });
-    $$renderer2.push(`<div class="space-y-6 animate-in"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div><h1 class="text-2xl font-bold text-slate-800">Token Ujian</h1> <p class="text-sm text-slate-500 mt-1">Generate dan kelola token akses ujian</p></div> <button class="btn-primary"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> Generate Token</button></div> `);
+    $$renderer2.push(`<div class="space-y-6 animate-in"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div><h1 class="text-2xl font-bold text-slate-800">Token Ujian</h1> <p class="text-sm text-slate-500 mt-1">Generate dan kelola token akses ujian per sesi</p></div> <button class="btn-primary"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> Generate Token</button></div> `);
     {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]--> <div class="space-y-3">`);
-    const each_array_1 = ensure_array_like(tokens);
-    if (each_array_1.length !== 0) {
+    const each_array_2 = ensure_array_like(tokens);
+    if (each_array_2.length !== 0) {
       $$renderer2.push("<!--[-->");
-      for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
-        let token = each_array_1[$$index_1];
+      for (let $$index_2 = 0, $$length = each_array_2.length; $$index_2 < $$length; $$index_2++) {
+        let token = each_array_2[$$index_2];
         const expired = isExpired(token.expires_at);
         const status = getReleaseStatus(token, currentTime);
-        $$renderer2.push(`<div${attr_class(`card p-5 ${expired ? "opacity-60" : ""}`)}><div class="flex flex-col sm:flex-row sm:items-center gap-4"><div class="flex-1 min-w-0"><div class="flex items-center gap-3 mb-2"><span${attr_class(`text-2xl font-mono font-bold tracking-[0.2em] ${status.active ? "text-emerald-600" : "text-slate-700"}`)}>${escape_html(token.token_code)}</span> `);
+        $$renderer2.push(`<div${attr_class(`card p-5 ${expired ? "opacity-60" : ""}`)}><div class="flex flex-col sm:flex-row sm:items-center gap-4"><div class="flex-1 min-w-0"><div class="flex items-center flex-wrap gap-3 mb-2"><span${attr_class(`text-2xl font-mono font-bold tracking-[0.2em] ${status.active ? "text-emerald-600" : "text-slate-700"}`)}>${escape_html(token.token_code)}</span> <span class="badge bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold">Sesi ${escape_html(token.session_number || 1)}</span> `);
         if (status.active) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<span class="badge-success">${escape_html(status.label)}</span>`);
