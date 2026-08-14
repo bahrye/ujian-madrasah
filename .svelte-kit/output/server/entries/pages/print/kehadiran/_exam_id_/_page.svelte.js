@@ -1,4 +1,4 @@
-import { h as head, i as ensure_array_like, e as escape_html, j as attr_class, l as clsx, k as attr, f as bind_props } from "../../../../../chunks/index.js";
+import { h as head, i as ensure_array_like, j as attr_class, l as clsx, e as escape_html, k as attr, f as bind_props } from "../../../../../chunks/index.js";
 import { p as parseDate } from "../../../../../chunks/date.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
@@ -37,58 +37,14 @@ function _page($$renderer, $$props) {
         $$renderer4.push(`<title>Daftar Hadir Ujian - ${escape_html(exam.title)}</title>`);
       });
     });
-    $$renderer2.push(`<div class="no-print p-4 bg-slate-800 text-white border-b border-slate-700 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-md svelte-5lujtk"><div class="flex items-center gap-4 flex-wrap"><span class="text-xs font-semibold uppercase tracking-wider text-slate-300">Pengaturan Pengawas:</span> <div class="flex items-center gap-2"><label for="p1-select" class="text-xs text-slate-300 font-medium">Pengawas 1:</label> `);
-    $$renderer2.select(
-      {
-        id: "p1-select",
-        value: proctor1Id,
-        class: "bg-slate-700 text-white text-xs border border-slate-600 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-indigo-400"
-      },
-      ($$renderer3) => {
-        $$renderer3.option({ value: "" }, ($$renderer4) => {
-          $$renderer4.push(`-- Pilih Pengawas 1 --`);
-        });
-        $$renderer3.push(`<!--[-->`);
-        const each_array = ensure_array_like(proctorOptions);
-        for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
-          let p = each_array[$$index];
-          $$renderer3.option({ value: p.id }, ($$renderer4) => {
-            $$renderer4.push(`${escape_html(p.name)} ${escape_html(p.nip ? `(NIP. ${p.nip})` : "")}`);
-          });
-        }
-        $$renderer3.push(`<!--]-->`);
-      }
-    );
-    $$renderer2.push(`</div> <div class="flex items-center gap-2"><label for="p2-select" class="text-xs text-slate-300 font-medium">Pengawas 2:</label> `);
-    $$renderer2.select(
-      {
-        id: "p2-select",
-        value: proctor2Id,
-        class: "bg-slate-700 text-white text-xs border border-slate-600 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-indigo-400"
-      },
-      ($$renderer3) => {
-        $$renderer3.option({ value: "" }, ($$renderer4) => {
-          $$renderer4.push(`-- Tidak Ada / Kosongkan --`);
-        });
-        $$renderer3.push(`<!--[-->`);
-        const each_array_1 = ensure_array_like(proctorOptions);
-        for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
-          let p = each_array_1[$$index_1];
-          $$renderer3.option({ value: p.id }, ($$renderer4) => {
-            $$renderer4.push(`${escape_html(p.name)} ${escape_html(p.nip ? `(NIP. ${p.nip})` : "")}`);
-          });
-        }
-        $$renderer3.push(`<!--]-->`);
-      }
-    );
-    $$renderer2.push(`</div></div> <div class="flex items-center gap-2"><button class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-medium transition-colors">Tutup</button> <button class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-xs font-bold transition-colors flex items-center gap-1.5 shadow"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg> Cetak Daftar Hadir</button></div></div> <div class="p-4 md:p-8 print:p-0 print:m-0 max-w-[215.9mm] mx-auto bg-white" style="font-family: 'Times New Roman', Times, Arial, serif; font-variant-numeric: lining-nums tabular-nums;"><!--[-->`);
-    const each_array_2 = ensure_array_like(Object.entries(participantsGrouped));
-    for (let roomIdx = 0, $$length = each_array_2.length; roomIdx < $$length; roomIdx++) {
-      let [roomName, sessionsDict] = each_array_2[roomIdx];
+    $$renderer2.push(`<div class="no-print p-4 bg-slate-800 text-white border-b border-slate-700 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-md svelte-5lujtk"><div class="text-xs text-slate-300">Gunakan kertas <strong>F4 / Folio</strong> saat mencetak daftar hadir.</div> <div class="flex items-center gap-2"><button class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-medium transition-colors">Tutup</button> <button class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-xs font-bold transition-colors flex items-center gap-1.5 shadow"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg> Cetak Daftar Hadir</button></div></div> <div class="p-4 md:p-8 print:p-0 print:m-0 max-w-[215.9mm] mx-auto bg-white" style="font-family: 'Times New Roman', Times, Arial, serif; font-variant-numeric: lining-nums tabular-nums;"><!--[-->`);
+    const each_array = ensure_array_like(Object.entries(participantsGrouped));
+    for (let roomIdx = 0, $$length = each_array.length; roomIdx < $$length; roomIdx++) {
+      let [roomName, sessionsDict] = each_array[roomIdx];
       $$renderer2.push(`<!--[-->`);
-      const each_array_3 = ensure_array_like(Object.entries(sessionsDict));
-      for (let sessionIdx = 0, $$length2 = each_array_3.length; sessionIdx < $$length2; sessionIdx++) {
-        let [sessionNumStr, students] = each_array_3[sessionIdx];
+      const each_array_1 = ensure_array_like(Object.entries(sessionsDict));
+      for (let sessionIdx = 0, $$length2 = each_array_1.length; sessionIdx < $$length2; sessionIdx++) {
+        let [sessionNumStr, students] = each_array_1[sessionIdx];
         const sessionNum = parseInt(sessionNumStr);
         const sessionData = sessionMap?.[sessionNum];
         const effectiveStart = sessionData?.start_time || exam.start_time;
@@ -131,9 +87,9 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<tr><td class="py-1 font-medium">Ruang</td><td>:</td><td>${escape_html(roomName)}</td></tr>`);
         }
         $$renderer2.push(`<!--]--></tbody></table></div> <table class="w-full border-collapse border border-black mb-6 text-sm"><thead><tr><th class="border border-black p-2 w-12 text-center">No</th><th class="border border-black p-2 px-4 whitespace-nowrap">${escape_html(isNomorPesertaMode ? "No. Peserta" : "NISN")}</th><th class="border border-black p-2 text-left">Nama Peserta</th><th class="border border-black p-2 w-48 text-center" colspan="2">Tanda Tangan</th><th class="border border-black p-2 w-24 text-center">Ket.</th></tr></thead><tbody><!--[-->`);
-        const each_array_4 = ensure_array_like(students);
-        for (let i = 0, $$length3 = each_array_4.length; i < $$length3; i++) {
-          let p = each_array_4[i];
+        const each_array_2 = ensure_array_like(students);
+        for (let i = 0, $$length3 = each_array_2.length; i < $$length3; i++) {
+          let p = each_array_2[i];
           $$renderer2.push(`<tr><td class="border border-black p-2 text-center">${escape_html(i + 1)}</td><td class="border border-black p-2 text-center whitespace-nowrap text-xs leading-tight font-serif">${escape_html(isNomorPesertaMode ? p.nomor_peserta || "-" : p.nisn || p.username)}</td><td class="border border-black p-2">${escape_html(p.student_name)}</td><td class="border-b border-black p-2 w-24 align-top h-12 relative text-center">`);
           if ((i + 1) % 2 !== 0) {
             $$renderer2.push("<!--[0-->");

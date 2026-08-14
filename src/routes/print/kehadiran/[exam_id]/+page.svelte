@@ -68,28 +68,8 @@
 
 <!-- Control Bar -->
 <div class="no-print p-4 bg-slate-800 text-white border-b border-slate-700 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-md">
-	<div class="flex items-center gap-4 flex-wrap">
-		<span class="text-xs font-semibold uppercase tracking-wider text-slate-300">Pengaturan Pengawas:</span>
-		
-		<div class="flex items-center gap-2">
-			<label for="p1-select" class="text-xs text-slate-300 font-medium">Pengawas 1:</label>
-			<select id="p1-select" bind:value={proctor1Id} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-indigo-400">
-				<option value="">-- Pilih Pengawas 1 --</option>
-				{#each proctorOptions as p}
-					<option value={p.id}>{p.name} {p.nip ? `(NIP. ${p.nip})` : ''}</option>
-				{/each}
-			</select>
-		</div>
-
-		<div class="flex items-center gap-2">
-			<label for="p2-select" class="text-xs text-slate-300 font-medium">Pengawas 2:</label>
-			<select id="p2-select" bind:value={proctor2Id} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-indigo-400">
-				<option value="">-- Tidak Ada / Kosongkan --</option>
-				{#each proctorOptions as p}
-					<option value={p.id}>{p.name} {p.nip ? `(NIP. ${p.nip})` : ''}</option>
-				{/each}
-			</select>
-		</div>
+	<div class="text-xs text-slate-300">
+		Gunakan kertas <strong>F4 / Folio</strong> saat mencetak daftar hadir.
 	</div>
 
 	<div class="flex items-center gap-2">

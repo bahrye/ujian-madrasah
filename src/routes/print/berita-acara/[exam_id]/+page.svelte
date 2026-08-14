@@ -12,6 +12,7 @@
 	let proctor2Id = data.defaultProctor2Id || '';
 	let proctorTechId = data.defaultProctorTechId || '';
 	let committeeId = data.defaultCommitteeId || '';
+	let selectedTimezone = 'WIB';
 
 	$: proctor1 = proctorOptions.find(p => String(p.id) === String(proctor1Id));
 	$: proctor2 = proctorOptions.find(p => String(p.id) === String(proctor2Id));
@@ -153,48 +154,13 @@
 
 <!-- Control Bar -->
 <div class="no-print p-4 bg-slate-800 text-white border-b border-slate-700 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-md">
-	<div class="flex items-center gap-4 flex-wrap">
-		<span class="text-xs font-semibold uppercase tracking-wider text-slate-300">Pengaturan TTD Petugas:</span>
-		
-		<div class="flex items-center gap-1.5">
-			<label for="p1-select" class="text-xs text-slate-300 font-medium">Pengawas 1:</label>
-			<select id="p1-select" bind:value={proctor1Id} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-400 max-w-[140px]">
-				<option value="">-- Pilih Pengawas 1 --</option>
-				{#each proctorOptions as p}
-					<option value={p.id}>{p.name}</option>
-				{/each}
-			</select>
-		</div>
-
-		<div class="flex items-center gap-1.5">
-			<label for="p2-select" class="text-xs text-slate-300 font-medium">Pengawas 2:</label>
-			<select id="p2-select" bind:value={proctor2Id} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-400 max-w-[140px]">
-				<option value="">-- Kosongkan --</option>
-				{#each proctorOptions as p}
-					<option value={p.id}>{p.name}</option>
-				{/each}
-			</select>
-		</div>
-
-		<div class="flex items-center gap-1.5">
-			<label for="pt-select" class="text-xs text-slate-300 font-medium">Proktor/Teknisi:</label>
-			<select id="pt-select" bind:value={proctorTechId} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-400 max-w-[140px]">
-				<option value="">-- Kosongkan --</option>
-				{#each proctorOptions as p}
-					<option value={p.id}>{p.name}</option>
-				{/each}
-			</select>
-		</div>
-
-		<div class="flex items-center gap-1.5">
-			<label for="cm-select" class="text-xs text-slate-300 font-medium">Panitia Ujian:</label>
-			<select id="cm-select" bind:value={committeeId} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-400 max-w-[140px]">
-				<option value="">-- Kosongkan --</option>
-				{#each proctorOptions as p}
-					<option value={p.id}>{p.name}</option>
-				{/each}
-			</select>
-		</div>
+	<div class="flex items-center gap-2">
+		<label for="tz-select" class="text-xs text-slate-300 font-medium">Zona Waktu:</label>
+		<select id="tz-select" bind:value={selectedTimezone} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-indigo-400">
+			<option value="WIB">WIB (Waktu Indonesia Barat)</option>
+			<option value="WITA">WITA (Waktu Indonesia Tengah)</option>
+			<option value="WIT">WIT (Waktu Indonesia Timur)</option>
+		</select>
 	</div>
 
 	<div class="flex items-center gap-2">
@@ -244,7 +210,7 @@
 						KEMENTERIAN AGAMA REPUBLIK INDONESIA
 					</h4>
 					<h3 class="font-bold text-xl uppercase tracking-wide text-black m-0 my-0.5">
-						{school?.name || 'NAMA SEKOLAH'}
+						{school?.name || 'NAMA MADRASAH'}
 					</h3>
 					{#if school?.address}
 						<p class="text-xs italic text-black m-0 leading-tight">{school.address}</p>
@@ -266,17 +232,17 @@
 
 			<!-- Garis Kop Surat (Tipis atas, Agak tebal bawah) -->
 			<div class="mt-2 mb-3">
-				<div style="border-bottom: 1px solid #000;"></div>
-				<div style="border-bottom: 2.5px solid #000; margin-top: 2px;"></div>
+				<div class="border-b-2 border-black w-full"></div>
+				<div class="border-b border-black w-full mt-0.5"></div>
 			</div>
 
-			<!-- Judul -->
-			<div class="text-center mb-3">
+			<!-- Judul Dokumen -->
+			<div class="text-center mb-4">
 				<h1 class="font-bold text-lg uppercase underline tracking-wider mb-0.5">BERITA ACARA PELAKSANAAN UJIAN</h1>
 				<p class="text-sm font-medium">Tahun Ajaran {getAcademicYear(effectiveStart)}</p>
 			</div>
 
-			<!-- Isu/Paragraf Pembuka -->
+			<!-- Teks Pembuka -->
 			<p class="mb-2 text-justify">
 				Pada hari ini <span class="border-b border-dotted border-black px-2">{getDayName(effectiveStart)}</span> 
 				tanggal <span class="border-b border-dotted border-black px-2">{getDayNumber(effectiveStart)}</span> 
@@ -291,7 +257,7 @@
 					<tbody>
 						<tr class="align-top"><td class="w-48 py-0.5">a. Satuan Pendidikan</td><td class="w-4 py-0.5">:</td><td class="py-0.5 font-bold uppercase">{school?.name || '-'}</td></tr>
 						<tr class="align-top"><td class="py-0.5">b. Ruang / Sesi Ujian</td><td class="py-0.5">:</td><td class="py-0.5 font-bold">{roomName} / Sesi {sessionNum}</td></tr>
-						<tr class="align-top"><td class="py-0.5">c. Waktu Pelaksanaan</td><td class="py-0.5">:</td><td class="py-0.5">{formatTime(effectiveStart)} s.d. {formatTime(effectiveEnd)} WIB</td></tr>
+						<tr class="align-top"><td class="py-0.5">c. Waktu Pelaksanaan</td><td class="py-0.5">:</td><td class="py-0.5">{formatTime(effectiveStart)} s.d. {formatTime(effectiveEnd)} {selectedTimezone}</td></tr>
 						<tr class="align-top"><td class="py-0.5">d. Jumlah Peserta Seharusnya</td><td class="py-0.5">:</td><td class="py-0.5">{count} Orang</td></tr>
 						<tr class="align-top"><td class="py-0.5">e. Jumlah Peserta Hadir</td><td class="py-0.5">:</td><td class="py-0.5">........... Orang</td></tr>
 						<tr class="align-top"><td class="py-0.5">f. Jumlah Peserta Tidak Hadir</td><td class="py-0.5">:</td><td class="py-0.5">........... Orang</td></tr>
