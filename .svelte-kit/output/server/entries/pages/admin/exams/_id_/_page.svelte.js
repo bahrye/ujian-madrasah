@@ -175,7 +175,7 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<div class="p-8 text-center text-slate-400 text-sm">Belum ada pengawas yang ditugaskan untuk ujian ini.</div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<form id="proctors-form" method="POST" action="?/updateAllProctors"><div class="table-container border-0 rounded-none max-h-80 overflow-y-auto"><table class="table"><thead class="sticky top-0 bg-white z-10"><tr><th>Nama Pengawas</th><th>Username</th>`);
+      $$renderer2.push(`<form id="proctors-form" method="POST" action="?/updateAllProctors"><div class="table-container border-0 rounded-none max-h-80 overflow-y-auto"><table class="table"><thead class="sticky top-0 bg-white z-10"><tr><th>Nama Pengawas</th><th>Username</th><th>Penetapan Peran</th>`);
       if (data.hasSessions) {
         $$renderer2.push("<!--[0-->");
         $$renderer2.push(`<th>Sesi Mengawas</th>`);
@@ -193,7 +193,29 @@ function _page($$renderer, $$props) {
       const each_array_3 = ensure_array_like(examProctors);
       for (let $$index_5 = 0, $$length = each_array_3.length; $$index_5 < $$length; $$index_5++) {
         let proctor = each_array_3[$$index_5];
-        $$renderer2.push(`<tr><td class="font-medium text-slate-800"><input type="hidden" name="exam_proctor_ids"${attr("value", proctor.exam_proctor_id)}/> ${escape_html(proctor.name)}</td><td class="font-mono text-sm text-slate-500">${escape_html(proctor.username)}</td>`);
+        $$renderer2.push(`<tr><td class="font-medium text-slate-800"><input type="hidden" name="exam_proctor_ids"${attr("value", proctor.exam_proctor_id)}/> ${escape_html(proctor.name)}</td><td class="font-mono text-sm text-slate-500">${escape_html(proctor.username)}</td><td>`);
+        $$renderer2.select(
+          {
+            name: `role_${proctor.exam_proctor_id}`,
+            class: "select select-sm select-bordered w-full max-w-[150px]",
+            value: proctor.proctor_role || "p1"
+          },
+          ($$renderer3) => {
+            $$renderer3.option({ value: "p1" }, ($$renderer4) => {
+              $$renderer4.push(`Pengawas 1`);
+            });
+            $$renderer3.option({ value: "p2" }, ($$renderer4) => {
+              $$renderer4.push(`Pengawas 2`);
+            });
+            $$renderer3.option({ value: "pt" }, ($$renderer4) => {
+              $$renderer4.push(`Proktor / Teknisi`);
+            });
+            $$renderer3.option({ value: "cm" }, ($$renderer4) => {
+              $$renderer4.push(`Panitia Ujian`);
+            });
+          }
+        );
+        $$renderer2.push(`</td>`);
         if (data.hasSessions) {
           $$renderer2.push("<!--[0-->");
           const sessionsArr = proctor.sessions ? JSON.parse(proctor.sessions) : [];

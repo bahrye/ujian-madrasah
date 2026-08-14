@@ -1,4 +1,4 @@
-import { g as getDB } from "../../../../../chunks/db.js";
+import { g as getDB, e as ensureProctorRoleColumn } from "../../../../../chunks/db.js";
 import { error } from "@sveltejs/kit";
 const load = async ({ platform, params, locals }) => {
   const db = getDB(platform);
@@ -44,12 +44,13 @@ const load = async ({ platform, params, locals }) => {
       sessionMap[s.session_number] = s;
     }
   }
+  await ensureProctorRoleColumn(db);
   const assignedProctorsRes = await db.prepare(`
-		SELECT DISTINCT u.id, u.name, u.nip, u.role
+		SELECT DISTINCT u.id, u.name, u.nip, u.role, COALESCE(ep.proctor_role, 'p1') as proctor_role
 		FROM exam_proctors ep
 		JOIN users u ON ep.proctor_id = u.id
 		WHERE ep.exam_id = ?
-		ORDER BY u.name ASC
+		ORDER BY ep.id ASC
 	`).bind(examId).all();
   const schoolTeachersRes = await db.prepare(`
 		SELECT id, name, nip, role
@@ -64,8 +65,14 @@ const load = async ({ platform, params, locals }) => {
     ...assignedProctors,
     ...schoolTeachers.filter((t) => !assignedIds.has(t.id))
   ];
-  const defaultProctor1Id = assignedProctors[0]?.id || proctorOptions[0]?.id || "";
-  const defaultProctor2Id = assignedProctors[1]?.id || "";
+  const p1Obj = assignedProctors.find((p) => p.proctor_role === "p1" || p.proctor_role === "Pengawas 1");
+  const p2Obj = assignedProctors.find((p) => p.proctor_role === "p2" || p.proctor_role === "Pengawas 2");
+  const ptObj = assignedProctors.find((p) => p.proctor_role === "pt" || p.proctor_role === "Proktor / Teknisi");
+  const cmObj = assignedProctors.find((p) => p.proctor_role === "cm" || p.proctor_role === "Panitia Ujian");
+  const defaultProctor1Id = p1Obj?.id || assignedProctors[0]?.id || proctorOptions[0]?.id || "";
+  const defaultProctor2Id = p2Obj?.id || (assignedProctors.length > 1 && assignedProctors[1]?.id !== defaultProctor1Id ? assignedProctors[1]?.id : "");
+  const defaultProctorTechId = ptObj?.id || "";
+  const defaultCommitteeId = cmObj?.id || "";
   return {
     school,
     exam,
@@ -76,7 +83,9 @@ const load = async ({ platform, params, locals }) => {
     sessionMap,
     proctorOptions,
     defaultProctor1Id,
-    defaultProctor2Id
+    defaultProctor2Id,
+    defaultProctorTechId,
+    defaultCommitteeId
   };
 };
 export {

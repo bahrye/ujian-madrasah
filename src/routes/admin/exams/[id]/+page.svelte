@@ -324,6 +324,7 @@
 							<tr>
 								<th>Nama Pengawas</th>
 								<th>Username</th>
+								<th>Penetapan Peran</th>
 								{#if data.hasSessions}<th>Sesi Mengawas</th>{/if}
 								{#if data.examRooms.length > 0}<th>Ruang Ujian</th>{/if}
 								<th class="w-16">Aksi</th>
@@ -337,6 +338,14 @@
 										{proctor.name}
 									</td>
 									<td class="font-mono text-sm text-slate-500">{proctor.username}</td>
+									<td>
+										<select name={`role_${proctor.exam_proctor_id}`} class="select select-sm select-bordered w-full max-w-[150px]" value={proctor.proctor_role || 'p1'}>
+											<option value="p1">Pengawas 1</option>
+											<option value="p2">Pengawas 2</option>
+											<option value="pt">Proktor / Teknisi</option>
+											<option value="cm">Panitia Ujian</option>
+										</select>
+									</td>
 									{#if data.hasSessions}
 										{@const sessionsArr = proctor.sessions ? JSON.parse(proctor.sessions) : []}
 										<td>

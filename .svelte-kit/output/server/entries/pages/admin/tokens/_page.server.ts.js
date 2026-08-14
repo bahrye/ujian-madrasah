@@ -1,5 +1,5 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { g as getDB, e as ensureTokenSessionColumn } from "../../../../chunks/db.js";
+import { g as getDB, a as ensureTokenSessionColumn } from "../../../../chunks/db.js";
 import { g as generateTokenCode } from "../../../../chunks/auth.js";
 import { c as checkSessionTimeWindow } from "../../../../chunks/date.js";
 const load = async ({ platform, locals }) => {

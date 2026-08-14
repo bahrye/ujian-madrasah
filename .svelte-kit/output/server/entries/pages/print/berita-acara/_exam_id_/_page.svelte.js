@@ -6,8 +6,8 @@ function _page($$renderer, $$props) {
     let data = $$props["data"];
     let proctor1Id = data.defaultProctor1Id || (proctorOptions[0]?.id || "");
     let proctor2Id = data.defaultProctor2Id || "";
-    let proctorTechId = "";
-    let committeeId = "";
+    let proctorTechId = data.defaultProctorTechId || "";
+    let committeeId = data.defaultCommitteeId || "";
     function resolveStart(sessionData, exam2) {
       if (sessionData?.start_time && sessionData.start_time.trim()) {
         const s = sessionData.start_time.trim();

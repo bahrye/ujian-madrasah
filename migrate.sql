@@ -1,3 +1,4 @@
 ALTER TABLE users ADD COLUMN session_number INTEGER DEFAULT 1;
 ALTER TABLE exams ADD COLUMN max_attempts INTEGER NOT NULL DEFAULT 1;
 ALTER TABLE exam_proctors ADD COLUMN sessions TEXT;
+ALTER TABLE exam_proctors ADD COLUMN proctor_role TEXT DEFAULT 'p1';

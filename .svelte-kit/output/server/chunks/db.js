@@ -20,8 +20,15 @@ async function ensureTokenSessionColumn(db) {
   } catch (e) {
   }
 }
+async function ensureProctorRoleColumn(db) {
+  try {
+    await db.prepare("ALTER TABLE exam_proctors ADD COLUMN proctor_role TEXT DEFAULT 'p1'").run();
+  } catch (e) {
+  }
+}
 export {
+  ensureTokenSessionColumn as a,
   dbRun as d,
-  ensureTokenSessionColumn as e,
+  ensureProctorRoleColumn as e,
   getDB as g
 };

@@ -50,3 +50,11 @@ export async function ensureTokenSessionColumn(db: D1Database) {
 	}
 }
 
+export async function ensureProctorRoleColumn(db: D1Database) {
+	try {
+		await db.prepare("ALTER TABLE exam_proctors ADD COLUMN proctor_role TEXT DEFAULT 'p1'").run();
+	} catch (e: any) {
+		// Ignore error if column already exists
+	}
+}
+

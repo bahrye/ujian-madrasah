@@ -1,10 +1,11 @@
 // @ts-nocheck
 import type { PageServerLoad } from './$types';
-import { getDB } from '$lib/server/db';
+import { getDB, ensureProctorRoleColumn } from '$lib/server/db';
 import { error } from '@sveltejs/kit';
 
 export const load = async ({ platform, params, locals }: Parameters<PageServerLoad>[0]) => {
 	const db = getDB(platform);
+	await ensureProctorRoleColumn(db);
 	const examIdStr = params.exam_id;
 	const examId = parseInt(examIdStr, 10);
 	
@@ -20,14 +21,14 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 
 	// Get participants
 	const participants = await db.prepare(`
-		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, c.name as class_name, sa.signature, u.session_number, r.name as room_name
-		FROM exam_participants p
-		JOIN users u ON p.student_id = u.id
+		SELECT ep.id as participant_id, u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, c.name as class_name, sa.signature, u.session_number, er.name as room_name
+		FROM exam_participants ep
+		JOIN users u ON ep.student_id = u.id
 		LEFT JOIN classes c ON u.class_id = c.id
-		LEFT JOIN exam_rooms r ON p.room_id = r.id
-		LEFT JOIN student_attempts sa ON sa.student_id = u.id AND sa.exam_id = p.exam_id
-		WHERE p.exam_id = ?
-		ORDER BY r.name, u.session_number, c.name, u.name
+		LEFT JOIN exam_rooms er ON ep.room_id = er.id
+		LEFT JOIN student_attempts sa ON sa.student_id = u.id AND sa.exam_id = ep.exam_id
+		WHERE ep.exam_id = ?
+		ORDER BY er.name, u.session_number, c.name, u.name
 	`).bind(examId).all();
 
 	// Check login mode
@@ -50,11 +51,11 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 
 	// Fetch proctors assigned to this exam
 	const assignedProctorsRes = await db.prepare(`
-		SELECT DISTINCT u.id, u.name, u.nip, u.role
+		SELECT DISTINCT u.id, u.name, u.nip, u.role, COALESCE(ep.proctor_role, 'p1') as proctor_role
 		FROM exam_proctors ep
 		JOIN users u ON ep.proctor_id = u.id
 		WHERE ep.exam_id = ?
-		ORDER BY u.name ASC
+		ORDER BY ep.id ASC
 	`).bind(examId).all();
 
 	// Fetch all teachers/proctors/admins in the school
@@ -74,8 +75,11 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 		...schoolTeachers.filter(t => !assignedIds.has(t.id))
 	];
 
-	const defaultProctor1Id = assignedProctors[0]?.id || proctorOptions[0]?.id || '';
-	const defaultProctor2Id = assignedProctors[1]?.id || '';
+	const p1Obj = assignedProctors.find(p => p.proctor_role === 'p1' || p.proctor_role === 'Pengawas 1');
+	const p2Obj = assignedProctors.find(p => p.proctor_role === 'p2' || p.proctor_role === 'Pengawas 2');
+
+	const defaultProctor1Id = p1Obj?.id || assignedProctors[0]?.id || proctorOptions[0]?.id || '';
+	const defaultProctor2Id = p2Obj?.id || (assignedProctors.length > 1 && assignedProctors[1]?.id !== defaultProctor1Id ? assignedProctors[1]?.id : '');
 
 	// Group participants by Room -> Session -> Class
 	const results = participants.results as any[];

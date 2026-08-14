@@ -1,7 +1,8 @@
-import { g as getDB } from "../../../../../chunks/db.js";
+import { g as getDB, e as ensureProctorRoleColumn } from "../../../../../chunks/db.js";
 import { fail, error } from "@sveltejs/kit";
 const load = async ({ platform, params, locals }) => {
   const db = getDB(platform);
+  await ensureProctorRoleColumn(db);
   const examIdStr = params.id;
   const examId = parseInt(examIdStr, 10);
   if (isNaN(examId)) throw error(400, "ID Ujian tidak valid");
@@ -52,7 +53,7 @@ const load = async ({ platform, params, locals }) => {
 	`).bind(examId).all();
   const allProctors = await db.prepare('SELECT id, name, username, role FROM users WHERE school_id = ? AND role IN ("pengawas", "guru") ORDER BY role ASC, name ASC').bind(locals.user.school_id).all();
   const examProctors = await db.prepare(`
-		SELECT ep.id as exam_proctor_id, u.id as user_id, u.name, u.username, ep.room_id, ep.sessions
+		SELECT ep.id as exam_proctor_id, u.id as user_id, u.name, u.username, ep.room_id, ep.sessions, COALESCE(ep.proctor_role, 'p1') as proctor_role
 		FROM exam_proctors ep
 		JOIN users u ON ep.proctor_id = u.id
 		WHERE ep.exam_id = ?
@@ -199,9 +200,10 @@ const actions = {
     const statements = proctorIds.map((proctorId) => {
       const roomIdStr = form.get(`room_${proctorId}`)?.toString();
       const roomId = roomIdStr ? parseInt(roomIdStr, 10) : null;
+      const roleStr = form.get(`role_${proctorId}`)?.toString() || "p1";
       const sessionsArr = form.getAll(`sessions_${proctorId}`).map((s) => parseInt(s.toString(), 10)).filter((s) => !isNaN(s));
       const sessionsJson = sessionsArr.length > 0 ? JSON.stringify(sessionsArr) : null;
-      return db.prepare("UPDATE exam_proctors SET room_id = ?, sessions = ? WHERE id = ? AND exam_id = ?").bind(roomId, sessionsJson, proctorId, examId);
+      return db.prepare("UPDATE exam_proctors SET room_id = ?, sessions = ?, proctor_role = ? WHERE id = ? AND exam_id = ?").bind(roomId, sessionsJson, roleStr, proctorId, examId);
     });
     await db.batch(statements);
     return { success: "Pengaturan pengawas berhasil disimpan." };
@@ -287,7 +289,7 @@ const actions = {
       return fail(400, { error: "Pengawas tidak valid." });
     }
     const insertStmts = validProctors.results.map(
-      (p) => db.prepare("INSERT OR IGNORE INTO exam_proctors (exam_id, proctor_id) VALUES (?, ?)").bind(parsedExamId, p.id)
+      (p) => db.prepare("INSERT OR IGNORE INTO exam_proctors (exam_id, proctor_id, proctor_role) VALUES (?, ?, 'p1')").bind(parsedExamId, p.id)
     );
     await db.batch(insertStmts);
     return { success: `Berhasil menambahkan ${validProctors.results.length} pengawas ujian.` };

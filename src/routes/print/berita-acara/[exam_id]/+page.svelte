@@ -10,8 +10,8 @@
 
 	let proctor1Id = data.defaultProctor1Id || (proctorOptions[0]?.id || '');
 	let proctor2Id = data.defaultProctor2Id || '';
-	let proctorTechId = '';
-	let committeeId = '';
+	let proctorTechId = data.defaultProctorTechId || '';
+	let committeeId = data.defaultCommitteeId || '';
 
 	$: proctor1 = proctorOptions.find(p => String(p.id) === String(proctor1Id));
 	$: proctor2 = proctorOptions.find(p => String(p.id) === String(proctor2Id));
