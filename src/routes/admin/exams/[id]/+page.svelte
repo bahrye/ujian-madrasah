@@ -283,11 +283,11 @@
 	<div class="card overflow-hidden mb-6">
 		<div class="p-5 border-b border-slate-100 flex items-center justify-between">
 			<div>
-				<h2 class="text-lg font-bold text-slate-800">Daftar Pengawas Ujian</h2>
-				<p class="text-xs text-slate-500 mt-0.5">Tentukan sesi dan ruang mengawas untuk setiap pengawas.</p>
+				<h2 class="text-lg font-bold text-slate-800">Daftar Pengawas, Proktor, dan Panitia Ujian</h2>
+				<p class="text-xs text-slate-500 mt-0.5">Tentukan penetapan peran, sesi, dan ruang mengawas untuk setiap petugas.</p>
 			</div>
 			<div class="flex items-center gap-2">
-				{#if examProctors.length > 0 && hasSessionsOrRooms}
+				{#if examProctors.length > 0}
 					<button type="submit" form="proctors-form" disabled={isSavingProctors} class="btn-sm btn-primary flex items-center gap-1.5 shadow-sm">
 						{#if isSavingProctors}
 							<span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
@@ -296,7 +296,7 @@
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
 							</svg>
-							Simpan Sesi & Ruang
+							Simpan Petugas
 						{/if}
 					</button>
 				{/if}
