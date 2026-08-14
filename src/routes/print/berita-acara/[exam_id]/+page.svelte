@@ -13,13 +13,73 @@
 	let proctorTechId = '';
 	let committeeId = '';
 
+	// Date and time manual overrides if needed
+	let customDateStr = '';
+	let customStartTime = '';
+	let customEndTime = '';
+
 	$: proctor1 = proctorOptions.find(p => String(p.id) === String(proctor1Id));
 	$: proctor2 = proctorOptions.find(p => String(p.id) === String(proctor2Id));
 	$: proctorTech = proctorOptions.find(p => String(p.id) === String(proctorTechId));
 	$: committee = proctorOptions.find(p => String(p.id) === String(committeeId));
 
+	function resolveStart(sessionData: any, exam: any, customDate: string, customTime: string) {
+		if (customDate || customTime) {
+			const baseDateStr = customDate || sessionData?.start_time || exam?.start_time || exam?.exam_type_start_time || new Date().toISOString().slice(0, 10);
+			const baseDate = baseDateStr.includes('T') ? baseDateStr.split('T')[0] : (baseDateStr.includes(' ') ? baseDateStr.split(' ')[0] : baseDateStr);
+			const baseTime = customTime || (sessionData?.start_time?.includes('T') ? sessionData.start_time.split('T')[1].slice(0, 5) : sessionData?.start_time || '08:00');
+			return `${baseDate}T${baseTime}:00`;
+		}
+
+		if (sessionData?.start_time && sessionData.start_time.trim()) {
+			const s = sessionData.start_time.trim();
+			if (s.includes('-') || s.includes('/')) return s;
+			const baseDateStr = exam?.start_time || exam?.exam_type_start_time || new Date().toISOString().slice(0, 10);
+			const datePart = baseDateStr.split(/[T ]/)[0];
+			return `${datePart}T${s.slice(0, 5)}:00`;
+		}
+
+		if (exam?.start_time && exam.start_time.trim()) {
+			return exam.start_time.trim();
+		}
+
+		if (exam?.exam_type_start_time && exam.exam_type_start_time.trim()) {
+			return exam.exam_type_start_time.trim();
+		}
+
+		return null;
+	}
+
+	function resolveEnd(sessionData: any, exam: any, customDate: string, customTime: string) {
+		if (customDate || customTime) {
+			const baseDateStr = customDate || sessionData?.end_time || exam?.end_time || exam?.exam_type_end_time || new Date().toISOString().slice(0, 10);
+			const baseDate = baseDateStr.includes('T') ? baseDateStr.split('T')[0] : (baseDateStr.includes(' ') ? baseDateStr.split(' ')[0] : baseDateStr);
+			const baseTime = customTime || (sessionData?.end_time?.includes('T') ? sessionData.end_time.split('T')[1].slice(0, 5) : sessionData?.end_time || '09:30');
+			return `${baseDate}T${baseTime}:00`;
+		}
+
+		if (sessionData?.end_time && sessionData.end_time.trim()) {
+			const s = sessionData.end_time.trim();
+			if (s.includes('-') || s.includes('/')) return s;
+			const baseDateStr = exam?.end_time || exam?.start_time || exam?.exam_type_end_time || new Date().toISOString().slice(0, 10);
+			const datePart = baseDateStr.split(/[T ]/)[0];
+			return `${datePart}T${s.slice(0, 5)}:00`;
+		}
+
+		if (exam?.end_time && exam.end_time.trim()) {
+			return exam.end_time.trim();
+		}
+
+		if (exam?.exam_type_end_time && exam.exam_type_end_time.trim()) {
+			return exam.exam_type_end_time.trim();
+		}
+
+		return null;
+	}
+
 	function getAcademicYear(dateStr: string | null) {
-		const d = dateStr ? parseDate(dateStr) : new Date();
+		if (!dateStr) return '2025/2026';
+		const d = parseDate(dateStr);
 		const validDate = isNaN(d.getTime()) ? new Date() : d;
 		const year = validDate.getFullYear();
 		const month = validDate.getMonth() + 1; // 1 to 12
@@ -30,8 +90,36 @@
 		}
 	}
 
-	function formatDate(dateStr: string | null) {
-		if (!dateStr || dateStr === '-') return '......................';
+	function getDayName(dateStr: string | null) {
+		if (!dateStr) return '................';
+		const d = parseDate(dateStr);
+		if (isNaN(d.getTime())) return '................';
+		return d.toLocaleDateString('id-ID', { weekday: 'long' });
+	}
+
+	function getDayNumber(dateStr: string | null) {
+		if (!dateStr) return '......';
+		const d = parseDate(dateStr);
+		if (isNaN(d.getTime())) return '......';
+		return d.getDate().toString();
+	}
+
+	function getMonthName(dateStr: string | null) {
+		if (!dateStr) return '................';
+		const d = parseDate(dateStr);
+		if (isNaN(d.getTime())) return '................';
+		return d.toLocaleDateString('id-ID', { month: 'long' });
+	}
+
+	function getYearNumber(dateStr: string | null) {
+		if (!dateStr) return '..........';
+		const d = parseDate(dateStr);
+		if (isNaN(d.getTime())) return '..........';
+		return d.getFullYear().toString();
+	}
+
+	function formatDateFull(dateStr: string | null) {
+		if (!dateStr) return '......................';
 		const date = parseDate(dateStr);
 		if (isNaN(date.getTime())) return '......................';
 		return date.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -39,10 +127,11 @@
 
 	function formatTime(timeStr: string | null) {
 		if (!timeStr) return '....';
-		if (timeStr.length <= 5) return timeStr;
-		if (timeStr.includes('T')) return timeStr.split('T')[1].slice(0, 5);
-		if (timeStr.includes(' ')) return timeStr.split(' ')[1].slice(0, 5);
-		return timeStr.slice(0, 5);
+		const str = String(timeStr).trim();
+		if (str.includes('T')) return str.split('T')[1].slice(0, 5).replace(':', '.');
+		if (str.includes(' ')) return str.split(' ')[1].slice(0, 5).replace(':', '.');
+		if (str.includes(':')) return str.slice(0, 5).replace(':', '.');
+		return str;
 	}
 </script>
 
@@ -74,11 +163,11 @@
 <!-- Control Bar -->
 <div class="no-print p-4 bg-slate-800 text-white border-b border-slate-700 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-md">
 	<div class="flex items-center gap-4 flex-wrap">
-		<span class="text-xs font-semibold uppercase tracking-wider text-slate-300">Pengaturan TTD Petugas:</span>
+		<span class="text-xs font-semibold uppercase tracking-wider text-slate-300">Pengaturan TTD & Waktu:</span>
 		
 		<div class="flex items-center gap-1.5">
 			<label for="p1-select" class="text-xs text-slate-300 font-medium">Pengawas 1:</label>
-			<select id="p1-select" bind:value={proctor1Id} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-indigo-400 max-w-[150px]">
+			<select id="p1-select" bind:value={proctor1Id} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-400 max-w-[140px]">
 				<option value="">-- Pilih Pengawas 1 --</option>
 				{#each proctorOptions as p}
 					<option value={p.id}>{p.name}</option>
@@ -88,7 +177,7 @@
 
 		<div class="flex items-center gap-1.5">
 			<label for="p2-select" class="text-xs text-slate-300 font-medium">Pengawas 2:</label>
-			<select id="p2-select" bind:value={proctor2Id} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-indigo-400 max-w-[150px]">
+			<select id="p2-select" bind:value={proctor2Id} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-400 max-w-[140px]">
 				<option value="">-- Kosongkan --</option>
 				{#each proctorOptions as p}
 					<option value={p.id}>{p.name}</option>
@@ -98,7 +187,7 @@
 
 		<div class="flex items-center gap-1.5">
 			<label for="pt-select" class="text-xs text-slate-300 font-medium">Proktor/Teknisi:</label>
-			<select id="pt-select" bind:value={proctorTechId} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-indigo-400 max-w-[150px]">
+			<select id="pt-select" bind:value={proctorTechId} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-400 max-w-[140px]">
 				<option value="">-- Kosongkan --</option>
 				{#each proctorOptions as p}
 					<option value={p.id}>{p.name}</option>
@@ -108,12 +197,28 @@
 
 		<div class="flex items-center gap-1.5">
 			<label for="cm-select" class="text-xs text-slate-300 font-medium">Panitia Ujian:</label>
-			<select id="cm-select" bind:value={committeeId} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-indigo-400 max-w-[150px]">
+			<select id="cm-select" bind:value={committeeId} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-400 max-w-[140px]">
 				<option value="">-- Kosongkan --</option>
 				{#each proctorOptions as p}
 					<option value={p.id}>{p.name}</option>
 				{/each}
 			</select>
+		</div>
+
+		<!-- Date / Time inputs -->
+		<div class="flex items-center gap-1.5 border-l border-slate-600 pl-3">
+			<label for="date-override" class="text-xs text-slate-300 font-medium">Tgl:</label>
+			<input id="date-override" type="date" bind:value={customDateStr} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1" />
+		</div>
+
+		<div class="flex items-center gap-1.5">
+			<label for="start-override" class="text-xs text-slate-300 font-medium">Mulai:</label>
+			<input id="start-override" type="time" bind:value={customStartTime} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1" />
+		</div>
+
+		<div class="flex items-center gap-1.5">
+			<label for="end-override" class="text-xs text-slate-300 font-medium">Selesai:</label>
+			<input id="end-override" type="time" bind:value={customEndTime} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1" />
 		</div>
 	</div>
 
@@ -133,8 +238,8 @@
 	{#each Object.entries(sessionsDict) as [sessionNumStr, count], sessionIdx}
 		{@const sessionNum = parseInt(sessionNumStr)}
 		{@const sessionData = sessionMap?.[sessionNum]}
-		{@const effectiveStart = sessionData?.start_time || exam.start_time}
-		{@const effectiveEnd = sessionData?.end_time || exam.end_time}
+		{@const effectiveStart = resolveStart(sessionData, exam, customDateStr, customStartTime)}
+		{@const effectiveEnd = resolveEnd(sessionData, exam, customDateStr, customEndTime)}
 		{@const locationStr = [
 			school?.district ? `Kecamatan ${school.district}` : '',
 			school?.city ? (school.city.toLowerCase().startsWith('kab') || school.city.toLowerCase().startsWith('kota') ? school.city : `Kabupaten ${school.city}`) : '',
@@ -196,10 +301,10 @@
 
 			<!-- Isu/Paragraf Pembuka -->
 			<p class="mb-4 text-justify">
-				Pada hari ini <span class="border-b border-dotted border-black px-2">{effectiveStart ? parseDate(effectiveStart).toLocaleDateString('id-ID', { weekday: 'long' }) : '................'}</span> 
-				tanggal <span class="border-b border-dotted border-black px-2">{effectiveStart ? parseDate(effectiveStart).getDate() : '......'}</span> 
-				bulan <span class="border-b border-dotted border-black px-2">{effectiveStart ? parseDate(effectiveStart).toLocaleDateString('id-ID', { month: 'long' }) : '................'}</span> 
-				tahun <span class="border-b border-dotted border-black px-2">{effectiveStart ? parseDate(effectiveStart).getFullYear() : '..........'}</span>, 
+				Pada hari ini <span class="border-b border-dotted border-black px-2">{getDayName(effectiveStart)}</span> 
+				tanggal <span class="border-b border-dotted border-black px-2">{getDayNumber(effectiveStart)}</span> 
+				bulan <span class="border-b border-dotted border-black px-2">{getMonthName(effectiveStart)}</span> 
+				tahun <span class="border-b border-dotted border-black px-2">{getYearNumber(effectiveStart)}</span>, 
 				telah diselenggarakan <strong class="uppercase">{exam.exam_type_name || exam.title}</strong> Mata Pelajaran <strong>{exam.subject_name || 'Umum'}</strong> untuk:
 			</p>
 
@@ -254,7 +359,7 @@
 
 				<div class="flex justify-end pt-2">
 					<div class="w-72 text-center">
-						<p class="text-xs text-slate-700 mb-1">{locationCity}, {formatDate(effectiveStart)}</p>
+						<p class="text-xs text-slate-700 mb-1">{locationCity}, {formatDateFull(effectiveStart)}</p>
 						<p class="font-medium mb-14">Kepala Madrasah,</p>
 						<p class="border-b border-black font-bold inline-block px-3">{school?.principal_name || '( .................................... )'}</p>
 						<p class="text-xs mt-1">NIP. {school?.principal_nip || '..............................'}</p>

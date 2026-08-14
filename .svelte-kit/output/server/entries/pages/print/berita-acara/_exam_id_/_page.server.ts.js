@@ -6,7 +6,14 @@ const load = async ({ platform, params, locals }) => {
   const examId = parseInt(examIdStr, 10);
   if (isNaN(examId)) throw error(400, "ID Ujian tidak valid");
   const school = await db.prepare("SELECT * FROM schools WHERE id = ?").bind(locals.user.school_id).first();
-  const exam = await db.prepare("SELECT e.*, s.name as subject_name, et.name as exam_type_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id LEFT JOIN exam_types et ON e.exam_type_id = et.id WHERE e.id = ? AND e.school_id = ?").bind(examId, locals.user.school_id).first();
+  const exam = await db.prepare(`
+		SELECT e.*, s.name as subject_name, et.name as exam_type_name,
+		       et.start_time as exam_type_start_time, et.end_time as exam_type_end_time
+		FROM exams e 
+		LEFT JOIN subjects s ON e.subject_id = s.id 
+		LEFT JOIN exam_types et ON e.exam_type_id = et.id 
+		WHERE e.id = ? AND e.school_id = ?
+	`).bind(examId, locals.user.school_id).first();
   if (!exam) throw error(404, "Ujian tidak ditemukan");
   const participantsGroupedRaw = await db.prepare(`
 		SELECT r.name as room_name, u.session_number, COUNT(p.id) as count

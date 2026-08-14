@@ -1,4 +1,4 @@
-import { h as head, i as ensure_array_like, e as escape_html, j as attr_class, l as clsx, k as attr, f as bind_props } from "../../../../../chunks/index.js";
+import { h as head, i as ensure_array_like, e as escape_html, k as attr, j as attr_class, l as clsx, f as bind_props } from "../../../../../chunks/index.js";
 import { p as parseDate } from "../../../../../chunks/date.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
@@ -8,8 +8,44 @@ function _page($$renderer, $$props) {
     let proctor2Id = data.defaultProctor2Id || "";
     let proctorTechId = "";
     let committeeId = "";
+    let customDateStr = "";
+    let customStartTime = "";
+    let customEndTime = "";
+    function resolveStart(sessionData, exam2, customDate, customTime) {
+      if (sessionData?.start_time && sessionData.start_time.trim()) {
+        const s = sessionData.start_time.trim();
+        if (s.includes("-") || s.includes("/")) return s;
+        const baseDateStr = exam2?.start_time || exam2?.exam_type_start_time || (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
+        const datePart = baseDateStr.split(/[T ]/)[0];
+        return `${datePart}T${s.slice(0, 5)}:00`;
+      }
+      if (exam2?.start_time && exam2.start_time.trim()) {
+        return exam2.start_time.trim();
+      }
+      if (exam2?.exam_type_start_time && exam2.exam_type_start_time.trim()) {
+        return exam2.exam_type_start_time.trim();
+      }
+      return null;
+    }
+    function resolveEnd(sessionData, exam2, customDate, customTime) {
+      if (sessionData?.end_time && sessionData.end_time.trim()) {
+        const s = sessionData.end_time.trim();
+        if (s.includes("-") || s.includes("/")) return s;
+        const baseDateStr = exam2?.end_time || exam2?.start_time || exam2?.exam_type_end_time || (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
+        const datePart = baseDateStr.split(/[T ]/)[0];
+        return `${datePart}T${s.slice(0, 5)}:00`;
+      }
+      if (exam2?.end_time && exam2.end_time.trim()) {
+        return exam2.end_time.trim();
+      }
+      if (exam2?.exam_type_end_time && exam2.exam_type_end_time.trim()) {
+        return exam2.exam_type_end_time.trim();
+      }
+      return null;
+    }
     function getAcademicYear(dateStr) {
-      const d = dateStr ? parseDate(dateStr) : /* @__PURE__ */ new Date();
+      if (!dateStr) return "2025/2026";
+      const d = parseDate(dateStr);
       const validDate = isNaN(d.getTime()) ? /* @__PURE__ */ new Date() : d;
       const year = validDate.getFullYear();
       const month = validDate.getMonth() + 1;
@@ -19,8 +55,32 @@ function _page($$renderer, $$props) {
         return `${year - 1}/${year}`;
       }
     }
-    function formatDate(dateStr) {
-      if (!dateStr || dateStr === "-") return "......................";
+    function getDayName(dateStr) {
+      if (!dateStr) return "................";
+      const d = parseDate(dateStr);
+      if (isNaN(d.getTime())) return "................";
+      return d.toLocaleDateString("id-ID", { weekday: "long" });
+    }
+    function getDayNumber(dateStr) {
+      if (!dateStr) return "......";
+      const d = parseDate(dateStr);
+      if (isNaN(d.getTime())) return "......";
+      return d.getDate().toString();
+    }
+    function getMonthName(dateStr) {
+      if (!dateStr) return "................";
+      const d = parseDate(dateStr);
+      if (isNaN(d.getTime())) return "................";
+      return d.toLocaleDateString("id-ID", { month: "long" });
+    }
+    function getYearNumber(dateStr) {
+      if (!dateStr) return "..........";
+      const d = parseDate(dateStr);
+      if (isNaN(d.getTime())) return "..........";
+      return d.getFullYear().toString();
+    }
+    function formatDateFull(dateStr) {
+      if (!dateStr) return "......................";
       const date = parseDate(dateStr);
       if (isNaN(date.getTime())) return "......................";
       return date.toLocaleDateString("id-ID", {
@@ -32,10 +92,11 @@ function _page($$renderer, $$props) {
     }
     function formatTime(timeStr) {
       if (!timeStr) return "....";
-      if (timeStr.length <= 5) return timeStr;
-      if (timeStr.includes("T")) return timeStr.split("T")[1].slice(0, 5);
-      if (timeStr.includes(" ")) return timeStr.split(" ")[1].slice(0, 5);
-      return timeStr.slice(0, 5);
+      const str = String(timeStr).trim();
+      if (str.includes("T")) return str.split("T")[1].slice(0, 5).replace(":", ".");
+      if (str.includes(" ")) return str.split(" ")[1].slice(0, 5).replace(":", ".");
+      if (str.includes(":")) return str.slice(0, 5).replace(":", ".");
+      return str;
     }
     school = data.school;
     exam = data.exam;
@@ -52,12 +113,12 @@ function _page($$renderer, $$props) {
         $$renderer4.push(`<title>Berita Acara - ${escape_html(exam.exam_type_name || exam.title)}</title>`);
       });
     });
-    $$renderer2.push(`<div class="no-print p-4 bg-slate-800 text-white border-b border-slate-700 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-md svelte-npx4lb"><div class="flex items-center gap-4 flex-wrap"><span class="text-xs font-semibold uppercase tracking-wider text-slate-300">Pengaturan TTD Petugas:</span> <div class="flex items-center gap-1.5"><label for="p1-select" class="text-xs text-slate-300 font-medium">Pengawas 1:</label> `);
+    $$renderer2.push(`<div class="no-print p-4 bg-slate-800 text-white border-b border-slate-700 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-md svelte-npx4lb"><div class="flex items-center gap-4 flex-wrap"><span class="text-xs font-semibold uppercase tracking-wider text-slate-300">Pengaturan TTD &amp; Waktu:</span> <div class="flex items-center gap-1.5"><label for="p1-select" class="text-xs text-slate-300 font-medium">Pengawas 1:</label> `);
     $$renderer2.select(
       {
         id: "p1-select",
         value: proctor1Id,
-        class: "bg-slate-700 text-white text-xs border border-slate-600 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-indigo-400 max-w-[150px]"
+        class: "bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-400 max-w-[140px]"
       },
       ($$renderer3) => {
         $$renderer3.option({ value: "" }, ($$renderer4) => {
@@ -79,7 +140,7 @@ function _page($$renderer, $$props) {
       {
         id: "p2-select",
         value: proctor2Id,
-        class: "bg-slate-700 text-white text-xs border border-slate-600 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-indigo-400 max-w-[150px]"
+        class: "bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-400 max-w-[140px]"
       },
       ($$renderer3) => {
         $$renderer3.option({ value: "" }, ($$renderer4) => {
@@ -101,7 +162,7 @@ function _page($$renderer, $$props) {
       {
         id: "pt-select",
         value: proctorTechId,
-        class: "bg-slate-700 text-white text-xs border border-slate-600 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-indigo-400 max-w-[150px]"
+        class: "bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-400 max-w-[140px]"
       },
       ($$renderer3) => {
         $$renderer3.option({ value: "" }, ($$renderer4) => {
@@ -123,7 +184,7 @@ function _page($$renderer, $$props) {
       {
         id: "cm-select",
         value: committeeId,
-        class: "bg-slate-700 text-white text-xs border border-slate-600 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-indigo-400 max-w-[150px]"
+        class: "bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-400 max-w-[140px]"
       },
       ($$renderer3) => {
         $$renderer3.option({ value: "" }, ($$renderer4) => {
@@ -140,7 +201,7 @@ function _page($$renderer, $$props) {
         $$renderer3.push(`<!--]-->`);
       }
     );
-    $$renderer2.push(`</div></div> <div class="flex items-center gap-2"><button class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-medium transition-colors">Tutup</button> <button class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-xs font-bold transition-colors flex items-center gap-1.5 shadow"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg> Cetak Berita Acara</button></div></div> <div class="p-4 md:p-8 max-w-4xl mx-auto font-serif text-[15px] leading-snug print:p-0 print:m-0 bg-white"><!--[-->`);
+    $$renderer2.push(`</div> <div class="flex items-center gap-1.5 border-l border-slate-600 pl-3"><label for="date-override" class="text-xs text-slate-300 font-medium">Tgl:</label> <input id="date-override" type="date"${attr("value", customDateStr)} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1"/></div> <div class="flex items-center gap-1.5"><label for="start-override" class="text-xs text-slate-300 font-medium">Mulai:</label> <input id="start-override" type="time"${attr("value", customStartTime)} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1"/></div> <div class="flex items-center gap-1.5"><label for="end-override" class="text-xs text-slate-300 font-medium">Selesai:</label> <input id="end-override" type="time"${attr("value", customEndTime)} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1"/></div></div> <div class="flex items-center gap-2"><button class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-medium transition-colors">Tutup</button> <button class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-xs font-bold transition-colors flex items-center gap-1.5 shadow"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg> Cetak Berita Acara</button></div></div> <div class="p-4 md:p-8 max-w-4xl mx-auto font-serif text-[15px] leading-snug print:p-0 print:m-0 bg-white"><!--[-->`);
     const each_array_4 = ensure_array_like(Object.entries(participantsGrouped));
     for (let roomIdx = 0, $$length = each_array_4.length; roomIdx < $$length; roomIdx++) {
       let [roomName, sessionsDict] = each_array_4[roomIdx];
@@ -150,8 +211,8 @@ function _page($$renderer, $$props) {
         let [sessionNumStr, count] = each_array_5[sessionIdx];
         const sessionNum = parseInt(sessionNumStr);
         const sessionData = sessionMap?.[sessionNum];
-        const effectiveStart = sessionData?.start_time || exam.start_time;
-        const effectiveEnd = sessionData?.end_time || exam.end_time;
+        const effectiveStart = resolveStart(sessionData, exam);
+        const effectiveEnd = resolveEnd(sessionData, exam);
         const locationStr = [
           school?.district ? `Kecamatan ${school.district}` : "",
           school?.city ? school.city.toLowerCase().startsWith("kab") || school.city.toLowerCase().startsWith("kota") ? school.city : `Kabupaten ${school.city}` : "",
@@ -190,14 +251,14 @@ function _page($$renderer, $$props) {
           $$renderer2.push("<!--[-1-->");
           $$renderer2.push(`<div class="w-20 h-20 shrink-0"></div>`);
         }
-        $$renderer2.push(`<!--]--></div> <div class="mt-2 mb-5"><div style="border-bottom: 1px solid #000;"></div> <div style="border-bottom: 2.5px solid #000; margin-top: 2px;"></div></div> <div class="text-center mb-6"><h1 class="font-bold text-lg uppercase underline tracking-wider mb-1">BERITA ACARA PELAKSANAAN UJIAN</h1> <p class="text-sm font-medium">Tahun Ajaran ${escape_html(getAcademicYear(effectiveStart))}</p></div> <p class="mb-4 text-justify">Pada hari ini <span class="border-b border-dotted border-black px-2">${escape_html(effectiveStart ? parseDate(effectiveStart).toLocaleDateString("id-ID", { weekday: "long" }) : "................")}</span> tanggal <span class="border-b border-dotted border-black px-2">${escape_html(effectiveStart ? parseDate(effectiveStart).getDate() : "......")}</span> bulan <span class="border-b border-dotted border-black px-2">${escape_html(effectiveStart ? parseDate(effectiveStart).toLocaleDateString("id-ID", { month: "long" }) : "................")}</span> tahun <span class="border-b border-dotted border-black px-2">${escape_html(effectiveStart ? parseDate(effectiveStart).getFullYear() : "..........")}</span>, 
+        $$renderer2.push(`<!--]--></div> <div class="mt-2 mb-5"><div style="border-bottom: 1px solid #000;"></div> <div style="border-bottom: 2.5px solid #000; margin-top: 2px;"></div></div> <div class="text-center mb-6"><h1 class="font-bold text-lg uppercase underline tracking-wider mb-1">BERITA ACARA PELAKSANAAN UJIAN</h1> <p class="text-sm font-medium">Tahun Ajaran ${escape_html(getAcademicYear(effectiveStart))}</p></div> <p class="mb-4 text-justify">Pada hari ini <span class="border-b border-dotted border-black px-2">${escape_html(getDayName(effectiveStart))}</span> tanggal <span class="border-b border-dotted border-black px-2">${escape_html(getDayNumber(effectiveStart))}</span> bulan <span class="border-b border-dotted border-black px-2">${escape_html(getMonthName(effectiveStart))}</span> tahun <span class="border-b border-dotted border-black px-2">${escape_html(getYearNumber(effectiveStart))}</span>, 
 				telah diselenggarakan <strong class="uppercase">${escape_html(exam.exam_type_name || exam.title)}</strong> Mata Pelajaran <strong>${escape_html(exam.subject_name || "Umum")}</strong> untuk:</p> <div class="ml-4 mb-6"><table class="w-full"><tbody><tr class="align-top"><td class="w-48 py-1">a. Satuan Pendidikan</td><td class="w-4 py-1">:</td><td class="py-1 font-bold uppercase">${escape_html(school?.name || "-")}</td></tr><tr class="align-top"><td class="py-1">b. Ruang / Sesi Ujian</td><td class="py-1">:</td><td class="py-1 font-bold">${escape_html(roomName)} / Sesi ${escape_html(sessionNum)}</td></tr><tr class="align-top"><td class="py-1">c. Waktu Pelaksanaan</td><td class="py-1">:</td><td class="py-1">${escape_html(formatTime(effectiveStart))} s.d. ${escape_html(formatTime(effectiveEnd))} WIB</td></tr><tr class="align-top"><td class="py-1">d. Jumlah Peserta Seharusnya</td><td class="py-1">:</td><td class="py-1">${escape_html(count)} Orang</td></tr><tr class="align-top"><td class="py-1">e. Jumlah Peserta Hadir</td><td class="py-1">:</td><td class="py-1">........... Orang</td></tr><tr class="align-top"><td class="py-1">f. Jumlah Peserta Tidak Hadir</td><td class="py-1">:</td><td class="py-1">........... Orang</td></tr><tr class="align-top"><td class="py-1.5 pl-4 text-sm font-sans" colspan="3"><div class="flex items-baseline gap-2"><span>- Nomor Peserta yang Tidak Hadir:</span> <span class="border-b border-dotted border-black flex-1 min-h-[1.2rem]"></span></div> <div class="mt-1.5"><span class="border-b border-dotted border-black block w-full min-h-[1.2rem]"></span></div></td></tr></tbody></table></div> <div class="mb-6"><p class="mb-2 font-bold">Catatan / Kejadian Penting Selama Ujian Berlangsung:</p> <div class="border border-black p-3 min-h-[90px] text-xs font-mono text-slate-500 rounded"><span class="print:hidden">( Kosongkan jika pelaksanaan ujian berjalan tertib dan lancar )</span></div></div> <p class="mb-8">Demikian Berita Acara ini dibuat dengan sesungguhnya untuk dipergunakan sebagaimana mestinya.</p> <div class="mt-8 text-sm"><div class="grid grid-cols-2 md:grid-cols-3 gap-6 text-center mb-8"><!--[-->`);
         const each_array_6 = ensure_array_like(activeOfficers);
         for (let $$index_4 = 0, $$length3 = each_array_6.length; $$index_4 < $$length3; $$index_4++) {
           let officer = each_array_6[$$index_4];
           $$renderer2.push(`<div><p class="font-medium mb-14">${escape_html(officer.role)},</p> <p class="border-b border-black font-bold inline-block px-3">${escape_html(officer.data?.name || "( .................................... )")}</p> <p class="text-xs mt-1">NIP. ${escape_html(officer.data?.nip || "..............................")}</p></div>`);
         }
-        $$renderer2.push(`<!--]--></div> <div class="flex justify-end pt-2"><div class="w-72 text-center"><p class="text-xs text-slate-700 mb-1">${escape_html(locationCity)}, ${escape_html(formatDate(effectiveStart))}</p> <p class="font-medium mb-14">Kepala Madrasah,</p> <p class="border-b border-black font-bold inline-block px-3">${escape_html(school?.principal_name || "( .................................... )")}</p> <p class="text-xs mt-1">NIP. ${escape_html(school?.principal_nip || "..............................")}</p></div></div></div></div>`);
+        $$renderer2.push(`<!--]--></div> <div class="flex justify-end pt-2"><div class="w-72 text-center"><p class="text-xs text-slate-700 mb-1">${escape_html(locationCity)}, ${escape_html(formatDateFull(effectiveStart))}</p> <p class="font-medium mb-14">Kepala Madrasah,</p> <p class="border-b border-black font-bold inline-block px-3">${escape_html(school?.principal_name || "( .................................... )")}</p> <p class="text-xs mt-1">NIP. ${escape_html(school?.principal_nip || "..............................")}</p></div></div></div></div>`);
       }
       $$renderer2.push(`<!--]-->`);
     }
