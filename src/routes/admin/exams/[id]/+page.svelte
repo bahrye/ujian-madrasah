@@ -18,6 +18,7 @@
 	$: allTeachers = data.allTeachers as any[];
 	$: examTeachers = data.examTeachers as any[];
 	$: examProctors = data.examProctors as any[];
+	$: hasSessionsOrRooms = data.hasSessions || (data.examRooms && data.examRooms.length > 0);
 
 	let showAddParticipantModal = false;
 	let addParticipantTab: 'class' | 'student' = 'class';
@@ -264,7 +265,7 @@
 				<p class="text-xs text-slate-500 mt-0.5">Tentukan sesi dan ruang mengawas untuk setiap pengawas.</p>
 			</div>
 			<div class="flex items-center gap-2">
-				{#if examProctors.length > 0}
+				{#if examProctors.length > 0 && hasSessionsOrRooms}
 					<button type="submit" form="proctors-form" disabled={isSavingProctors} class="btn-sm btn-primary flex items-center gap-1.5 shadow-sm">
 						{#if isSavingProctors}
 							<span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
@@ -379,7 +380,7 @@
 				<p class="text-xs text-slate-500 mt-0.5">Tentukan sesi dan ruang untuk peserta ujian.</p>
 			</div>
 			<div class="flex items-center gap-2">
-				{#if participants.length > 0}
+				{#if participants.length > 0 && hasSessionsOrRooms}
 					<button type="submit" form="participants-form" disabled={isSavingParticipants} class="btn-sm btn-primary flex items-center gap-1.5 shadow-sm">
 						{#if isSavingParticipants}
 							<span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>

@@ -12,7 +12,7 @@ import "katex/dist/contrib/auto-render.mjs";
 import { t as toasts } from "../../../../../chunks/toast.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
-    let exam, questions, attempts, tokens, participants, examTeachers, examProctors;
+    let exam, questions, attempts, tokens, participants, examTeachers, examProctors, hasSessionsOrRooms;
     let form = fallback($$props["form"], null);
     let data = $$props["data"];
     let studentSearch = "";
@@ -26,6 +26,7 @@ function _page($$renderer, $$props) {
     data.allTeachers;
     examTeachers = data.examTeachers;
     examProctors = data.examProctors;
+    hasSessionsOrRooms = data.hasSessions || data.examRooms && data.examRooms.length > 0;
     data.allStudents ? data.allStudents.filter((s) => {
       const matchesSearch = s.name.toLowerCase().includes(studentSearch.toLowerCase()) || s.username.toLowerCase().includes(studentSearch.toLowerCase());
       const matchesClass = true;
@@ -142,7 +143,7 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<!--]--></tbody></table></div>`);
     }
     $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden mb-6"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><div><h2 class="text-lg font-bold text-slate-800">Daftar Pengawas Ujian</h2> <p class="text-xs text-slate-500 mt-0.5">Tentukan sesi dan ruang mengawas untuk setiap pengawas.</p></div> <div class="flex items-center gap-2">`);
-    if (examProctors.length > 0) {
+    if (examProctors.length > 0 && hasSessionsOrRooms) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<button type="submit" form="proctors-form"${attr("disabled", isSavingProctors, true)} class="btn-sm btn-primary flex items-center gap-1.5 shadow-sm">`);
       {
@@ -236,7 +237,7 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<!--]--></tbody></table></div></form>`);
     }
     $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden mb-6"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><div><h2 class="text-lg font-bold text-slate-800">Daftar Peserta Ujian</h2> <p class="text-xs text-slate-500 mt-0.5">Tentukan sesi dan ruang untuk peserta ujian.</p></div> <div class="flex items-center gap-2">`);
-    if (participants.length > 0) {
+    if (participants.length > 0 && hasSessionsOrRooms) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<button type="submit" form="participants-form"${attr("disabled", isSavingParticipants, true)} class="btn-sm btn-primary flex items-center gap-1.5 shadow-sm">`);
       {
