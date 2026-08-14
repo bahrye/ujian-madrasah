@@ -1,6 +1,6 @@
 // @ts-nocheck
 import type { PageServerLoad } from './$types';
-import { getDB, ensureProctorRoleColumn } from '$lib/server/db';
+import { getDB, ensureProctorRoleColumn, ensureExamTypeProctorsTable } from '$lib/server/db';
 import { error } from '@sveltejs/kit';
 
 export const load = async ({ platform, params, locals }: Parameters<PageServerLoad>[0]) => {
@@ -62,8 +62,9 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 	}
 
 	await ensureProctorRoleColumn(db);
+	await ensureExamTypeProctorsTable(db);
 
-	// Fetch proctors assigned to this exam
+	// Fetch proctors assigned to this specific exam (Pengawas 1 & 2)
 	const assignedProctorsRes = await db.prepare(`
 		SELECT DISTINCT u.id, u.name, u.nip, u.role, COALESCE(ep.proctor_role, 'p1') as proctor_role
 		FROM exam_proctors ep
@@ -71,6 +72,18 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 		WHERE ep.exam_id = ?
 		ORDER BY ep.id ASC
 	`).bind(examId).all();
+
+	// Fetch Proktor & Panitia assigned to this exam's Exam Type (exam_type_proctors)
+	let typeProctorsRes = { results: [] as any[] };
+	if ((exam as any).exam_type_id) {
+		typeProctorsRes = await db.prepare(`
+			SELECT DISTINCT u.id, u.name, u.nip, u.role, COALESCE(etp.proctor_role, 'pt') as proctor_role
+			FROM exam_type_proctors etp
+			JOIN users u ON etp.proctor_id = u.id
+			WHERE etp.exam_type_id = ?
+			ORDER BY etp.id ASC
+		`).bind((exam as any).exam_type_id).all();
+	}
 
 	// Fetch all teachers/proctors/admins in the school
 	const schoolTeachersRes = await db.prepare(`
@@ -81,18 +94,25 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 	`).bind(locals.user!.school_id).all();
 
 	const assignedProctors = (assignedProctorsRes.results || []) as any[];
+	const typeProctors = (typeProctorsRes.results || []) as any[];
 	const schoolTeachers = (schoolTeachersRes.results || []) as any[];
 
-	const assignedIds = new Set(assignedProctors.map(p => p.id));
+	const assignedIds = new Set([...assignedProctors.map(p => p.id), ...typeProctors.map(p => p.id)]);
 	const proctorOptions = [
 		...assignedProctors,
+		...typeProctors,
 		...schoolTeachers.filter(t => !assignedIds.has(t.id))
 	];
 
+	// Pengawas 1 & 2 from assignedProctors (specific exam)
 	const p1Obj = assignedProctors.find(p => p.proctor_role === 'p1' || p.proctor_role === 'Pengawas 1');
 	const p2Obj = assignedProctors.find(p => p.proctor_role === 'p2' || p.proctor_role === 'Pengawas 2');
-	const ptObj = assignedProctors.find(p => p.proctor_role === 'pt' || p.proctor_role === 'Proktor / Teknisi');
-	const cmObj = assignedProctors.find(p => p.proctor_role === 'cm' || p.proctor_role === 'Panitia Ujian');
+
+	// Proktor / Teknisi & Panitia Ujian from typeProctors (exam type level)
+	const ptObj = typeProctors.find(p => p.proctor_role === 'pt' || p.proctor_role === 'Proktor / Teknisi')
+		|| assignedProctors.find(p => p.proctor_role === 'pt' || p.proctor_role === 'Proktor / Teknisi');
+	const cmObj = typeProctors.find(p => p.proctor_role === 'cm' || p.proctor_role === 'Panitia Ujian')
+		|| assignedProctors.find(p => p.proctor_role === 'cm' || p.proctor_role === 'Panitia Ujian');
 
 	const defaultProctor1Id = p1Obj?.id || assignedProctors[0]?.id || proctorOptions[0]?.id || '';
 	const defaultProctor2Id = p2Obj?.id || (assignedProctors.length > 1 && assignedProctors[1]?.id !== defaultProctor1Id ? assignedProctors[1]?.id : '');

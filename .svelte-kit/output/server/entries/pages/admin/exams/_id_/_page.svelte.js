@@ -157,13 +157,13 @@ function _page($$renderer, $$props) {
       }
       $$renderer2.push(`<!--]--></tbody></table></div>`);
     }
-    $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden mb-6"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><div><h2 class="text-lg font-bold text-slate-800">Daftar Pengawas, Proktor, dan Panitia Ujian</h2> <p class="text-xs text-slate-500 mt-0.5">Tentukan penetapan peran, sesi, dan ruang mengawas untuk setiap petugas.</p></div> <div class="flex items-center gap-2">`);
+    $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden mb-6"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><div><h2 class="text-lg font-bold text-slate-800">Daftar Pengawas Ujian</h2> <p class="text-xs text-slate-500 mt-0.5">Tentukan penetapan pengawas, sesi, dan ruang mengawas untuk setiap pengawas.</p></div> <div class="flex items-center gap-2">`);
     if (examProctors.length > 0) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<button type="submit" form="proctors-form"${attr("disabled", isSavingProctors, true)} class="btn-sm btn-primary flex items-center gap-1.5 shadow-sm">`);
       {
         $$renderer2.push("<!--[-1-->");
-        $$renderer2.push(`<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> Simpan Petugas`);
+        $$renderer2.push(`<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> Simpan Pengawas`);
       }
       $$renderer2.push(`<!--]--></button>`);
     } else {
@@ -198,7 +198,7 @@ function _page($$renderer, $$props) {
           {
             name: `role_${proctor.exam_proctor_id}`,
             class: "select select-sm select-bordered w-full max-w-[150px]",
-            value: proctor.proctor_role || "p1"
+            value: proctor.proctor_role === "p2" ? "p2" : "p1"
           },
           ($$renderer3) => {
             $$renderer3.option({ value: "p1" }, ($$renderer4) => {
@@ -206,12 +206,6 @@ function _page($$renderer, $$props) {
             });
             $$renderer3.option({ value: "p2" }, ($$renderer4) => {
               $$renderer4.push(`Pengawas 2`);
-            });
-            $$renderer3.option({ value: "pt" }, ($$renderer4) => {
-              $$renderer4.push(`Proktor / Teknisi`);
-            });
-            $$renderer3.option({ value: "cm" }, ($$renderer4) => {
-              $$renderer4.push(`Panitia Ujian`);
             });
           }
         );

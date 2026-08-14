@@ -283,8 +283,8 @@
 	<div class="card overflow-hidden mb-6">
 		<div class="p-5 border-b border-slate-100 flex items-center justify-between">
 			<div>
-				<h2 class="text-lg font-bold text-slate-800">Daftar Pengawas, Proktor, dan Panitia Ujian</h2>
-				<p class="text-xs text-slate-500 mt-0.5">Tentukan penetapan peran, sesi, dan ruang mengawas untuk setiap petugas.</p>
+				<h2 class="text-lg font-bold text-slate-800">Daftar Pengawas Ujian</h2>
+				<p class="text-xs text-slate-500 mt-0.5">Tentukan penetapan pengawas, sesi, dan ruang mengawas untuk setiap pengawas.</p>
 			</div>
 			<div class="flex items-center gap-2">
 				{#if examProctors.length > 0}
@@ -296,7 +296,7 @@
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
 							</svg>
-							Simpan Petugas
+							Simpan Pengawas
 						{/if}
 					</button>
 				{/if}
@@ -339,11 +339,9 @@
 									</td>
 									<td class="font-mono text-sm text-slate-500">{proctor.username}</td>
 									<td>
-										<select name={`role_${proctor.exam_proctor_id}`} class="select select-sm select-bordered w-full max-w-[150px]" value={proctor.proctor_role || 'p1'}>
+										<select name={`role_${proctor.exam_proctor_id}`} class="select select-sm select-bordered w-full max-w-[150px]" value={proctor.proctor_role === 'p2' ? 'p2' : 'p1'}>
 											<option value="p1">Pengawas 1</option>
 											<option value="p2">Pengawas 2</option>
-											<option value="pt">Proktor / Teknisi</option>
-											<option value="cm">Panitia Ujian</option>
 										</select>
 									</td>
 									{#if data.hasSessions}

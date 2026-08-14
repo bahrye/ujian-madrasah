@@ -1,4 +1,4 @@
-import { g as getDB, a as ensureProctorRoleColumn } from "../../../../../chunks/db.js";
+import { g as getDB, a as ensureProctorRoleColumn, e as ensureExamTypeProctorsTable } from "../../../../../chunks/db.js";
 import { error } from "@sveltejs/kit";
 const load = async ({ platform, params, locals }) => {
   const db = getDB(platform);
@@ -45,6 +45,7 @@ const load = async ({ platform, params, locals }) => {
     }
   }
   await ensureProctorRoleColumn(db);
+  await ensureExamTypeProctorsTable(db);
   const assignedProctorsRes = await db.prepare(`
 		SELECT DISTINCT u.id, u.name, u.nip, u.role, COALESCE(ep.proctor_role, 'p1') as proctor_role
 		FROM exam_proctors ep
@@ -52,6 +53,16 @@ const load = async ({ platform, params, locals }) => {
 		WHERE ep.exam_id = ?
 		ORDER BY ep.id ASC
 	`).bind(examId).all();
+  let typeProctorsRes = { results: [] };
+  if (exam.exam_type_id) {
+    typeProctorsRes = await db.prepare(`
+			SELECT DISTINCT u.id, u.name, u.nip, u.role, COALESCE(etp.proctor_role, 'pt') as proctor_role
+			FROM exam_type_proctors etp
+			JOIN users u ON etp.proctor_id = u.id
+			WHERE etp.exam_type_id = ?
+			ORDER BY etp.id ASC
+		`).bind(exam.exam_type_id).all();
+  }
   const schoolTeachersRes = await db.prepare(`
 		SELECT id, name, nip, role
 		FROM users
@@ -59,16 +70,18 @@ const load = async ({ platform, params, locals }) => {
 		ORDER BY name ASC
 	`).bind(locals.user.school_id).all();
   const assignedProctors = assignedProctorsRes.results || [];
+  const typeProctors = typeProctorsRes.results || [];
   const schoolTeachers = schoolTeachersRes.results || [];
-  const assignedIds = new Set(assignedProctors.map((p) => p.id));
+  const assignedIds = /* @__PURE__ */ new Set([...assignedProctors.map((p) => p.id), ...typeProctors.map((p) => p.id)]);
   const proctorOptions = [
     ...assignedProctors,
+    ...typeProctors,
     ...schoolTeachers.filter((t) => !assignedIds.has(t.id))
   ];
   const p1Obj = assignedProctors.find((p) => p.proctor_role === "p1" || p.proctor_role === "Pengawas 1");
   const p2Obj = assignedProctors.find((p) => p.proctor_role === "p2" || p.proctor_role === "Pengawas 2");
-  const ptObj = assignedProctors.find((p) => p.proctor_role === "pt" || p.proctor_role === "Proktor / Teknisi");
-  const cmObj = assignedProctors.find((p) => p.proctor_role === "cm" || p.proctor_role === "Panitia Ujian");
+  const ptObj = typeProctors.find((p) => p.proctor_role === "pt" || p.proctor_role === "Proktor / Teknisi") || assignedProctors.find((p) => p.proctor_role === "pt" || p.proctor_role === "Proktor / Teknisi");
+  const cmObj = typeProctors.find((p) => p.proctor_role === "cm" || p.proctor_role === "Panitia Ujian") || assignedProctors.find((p) => p.proctor_role === "cm" || p.proctor_role === "Panitia Ujian");
   const defaultProctor1Id = p1Obj?.id || assignedProctors[0]?.id || proctorOptions[0]?.id || "";
   const defaultProctor2Id = p2Obj?.id || (assignedProctors.length > 1 && assignedProctors[1]?.id !== defaultProctor1Id ? assignedProctors[1]?.id : "");
   const defaultProctorTechId = ptObj?.id || "";
