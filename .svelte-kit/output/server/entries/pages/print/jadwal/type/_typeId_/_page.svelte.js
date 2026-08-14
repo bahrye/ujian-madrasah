@@ -1,4 +1,4 @@
-import { h as head, i as ensure_array_like, j as attr_class, k as attr, e as escape_html, f as bind_props } from "../../../../../../chunks/index.js";
+import { h as head, i as ensure_array_like, j as attr_class, e as escape_html, k as attr, f as bind_props } from "../../../../../../chunks/index.js";
 import { p as parseDate } from "../../../../../../chunks/date.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
@@ -58,22 +58,34 @@ function _page($$renderer, $$props) {
     const each_array = ensure_array_like(participants);
     for (let i = 0, $$length = each_array.length; i < $$length; i++) {
       let p = each_array[i];
-      $$renderer2.push(`<div${attr_class(`p-8 print:p-0 ${i < participants.length - 1 ? "page-break mb-8 print:mb-0 border-b-8 print:border-b-0 border-slate-100" : ""}`)}><div class="flex items-center gap-6 border-b-[3px] border-black pb-4 mb-6">`);
-      if (school?.logo_url) {
-        $$renderer2.push("<!--[0-->");
-        $$renderer2.push(`<img${attr("src", school.logo_url)} alt="Logo" class="w-20 h-20 object-contain"/>`);
-      } else {
-        $$renderer2.push("<!--[-1-->");
-        $$renderer2.push(`<div class="w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center text-slate-400 font-bold text-xl">${escape_html(school?.name?.charAt(0) || "M")}</div>`);
-      }
-      $$renderer2.push(`<!--]--> <div class="text-center flex-1 pr-26"><div class="font-bold text-xl uppercase leading-tight mb-1">${escape_html(school?.name || "")}</div> <div class="text-sm font-medium uppercase mb-1">Jadwal ${escape_html(examType.name)}</div> `);
+      const locationStr = [
+        school?.district ? `Kecamatan ${school.district}` : "",
+        school?.city ? school.city.toLowerCase().startsWith("kab") || school.city.toLowerCase().startsWith("kota") ? school.city : `Kabupaten ${school.city}` : "",
+        school?.province ? school.province : ""
+      ].filter(Boolean).join(", ");
+      $$renderer2.push(`<div${attr_class(`p-8 print:p-0 ${i < participants.length - 1 ? "page-break mb-8 print:mb-0 border-b-8 print:border-b-0 border-slate-100" : ""}`)}><div class="flex items-center justify-between gap-4 pb-3 mb-5 relative" style="border-bottom: 3px double #000;"><img src="/kemenag.png" alt="Logo Kemenag" class="w-20 h-20 object-contain shrink-0"/> <div class="flex-1 text-center font-serif px-2"><h4 class="font-semibold text-sm uppercase tracking-wider text-black m-0 leading-tight">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h4> <h3 class="font-bold text-xl uppercase tracking-wide text-black m-0 my-0.5">${escape_html(school?.name || "NAMA SEKOLAH")}</h3> `);
       if (school?.address) {
         $$renderer2.push("<!--[0-->");
-        $$renderer2.push(`<div class="text-xs">${escape_html(school.address)}</div>`);
+        $$renderer2.push(`<p class="text-xs italic text-black m-0 leading-tight">${escape_html(school.address)}</p>`);
       } else {
         $$renderer2.push("<!--[-1-->");
       }
-      $$renderer2.push(`<!--]--></div></div> <div class="mb-6"><table class="text-sm w-full max-w-md"><tbody><tr><td class="py-1 w-32 font-medium">Nama Peserta</td><td class="py-1 w-4 text-center">:</td><td class="py-1 font-bold">${escape_html(p.student_name)}</td></tr><tr><td class="py-1 font-medium">NISN</td><td class="py-1 text-center">:</td><td class="py-1">${escape_html(p.nisn || "-")}</td></tr><tr><td class="py-1 font-medium">Nomor Peserta</td><td class="py-1 text-center">:</td><td class="py-1">${escape_html(p.nomor_peserta || "-")}</td></tr><tr><td class="py-1 font-medium">Kelas</td><td class="py-1 text-center">:</td><td class="py-1">${escape_html(p.class_name || "-")}</td></tr></tbody></table></div> <div class="border border-black"><table class="w-full text-sm text-left"><thead class="bg-gray-100 border-b border-black"><tr><th class="py-2 px-3 border-r border-black w-12 text-center">No</th><th class="py-2 px-3 border-r border-black">Hari, Tanggal</th><th class="py-2 px-3 border-r border-black">Mata Pelajaran</th><th class="py-2 px-3 border-r border-black text-center">Waktu</th><th class="py-2 px-3 border-r border-black text-center w-24">Sesi</th><th class="py-2 px-3 text-center w-32">Ruang</th></tr></thead><tbody>`);
+      $$renderer2.push(`<!--]--> `);
+      if (locationStr) {
+        $$renderer2.push("<!--[0-->");
+        $$renderer2.push(`<p class="text-xs italic text-black m-0 leading-tight mt-0.5">${escape_html(locationStr)}</p>`);
+      } else {
+        $$renderer2.push("<!--[-1-->");
+      }
+      $$renderer2.push(`<!--]--></div> `);
+      if (school?.logo_url) {
+        $$renderer2.push("<!--[0-->");
+        $$renderer2.push(`<img${attr("src", school.logo_url)} alt="Logo Sekolah" class="w-20 h-20 object-contain shrink-0"/>`);
+      } else {
+        $$renderer2.push("<!--[-1-->");
+        $$renderer2.push(`<div class="w-20 h-20 shrink-0"></div>`);
+      }
+      $$renderer2.push(`<!--]--></div> <div class="mb-6"><table class="text-sm w-full max-w-md"><tbody><tr><td class="py-1 w-32 font-medium">Nama Peserta</td><td class="py-1 w-4 text-center">:</td><td class="py-1 font-bold">${escape_html(p.student_name)}</td></tr><tr><td class="py-1 font-medium">NISN</td><td class="py-1 text-center">:</td><td class="py-1">${escape_html(p.nisn || "-")}</td></tr><tr><td class="py-1 font-medium">Nomor Peserta</td><td class="py-1 text-center">:</td><td class="py-1">${escape_html(p.nomor_peserta || "-")}</td></tr><tr><td class="py-1 font-medium">Kelas</td><td class="py-1 text-center">:</td><td class="py-1">${escape_html(p.class_name || "-")}</td></tr></tbody></table></div> <div class="border border-black"><table class="w-full text-sm text-left"><thead class="bg-gray-100 border-b border-black"><tr><th class="py-2 px-3 border-r border-black w-12 text-center">No</th><th class="py-2 px-3 border-r border-black">Hari, Tanggal</th><th class="py-2 px-3 border-r border-black">Mata Pelajaran</th><th class="py-2 px-3 border-r border-black text-center">Waktu</th><th class="py-2 px-3 border-r border-black text-center w-24">Sesi</th><th class="py-2 px-3 text-center w-32">Ruang</th></tr></thead><tbody>`);
       if (p.schedules && p.schedules.length > 0) {
         $$renderer2.push("<!--[0-->");
         $$renderer2.push(`<!--[-->`);

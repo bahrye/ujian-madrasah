@@ -95,21 +95,34 @@ function _page($$renderer, $$props) {
         const effectiveEnd = sessionData?.end_time || exam.end_time;
         const effectiveDateStr = effectiveStart && effectiveStart.includes("-") ? effectiveStart : exam.start_time;
         const classNames = Array.from(new Set(students.map((s) => s.class_name).filter(Boolean))).join(", ") || "-";
-        $$renderer2.push(`<div${attr_class(clsx(roomIdx > 0 || sessionIdx > 0 ? "break-before-page pt-8" : ""), "svelte-5lujtk")}><div class="text-center mb-6 pb-4 border-b-2 border-black flex items-center">`);
-        if (school?.logo_url) {
-          $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<img${attr("src", school.logo_url)} alt="Logo" class="w-20 h-20 object-contain absolute"/>`);
-        } else {
-          $$renderer2.push("<!--[-1-->");
-        }
-        $$renderer2.push(`<!--]--> <div class="flex-1"><h2 class="font-bold text-lg uppercase tracking-wide">DAFTAR HADIR PESERTA UJIAN</h2> <h3 class="font-bold text-xl uppercase">${escape_html(school?.name || "NAMA SEKOLAH")}</h3> `);
+        const locationStr = [
+          school?.district ? `Kecamatan ${school.district}` : "",
+          school?.city ? school.city.toLowerCase().startsWith("kab") || school.city.toLowerCase().startsWith("kota") ? school.city : `Kabupaten ${school.city}` : "",
+          school?.province ? school.province : ""
+        ].filter(Boolean).join(", ");
+        $$renderer2.push(`<div${attr_class(clsx(roomIdx > 0 || sessionIdx > 0 ? "break-before-page pt-8" : ""), "svelte-5lujtk")}><div class="flex items-center justify-between gap-4 pb-3 mb-5 relative" style="border-bottom: 3px double #000;"><img src="/kemenag.png" alt="Logo Kemenag" class="w-20 h-20 object-contain shrink-0"/> <div class="flex-1 text-center font-serif px-2"><h4 class="font-semibold text-sm uppercase tracking-wider text-black m-0 leading-tight">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h4> <h3 class="font-bold text-xl uppercase tracking-wide text-black m-0 my-0.5">${escape_html(school?.name || "NAMA SEKOLAH")}</h3> `);
         if (school?.address) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<p class="text-sm mt-1">${escape_html(school.address)}</p>`);
+          $$renderer2.push(`<p class="text-xs italic text-black m-0 leading-tight">${escape_html(school.address)}</p>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
-        $$renderer2.push(`<!--]--></div></div> <div class="grid grid-cols-2 gap-4 mb-4 text-sm"><table class="w-full"><tbody><tr><td class="py-1 w-32 font-medium">Ujian</td><td class="w-4">:</td><td>${escape_html(exam.exam_type_name || exam.title)}</td></tr><tr><td class="py-1 font-medium">Mata Pelajaran</td><td>:</td><td>${escape_html(exam.subject_name || "Umum")}</td></tr><tr><td class="py-1 font-medium">Kelas</td><td>:</td><td>${escape_html(classNames)}</td></tr></tbody></table> <table class="w-full"><tbody><tr><td class="py-1 w-32 font-medium">Hari, Tanggal</td><td class="w-4">:</td><td>${escape_html(formatDate(effectiveDateStr))}</td></tr><tr><td class="py-1 font-medium">Waktu</td><td>:</td><td>${escape_html(formatTime(effectiveStart))} - ${escape_html(formatTime(effectiveEnd))}</td></tr>`);
+        $$renderer2.push(`<!--]--> `);
+        if (locationStr) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<p class="text-xs italic text-black m-0 leading-tight mt-0.5">${escape_html(locationStr)}</p>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+        }
+        $$renderer2.push(`<!--]--></div> `);
+        if (school?.logo_url) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<img${attr("src", school.logo_url)} alt="Logo Sekolah" class="w-20 h-20 object-contain shrink-0"/>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<div class="w-20 h-20 shrink-0"></div>`);
+        }
+        $$renderer2.push(`<!--]--></div> <div class="grid grid-cols-2 gap-4 mb-4 text-sm"><table class="w-full"><tbody><tr><td class="py-1 w-32 font-medium">Ujian</td><td class="w-4">:</td><td>${escape_html(exam.exam_type_name || exam.title)}</td></tr><tr><td class="py-1 font-medium">Mata Pelajaran</td><td>:</td><td>${escape_html(exam.subject_name || "Umum")}</td></tr><tr><td class="py-1 font-medium">Kelas</td><td>:</td><td>${escape_html(classNames)}</td></tr></tbody></table> <table class="w-full"><tbody><tr><td class="py-1 w-32 font-medium">Hari, Tanggal</td><td class="w-4">:</td><td>${escape_html(formatDate(effectiveDateStr))}</td></tr><tr><td class="py-1 font-medium">Waktu</td><td>:</td><td>${escape_html(formatTime(effectiveStart))} - ${escape_html(formatTime(effectiveEnd))}</td></tr>`);
         if (data.hasSessions) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<tr><td class="py-1 font-medium">Ruang / Sesi</td><td>:</td><td>${escape_html(roomName)} / Sesi ${escape_html(sessionNum)}</td></tr>`);

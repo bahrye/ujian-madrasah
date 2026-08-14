@@ -67,24 +67,43 @@
 	{/if}
 
 	{#each participants as p, i}
+		{@const locationStr = [
+			school?.district ? `Kecamatan ${school.district}` : '',
+			school?.city ? (school.city.toLowerCase().startsWith('kab') || school.city.toLowerCase().startsWith('kota') ? school.city : `Kabupaten ${school.city}`) : '',
+			school?.province ? school.province : ''
+		].filter(Boolean).join(', ')}
 		<div class="p-8 print:p-0 {i < participants.length - 1 ? 'page-break mb-8 print:mb-0 border-b-8 print:border-b-0 border-slate-100' : ''}">
 			<!-- Kop Surat -->
-			<div class="flex items-center gap-6 border-b-[3px] border-black pb-4 mb-6">
-				{#if school?.logo_url}
-					<img src={school.logo_url} alt="Logo" class="w-20 h-20 object-contain" />
-				{:else}
-					<div class="w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center text-slate-400 font-bold text-xl">
-						{school?.name?.charAt(0) || 'M'}
-					</div>
-				{/if}
-				
-				<div class="text-center flex-1 pr-26">
-					<div class="font-bold text-xl uppercase leading-tight mb-1">{school?.name || ''}</div>
-					<div class="text-sm font-medium uppercase mb-1">Jadwal {examType.name}</div>
+			<div class="flex items-center justify-between gap-4 pb-3 mb-5 relative" style="border-bottom: 3px double #000;">
+				<img 
+					src="/kemenag.png" 
+					alt="Logo Kemenag" 
+					class="w-20 h-20 object-contain shrink-0" 
+					on:error={(e) => { (e.currentTarget as HTMLElement).style.visibility = 'hidden'; }}
+				/>
+				<div class="flex-1 text-center font-serif px-2">
+					<h4 class="font-semibold text-sm uppercase tracking-wider text-black m-0 leading-tight">
+						KEMENTERIAN AGAMA REPUBLIK INDONESIA
+					</h4>
+					<h3 class="font-bold text-xl uppercase tracking-wide text-black m-0 my-0.5">
+						{school?.name || 'NAMA SEKOLAH'}
+					</h3>
 					{#if school?.address}
-						<div class="text-xs">{school.address}</div>
+						<p class="text-xs italic text-black m-0 leading-tight">{school.address}</p>
+					{/if}
+					{#if locationStr}
+						<p class="text-xs italic text-black m-0 leading-tight mt-0.5">{locationStr}</p>
 					{/if}
 				</div>
+				{#if school?.logo_url}
+					<img 
+						src={school.logo_url} 
+						alt="Logo Sekolah" 
+						class="w-20 h-20 object-contain shrink-0" 
+					/>
+				{:else}
+					<div class="w-20 h-20 shrink-0"></div>
+				{/if}
 			</div>
 
 			<!-- Profil Siswa -->

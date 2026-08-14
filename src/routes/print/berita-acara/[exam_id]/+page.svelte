@@ -47,19 +47,43 @@
 {#each Object.entries(participantsGrouped) as [roomName, sessionsDict], roomIdx}
 	{#each Object.entries(sessionsDict) as [sessionNumStr, count], sessionIdx}
 		{@const sessionNum = parseInt(sessionNumStr)}
+		{@const locationStr = [
+			school?.district ? `Kecamatan ${school.district}` : '',
+			school?.city ? (school.city.toLowerCase().startsWith('kab') || school.city.toLowerCase().startsWith('kota') ? school.city : `Kabupaten ${school.city}`) : '',
+			school?.province ? school.province : ''
+		].filter(Boolean).join(', ')}
 		<div class={roomIdx > 0 || sessionIdx > 0 ? "break-before-page pt-8" : ""}>
-	<!-- Kop -->
-	<div class="text-center mb-4 pb-3 border-b-4 border-black flex items-center relative">
-		{#if school?.logo_url}
-			<img src={school.logo_url} alt="Logo" class="w-20 h-20 object-contain absolute left-0" />
-		{/if}
-		<div class="flex-1 px-24">
-			<h2 class="font-bold text-lg uppercase tracking-wide m-0">PANITIA PENYELENGGARA UJIAN</h2>
-			<h3 class="font-bold text-xl uppercase m-0">{school?.name || 'NAMA SEKOLAH'}</h3>
+	<!-- Kop Surat -->
+	<div class="flex items-center justify-between gap-4 pb-3 mb-5 relative" style="border-bottom: 3px double #000;">
+		<img 
+			src="/kemenag.png" 
+			alt="Logo Kemenag" 
+			class="w-20 h-20 object-contain shrink-0" 
+			on:error={(e) => { (e.currentTarget as HTMLElement).style.visibility = 'hidden'; }}
+		/>
+		<div class="flex-1 text-center font-serif px-2">
+			<h4 class="font-semibold text-sm uppercase tracking-wider text-black m-0 leading-tight">
+				KEMENTERIAN AGAMA REPUBLIK INDONESIA
+			</h4>
+			<h3 class="font-bold text-xl uppercase tracking-wide text-black m-0 my-0.5">
+				{school?.name || 'NAMA SEKOLAH'}
+			</h3>
 			{#if school?.address}
-				<p class="text-xs m-0 mt-0.5 font-sans">{school.address}</p>
+				<p class="text-xs italic text-black m-0 leading-tight">{school.address}</p>
+			{/if}
+			{#if locationStr}
+				<p class="text-xs italic text-black m-0 leading-tight mt-0.5">{locationStr}</p>
 			{/if}
 		</div>
+		{#if school?.logo_url}
+			<img 
+				src={school.logo_url} 
+				alt="Logo Sekolah" 
+				class="w-20 h-20 object-contain shrink-0" 
+			/>
+		{:else}
+			<div class="w-20 h-20 shrink-0"></div>
+		{/if}
 	</div>
 
 	<!-- Judul -->
