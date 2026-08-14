@@ -41,21 +41,33 @@
 	<title>Cetak Kartu Peserta Ujian - {examType.name}</title>
 </svelte:head>
 
-<!-- Design Selector (hidden when printing) -->
-<div class="print:hidden p-4 bg-white border-b border-slate-200 flex items-center gap-4 sticky top-0 z-10 shadow-sm">
-	<span class="text-sm font-medium text-slate-700">Pilih Desain:</span>
-	<button 
-		class="px-4 py-2 rounded-lg text-sm font-medium transition-all {selectedDesign === 'default' ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}"
-		on:click={() => selectedDesign = 'default'}
-	>
-		Desain 1 (Default)
-	</button>
-	<button 
-		class="px-4 py-2 rounded-lg text-sm font-medium transition-all {selectedDesign === 'kartu-login' ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}"
-		on:click={() => selectedDesign = 'kartu-login'}
-	>
-		Desain 2 (Kartu Login)
-	</button>
+<!-- Design Selector & Control Bar (hidden when printing) -->
+<div class="no-print p-4 bg-slate-800 text-white border-b border-slate-700 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-md">
+	<div class="flex items-center gap-3 flex-wrap">
+		<span class="text-xs font-semibold uppercase tracking-wider text-slate-300">Pilih Desain:</span>
+		<button 
+			class="px-3 py-1.5 rounded text-xs font-semibold transition-all {selectedDesign === 'default' ? 'bg-indigo-600 text-white shadow' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}"
+			on:click={() => selectedDesign = 'default'}
+		>
+			Desain 1 (Default)
+		</button>
+		<button 
+			class="px-3 py-1.5 rounded text-xs font-semibold transition-all {selectedDesign === 'kartu-login' ? 'bg-indigo-600 text-white shadow' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}"
+			on:click={() => selectedDesign = 'kartu-login'}
+		>
+			Desain 2 (Kartu Login)
+		</button>
+	</div>
+
+	<div class="flex items-center gap-2">
+		<button class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-medium transition-colors" on:click={() => window.close()}>Tutup</button>
+		<button class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-xs font-bold transition-colors flex items-center gap-1.5 shadow" on:click={() => window.print()}>
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+			</svg>
+			Cetak Kartu
+		</button>
+	</div>
 </div>
 
 <div class="p-4 sm:p-8 print:p-0 overflow-x-auto print:overflow-visible w-full">

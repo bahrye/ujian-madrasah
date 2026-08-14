@@ -44,15 +44,15 @@
 	</style>
 </svelte:head>
 
-<div class="no-print p-4 bg-slate-100 border-b border-slate-200 flex justify-between items-center fixed top-0 left-0 right-0 z-50">
-	<div class="text-sm text-slate-600">
-		Gunakan pengaturan <strong>Kertas A4</strong> dan <strong>Skala Default</strong> saat mencetak.
+<div class="no-print p-4 bg-slate-800 text-white border-b border-slate-700 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-md">
+	<div class="text-xs text-slate-300">
+		Gunakan kertas <strong>A4</strong> saat mencetak jadwal ujian.
 	</div>
-	<div class="flex gap-3">
-		<button class="btn-ghost" on:click={() => window.close()}>Tutup</button>
-		<button class="btn-primary" on:click={() => window.print()}>
-			<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+	<div class="flex items-center gap-2">
+		<button class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-medium transition-colors" on:click={() => window.close()}>Tutup</button>
+		<button class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-xs font-bold transition-colors flex items-center gap-1.5 shadow" on:click={() => window.print()}>
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
 			</svg>
 			Cetak Jadwal
 		</button>
