@@ -46,8 +46,42 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 	// Check login mode
 	const sample = await db.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(locals.user!.school_id).first();
 	const isNomorPesertaMode = (sample && sample.username === sample.nomor_peserta);
+	const sessionRecords = await db.prepare('SELECT * FROM exam_sessions WHERE exam_id = ?').bind(examId).all();
+	const sessionMap: Record<number, { start_time: string | null; end_time: string | null }> = {};
+	if (sessionRecords.results) {
+		for (const s of sessionRecords.results as any[]) {
+			sessionMap[s.session_number] = s;
+		}
+	}
 
+	// Fetch proctors assigned to this exam
+	const assignedProctorsRes = await db.prepare(`
+		SELECT DISTINCT u.id, u.name, u.nip, u.role
+		FROM exam_proctors ep
+		JOIN users u ON ep.proctor_id = u.id
+		WHERE ep.exam_id = ?
+		ORDER BY u.name ASC
+	`).bind(examId).all();
 
+	// Fetch all teachers/proctors/admins in the school
+	const schoolTeachersRes = await db.prepare(`
+		SELECT id, name, nip, role
+		FROM users
+		WHERE school_id = ? AND role IN ('guru', 'pengawas', 'admin') AND is_active = 1
+		ORDER BY name ASC
+	`).bind(locals.user!.school_id).all();
+
+	const assignedProctors = (assignedProctorsRes.results || []) as any[];
+	const schoolTeachers = (schoolTeachersRes.results || []) as any[];
+
+	const assignedIds = new Set(assignedProctors.map(p => p.id));
+	const proctorOptions = [
+		...assignedProctors,
+		...schoolTeachers.filter(t => !assignedIds.has(t.id))
+	];
+
+	const defaultProctor1Id = assignedProctors[0]?.id || proctorOptions[0]?.id || '';
+	const defaultProctor2Id = assignedProctors[1]?.id || '';
 
 	return { 
 		school,
@@ -55,6 +89,10 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 		participantsGrouped,
 		isNomorPesertaMode,
 		hasSessions,
-		hasRooms
+		hasRooms,
+		sessionMap,
+		proctorOptions,
+		defaultProctor1Id,
+		defaultProctor2Id
 	};
 };
