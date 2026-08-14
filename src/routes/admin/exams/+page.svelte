@@ -17,6 +17,13 @@
 	let classesLoaded: any[] = [];
 	let classesLoading = false;
 
+	// Petugas modal state
+	let proctorsModal: any = null;
+	let proctorsLoaded: any[] = [];
+	let proctorsLoading = false;
+	let selectedProctorId = '';
+	let selectedProctorRole = 'pt';
+
 	$: if (form?.success) toasts.success(form.success);
 	$: if (form?.error) toasts.error(form.error);
 
@@ -35,6 +42,23 @@
 			}
 		} catch {}
 		classesLoading = false;
+	}
+
+	async function openProctorsModal(type: any) {
+		proctorsModal = type;
+		await loadTypeProctors(type.id);
+	}
+
+	async function loadTypeProctors(examTypeId: number) {
+		proctorsLoading = true;
+		try {
+			const resp = await fetch(`/api/exam-type-proctors?exam_type_id=${examTypeId}`);
+			if (resp.ok) {
+				const json = await resp.json();
+				proctorsLoaded = json.proctors || [];
+			}
+		} catch {}
+		proctorsLoading = false;
 	}
 
 	let expandedClassIds: Set<number> = new Set();
@@ -109,11 +133,34 @@
 						</div>
 					</div>
 					{#if type.class_names}
-						<div class="mt-2 text-slate-500 flex items-start gap-1.5 pt-2 border-t border-slate-100 border-dashed">
+						<div class="mt-2 text-slate-500 flex items-start gap-1.5 pt-2 border-t border-slate-100 border-dashed text-xs">
 							<svg class="w-3.5 h-3.5 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
 							</svg>
 							<span class="leading-snug line-clamp-2" title={type.class_names}>{type.class_names}</span>
+						</div>
+					{/if}
+
+					{#if type.proctor_names || type.committee_names || type.supervisor_names}
+						<div class="mt-2 text-slate-600 flex flex-col gap-1.5 pt-2 border-t border-slate-100 border-dashed">
+							{#if type.proctor_names}
+								<div class="flex items-center gap-1.5 text-[11px]">
+									<span class="font-semibold text-amber-800 bg-amber-100/80 px-1.5 py-0.5 rounded border border-amber-200 shrink-0">Proktor:</span>
+									<span class="leading-snug truncate font-medium text-slate-700" title={type.proctor_names}>{type.proctor_names}</span>
+								</div>
+							{/if}
+							{#if type.committee_names}
+								<div class="flex items-center gap-1.5 text-[11px]">
+									<span class="font-semibold text-indigo-800 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200 shrink-0">Panitia:</span>
+									<span class="leading-snug truncate font-medium text-slate-700" title={type.committee_names}>{type.committee_names}</span>
+								</div>
+							{/if}
+							{#if type.supervisor_names}
+								<div class="flex items-center gap-1.5 text-[11px]">
+									<span class="font-semibold text-emerald-800 bg-emerald-100/80 px-1.5 py-0.5 rounded border border-emerald-200 shrink-0">Pengawas:</span>
+									<span class="leading-snug truncate font-medium text-slate-700" title={type.supervisor_names}>{type.supervisor_names}</span>
+								</div>
+							{/if}
 						</div>
 					{/if}
 				</div>
@@ -125,6 +172,13 @@
 					<button class="btn-sm btn-ghost text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50" on:click={() => openParticipantsModal(type)} title="Kelola Peserta Default">
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+						</svg>
+					</button>
+
+					<!-- Tombol Petugas Ujian (Proktor / Panitia / Pengawas) -->
+					<button class="btn-sm btn-ghost text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50" on:click={() => openProctorsModal(type)} title="Kelola Petugas Default (Proktor / Panitia / Pengawas)">
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
 						</svg>
 					</button>
 
@@ -374,6 +428,113 @@
 					<button type="submit" class="btn-danger flex-1">Hapus</button>
 				</div>
 			</form>
+		</div>
+	</div>
+{/if}
+
+<!-- ── Proctors Modal (Petugas Default) ─────────────────────────────────── -->
+{#if proctorsModal}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => { proctorsModal = null; }}>
+		<div class="max-h-[90vh] overflow-y-auto card p-6 w-full max-w-xl animate-bounce-in" on:click|stopPropagation>
+			<div class="flex items-center justify-between mb-5">
+				<div>
+					<h2 class="text-lg font-bold text-slate-800">Petugas Default — {proctorsModal.name}</h2>
+					<p class="text-xs text-slate-500 mt-0.5">Proktor dan Panitia ini akan otomatis terisi pada Berita Acara & Daftar Hadir seluruh ujian tipe ini.</p>
+				</div>
+				<button class="text-slate-400 hover:text-slate-600" on:click={() => { proctorsModal = null; }}>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+				</button>
+			</div>
+
+			<!-- Form Tambah Petugas -->
+			<form method="POST" action="?/addTypeProctor"
+				use:enhance={() => { return async ({ update }) => { await update(); await loadTypeProctors(proctorsModal.id); }; }}
+				class="bg-emerald-50 rounded-xl p-4 border border-emerald-100 mb-6">
+				<input type="hidden" name="exam_type_id" value={proctorsModal.id} />
+				<h3 class="font-bold text-slate-700 mb-2.5 text-sm flex items-center gap-2">
+					<svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+					</svg>
+					Tambah Petugas Default
+				</h3>
+
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+					<div>
+						<label class="label-text mb-1 block">Pilih Guru / Pengawas:</label>
+						<select name="proctor_id" bind:value={selectedProctorId} class="select select-sm select-bordered w-full bg-white text-xs" required>
+							<option value="">-- Pilih Petugas --</option>
+							{#each (data.teachers || []) as t}
+								<option value={t.id}>{t.name} {t.nip ? `(NIP. ${t.nip})` : ''}</option>
+							{/each}
+						</select>
+					</div>
+
+					<div>
+						<label class="label-text mb-1 block">Penetapan Peran:</label>
+						<select name="proctor_role" bind:value={selectedProctorRole} class="select select-sm select-bordered w-full bg-white text-xs">
+							<option value="pt">Proktor / Teknisi</option>
+							<option value="cm">Panitia Ujian</option>
+							<option value="p1">Pengawas 1</option>
+							<option value="p2">Pengawas 2</option>
+						</select>
+					</div>
+				</div>
+
+				<button type="submit" disabled={!selectedProctorId} class="btn-sm btn-primary w-full bg-emerald-600 hover:bg-emerald-700 border-emerald-600">
+					+ Tambahkan Petugas
+				</button>
+			</form>
+
+			<!-- Daftar Petugas Terdaftar -->
+			<div>
+				<h3 class="font-bold text-slate-700 mb-3 text-sm flex items-center justify-between">
+					<span>Petugas Terdaftar</span>
+					<span class="badge badge-sm badge-neutral">{proctorsLoaded.length} Petugas</span>
+				</h3>
+
+				{#if proctorsLoading}
+					<div class="text-center py-6 text-slate-400 text-xs">Memuat data petugas...</div>
+				{:else if proctorsLoaded.length === 0}
+					<div class="text-center py-6 bg-slate-50 rounded-xl text-slate-400 text-xs">
+						Belum ada petugas default. Silakan tambahkan proktor atau panitia di atas.
+					</div>
+				{:else}
+					<div class="space-y-2">
+						{#each proctorsLoaded as p}
+							<div class="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl hover:border-slate-300 transition-colors shadow-sm">
+								<div>
+									<div class="font-medium text-slate-800 text-sm">{p.name}</div>
+									<div class="text-xs text-slate-500 font-mono">{p.nip ? `NIP. ${p.nip}` : 'Non-NIP'}</div>
+								</div>
+								<div class="flex items-center gap-3">
+									<span class={`badge text-xs px-2.5 py-1 ${
+										p.proctor_role === 'pt' ? 'bg-amber-100 text-amber-800 border-amber-200' :
+										p.proctor_role === 'cm' ? 'bg-indigo-100 text-indigo-800 border-indigo-200' :
+										p.proctor_role === 'p2' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' :
+										'bg-blue-100 text-blue-800 border-blue-200'
+									}`}>
+										{p.proctor_role === 'pt' ? 'Proktor / Teknisi' :
+										 p.proctor_role === 'cm' ? 'Panitia Ujian' :
+										 p.proctor_role === 'p2' ? 'Pengawas 2' : 'Pengawas 1'}
+									</span>
+
+									<form method="POST" action="?/removeTypeProctor"
+										use:enhance={() => { return async ({ update }) => { await update(); await loadTypeProctors(proctorsModal.id); }; }}>
+										<input type="hidden" name="id" value={p.id} />
+										<button type="submit" class="p-1 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors" title="Hapus">
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+												<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
+											</svg>
+										</button>
+									</form>
+								</div>
+							</div>
+						{/each}
+					</div>
+				{/if}
+			</div>
 		</div>
 	</div>
 {/if}

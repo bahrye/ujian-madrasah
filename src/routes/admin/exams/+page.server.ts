@@ -1,15 +1,20 @@
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getDB } from '$lib/server/db';
+import { getDB, ensureExamTypeProctorsTable } from '$lib/server/db';
 
 export const load: PageServerLoad = async ({ platform, locals }) => {
 	const db = getDB(platform);
+	await ensureExamTypeProctorsTable(db);
 
 	const examTypes = await db.prepare(`
 		SELECT et.*, 
 			(SELECT COUNT(*) FROM exams WHERE exam_type_id = et.id) as exam_count,
 			(SELECT COUNT(u.id) FROM users u JOIN exam_type_classes etc ON etc.class_id = u.class_id WHERE etc.exam_type_id = et.id AND u.role = 'siswa' AND u.is_active = 1) as participant_count,
-			(SELECT GROUP_CONCAT(name, ', ') FROM (SELECT c.name FROM classes c JOIN exam_type_classes etc ON etc.class_id = c.id WHERE etc.exam_type_id = et.id ORDER BY c.name)) as class_names
+			(SELECT COUNT(*) FROM exam_type_proctors WHERE exam_type_id = et.id) as proctor_count,
+			(SELECT GROUP_CONCAT(name, ', ') FROM (SELECT c.name FROM classes c JOIN exam_type_classes etc ON etc.class_id = c.id WHERE etc.exam_type_id = et.id ORDER BY c.name)) as class_names,
+			(SELECT GROUP_CONCAT(u.name, ', ') FROM exam_type_proctors etp JOIN users u ON etp.proctor_id = u.id WHERE etp.exam_type_id = et.id AND etp.proctor_role = 'pt') as proctor_names,
+			(SELECT GROUP_CONCAT(u.name, ', ') FROM exam_type_proctors etp JOIN users u ON etp.proctor_id = u.id WHERE etp.exam_type_id = et.id AND etp.proctor_role = 'cm') as committee_names,
+			(SELECT GROUP_CONCAT(u.name, ', ') FROM exam_type_proctors etp JOIN users u ON etp.proctor_id = u.id WHERE etp.exam_type_id = et.id AND etp.proctor_role IN ('p1', 'p2')) as supervisor_names
 		FROM exam_types et
 		WHERE et.school_id = ?
 		ORDER BY et.created_at DESC
@@ -22,10 +27,15 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		'SELECT id, name, username, class_id FROM users WHERE school_id = ? AND role = "siswa" ORDER BY name ASC'
 	).bind(locals.user!.school_id).all<{ id: number; name: string; username: string; class_id: number | null }>();
 
+	const teachers = await db.prepare(
+		'SELECT id, name, nip, role FROM users WHERE school_id = ? AND role IN ("guru", "pengawas", "admin") AND is_active = 1 ORDER BY name ASC'
+	).bind(locals.user!.school_id).all<{ id: number; name: string; nip: string | null; role: string }>();
+
 	return {
 		examTypes: examTypes.results,
 		classes: classes.results,
-		students: students.results
+		students: students.results,
+		teachers: teachers.results
 	};
 };
 
@@ -288,5 +298,47 @@ export const actions: Actions = {
 		});
 
 		return { classes: formattedClasses };
+	},
+
+	addTypeProctor: async ({ request, platform, locals }) => {
+		const db = getDB(platform);
+		await ensureExamTypeProctorsTable(db);
+		const form = await request.formData();
+		const examTypeIdStr = form.get('exam_type_id')?.toString();
+		const proctorIdStr = form.get('proctor_id')?.toString();
+		const proctorRole = form.get('proctor_role')?.toString() || 'pt';
+
+		const examTypeId = parseInt(examTypeIdStr || '', 10);
+		const proctorId = parseInt(proctorIdStr || '', 10);
+
+		if (isNaN(examTypeId) || isNaN(proctorId)) return fail(400, { error: 'Data petugas tidak valid.' });
+
+		try {
+			await db.prepare('INSERT OR REPLACE INTO exam_type_proctors (exam_type_id, proctor_id, proctor_role) VALUES (?, ?, ?)')
+				.bind(examTypeId, proctorId, proctorRole).run();
+
+			// Auto-sync to all exams belonging to this exam_type_id
+			await db.prepare(`
+				INSERT OR IGNORE INTO exam_proctors (exam_id, proctor_id, proctor_role)
+				SELECT id, ?, ? FROM exams WHERE exam_type_id = ? AND school_id = ?
+			`).bind(proctorId, proctorRole, examTypeId, locals.user!.school_id).run();
+
+			return { success: 'Petugas default berhasil ditambahkan.' };
+		} catch (e: any) {
+			return fail(500, { error: e.message || 'Gagal menambahkan petugas.' });
+		}
+	},
+
+	removeTypeProctor: async ({ request, platform, locals }) => {
+		const db = getDB(platform);
+		await ensureExamTypeProctorsTable(db);
+		const form = await request.formData();
+		const idStr = form.get('id')?.toString();
+		const id = parseInt(idStr || '', 10);
+
+		if (isNaN(id)) return fail(400, { error: 'ID tidak valid.' });
+
+		await db.prepare('DELETE FROM exam_type_proctors WHERE id = ?').bind(id).run();
+		return { success: 'Petugas default berhasil dihapus.' };
 	}
 };

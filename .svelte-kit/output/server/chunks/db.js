@@ -26,9 +26,24 @@ async function ensureProctorRoleColumn(db) {
   } catch (e) {
   }
 }
+async function ensureExamTypeProctorsTable(db) {
+  try {
+    await db.prepare(`
+			CREATE TABLE IF NOT EXISTS exam_type_proctors (
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				exam_type_id INTEGER NOT NULL,
+				proctor_id INTEGER NOT NULL,
+				proctor_role TEXT DEFAULT 'pt',
+				UNIQUE(exam_type_id, proctor_id)
+			)
+		`).run();
+  } catch (e) {
+  }
+}
 export {
-  ensureTokenSessionColumn as a,
+  ensureProctorRoleColumn as a,
+  ensureTokenSessionColumn as b,
   dbRun as d,
-  ensureProctorRoleColumn as e,
+  ensureExamTypeProctorsTable as e,
   getDB as g
 };

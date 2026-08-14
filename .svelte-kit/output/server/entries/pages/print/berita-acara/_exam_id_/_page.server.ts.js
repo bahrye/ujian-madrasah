@@ -1,4 +1,4 @@
-import { g as getDB, e as ensureProctorRoleColumn } from "../../../../../chunks/db.js";
+import { g as getDB, a as ensureProctorRoleColumn } from "../../../../../chunks/db.js";
 import { error } from "@sveltejs/kit";
 const load = async ({ platform, params, locals }) => {
   const db = getDB(platform);

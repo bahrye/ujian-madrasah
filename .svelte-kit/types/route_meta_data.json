@@ -129,6 +129,9 @@
 	"/api/exam-type-classes": [
 		"src/routes/api/exam-type-classes/+server.ts"
 	],
+	"/api/exam-type-proctors": [
+		"src/routes/api/exam-type-proctors/+server.ts"
+	],
 	"/api/exams/[id]/questions": [
 		"src/routes/api/exams/[id]/questions/+server.ts"
 	],

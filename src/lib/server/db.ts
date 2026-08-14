@@ -58,3 +58,19 @@ export async function ensureProctorRoleColumn(db: D1Database) {
 	}
 }
 
+export async function ensureExamTypeProctorsTable(db: D1Database) {
+	try {
+		await db.prepare(`
+			CREATE TABLE IF NOT EXISTS exam_type_proctors (
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				exam_type_id INTEGER NOT NULL,
+				proctor_id INTEGER NOT NULL,
+				proctor_role TEXT DEFAULT 'pt',
+				UNIQUE(exam_type_id, proctor_id)
+			)
+		`).run();
+	} catch (e: any) {
+		// Ignore error
+	}
+}
+
