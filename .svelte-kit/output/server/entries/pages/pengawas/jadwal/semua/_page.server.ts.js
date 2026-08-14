@@ -1,7 +1,7 @@
 import { redirect } from "@sveltejs/kit";
 import { g as getDB } from "../../../../../chunks/db.js";
 const load = async ({ locals, platform }) => {
-  if (!locals.user || locals.user.role !== "pengawas") {
+  if (!locals.user) {
     throw redirect(302, "/login");
   }
   const db = getDB(platform);

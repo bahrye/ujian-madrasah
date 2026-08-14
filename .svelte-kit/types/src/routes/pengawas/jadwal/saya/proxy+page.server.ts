@@ -15,13 +15,13 @@ export interface ProctorScheduleItem {
 }
 
 export const load = async ({ locals, platform }: Parameters<ServerLoad>[0]) => {
-	if (!locals.user || locals.user.role !== 'pengawas') {
+	if (!locals.user) {
 		throw redirect(302, '/login');
 	}
 
 	const db = getDB(platform);
 
-	// Ambil jadwal mengawas pribadi (ujian yang ditugaskan kepada pengawas ini)
+	// Ambil jadwal mengawas pribadi (ujian yang ditugaskan kepada pengawas/guru ini)
 	const { results: schedules } = await db.prepare(`
 		SELECT e.*, s.name as subject_name, et.name as exam_type_name
 		FROM exams e

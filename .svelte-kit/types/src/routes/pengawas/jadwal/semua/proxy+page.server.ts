@@ -23,7 +23,7 @@ export interface ClassItem {
 }
 
 export const load = async ({ locals, platform }: Parameters<ServerLoad>[0]) => {
-	if (!locals.user || locals.user.role !== 'pengawas') {
+	if (!locals.user) {
 		throw redirect(302, '/login');
 	}
 
