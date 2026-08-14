@@ -37,12 +37,13 @@
 <style>
 	@media print {
 		@page {
-			size: A4;
-			margin: 0;
+			size: 215.9mm 330mm; /* F4 / Folio */
+			margin: 1cm;
 		}
 		:global(body) {
 			margin: 0;
 			padding: 0;
+			font-family: 'Times New Roman', Times, Georgia, serif !important;
 			-webkit-print-color-adjust: exact;
 			print-color-adjust: exact;
 		}
@@ -93,7 +94,7 @@
 	</div>
 </div>
 
-<div class="p-8 print:p-8 max-w-[21cm] mx-auto bg-white">
+<div class="p-8 print:p-8 max-w-[215.9mm] mx-auto bg-white" style="font-family: 'Times New Roman', Times, Georgia, serif;">
 	<!-- Print each room and session on a new page -->
 	{#each Object.entries(participantsGrouped) as [roomName, sessionsDict], roomIdx}
 		{#each Object.entries(sessionsDict) as [sessionNumStr, students], sessionIdx}
@@ -190,7 +191,7 @@
 					{#each students as p, i}
 						<tr>
 							<td class="border border-black p-2 text-center">{i + 1}</td>
-							<td class="border border-black p-2 text-center font-mono whitespace-nowrap text-[11px] leading-tight">{isNomorPesertaMode ? (p.nomor_peserta || '-') : (p.nisn || p.username)}</td>
+							<td class="border border-black p-2 text-center whitespace-nowrap text-xs leading-tight font-serif">{isNomorPesertaMode ? (p.nomor_peserta || '-') : (p.nisn || p.username)}</td>
 							<td class="border border-black p-2">{p.student_name}</td>
 							<td class="border-b border-black p-2 w-24 align-top h-12 relative text-center">
 								{#if (i + 1) % 2 !== 0}

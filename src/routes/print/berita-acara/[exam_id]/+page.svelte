@@ -123,11 +123,12 @@
 <style>
 	@media print {
 		@page { 
-			size: A4;
+			size: 215.9mm 330mm; /* F4 / Folio */
 			margin: 1cm; 
 		}
 		:global(body) {
 			margin: 0;
+			font-family: 'Times New Roman', Times, Georgia, serif !important;
 			-webkit-print-color-adjust: exact;
 			print-color-adjust: exact;
 		}
@@ -198,7 +199,7 @@
 	</div>
 </div>
 
-<div class="p-4 md:p-8 max-w-4xl mx-auto font-serif text-[15px] leading-snug print:p-0 print:m-0 bg-white">
+<div class="p-4 md:p-8 max-w-[215.9mm] mx-auto font-serif text-[15px] leading-snug print:p-0 print:m-0 bg-white" style="font-family: 'Times New Roman', Times, Georgia, serif;">
 {#each Object.entries(participantsGrouped) as [roomName, sessionsDict], roomIdx}
 	{#each Object.entries(sessionsDict) as [sessionNumStr, count], sessionIdx}
 		{@const sessionNum = parseInt(sessionNumStr)}
@@ -253,19 +254,19 @@
 			</div>
 
 			<!-- Garis Kop Surat (Tipis atas, Agak tebal bawah) -->
-			<div class="mt-2 mb-5">
+			<div class="mt-2 mb-3">
 				<div style="border-bottom: 1px solid #000;"></div>
 				<div style="border-bottom: 2.5px solid #000; margin-top: 2px;"></div>
 			</div>
 
 			<!-- Judul -->
-			<div class="text-center mb-6">
-				<h1 class="font-bold text-lg uppercase underline tracking-wider mb-1">BERITA ACARA PELAKSANAAN UJIAN</h1>
+			<div class="text-center mb-3">
+				<h1 class="font-bold text-lg uppercase underline tracking-wider mb-0.5">BERITA ACARA PELAKSANAAN UJIAN</h1>
 				<p class="text-sm font-medium">Tahun Ajaran {getAcademicYear(effectiveStart)}</p>
 			</div>
 
 			<!-- Isu/Paragraf Pembuka -->
-			<p class="mb-4 text-justify">
+			<p class="mb-2 text-justify">
 				Pada hari ini <span class="border-b border-dotted border-black px-2">{getDayName(effectiveStart)}</span> 
 				tanggal <span class="border-b border-dotted border-black px-2">{getDayNumber(effectiveStart)}</span> 
 				bulan <span class="border-b border-dotted border-black px-2">{getMonthName(effectiveStart)}</span> 
@@ -274,23 +275,23 @@
 			</p>
 
 			<!-- Tabel Info Ruang & Waktu -->
-			<div class="ml-4 mb-6">
+			<div class="ml-4 mb-3">
 				<table class="w-full">
 					<tbody>
-						<tr class="align-top"><td class="w-48 py-1">a. Satuan Pendidikan</td><td class="w-4 py-1">:</td><td class="py-1 font-bold uppercase">{school?.name || '-'}</td></tr>
-						<tr class="align-top"><td class="py-1">b. Ruang / Sesi Ujian</td><td class="py-1">:</td><td class="py-1 font-bold">{roomName} / Sesi {sessionNum}</td></tr>
-						<tr class="align-top"><td class="py-1">c. Waktu Pelaksanaan</td><td class="py-1">:</td><td class="py-1">{formatTime(effectiveStart)} s.d. {formatTime(effectiveEnd)} WIB</td></tr>
-						<tr class="align-top"><td class="py-1">d. Jumlah Peserta Seharusnya</td><td class="py-1">:</td><td class="py-1">{count} Orang</td></tr>
-						<tr class="align-top"><td class="py-1">e. Jumlah Peserta Hadir</td><td class="py-1">:</td><td class="py-1">........... Orang</td></tr>
-						<tr class="align-top"><td class="py-1">f. Jumlah Peserta Tidak Hadir</td><td class="py-1">:</td><td class="py-1">........... Orang</td></tr>
+						<tr class="align-top"><td class="w-48 py-0.5">a. Satuan Pendidikan</td><td class="w-4 py-0.5">:</td><td class="py-0.5 font-bold uppercase">{school?.name || '-'}</td></tr>
+						<tr class="align-top"><td class="py-0.5">b. Ruang / Sesi Ujian</td><td class="py-0.5">:</td><td class="py-0.5 font-bold">{roomName} / Sesi {sessionNum}</td></tr>
+						<tr class="align-top"><td class="py-0.5">c. Waktu Pelaksanaan</td><td class="py-0.5">:</td><td class="py-0.5">{formatTime(effectiveStart)} s.d. {formatTime(effectiveEnd)} WIB</td></tr>
+						<tr class="align-top"><td class="py-0.5">d. Jumlah Peserta Seharusnya</td><td class="py-0.5">:</td><td class="py-0.5">{count} Orang</td></tr>
+						<tr class="align-top"><td class="py-0.5">e. Jumlah Peserta Hadir</td><td class="py-0.5">:</td><td class="py-0.5">........... Orang</td></tr>
+						<tr class="align-top"><td class="py-0.5">f. Jumlah Peserta Tidak Hadir</td><td class="py-0.5">:</td><td class="py-0.5">........... Orang</td></tr>
 						<tr class="align-top">
-							<td class="py-1.5 pl-4 text-sm font-sans" colspan="3">
+							<td class="py-1 pl-4 text-sm font-sans" colspan="3">
 								<div class="flex items-baseline gap-2">
 									<span>- Nomor Peserta yang Tidak Hadir:</span>
-									<span class="border-b border-dotted border-black flex-1 min-h-[1.2rem]"></span>
+									<span class="border-b border-dotted border-black flex-1 min-h-[1.1rem]"></span>
 								</div>
-								<div class="mt-1.5">
-									<span class="border-b border-dotted border-black block w-full min-h-[1.2rem]"></span>
+								<div class="mt-1">
+									<span class="border-b border-dotted border-black block w-full min-h-[1.1rem]"></span>
 								</div>
 							</td>
 						</tr>
@@ -299,34 +300,34 @@
 			</div>
 
 			<!-- Catatan / Kejadian Penting -->
-			<div class="mb-6">
-				<p class="mb-2 font-bold">Catatan / Kejadian Penting Selama Ujian Berlangsung:</p>
-				<div class="border border-black p-3 min-h-[90px] text-xs font-mono text-slate-500 rounded">
+			<div class="mb-3">
+				<p class="mb-1 font-bold text-sm">Catatan / Kejadian Penting Selama Ujian Berlangsung:</p>
+				<div class="border border-black p-2 min-h-[48px] text-xs font-serif text-slate-500 rounded">
 					<span class="print:hidden">( Kosongkan jika pelaksanaan ujian berjalan tertib dan lancar )</span>
 				</div>
 			</div>
 
-			<p class="mb-8">
+			<p class="mb-3">
 				Demikian Berita Acara ini dibuat dengan sesungguhnya untuk dipergunakan sebagaimana mestinya.
 			</p>
 
 			<!-- TTD Petugas & Kepala Madrasah (2-Column Grid Alignment System) -->
-			<div class="mt-8 text-sm font-serif">
+			<div class="mt-4 text-sm font-serif">
 				{#if activeOfficers.length <= 1}
 					<!-- CASE 1: 1 Officer (Pengawas Ruang) -->
-					<div class="grid grid-cols-2 gap-8 text-center">
+					<div class="grid grid-cols-2 gap-4 text-center">
 						<!-- Left Column: Kepala Madrasah -->
 						<div>
-							<div class="h-6"></div>
-							<p class="font-medium mb-14">Kepala Madrasah,</p>
+							<div class="h-5"></div>
+							<p class="font-medium mb-9">Kepala Madrasah,</p>
 							<p class="border-b border-black font-bold inline-block px-3">{school?.principal_name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {school?.principal_nip || '..............................'}</p>
 						</div>
 
 						<!-- Right Column: Date + Pengawas Ruang -->
 						<div>
-							<p class="text-xs text-slate-700 mb-1">{locationCity}, {formatDateFull(effectiveStart)}</p>
-							<p class="font-medium mb-14">{activeOfficers[0]?.role === 'Pengawas I' ? 'Pengawas Ruang' : (activeOfficers[0]?.role || 'Pengawas Ruang')},</p>
+							<p class="text-xs text-slate-700 mb-0.5">{locationCity}, {formatDateFull(effectiveStart)}</p>
+							<p class="font-medium mb-9">{activeOfficers[0]?.role === 'Pengawas I' ? 'Pengawas Ruang' : (activeOfficers[0]?.role || 'Pengawas Ruang')},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[0]?.data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[0]?.data?.nip || '..............................'}</p>
 						</div>
@@ -334,19 +335,19 @@
 
 				{:else if activeOfficers.length === 2}
 					<!-- CASE 2: 2 Officers (Pengawas I & Pengawas II) -->
-					<div class="grid grid-cols-2 gap-8 text-center">
+					<div class="grid grid-cols-2 gap-4 text-center">
 						<!-- Row 1 Left: Pengawas I -->
 						<div>
-							<div class="h-6"></div>
-							<p class="font-medium mb-14">{activeOfficers[0].role},</p>
+							<div class="h-5"></div>
+							<p class="font-medium mb-9">{activeOfficers[0].role},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[0].data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[0].data?.nip || '..............................'}</p>
 						</div>
 
 						<!-- Row 1 Right: Date + Pengawas II -->
 						<div>
-							<p class="text-xs text-slate-700 mb-1">{locationCity}, {formatDateFull(effectiveStart)}</p>
-							<p class="font-medium mb-14">{activeOfficers[1].role},</p>
+							<p class="text-xs text-slate-700 mb-0.5">{locationCity}, {formatDateFull(effectiveStart)}</p>
+							<p class="font-medium mb-9">{activeOfficers[1].role},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[1].data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[1].data?.nip || '..............................'}</p>
 						</div>
@@ -355,8 +356,8 @@
 						<div></div>
 
 						<!-- Row 2 Right: Kepala Madrasah -->
-						<div class="mt-4">
-							<p class="font-medium mb-14">Kepala Madrasah,</p>
+						<div class="mt-2">
+							<p class="font-medium mb-9">Kepala Madrasah,</p>
 							<p class="border-b border-black font-bold inline-block px-3">{school?.principal_name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {school?.principal_nip || '..............................'}</p>
 						</div>
@@ -364,33 +365,33 @@
 
 				{:else if activeOfficers.length === 3}
 					<!-- CASE 3: 3 Officers (Pengawas I, Pengawas II, Panitia/Proktor) -->
-					<div class="grid grid-cols-2 gap-8 text-center">
+					<div class="grid grid-cols-2 gap-4 text-center">
 						<!-- Row 1 Left: Pengawas I -->
 						<div>
-							<div class="h-6"></div>
-							<p class="font-medium mb-14">{activeOfficers[0].role},</p>
+							<div class="h-5"></div>
+							<p class="font-medium mb-9">{activeOfficers[0].role},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[0].data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[0].data?.nip || '..............................'}</p>
 						</div>
 
 						<!-- Row 1 Right: Date + Pengawas II -->
 						<div>
-							<p class="text-xs text-slate-700 mb-1">{locationCity}, {formatDateFull(effectiveStart)}</p>
-							<p class="font-medium mb-14">{activeOfficers[1].role},</p>
+							<p class="text-xs text-slate-700 mb-0.5">{locationCity}, {formatDateFull(effectiveStart)}</p>
+							<p class="font-medium mb-9">{activeOfficers[1].role},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[1].data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[1].data?.nip || '..............................'}</p>
 						</div>
 
 						<!-- Row 2 Left: Officer 3 (Panitia/Proktor) -->
-						<div class="mt-4">
-							<p class="font-medium mb-14">{activeOfficers[2].role},</p>
+						<div class="mt-2">
+							<p class="font-medium mb-9">{activeOfficers[2].role},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[2].data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[2].data?.nip || '..............................'}</p>
 						</div>
 
 						<!-- Row 2 Right: Kepala Madrasah -->
-						<div class="mt-4">
-							<p class="font-medium mb-14">Kepala Madrasah,</p>
+						<div class="mt-2">
+							<p class="font-medium mb-9">Kepala Madrasah,</p>
 							<p class="border-b border-black font-bold inline-block px-3">{school?.principal_name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {school?.principal_nip || '..............................'}</p>
 						</div>
@@ -398,33 +399,33 @@
 
 				{:else}
 					<!-- CASE 4: 4 Officers (Pengawas I, Pengawas II, Proktor, Panitia) -->
-					<div class="grid grid-cols-2 gap-8 text-center">
+					<div class="grid grid-cols-2 gap-4 text-center">
 						<!-- Row 1 Left: Pengawas I -->
 						<div>
-							<div class="h-6"></div>
-							<p class="font-medium mb-14">{activeOfficers[0].role},</p>
+							<div class="h-5"></div>
+							<p class="font-medium mb-9">{activeOfficers[0].role},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[0].data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[0].data?.nip || '..............................'}</p>
 						</div>
 
 						<!-- Row 1 Right: Date + Pengawas II -->
 						<div>
-							<p class="text-xs text-slate-700 mb-1">{locationCity}, {formatDateFull(effectiveStart)}</p>
-							<p class="font-medium mb-14">{activeOfficers[1].role},</p>
+							<p class="text-xs text-slate-700 mb-0.5">{locationCity}, {formatDateFull(effectiveStart)}</p>
+							<p class="font-medium mb-9">{activeOfficers[1].role},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[1].data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[1].data?.nip || '..............................'}</p>
 						</div>
 
 						<!-- Row 2 Left: Proktor / Teknisi -->
-						<div class="mt-4">
-							<p class="font-medium mb-14">{activeOfficers[2].role},</p>
+						<div class="mt-2">
+							<p class="font-medium mb-9">{activeOfficers[2].role},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[2].data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[2].data?.nip || '..............................'}</p>
 						</div>
 
 						<!-- Row 2 Right: Panitia Ujian -->
-						<div class="mt-4">
-							<p class="font-medium mb-14">{activeOfficers[3].role},</p>
+						<div class="mt-2">
+							<p class="font-medium mb-9">{activeOfficers[3].role},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[3].data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[3].data?.nip || '..............................'}</p>
 						</div>
@@ -433,8 +434,8 @@
 						<div></div>
 
 						<!-- Row 3 Right: Kepala Madrasah -->
-						<div class="mt-4">
-							<p class="font-medium mb-14">Kepala Madrasah,</p>
+						<div class="mt-2">
+							<p class="font-medium mb-9">Kepala Madrasah,</p>
 							<p class="border-b border-black font-bold inline-block px-3">{school?.principal_name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {school?.principal_nip || '..............................'}</p>
 						</div>
