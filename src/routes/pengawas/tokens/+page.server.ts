@@ -196,7 +196,7 @@ export const actions: Actions = {
 			return fail(400, { error: `Gagal: Masih ada token aktif untuk Sesi ${parsedSessionNumber} ujian ini (${activeToken.token_code}). Harap hapus token tersebut dahulu jika ingin membuat yang baru.` });
 		}
 
-		const expiresAt = new Date(nowMs + durationHours * 60 * 60 * 1000).toISOString();
+		const expiresAt = new Date(Date.now() + durationHours * 60 * 60 * 1000).toISOString();
 
 		try {
 			// Hapus token lama yang kadaluwarsa dan tidak pernah digunakan oleh siswa untuk sesi ini

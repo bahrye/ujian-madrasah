@@ -49,58 +49,49 @@ export function parseLocalDate(dateStr: any): Date {
 }
 
 /**
- * Calculates epoch minutes from wall-clock components of a YYYY-MM-DD HH:mm string.
+ * Calculates UTC timestamp (in ms) from wall-clock components of a YYYY-MM-DD HH:mm string.
  */
-export function getWallClockMinutes(dateStr: any): number | null {
+export function getWallClockMs(dateStr: any): number | null {
     if (!dateStr) return null;
     const str = String(dateStr);
     const match = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})[T\s](\d{1,2}):(\d{1,2})/);
     if (!match) return null;
     const [, year, month, day, hour, minute] = match;
-    return Date.UTC(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10), parseInt(hour, 10), parseInt(minute, 10)) / 60000;
-}
-
-/**
- * Gets wall-clock minutes for current time in a given timezone (e.g. Asia/Makassar, Asia/Jakarta, Asia/Jayapura).
- */
-export function getNowWallClockMinutes(now: Date = new Date(), timeZone?: string): number {
-    try {
-        const tz = timeZone || (typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'Asia/Makassar');
-        const str = now.toLocaleString('sv-SE', { timeZone: tz });
-        const minutes = getWallClockMinutes(str);
-        if (minutes !== null) return minutes;
-    } catch (e) {}
-    return Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes()) / 60000;
+    return Date.UTC(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10), parseInt(hour, 10), parseInt(minute, 10));
 }
 
 /**
  * Checks if current time is within 15 minutes before the exam session start time and before end time.
- * Multi-timezone aware across Indonesian timezones (WIB, WITA, WIT).
+ * Pure mathematical calculation without relying on locale formatting (safe for Cloudflare Workers V8).
  */
 export function checkSessionTimeWindow(startTimeStr: string | null, endTimeStr: string | null, now: Date = new Date()): { allowed: boolean; reason?: 'too_early' | 'too_late'; timeFormatted?: string } {
     if (!startTimeStr) return { allowed: true };
 
-    const startMinutes = getWallClockMinutes(startTimeStr);
-    if (startMinutes === null) return { allowed: true };
+    const startMs = getWallClockMs(startTimeStr);
+    if (startMs === null) return { allowed: true };
 
-    const endMinutes = endTimeStr ? getWallClockMinutes(endTimeStr) : null;
-    const earliestMinutes = startMinutes - 15;
+    const endMs = endTimeStr ? getWallClockMs(endTimeStr) : null;
+    const earliestMs = startMs - (15 * 60 * 1000);
 
-    // Check across standard Indonesian timezones (Asia/Makassar WITA, Asia/Jakarta WIB, Asia/Jayapura WIT)
-    const timezones = ['Asia/Makassar', 'Asia/Jakarta', 'Asia/Jayapura'];
+    const nowUtcMs = now.getTime();
+    
+    // Indonesian time offsets in ms: WITA (+8h), WIB (+7h), WIT (+9h)
+    const offsets = [8 * 3600 * 1000, 7 * 3600 * 1000, 9 * 3600 * 1000];
+    
+    // Also include client/system local offset if available and not already present
     try {
-        const systemTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        if (systemTz && !timezones.includes(systemTz)) timezones.unshift(systemTz);
+        const clientOffset = -now.getTimezoneOffset() * 60 * 1000;
+        if (!offsets.includes(clientOffset)) offsets.unshift(clientOffset);
     } catch (e) {}
 
+    let isAllowed = false;
     let isTooEarly = false;
     let isTooLate = false;
-    let isAllowed = false;
 
-    for (const tz of timezones) {
-        const nowMin = getNowWallClockMinutes(now, tz);
-        const tooEarly = nowMin < earliestMinutes;
-        const tooLate = endMinutes !== null && nowMin > endMinutes;
+    for (const offset of offsets) {
+        const nowWallMs = nowUtcMs + offset;
+        const tooEarly = nowWallMs < earliestMs;
+        const tooLate = endMs !== null && nowWallMs > endMs;
 
         if (!tooEarly && !tooLate) {
             isAllowed = true;

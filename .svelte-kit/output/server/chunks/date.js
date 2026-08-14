@@ -30,42 +30,33 @@ function parseLocalDate(dateStr) {
   }
   return new Date(str);
 }
-function getWallClockMinutes(dateStr) {
+function getWallClockMs(dateStr) {
   if (!dateStr) return null;
   const str = String(dateStr);
   const match = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})[T\s](\d{1,2}):(\d{1,2})/);
   if (!match) return null;
   const [, year, month, day, hour, minute] = match;
-  return Date.UTC(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10), parseInt(hour, 10), parseInt(minute, 10)) / 6e4;
-}
-function getNowWallClockMinutes(now = /* @__PURE__ */ new Date(), timeZone) {
-  try {
-    const tz = timeZone || (typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "Asia/Makassar");
-    const str = now.toLocaleString("sv-SE", { timeZone: tz });
-    const minutes = getWallClockMinutes(str);
-    if (minutes !== null) return minutes;
-  } catch (e) {
-  }
-  return Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes()) / 6e4;
+  return Date.UTC(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10), parseInt(hour, 10), parseInt(minute, 10));
 }
 function checkSessionTimeWindow(startTimeStr, endTimeStr, now = /* @__PURE__ */ new Date()) {
   if (!startTimeStr) return { allowed: true };
-  const startMinutes = getWallClockMinutes(startTimeStr);
-  if (startMinutes === null) return { allowed: true };
-  const endMinutes = endTimeStr ? getWallClockMinutes(endTimeStr) : null;
-  const earliestMinutes = startMinutes - 15;
-  const timezones = ["Asia/Makassar", "Asia/Jakarta", "Asia/Jayapura"];
+  const startMs = getWallClockMs(startTimeStr);
+  if (startMs === null) return { allowed: true };
+  const endMs = endTimeStr ? getWallClockMs(endTimeStr) : null;
+  const earliestMs = startMs - 15 * 60 * 1e3;
+  const nowUtcMs = now.getTime();
+  const offsets = [8 * 3600 * 1e3, 7 * 3600 * 1e3, 9 * 3600 * 1e3];
   try {
-    const systemTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if (systemTz && !timezones.includes(systemTz)) timezones.unshift(systemTz);
+    const clientOffset = -now.getTimezoneOffset() * 60 * 1e3;
+    if (!offsets.includes(clientOffset)) offsets.unshift(clientOffset);
   } catch (e) {
   }
-  let isTooEarly = false;
   let isAllowed = false;
-  for (const tz of timezones) {
-    const nowMin = getNowWallClockMinutes(now, tz);
-    const tooEarly = nowMin < earliestMinutes;
-    const tooLate = endMinutes !== null && nowMin > endMinutes;
+  let isTooEarly = false;
+  for (const offset of offsets) {
+    const nowWallMs = nowUtcMs + offset;
+    const tooEarly = nowWallMs < earliestMs;
+    const tooLate = endMs !== null && nowWallMs > endMs;
     if (!tooEarly && !tooLate) {
       isAllowed = true;
       break;
