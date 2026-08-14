@@ -49,15 +49,27 @@ export function parseLocalDate(dateStr: any): Date {
 }
 
 /**
- * Calculates UTC timestamp (in ms) from wall-clock components of a YYYY-MM-DD HH:mm string.
+ * Calculates UTC timestamp (in ms) from wall-clock components of a YYYY-MM-DD HH:mm or HH:mm string.
  */
-export function getWallClockMs(dateStr: any): number | null {
+export function getWallClockMs(dateStr: any, referenceDate = new Date()): number | null {
     if (!dateStr) return null;
-    const str = String(dateStr);
-    const match = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})[T\s](\d{1,2}):(\d{1,2})/);
-    if (!match) return null;
-    const [, year, month, day, hour, minute] = match;
-    return Date.UTC(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10), parseInt(hour, 10), parseInt(minute, 10));
+    const str = String(dateStr).trim();
+    
+    // Case A: Full date and time "YYYY-MM-DD HH:mm" or "YYYY-MM-DDTHH:mm"
+    const matchFull = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})[T\s](\d{1,2}):(\d{1,2})/);
+    if (matchFull) {
+        const [, year, month, day, hour, minute] = matchFull;
+        return Date.UTC(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10), parseInt(hour, 10), parseInt(minute, 10));
+    }
+
+    // Case B: Time string only "HH:mm" (e.g. "14:20" from <input type="time">)
+    const matchTimeOnly = str.match(/^(\d{1,2}):(\d{1,2})/);
+    if (matchTimeOnly) {
+        const [, hour, minute] = matchTimeOnly;
+        return Date.UTC(referenceDate.getUTCFullYear(), referenceDate.getUTCMonth(), referenceDate.getUTCDate(), parseInt(hour, 10), parseInt(minute, 10));
+    }
+
+    return null;
 }
 
 /**
@@ -72,10 +84,10 @@ export function checkSessionTimeWindow(
 ): { allowed: boolean; reason?: 'too_early' | 'too_late'; timeFormatted?: string } {
     if (!startTimeStr) return { allowed: true };
 
-    const startMs = getWallClockMs(startTimeStr);
+    const startMs = getWallClockMs(startTimeStr, now);
     if (startMs === null) return { allowed: true };
 
-    const endMs = endTimeStr ? getWallClockMs(endTimeStr) : null;
+    const endMs = endTimeStr ? getWallClockMs(endTimeStr, now) : null;
     
     // Compare in whole wall-clock minutes to prevent millisecond round-down issues
     const startMin = Math.floor(startMs / 60000);
@@ -106,4 +118,55 @@ export function checkSessionTimeWindow(
 
     if (tooEarly) return { allowed: false, reason: 'too_early', timeFormatted: timeFormatted.replace(':', '.') };
     return { allowed: false, reason: 'too_late', timeFormatted: timeFormatted.replace(':', '.') };
+}
+
+/**
+ * Checks if current wall-clock time is active for a student's exam attempt.
+ */
+export function isStudentExamTimeActive(
+    startTimeStr: string | null, 
+    endTimeStr: string | null, 
+    now: Date = new Date(),
+    clientTzOffsetMinutes?: number | null
+): { allowed: boolean; reason?: 'too_early' | 'too_late' } {
+    if (!startTimeStr && !endTimeStr) return { allowed: true };
+
+    let offsetMs: number;
+    if (typeof clientTzOffsetMinutes === 'number' && !isNaN(clientTzOffsetMinutes)) {
+        offsetMs = -clientTzOffsetMinutes * 60 * 1000;
+    } else {
+        const localOffsetMins = now.getTimezoneOffset();
+        offsetMs = localOffsetMins !== 0 ? -localOffsetMins * 60 * 1000 : 8 * 3600 * 1000;
+    }
+
+    const nowWallDate = new Date(now.getTime() + offsetMs);
+    const nowWallMin = Math.floor(nowWallDate.getTime() / 60000);
+
+    let startMin: number | null = null;
+    if (startTimeStr) {
+        const startMs = getWallClockMs(startTimeStr, nowWallDate);
+        if (startMs !== null) {
+            startMin = Math.floor(startMs / 60000);
+            if (nowWallMin < startMin) {
+                return { allowed: false, reason: 'too_early' };
+            }
+        }
+    }
+
+    if (endTimeStr) {
+        const endMs = getWallClockMs(endTimeStr, nowWallDate);
+        if (endMs !== null) {
+            let endMin = Math.floor(endMs / 60000);
+            if (startMin !== null && !endTimeStr.includes('-') && !endTimeStr.includes('/')) {
+                if (endMin <= startMin) {
+                    endMin += 24 * 60;
+                }
+            }
+            if (nowWallMin > endMin) {
+                return { allowed: false, reason: 'too_late' };
+            }
+        }
+    }
+
+    return { allowed: true };
 }

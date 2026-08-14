@@ -135,6 +135,7 @@
 				autocomplete="off"
 			/>
 			<input type="hidden" name="exam_id" value={data.exam.id} />
+			<input type="hidden" name="tz_offset" value={new Date().getTimezoneOffset()} />
 
 			<button type="submit" disabled={loading} class="btn-primary w-full py-3 text-base justify-center">
 				{#if loading}
@@ -255,6 +256,7 @@
 			}}>
 				<input type="hidden" name="token" value={tokenCode} />
 				<input type="hidden" name="exam_id" value={data.exam.id} />
+				<input type="hidden" name="tz_offset" value={new Date().getTimezoneOffset()} />
 				<input type="hidden" name="signature" value={signatureData} />
 				
 				<div class="flex gap-3">

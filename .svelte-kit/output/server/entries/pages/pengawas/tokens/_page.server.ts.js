@@ -169,7 +169,7 @@ const actions = {
         attemptsCount++;
         tokenCode = generateTokenCode(6);
         try {
-          await db.prepare("INSERT INTO tokens (school_id, exam_id, session_number, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?, ?)").bind(locals.user.school_id, parsedExamId, parsedSessionNumber, tokenCode, locals.user.id, expiresAt).run();
+          await db.prepare("INSERT INTO tokens (school_id, exam_id, session_number, token_code, is_released, released_at, created_by, expires_at) VALUES (?, ?, ?, ?, 1, datetime('now'), ?, ?)").bind(locals.user.school_id, parsedExamId, parsedSessionNumber, tokenCode, locals.user.id, expiresAt).run();
           inserted = true;
         } catch (err) {
           if (err.message && err.message.includes("UNIQUE")) {

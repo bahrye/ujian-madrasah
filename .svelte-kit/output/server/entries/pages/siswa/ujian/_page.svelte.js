@@ -23,7 +23,7 @@ function _page($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--> <form method="POST" action="?/validateToken" class="space-y-4"><input name="token" type="text" required="" class="input text-center text-2xl font-mono tracking-[0.3em] uppercase py-4" placeholder="_ _ _ _ _ _" maxlength="10" autocomplete="off"/> <input type="hidden" name="exam_id"${attr("value", data.exam.id)}/> <button type="submit"${attr("disabled", loading, true)} class="btn-primary w-full py-3 text-base justify-center">`);
+    $$renderer2.push(`<!--]--> <form method="POST" action="?/validateToken" class="space-y-4"><input name="token" type="text" required="" class="input text-center text-2xl font-mono tracking-[0.3em] uppercase py-4" placeholder="_ _ _ _ _ _" maxlength="10" autocomplete="off"/> <input type="hidden" name="exam_id"${attr("value", data.exam.id)}/> <input type="hidden" name="tz_offset"${attr("value", (/* @__PURE__ */ new Date()).getTimezoneOffset())}/> <button type="submit"${attr("disabled", loading, true)} class="btn-primary w-full py-3 text-base justify-center">`);
     {
       $$renderer2.push("<!--[-1-->");
       $$renderer2.push(`Mulai Ujian`);

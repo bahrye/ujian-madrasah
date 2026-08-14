@@ -1,4 +1,4 @@
-import { p as parseDate } from "../../../../chunks/date.js";
+import { i as isStudentExamTimeActive, p as parseDate } from "../../../../chunks/date.js";
 import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
 import { s as signExamToken } from "../../../../chunks/auth.js";
@@ -43,6 +43,8 @@ const actions = {
     const tokenCode = form.get("token")?.toString().trim().toUpperCase();
     const examIdStr = form.get("exam_id")?.toString();
     const parsedExamId = parseInt(examIdStr || "", 10);
+    const tzOffsetStr = form.get("tz_offset")?.toString();
+    const clientTzOffset = tzOffsetStr ? parseInt(tzOffsetStr, 10) : null;
     if (!tokenCode || isNaN(parsedExamId)) return fail(400, { error: "Data tidak lengkap." });
     try {
       const token = await db.prepare(`
@@ -74,24 +76,23 @@ const actions = {
       }
       const startTimeStr = sessionRecord?.start_time || token.exam_start_time;
       const endTimeStr = sessionRecord?.end_time || token.exam_end_time;
-      const now = /* @__PURE__ */ new Date();
-      if (startTimeStr && now < new Date(startTimeStr)) {
-        return fail(400, { error: "Waktu ujian belum dimulai untuk sesi Anda." });
-      }
-      if (endTimeStr && now > new Date(endTimeStr)) {
-        return fail(400, { error: "Waktu ujian telah berakhir untuk sesi Anda." });
+      const timeCheck = isStudentExamTimeActive(startTimeStr, endTimeStr, /* @__PURE__ */ new Date(), clientTzOffset);
+      if (!timeCheck.allowed) {
+        if (timeCheck.reason === "too_early") {
+          return fail(400, { error: "Waktu ujian belum dimulai untuk sesi Anda." });
+        } else if (timeCheck.reason === "too_late") {
+          return fail(400, { error: "Waktu ujian telah berakhir untuk sesi Anda." });
+        }
       }
       if (!token.is_released) {
-        return fail(400, { error: "Token ujian ini sudah ditarik atau belum dirilis oleh pengawas." });
+        return fail(400, { error: "Token ujian ini belum dirilis oleh pengawas." });
       }
       if (token.released_at) {
         const releasedAt = parseDate(token.released_at).getTime();
-        const now2 = (/* @__PURE__ */ new Date()).getTime();
-        if (now2 - releasedAt > 15 * 60 * 1e3) {
-          return fail(400, { error: "Token sudah kedaluwarsa / ditarik otomatis (melewati batas waktu 15 menit)." });
+        const nowMs = Date.now();
+        if (nowMs - releasedAt > 15 * 60 * 1e3) {
+          return fail(400, { error: "Token sudah kedaluwarsa (melewati batas waktu 15 menit)." });
         }
-      } else {
-        return fail(400, { error: "Status rilis token tidak valid." });
       }
       if (parseDate(token.expires_at) < /* @__PURE__ */ new Date()) {
         return fail(400, { error: "Token sudah kedaluwarsa." });
@@ -121,6 +122,8 @@ const actions = {
     const tokenCode = form.get("token")?.toString().trim().toUpperCase();
     const examIdStr = form.get("exam_id")?.toString();
     const parsedExamId = parseInt(examIdStr || "", 10);
+    const tzOffsetStr = form.get("tz_offset")?.toString();
+    const clientTzOffset = tzOffsetStr ? parseInt(tzOffsetStr, 10) : null;
     if (!tokenCode || isNaN(parsedExamId)) return fail(400, { error: "Data tidak lengkap." });
     try {
       const token = await db.prepare(`
@@ -152,24 +155,23 @@ const actions = {
       }
       const startTimeStr = sessionRecord?.start_time || token.exam_start_time;
       const endTimeStr = sessionRecord?.end_time || token.exam_end_time;
-      const now = /* @__PURE__ */ new Date();
-      if (startTimeStr && now < new Date(startTimeStr)) {
-        return fail(400, { error: "Waktu ujian belum dimulai untuk sesi Anda." });
-      }
-      if (endTimeStr && now > new Date(endTimeStr)) {
-        return fail(400, { error: "Waktu ujian telah berakhir untuk sesi Anda." });
+      const timeCheck = isStudentExamTimeActive(startTimeStr, endTimeStr, /* @__PURE__ */ new Date(), clientTzOffset);
+      if (!timeCheck.allowed) {
+        if (timeCheck.reason === "too_early") {
+          return fail(400, { error: "Waktu ujian belum dimulai untuk sesi Anda." });
+        } else if (timeCheck.reason === "too_late") {
+          return fail(400, { error: "Waktu ujian telah berakhir untuk sesi Anda." });
+        }
       }
       if (!token.is_released) {
-        return fail(400, { error: "Token ujian ini sudah ditarik atau belum dirilis oleh pengawas." });
+        return fail(400, { error: "Token ujian ini belum dirilis oleh pengawas." });
       }
       if (token.released_at) {
         const releasedAt = parseDate(token.released_at).getTime();
-        const now2 = (/* @__PURE__ */ new Date()).getTime();
-        if (now2 - releasedAt > 15 * 60 * 1e3) {
-          return fail(400, { error: "Token sudah kedaluwarsa / ditarik otomatis (melewati batas waktu 15 menit)." });
+        const nowMs = Date.now();
+        if (nowMs - releasedAt > 15 * 60 * 1e3) {
+          return fail(400, { error: "Token sudah kedaluwarsa (melewati batas waktu 15 menit)." });
         }
-      } else {
-        return fail(400, { error: "Status rilis token tidak valid." });
       }
       if (parseDate(token.expires_at) < /* @__PURE__ */ new Date()) {
         return fail(400, { error: "Token sudah kedaluwarsa." });

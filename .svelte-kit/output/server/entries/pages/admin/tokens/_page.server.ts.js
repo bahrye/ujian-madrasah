@@ -125,7 +125,7 @@ const actions = {
 				WHERE exam_id = ? AND (session_number = ? OR session_number IS NULL) AND school_id = ? 
 				  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
 			`).bind(parsedExamId, parsedSessionNumber, locals.user.school_id, parsedExamId).run();
-      await db.prepare("INSERT INTO tokens (school_id, exam_id, session_number, token_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?, ?)").bind(locals.user.school_id, parsedExamId, parsedSessionNumber, tokenCode, locals.user.id, expiresAt).run();
+      await db.prepare("INSERT INTO tokens (school_id, exam_id, session_number, token_code, is_released, released_at, created_by, expires_at) VALUES (?, ?, ?, ?, 1, datetime('now'), ?, ?)").bind(locals.user.school_id, parsedExamId, parsedSessionNumber, tokenCode, locals.user.id, expiresAt).run();
       return { success: `Token Sesi ${parsedSessionNumber} berhasil dibuat: ${tokenCode}` };
     } catch (e) {
       console.error(e);

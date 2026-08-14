@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { parseDate } from '$lib/utils/date';
+import { parseDate, isStudentExamTimeActive } from '$lib/utils/date';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
@@ -9,8 +9,6 @@ import { env } from '$env/dynamic/private';
 
 export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>[0]) => {
 	const db = getDB(platform);
-
-
 
 	const examIdStr = url.searchParams.get('exam_id');
 	const parsedExamId = parseInt(examIdStr || '', 10);
@@ -53,6 +51,8 @@ export const actions = {
 		const tokenCode = form.get('token')?.toString().trim().toUpperCase();
 		const examIdStr = form.get('exam_id')?.toString();
 		const parsedExamId = parseInt(examIdStr || '', 10);
+		const tzOffsetStr = form.get('tz_offset')?.toString();
+		const clientTzOffset = tzOffsetStr ? parseInt(tzOffsetStr, 10) : null;
 
 		if (!tokenCode || isNaN(parsedExamId)) return fail(400, { error: 'Data tidak lengkap.' });
 
@@ -79,7 +79,7 @@ export const actions = {
 				return fail(400, { error: `Token ini khusus untuk Sesi ${tokenSession}. Sesi Anda adalah Sesi ${studentSession}.` });
 			}
 
-			// Validasi keaktifan dan status rilis token terlebih dahulu
+			// Validasi keaktifan ujian
 			if (!token.is_active) {
 				return fail(400, { error: 'Ujian saat ini tidak aktif.' });
 			}
@@ -95,26 +95,25 @@ export const actions = {
 			
 			const startTimeStr = sessionRecord?.start_time || token.exam_start_time;
 			const endTimeStr = sessionRecord?.end_time || token.exam_end_time;
-			const now = new Date();
 			
-			if (startTimeStr && now < new Date(startTimeStr)) {
-				return fail(400, { error: 'Waktu ujian belum dimulai untuk sesi Anda.' });
-			}
-			if (endTimeStr && now > new Date(endTimeStr)) {
-				return fail(400, { error: 'Waktu ujian telah berakhir untuk sesi Anda.' });
+			const timeCheck = isStudentExamTimeActive(startTimeStr, endTimeStr, new Date(), clientTzOffset);
+			if (!timeCheck.allowed) {
+				if (timeCheck.reason === 'too_early') {
+					return fail(400, { error: 'Waktu ujian belum dimulai untuk sesi Anda.' });
+				} else if (timeCheck.reason === 'too_late') {
+					return fail(400, { error: 'Waktu ujian telah berakhir untuk sesi Anda.' });
+				}
 			}
 
 			if (!token.is_released) {
-				return fail(400, { error: 'Token ujian ini sudah ditarik atau belum dirilis oleh pengawas.' });
+				return fail(400, { error: 'Token ujian ini belum dirilis oleh pengawas.' });
 			}
 			if (token.released_at) {
 				const releasedAt = parseDate(token.released_at).getTime();
-				const now = new Date().getTime();
-				if (now - releasedAt > 15 * 60 * 1000) {
-					return fail(400, { error: 'Token sudah kedaluwarsa / ditarik otomatis (melewati batas waktu 15 menit).' });
+				const nowMs = Date.now();
+				if (nowMs - releasedAt > 15 * 60 * 1000) {
+					return fail(400, { error: 'Token sudah kedaluwarsa (melewati batas waktu 15 menit).' });
 				}
-			} else {
-				return fail(400, { error: 'Status rilis token tidak valid.' });
 			}
 			if (parseDate(token.expires_at) < new Date()) {
 				return fail(400, { error: 'Token sudah kedaluwarsa.' });
@@ -151,6 +150,8 @@ export const actions = {
 		const tokenCode = form.get('token')?.toString().trim().toUpperCase();
 		const examIdStr = form.get('exam_id')?.toString();
 		const parsedExamId = parseInt(examIdStr || '', 10);
+		const tzOffsetStr = form.get('tz_offset')?.toString();
+		const clientTzOffset = tzOffsetStr ? parseInt(tzOffsetStr, 10) : null;
 
 		if (!tokenCode || isNaN(parsedExamId)) return fail(400, { error: 'Data tidak lengkap.' });
 
@@ -177,7 +178,7 @@ export const actions = {
 				return fail(400, { error: `Token ini khusus untuk Sesi ${tokenSession}. Sesi Anda adalah Sesi ${studentSession}.` });
 			}
 
-			// Validasi keaktifan dan status rilis token terlebih dahulu
+			// Validasi keaktifan ujian
 			if (!token.is_active) {
 				return fail(400, { error: 'Ujian saat ini tidak aktif.' });
 			}
@@ -193,26 +194,25 @@ export const actions = {
 			
 			const startTimeStr = sessionRecord?.start_time || token.exam_start_time;
 			const endTimeStr = sessionRecord?.end_time || token.exam_end_time;
-			const now = new Date();
 			
-			if (startTimeStr && now < new Date(startTimeStr)) {
-				return fail(400, { error: 'Waktu ujian belum dimulai untuk sesi Anda.' });
-			}
-			if (endTimeStr && now > new Date(endTimeStr)) {
-				return fail(400, { error: 'Waktu ujian telah berakhir untuk sesi Anda.' });
+			const timeCheck = isStudentExamTimeActive(startTimeStr, endTimeStr, new Date(), clientTzOffset);
+			if (!timeCheck.allowed) {
+				if (timeCheck.reason === 'too_early') {
+					return fail(400, { error: 'Waktu ujian belum dimulai untuk sesi Anda.' });
+				} else if (timeCheck.reason === 'too_late') {
+					return fail(400, { error: 'Waktu ujian telah berakhir untuk sesi Anda.' });
+				}
 			}
 
 			if (!token.is_released) {
-				return fail(400, { error: 'Token ujian ini sudah ditarik atau belum dirilis oleh pengawas.' });
+				return fail(400, { error: 'Token ujian ini belum dirilis oleh pengawas.' });
 			}
 			if (token.released_at) {
 				const releasedAt = parseDate(token.released_at).getTime();
-				const now = new Date().getTime();
-				if (now - releasedAt > 15 * 60 * 1000) {
-					return fail(400, { error: 'Token sudah kedaluwarsa / ditarik otomatis (melewati batas waktu 15 menit).' });
+				const nowMs = Date.now();
+				if (nowMs - releasedAt > 15 * 60 * 1000) {
+					return fail(400, { error: 'Token sudah kedaluwarsa (melewati batas waktu 15 menit).' });
 				}
-			} else {
-				return fail(400, { error: 'Status rilis token tidak valid.' });
 			}
 			if (parseDate(token.expires_at) < new Date()) {
 				return fail(400, { error: 'Token sudah kedaluwarsa.' });
@@ -252,7 +252,6 @@ export const actions = {
 					try {
 						const uploadResult = await uploadToCloudinary(signatureStr, mergedEnv);
 						if (uploadResult.success && uploadResult.url) {
-							// Update DB with the secure Cloudinary URL, replacing the heavy base64 string
 							await db.prepare(`UPDATE student_attempts SET signature = ? WHERE id = ?`)
 								.bind(uploadResult.url, attemptId).run();
 							console.log('Background upload success for attempt', attemptId);
@@ -264,7 +263,6 @@ export const actions = {
 					}
 				};
 
-				// Use Cloudflare's waitUntil to run after response, or fire-and-forget in Node dev
 				if (platform?.context?.waitUntil) {
 					platform.context.waitUntil(backgroundUpload());
 				} else {
