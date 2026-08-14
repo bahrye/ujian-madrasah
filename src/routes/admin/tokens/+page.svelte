@@ -93,6 +93,7 @@
 		<div class="card p-6 border-2 border-amber-200 animate-in">
 			<h2 class="text-lg font-bold text-slate-800 mb-4">Generate Token Baru</h2>
 			<form method="POST" action="?/generate" use:enhance={() => { return async ({ update }) => { showGenerate = false; await update(); }; }} class="space-y-4">
+				<input type="hidden" name="tz_offset" value={new Date().getTimezoneOffset()} />
 				<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
 					<div>
 						<label class="label" for="t-exam">Ujian</label>
@@ -112,7 +113,7 @@
 								<option value="">Pilih ujian dulu</option>
 							{:else}
 								{#each availableSessions as session}
-									{@const timeCheck = checkSessionTimeWindow(session.start_time, session.end_time, new Date(currentTime))}
+									{@const timeCheck = checkSessionTimeWindow(session.start_time, session.end_time, new Date(currentTime), new Date().getTimezoneOffset())}
 									{@const isAllowed = timeCheck.allowed}
 									{@const isPastEnd = timeCheck.reason === 'too_late'}
 									{@const startTimeFormatted = session.start_time ? (session.start_time.includes('T') ? session.start_time.split('T')[1].slice(0, 5) : session.start_time.includes(' ') ? session.start_time.split(' ')[1].slice(0, 5) : session.start_time) : ''}

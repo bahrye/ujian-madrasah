@@ -38,34 +38,26 @@ function getWallClockMs(dateStr) {
   const [, year, month, day, hour, minute] = match;
   return Date.UTC(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10), parseInt(hour, 10), parseInt(minute, 10));
 }
-function checkSessionTimeWindow(startTimeStr, endTimeStr, now = /* @__PURE__ */ new Date()) {
+function checkSessionTimeWindow(startTimeStr, endTimeStr, now = /* @__PURE__ */ new Date(), clientTzOffsetMinutes) {
   if (!startTimeStr) return { allowed: true };
   const startMs = getWallClockMs(startTimeStr);
   if (startMs === null) return { allowed: true };
   const endMs = endTimeStr ? getWallClockMs(endTimeStr) : null;
   const earliestMs = startMs - 15 * 60 * 1e3;
   const nowUtcMs = now.getTime();
-  const offsets = [8 * 3600 * 1e3, 7 * 3600 * 1e3, 9 * 3600 * 1e3];
-  try {
-    const clientOffset = -now.getTimezoneOffset() * 60 * 1e3;
-    if (!offsets.includes(clientOffset)) offsets.unshift(clientOffset);
-  } catch (e) {
+  let offsetMs;
+  if (typeof clientTzOffsetMinutes === "number" && !isNaN(clientTzOffsetMinutes)) {
+    offsetMs = -clientTzOffsetMinutes * 60 * 1e3;
+  } else {
+    const localOffsetMins = now.getTimezoneOffset();
+    offsetMs = localOffsetMins !== 0 ? -localOffsetMins * 60 * 1e3 : 8 * 3600 * 1e3;
   }
-  let isAllowed = false;
-  let isTooEarly = false;
-  for (const offset of offsets) {
-    const nowWallMs = nowUtcMs + offset;
-    const tooEarly = nowWallMs < earliestMs;
-    const tooLate = endMs !== null && nowWallMs > endMs;
-    if (!tooEarly && !tooLate) {
-      isAllowed = true;
-      break;
-    }
-    if (tooEarly) isTooEarly = true;
-  }
-  if (isAllowed) return { allowed: true };
+  const nowWallMs = nowUtcMs + offsetMs;
+  const tooEarly = nowWallMs < earliestMs;
+  const tooLate = endMs !== null && nowWallMs > endMs;
+  if (!tooEarly && !tooLate) return { allowed: true };
   const timeFormatted = startTimeStr.includes("T") ? startTimeStr.split("T")[1].slice(0, 5) : startTimeStr.includes(" ") ? startTimeStr.split(" ")[1].slice(0, 5) : startTimeStr;
-  if (isTooEarly) return { allowed: false, reason: "too_early", timeFormatted: timeFormatted.replace(":", ".") };
+  if (tooEarly) return { allowed: false, reason: "too_early", timeFormatted: timeFormatted.replace(":", ".") };
   return { allowed: false, reason: "too_late", timeFormatted: timeFormatted.replace(":", ".") };
 }
 export {

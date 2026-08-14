@@ -171,11 +171,14 @@ export const actions: Actions = {
 			SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?
 		`).bind(parsedExamId, parsedSessionNumber).first<{ start_time: string | null; end_time: string | null }>();
 
+		const tzOffsetStr = form.get('tz_offset')?.toString();
+		const clientTzOffset = tzOffsetStr ? parseInt(tzOffsetStr, 10) : null;
+
 		const startTimeStr = sessionRecord?.start_time || proctorAssignment.exam_start_time;
 		const endTimeStr = sessionRecord?.end_time || proctorAssignment.exam_end_time;
 
 		// Aturan 15 menit sebelum waktu sesi ujian
-		const timeCheck = checkSessionTimeWindow(startTimeStr, endTimeStr);
+		const timeCheck = checkSessionTimeWindow(startTimeStr, endTimeStr, new Date(), clientTzOffset);
 		if (!timeCheck.allowed) {
 			if (timeCheck.reason === 'too_early') {
 				return fail(400, { error: `Token Sesi ${parsedSessionNumber} baru dapat dibuat 15 menit sebelum waktu sesi ujian dimulai (mulai pukul ${timeCheck.timeFormatted}).` });

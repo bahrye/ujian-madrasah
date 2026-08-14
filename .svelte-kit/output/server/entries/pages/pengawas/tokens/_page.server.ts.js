@@ -135,9 +135,11 @@ const actions = {
     const sessionRecord = await db.prepare(`
 			SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?
 		`).bind(parsedExamId, parsedSessionNumber).first();
+    const tzOffsetStr = form.get("tz_offset")?.toString();
+    const clientTzOffset = tzOffsetStr ? parseInt(tzOffsetStr, 10) : null;
     const startTimeStr = sessionRecord?.start_time || proctorAssignment.exam_start_time;
     const endTimeStr = sessionRecord?.end_time || proctorAssignment.exam_end_time;
-    const timeCheck = checkSessionTimeWindow(startTimeStr, endTimeStr);
+    const timeCheck = checkSessionTimeWindow(startTimeStr, endTimeStr, /* @__PURE__ */ new Date(), clientTzOffset);
     if (!timeCheck.allowed) {
       if (timeCheck.reason === "too_early") {
         return fail(400, { error: `Token Sesi ${parsedSessionNumber} baru dapat dibuat 15 menit sebelum waktu sesi ujian dimulai (mulai pukul ${timeCheck.timeFormatted}).` });

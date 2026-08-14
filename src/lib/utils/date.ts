@@ -62,9 +62,14 @@ export function getWallClockMs(dateStr: any): number | null {
 
 /**
  * Checks if current time is within 15 minutes before the exam session start time and before end time.
- * Pure mathematical calculation without relying on locale formatting (safe for Cloudflare Workers V8).
+ * Accepts optional clientTzOffsetMinutes (from Date.prototype.getTimezoneOffset(), e.g. -480 for WITA GMT+8).
  */
-export function checkSessionTimeWindow(startTimeStr: string | null, endTimeStr: string | null, now: Date = new Date()): { allowed: boolean; reason?: 'too_early' | 'too_late'; timeFormatted?: string } {
+export function checkSessionTimeWindow(
+    startTimeStr: string | null, 
+    endTimeStr: string | null, 
+    now: Date = new Date(),
+    clientTzOffsetMinutes?: number | null
+): { allowed: boolean; reason?: 'too_early' | 'too_late'; timeFormatted?: string } {
     if (!startTimeStr) return { allowed: true };
 
     const startMs = getWallClockMs(startTimeStr);
@@ -75,33 +80,19 @@ export function checkSessionTimeWindow(startTimeStr: string | null, endTimeStr: 
 
     const nowUtcMs = now.getTime();
     
-    // Indonesian time offsets in ms: WITA (+8h), WIB (+7h), WIT (+9h)
-    const offsets = [8 * 3600 * 1000, 7 * 3600 * 1000, 9 * 3600 * 1000];
-    
-    // Also include client/system local offset if available and not already present
-    try {
-        const clientOffset = -now.getTimezoneOffset() * 60 * 1000;
-        if (!offsets.includes(clientOffset)) offsets.unshift(clientOffset);
-    } catch (e) {}
-
-    let isAllowed = false;
-    let isTooEarly = false;
-    let isTooLate = false;
-
-    for (const offset of offsets) {
-        const nowWallMs = nowUtcMs + offset;
-        const tooEarly = nowWallMs < earliestMs;
-        const tooLate = endMs !== null && nowWallMs > endMs;
-
-        if (!tooEarly && !tooLate) {
-            isAllowed = true;
-            break;
-        }
-        if (tooEarly) isTooEarly = true;
-        if (tooLate) isTooLate = true;
+    let offsetMs: number;
+    if (typeof clientTzOffsetMinutes === 'number' && !isNaN(clientTzOffsetMinutes)) {
+        offsetMs = -clientTzOffsetMinutes * 60 * 1000;
+    } else {
+        const localOffsetMins = now.getTimezoneOffset();
+        offsetMs = localOffsetMins !== 0 ? -localOffsetMins * 60 * 1000 : 8 * 3600 * 1000;
     }
 
-    if (isAllowed) return { allowed: true };
+    const nowWallMs = nowUtcMs + offsetMs;
+    const tooEarly = nowWallMs < earliestMs;
+    const tooLate = endMs !== null && nowWallMs > endMs;
+
+    if (!tooEarly && !tooLate) return { allowed: true };
 
     const timeFormatted = startTimeStr.includes('T')
         ? startTimeStr.split('T')[1].slice(0, 5)
@@ -109,6 +100,6 @@ export function checkSessionTimeWindow(startTimeStr: string | null, endTimeStr: 
         ? startTimeStr.split(' ')[1].slice(0, 5)
         : startTimeStr;
 
-    if (isTooEarly) return { allowed: false, reason: 'too_early', timeFormatted: timeFormatted.replace(':', '.') };
+    if (tooEarly) return { allowed: false, reason: 'too_early', timeFormatted: timeFormatted.replace(':', '.') };
     return { allowed: false, reason: 'too_late', timeFormatted: timeFormatted.replace(':', '.') };
 }
