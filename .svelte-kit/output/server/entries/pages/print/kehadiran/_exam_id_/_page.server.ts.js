@@ -31,6 +31,28 @@ const load = async ({ platform, params, locals }) => {
       sessionMap[s.session_number] = s;
     }
   }
+  const assignedProctorsRes = await db.prepare(`
+		SELECT DISTINCT u.id, u.name, u.nip, u.role
+		FROM exam_proctors ep
+		JOIN users u ON ep.proctor_id = u.id
+		WHERE ep.exam_id = ?
+		ORDER BY u.name ASC
+	`).bind(examId).all();
+  const schoolTeachersRes = await db.prepare(`
+		SELECT id, name, nip, role
+		FROM users
+		WHERE school_id = ? AND role IN ('guru', 'pengawas', 'admin') AND is_active = 1
+		ORDER BY name ASC
+	`).bind(locals.user.school_id).all();
+  const assignedProctors = assignedProctorsRes.results || [];
+  const schoolTeachers = schoolTeachersRes.results || [];
+  const assignedIds = new Set(assignedProctors.map((p) => p.id));
+  const proctorOptions = [
+    ...assignedProctors,
+    ...schoolTeachers.filter((t) => !assignedIds.has(t.id))
+  ];
+  const defaultProctor1Id = assignedProctors[0]?.id || proctorOptions[0]?.id || "";
+  const defaultProctor2Id = assignedProctors[1]?.id || "";
   const results = participants.results;
   const participantsGrouped = results.reduce((acc, p) => {
     const roomName = p.room_name || "Ruang Ujian";
@@ -47,7 +69,10 @@ const load = async ({ platform, params, locals }) => {
     isNomorPesertaMode,
     hasSessions,
     hasRooms,
-    sessionMap
+    sessionMap,
+    proctorOptions,
+    defaultProctor1Id,
+    defaultProctor2Id
   };
 };
 export {

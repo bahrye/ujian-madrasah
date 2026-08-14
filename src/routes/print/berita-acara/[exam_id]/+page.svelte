@@ -22,8 +22,26 @@
 			-webkit-print-color-adjust: exact;
 			print-color-adjust: exact;
 		}
+		.no-print {
+			display: none !important;
+		}
 	}
 </style>
+
+<div class="no-print p-4 bg-slate-800 text-white border-b border-slate-700 flex justify-between items-center sticky top-0 z-50 shadow-md">
+	<div class="text-xs text-slate-300">
+		Gunakan kertas <strong>A4</strong> saat mencetak.
+	</div>
+	<div class="flex items-center gap-2">
+		<button class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-medium transition-colors" on:click={() => window.close()}>Tutup</button>
+		<button class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-xs font-bold transition-colors flex items-center gap-1.5 shadow" on:click={() => window.print()}>
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+			</svg>
+			Cetak Berita Acara
+		</button>
+	</div>
+</div>
 
 <div class="p-4 md:p-8 max-w-4xl mx-auto font-serif text-[15px] leading-snug print:p-0 print:m-0 bg-white">
 {#each Object.entries(participantsGrouped) as [roomName, sessionsDict], roomIdx}
@@ -39,135 +57,71 @@
 			<h2 class="font-bold text-lg uppercase tracking-wide m-0">PANITIA PENYELENGGARA UJIAN</h2>
 			<h3 class="font-bold text-xl uppercase m-0">{school?.name || 'NAMA SEKOLAH'}</h3>
 			{#if school?.address}
-				<p class="text-sm mt-1 mb-0">{school.address}</p>
-			{/if}
-			{#if school?.website || school?.email}
-				<p class="text-xs m-0">Website: {school.website || '-'} | Email: {school.email || '-'}</p>
+				<p class="text-xs m-0 mt-0.5 font-sans">{school.address}</p>
 			{/if}
 		</div>
 	</div>
 
-	<!-- Judul Surat -->
-	<div class="text-center mb-4">
-		<h4 class="font-bold text-lg uppercase underline">BERITA ACARA PELAKSANAAN UJIAN</h4>
+	<!-- Judul -->
+	<div class="text-center mb-6">
+		<h1 class="font-bold text-lg uppercase underline tracking-wider mb-1">BERITA ACARA PELAKSANAAN UJIAN</h1>
+		<p class="text-sm font-medium">Tahun Ajaran 2025/2026</p>
 	</div>
 
-	<!-- Isi Surat -->
-	<div class="text-justify mb-4">
-		<p class="mb-3">Pada hari ini <span class="font-bold">{exam.start_time ? parseDate(exam.start_time).toLocaleDateString('id-ID', { weekday: 'long' }) : '..................'}</span> tanggal <span class="font-bold">{exam.start_time ? parseDate(exam.start_time).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '..............................'}</span>, telah diselenggarakan Ujian untuk mata pelajaran <span class="font-bold">{exam.subject_name || 'Umum'}</span> dari pukul <span class="font-bold">{exam.start_time ? parseDate(exam.start_time).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '....'}</span> sampai dengan pukul <span class="font-bold">{exam.end_time ? parseDate(exam.end_time).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '....'}</span>.</p>
+	<!-- Isu/Paragraf Pembuka -->
+	<p class="mb-4 text-justify">
+		Pada hari ini <span class="border-b border-dotted border-black px-2">{exam.start_time ? parseDate(exam.start_time).toLocaleDateString('id-ID', { weekday: 'long' }) : '................'}</span> 
+		tanggal <span class="border-b border-dotted border-black px-2">{exam.start_time ? parseDate(exam.start_time).getDate() : '......'}</span> 
+		bulan <span class="border-b border-dotted border-black px-2">{exam.start_time ? parseDate(exam.start_time).toLocaleDateString('id-ID', { month: 'long' }) : '................'}</span> 
+		tahun <span class="border-b border-dotted border-black px-2">{exam.start_time ? parseDate(exam.start_time).getFullYear() : '..........'}</span>, 
+		telah diselenggarakan <strong class="uppercase">{exam.exam_type_name || exam.title}</strong> Mata Pelajaran <strong>{exam.subject_name || 'Umum'}</strong> untuk:
+	</p>
 
-		<table class="w-full mb-4">
+	<!-- Tabel Info Ruang & Waktu -->
+	<div class="ml-4 mb-6">
+		<table class="w-full">
 			<tbody>
-				<tr>
-					<td class="py-1 w-8">1.</td>
-					<td class="py-1 w-60">Nama Ujian</td>
-					<td class="py-1 w-4">:</td>
-					<td class="py-1 font-bold">{exam.exam_type_name || exam.title}</td>
-				</tr>
-				<tr>
-					<td class="py-1">2.</td>
-					<td class="py-1">Mata Pelajaran</td>
-					<td class="py-1">:</td>
-					<td class="py-1 font-bold">{exam.subject_name || 'Umum'}</td>
-				</tr>
-				{#if data.hasSessions}
-				<tr>
-					<td class="py-1">3.</td>
-					<td class="py-1">Ruang / Sesi</td>
-					<td class="py-1">:</td>
-					<td class="py-1 font-bold">{roomName} / Sesi {sessionNum}</td>
-				</tr>
-				{:else}
-				<tr>
-					<td class="py-1">3.</td>
-					<td class="py-1">Ruang</td>
-					<td class="py-1">:</td>
-					<td class="py-1 font-bold">{roomName}</td>
-				</tr>
-				{/if}
-				<tr>
-					<td class="py-1">4.</td>
-					<td class="py-1">Jumlah Peserta Seharusnya</td>
-					<td class="py-1">:</td>
-					<td class="py-1 font-bold">{count} Orang</td>
-				</tr>
-				<tr>
-					<td class="py-1">5.</td>
-					<td class="py-1">Jumlah Peserta Hadir</td>
-					<td class="py-1">:</td>
-					<td class="py-1 font-bold">.......... Orang</td>
-				</tr>
-				<tr>
-					<td class="py-1">6.</td>
-					<td class="py-1">Jumlah Peserta Tidak Hadir</td>
-					<td class="py-1">:</td>
-					<td class="py-1 font-bold">.......... Orang</td>
-				</tr>
-				<tr>
-					<td class="py-1 align-top">7.</td>
-					<td class="py-1 align-top">{isNomorPesertaMode ? 'Nomor Peserta Tidak Hadir' : 'NISN Tidak Hadir'}</td>
-					<td class="py-1 align-top">:</td>
-					<td class="py-1 align-top text-slate-400 italic">.......................................................................................<br/><br/>.......................................................................................</td>
+				<tr class="align-top"><td class="w-48 py-1">a. Satuan Pendidikan</td><td class="w-4 py-1">:</td><td class="py-1 font-bold uppercase">{school?.name || '-'}</td></tr>
+				<tr class="align-top"><td class="py-1">b. Ruang / Sesi Ujian</td><td class="py-1">:</td><td class="py-1 font-bold">{roomName} / Sesi {sessionNum}</td></tr>
+				<tr class="align-top"><td class="py-1">c. Waktu Pelaksanaan</td><td class="py-1">:</td><td class="py-1">{exam.start_time ? parseDate(exam.start_time).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '....'} s.d. {exam.end_time ? parseDate(exam.end_time).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '....'} WIB</td></tr>
+				<tr class="align-top"><td class="py-1">d. Jumlah Peserta Seharusnya</td><td class="py-1">:</td><td class="py-1">{count} Orang</td></tr>
+				<tr class="align-top"><td class="py-1">e. Jumlah Peserta Hadir</td><td class="py-1">:</td><td class="py-1">........... Orang</td></tr>
+				<tr class="align-top"><td class="py-1">f. Jumlah Peserta Tidak Hadir</td><td class="py-1">:</td><td class="py-1">........... Orang</td></tr>
+				<tr class="align-top">
+					<td class="py-1 pl-4 text-sm font-sans" colspan="3">
+						- Nomor Peserta yang Tidak Hadir: <span class="border-b border-dotted border-black px-4 inline-block min-w-[250px]"></span>
+					</td>
 				</tr>
 			</tbody>
 		</table>
-
-		<p class="mb-1">Catatan selama pelaksanaan ujian / Kejadian penting:</p>
-		<div class="border border-black p-2 h-16 rounded-sm mb-4 bg-transparent">
-			<!-- Empty space for writing notes -->
-		</div>
-
-		<p class="mb-2">Demikian berita acara ini dibuat dengan sesungguhnya untuk dapat dipergunakan sebagaimana mestinya.</p>
 	</div>
 
-	<!-- Tanda Tangan -->
-	<div class="mt-4 px-4 text-sm">
-		<div class="flex justify-end mb-2">
-			<p>............, ....................................</p>
-		</div>
-		
-		<div class="flex justify-between mb-2">
-			<div class="text-center w-52">
-				<p class="mb-10">Pengawas 1</p>
-				<p class="font-bold border-b border-black w-full text-transparent">.............................</p>
-				<p class="mt-1 text-left">NIP.</p>
-			</div>
-			<div class="text-center w-52">
-				<p class="mb-10">Pengawas 2</p>
-				<p class="font-bold border-b border-black w-full text-transparent">.............................</p>
-				<p class="mt-1 text-left">NIP.</p>
-			</div>
-		</div>
-
-		<div class="flex justify-between mb-2">
-			<div class="text-center w-52">
-				<p class="mb-10">Proktor / Teknisi</p>
-				<p class="font-bold border-b border-black w-full text-transparent">.............................</p>
-				<p class="mt-1 text-left">NIP.</p>
-			</div>
-			<div class="text-center w-52">
-				<p class="mb-10">Panitia Ujian</p>
-				<p class="font-bold border-b border-black w-full text-transparent">.............................</p>
-				<p class="mt-1 text-left">NIP.</p>
-			</div>
-		</div>
-
-		<div class="flex justify-center">
-			<div class="text-center w-60">
-				<p class="mb-1">Mengetahui,</p>
-				<p class="mb-10">Kepala Madrasah</p>
-				<p class="font-bold border-b border-black w-full text-transparent">...................................</p>
-				<p class="mt-1 text-left">NIP.</p>
-			</div>
+	<!-- Catatan / Kejadian Penting -->
+	<div class="mb-6">
+		<p class="mb-2 font-bold">Catatan / Kejadian Penting Selama Ujian Berlangsung:</p>
+		<div class="border border-slate-400 p-3 min-h-[100px] text-xs font-mono text-slate-500 rounded">
+			( Kosongkan jika pelaksanaan ujian berjalan tertib dan lancar )
 		</div>
 	</div>
+
+	<p class="mb-8">
+		Demikian Berita Acara ini dibuat dengan sesungguhnya untuk dipergunakan sebagaimana mestinya.
+	</p>
+
+	<!-- TTD Pengawas -->
+	<div class="grid grid-cols-2 gap-8 text-center mt-12">
+		<div>
+			<p class="mb-16">Pengawas I</p>
+			<p class="font-bold border-b border-black inline-block px-4">( .................................................... )</p>
+			<p class="text-xs mt-1">NIP. ........................................</p>
 		</div>
+		<div>
+			<p class="mb-16">Pengawas II</p>
+			<p class="font-bold border-b border-black inline-block px-4">( .................................................... )</p>
+			<p class="text-xs mt-1">NIP. ........................................</p>
+		</div>
+	</div>
+</div>
 	{/each}
 {/each}
-
-{#if Object.keys(participantsGrouped).length === 0}
-	<div class="text-center text-slate-500 py-10">
-		Belum ada peserta di ujian ini.
-	</div>
-{/if}
 </div>

@@ -9,6 +9,21 @@
 	<title>Cetak Kartu Peserta Ujian - {exam.title}</title>
 </svelte:head>
 
+<div class="no-print p-4 bg-slate-800 text-white border-b border-slate-700 flex justify-between items-center sticky top-0 z-50 shadow-md">
+	<div class="text-xs text-slate-300">
+		Gunakan kertas <strong>A4</strong> saat mencetak.
+	</div>
+	<div class="flex items-center gap-2">
+		<button class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-medium transition-colors" on:click={() => window.close()}>Tutup</button>
+		<button class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-xs font-bold transition-colors flex items-center gap-1.5 shadow" on:click={() => window.print()}>
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+			</svg>
+			Cetak Kartu
+		</button>
+	</div>
+</div>
+
 <div class="p-4 sm:p-8 print:p-0 overflow-x-auto print:overflow-visible w-full">
 	<div class="print:w-full min-w-[750px] print:min-w-0">
 		{#each Array(Math.ceil(participants.length / 4)) as _, pageIndex}
@@ -38,97 +53,58 @@
 					<div class="text-center font-bold text-xs mb-3 pb-2 border-b border-slate-300">
 							{exam.exam_type_name || 'Ujian'} - {exam.subject_name || 'Umum'}
 						</div>
-						<table class="w-full text-[11px] leading-snug">
-							<tbody>
-								<tr>
-									<td class="py-1 w-24 font-medium text-slate-700">No. Peserta</td>
-									<td class="py-1 w-4 text-center">:</td>
-									<td class="py-1 font-bold">{p.nisn}</td>
-								</tr>
-								<tr>
-									<td class="py-1 font-medium text-slate-700">Nama</td>
-									<td class="py-1 text-center">:</td>
-									<td class="py-1 font-bold"><div class="line-clamp-2 leading-tight pr-1">{p.student_name}</div></td>
-								</tr>
-								<tr>
-									<td class="py-1 font-medium text-slate-700">Kelas</td>
-									<td class="py-1 text-center">:</td>
-									<td class="py-1 font-bold">{p.class_name || '-'}</td>
-								</tr>
-								{#if data.hasRooms || data.hasSessions}
-								<tr>
-									<td class="py-1 font-medium text-slate-700">{data.hasRooms && data.hasSessions ? 'Ruang / Sesi' : data.hasRooms ? 'Ruang' : 'Sesi & Waktu'}</td>
-									<td class="py-1 text-center">:</td>
-									<td class="py-1 font-bold">
-										{#if data.hasRooms && data.hasSessions}
-											{p.room_name || '..........'} / Sesi {p.session_number} ({p.session_time || '-'})
-										{:else if data.hasRooms}
-											{p.room_name || '..........'}
-										{:else}
-											Sesi {p.session_number} ({p.session_time || '-'})
-										{/if}
-									</td>
-								</tr>
-								{/if}
-								<tr>
-									<td class="py-1 font-medium text-slate-700">TTL</td>
-									<td class="py-1 text-center">:</td>
-									<td class="py-1 font-bold">{p.place_of_birth || '-'}, {p.date_of_birth ? new Date(p.date_of_birth).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}) : '-'}</td>
-								</tr>
-								<tr>
-									<td class="py-1 font-medium text-slate-700">Link Akses</td>
-									<td class="py-1 text-center">:</td>
-									<td class="py-1 font-bold">https://ujian-madrasah.pages.dev</td>
-								</tr>
-							</tbody>
-						</table>
-						
-						<!-- Spacer to push bottom content down evenly -->
-						<div class="flex-1 min-h-[0.5rem]"></div>
-
-						<div class="mt-3 text-[11px] bg-slate-50 border border-slate-200 p-1.5 rounded text-slate-700 text-center font-medium">
-							Gunakan <span class="font-bold">No. Peserta</span> sebagai Username dan <span class="font-bold">NISN</span> sebagai Password.
-						</div>
-					
-					<div class="mt-4 flex justify-between items-end">
-						<div class="flex gap-3 items-end">
-							{#if p.photo}
-								<img src={p.photo} alt="Foto {p.student_name}" class="w-[2cm] h-[3cm] border-2 border-slate-300 object-cover bg-slate-50" />
-							{:else}
-								<div class="w-[2cm] h-[3cm] border-2 border-slate-300 flex items-center justify-center bg-slate-50 text-slate-400 text-[10px] text-center p-1">
-									Pas Foto<br/>2 x 3
+						<div class="flex-1 flex gap-4">
+							<div class="w-24 flex flex-col items-center gap-2">
+								<div class="w-20 h-24 bg-slate-200 border border-slate-400 flex items-center justify-center text-[10px] text-slate-400 font-semibold text-center leading-tight p-1">
+									FOTO 3x4
 								</div>
-							{/if}
+								<div class="text-[10px] font-mono font-bold bg-slate-100 px-1 py-0.5 border border-slate-300 rounded text-center w-full truncate" title={p.username}>
+									{p.username}
+								</div>
+							</div>
+							
+							<div class="flex-1 text-xs space-y-1.5">
+								<div class="grid grid-cols-[80px_8px_1fr] items-baseline">
+									<span class="text-slate-600">Nama</span>
+									<span>:</span>
+									<span class="font-bold uppercase truncate">{p.student_name}</span>
+								</div>
+								<div class="grid grid-cols-[80px_8px_1fr] items-baseline">
+									<span class="text-slate-600">No. Peserta</span>
+									<span>:</span>
+									<span class="font-mono font-bold">{p.nomor_peserta || '-'}</span>
+								</div>
+								<div class="grid grid-cols-[80px_8px_1fr] items-baseline">
+									<span class="text-slate-600">NISN</span>
+									<span>:</span>
+									<span class="font-mono">{p.nisn || '-'}</span>
+								</div>
+								<div class="grid grid-cols-[80px_8px_1fr] items-baseline">
+									<span class="text-slate-600">Kelas</span>
+									<span>:</span>
+									<span class="font-bold">{p.class_name || '-'}</span>
+								</div>
+								<div class="grid grid-cols-[80px_8px_1fr] items-baseline">
+									<span class="text-slate-600">Ruang / Sesi</span>
+									<span>:</span>
+									<span class="font-semibold">{p.room_name || '-'} / Sesi {p.session_number || 1}</span>
+								</div>
+								<div class="grid grid-cols-[80px_8px_1fr] items-baseline">
+									<span class="text-slate-600">Password</span>
+									<span>:</span>
+									<span class="font-mono bg-slate-100 px-1 border border-slate-200 rounded">{p.plain_password || '******'}</span>
+								</div>
+							</div>
 						</div>
-						<div class="text-center mt-3">
-							<p class="text-[10px] mb-8">Panitia Ujian</p>
-							<p class="text-[10px] font-bold border-b border-slate-800 inline-block px-4">......................................</p>
+
+						<div class="mt-2 pt-2 border-t border-slate-200 flex justify-between items-end text-[9px] text-slate-500">
+							<div>Simpan kartu ini dengan baik selama ujian.</div>
+							<div class="font-semibold text-slate-700 text-right">Kepala Madrasah</div>
 						</div>
 					</div>
 				</div>
-			</div>
 			{/each}
 		</div>
 		{/each}
 	</div>
-	{#if participants.length === 0}
-		<div class="text-center text-slate-500 py-10">
-			Belum ada peserta di ujian ini.
-		</div>
-	{/if}
 </div>
-
-<style>
-	@page {
-		size: A4;
-		margin: 5mm 3mm;
-	}
-	@media print {
-		:global(body) {
-			margin: 0 !important;
-			padding: 0 !important;
-			-webkit-print-color-adjust: exact !important;
-			print-color-adjust: exact !important;
-		}
-	}
-</style>

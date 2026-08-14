@@ -6,6 +6,13 @@
 	$: participantsGrouped = data.participantsGrouped as Record<string, Record<number, any[]>>;
 	$: isNomorPesertaMode = data.isNomorPesertaMode;
 	$: sessionMap = data.sessionMap as Record<number, { start_time: string | null; end_time: string | null }>;
+	$: proctorOptions = (data.proctorOptions || []) as any[];
+
+	let proctor1Id = data.defaultProctor1Id || (proctorOptions[0]?.id || '');
+	let proctor2Id = data.defaultProctor2Id || '';
+
+	$: proctor1 = proctorOptions.find(p => String(p.id) === String(proctor1Id));
+	$: proctor2 = proctorOptions.find(p => String(p.id) === String(proctor2Id));
 
 	function formatDate(dateStr: string | null) {
 		if (!dateStr || dateStr === '-') return '......................';
@@ -31,17 +38,62 @@
 	@media print {
 		@page {
 			size: A4;
-			margin: 1cm;
+			margin: 0;
 		}
 		:global(body) {
 			margin: 0;
+			padding: 0;
 			-webkit-print-color-adjust: exact;
 			print-color-adjust: exact;
+		}
+		.no-print {
+			display: none !important;
+		}
+		.break-before-page {
+			break-before: page;
+			page-break-before: always;
 		}
 	}
 </style>
 
-<div class="p-8 print:p-12 max-w-[21cm] mx-auto bg-white">
+<!-- Control Bar -->
+<div class="no-print p-4 bg-slate-800 text-white border-b border-slate-700 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-md">
+	<div class="flex items-center gap-4 flex-wrap">
+		<span class="text-xs font-semibold uppercase tracking-wider text-slate-300">Pengaturan Pengawas:</span>
+		
+		<div class="flex items-center gap-2">
+			<label for="p1-select" class="text-xs text-slate-300 font-medium">Pengawas 1:</label>
+			<select id="p1-select" bind:value={proctor1Id} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-indigo-400">
+				<option value="">-- Pilih Pengawas 1 --</option>
+				{#each proctorOptions as p}
+					<option value={p.id}>{p.name} {p.nip ? `(NIP. ${p.nip})` : ''}</option>
+				{/each}
+			</select>
+		</div>
+
+		<div class="flex items-center gap-2">
+			<label for="p2-select" class="text-xs text-slate-300 font-medium">Pengawas 2:</label>
+			<select id="p2-select" bind:value={proctor2Id} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-indigo-400">
+				<option value="">-- Tidak Ada / Kosongkan --</option>
+				{#each proctorOptions as p}
+					<option value={p.id}>{p.name} {p.nip ? `(NIP. ${p.nip})` : ''}</option>
+				{/each}
+			</select>
+		</div>
+	</div>
+
+	<div class="flex items-center gap-2">
+		<button class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-medium transition-colors" on:click={() => window.close()}>Tutup</button>
+		<button class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-xs font-bold transition-colors flex items-center gap-1.5 shadow" on:click={() => window.print()}>
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+			</svg>
+			Cetak Daftar Hadir
+		</button>
+	</div>
+</div>
+
+<div class="p-8 print:p-8 max-w-[21cm] mx-auto bg-white">
 	<!-- Print each room and session on a new page -->
 	{#each Object.entries(participantsGrouped) as [roomName, sessionsDict], roomIdx}
 		{#each Object.entries(sessionsDict) as [sessionNumStr, students], sessionIdx}
@@ -87,7 +139,7 @@
 			</div>
 
 			<!-- Tabel Daftar Hadir -->
-			<table class="w-full border-collapse border border-black mb-8 text-sm">
+			<table class="w-full border-collapse border border-black mb-6 text-sm">
 				<thead>
 					<tr>
 						<th class="border border-black p-2 w-12 text-center">No</th>
@@ -127,22 +179,40 @@
 				</tbody>
 			</table>
 
-			<div class="grid grid-cols-2 gap-8 text-sm">
-				<div>
-					<p class="font-medium mb-1">Keterangan:</p>
-					<ol class="list-decimal pl-4 text-xs space-y-1">
-						<li>Daftar Hadir dibuat rangkap 2 (dua), masing-masing untuk Panitia dan Sekolah.</li>
-						<li>Pengawas ruang menyilangkan nama peserta yang tidak hadir.</li>
-					</ol>
-				</div>
-				<div class="text-center flex justify-end">
-					<div class="w-48">
-						<p class="mb-12">Pengawas Ruang,</p>
-						<p class="border-b border-black font-medium">( .................................... )</p>
-						<p class="text-xs mt-1">NIP. ..............................</p>
+			<!-- Keterangan & TTD Pengawas -->
+			<div class="mb-4 text-xs text-slate-700">
+				<p class="font-medium mb-0.5">Keterangan:</p>
+				<ol class="list-decimal pl-4 space-y-0.5">
+					<li>Daftar Hadir dibuat rangkap 2 (dua), masing-masing untuk Panitia dan Sekolah.</li>
+					<li>Pengawas ruang menyilangkan nama peserta yang tidak hadir.</li>
+				</ol>
+			</div>
+
+			<!-- TTD Pengawas -->
+			{#if proctor1 && proctor2 && String(proctor1.id) !== String(proctor2.id)}
+				<!-- 2 Pengawas Layout -->
+				<div class="grid grid-cols-2 gap-8 text-sm pt-2">
+					<div class="text-center">
+						<p class="mb-14 font-medium">Pengawas I,</p>
+						<p class="border-b border-black font-bold inline-block px-4">{proctor1.name}</p>
+						<p class="text-xs mt-1">NIP. {proctor1.nip || '..............................'}</p>
+					</div>
+					<div class="text-center">
+						<p class="mb-14 font-medium">Pengawas II,</p>
+						<p class="border-b border-black font-bold inline-block px-4">{proctor2.name}</p>
+						<p class="text-xs mt-1">NIP. {proctor2.nip || '..............................'}</p>
 					</div>
 				</div>
-			</div>
+			{:else}
+				<!-- 1 Pengawas Layout -->
+				<div class="flex justify-end text-sm pt-2">
+					<div class="w-60 text-center">
+						<p class="mb-14 font-medium">Pengawas Ruang,</p>
+						<p class="border-b border-black font-bold inline-block px-2">{proctor1?.name || '( .................................... )'}</p>
+						<p class="text-xs mt-1">NIP. {proctor1?.nip || '..............................'}</p>
+					</div>
+				</div>
+			{/if}
 		</div>
 		{/each}
 	{/each}
