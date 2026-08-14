@@ -102,6 +102,7 @@
 			{@const effectiveStart = sessionData?.start_time || exam.start_time}
 			{@const effectiveEnd = sessionData?.end_time || exam.end_time}
 			{@const effectiveDateStr = (effectiveStart && effectiveStart.includes('-')) ? effectiveStart : exam.start_time}
+			{@const classNames = Array.from(new Set(students.map(s => s.class_name).filter(Boolean))).join(', ') || '-'}
 		<div class={roomIdx > 0 || sessionIdx > 0 ? "break-before-page pt-8" : ""}>
 			<!-- Kop -->
 			<div class="text-center mb-6 pb-4 border-b-2 border-black flex items-center">
@@ -123,17 +124,18 @@
 					<tbody>
 						<tr><td class="py-1 w-32 font-medium">Ujian</td><td class="w-4">:</td><td>{exam.exam_type_name || exam.title}</td></tr>
 						<tr><td class="py-1 font-medium">Mata Pelajaran</td><td>:</td><td>{exam.subject_name || 'Umum'}</td></tr>
-						{#if data.hasSessions}
-						<tr><td class="py-1 font-medium">Ruang / Sesi</td><td>:</td><td>{roomName} / Sesi {sessionNum}</td></tr>
-						{:else}
-						<tr><td class="py-1 font-medium">Ruang</td><td>:</td><td>{roomName}</td></tr>
-						{/if}
+						<tr><td class="py-1 font-medium">Kelas</td><td>:</td><td>{classNames}</td></tr>
 					</tbody>
 				</table>
 				<table class="w-full">
 					<tbody>
 						<tr><td class="py-1 w-32 font-medium">Hari, Tanggal</td><td class="w-4">:</td><td>{formatDate(effectiveDateStr)}</td></tr>
 						<tr><td class="py-1 font-medium">Waktu</td><td>:</td><td>{formatTime(effectiveStart)} - {formatTime(effectiveEnd)}</td></tr>
+						{#if data.hasSessions}
+						<tr><td class="py-1 font-medium">Ruang / Sesi</td><td>:</td><td>{roomName} / Sesi {sessionNum}</td></tr>
+						{:else}
+						<tr><td class="py-1 font-medium">Ruang</td><td>:</td><td>{roomName}</td></tr>
+						{/if}
 					</tbody>
 				</table>
 			</div>
@@ -145,7 +147,6 @@
 						<th class="border border-black p-2 w-12 text-center">No</th>
 						<th class="border border-black p-2 px-4 whitespace-nowrap">{isNomorPesertaMode ? 'No. Peserta' : 'NISN'}</th>
 						<th class="border border-black p-2 text-left">Nama Peserta</th>
-						<th class="border border-black p-2 text-left w-24">Kelas</th>
 						<th class="border border-black p-2 w-48 text-center" colspan="2">Tanda Tangan</th>
 						<th class="border border-black p-2 w-24 text-center">Ket.</th>
 					</tr>
@@ -156,7 +157,6 @@
 							<td class="border border-black p-2 text-center">{i + 1}</td>
 							<td class="border border-black p-2 text-center font-mono whitespace-nowrap text-[11px] leading-tight">{isNomorPesertaMode ? (p.nomor_peserta || '-') : (p.nisn || p.username)}</td>
 							<td class="border border-black p-2">{p.student_name}</td>
-							<td class="border border-black p-2 text-xs">{p.class_name || '-'}</td>
 							<td class="border-b border-black p-2 w-24 align-top h-12 relative text-center">
 								{#if (i + 1) % 2 !== 0}
 									<span class="text-xs text-slate-500 text-left absolute top-1 left-1 z-10">{i + 1}.</span>

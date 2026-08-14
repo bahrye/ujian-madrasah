@@ -94,6 +94,7 @@ function _page($$renderer, $$props) {
         const effectiveStart = sessionData?.start_time || exam.start_time;
         const effectiveEnd = sessionData?.end_time || exam.end_time;
         const effectiveDateStr = effectiveStart && effectiveStart.includes("-") ? effectiveStart : exam.start_time;
+        const classNames = Array.from(new Set(students.map((s) => s.class_name).filter(Boolean))).join(", ") || "-";
         $$renderer2.push(`<div${attr_class(clsx(roomIdx > 0 || sessionIdx > 0 ? "break-before-page pt-8" : ""), "svelte-5lujtk")}><div class="text-center mb-6 pb-4 border-b-2 border-black flex items-center">`);
         if (school?.logo_url) {
           $$renderer2.push("<!--[0-->");
@@ -108,7 +109,7 @@ function _page($$renderer, $$props) {
         } else {
           $$renderer2.push("<!--[-1-->");
         }
-        $$renderer2.push(`<!--]--></div></div> <div class="grid grid-cols-2 gap-4 mb-4 text-sm"><table class="w-full"><tbody><tr><td class="py-1 w-32 font-medium">Ujian</td><td class="w-4">:</td><td>${escape_html(exam.exam_type_name || exam.title)}</td></tr><tr><td class="py-1 font-medium">Mata Pelajaran</td><td>:</td><td>${escape_html(exam.subject_name || "Umum")}</td></tr>`);
+        $$renderer2.push(`<!--]--></div></div> <div class="grid grid-cols-2 gap-4 mb-4 text-sm"><table class="w-full"><tbody><tr><td class="py-1 w-32 font-medium">Ujian</td><td class="w-4">:</td><td>${escape_html(exam.exam_type_name || exam.title)}</td></tr><tr><td class="py-1 font-medium">Mata Pelajaran</td><td>:</td><td>${escape_html(exam.subject_name || "Umum")}</td></tr><tr><td class="py-1 font-medium">Kelas</td><td>:</td><td>${escape_html(classNames)}</td></tr></tbody></table> <table class="w-full"><tbody><tr><td class="py-1 w-32 font-medium">Hari, Tanggal</td><td class="w-4">:</td><td>${escape_html(formatDate(effectiveDateStr))}</td></tr><tr><td class="py-1 font-medium">Waktu</td><td>:</td><td>${escape_html(formatTime(effectiveStart))} - ${escape_html(formatTime(effectiveEnd))}</td></tr>`);
         if (data.hasSessions) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<tr><td class="py-1 font-medium">Ruang / Sesi</td><td>:</td><td>${escape_html(roomName)} / Sesi ${escape_html(sessionNum)}</td></tr>`);
@@ -116,11 +117,11 @@ function _page($$renderer, $$props) {
           $$renderer2.push("<!--[-1-->");
           $$renderer2.push(`<tr><td class="py-1 font-medium">Ruang</td><td>:</td><td>${escape_html(roomName)}</td></tr>`);
         }
-        $$renderer2.push(`<!--]--></tbody></table> <table class="w-full"><tbody><tr><td class="py-1 w-32 font-medium">Hari, Tanggal</td><td class="w-4">:</td><td>${escape_html(formatDate(effectiveDateStr))}</td></tr><tr><td class="py-1 font-medium">Waktu</td><td>:</td><td>${escape_html(formatTime(effectiveStart))} - ${escape_html(formatTime(effectiveEnd))}</td></tr></tbody></table></div> <table class="w-full border-collapse border border-black mb-6 text-sm"><thead><tr><th class="border border-black p-2 w-12 text-center">No</th><th class="border border-black p-2 px-4 whitespace-nowrap">${escape_html(isNomorPesertaMode ? "No. Peserta" : "NISN")}</th><th class="border border-black p-2 text-left">Nama Peserta</th><th class="border border-black p-2 text-left w-24">Kelas</th><th class="border border-black p-2 w-48 text-center" colspan="2">Tanda Tangan</th><th class="border border-black p-2 w-24 text-center">Ket.</th></tr></thead><tbody><!--[-->`);
+        $$renderer2.push(`<!--]--></tbody></table></div> <table class="w-full border-collapse border border-black mb-6 text-sm"><thead><tr><th class="border border-black p-2 w-12 text-center">No</th><th class="border border-black p-2 px-4 whitespace-nowrap">${escape_html(isNomorPesertaMode ? "No. Peserta" : "NISN")}</th><th class="border border-black p-2 text-left">Nama Peserta</th><th class="border border-black p-2 w-48 text-center" colspan="2">Tanda Tangan</th><th class="border border-black p-2 w-24 text-center">Ket.</th></tr></thead><tbody><!--[-->`);
         const each_array_4 = ensure_array_like(students);
         for (let i = 0, $$length3 = each_array_4.length; i < $$length3; i++) {
           let p = each_array_4[i];
-          $$renderer2.push(`<tr><td class="border border-black p-2 text-center">${escape_html(i + 1)}</td><td class="border border-black p-2 text-center font-mono whitespace-nowrap text-[11px] leading-tight">${escape_html(isNomorPesertaMode ? p.nomor_peserta || "-" : p.nisn || p.username)}</td><td class="border border-black p-2">${escape_html(p.student_name)}</td><td class="border border-black p-2 text-xs">${escape_html(p.class_name || "-")}</td><td class="border-b border-black p-2 w-24 align-top h-12 relative text-center">`);
+          $$renderer2.push(`<tr><td class="border border-black p-2 text-center">${escape_html(i + 1)}</td><td class="border border-black p-2 text-center font-mono whitespace-nowrap text-[11px] leading-tight">${escape_html(isNomorPesertaMode ? p.nomor_peserta || "-" : p.nisn || p.username)}</td><td class="border border-black p-2">${escape_html(p.student_name)}</td><td class="border-b border-black p-2 w-24 align-top h-12 relative text-center">`);
           if ((i + 1) % 2 !== 0) {
             $$renderer2.push("<!--[0-->");
             $$renderer2.push(`<span class="text-xs text-slate-500 text-left absolute top-1 left-1 z-10">${escape_html(i + 1)}.</span> `);
