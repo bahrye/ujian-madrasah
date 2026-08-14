@@ -36,7 +36,10 @@
 
 <style>
 	:global(body) {
-		font-family: 'Times New Roman', Times, Georgia, serif;
+		font-family: 'Times New Roman', Times, Arial, serif !important;
+		font-variant-numeric: lining-nums tabular-nums !important;
+		-webkit-font-feature-settings: "lnum" 1, "tnum" 1 !important;
+		font-feature-settings: "lnum" 1, "tnum" 1 !important;
 	}
 	@media print {
 		@page {
@@ -46,7 +49,10 @@
 		:global(body) {
 			margin: 0;
 			padding: 0;
-			font-family: 'Times New Roman', Times, Georgia, serif !important;
+			font-family: 'Times New Roman', Times, Arial, serif !important;
+			font-variant-numeric: lining-nums tabular-nums !important;
+			-webkit-font-feature-settings: "lnum" 1, "tnum" 1 !important;
+			font-feature-settings: "lnum" 1, "tnum" 1 !important;
 			-webkit-print-color-adjust: exact;
 			print-color-adjust: exact;
 		}
@@ -97,7 +103,7 @@
 	</div>
 </div>
 
-<div class="p-4 md:p-8 print:p-0 print:m-0 max-w-[215.9mm] mx-auto bg-white" style="font-family: 'Times New Roman', Times, Georgia, serif;">
+<div class="p-4 md:p-8 print:p-0 print:m-0 max-w-[215.9mm] mx-auto bg-white" style="font-family: 'Times New Roman', Times, Arial, serif; font-variant-numeric: lining-nums tabular-nums;">
 	<!-- Print each room and session on a new page -->
 	{#each Object.entries(participantsGrouped) as [roomName, sessionsDict], roomIdx}
 		{#each Object.entries(sessionsDict) as [sessionNumStr, students], sessionIdx}

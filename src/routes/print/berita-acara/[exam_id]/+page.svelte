@@ -103,7 +103,7 @@
 		if (!dateStr) return '......................';
 		const date = parseDate(dateStr);
 		if (isNaN(date.getTime())) return '......................';
-		return date.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+		return date.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
 	}
 
 	function formatTime(timeStr: string | null) {
@@ -122,7 +122,10 @@
 
 <style>
 	:global(body) {
-		font-family: 'Times New Roman', Times, Georgia, serif;
+		font-family: 'Times New Roman', Times, Arial, serif !important;
+		font-variant-numeric: lining-nums tabular-nums !important;
+		-webkit-font-feature-settings: "lnum" 1, "tnum" 1 !important;
+		font-feature-settings: "lnum" 1, "tnum" 1 !important;
 	}
 	@media print {
 		@page { 
@@ -131,7 +134,10 @@
 		}
 		:global(body) {
 			margin: 0;
-			font-family: 'Times New Roman', Times, Georgia, serif !important;
+			font-family: 'Times New Roman', Times, Arial, serif !important;
+			font-variant-numeric: lining-nums tabular-nums !important;
+			-webkit-font-feature-settings: "lnum" 1, "tnum" 1 !important;
+			font-feature-settings: "lnum" 1, "tnum" 1 !important;
 			-webkit-print-color-adjust: exact;
 			print-color-adjust: exact;
 		}
@@ -202,7 +208,7 @@
 	</div>
 </div>
 
-<div class="p-4 md:p-8 max-w-[215.9mm] mx-auto font-serif text-[15px] leading-snug print:p-0 print:m-0 bg-white" style="font-family: 'Times New Roman', Times, Georgia, serif;">
+<div class="p-4 md:p-8 max-w-[215.9mm] mx-auto font-serif text-[15px] leading-snug print:p-0 print:m-0 bg-white" style="font-family: 'Times New Roman', Times, Arial, serif; font-variant-numeric: lining-nums tabular-nums;">
 {#each Object.entries(participantsGrouped) as [roomName, sessionsDict], roomIdx}
 	{#each Object.entries(sessionsDict) as [sessionNumStr, count], sessionIdx}
 		{@const sessionNum = parseInt(sessionNumStr)}
@@ -214,7 +220,9 @@
 			school?.city ? (school.city.toLowerCase().startsWith('kab') || school.city.toLowerCase().startsWith('kota') ? school.city : `Kabupaten ${school.city}`) : '',
 			school?.province ? school.province : ''
 		].filter(Boolean).join(', ')}
-		{@const locationCity = school?.city ? (school.city.toLowerCase().startsWith('kab') || school.city.toLowerCase().startsWith('kota') ? school.city : `Kab. ${school.city}`) : '....................'}
+		{@const locationCity = school?.address 
+			? school.address.split(',')[0].trim() 
+			: (school?.city ? school.city.replace(/^(kab\.|kabupaten|kota)\s+/i, '') : '....................')}
 		{@const activeOfficers = [
 			{ role: 'Pengawas I', data: proctor1, id: 'p1' },
 			{ role: 'Pengawas II', data: proctor2, id: 'p2' },
