@@ -319,7 +319,7 @@
 						<!-- Left Column: Kepala Madrasah -->
 						<div>
 							<div class="h-5"></div>
-							<p class="font-medium mb-9">Kepala Madrasah,</p>
+							<p class="font-medium mb-12">Kepala Madrasah,</p>
 							<p class="border-b border-black font-bold inline-block px-3">{school?.principal_name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {school?.principal_nip || '..............................'}</p>
 						</div>
@@ -327,7 +327,7 @@
 						<!-- Right Column: Date + Pengawas Ruang -->
 						<div>
 							<p class="text-xs text-slate-700 mb-0.5">{locationCity}, {formatDateFull(effectiveStart)}</p>
-							<p class="font-medium mb-9">{activeOfficers[0]?.role === 'Pengawas I' ? 'Pengawas Ruang' : (activeOfficers[0]?.role || 'Pengawas Ruang')},</p>
+							<p class="font-medium mb-12">{activeOfficers[0]?.role === 'Pengawas I' ? 'Pengawas Ruang' : (activeOfficers[0]?.role || 'Pengawas Ruang')},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[0]?.data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[0]?.data?.nip || '..............................'}</p>
 						</div>
@@ -339,7 +339,7 @@
 						<!-- Row 1 Left: Pengawas I -->
 						<div>
 							<div class="h-5"></div>
-							<p class="font-medium mb-9">{activeOfficers[0].role},</p>
+							<p class="font-medium mb-12">{activeOfficers[0].role},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[0].data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[0].data?.nip || '..............................'}</p>
 						</div>
@@ -347,7 +347,7 @@
 						<!-- Row 1 Right: Date + Pengawas II -->
 						<div>
 							<p class="text-xs text-slate-700 mb-0.5">{locationCity}, {formatDateFull(effectiveStart)}</p>
-							<p class="font-medium mb-9">{activeOfficers[1].role},</p>
+							<p class="font-medium mb-12">{activeOfficers[1].role},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[1].data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[1].data?.nip || '..............................'}</p>
 						</div>
@@ -357,7 +357,7 @@
 
 						<!-- Row 2 Right: Kepala Madrasah -->
 						<div class="mt-2">
-							<p class="font-medium mb-9">Kepala Madrasah,</p>
+							<p class="font-medium mb-12">Kepala Madrasah,</p>
 							<p class="border-b border-black font-bold inline-block px-3">{school?.principal_name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {school?.principal_nip || '..............................'}</p>
 						</div>
@@ -369,7 +369,7 @@
 						<!-- Row 1 Left: Pengawas I -->
 						<div>
 							<div class="h-5"></div>
-							<p class="font-medium mb-9">{activeOfficers[0].role},</p>
+							<p class="font-medium mb-12">{activeOfficers[0].role},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[0].data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[0].data?.nip || '..............................'}</p>
 						</div>
@@ -377,21 +377,21 @@
 						<!-- Row 1 Right: Date + Pengawas II -->
 						<div>
 							<p class="text-xs text-slate-700 mb-0.5">{locationCity}, {formatDateFull(effectiveStart)}</p>
-							<p class="font-medium mb-9">{activeOfficers[1].role},</p>
+							<p class="font-medium mb-12">{activeOfficers[1].role},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[1].data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[1].data?.nip || '..............................'}</p>
 						</div>
 
 						<!-- Row 2 Left: Officer 3 (Panitia/Proktor) -->
 						<div class="mt-2">
-							<p class="font-medium mb-9">{activeOfficers[2].role},</p>
+							<p class="font-medium mb-12">{activeOfficers[2].role},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[2].data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[2].data?.nip || '..............................'}</p>
 						</div>
 
 						<!-- Row 2 Right: Kepala Madrasah -->
 						<div class="mt-2">
-							<p class="font-medium mb-9">Kepala Madrasah,</p>
+							<p class="font-medium mb-12">Kepala Madrasah,</p>
 							<p class="border-b border-black font-bold inline-block px-3">{school?.principal_name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {school?.principal_nip || '..............................'}</p>
 						</div>
@@ -403,7 +403,7 @@
 						<!-- Row 1 Left: Pengawas I -->
 						<div>
 							<div class="h-5"></div>
-							<p class="font-medium mb-9">{activeOfficers[0].role},</p>
+							<p class="font-medium mb-12">{activeOfficers[0].role},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[0].data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[0].data?.nip || '..............................'}</p>
 						</div>
@@ -411,21 +411,21 @@
 						<!-- Row 1 Right: Date + Pengawas II -->
 						<div>
 							<p class="text-xs text-slate-700 mb-0.5">{locationCity}, {formatDateFull(effectiveStart)}</p>
-							<p class="font-medium mb-9">{activeOfficers[1].role},</p>
+							<p class="font-medium mb-12">{activeOfficers[1].role},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[1].data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[1].data?.nip || '..............................'}</p>
 						</div>
 
 						<!-- Row 2 Left: Proktor / Teknisi -->
 						<div class="mt-2">
-							<p class="font-medium mb-9">{activeOfficers[2].role},</p>
+							<p class="font-medium mb-12">{activeOfficers[2].role},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[2].data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[2].data?.nip || '..............................'}</p>
 						</div>
 
 						<!-- Row 2 Right: Panitia Ujian -->
 						<div class="mt-2">
-							<p class="font-medium mb-9">{activeOfficers[3].role},</p>
+							<p class="font-medium mb-12">{activeOfficers[3].role},</p>
 							<p class="border-b border-black font-bold inline-block px-3">{activeOfficers[3].data?.name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {activeOfficers[3].data?.nip || '..............................'}</p>
 						</div>
@@ -435,7 +435,7 @@
 
 						<!-- Row 3 Right: Kepala Madrasah -->
 						<div class="mt-2">
-							<p class="font-medium mb-9">Kepala Madrasah,</p>
+							<p class="font-medium mb-12">Kepala Madrasah,</p>
 							<p class="border-b border-black font-bold inline-block px-3">{school?.principal_name || '( .................................... )'}</p>
 							<p class="text-xs mt-1">NIP. {school?.principal_nip || '..............................'}</p>
 						</div>
