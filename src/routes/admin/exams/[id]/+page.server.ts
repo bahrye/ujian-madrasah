@@ -62,7 +62,7 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 		ORDER BY u.name
 	`).bind(examId).all();
 
-	const allProctors = await db.prepare('SELECT id, name, username FROM users WHERE school_id = ? AND role = "pengawas" ORDER BY name').bind(locals.user!.school_id).all();
+	const allProctors = await db.prepare('SELECT id, name, username, role FROM users WHERE school_id = ? AND role IN ("pengawas", "guru") ORDER BY role ASC, name ASC').bind(locals.user!.school_id).all();
 	const examProctors = await db.prepare(`
 		SELECT ep.id as exam_proctor_id, u.id as user_id, u.name, u.username, ep.room_id, ep.sessions
 		FROM exam_proctors ep
@@ -369,7 +369,7 @@ export const actions: Actions = {
 		if (!exam) return fail(403, { error: 'Ujian tidak ditemukan atau bukan milik sekolah Anda.' });
 
 		const placeholders = parsedProctorIds.map(() => '?').join(',');
-		const validProctors = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "pengawas"`)
+		const validProctors = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role IN ("pengawas", "guru")`)
 			.bind(...parsedProctorIds, locals.user.school_id).all<{ id: number }>();
 
 		if (validProctors.results.length === 0) {

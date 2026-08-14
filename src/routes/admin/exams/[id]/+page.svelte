@@ -28,6 +28,7 @@
 	let teacherSearch = '';
 	
 	let showAddProctorModal = false;
+	let proctorSearch = '';
 	let isSavingProctors = false;
 	let isSavingParticipants = false;
 
@@ -720,21 +721,36 @@
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => (showAddProctorModal = false)}>
 		<div class="card p-6 w-full max-w-lg animate-bounce-in max-h-[90vh] flex flex-col" on:click|stopPropagation>
-			<div class="flex items-center justify-between mb-6">
-				<h2 class="text-lg font-bold text-slate-800">Tambah Pengawas</h2>
+			<div class="flex items-center justify-between mb-4">
+				<div>
+					<h2 class="text-lg font-bold text-slate-800">Tambah Pengawas Ujian</h2>
+					<p class="text-xs text-slate-500 mt-0.5">Pilih akun Pengawas atau Guru untuk mengawasi ujian ini.</p>
+				</div>
 				<button class="text-slate-400 hover:text-slate-600" on:click={() => (showAddProctorModal = false)}>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
 				</button>
 			</div>
+
+			<!-- Filter Search -->
+			<div class="mb-3">
+				<input type="text" placeholder="Cari nama pengawas atau guru..." bind:value={proctorSearch} class="input text-sm py-1.5" />
+			</div>
 			
-			<form method="POST" action="?/addProctor" use:enhance={() => { return async ({ update }) => { showAddProctorModal = false; await update(); }; }} class="flex flex-col flex-1 overflow-hidden">
-				<div class="overflow-y-auto flex-1 mb-4 border border-slate-200 rounded-lg p-2">
-					{#each data.allProctors as proctor}
-						{@const isAdded = examProctors.some((p: any) => p.user_id === proctor.id)}
-						<label class="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer border-b border-slate-100 last:border-0 {isAdded ? 'opacity-50' : ''}">
+			<form method="POST" action="?/addProctor" use:enhance={() => { return async ({ update }) => { showAddProctorModal = false; proctorSearch = ''; await update(); }; }} class="flex flex-col flex-1 overflow-hidden">
+				<div class="overflow-y-auto flex-1 mb-4 border border-slate-200 rounded-lg p-2 bg-slate-50">
+					{#each data.allProctors.filter((p) => p.name.toLowerCase().includes(proctorSearch.toLowerCase()) || p.username.toLowerCase().includes(proctorSearch.toLowerCase())) as proctor}
+						{@const isAdded = examProctors.some((p) => p.user_id === proctor.id)}
+						<label class="flex items-center gap-3 p-3 hover:bg-white rounded-lg cursor-pointer border-b border-slate-100 last:border-0 {isAdded ? 'opacity-50' : ''}">
 							<input type="checkbox" name="proctor_ids" value={proctor.id} class="w-4 h-4 text-indigo-600 rounded" disabled={isAdded} />
 							<div class="flex-1">
-								<p class="text-sm font-medium text-slate-800">{proctor.name}</p>
+								<div class="flex items-center gap-2">
+									<p class="text-sm font-medium text-slate-800">{proctor.name}</p>
+									{#if proctor.role === 'guru'}
+										<span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200">Guru</span>
+									{:else}
+										<span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">Pengawas</span>
+									{/if}
+								</div>
 								<p class="text-xs text-slate-500 font-mono">{proctor.username}</p>
 							</div>
 							{#if isAdded}
@@ -742,7 +758,7 @@
 							{/if}
 						</label>
 					{:else}
-						<div class="p-4 text-center text-sm text-slate-500">Tidak ada data pengawas.</div>
+						<div class="p-4 text-center text-sm text-slate-500">Tidak ada data pengawas / guru.</div>
 					{/each}
 				</div>
 				

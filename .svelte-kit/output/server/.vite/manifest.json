@@ -1286,7 +1286,10 @@
     "file": "entries/pages/guru/_layout.server.ts.js",
     "name": "entries/pages/guru/_layout.server.ts",
     "src": "src/routes/guru/+layout.server.ts",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
   },
   "src/routes/guru/+layout.svelte": {
     "file": "entries/pages/guru/_layout.svelte.js",
