@@ -45,7 +45,26 @@ function _page($$renderer, $$props) {
         }
       );
     }
-    $$renderer2.push(`<!--]--></select> <noscript><button type="submit" class="btn-secondary btn-sm">Tampilkan</button></noscript></form> `);
+    $$renderer2.push(`<!--]--></select> `);
+    if (data.examFilter && data.availableSessions && data.availableSessions.length > 0) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<select name="session_number" class="select w-44">`);
+      $$renderer2.option({ value: "" }, ($$renderer3) => {
+        $$renderer3.push(`Semua Sesi`);
+      });
+      $$renderer2.push(`<!--[-->`);
+      const each_array_1 = ensure_array_like(data.availableSessions);
+      for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
+        let sn = each_array_1[$$index_1];
+        $$renderer2.option({ value: sn, selected: data.sessionFilter === String(sn) }, ($$renderer3) => {
+          $$renderer3.push(`Sesi ${escape_html(sn)}`);
+        });
+      }
+      $$renderer2.push(`<!--]--></select>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--> <noscript><button type="submit" class="btn-secondary btn-sm">Tampilkan</button></noscript></form> `);
     if (data.examFilter) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div class="flex gap-2 overflow-x-auto p-1.5 -m-1.5 mb-1 mt-2"><button${attr_class(`btn-sm ${"btn-primary"}`)}>Semua</button> <button${attr_class(`btn-sm ${"btn-ghost border border-slate-200 text-slate-600"}`)}>Sedang Mengerjakan</button> <button${attr_class(`btn-sm ${"btn-ghost border border-slate-200 text-slate-600"}`)}>Selesai</button> <button${attr_class(`btn-sm ${"btn-ghost border border-slate-200 text-slate-600"}`)}>Belum Mengerjakan</button></div>`);
@@ -62,10 +81,10 @@ function _page($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
       $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Siswa</th><th>Username</th><th>Status</th><th class="w-24 text-center">Pelanggaran</th><th class="w-32">Progress</th><th>Sisa Waktu</th><th class="text-right">Aksi</th></tr></thead><tbody><!--[-->`);
-      const each_array_1 = ensure_array_like(filteredAttempts);
-      for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
-        let a = each_array_1[$$index_1];
-        $$renderer2.push(`<tr><td class="font-semibold text-slate-800">${escape_html(a.student_name)}</td><td class="text-slate-500">@${escape_html(a.username)}</td><td><div class="flex flex-col gap-1 items-start"><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[a.status] || "badge-secondary"))}>`);
+      const each_array_2 = ensure_array_like(filteredAttempts);
+      for (let $$index_2 = 0, $$length = each_array_2.length; $$index_2 < $$length; $$index_2++) {
+        let a = each_array_2[$$index_2];
+        $$renderer2.push(`<tr><td class="font-semibold text-slate-800"><div>${escape_html(a.student_name)}</div> <span class="inline-block px-1.5 py-0.5 mt-0.5 text-[10px] font-semibold text-indigo-700 bg-indigo-50 rounded border border-indigo-100">Sesi ${escape_html(a.student_session_number || 1)}</span></td><td class="text-slate-500">@${escape_html(a.username)}</td><td><div class="flex flex-col gap-1 items-start"><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[a.status] || "badge-secondary"))}>`);
         if (a.status === "mengerjakan") {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<span class="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse mr-1"></span>`);

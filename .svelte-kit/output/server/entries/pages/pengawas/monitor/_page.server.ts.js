@@ -8,60 +8,109 @@ const load = async ({ platform, url, locals }) => {
     const db = getDB(platform);
     const examFilterStr = url.searchParams.get("exam_id") || "";
     const examFilter = parseInt(examFilterStr, 10);
+    const sessionFilterStr = url.searchParams.get("session_number") || "";
+    const sessionFilter = parseInt(sessionFilterStr, 10);
     const exams = await db.prepare(`
-		SELECT e.id, e.title 
-		FROM exams e 
-		JOIN exam_proctors ep ON e.id = ep.exam_id
-		WHERE e.is_active = 1 AND e.school_id = ? AND ep.proctor_id = ?
-		ORDER BY e.title
-	`).bind(locals.user.school_id, locals.user.id).all();
+			SELECT e.id, e.title 
+			FROM exams e 
+			JOIN exam_proctors ep ON e.id = ep.exam_id
+			WHERE e.is_active = 1 AND e.school_id = ? AND ep.proctor_id = ?
+			ORDER BY e.title
+		`).bind(locals.user.school_id, locals.user.id).all();
+    let availableSessions = [];
+    let allowedProctorSessions = null;
+    if (!isNaN(examFilter)) {
+      const proctorAssignment = await db.prepare(`
+				SELECT sessions FROM exam_proctors WHERE exam_id = ? AND proctor_id = ?
+			`).bind(examFilter, locals.user.id).first();
+      if (proctorAssignment?.sessions) {
+        try {
+          const parsed = JSON.parse(proctorAssignment.sessions);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            allowedProctorSessions = parsed.map((s) => parseInt(s, 10));
+          }
+        } catch (e) {
+        }
+      }
+      const dbSessions = await db.prepare(`
+				SELECT session_number FROM exam_sessions WHERE exam_id = ? ORDER BY session_number
+			`).bind(examFilter).all();
+      if (dbSessions.results.length > 0) {
+        availableSessions = dbSessions.results.map((s) => s.session_number);
+      } else {
+        availableSessions = [1];
+      }
+      if (allowedProctorSessions && allowedProctorSessions.length > 0) {
+        availableSessions = availableSessions.filter((sn) => allowedProctorSessions.includes(sn));
+      }
+    }
+    let activeSessionFilter = null;
+    if (!isNaN(sessionFilter) && availableSessions.includes(sessionFilter)) {
+      activeSessionFilter = sessionFilter;
+    } else if (allowedProctorSessions && allowedProctorSessions.length === 1) {
+      activeSessionFilter = allowedProctorSessions[0];
+    } else if (availableSessions.length === 1) {
+      activeSessionFilter = availableSessions[0];
+    }
     let attempts = [];
     if (!isNaN(examFilter)) {
-      const result = await db.prepare(`
-			SELECT 
-				epart.student_id,
-				u.name as student_name, 
-				u.username, 
-				e.title as exam_title,
-				e.duration_minutes,
-				(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count,
-				sa.id as attempt_id,
-				sa.start_time,
-				sa.end_time,
-				sa.submit_time,
-				sa.score,
-				sa.total_points,
-				sa.status,
-				sa.violation_count,
-				sa.violation_logs,
-				sa.is_paused,
-				sa.paused_at
-			FROM exam_participants epart
-			JOIN users u ON epart.student_id = u.id
-			JOIN exams e ON epart.exam_id = e.id
-			JOIN exam_proctors ep ON e.id = ep.exam_id
-			LEFT JOIN student_attempts sa ON sa.student_id = epart.student_id AND sa.exam_id = epart.exam_id
-			WHERE epart.exam_id = ? AND e.school_id = ? AND ep.proctor_id = ?
-			  AND (ep.room_id IS NULL OR ep.room_id = epart.room_id)
-			  AND (ep.sessions IS NULL OR ep.sessions = '[]' OR u.session_number IN (SELECT value FROM json_each(ep.sessions)))
-			ORDER BY 
-				CASE WHEN sa.status = 'mengerjakan' THEN 1 
-					 WHEN sa.status IS NULL THEN 2 
-					 ELSE 3 END ASC,
-				u.name ASC
-		`).bind(examFilter, locals.user.school_id, locals.user.id).all();
+      let query = `
+				SELECT 
+					epart.student_id,
+					u.name as student_name, 
+					u.username, 
+					COALESCE(u.session_number, 1) as student_session_number,
+					e.title as exam_title,
+					e.duration_minutes,
+					(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count,
+					sa.id as attempt_id,
+					sa.start_time,
+					sa.end_time,
+					sa.submit_time,
+					sa.score,
+					sa.total_points,
+					sa.status,
+					sa.violation_count,
+					sa.violation_logs,
+					sa.is_paused,
+					sa.paused_at
+				FROM exam_participants epart
+				JOIN users u ON epart.student_id = u.id
+				JOIN exams e ON epart.exam_id = e.id
+				JOIN exam_proctors ep ON e.id = ep.exam_id
+				LEFT JOIN student_attempts sa ON sa.student_id = epart.student_id AND sa.exam_id = epart.exam_id
+				WHERE epart.exam_id = ? AND e.school_id = ? AND ep.proctor_id = ?
+				  AND (ep.room_id IS NULL OR ep.room_id = epart.room_id)
+			`;
+      const bindings = [examFilter, locals.user.school_id, locals.user.id];
+      if (activeSessionFilter !== null) {
+        query += ` AND COALESCE(u.session_number, 1) = ?`;
+        bindings.push(activeSessionFilter);
+      } else if (allowedProctorSessions && allowedProctorSessions.length > 0) {
+        const placeholders = allowedProctorSessions.map(() => "?").join(",");
+        query += ` AND COALESCE(u.session_number, 1) IN (${placeholders})`;
+        bindings.push(...allowedProctorSessions);
+      }
+      query += `
+				ORDER BY 
+					CASE WHEN sa.status = 'mengerjakan' THEN 1 
+						 WHEN sa.status IS NULL THEN 2 
+						 ELSE 3 END ASC,
+					u.name ASC
+			`;
+      const result = await db.prepare(query).bind(...bindings).all();
       attempts = result.results;
     }
     let answeredCountsMap = {};
     const attemptIds = attempts.map((a) => a.attempt_id).filter((id) => id);
     if (attemptIds.length > 0) {
       const countsResult = await db.prepare(`
-			SELECT sa.attempt_id, COUNT(*) as c
-			FROM student_answers sa
-			JOIN student_attempts st ON sa.attempt_id = st.id
-			WHERE st.exam_id = ? AND sa.answer_given IS NOT NULL AND sa.answer_given != ''
-			GROUP BY sa.attempt_id
-		`).bind(examFilter).all();
+				SELECT sa.attempt_id, COUNT(*) as c
+				FROM student_answers sa
+				JOIN student_attempts st ON sa.attempt_id = st.id
+				WHERE st.exam_id = ? AND sa.answer_given IS NOT NULL AND sa.answer_given != ''
+				GROUP BY sa.attempt_id
+			`).bind(examFilter).all();
       countsResult.results.forEach((r) => {
         answeredCountsMap[r.attempt_id] = r.c;
       });
@@ -115,10 +164,16 @@ const load = async ({ platform, url, locals }) => {
         };
       })
     );
-    return { exams: exams.results, attempts: attemptsWithProgress, examFilter: isNaN(examFilter) ? "" : examFilter };
+    return {
+      exams: exams.results,
+      attempts: attemptsWithProgress,
+      examFilter: isNaN(examFilter) ? "" : examFilter,
+      availableSessions,
+      sessionFilter: activeSessionFilter !== null ? String(activeSessionFilter) : ""
+    };
   } catch (err) {
     console.error("Load Error in monitor page:", err);
-    return { exams: [], attempts: [], examFilter: "", loadError: err.message || String(err) };
+    return { exams: [], attempts: [], examFilter: "", availableSessions: [], sessionFilter: "", loadError: err.message || String(err) };
   }
 };
 const actions = {

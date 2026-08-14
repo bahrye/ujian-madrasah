@@ -28,7 +28,7 @@
 		interval = setInterval(() => {
 			currentTime = Date.now();
 			invalidateAll();
-		}, 5000); // 5 detik lebih cepat dan responsif untuk admin
+		}, 5000);
 	});
 
 	onDestroy(() => {
@@ -53,6 +53,16 @@
 					<option value={exam.id} selected={data.examFilter === String(exam.id)}>{exam.title}</option>
 				{/each}
 			</select>
+
+			{#if data.examFilter && data.availableSessions && data.availableSessions.length > 0}
+				<select name="session_number" class="select w-44" on:change={() => formElement?.submit()}>
+					<option value="">Semua Sesi</option>
+					{#each data.availableSessions as sn}
+						<option value={sn} selected={data.sessionFilter === String(sn)}>Sesi {sn}</option>
+					{/each}
+				</select>
+			{/if}
+
 			<noscript>
 				<button type="submit" class="btn-secondary btn-sm">Tampilkan</button>
 			</noscript>
@@ -101,7 +111,10 @@
 					<tbody>
 						{#each filteredAttempts as a (a.id)}
 							<tr>
-								<td class="font-semibold text-slate-800">{a.student_name}</td>
+								<td class="font-semibold text-slate-800">
+									<div>{a.student_name}</div>
+									<span class="inline-block px-1.5 py-0.5 mt-0.5 text-[10px] font-semibold text-indigo-700 bg-indigo-50 rounded border border-indigo-100">Sesi {a.student_session_number || 1}</span>
+								</td>
 								<td class="text-slate-500">@{a.username}</td>
 								<td>
 									<div class="flex flex-col gap-1 items-start">
