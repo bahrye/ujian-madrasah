@@ -1,6 +1,7 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB, e as ensureTokenSessionColumn } from "../../../../chunks/db.js";
 import { g as generateTokenCode } from "../../../../chunks/auth.js";
+import { c as checkSessionTimeWindow } from "../../../../chunks/date.js";
 const load = async ({ platform, locals }) => {
   if (!locals.user) throw redirect(302, "/login");
   const db = getDB(platform);
@@ -136,22 +137,15 @@ const actions = {
 		`).bind(parsedExamId, parsedSessionNumber).first();
     const startTimeStr = sessionRecord?.start_time || proctorAssignment.exam_start_time;
     const endTimeStr = sessionRecord?.end_time || proctorAssignment.exam_end_time;
-    const nowMs = Date.now();
-    if (startTimeStr) {
-      const sessionStartTime = new Date(startTimeStr).getTime();
-      const earliestGenerateTime = sessionStartTime - 15 * 60 * 1e3;
-      if (nowMs < earliestGenerateTime) {
-        const timeFormatted = new Date(startTimeStr).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
-        return fail(400, { error: `Token Sesi ${parsedSessionNumber} baru dapat dibuat 15 menit sebelum waktu sesi ujian dimulai (mulai pukul ${timeFormatted}).` });
-      }
-    }
-    if (endTimeStr) {
-      const sessionEndTime = new Date(endTimeStr).getTime();
-      if (nowMs > sessionEndTime) {
+    const timeCheck = checkSessionTimeWindow(startTimeStr, endTimeStr);
+    if (!timeCheck.allowed) {
+      if (timeCheck.reason === "too_early") {
+        return fail(400, { error: `Token Sesi ${parsedSessionNumber} baru dapat dibuat 15 menit sebelum waktu sesi ujian dimulai (mulai pukul ${timeCheck.timeFormatted}).` });
+      } else if (timeCheck.reason === "too_late") {
         return fail(400, { error: `Token tidak dapat dibuat karena Sesi ${parsedSessionNumber} telah berakhir.` });
       }
     }
-    const nowIso = new Date(nowMs).toISOString();
+    const nowIso = (/* @__PURE__ */ new Date()).toISOString();
     const activeToken = await db.prepare(`
 			SELECT token_code FROM tokens 
 			WHERE exam_id = ? AND (session_number = ? OR session_number IS NULL) AND school_id = ? AND expires_at > ?

@@ -2,6 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB, ensureTokenSessionColumn } from '$lib/server/db';
 import { generateTokenCode } from '$lib/server/auth';
+import { checkSessionTimeWindow } from '$lib/utils/date';
 
 export interface ExamSessionItem {
 	session_number: number;
@@ -172,26 +173,18 @@ export const actions: Actions = {
 
 		const startTimeStr = sessionRecord?.start_time || proctorAssignment.exam_start_time;
 		const endTimeStr = sessionRecord?.end_time || proctorAssignment.exam_end_time;
-		const nowMs = Date.now();
 
 		// Aturan 15 menit sebelum waktu sesi ujian
-		if (startTimeStr) {
-			const sessionStartTime = new Date(startTimeStr).getTime();
-			const earliestGenerateTime = sessionStartTime - 15 * 60 * 1000;
-			if (nowMs < earliestGenerateTime) {
-				const timeFormatted = new Date(startTimeStr).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-				return fail(400, { error: `Token Sesi ${parsedSessionNumber} baru dapat dibuat 15 menit sebelum waktu sesi ujian dimulai (mulai pukul ${timeFormatted}).` });
-			}
-		}
-
-		if (endTimeStr) {
-			const sessionEndTime = new Date(endTimeStr).getTime();
-			if (nowMs > sessionEndTime) {
+		const timeCheck = checkSessionTimeWindow(startTimeStr, endTimeStr);
+		if (!timeCheck.allowed) {
+			if (timeCheck.reason === 'too_early') {
+				return fail(400, { error: `Token Sesi ${parsedSessionNumber} baru dapat dibuat 15 menit sebelum waktu sesi ujian dimulai (mulai pukul ${timeCheck.timeFormatted}).` });
+			} else if (timeCheck.reason === 'too_late') {
 				return fail(400, { error: `Token tidak dapat dibuat karena Sesi ${parsedSessionNumber} telah berakhir.` });
 			}
 		}
 
-		const nowIso = new Date(nowMs).toISOString();
+		const nowIso = new Date().toISOString();
 
 		// Check for active token per exam AND session_number
 		const activeToken = await db.prepare(`

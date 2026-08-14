@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { parseDate } from '$lib/utils/date';
+	import { parseDate, checkSessionTimeWindow } from '$lib/utils/date';
 
 	import { enhance } from '$app/forms';
 	import { ICONS } from '$lib/utils/constants';
@@ -112,12 +112,11 @@
 								<option value="">Pilih ujian dulu</option>
 							{:else}
 								{#each availableSessions as session}
-									{@const start = session.start_time ? parseDate(session.start_time).getTime() : 0}
-									{@const end = session.end_time ? parseDate(session.end_time).getTime() : Infinity}
-									{@const isPastEnd = currentTime > end}
-									{@const isAllowed = (!session.start_time || currentTime >= start - 15 * 60 * 1000) && !isPastEnd}
-									{@const startTimeFormatted = session.start_time ? parseDate(session.start_time).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : ''}
-									{@const endTimeFormatted = session.end_time ? parseDate(session.end_time).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : ''}
+									{@const timeCheck = checkSessionTimeWindow(session.start_time, session.end_time, new Date(currentTime))}
+									{@const isAllowed = timeCheck.allowed}
+									{@const isPastEnd = timeCheck.reason === 'too_late'}
+									{@const startTimeFormatted = session.start_time ? (session.start_time.includes('T') ? session.start_time.split('T')[1].slice(0, 5) : session.start_time.includes(' ') ? session.start_time.split(' ')[1].slice(0, 5) : session.start_time) : ''}
+									{@const endTimeFormatted = session.end_time ? (session.end_time.includes('T') ? session.end_time.split('T')[1].slice(0, 5) : session.end_time.includes(' ') ? session.end_time.split(' ')[1].slice(0, 5) : session.end_time) : ''}
 									{@const timeLabel = startTimeFormatted ? ` (${startTimeFormatted}${endTimeFormatted ? ' - ' + endTimeFormatted : ''})` : ''}
 									<option value={session.session_number} disabled={!isAllowed}>
 										Sesi {session.session_number}{timeLabel}
