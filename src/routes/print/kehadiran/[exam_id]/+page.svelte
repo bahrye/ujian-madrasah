@@ -35,6 +35,9 @@
 </svelte:head>
 
 <style>
+	:global(body) {
+		font-family: 'Times New Roman', Times, Georgia, serif;
+	}
 	@media print {
 		@page {
 			size: 215.9mm 330mm; /* F4 / Folio */

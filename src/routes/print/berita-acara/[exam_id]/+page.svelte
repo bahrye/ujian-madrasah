@@ -121,6 +121,9 @@
 </svelte:head>
 
 <style>
+	:global(body) {
+		font-family: 'Times New Roman', Times, Georgia, serif;
+	}
 	@media print {
 		@page { 
 			size: 215.9mm 330mm; /* F4 / Folio */
@@ -302,7 +305,7 @@
 			<!-- Catatan / Kejadian Penting -->
 			<div class="mb-3">
 				<p class="mb-1 font-bold text-sm">Catatan / Kejadian Penting Selama Ujian Berlangsung:</p>
-				<div class="border border-black p-2 min-h-[48px] text-xs font-serif text-slate-500 rounded">
+				<div class="border border-black p-2 min-h-[75px] text-xs font-serif text-slate-500 rounded">
 					<span class="print:hidden">( Kosongkan jika pelaksanaan ujian berjalan tertib dan lancar )</span>
 				</div>
 			</div>
