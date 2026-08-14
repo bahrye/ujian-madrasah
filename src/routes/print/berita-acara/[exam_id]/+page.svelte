@@ -230,7 +230,7 @@
 			{ role: 'Panitia Ujian', data: committee, id: 'cm' }
 		].filter(o => (o.id === 'p1' && proctor1Id) || (o.id !== 'p1' && o.data))}
 
-		<div class={roomIdx > 0 || sessionIdx > 0 ? "break-before-page pt-8" : ""}>
+		<div class={roomIdx > 0 || sessionIdx > 0 ? "break-before-page pt-8 print:pt-0" : ""}>
 			<!-- Kop Surat -->
 			<div class="flex items-center justify-between gap-4 pb-2 relative">
 				<img 

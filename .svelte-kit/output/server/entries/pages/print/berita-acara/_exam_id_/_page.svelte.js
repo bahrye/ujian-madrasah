@@ -217,7 +217,7 @@ function _page($$renderer, $$props) {
           { role: "Proktor / Teknisi", data: proctorTech, id: "pt" },
           { role: "Panitia Ujian", data: committee, id: "cm" }
         ].filter((o) => o.id === "p1" && proctor1Id || o.id !== "p1" && o.data);
-        $$renderer2.push(`<div${attr_class(clsx(roomIdx > 0 || sessionIdx > 0 ? "break-before-page pt-8" : ""), "svelte-npx4lb")}><div class="flex items-center justify-between gap-4 pb-2 relative"><img src="/kemenag.png" alt="Logo Kemenag" class="w-20 h-20 object-contain shrink-0"/> <div class="flex-1 text-center font-serif px-2"><h4 class="font-semibold text-sm uppercase tracking-wider text-black m-0 leading-tight">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h4> <h3 class="font-bold text-xl uppercase tracking-wide text-black m-0 my-0.5">${escape_html(school?.name || "NAMA SEKOLAH")}</h3> `);
+        $$renderer2.push(`<div${attr_class(clsx(roomIdx > 0 || sessionIdx > 0 ? "break-before-page pt-8 print:pt-0" : ""), "svelte-npx4lb")}><div class="flex items-center justify-between gap-4 pb-2 relative"><img src="/kemenag.png" alt="Logo Kemenag" class="w-20 h-20 object-contain shrink-0"/> <div class="flex-1 text-center font-serif px-2"><h4 class="font-semibold text-sm uppercase tracking-wider text-black m-0 leading-tight">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h4> <h3 class="font-bold text-xl uppercase tracking-wide text-black m-0 my-0.5">${escape_html(school?.name || "NAMA SEKOLAH")}</h3> `);
         if (school?.address) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<p class="text-xs italic text-black m-0 leading-tight">${escape_html(school.address)}</p>`);
