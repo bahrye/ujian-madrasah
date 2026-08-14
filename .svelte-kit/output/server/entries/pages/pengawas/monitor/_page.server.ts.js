@@ -167,7 +167,7 @@ const load = async ({ platform, url, locals }) => {
     return {
       exams: exams.results,
       attempts: attemptsWithProgress,
-      examFilter: isNaN(examFilter) ? "" : examFilter,
+      examFilter: isNaN(examFilter) ? "" : String(examFilter),
       availableSessions,
       sessionFilter: activeSessionFilter !== null ? String(activeSessionFilter) : ""
     };

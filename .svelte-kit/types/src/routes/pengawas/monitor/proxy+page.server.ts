@@ -194,7 +194,7 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 		return {
 			exams: exams.results,
 			attempts: attemptsWithProgress,
-			examFilter: isNaN(examFilter) ? '' : examFilter,
+			examFilter: isNaN(examFilter) ? '' : String(examFilter),
 			availableSessions,
 			sessionFilter: activeSessionFilter !== null ? String(activeSessionFilter) : ''
 		};

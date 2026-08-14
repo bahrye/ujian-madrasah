@@ -155,7 +155,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 		return {
 			exams: exams.results,
 			attempts: attemptsWithProgress,
-			examFilter: isNaN(examFilter) ? '' : examFilter,
+			examFilter: isNaN(examFilter) ? '' : String(examFilter),
 			availableSessions,
 			sessionFilter: !isNaN(sessionFilter) ? String(sessionFilter) : ''
 		};

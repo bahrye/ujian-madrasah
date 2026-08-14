@@ -50,7 +50,7 @@
 			<select name="exam_id" class="select flex-1 min-w-[200px]" required on:change={() => formElement?.submit()}>
 				<option value="">-- Pilih Ujian --</option>
 				{#each data.exams as exam}
-					<option value={exam.id} selected={data.examFilter === String(exam.id)}>{exam.title}</option>
+					<option value={exam.id} selected={String(data.examFilter) === String(exam.id)}>{exam.title}</option>
 				{/each}
 			</select>
 

@@ -38,7 +38,7 @@ function _page($$renderer, $$props) {
       $$renderer2.option(
         {
           value: exam.id,
-          selected: data.examFilter === String(exam.id)
+          selected: String(data.examFilter) === String(exam.id)
         },
         ($$renderer3) => {
           $$renderer3.push(`${escape_html(exam.title)}`);
