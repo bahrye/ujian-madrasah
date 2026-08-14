@@ -100,7 +100,7 @@ function _page($$renderer, $$props) {
           school?.city ? school.city.toLowerCase().startsWith("kab") || school.city.toLowerCase().startsWith("kota") ? school.city : `Kabupaten ${school.city}` : "",
           school?.province ? school.province : ""
         ].filter(Boolean).join(", ");
-        $$renderer2.push(`<div${attr_class(clsx(roomIdx > 0 || sessionIdx > 0 ? "break-before-page pt-8" : ""), "svelte-5lujtk")}><div class="flex items-center justify-between gap-4 pb-3 mb-5 relative" style="border-bottom: 3px double #000;"><img src="/kemenag.png" alt="Logo Kemenag" class="w-20 h-20 object-contain shrink-0"/> <div class="flex-1 text-center font-serif px-2"><h4 class="font-semibold text-sm uppercase tracking-wider text-black m-0 leading-tight">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h4> <h3 class="font-bold text-xl uppercase tracking-wide text-black m-0 my-0.5">${escape_html(school?.name || "NAMA SEKOLAH")}</h3> `);
+        $$renderer2.push(`<div${attr_class(clsx(roomIdx > 0 || sessionIdx > 0 ? "break-before-page pt-8" : ""), "svelte-5lujtk")}><div class="flex items-center justify-between gap-4 pb-2 relative"><img src="/kemenag.png" alt="Logo Kemenag" class="w-20 h-20 object-contain shrink-0"/> <div class="flex-1 text-center font-serif px-2"><h4 class="font-semibold text-sm uppercase tracking-wider text-black m-0 leading-tight">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h4> <h3 class="font-bold text-xl uppercase tracking-wide text-black m-0 my-0.5">${escape_html(school?.name || "NAMA SEKOLAH")}</h3> `);
         if (school?.address) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<p class="text-xs italic text-black m-0 leading-tight">${escape_html(school.address)}</p>`);
@@ -121,6 +121,13 @@ function _page($$renderer, $$props) {
         } else {
           $$renderer2.push("<!--[-1-->");
           $$renderer2.push(`<div class="w-20 h-20 shrink-0"></div>`);
+        }
+        $$renderer2.push(`<!--]--></div> <div class="mt-2 mb-5"><div style="border-bottom: 1px solid #000;"></div> <div style="border-bottom: 2.5px solid #000; margin-top: 2px;"></div></div> <div class="text-center mb-5 font-serif"><h2 class="font-bold text-lg uppercase underline tracking-wider m-0">DAFTAR HADIR PESERTA UJIAN</h2> `);
+        if (exam.exam_type_name) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<p class="text-xs font-semibold text-slate-700 uppercase mt-0.5">${escape_html(exam.exam_type_name)}</p>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
         }
         $$renderer2.push(`<!--]--></div> <div class="grid grid-cols-2 gap-4 mb-4 text-sm"><table class="w-full"><tbody><tr><td class="py-1 w-32 font-medium">Ujian</td><td class="w-4">:</td><td>${escape_html(exam.exam_type_name || exam.title)}</td></tr><tr><td class="py-1 font-medium">Mata Pelajaran</td><td>:</td><td>${escape_html(exam.subject_name || "Umum")}</td></tr><tr><td class="py-1 font-medium">Kelas</td><td>:</td><td>${escape_html(classNames)}</td></tr></tbody></table> <table class="w-full"><tbody><tr><td class="py-1 w-32 font-medium">Hari, Tanggal</td><td class="w-4">:</td><td>${escape_html(formatDate(effectiveDateStr))}</td></tr><tr><td class="py-1 font-medium">Waktu</td><td>:</td><td>${escape_html(formatTime(effectiveStart))} - ${escape_html(formatTime(effectiveEnd))}</td></tr>`);
         if (data.hasSessions) {

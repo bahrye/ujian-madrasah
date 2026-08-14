@@ -110,7 +110,7 @@
 			].filter(Boolean).join(', ')}
 		<div class={roomIdx > 0 || sessionIdx > 0 ? "break-before-page pt-8" : ""}>
 			<!-- Kop Surat -->
-			<div class="flex items-center justify-between gap-4 pb-3 mb-5 relative" style="border-bottom: 3px double #000;">
+			<div class="flex items-center justify-between gap-4 pb-2 relative">
 				<img 
 					src="/kemenag.png" 
 					alt="Logo Kemenag" 
@@ -139,6 +139,20 @@
 					/>
 				{:else}
 					<div class="w-20 h-20 shrink-0"></div>
+				{/if}
+			</div>
+
+			<!-- Garis Kop Surat (Tipis atas, Agak tebal bawah) -->
+			<div class="mt-2 mb-5">
+				<div style="border-bottom: 1px solid #000;"></div>
+				<div style="border-bottom: 2.5px solid #000; margin-top: 2px;"></div>
+			</div>
+
+			<!-- Judul Dokumen -->
+			<div class="text-center mb-5 font-serif">
+				<h2 class="font-bold text-lg uppercase underline tracking-wider m-0">DAFTAR HADIR PESERTA UJIAN</h2>
+				{#if exam.exam_type_name}
+					<p class="text-xs font-semibold text-slate-700 uppercase mt-0.5">{exam.exam_type_name}</p>
 				{/if}
 			</div>
 
