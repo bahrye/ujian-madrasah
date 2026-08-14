@@ -14,6 +14,7 @@
 						{ label: 'Dashboard Pengawas', href: '/pengawas' },
 						{ label: 'Tata Tertib', href: '/pengawas/tata-tertib' },
 						{ label: 'Jadwal Saya', href: '/pengawas/jadwal/saya' },
+						{ label: 'Jadwal Semua', href: '/pengawas/jadwal/semua' },
 						{ label: 'Generate Token', href: '/pengawas/tokens' },
 						{ label: 'Monitoring Siswa', href: '/pengawas/monitor' }
 					]
