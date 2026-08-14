@@ -47,10 +47,16 @@
 	}
 
 	function portal(node: HTMLElement) {
-		document.body.appendChild(node);
+		let destroyed = false;
+		setTimeout(() => {
+			if (!destroyed && node && node.parentNode !== document.body) {
+				document.body.appendChild(node);
+			}
+		}, 0);
 		return {
 			destroy() {
-				if (node.parentNode) {
+				destroyed = true;
+				if (node && node.parentNode) {
 					node.parentNode.removeChild(node);
 				}
 			}
