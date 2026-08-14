@@ -13,24 +13,12 @@
 	let proctorTechId = '';
 	let committeeId = '';
 
-	// Date and time manual overrides if needed
-	let customDateStr = '';
-	let customStartTime = '';
-	let customEndTime = '';
-
 	$: proctor1 = proctorOptions.find(p => String(p.id) === String(proctor1Id));
 	$: proctor2 = proctorOptions.find(p => String(p.id) === String(proctor2Id));
 	$: proctorTech = proctorOptions.find(p => String(p.id) === String(proctorTechId));
 	$: committee = proctorOptions.find(p => String(p.id) === String(committeeId));
 
-	function resolveStart(sessionData: any, exam: any, customDate: string, customTime: string) {
-		if (customDate || customTime) {
-			const baseDateStr = customDate || sessionData?.start_time || exam?.start_time || exam?.exam_type_start_time || new Date().toISOString().slice(0, 10);
-			const baseDate = baseDateStr.includes('T') ? baseDateStr.split('T')[0] : (baseDateStr.includes(' ') ? baseDateStr.split(' ')[0] : baseDateStr);
-			const baseTime = customTime || (sessionData?.start_time?.includes('T') ? sessionData.start_time.split('T')[1].slice(0, 5) : sessionData?.start_time || '08:00');
-			return `${baseDate}T${baseTime}:00`;
-		}
-
+	function resolveStart(sessionData: any, exam: any) {
 		if (sessionData?.start_time && sessionData.start_time.trim()) {
 			const s = sessionData.start_time.trim();
 			if (s.includes('-') || s.includes('/')) return s;
@@ -50,14 +38,7 @@
 		return null;
 	}
 
-	function resolveEnd(sessionData: any, exam: any, customDate: string, customTime: string) {
-		if (customDate || customTime) {
-			const baseDateStr = customDate || sessionData?.end_time || exam?.end_time || exam?.exam_type_end_time || new Date().toISOString().slice(0, 10);
-			const baseDate = baseDateStr.includes('T') ? baseDateStr.split('T')[0] : (baseDateStr.includes(' ') ? baseDateStr.split(' ')[0] : baseDateStr);
-			const baseTime = customTime || (sessionData?.end_time?.includes('T') ? sessionData.end_time.split('T')[1].slice(0, 5) : sessionData?.end_time || '09:30');
-			return `${baseDate}T${baseTime}:00`;
-		}
-
+	function resolveEnd(sessionData: any, exam: any) {
 		if (sessionData?.end_time && sessionData.end_time.trim()) {
 			const s = sessionData.end_time.trim();
 			if (s.includes('-') || s.includes('/')) return s;
@@ -163,7 +144,7 @@
 <!-- Control Bar -->
 <div class="no-print p-4 bg-slate-800 text-white border-b border-slate-700 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-md">
 	<div class="flex items-center gap-4 flex-wrap">
-		<span class="text-xs font-semibold uppercase tracking-wider text-slate-300">Pengaturan TTD & Waktu:</span>
+		<span class="text-xs font-semibold uppercase tracking-wider text-slate-300">Pengaturan TTD Petugas:</span>
 		
 		<div class="flex items-center gap-1.5">
 			<label for="p1-select" class="text-xs text-slate-300 font-medium">Pengawas 1:</label>
@@ -204,22 +185,6 @@
 				{/each}
 			</select>
 		</div>
-
-		<!-- Date / Time inputs -->
-		<div class="flex items-center gap-1.5 border-l border-slate-600 pl-3">
-			<label for="date-override" class="text-xs text-slate-300 font-medium">Tgl:</label>
-			<input id="date-override" type="date" bind:value={customDateStr} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1" />
-		</div>
-
-		<div class="flex items-center gap-1.5">
-			<label for="start-override" class="text-xs text-slate-300 font-medium">Mulai:</label>
-			<input id="start-override" type="time" bind:value={customStartTime} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1" />
-		</div>
-
-		<div class="flex items-center gap-1.5">
-			<label for="end-override" class="text-xs text-slate-300 font-medium">Selesai:</label>
-			<input id="end-override" type="time" bind:value={customEndTime} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1" />
-		</div>
 	</div>
 
 	<div class="flex items-center gap-2">
@@ -238,8 +203,8 @@
 	{#each Object.entries(sessionsDict) as [sessionNumStr, count], sessionIdx}
 		{@const sessionNum = parseInt(sessionNumStr)}
 		{@const sessionData = sessionMap?.[sessionNum]}
-		{@const effectiveStart = resolveStart(sessionData, exam, customDateStr, customStartTime)}
-		{@const effectiveEnd = resolveEnd(sessionData, exam, customDateStr, customEndTime)}
+		{@const effectiveStart = resolveStart(sessionData, exam)}
+		{@const effectiveEnd = resolveEnd(sessionData, exam)}
 		{@const locationStr = [
 			school?.district ? `Kecamatan ${school.district}` : '',
 			school?.city ? (school.city.toLowerCase().startsWith('kab') || school.city.toLowerCase().startsWith('kota') ? school.city : `Kabupaten ${school.city}`) : '',

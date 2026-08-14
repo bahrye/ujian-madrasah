@@ -1,4 +1,4 @@
-import { h as head, i as ensure_array_like, e as escape_html, k as attr, j as attr_class, l as clsx, c as stringify, f as bind_props } from "../../../../../chunks/index.js";
+import { h as head, i as ensure_array_like, e as escape_html, j as attr_class, l as clsx, k as attr, c as stringify, f as bind_props } from "../../../../../chunks/index.js";
 import { p as parseDate } from "../../../../../chunks/date.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
@@ -8,10 +8,7 @@ function _page($$renderer, $$props) {
     let proctor2Id = data.defaultProctor2Id || "";
     let proctorTechId = "";
     let committeeId = "";
-    let customDateStr = "";
-    let customStartTime = "";
-    let customEndTime = "";
-    function resolveStart(sessionData, exam2, customDate, customTime) {
+    function resolveStart(sessionData, exam2) {
       if (sessionData?.start_time && sessionData.start_time.trim()) {
         const s = sessionData.start_time.trim();
         if (s.includes("-") || s.includes("/")) return s;
@@ -27,7 +24,7 @@ function _page($$renderer, $$props) {
       }
       return null;
     }
-    function resolveEnd(sessionData, exam2, customDate, customTime) {
+    function resolveEnd(sessionData, exam2) {
       if (sessionData?.end_time && sessionData.end_time.trim()) {
         const s = sessionData.end_time.trim();
         if (s.includes("-") || s.includes("/")) return s;
@@ -113,7 +110,7 @@ function _page($$renderer, $$props) {
         $$renderer4.push(`<title>Berita Acara - ${escape_html(exam.exam_type_name || exam.title)}</title>`);
       });
     });
-    $$renderer2.push(`<div class="no-print p-4 bg-slate-800 text-white border-b border-slate-700 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-md svelte-npx4lb"><div class="flex items-center gap-4 flex-wrap"><span class="text-xs font-semibold uppercase tracking-wider text-slate-300">Pengaturan TTD &amp; Waktu:</span> <div class="flex items-center gap-1.5"><label for="p1-select" class="text-xs text-slate-300 font-medium">Pengawas 1:</label> `);
+    $$renderer2.push(`<div class="no-print p-4 bg-slate-800 text-white border-b border-slate-700 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-md svelte-npx4lb"><div class="flex items-center gap-4 flex-wrap"><span class="text-xs font-semibold uppercase tracking-wider text-slate-300">Pengaturan TTD Petugas:</span> <div class="flex items-center gap-1.5"><label for="p1-select" class="text-xs text-slate-300 font-medium">Pengawas 1:</label> `);
     $$renderer2.select(
       {
         id: "p1-select",
@@ -201,7 +198,7 @@ function _page($$renderer, $$props) {
         $$renderer3.push(`<!--]-->`);
       }
     );
-    $$renderer2.push(`</div> <div class="flex items-center gap-1.5 border-l border-slate-600 pl-3"><label for="date-override" class="text-xs text-slate-300 font-medium">Tgl:</label> <input id="date-override" type="date"${attr("value", customDateStr)} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1"/></div> <div class="flex items-center gap-1.5"><label for="start-override" class="text-xs text-slate-300 font-medium">Mulai:</label> <input id="start-override" type="time"${attr("value", customStartTime)} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1"/></div> <div class="flex items-center gap-1.5"><label for="end-override" class="text-xs text-slate-300 font-medium">Selesai:</label> <input id="end-override" type="time"${attr("value", customEndTime)} class="bg-slate-700 text-white text-xs border border-slate-600 rounded px-2 py-1"/></div></div> <div class="flex items-center gap-2"><button class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-medium transition-colors">Tutup</button> <button class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-xs font-bold transition-colors flex items-center gap-1.5 shadow"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg> Cetak Berita Acara</button></div></div> <div class="p-4 md:p-8 max-w-4xl mx-auto font-serif text-[15px] leading-snug print:p-0 print:m-0 bg-white"><!--[-->`);
+    $$renderer2.push(`</div></div> <div class="flex items-center gap-2"><button class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-medium transition-colors">Tutup</button> <button class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-xs font-bold transition-colors flex items-center gap-1.5 shadow"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg> Cetak Berita Acara</button></div></div> <div class="p-4 md:p-8 max-w-4xl mx-auto font-serif text-[15px] leading-snug print:p-0 print:m-0 bg-white"><!--[-->`);
     const each_array_4 = ensure_array_like(Object.entries(participantsGrouped));
     for (let roomIdx = 0, $$length = each_array_4.length; roomIdx < $$length; roomIdx++) {
       let [roomName, sessionsDict] = each_array_4[roomIdx];
