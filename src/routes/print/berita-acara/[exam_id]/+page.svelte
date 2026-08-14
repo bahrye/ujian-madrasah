@@ -285,7 +285,7 @@
 						<tr class="align-top"><td class="py-0.5">e. Jumlah Peserta Hadir</td><td class="py-0.5">:</td><td class="py-0.5">........... Orang</td></tr>
 						<tr class="align-top"><td class="py-0.5">f. Jumlah Peserta Tidak Hadir</td><td class="py-0.5">:</td><td class="py-0.5">........... Orang</td></tr>
 						<tr class="align-top">
-							<td class="py-1 pl-4 text-sm font-sans" colspan="3">
+							<td class="py-1 pl-4 text-sm font-serif" colspan="3">
 								<div class="flex items-baseline gap-2">
 									<span>- Nomor Peserta yang Tidak Hadir:</span>
 									<span class="border-b border-dotted border-black flex-1 min-h-[1.1rem]"></span>
