@@ -20,8 +20,8 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 	`).bind(examId).all();
 	const tokens = await db.prepare('SELECT * FROM tokens WHERE exam_id = ? ORDER BY created_at DESC').bind(examId).all();
 	
-	const sessionsCount = await db.prepare('SELECT COUNT(*) as count FROM exam_sessions WHERE exam_id = ?').bind(examId).first<{count: number}>();
-	const hasSessions = (sessionsCount?.count || 0) > 0;
+	const examSessions = await db.prepare('SELECT * FROM exam_sessions WHERE exam_id = ? ORDER BY session_number').bind(examId).all();
+	const hasSessions = (examSessions.results?.length || 0) > 0;
 
 	const examRooms = await db.prepare('SELECT * FROM exam_rooms WHERE exam_id = ? ORDER BY name').bind(examId).all();
 
@@ -85,7 +85,8 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 		allProctors: allProctors.results,
 		examProctors: examProctors.results,
 		hasSessions,
-		sessionsCount: sessionsCount?.count || 0,
+		sessionsCount: examSessions.results?.length || 0,
+		examSessions: examSessions.results || [],
 		examRooms: examRooms.results
 	};
 };

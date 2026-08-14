@@ -12,7 +12,7 @@ import "katex/dist/contrib/auto-render.mjs";
 import { t as toasts } from "../../../../../chunks/toast.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
-    let exam, questions, attempts, tokens, participants, examTeachers, examProctors, hasSessionsOrRooms;
+    let exam, questions, attempts, tokens, participants, examTeachers, examProctors, examSessions, hasSessionsOrRooms;
     let form = fallback($$props["form"], null);
     let data = $$props["data"];
     let studentSearch = "";
@@ -26,6 +26,7 @@ function _page($$renderer, $$props) {
     data.allTeachers;
     examTeachers = data.examTeachers;
     examProctors = data.examProctors;
+    examSessions = data.examSessions || [];
     hasSessionsOrRooms = data.hasSessions || data.examRooms && data.examRooms.length > 0;
     data.allStudents ? data.allStudents.filter((s) => {
       const matchesSearch = s.name.toLowerCase().includes(studentSearch.toLowerCase()) || s.username.toLowerCase().includes(studentSearch.toLowerCase());
@@ -68,7 +69,21 @@ function _page($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--> <div class="mt-4 flex flex-wrap gap-4 text-xs text-slate-500"><span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> Mulai: <strong class="text-slate-600 font-medium">${escape_html(exam.start_time ? parseDate(exam.start_time).toLocaleString("id-ID") : "-")}</strong></span> <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> Selesai: <strong class="text-slate-600 font-medium">${escape_html(exam.end_time ? parseDate(exam.end_time).toLocaleString("id-ID") : "-")}</strong></span> <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7"></path></svg> Tampilan Soal: <strong class="text-slate-600 font-medium">${escape_html(exam.shuffle_questions ? "Acak" : "Tidak Acak")}</strong></span> <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Tampilan Nilai: <strong class="text-slate-600 font-medium">${escape_html({
+    $$renderer2.push(`<!--]--> <div class="mt-4 flex flex-wrap gap-4 text-xs text-slate-500 items-center">`);
+    if (examSessions.length > 0) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<div class="w-full flex flex-wrap gap-2 items-center bg-slate-50 p-2.5 rounded-lg border border-slate-100 mb-1"><span class="text-slate-600 font-semibold flex items-center gap-1 mr-1"><svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> Jadwal Per Sesi:</span> <div class="flex flex-wrap gap-2"><!--[-->`);
+      const each_array = ensure_array_like(examSessions);
+      for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
+        let session = each_array[$$index];
+        $$renderer2.push(`<span class="inline-flex items-center gap-1.5 bg-white px-2.5 py-1 rounded border border-slate-200 text-xs shadow-xs"><strong class="text-indigo-600 font-bold">Sesi ${escape_html(session.session_number)}:</strong> <span class="text-slate-700 font-medium">${escape_html(session.start_time ? parseDate(session.start_time).toLocaleString("id-ID") : "-")} <span class="text-slate-400 mx-0.5">s/d</span> ${escape_html(session.end_time ? parseDate(session.end_time).toLocaleString("id-ID") : "-")}</span></span>`);
+      }
+      $$renderer2.push(`<!--]--></div></div>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+      $$renderer2.push(`<span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> Mulai: <strong class="text-slate-600 font-medium">${escape_html(exam.start_time ? parseDate(exam.start_time).toLocaleString("id-ID") : "-")}</strong></span> <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> Selesai: <strong class="text-slate-600 font-medium">${escape_html(exam.end_time ? parseDate(exam.end_time).toLocaleString("id-ID") : "-")}</strong></span>`);
+    }
+    $$renderer2.push(`<!--]--> <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7"></path></svg> Tampilan Soal: <strong class="text-slate-600 font-medium">${escape_html(exam.shuffle_questions ? "Acak" : "Tidak Acak")}</strong></span> <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Tampilan Nilai: <strong class="text-slate-600 font-medium">${escape_html({
       after_type_end_time: "Jadwal Tipe Ujian",
       after_submit: "Langsung Tampil",
       after_end_time: "Jadwal Ujian",
@@ -81,9 +96,9 @@ function _page($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
       $$renderer2.push(`<div class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"><!--[-->`);
-      const each_array = ensure_array_like(data.examRooms);
-      for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
-        let room = each_array[$$index];
+      const each_array_1 = ensure_array_like(data.examRooms);
+      for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
+        let room = each_array_1[$$index_1];
         $$renderer2.push(`<div class="border border-slate-100 rounded-lg p-3 bg-slate-50 flex items-center justify-between"><div class="font-medium text-slate-700 text-sm">${escape_html(room.name)}</div> `);
         ConfirmForm($$renderer2, {
           action: "?/deleteRoom",
@@ -115,9 +130,9 @@ function _page($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
       $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Nama Guru</th><th>Username</th><th>Aksi</th></tr></thead><tbody><!--[-->`);
-      const each_array_1 = ensure_array_like(examTeachers);
-      for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
-        let teacher = each_array_1[$$index_1];
+      const each_array_2 = ensure_array_like(examTeachers);
+      for (let $$index_2 = 0, $$length = each_array_2.length; $$index_2 < $$length; $$index_2++) {
+        let teacher = each_array_2[$$index_2];
         $$renderer2.push(`<tr><td class="font-medium text-slate-800">${escape_html(teacher.name)}</td><td class="font-mono text-sm text-slate-500">${escape_html(teacher.username)}</td><td>`);
         ConfirmForm($$renderer2, {
           action: "?/removeTeacher",
@@ -175,17 +190,17 @@ function _page($$renderer, $$props) {
         $$renderer2.push("<!--[-1-->");
       }
       $$renderer2.push(`<!--]--><th class="w-16">Aksi</th></tr></thead><tbody><!--[-->`);
-      const each_array_2 = ensure_array_like(examProctors);
-      for (let $$index_4 = 0, $$length = each_array_2.length; $$index_4 < $$length; $$index_4++) {
-        let proctor = each_array_2[$$index_4];
+      const each_array_3 = ensure_array_like(examProctors);
+      for (let $$index_5 = 0, $$length = each_array_3.length; $$index_5 < $$length; $$index_5++) {
+        let proctor = each_array_3[$$index_5];
         $$renderer2.push(`<tr><td class="font-medium text-slate-800"><input type="hidden" name="exam_proctor_ids"${attr("value", proctor.exam_proctor_id)}/> ${escape_html(proctor.name)}</td><td class="font-mono text-sm text-slate-500">${escape_html(proctor.username)}</td>`);
         if (data.hasSessions) {
           $$renderer2.push("<!--[0-->");
           const sessionsArr = proctor.sessions ? JSON.parse(proctor.sessions) : [];
           $$renderer2.push(`<td><div class="flex flex-wrap gap-2.5 items-center"><!--[-->`);
-          const each_array_3 = ensure_array_like(Array(data.sessionsCount));
-          for (let i = 0, $$length2 = each_array_3.length; i < $$length2; i++) {
-            each_array_3[i];
+          const each_array_4 = ensure_array_like(Array(data.sessionsCount));
+          for (let i = 0, $$length2 = each_array_4.length; i < $$length2; i++) {
+            each_array_4[i];
             const sNum = i + 1;
             $$renderer2.push(`<label class="flex items-center gap-1.5 cursor-pointer bg-slate-50 hover:bg-indigo-50 px-2 py-1 rounded border border-slate-200 hover:border-indigo-200 transition-colors"><input type="checkbox"${attr("name", `sessions_${proctor.exam_proctor_id}`)}${attr("value", sNum)}${attr("checked", sessionsArr.includes(sNum), true)} class="w-3.5 h-3.5 text-indigo-600 rounded focus:ring-indigo-500"/> <span class="text-xs font-medium text-slate-700">Sesi ${escape_html(sNum)}</span></label>`);
           }
@@ -201,9 +216,9 @@ function _page($$renderer, $$props) {
             $$renderer3.push(`- Semua Ruang -`);
           });
           $$renderer2.push(`<!--[-->`);
-          const each_array_4 = ensure_array_like(data.examRooms);
-          for (let $$index_3 = 0, $$length2 = each_array_4.length; $$index_3 < $$length2; $$index_3++) {
-            let room = each_array_4[$$index_3];
+          const each_array_5 = ensure_array_like(data.examRooms);
+          for (let $$index_4 = 0, $$length2 = each_array_5.length; $$index_4 < $$length2; $$index_4++) {
+            let room = each_array_5[$$index_4];
             $$renderer2.option({ value: room.id, selected: proctor.room_id === room.id }, ($$renderer3) => {
               $$renderer3.push(`${escape_html(room.name)}`);
             });
@@ -269,16 +284,16 @@ function _page($$renderer, $$props) {
         $$renderer2.push("<!--[-1-->");
       }
       $$renderer2.push(`<!--]--><th class="w-16">Aksi</th></tr></thead><tbody><!--[-->`);
-      const each_array_5 = ensure_array_like(participants);
-      for (let $$index_7 = 0, $$length = each_array_5.length; $$index_7 < $$length; $$index_7++) {
-        let p = each_array_5[$$index_7];
+      const each_array_6 = ensure_array_like(participants);
+      for (let $$index_8 = 0, $$length = each_array_6.length; $$index_8 < $$length; $$index_8++) {
+        let p = each_array_6[$$index_8];
         $$renderer2.push(`<tr><td class="text-xs font-mono"><input type="hidden" name="participant_ids"${attr("value", p.participant_id)}/> <input type="hidden" name="user_ids"${attr("value", p.user_id)}/> ${escape_html(p.nisn)}</td><td class="font-medium">${escape_html(p.student_name)}</td><td>${escape_html(p.class_name || "-")}</td>`);
         if (data.hasSessions) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<td><select${attr("name", `session_${p.user_id}`)} class="select select-sm select-bordered w-full max-w-[120px]"><!--[-->`);
-          const each_array_6 = ensure_array_like(Array(data.sessionsCount));
-          for (let i = 0, $$length2 = each_array_6.length; i < $$length2; i++) {
-            each_array_6[i];
+          const each_array_7 = ensure_array_like(Array(data.sessionsCount));
+          for (let i = 0, $$length2 = each_array_7.length; i < $$length2; i++) {
+            each_array_7[i];
             $$renderer2.option({ value: i + 1, selected: p.session_number === i + 1 }, ($$renderer3) => {
               $$renderer3.push(`Sesi ${escape_html(i + 1)}`);
             });
@@ -295,9 +310,9 @@ function _page($$renderer, $$props) {
             $$renderer3.push(`- Default -`);
           });
           $$renderer2.push(`<!--[-->`);
-          const each_array_7 = ensure_array_like(data.examRooms);
-          for (let $$index_6 = 0, $$length2 = each_array_7.length; $$index_6 < $$length2; $$index_6++) {
-            let room = each_array_7[$$index_6];
+          const each_array_8 = ensure_array_like(data.examRooms);
+          for (let $$index_7 = 0, $$length2 = each_array_8.length; $$index_7 < $$length2; $$index_7++) {
+            let room = each_array_8[$$index_7];
             $$renderer2.option({ value: room.id, selected: p.room_id === room.id }, ($$renderer3) => {
               $$renderer3.push(`${escape_html(room.name)}`);
             });
@@ -337,9 +352,9 @@ function _page($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
       $$renderer2.push(`<div class="divide-y divide-slate-100"><!--[-->`);
-      const each_array_8 = ensure_array_like(questions.slice(0, 5));
-      for (let $$index_8 = 0, $$length = each_array_8.length; $$index_8 < $$length; $$index_8++) {
-        let q = each_array_8[$$index_8];
+      const each_array_9 = ensure_array_like(questions.slice(0, 5));
+      for (let $$index_9 = 0, $$length = each_array_9.length; $$index_9 < $$length; $$index_9++) {
+        let q = each_array_9[$$index_9];
         $$renderer2.push(`<div class="p-4 flex items-center gap-3"><span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold flex-shrink-0">${escape_html(q.question_number)}</span> <div class="flex-1 min-w-0"><p class="text-sm text-slate-700 truncate">${escape_html(q.question_text)}</p> <span class="text-[10px] badge-primary mt-0.5">${escape_html(QUESTION_TYPE_LABELS[q.type] || q.type)}</span></div> <span class="text-xs text-slate-400">${escape_html(q.points)} poin</span></div>`);
       }
       $$renderer2.push(`<!--]--></div> `);
@@ -358,9 +373,9 @@ function _page($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
       $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Siswa</th><th>Status</th><th>Nilai</th><th>Waktu Mulai</th><th>TTD</th></tr></thead><tbody><!--[-->`);
-      const each_array_9 = ensure_array_like(attempts);
-      for (let $$index_9 = 0, $$length = each_array_9.length; $$index_9 < $$length; $$index_9++) {
-        let a = each_array_9[$$index_9];
+      const each_array_10 = ensure_array_like(attempts);
+      for (let $$index_10 = 0, $$length = each_array_10.length; $$index_10 < $$length; $$index_10++) {
+        let a = each_array_10[$$index_10];
         $$renderer2.push(`<tr><td class="font-medium">${escape_html(a.student_name)}</td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[a.status] || "badge-info"))}>${escape_html(ATTEMPT_STATUS_LABELS[a.status] || a.status)}</span></td><td class="font-semibold">${escape_html(a.score != null ? a.score : "-")}</td><td class="text-xs text-slate-500">${escape_html(parseDate(a.start_time).toLocaleString("id-ID"))}</td><td>`);
         if (a.signature) {
           $$renderer2.push("<!--[0-->");

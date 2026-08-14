@@ -18,6 +18,7 @@
 	$: allTeachers = data.allTeachers as any[];
 	$: examTeachers = data.examTeachers as any[];
 	$: examProctors = data.examProctors as any[];
+	$: examSessions = (data.examSessions || []) as any[];
 	$: hasSessionsOrRooms = data.hasSessions || (data.examRooms && data.examRooms.length > 0);
 
 	let showAddParticipantModal = false;
@@ -120,15 +121,36 @@
 		{#if exam.description}
 			<p class="mt-3 text-sm text-slate-600">{exam.description}</p>
 		{/if}
-		<div class="mt-4 flex flex-wrap gap-4 text-xs text-slate-500">
-			<span class="flex items-center gap-1">
-				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} /></svg>
-				Mulai: <strong class="text-slate-600 font-medium">{exam.start_time ? parseDate(exam.start_time).toLocaleString('id-ID') : '-'}</strong>
-			</span>
-			<span class="flex items-center gap-1">
-				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} /></svg>
-				Selesai: <strong class="text-slate-600 font-medium">{exam.end_time ? parseDate(exam.end_time).toLocaleString('id-ID') : '-'}</strong>
-			</span>
+		<div class="mt-4 flex flex-wrap gap-4 text-xs text-slate-500 items-center">
+			{#if examSessions.length > 0}
+				<div class="w-full flex flex-wrap gap-2 items-center bg-slate-50 p-2.5 rounded-lg border border-slate-100 mb-1">
+					<span class="text-slate-600 font-semibold flex items-center gap-1 mr-1">
+						<svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} /></svg>
+						Jadwal Per Sesi:
+					</span>
+					<div class="flex flex-wrap gap-2">
+						{#each examSessions as session}
+							<span class="inline-flex items-center gap-1.5 bg-white px-2.5 py-1 rounded border border-slate-200 text-xs shadow-xs">
+								<strong class="text-indigo-600 font-bold">Sesi {session.session_number}:</strong>
+								<span class="text-slate-700 font-medium">
+									{session.start_time ? parseDate(session.start_time).toLocaleString('id-ID') : '-'}
+									<span class="text-slate-400 mx-0.5">s/d</span>
+									{session.end_time ? parseDate(session.end_time).toLocaleString('id-ID') : '-'}
+								</span>
+							</span>
+						{/each}
+					</div>
+				</div>
+			{:else}
+				<span class="flex items-center gap-1">
+					<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} /></svg>
+					Mulai: <strong class="text-slate-600 font-medium">{exam.start_time ? parseDate(exam.start_time).toLocaleString('id-ID') : '-'}</strong>
+				</span>
+				<span class="flex items-center gap-1">
+					<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} /></svg>
+					Selesai: <strong class="text-slate-600 font-medium">{exam.end_time ? parseDate(exam.end_time).toLocaleString('id-ID') : '-'}</strong>
+				</span>
+			{/if}
 			<span class="flex items-center gap-1">
 				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" /></svg>
 				Tampilan Soal: <strong class="text-slate-600 font-medium">{exam.shuffle_questions ? 'Acak' : 'Tidak Acak'}</strong>
