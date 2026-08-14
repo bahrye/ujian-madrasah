@@ -62,7 +62,7 @@ export function getWallClockMs(dateStr: any): number | null {
 
 /**
  * Checks if current time is within 15 minutes before the exam session start time and before end time.
- * Accepts optional clientTzOffsetMinutes (from Date.prototype.getTimezoneOffset(), e.g. -480 for WITA GMT+8).
+ * Minute-floor precision so minute 14:05 for a 14:20 exam is immediately allowed.
  */
 export function checkSessionTimeWindow(
     startTimeStr: string | null, 
@@ -76,7 +76,11 @@ export function checkSessionTimeWindow(
     if (startMs === null) return { allowed: true };
 
     const endMs = endTimeStr ? getWallClockMs(endTimeStr) : null;
-    const earliestMs = startMs - (15 * 60 * 1000);
+    
+    // Compare in whole wall-clock minutes to prevent millisecond round-down issues
+    const startMin = Math.floor(startMs / 60000);
+    const earliestMin = startMin - 15;
+    const endMin = endMs !== null ? Math.floor(endMs / 60000) : null;
 
     const nowUtcMs = now.getTime();
     
@@ -88,9 +92,9 @@ export function checkSessionTimeWindow(
         offsetMs = localOffsetMins !== 0 ? -localOffsetMins * 60 * 1000 : 8 * 3600 * 1000;
     }
 
-    const nowWallMs = nowUtcMs + offsetMs;
-    const tooEarly = nowWallMs < earliestMs;
-    const tooLate = endMs !== null && nowWallMs > endMs;
+    const nowWallMin = Math.floor((nowUtcMs + offsetMs) / 60000);
+    const tooEarly = nowWallMin < earliestMin;
+    const tooLate = endMin !== null && nowWallMin > endMin;
 
     if (!tooEarly && !tooLate) return { allowed: true };
 

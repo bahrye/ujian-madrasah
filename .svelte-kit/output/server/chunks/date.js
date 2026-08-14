@@ -43,7 +43,9 @@ function checkSessionTimeWindow(startTimeStr, endTimeStr, now = /* @__PURE__ */ 
   const startMs = getWallClockMs(startTimeStr);
   if (startMs === null) return { allowed: true };
   const endMs = endTimeStr ? getWallClockMs(endTimeStr) : null;
-  const earliestMs = startMs - 15 * 60 * 1e3;
+  const startMin = Math.floor(startMs / 6e4);
+  const earliestMin = startMin - 15;
+  const endMin = endMs !== null ? Math.floor(endMs / 6e4) : null;
   const nowUtcMs = now.getTime();
   let offsetMs;
   if (typeof clientTzOffsetMinutes === "number" && !isNaN(clientTzOffsetMinutes)) {
@@ -52,9 +54,9 @@ function checkSessionTimeWindow(startTimeStr, endTimeStr, now = /* @__PURE__ */ 
     const localOffsetMins = now.getTimezoneOffset();
     offsetMs = localOffsetMins !== 0 ? -localOffsetMins * 60 * 1e3 : 8 * 3600 * 1e3;
   }
-  const nowWallMs = nowUtcMs + offsetMs;
-  const tooEarly = nowWallMs < earliestMs;
-  const tooLate = endMs !== null && nowWallMs > endMs;
+  const nowWallMin = Math.floor((nowUtcMs + offsetMs) / 6e4);
+  const tooEarly = nowWallMin < earliestMin;
+  const tooLate = endMin !== null && nowWallMin > endMin;
   if (!tooEarly && !tooLate) return { allowed: true };
   const timeFormatted = startTimeStr.includes("T") ? startTimeStr.split("T")[1].slice(0, 5) : startTimeStr.includes(" ") ? startTimeStr.split(" ")[1].slice(0, 5) : startTimeStr;
   if (tooEarly) return { allowed: false, reason: "too_early", timeFormatted: timeFormatted.replace(":", ".") };
