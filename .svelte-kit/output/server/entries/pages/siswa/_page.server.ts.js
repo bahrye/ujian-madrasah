@@ -55,7 +55,7 @@ const load = async ({ platform, locals }) => {
   let rawSchedules = [];
   try {
     const schedulesRes = await db.prepare(`
-			SELECT 
+			SELECT DISTINCT
 				e.id,
 				e.title,
 				e.start_time,
@@ -68,12 +68,7 @@ const load = async ({ platform, locals }) => {
 					WHERE exam_id = e.id AND student_id = ? 
 					ORDER BY created_at DESC LIMIT 1
 				) as attempt_status,
-				(
-					SELECT r.name 
-					FROM exam_participants ep2 
-					LEFT JOIN exam_rooms r ON ep2.room_id = r.id 
-					WHERE ep2.exam_id = e.id AND ep2.student_id = ?
-				) as room_name,
+				r.name as room_name,
 				? as session_number,
 				(SELECT COUNT(*) FROM exam_sessions WHERE exam_id = e.id) > 0 as has_sessions,
 				(
@@ -83,20 +78,16 @@ const load = async ({ platform, locals }) => {
 					WHERE epr.exam_id = e.id
 				) as proctor_names
 			FROM exams e
+			JOIN exam_participants ep ON ep.exam_id = e.id
 			JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN exam_rooms r ON ep.room_id = r.id
 			LEFT JOIN subjects s ON e.subject_id = s.id
-			WHERE e.school_id = ? 
-			  AND e.exam_type_id IN (
-				  SELECT DISTINCT exam_type_id 
-				  FROM exams 
-				  WHERE id IN (
-					  SELECT exam_id FROM exam_participants WHERE student_id = ?
-				  )
-			  )
+			WHERE ep.student_id = ?
+			  AND e.school_id = ? 
 			  AND e.is_active = 1
 			  AND et.is_active = 1
 			ORDER BY et.id ASC, e.start_time ASC, e.id ASC
-		`).bind(userId, userId, studentSession, locals.user.school_id, userId).all();
+		`).bind(userId, studentSession, userId, locals.user.school_id).all();
     rawSchedules = schedulesRes.results || [];
   } catch (e) {
     console.error("Error loading dashboard schedules:", e);
