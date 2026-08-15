@@ -1,6 +1,6 @@
 import { h as head, i as ensure_array_like, k as attr, e as escape_html, c as stringify, f as bind_props } from "../../../../chunks/index.js";
 import { p as parseDate } from "../../../../chunks/date.js";
-import { f as formatProctorsText } from "../../../../chunks/format.js";
+import { p as parseProctors } from "../../../../chunks/format.js";
 import { I as ICONS } from "../../../../chunks/constants.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
@@ -59,8 +59,8 @@ function _page($$renderer, $$props) {
     const each_array = ensure_array_like(data.schedules);
     if (each_array.length !== 0) {
       $$renderer2.push("<!--[-->");
-      for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
-        let exam = each_array[$$index];
+      for (let $$index_1 = 0, $$length = each_array.length; $$index_1 < $$length; $$index_1++) {
+        let exam = each_array[$$index_1];
         $$renderer2.push(`<div class="card-hover p-5 bg-white border border-slate-200 flex flex-col justify-between h-full"><div><div class="flex items-start justify-between mb-3"><div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.calendar)}></path></svg></div> <span class="badge-primary text-xs font-semibold px-2.5 py-1 rounded-md">${escape_html(formatScheduleDate(exam.start_time))}</span></div> `);
         if (exam.title.length > 22) {
           $$renderer2.push("<!--[0-->");
@@ -90,7 +90,13 @@ function _page($$renderer, $$props) {
         } else {
           $$renderer2.push("<!--[-1-->");
         }
-        $$renderer2.push(`<!--]--> <div class="space-y-2 mb-4"><div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> <span>Pukul: ${escape_html(formatTimeRange(exam.start_time, exam.end_time))}</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg> <span>Durasi: ${escape_html(exam.duration_minutes)} menit</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> <span>Soal: ${escape_html(exam.question_count)}</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.users)}></path></svg> <span class="line-clamp-1"${attr("title", formatProctorsText(exam.proctors))}>${escape_html(formatProctorsText(exam.proctors))}</span></div></div></div> <div class="pt-4 border-t border-slate-100 mt-auto">`);
+        $$renderer2.push(`<!--]--> <div class="space-y-2 mb-4"><div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> <span>Pukul: ${escape_html(formatTimeRange(exam.start_time, exam.end_time))}</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg> <span>Durasi: ${escape_html(exam.duration_minutes)} menit</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> <span>Soal: ${escape_html(exam.question_count)}</span></div> <div class="flex items-start text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.users)}></path></svg> <div class="space-y-0.5"><!--[-->`);
+        const each_array_1 = ensure_array_like(parseProctors(exam.proctors));
+        for (let $$index = 0, $$length2 = each_array_1.length; $$index < $$length2; $$index++) {
+          let p = each_array_1[$$index];
+          $$renderer2.push(`<div><span class="font-medium text-slate-700">${escape_html(p.label)}:</span> ${escape_html(p.name)}</div>`);
+        }
+        $$renderer2.push(`<!--]--></div></div></div></div> <div class="pt-4 border-t border-slate-100 mt-auto">`);
         if (exam.attempt_status && ["selesai", "waktu_habis", "remedial"].includes(exam.attempt_status)) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<button disabled="" class="btn w-full justify-center bg-emerald-50 text-emerald-600 border border-emerald-200 cursor-not-allowed shadow-none"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> Selesai</button>`);

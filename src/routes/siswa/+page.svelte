@@ -240,7 +240,7 @@
 
 	<!-- Active Exams -->
 	<div>
-		<h2 class="text-lg font-bold text-slate-800 mb-3">Ujian Tersedia</h2>
+		<h2 class="text-lg font-bold text-slate-800 mb-3">Ujian Tersedia Hari Ini</h2>
 		{#if activeExams.length === 0}
 			<div class="card p-8 text-center text-slate-400">
 				<svg class="w-12 h-12 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
@@ -282,13 +282,17 @@
 								</svg>
 								<span>Soal: {exam.question_count}</span>
 							</div>
-							<div class="flex items-center text-sm text-slate-600">
-								<svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<div class="flex items-start text-sm text-slate-600">
+								<svg class="w-4 h-4 mr-2 text-slate-400 min-w-4 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.users} />
 								</svg>
-								<span class="line-clamp-1" title={formatProctorsText(exam.proctors)}>
-									{formatProctorsText(exam.proctors)}
-								</span>
+								<div class="space-y-0.5">
+									{#each parseProctors(exam.proctors) as p}
+										<div>
+											<span class="font-medium text-slate-700">{p.label}:</span> {p.name}
+										</div>
+									{/each}
+								</div>
 							</div>
 						</div>
 						

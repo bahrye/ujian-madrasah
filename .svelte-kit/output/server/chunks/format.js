@@ -23,11 +23,6 @@ function parseProctors(proctorsInput) {
     name
   }));
 }
-function formatProctorsText(proctorsInput) {
-  const list = parseProctors(proctorsInput);
-  return list.map((p) => `${p.label}: ${p.name}`).join(" | ");
-}
 export {
-  formatProctorsText as f,
   parseProctors as p
 };
