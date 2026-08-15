@@ -188,6 +188,7 @@
 	let isMountedAndReady = false;
 
 	onDestroy(() => {
+		stopWarningSoundLoop();
 		if (wakeLock !== null) {
 			wakeLock.release();
 			wakeLock = null;
@@ -254,6 +255,58 @@
 		}, 1000);
 	}
 
+	// Sound Warning Helper (Web Audio API Synthesizer)
+	let warningAudioCtx: AudioContext | null = null;
+	let warningSoundInterval: any = null;
+
+	function playWarningBeep() {
+		try {
+			if (!warningAudioCtx) {
+				const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+				if (AudioContextClass) {
+					warningAudioCtx = new AudioContextClass();
+				}
+			}
+			if (warningAudioCtx && warningAudioCtx.state === 'suspended') {
+				warningAudioCtx.resume();
+			}
+			if (!warningAudioCtx) return;
+
+			const osc = warningAudioCtx.createOscillator();
+			const gain = warningAudioCtx.createGain();
+
+			osc.type = 'sawtooth';
+			osc.frequency.setValueAtTime(880, warningAudioCtx.currentTime); 
+			osc.frequency.exponentialRampToValueAtTime(550, warningAudioCtx.currentTime + 0.18);
+
+			gain.gain.setValueAtTime(0.35, warningAudioCtx.currentTime);
+			gain.gain.exponentialRampToValueAtTime(0.01, warningAudioCtx.currentTime + 0.2);
+
+			osc.connect(gain);
+			gain.connect(warningAudioCtx.destination);
+
+			osc.start();
+			osc.stop(warningAudioCtx.currentTime + 0.2);
+		} catch (e) {
+			console.warn('Audio play error:', e);
+		}
+	}
+
+	function startWarningSoundLoop() {
+		stopWarningSoundLoop();
+		playWarningBeep();
+		warningSoundInterval = setInterval(() => {
+			playWarningBeep();
+		}, 600);
+	}
+
+	function stopWarningSoundLoop() {
+		if (warningSoundInterval) {
+			clearInterval(warningSoundInterval);
+			warningSoundInterval = null;
+		}
+	}
+
 	let isDisqualifying = false;
 
 	function triggerViolation(type: string) {
@@ -272,9 +325,11 @@
 		isExamBlurred = false;
 
 		if (warnings > MAX_WARNINGS) {
+			stopWarningSoundLoop();
 			triggerDisqualification();
 		} else {
 			showWarningModal = true;
+			startWarningSoundLoop();
 		}
 	}
 
@@ -292,6 +347,10 @@
 		sessionStorage.setItem(`cheat_type_${attempt.id}`, type);
 		
 		cheatCountdownRemaining = Math.max(1, Math.floor(toleranceMs / 1000));
+
+		// Bunyikan alarm suara peringatan selama masa jeda 10 detik
+		startWarningSoundLoop();
+
 		cheatCountdownInterval = setInterval(() => {
 			cheatCountdownRemaining -= 1;
 			if (cheatCountdownRemaining <= 0) {
@@ -315,6 +374,8 @@
 		if (isExamBlurred) {
 			isExamBlurred = false;
 		}
+		// Hentikan suara alarm begitu siswa kembali ke layar ujian
+		stopWarningSoundLoop();
 		if (wakeLock !== null && wakeLock.released) {
 			requestWakeLock();
 		} else if (wakeLock === null) {
@@ -807,7 +868,7 @@
 			</div>
 			<h3 class="text-xl font-bold text-slate-800 mb-2">Peringatan Kecurangan!</h3>
 			<p class="text-slate-600 mb-6 text-sm">Anda terdeteksi melakukan aktivitas di luar halaman ujian. Peringatan ke-{warnings} dari {MAX_WARNINGS}. Jika melebihi batas, ujian akan otomatis dihentikan.</p>
-			<button class="btn-primary w-full" on:click={() => { showWarningModal = false; if (!isFullscreen && hasEnteredFullscreenOnce) { handleCheatWarning('Keluar dari Layar Penuh', 10000); } }}>
+			<button class="btn-primary w-full" on:click={() => { showWarningModal = false; stopWarningSoundLoop(); if (!isFullscreen && hasEnteredFullscreenOnce) { handleCheatWarning('Keluar dari Layar Penuh', 10000); } }}>
 				Saya Mengerti
 			</button>
 		</div>
