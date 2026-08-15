@@ -19,24 +19,18 @@
 		return () => clearTimeout(timer);
 	});
 
-	function formatAddress(school: any) {
-		if (!school) return '';
-		const parts = [
-			school.address,
-			school.village ? `Desa/Kel. ${school.village}` : '',
-			school.district ? `Kec. ${school.district}` : '',
-			school.city ? (String(school.city).toLowerCase().startsWith('kab') || String(school.city).toLowerCase().startsWith('kota') ? school.city : `Kab. ${school.city}`) : '',
-			school.province ? school.province : ''
-		].filter(Boolean);
-		return parts.join(', ');
-	}
+	$: locationStr = [
+		school?.district ? `Kec. ${school.district}` : '',
+		school?.city ? (school.city.toLowerCase().startsWith('kab') || school.city.toLowerCase().startsWith('kota') ? school.city : `Kab. ${school.city}`) : '',
+		school?.province ? school.province : ''
+	].filter(Boolean).join(', ');
 </script>
 
 <svelte:head>
 	<title>Hasil Ujian - {attempt.student_name} - {attempt.exam_title}</title>
 </svelte:head>
 
-<!-- Toolbar Controls (Hidden during print) -->
+<!-- Control Bar (Hidden during print) -->
 <div class="no-print fixed top-0 left-0 right-0 z-50 bg-slate-900/90 backdrop-blur text-white px-4 py-3 shadow-xl flex items-center justify-between">
 	<div class="flex items-center gap-3">
 		<span class="font-bold text-sm">Cetak Detail Hasil Ujian</span>
@@ -71,28 +65,50 @@
 </div>
 
 <!-- Print Container -->
-<div class="min-h-screen bg-white text-slate-800 p-4 sm:p-6 print:p-0 print:m-0 pt-16 print:pt-0">
+<div class="min-h-screen bg-white text-slate-800 p-4 sm:p-6 print:p-0 print:m-0 pt-16 print:pt-0 font-serif">
 	<div class="max-w-5xl mx-auto space-y-4 print:max-w-none">
 
-		<!-- Kop Sekolah / Madrasah -->
-		<div class="border-b-2 border-slate-900 pb-3 flex items-center gap-4">
-			{#if school?.logo_url}
-				<img src={school.logo_url} alt="Logo" class="w-16 h-16 object-contain flex-shrink-0" />
-			{/if}
-			<div class="flex-1 text-center">
-				<h1 class="text-xl font-black uppercase tracking-wide text-slate-900">{school?.name || 'MADRASAH'}</h1>
-				{#if formatAddress(school)}
-					<p class="text-xs text-slate-600 mt-0.5">{formatAddress(school)}</p>
+		<!-- Kop Surat Resmi (Disamakan dengan Daftar Hadir) -->
+		<div class="flex items-center justify-between gap-4 pb-1 relative">
+			<img 
+				src="/kemenag.png" 
+				alt="Logo Kemenag" 
+				class="w-20 h-20 object-contain shrink-0" 
+				on:error={(e) => { (e.currentTarget as HTMLElement).style.visibility = 'hidden'; }}
+			/>
+			<div class="flex-1 text-center font-serif px-2">
+				<h4 class="font-semibold text-sm uppercase tracking-wider text-black m-0 leading-tight">
+					KEMENTERIAN AGAMA REPUBLIK INDONESIA
+				</h4>
+				<h3 class="font-bold text-xl uppercase tracking-wide text-black m-0 my-0.5">
+					{school?.name || 'NAMA SEKOLAH'}
+				</h3>
+				{#if school?.address}
+					<p class="text-xs italic text-black m-0 leading-tight">{school.address}</p>
 				{/if}
-				<div class="mt-1 flex justify-center gap-4 text-[11px] text-slate-500 font-medium">
-					{#if school?.npsn}<span>NPSN: {school.npsn}</span>{/if}
-					{#if school?.nsm}<span>NSM: {school.nsm}</span>{/if}
-				</div>
+				{#if locationStr}
+					<p class="text-xs italic text-black m-0 leading-tight mt-0.5">{locationStr}</p>
+				{/if}
 			</div>
+			{#if school?.logo_url}
+				<img 
+					src={school.logo_url} 
+					alt="Logo Sekolah" 
+					class="w-20 h-20 object-contain shrink-0" 
+				/>
+			{:else}
+				<div class="w-20 h-20 shrink-0"></div>
+			{/if}
 		</div>
 
-		<!-- Judul & Info Peserta Header -->
-		<div class="bg-slate-50 rounded-xl p-4 border border-slate-200 print:bg-slate-50 print:border-slate-300">
+		<!-- Garis Kop Surat (Tipis atas, Agak tebal bawah) -->
+		<div class="mt-1 mb-4">
+			<div style="border-bottom: 1px solid #000;"></div>
+			<div style="border-bottom: 2.5px solid #000; margin-top: 2px;"></div>
+		</div>
+
+		<!-- Info Header Box -->
+		<div class="bg-slate-50 rounded-xl p-4 border border-slate-300 font-sans print:bg-slate-50 print:border-slate-300">
 			<div class="flex items-center justify-between border-b border-slate-200 pb-2 mb-3">
 				<h2 class="font-bold text-base text-indigo-950 uppercase tracking-wide">Lembar Detail Hasil & Jawaban Ujian</h2>
 				<span class="text-xs font-semibold px-2.5 py-1 bg-indigo-100 text-indigo-800 rounded-md print:border print:border-indigo-200">
@@ -134,40 +150,38 @@
 			</div>
 		</div>
 
-		<!-- Daftar Soal & Jawaban (2 Kolom / 1 Kolom Grid) -->
-		<div>
+		<!-- Rincian Jawaban Soal (Multi-Column Layout) -->
+		<div class="font-sans">
 			<div class="flex items-center justify-between mb-2">
 				<h3 class="font-bold text-xs uppercase text-slate-700 tracking-wider">Rincian Jawaban Soal ({answers.length} Soal)</h3>
 			</div>
 
-			<div class="{isTwoColumn ? 'grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-2.5 print:gap-2.5' : 'space-y-3'}" use:mathRender use:arabicRender>
+			<div class="{isTwoColumn ? 'columns-1 sm:columns-2 print:columns-2 gap-3 space-y-0' : 'space-y-3'}" use:mathRender use:arabicRender>
 				{#each answers as ans, i (ans.question_number)}
-					<div class="break-inside-avoid bg-white rounded-lg border-2 p-3 text-xs flex flex-col justify-between shadow-sm print:shadow-none {ans.score_given === ans.max_points ? 'border-emerald-400 bg-emerald-50/10' : (ans.score_given > 0 ? 'border-amber-400 bg-amber-50/10' : 'border-rose-400 bg-rose-50/10')}">
+					<div class="break-inside-avoid inline-block w-full mb-3 bg-white rounded-lg border-2 p-3 text-xs shadow-sm print:shadow-none {ans.score_given === ans.max_points ? 'border-emerald-400 bg-emerald-50/10' : (ans.score_given > 0 ? 'border-amber-400 bg-amber-50/10' : 'border-rose-400 bg-rose-50/10')}">
 						
 						<!-- Question Card Top Bar -->
-						<div>
-							<div class="flex items-center justify-between border-b border-slate-100 pb-1.5 mb-2 gap-2">
-								<div class="flex items-center gap-1.5 flex-wrap">
-									<span class="font-bold text-xs bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded">Soal #{ans.question_number}</span>
-									<span class="text-[10px] font-medium text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200">
-										{QUESTION_TYPE_LABELS[ans.type]}
-									</span>
-									{#if ans.is_doubted}
-										<span class="text-[10px] font-medium text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">Ragu</span>
-									{/if}
-								</div>
-								<div class="font-bold text-xs whitespace-nowrap">
-									<span class="{ans.score_given === ans.max_points ? 'text-emerald-600' : (ans.score_given > 0 ? 'text-amber-600' : 'text-rose-600')}">
-										{ans.score_given ?? 0}
-									</span>
-									<span class="text-slate-400 font-normal">/{ans.max_points} Poin</span>
-								</div>
+						<div class="flex items-center justify-between border-b border-slate-100 pb-1.5 mb-2 gap-2">
+							<div class="flex items-center gap-1.5 flex-wrap">
+								<span class="font-bold text-xs bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded">Soal #{ans.question_number}</span>
+								<span class="text-[10px] font-medium text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200">
+									{QUESTION_TYPE_LABELS[ans.type]}
+								</span>
+								{#if ans.is_doubted}
+									<span class="text-[10px] font-medium text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">Ragu</span>
+								{/if}
 							</div>
+							<div class="font-bold text-xs whitespace-nowrap">
+								<span class="{ans.score_given === ans.max_points ? 'text-emerald-600' : (ans.score_given > 0 ? 'text-amber-600' : 'text-rose-600')}">
+									{ans.score_given ?? 0}
+								</span>
+								<span class="text-slate-400 font-normal">/{ans.max_points} Poin</span>
+							</div>
+						</div>
 
-							<!-- Question Text -->
-							<div class="prose prose-xs max-w-none text-slate-800 mb-2.5 bg-slate-50 p-2 rounded border border-slate-200/60 font-serif leading-relaxed">
-								{@html ans.question_text}
-							</div>
+						<!-- Question Text -->
+						<div class="prose prose-xs max-w-none text-slate-800 mb-2.5 bg-slate-50 p-2 rounded border border-slate-200/60 font-serif leading-relaxed">
+							{@html ans.question_text}
 						</div>
 
 						<!-- Answer & Solution -->
@@ -285,7 +299,7 @@
 		</div>
 
 		<!-- Footer cetak -->
-		<div class="mt-6 pt-3 border-t border-slate-300 flex items-center justify-between text-[10px] text-slate-500">
+		<div class="mt-4 pt-3 border-t border-slate-300 flex items-center justify-between text-[10px] text-slate-500 font-sans">
 			<span>Dicetak otomatis dari Ujian Online Madrasah ({new Date().toLocaleDateString('id-ID')})</span>
 			<span>Halaman Detail Hasil Jawaban — {attempt.student_name} ({attempt.exam_title})</span>
 		</div>
@@ -308,6 +322,7 @@
 		}
 		.break-inside-avoid {
 			break-inside: avoid !important;
+			column-break-inside: avoid !important;
 			page-break-inside: avoid !important;
 		}
 	}
