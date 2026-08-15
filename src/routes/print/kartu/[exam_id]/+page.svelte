@@ -108,7 +108,10 @@
 
 						<div class="mt-2 pt-2 border-t border-slate-200 flex justify-between items-end text-[9px] text-slate-500">
 							<div>Simpan kartu ini dengan baik selama ujian.</div>
-							<div class="font-semibold text-slate-700 text-right">Kepala Madrasah</div>
+							<div class="font-semibold text-slate-700 text-right">
+								<p class="text-[9px] mb-5">Panitia Ujian,</p>
+								<p class="text-[9px] font-bold border-b border-slate-800 inline-block px-2">{data.committeeName || '......................................'}</p>
+							</div>
 						</div>
 					</div>
 				</div>

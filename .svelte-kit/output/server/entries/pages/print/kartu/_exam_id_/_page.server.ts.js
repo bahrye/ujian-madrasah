@@ -54,12 +54,25 @@ const load = async ({ platform, params, locals }) => {
   });
   const roomsCount = await db.prepare("SELECT COUNT(*) as count FROM exam_rooms WHERE exam_id = ?").bind(examId).first();
   const hasRooms = (roomsCount?.count || 0) > 0;
+  let committeeName = null;
+  if (exam && exam.exam_type_id) {
+    const committee = await db.prepare(`
+			SELECT u.name
+			FROM exam_type_proctors etp
+			JOIN users u ON etp.proctor_id = u.id
+			WHERE etp.exam_type_id = ? AND etp.proctor_role = 'cm'
+			ORDER BY etp.id ASC
+			LIMIT 1
+		`).bind(exam.exam_type_id).first();
+    committeeName = committee?.name || null;
+  }
   return {
     school,
     exam,
     participants: formattedParticipants,
     hasSessions: sessions.results.length > 0,
-    hasRooms
+    hasRooms,
+    committeeName
   };
 };
 export {

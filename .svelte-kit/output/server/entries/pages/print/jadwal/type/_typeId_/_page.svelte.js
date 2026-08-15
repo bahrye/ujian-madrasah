@@ -99,7 +99,7 @@ function _page($$renderer, $$props) {
         $$renderer2.push("<!--[-1-->");
         $$renderer2.push(`<tr><td colspan="6" class="py-8 text-center text-gray-500 italic">Belum ada jadwal ujian yang ditugaskan.</td></tr>`);
       }
-      $$renderer2.push(`<!--]--></tbody></table></div> <div class="mt-8 flex justify-end"><div class="text-center text-sm w-48"><div class="mb-16">Panitia Ujian,</div> <div class="border-b border-black w-full mb-1"></div> <div class="text-xs">NIP. ..............................</div></div></div></div>`);
+      $$renderer2.push(`<!--]--></tbody></table></div> <div class="mt-8 flex justify-end"><div class="text-center text-sm min-w-[200px]"><div class="mb-14">Panitia Ujian,</div> <div class="font-bold border-b border-black w-full mb-0.5 px-2">${escape_html(data.committeeName || "......................................")}</div> <div class="text-xs">NIP. ${escape_html(data.committeeNip || "..............................")}</div></div></div></div>`);
     }
     $$renderer2.push(`<!--]--></div>`);
     bind_props($$props, { data });

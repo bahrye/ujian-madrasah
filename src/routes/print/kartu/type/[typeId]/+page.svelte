@@ -155,8 +155,8 @@
 							{/if}
 						</div>
 						<div class="text-center mt-3">
-							<p class="text-[10px] mb-8">Panitia Ujian</p>
-							<p class="text-[10px] font-bold border-b border-slate-800 inline-block px-4">......................................</p>
+							<p class="text-[10px] mb-6">Panitia Ujian</p>
+							<p class="text-[10px] font-bold border-b border-slate-800 inline-block px-2">{data.committeeName || '......................................'}</p>
 						</div>
 					</div>
 				</div>
@@ -250,8 +250,8 @@
 						{/if}
 					</div>
 					<div class="text-center">
-						<p class="text-[10px] mb-6">Panitia Ujian</p>
-						<p class="text-[10px] font-bold border-b border-slate-700 inline-block px-3">..............................</p>
+						<p class="text-[10px] mb-5">Panitia Ujian</p>
+						<p class="text-[10px] font-bold border-b border-slate-700 inline-block px-2">{data.committeeName || '..............................'}</p>
 					</div>
 				</div>
 			</div>

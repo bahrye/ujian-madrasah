@@ -41,7 +41,7 @@ function _page($$renderer, $$props) {
           let pr = each_array_2[$$index];
           $$renderer2.push(`<div class="grid grid-cols-[80px_8px_1fr] items-baseline"><span class="text-slate-600">${escape_html(pr.label)}</span> <span>:</span> <span class="font-semibold truncate">${escape_html(pr.name)}</span></div>`);
         }
-        $$renderer2.push(`<!--]--> <div class="grid grid-cols-[80px_8px_1fr] items-baseline"><span class="text-slate-600">Password</span> <span>:</span> <span class="font-mono bg-slate-100 px-1 border border-slate-200 rounded">${escape_html(p.plain_password || "******")}</span></div></div></div> <div class="mt-2 pt-2 border-t border-slate-200 flex justify-between items-end text-[9px] text-slate-500"><div>Simpan kartu ini dengan baik selama ujian.</div> <div class="font-semibold text-slate-700 text-right">Kepala Madrasah</div></div></div></div>`);
+        $$renderer2.push(`<!--]--> <div class="grid grid-cols-[80px_8px_1fr] items-baseline"><span class="text-slate-600">Password</span> <span>:</span> <span class="font-mono bg-slate-100 px-1 border border-slate-200 rounded">${escape_html(p.plain_password || "******")}</span></div></div></div> <div class="mt-2 pt-2 border-t border-slate-200 flex justify-between items-end text-[9px] text-slate-500"><div>Simpan kartu ini dengan baik selama ujian.</div> <div class="font-semibold text-slate-700 text-right"><p class="text-[9px] mb-5">Panitia Ujian,</p> <p class="text-[9px] font-bold border-b border-slate-800 inline-block px-2">${escape_html(data.committeeName || "......................................")}</p></div></div></div></div>`);
       }
       $$renderer2.push(`<!--]--></div>`);
     }

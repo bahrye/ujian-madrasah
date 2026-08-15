@@ -41,6 +41,14 @@ const load = async ({ platform, params, locals, url }) => {
 		ORDER BY e.start_time ASC
 	`;
   const schedules = await db.prepare(scheduleQuery).bind(typeId, locals.user.school_id).all();
+  const roomsRes = await db.prepare(`
+		SELECT COUNT(DISTINCT r.id) as count 
+		FROM exam_participants ep 
+		JOIN exams e ON ep.exam_id = e.id 
+		JOIN exam_rooms r ON ep.room_id = r.id 
+		WHERE e.exam_type_id = ? AND e.school_id = ?
+	`).bind(typeId, locals.user.school_id).first();
+  const totalAssignedRooms = roomsRes?.count || 0;
   const scheduleByStudent = {};
   for (const row of schedules.results) {
     const studentId = String(row.student_id);
@@ -53,14 +61,17 @@ const load = async ({ platform, params, locals, url }) => {
       startTime = row.session_start_time || row.exam_start_time;
       endTime = row.session_end_time || row.exam_end_time;
     }
-    const effectiveDateStr = row.session_start_time && row.session_start_time.includes("-") ? row.session_start_time : row.exam_start_time || row.date;
+    const sessionStartStr = typeof row.session_start_time === "string" ? row.session_start_time : "";
+    const effectiveDateStr = sessionStartStr && sessionStartStr.includes("-") ? sessionStartStr : row.exam_start_time || row.date;
+    const rawRoom = row.room_name ? String(row.room_name).trim() : "";
+    const displayRoom = totalAssignedRooms <= 1 || !rawRoom || rawRoom === "-" ? "Ruang Ujian" : rawRoom;
     scheduleByStudent[studentId].push({
       exam_title: row.title,
       subject_name: row.subject_name,
       date: effectiveDateStr,
       start_time: startTime,
       end_time: endTime,
-      room_name: row.room_name || "-",
+      room_name: displayRoom,
       has_sessions: row.has_sessions,
       session_number: row.student_session_number
     });
@@ -71,10 +82,20 @@ const load = async ({ platform, params, locals, url }) => {
       schedules: scheduleByStudent[String(p.user_id)] || []
     };
   });
+  const committee = await db.prepare(`
+		SELECT u.name, u.nip
+		FROM exam_type_proctors etp
+		JOIN users u ON etp.proctor_id = u.id
+		WHERE etp.exam_type_id = ? AND etp.proctor_role = 'cm'
+		ORDER BY etp.id ASC
+		LIMIT 1
+	`).bind(typeId).first();
   return {
     school,
     examType,
-    participants: formattedParticipants
+    participants: formattedParticipants,
+    committeeName: committee?.name || null,
+    committeeNip: committee?.nip || null
   };
 };
 export {

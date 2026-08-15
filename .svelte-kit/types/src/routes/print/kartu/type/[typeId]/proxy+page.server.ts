@@ -57,9 +57,20 @@ export const load = async ({ platform, params, locals, url }: Parameters<PageSer
 		};
 	});
 
+	// Fetch Panitia (committee) assigned to this Exam Type (proctor_role = 'cm')
+	const committee = await db.prepare(`
+		SELECT u.name, u.nip
+		FROM exam_type_proctors etp
+		JOIN users u ON etp.proctor_id = u.id
+		WHERE etp.exam_type_id = ? AND etp.proctor_role = 'cm'
+		ORDER BY etp.id ASC
+		LIMIT 1
+	`).bind(typeId).first<{ name: string; nip: string | null }>();
+
 	return { 
 		school,
 		examType, 
-		participants: formattedParticipants
+		participants: formattedParticipants,
+		committeeName: committee?.name || null
 	};
 };

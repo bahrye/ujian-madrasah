@@ -45,7 +45,7 @@ function _page($$renderer, $$props) {
             $$renderer2.push("<!--[-1-->");
             $$renderer2.push(`<div class="w-[2cm] h-[3cm] border-2 border-slate-300 flex items-center justify-center bg-slate-50 text-slate-400 text-[10px] text-center p-1">Pas Foto<br/>2 x 3</div>`);
           }
-          $$renderer2.push(`<!--]--></div> <div class="text-center mt-3"><p class="text-[10px] mb-8">Panitia Ujian</p> <p class="text-[10px] font-bold border-b border-slate-800 inline-block px-4">......................................</p></div></div></div></div>`);
+          $$renderer2.push(`<!--]--></div> <div class="text-center mt-3"><p class="text-[10px] mb-6">Panitia Ujian</p> <p class="text-[10px] font-bold border-b border-slate-800 inline-block px-2">${escape_html(data.committeeName || "......................................")}</p></div></div></div></div>`);
         }
         $$renderer2.push(`<!--]--></div>`);
       }

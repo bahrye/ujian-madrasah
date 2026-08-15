@@ -186,10 +186,10 @@
 			</div>
 			
 			<div class="mt-8 flex justify-end">
-				<div class="text-center text-sm w-48">
-					<div class="mb-16">Panitia Ujian,</div>
-					<div class="border-b border-black w-full mb-1"></div>
-					<div class="text-xs">NIP. ..............................</div>
+				<div class="text-center text-sm min-w-[200px]">
+					<div class="mb-14">Panitia Ujian,</div>
+					<div class="font-bold border-b border-black w-full mb-0.5 px-2">{data.committeeName || '......................................'}</div>
+					<div class="text-xs">NIP. {data.committeeNip || '..............................'}</div>
 				</div>
 			</div>
 		</div>
