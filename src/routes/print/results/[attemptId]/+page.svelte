@@ -309,6 +309,15 @@
 </div>
 
 <style>
+	:global(.prose img) {
+		max-width: 100% !important;
+		max-height: 180px !important;
+		height: auto !important;
+		object-fit: contain !important;
+		border-radius: 0.375rem;
+		margin: 0.25rem auto;
+		display: block;
+	}
 	@media print {
 		@page {
 			size: A4 portrait;
