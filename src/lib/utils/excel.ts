@@ -25,6 +25,7 @@ export async function exportExamResults(examId: string, examTitle: string) {
 		const header1 = [
 			'Nama Lengkap Siswa',
 			'NISN',
+			'Nomor Peserta',
 			'Status Pengerjaan',
 			'Waktu Mulai',
 			'Waktu Selesai',
@@ -59,7 +60,8 @@ export async function exportExamResults(examId: string, examTitle: string) {
 
 			const row = [
 				p.student_name,
-				p.nisn,
+				p.nisn || '-',
+				p.nomor_peserta || '-',
 				ATTEMPT_STATUS_LABELS[p.status] || p.status,
 				startTime,
 				endTime,
@@ -248,7 +250,7 @@ export async function exportAllExamTypeResults(typeId: number, classId?: number,
 		// ==========================================
 		// SHEET 1: REKAP SEMUA NILAI
 		// ==========================================
-		const header1 = ['No', 'Nama Lengkap Siswa', 'NISN', 'Kelas'];
+		const header1 = ['No', 'Nama Lengkap Siswa', 'NISN', 'Nomor Peserta', 'Kelas'];
 		
 		exams.forEach((item: any) => {
 			const label = item.exam.subject_name || item.exam.title;
@@ -260,7 +262,8 @@ export async function exportAllExamTypeResults(typeId: number, classId?: number,
 			const row: any[] = [
 				idx + 1,
 				std.student_name,
-				std.nisn || std.nomor_peserta || '-',
+				std.nisn || '-',
+				std.nomor_peserta || '-',
 				std.class_name || '-'
 			];
 

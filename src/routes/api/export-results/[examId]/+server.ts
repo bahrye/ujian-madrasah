@@ -51,7 +51,8 @@ export const GET = async ({ params, platform, locals }: any) => {
 		SELECT 
 			epart.student_id,
 			u.name as student_name, 
-			u.username as nisn, 
+			u.nisn, 
+			u.nomor_peserta,
 			sa.id as attempt_id,
 			sa.start_time,
 			sa.end_time,

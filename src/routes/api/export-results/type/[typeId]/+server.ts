@@ -50,7 +50,7 @@ export const GET = async ({ params, platform, locals, url }: any) => {
 
 	// 4. Get Students for this class/school
 	let studentsQuery = `
-		SELECT u.id, u.name as student_name, u.username as nisn, u.nomor_peserta, c.name as class_name
+		SELECT u.id, u.name as student_name, u.nisn, u.nomor_peserta, c.name as class_name
 		FROM users u
 		JOIN classes c ON u.class_id = c.id
 		JOIN exam_type_classes etc ON etc.class_id = u.class_id
