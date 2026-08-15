@@ -59,7 +59,8 @@ export const actions: Actions = {
 			const token = await db.prepare(`
 				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active,
 				e.start_time as exam_start_time, e.end_time as exam_end_time, e.max_attempts,
-				u.session_number as student_session_number, t.session_number as token_session_number
+				u.session_number as student_session_number, t.session_number as token_session_number,
+				(SELECT COUNT(*) FROM exam_sessions WHERE exam_id = e.id) > 0 as has_sessions
 				FROM tokens t 
 				JOIN exams e ON t.exam_id = e.id
 				JOIN exam_types et ON e.exam_type_id = et.id
@@ -71,11 +72,13 @@ export const actions: Actions = {
 				return fail(400, { error: 'Token tidak valid untuk ujian ini.' });
 			}
 
-			// Validasi kesesuaian sesi token dengan sesi siswa
+			// Validasi kesesuaian sesi token dengan sesi siswa (hanya jika ujian menggunakan jadwal per sesi)
 			const studentSession = token.student_session_number || 1;
-			const tokenSession = token.token_session_number;
-			if (tokenSession && tokenSession !== studentSession) {
-				return fail(400, { error: `Token ini khusus untuk Sesi ${tokenSession}. Sesi Anda adalah Sesi ${studentSession}.` });
+			if (token.has_sessions) {
+				const tokenSession = token.token_session_number;
+				if (tokenSession && tokenSession !== studentSession) {
+					return fail(400, { error: `Token ini khusus untuk Sesi ${tokenSession}. Sesi Anda adalah Sesi ${studentSession}.` });
+				}
 			}
 
 			// Validasi keaktifan ujian
@@ -85,11 +88,13 @@ export const actions: Actions = {
 			
 			// Validasi sesi dan waktu ujian
 			let sessionRecord = null;
-			try {
-				sessionRecord = await db.prepare('SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?')
-					.bind(parsedExamId, studentSession).first<{ start_time: string | null, end_time: string | null }>();
-			} catch (e: any) {
-				console.warn('Failed to fetch exam_sessions:', e.message);
+			if (token.has_sessions) {
+				try {
+					sessionRecord = await db.prepare('SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?')
+						.bind(parsedExamId, studentSession).first<{ start_time: string | null, end_time: string | null }>();
+				} catch (e: any) {
+					console.warn('Failed to fetch exam_sessions:', e.message);
+				}
 			}
 			
 			const startTimeStr = sessionRecord?.start_time || token.exam_start_time;
@@ -158,7 +163,8 @@ export const actions: Actions = {
 			const token = await db.prepare(`
 				SELECT t.*, e.id as exam_id, e.title, e.duration_minutes, e.is_active,
 				e.start_time as exam_start_time, e.end_time as exam_end_time, e.max_attempts,
-				u.session_number as student_session_number, t.session_number as token_session_number
+				u.session_number as student_session_number, t.session_number as token_session_number,
+				(SELECT COUNT(*) FROM exam_sessions WHERE exam_id = e.id) > 0 as has_sessions
 				FROM tokens t 
 				JOIN exams e ON t.exam_id = e.id
 				JOIN exam_types et ON e.exam_type_id = et.id
@@ -170,11 +176,13 @@ export const actions: Actions = {
 				return fail(400, { error: 'Token tidak valid untuk ujian ini.' });
 			}
 
-			// Validasi kesesuaian sesi token dengan sesi siswa
+			// Validasi kesesuaian sesi token dengan sesi siswa (hanya jika ujian menggunakan jadwal per sesi)
 			const studentSession = token.student_session_number || 1;
-			const tokenSession = token.token_session_number;
-			if (tokenSession && tokenSession !== studentSession) {
-				return fail(400, { error: `Token ini khusus untuk Sesi ${tokenSession}. Sesi Anda adalah Sesi ${studentSession}.` });
+			if (token.has_sessions) {
+				const tokenSession = token.token_session_number;
+				if (tokenSession && tokenSession !== studentSession) {
+					return fail(400, { error: `Token ini khusus untuk Sesi ${tokenSession}. Sesi Anda adalah Sesi ${studentSession}.` });
+				}
 			}
 
 			// Validasi keaktifan ujian
@@ -184,11 +192,13 @@ export const actions: Actions = {
 
 			// Validasi sesi dan waktu ujian
 			let sessionRecord = null;
-			try {
-				sessionRecord = await db.prepare('SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?')
-					.bind(parsedExamId, studentSession).first<{ start_time: string | null, end_time: string | null }>();
-			} catch (e: any) {
-				console.warn('Failed to fetch exam_sessions:', e.message);
+			if (token.has_sessions) {
+				try {
+					sessionRecord = await db.prepare('SELECT start_time, end_time FROM exam_sessions WHERE exam_id = ? AND session_number = ?')
+						.bind(parsedExamId, studentSession).first<{ start_time: string | null, end_time: string | null }>();
+				} catch (e: any) {
+					console.warn('Failed to fetch exam_sessions:', e.message);
+				}
 			}
 			
 			const startTimeStr = sessionRecord?.start_time || token.exam_start_time;
