@@ -229,3 +229,74 @@ export async function exportExamResults(examId: string, examTitle: string) {
 		return { success: false, error: error.message };
 	}
 }
+
+export async function exportAllExamTypeResults(typeId: number, classId?: number, fileTitle?: string) {
+	try {
+		let url = `/api/export-results/type/${typeId}`;
+		if (classId) url += `?class_id=${classId}`;
+
+		const response = await fetch(url);
+		if (!response.ok) {
+			throw new Error('Gagal mengambil data rekap nilai untuk export Excel.');
+		}
+
+		const data = (await response.json()) as any;
+		const { examType, classData, students, exams } = data;
+
+		const wb = XLSX.utils.book_new();
+
+		// ==========================================
+		// SHEET 1: REKAP SEMUA NILAI
+		// ==========================================
+		const header1 = ['No', 'Nama Lengkap Siswa', 'NISN', 'Kelas'];
+		
+		exams.forEach((item: any) => {
+			const label = item.exam.subject_name || item.exam.title;
+			header1.push(label);
+		});
+		header1.push('Rata-Rata Nilai');
+
+		const rows1 = students.map((std: any, idx: number) => {
+			const row: any[] = [
+				idx + 1,
+				std.student_name,
+				std.nisn || std.nomor_peserta || '-',
+				std.class_name || '-'
+			];
+
+			let totalScore = 0;
+			let takenCount = 0;
+
+			exams.forEach((item: any) => {
+				const att = item.attemptsMap[std.id];
+				if (att && att.score != null) {
+					const val = typeof att.score === 'number' ? att.score : parseFloat(att.score);
+					row.push(val);
+					totalScore += val;
+					takenCount++;
+				} else {
+					row.push('-');
+				}
+			});
+
+			const avg = takenCount > 0 ? parseFloat((totalScore / takenCount).toFixed(2)) : '-';
+			row.push(avg);
+
+			return row;
+		});
+
+		const ws1 = XLSX.utils.aoa_to_sheet([header1, ...rows1]);
+		XLSX.utils.book_append_sheet(wb, ws1, 'Rekap Nilai');
+
+		// Export file
+		const titleStr = fileTitle || `${examType?.name || 'Ujian'}_${classData?.name || ''}`;
+		const safeTitle = titleStr.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+		XLSX.writeFile(wb, `rekap_nilai_${safeTitle}.xlsx`);
+
+		return { success: true };
+	} catch (error: any) {
+		console.error(error);
+		return { success: false, error: error.message };
+	}
+}
+

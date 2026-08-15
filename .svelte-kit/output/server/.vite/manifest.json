@@ -842,11 +842,11 @@
       "_index.js",
       "_date.js",
       "_format.js",
+      "_constants.js",
       "_exports.js",
       "_utils2.js",
       "_root.js",
       "_state.svelte.js",
-      "_constants.js",
       "_toast.js"
     ]
   },
@@ -1219,6 +1219,15 @@
     "file": "entries/endpoints/api/export-results/_examId_/_server.ts.js",
     "name": "entries/endpoints/api/export-results/_examId_/_server.ts",
     "src": "src/routes/api/export-results/[examId]/+server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/api/export-results/type/[typeId]/+server.ts": {
+    "file": "entries/endpoints/api/export-results/type/_typeId_/_server.ts.js",
+    "name": "entries/endpoints/api/export-results/type/_typeId_/_server.ts",
+    "src": "src/routes/api/export-results/type/[typeId]/+server.ts",
     "isEntry": true,
     "imports": [
       "_db.js"

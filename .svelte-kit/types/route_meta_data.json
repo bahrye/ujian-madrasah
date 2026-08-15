@@ -135,6 +135,9 @@
 	"/api/exams/[id]/questions": [
 		"src/routes/api/exams/[id]/questions/+server.ts"
 	],
+	"/api/export-results/type/[typeId]": [
+		"src/routes/api/export-results/type/[typeId]/+server.ts"
+	],
 	"/api/export-results/[examId]": [
 		"src/routes/api/export-results/[examId]/+server.ts"
 	],

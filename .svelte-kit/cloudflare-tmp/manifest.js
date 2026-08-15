@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg","kemenag.png","panduan-ui-ujian.jpeg","template_soal_ujian.docx"]),
 	mimeTypes: {".svg":"image/svg+xml",".png":"image/png",".jpeg":"image/jpeg"},
 	_: {
-		client: {start:"_app/immutable/entry/start.Nys1I4bM.js",app:"_app/immutable/entry/app.CEuj_lNu.js",imports:["_app/immutable/entry/start.Nys1I4bM.js","_app/immutable/chunks/nGX4hN7x.js","_app/immutable/chunks/CQiepFix.js","_app/immutable/chunks/DU7PTdcz.js","_app/immutable/chunks/KjQSC1ua.js","_app/immutable/chunks/Dt-JBCUV.js","_app/immutable/chunks/DYFg-3Jq.js","_app/immutable/entry/app.CEuj_lNu.js","_app/immutable/chunks/DU7PTdcz.js","_app/immutable/chunks/KjQSC1ua.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CQiepFix.js","_app/immutable/chunks/kmaicCfi.js","_app/immutable/chunks/BgX6hkEH.js","_app/immutable/chunks/DcB8fGZ9.js","_app/immutable/chunks/7z2sG6KI.js","_app/immutable/chunks/DYFg-3Jq.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
+		client: {start:"_app/immutable/entry/start.DE_v-DYk.js",app:"_app/immutable/entry/app.BFMi-_5r.js",imports:["_app/immutable/entry/start.DE_v-DYk.js","_app/immutable/chunks/DpX9-0eJ.js","_app/immutable/chunks/CQiepFix.js","_app/immutable/chunks/DU7PTdcz.js","_app/immutable/chunks/KjQSC1ua.js","_app/immutable/chunks/DieB1yrN.js","_app/immutable/chunks/DYFg-3Jq.js","_app/immutable/entry/app.BFMi-_5r.js","_app/immutable/chunks/DU7PTdcz.js","_app/immutable/chunks/KjQSC1ua.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CQiepFix.js","_app/immutable/chunks/kmaicCfi.js","_app/immutable/chunks/BgX6hkEH.js","_app/immutable/chunks/DcB8fGZ9.js","_app/immutable/chunks/7z2sG6KI.js","_app/immutable/chunks/DYFg-3Jq.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
 		nodes: [
 			__memo(() => import('../output/server/nodes/0.js')),
 			__memo(() => import('../output/server/nodes/1.js')),
@@ -293,6 +293,13 @@ return {
 				params: [{"name":"id","optional":false,"rest":false,"chained":false}],
 				page: null,
 				endpoint: __memo(() => import('../output/server/entries/endpoints/api/exams/_id_/questions/_server.ts.js'))
+			},
+			{
+				id: "/api/export-results/type/[typeId]",
+				pattern: /^\/api\/export-results\/type\/([^/]+?)\/?$/,
+				params: [{"name":"typeId","optional":false,"rest":false,"chained":false}],
+				page: null,
+				endpoint: __memo(() => import('../output/server/entries/endpoints/api/export-results/type/_typeId_/_server.ts.js'))
 			},
 			{
 				id: "/api/export-results/[examId]",
