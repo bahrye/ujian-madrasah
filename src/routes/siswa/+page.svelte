@@ -279,7 +279,14 @@
 								<svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} />
 								</svg>
-								<span>Pukul: {formatTimeRange(exam.start_time, exam.end_time)}</span>
+								<span>
+									Pukul: {formatTimeRange(exam.start_time, exam.end_time)}
+									{#if exam.has_sessions && exam.session_number}
+										<span class="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-md ml-1.5 inline-block">
+											Sesi {exam.session_number}
+										</span>
+									{/if}
+								</span>
 							</div>
 							<div class="flex items-center text-sm text-slate-600">
 								<svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">

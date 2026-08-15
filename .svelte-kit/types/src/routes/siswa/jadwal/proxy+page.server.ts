@@ -77,42 +77,49 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 		console.warn('Failed to fetch session_number:', e);
 	}
 
-	// Check for exam_sessions
-	if (schedules.length > 0) {
-		const examIds = schedules.map(s => s.id);
+	// Helper function to enrich an array of exams with session times
+	const enrichExamsWithSessions = async (examsList: any[]) => {
+		if (!examsList || examsList.length === 0) return examsList;
+		const examIds = examsList.map(s => s.id);
 		const placeholders = examIds.map(() => '?').join(',');
 		let sessionsResults: any[] = [];
 		try {
-			const sessionsQuery = await db.prepare(`SELECT * FROM exam_sessions WHERE exam_id IN (${placeholders}) AND session_number = ?`)
-				.bind(...examIds, studentSession).all<any>();
-			sessionsResults = sessionsQuery.results;
+			const sessionsQuery = await db.prepare(`SELECT * FROM exam_sessions WHERE exam_id IN (${placeholders}) ORDER BY session_number ASC`)
+				.bind(...examIds).all<any>();
+			sessionsResults = sessionsQuery.results || [];
 		} catch (e) {
 			console.warn('Failed to fetch exam_sessions:', e);
 		}
-		
-		const sessionMap = new Map();
+
+		const sessionsByExam = new Map<number, any[]>();
 		for (const row of sessionsResults) {
-			sessionMap.set(row.exam_id, row);
+			if (!sessionsByExam.has(row.exam_id)) {
+				sessionsByExam.set(row.exam_id, []);
+			}
+			sessionsByExam.get(row.exam_id)!.push(row);
 		}
 
-		schedules = schedules.map(schedule => {
-			const usedSession = schedule.has_sessions ? (schedule.ep_session_number || studentSession) : null;
-			const session = sessionMap.get(schedule.id);
-			if (session && usedSession && session.session_number === usedSession) {
+		return examsList.map(schedule => {
+			const examSessions = sessionsByExam.get(schedule.id) || [];
+			if (schedule.has_sessions && examSessions.length > 0) {
+				const targetSession = schedule.ep_session_number || studentSession;
+				const matchedSession = examSessions.find(s => s.session_number === targetSession) || examSessions[0];
 				return {
 					...schedule,
-					session_number: usedSession,
-					session_start_time: session.start_time,
-					session_end_time: session.end_time,
-					start_time: session.start_time || schedule.start_time,
-					end_time: session.end_time || schedule.end_time,
+					session_number: matchedSession.session_number,
+					session_start_time: matchedSession.start_time,
+					session_end_time: matchedSession.end_time,
+					start_time: matchedSession.start_time || schedule.start_time,
+					end_time: matchedSession.end_time || schedule.end_time,
 				};
 			}
-			return { ...schedule, session_number: usedSession || undefined };
+			return schedule;
 		});
-	}
+	};
+
+	const enrichedSchedules = await enrichExamsWithSessions(schedules);
 
 	return {
-		schedules
+		schedules: enrichedSchedules
 	};
 };

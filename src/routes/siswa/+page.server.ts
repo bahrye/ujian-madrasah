@@ -10,6 +10,7 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		SELECT DISTINCT 
 			e.*, 
 			s.name as subject,
+			(SELECT COUNT(*) FROM exam_sessions WHERE exam_id = e.id) > 0 as has_sessions,
 			COALESCE(
 				(
 					SELECT GROUP_CONCAT(u.name, '||')
@@ -105,43 +106,53 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		console.error('Error loading dashboard schedules:', e);
 	}
 
-	// Enrich with session times if exam has sessions
-	if (rawSchedules.length > 0) {
-		const examIds = rawSchedules.map(s => s.id);
+	// Helper function to enrich an array of exams with session times
+	const enrichExamsWithSessions = async (examsList: any[]) => {
+		if (!examsList || examsList.length === 0) return examsList;
+		const examIds = examsList.map(s => s.id);
 		const placeholders = examIds.map(() => '?').join(',');
 		let sessionsResults: any[] = [];
 		try {
-			const sessionsQuery = await db.prepare(`SELECT * FROM exam_sessions WHERE exam_id IN (${placeholders}) AND session_number = ?`)
-				.bind(...examIds, studentSession).all<any>();
-			sessionsResults = sessionsQuery.results;
+			const sessionsQuery = await db.prepare(`SELECT * FROM exam_sessions WHERE exam_id IN (${placeholders}) ORDER BY session_number ASC`)
+				.bind(...examIds).all<any>();
+			sessionsResults = sessionsQuery.results || [];
 		} catch (e) {
 			console.warn('Failed to fetch exam_sessions:', e);
 		}
-		
-		const sessionMap = new Map();
+
+		const sessionsByExam = new Map<number, any[]>();
 		for (const row of sessionsResults) {
-			sessionMap.set(row.exam_id, row);
+			if (!sessionsByExam.has(row.exam_id)) {
+				sessionsByExam.set(row.exam_id, []);
+			}
+			sessionsByExam.get(row.exam_id)!.push(row);
 		}
 
-		rawSchedules = rawSchedules.map(schedule => {
-			const session = sessionMap.get(schedule.id);
-			if (session && schedule.has_sessions) {
+		return examsList.map(schedule => {
+			const examSessions = sessionsByExam.get(schedule.id) || [];
+			if (schedule.has_sessions && examSessions.length > 0) {
+				const targetSession = schedule.ep_session_number || studentSession;
+				const matchedSession = examSessions.find(s => s.session_number === targetSession) || examSessions[0];
 				return {
 					...schedule,
-					session_start_time: session.start_time,
-					session_end_time: session.end_time,
-					start_time: session.start_time || schedule.start_time,
-					end_time: session.end_time || schedule.end_time,
+					session_number: matchedSession.session_number,
+					session_start_time: matchedSession.start_time,
+					session_end_time: matchedSession.end_time,
+					start_time: matchedSession.start_time || schedule.start_time,
+					end_time: matchedSession.end_time || schedule.end_time,
 				};
 			}
 			return schedule;
 		});
-	}
+	};
+
+	const enrichedActiveExams = await enrichExamsWithSessions(activeExams.results || []);
+	const enrichedSchedules = await enrichExamsWithSessions(rawSchedules);
 
 	return {
-		activeExams: activeExams.results,
+		activeExams: enrichedActiveExams,
 		myAttempts: myAttempts.results,
 		activeAttempt,
-		schedules: rawSchedules
+		schedules: enrichedSchedules
 	};
 };
