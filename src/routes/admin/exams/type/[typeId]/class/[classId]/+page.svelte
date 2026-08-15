@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { parseDate } from '$lib/utils/date';
+	import { parseProctors, formatProctorsText } from '$lib/utils/format';
 	import { enhance } from '$app/forms';
 	import { ICONS } from '$lib/utils/constants';
 	import { toasts } from '$lib/stores/toast';
@@ -59,7 +60,12 @@
 			<div class="card-hover p-5 flex flex-col">
 				<div class="flex items-start justify-between mb-3">
 					<div class="flex-1 min-w-0">
-						<h3 class="font-bold text-slate-800 truncate">{exam.title}</h3>
+						{#if exam.title.length > 20}
+							<!-- svelte-ignore a11y-distracting-elements -->
+							<marquee scrollamount="4" class="font-bold text-slate-800 text-base block">{exam.title}</marquee>
+						{:else}
+							<h3 class="font-bold text-slate-800">{exam.title}</h3>
+						{/if}
 						<p class="text-xs text-slate-500 mt-0.5">{exam.subject_name || 'Tanpa Mapel'}</p>
 					</div>
 					{#if exam.is_active}
@@ -104,6 +110,21 @@
 						</svg>
 						Nilai: {({ after_type_end_time: 'Jadwal Tipe Ujian', after_submit: 'Langsung Tampil', after_end_time: 'Jadwal Ujian', objective_only: 'Hanya Nilai Otomatis', manual: 'Manual (Guru/Admin)' })[exam.show_score_type || 'after_submit'] || 'Langsung Tampil'}
 					</span>
+					
+					{#if exam.proctors}
+						<div class="mt-1 text-slate-600 flex flex-col gap-1.5 pt-2 border-t border-slate-100 border-dashed w-full">
+							{#each parseProctors(exam.proctors) as p}
+								<div class="flex items-center gap-1.5 text-[11px]">
+									<span class="font-semibold text-indigo-800 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200/80 shrink-0">
+										{p.label}:
+									</span>
+									<span class="leading-snug font-medium text-slate-700 truncate" title={p.name}>
+										{p.name}
+									</span>
+								</div>
+							{/each}
+						</div>
+					{/if}
 					
 					<div class="flex items-start gap-1 w-full mt-0.5 {isOutOfBounds ? 'text-rose-500 font-medium' : 'text-slate-500'}" title={isOutOfBounds ? 'Waktu ujian berada di luar rentang tipe ujian, sehingga otomatis nonaktif' : 'Rentang Waktu Ujian'}>
 						<svg class="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">

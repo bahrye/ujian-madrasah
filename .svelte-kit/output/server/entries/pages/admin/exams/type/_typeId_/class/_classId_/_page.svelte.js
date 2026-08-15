@@ -1,5 +1,6 @@
 import { h as head, k as attr, c as stringify, e as escape_html, i as ensure_array_like, j as attr_class, f as bind_props } from "../../../../../../../../chunks/index.js";
 import { p as parseDate } from "../../../../../../../../chunks/date.js";
+import { p as parseProctors } from "../../../../../../../../chunks/format.js";
 import "@sveltejs/kit/internal";
 import "../../../../../../../../chunks/exports.js";
 import "../../../../../../../../chunks/utils2.js";
@@ -23,10 +24,18 @@ function _page($$renderer, $$props) {
     const each_array = ensure_array_like(data.exams);
     if (each_array.length !== 0) {
       $$renderer2.push("<!--[-->");
-      for (let $$index_1 = 0, $$length = each_array.length; $$index_1 < $$length; $$index_1++) {
-        let exam = each_array[$$index_1];
+      for (let $$index_2 = 0, $$length = each_array.length; $$index_2 < $$length; $$index_2++) {
+        let exam = each_array[$$index_2];
         const isOutOfBounds = exam.start_time && exam.start_time < data.examType.start_time || exam.end_time && exam.end_time > data.examType.end_time;
-        $$renderer2.push(`<div class="card-hover p-5 flex flex-col"><div class="flex items-start justify-between mb-3"><div class="flex-1 min-w-0"><h3 class="font-bold text-slate-800 truncate">${escape_html(exam.title)}</h3> <p class="text-xs text-slate-500 mt-0.5">${escape_html(exam.subject_name || "Tanpa Mapel")}</p></div> `);
+        $$renderer2.push(`<div class="card-hover p-5 flex flex-col"><div class="flex items-start justify-between mb-3"><div class="flex-1 min-w-0">`);
+        if (exam.title.length > 20) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<marquee scrollamount="4" class="font-bold text-slate-800 text-base block">${escape_html(exam.title)}</marquee>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<h3 class="font-bold text-slate-800">${escape_html(exam.title)}</h3>`);
+        }
+        $$renderer2.push(`<!--]--> <p class="text-xs text-slate-500 mt-0.5">${escape_html(exam.subject_name || "Tanpa Mapel")}</p></div> `);
         if (exam.is_active) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<span class="badge-success ml-2 flex-shrink-0">Aktif</span>`);
@@ -47,13 +56,26 @@ function _page($$renderer, $$props) {
           after_end_time: "Jadwal Ujian",
           objective_only: "Hanya Nilai Otomatis",
           manual: "Manual (Guru/Admin)"
-        }[exam.show_score_type || "after_submit"] || "Langsung Tampil")}</span> <div${attr_class(`flex items-start gap-1 w-full mt-0.5 ${isOutOfBounds ? "text-rose-500 font-medium" : "text-slate-500"}`)}${attr("title", isOutOfBounds ? "Waktu ujian berada di luar rentang tipe ujian, sehingga otomatis nonaktif" : "Rentang Waktu Ujian")}><svg class="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.calendar)}></path></svg> `);
+        }[exam.show_score_type || "after_submit"] || "Langsung Tampil")}</span> `);
+        if (exam.proctors) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<div class="mt-1 text-slate-600 flex flex-col gap-1.5 pt-2 border-t border-slate-100 border-dashed w-full"><!--[-->`);
+          const each_array_1 = ensure_array_like(parseProctors(exam.proctors));
+          for (let $$index = 0, $$length2 = each_array_1.length; $$index < $$length2; $$index++) {
+            let p = each_array_1[$$index];
+            $$renderer2.push(`<div class="flex items-center gap-1.5 text-[11px]"><span class="font-semibold text-indigo-800 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200/80 shrink-0">${escape_html(p.label)}:</span> <span class="leading-snug font-medium text-slate-700 truncate"${attr("title", p.name)}>${escape_html(p.name)}</span></div>`);
+          }
+          $$renderer2.push(`<!--]--></div>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+        }
+        $$renderer2.push(`<!--]--> <div${attr_class(`flex items-start gap-1 w-full mt-0.5 ${isOutOfBounds ? "text-rose-500 font-medium" : "text-slate-500"}`)}${attr("title", isOutOfBounds ? "Waktu ujian berada di luar rentang tipe ujian, sehingga otomatis nonaktif" : "Rentang Waktu Ujian")}><svg class="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.calendar)}></path></svg> `);
         if (exam.sessions && exam.sessions.length > 0) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<div class="flex flex-col gap-1 w-full"><!--[-->`);
-          const each_array_1 = ensure_array_like(exam.sessions);
-          for (let $$index = 0, $$length2 = each_array_1.length; $$index < $$length2; $$index++) {
-            let session = each_array_1[$$index];
+          const each_array_2 = ensure_array_like(exam.sessions);
+          for (let $$index_1 = 0, $$length2 = each_array_2.length; $$index_1 < $$length2; $$index_1++) {
+            let session = each_array_2[$$index_1];
             $$renderer2.push(`<div class="flex items-center justify-between bg-slate-50 p-1.5 rounded border border-slate-100"><span class="font-semibold text-slate-700">Sesi ${escape_html(session.session_number)}</span> <span class="text-slate-600 text-[10px]">${escape_html(session.start_time ? parseDate(session.start_time).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : "-")}
 											s/d
 											${escape_html(session.end_time ? parseDate(session.end_time).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" }) : "-")}</span></div>`);

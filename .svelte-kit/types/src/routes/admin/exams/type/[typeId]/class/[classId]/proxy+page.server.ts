@@ -25,7 +25,18 @@ export const load = async ({ params, platform, locals }: Parameters<PageServerLo
 			(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count,
 			(SELECT COUNT(*) FROM exam_participants WHERE exam_id = e.id) as participant_count,
 			(SELECT COUNT(*) FROM exam_teachers WHERE exam_id = e.id) as teacher_count,
-			(SELECT COUNT(*) FROM exam_proctors WHERE exam_id = e.id) as proctor_count
+			(SELECT COUNT(*) FROM exam_proctors WHERE exam_id = e.id) as proctor_count,
+			COALESCE(
+				(
+					SELECT GROUP_CONCAT(u2.name, ', ')
+					FROM exam_proctors epr
+					JOIN users u2 ON epr.proctor_id = u2.id
+					WHERE epr.exam_id = e.id
+				),
+				(
+					SELECT u3.name FROM users u3 WHERE u3.id = e.created_by AND u3.role = 'guru'
+				)
+			) as proctors
 		FROM exams e
 		LEFT JOIN users u ON e.created_by = u.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
