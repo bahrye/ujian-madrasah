@@ -7,6 +7,12 @@ const load = async ({ platform, locals }) => {
 		SELECT 
 			e.*, 
 			s.name as subject,
+			(
+				SELECT status 
+				FROM student_attempts 
+				WHERE exam_id = e.id AND student_id = ? 
+				ORDER BY created_at DESC LIMIT 1
+			) as attempt_status,
 			COALESCE(
 				(
 					SELECT GROUP_CONCAT(u.name, '||')
@@ -30,7 +36,7 @@ const load = async ({ platform, locals }) => {
 		JOIN exam_types et ON e.exam_type_id = et.id
 		WHERE ep.student_id = ? AND e.school_id = ? AND e.is_active = 1 AND et.is_active = 1
 		ORDER BY CASE WHEN e.start_time IS NULL THEN 1 ELSE 0 END, e.start_time ASC, e.created_at DESC
-	`).bind(locals.user.id, locals.user.school_id).all();
+	`).bind(locals.user.id, locals.user.id, locals.user.school_id).all();
   let schedules = examsQuery.results || [];
   let studentSession = 1;
   try {

@@ -293,7 +293,7 @@
 						</div>
 						
 						<div class="pt-4 border-t border-slate-100 mt-auto">
-							{#if myAttempts.some(a => a.exam_id === exam.id && ['selesai', 'waktu_habis'].includes(a.status))}
+							{#if myAttempts.some(a => a.exam_id === exam.id && ['selesai', 'waktu_habis', 'remedial'].includes(a.status))}
 								<button disabled class="btn w-full justify-center bg-emerald-50 text-emerald-600 border border-emerald-200 cursor-not-allowed shadow-none">
 									<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
