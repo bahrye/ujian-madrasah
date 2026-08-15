@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { parseDate } from '$lib/utils/date';
-
 	import { QUESTION_TYPE_LABELS, ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS, ICONS } from '$lib/utils/constants';
 	import { mathRender } from '$lib/actions/mathRender';
 	import { arabicRender } from '$lib/actions/arabicRender';
@@ -8,7 +7,6 @@
 	export let data;
 	$: attempt = data.attempt as any;
 	$: answers = data.answers as any[];
-
 </script>
 
 <svelte:head>
@@ -16,12 +14,18 @@
 </svelte:head>
 
 <div class="space-y-6 animate-in">
-	<div class="flex items-center gap-3">
+	<div class="flex items-center justify-between gap-3">
 		<a href="/guru/results" class="btn-ghost btn-sm">
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 				<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.chevronLeft} />
 			</svg>
 			Kembali
+		</a>
+		<a href="/print/results/{attempt.id}" target="_blank" class="btn btn-primary btn-sm flex items-center gap-2 shadow-md">
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+				<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.print} />
+			</svg>
+			Cetak Hasil (PDF)
 		</a>
 	</div>
 
@@ -205,7 +209,6 @@
 					{#if ['essay', 'isian_singkat'].includes(ans.type) && ans.score_given == null}
 						<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
 							<span class="text-xs text-rose-500 font-medium">⚠️ Jawaban ini belum dinilai oleh Guru</span>
-							<!-- Note: Admin might not have access to /guru, so we just inform them -->
 						</div>
 					{/if}
 				</div>

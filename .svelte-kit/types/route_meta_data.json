@@ -310,6 +310,11 @@
 		"src/routes/print/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/print/results/[attemptId]": [
+		"src/routes/print/results/[attemptId]/+page.server.ts",
+		"src/routes/print/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/siswa": [
 		"src/routes/siswa/+page.server.ts",
 		"src/routes/siswa/+layout.server.ts",
