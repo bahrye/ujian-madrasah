@@ -406,7 +406,25 @@
 		}
 	}
 
+	function unlockAudioAndVibration() {
+		try {
+			if (!warningAudioCtx) {
+				const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+				if (AudioContextClass) {
+					warningAudioCtx = new AudioContextClass();
+				}
+			}
+			if (warningAudioCtx && warningAudioCtx.state === 'suspended') {
+				warningAudioCtx.resume();
+			}
+			if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+				navigator.vibrate([100, 50, 100]);
+			}
+		} catch (e) {}
+	}
+
 	async function enterFullscreen() {
+		unlockAudioAndVibration();
 		handleReturnToExam();
 		try {
 			if (document.documentElement.requestFullscreen) {
