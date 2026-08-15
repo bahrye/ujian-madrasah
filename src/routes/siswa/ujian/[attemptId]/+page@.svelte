@@ -272,21 +272,44 @@
 			}
 			if (!warningAudioCtx) return;
 
-			const osc = warningAudioCtx.createOscillator();
-			const gain = warningAudioCtx.createGain();
+			// Getarkan perangkat HP/Tablet fisik jika mendukung Vibration API
+			if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+				try {
+					navigator.vibrate([250, 100, 250]);
+				} catch {}
+			}
 
-			osc.type = 'sawtooth';
-			osc.frequency.setValueAtTime(880, warningAudioCtx.currentTime); 
-			osc.frequency.exponentialRampToValueAtTime(550, warningAudioCtx.currentTime + 0.18);
+			const now = warningAudioCtx.currentTime;
 
-			gain.gain.setValueAtTime(0.35, warningAudioCtx.currentTime);
-			gain.gain.exponentialRampToValueAtTime(0.01, warningAudioCtx.currentTime + 0.2);
+			// Tone 1: Sirene utama amplitudo maksimal (1400Hz -> 700Hz)
+			const osc1 = warningAudioCtx.createOscillator();
+			const gain1 = warningAudioCtx.createGain();
+			osc1.type = 'sawtooth';
+			osc1.frequency.setValueAtTime(1400, now);
+			osc1.frequency.exponentialRampToValueAtTime(700, now + 0.22);
 
-			osc.connect(gain);
-			gain.connect(warningAudioCtx.destination);
+			gain1.gain.setValueAtTime(1.0, now); // Gain maksimal 100%
+			gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.24);
 
-			osc.start();
-			osc.stop(warningAudioCtx.currentTime + 0.2);
+			osc1.connect(gain1);
+			gain1.connect(warningAudioCtx.destination);
+			osc1.start(now);
+			osc1.stop(now + 0.24);
+
+			// Tone 2: Harmonis nada tinggi (2800Hz) untuk menembus batas frekuensi speaker minim
+			const osc2 = warningAudioCtx.createOscillator();
+			const gain2 = warningAudioCtx.createGain();
+			osc2.type = 'square';
+			osc2.frequency.setValueAtTime(2800, now);
+			osc2.frequency.exponentialRampToValueAtTime(1400, now + 0.22);
+
+			gain2.gain.setValueAtTime(0.7, now);
+			gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.24);
+
+			osc2.connect(gain2);
+			gain2.connect(warningAudioCtx.destination);
+			osc2.start(now);
+			osc2.stop(now + 0.24);
 		} catch (e) {
 			console.warn('Audio play error:', e);
 		}
