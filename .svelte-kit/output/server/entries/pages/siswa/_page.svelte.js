@@ -53,6 +53,12 @@ function _page($$renderer, $$props) {
       const end = parseDate(endTimeStr);
       return current.getTime() >= end.getTime();
     }
+    function isExamToday(dateStr) {
+      if (!dateStr) return false;
+      const date = parseDate(dateStr);
+      const today = /* @__PURE__ */ new Date();
+      return date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
+    }
     function formatOnlyTime(dateStr) {
       if (!dateStr) return "--.--";
       const date = parseDate(dateStr);
@@ -197,7 +203,7 @@ function _page($$renderer, $$props) {
               $$renderer2.push("<!--[-1-->");
             }
             $$renderer2.push(`<!--]--><td class="border-2 border-slate-300 px-3 py-2 text-center">${escape_html(eIdx + 1)}</td><td class="border-2 border-slate-300 px-3 py-2 text-center">${escape_html(exam.room_name || "Ruang Ujian")}</td><td class="border-2 border-slate-300 px-3 py-2 text-center">${escape_html(exam.has_sessions ? exam.session_number || 1 : "-")}</td><td class="border-2 border-slate-300 px-3 py-2 text-center tracking-wider">${escape_html(formatOnlyTime(exam.start_time || ""))} - ${escape_html(formatOnlyTime(exam.end_time || ""))}</td><td class="border-2 border-slate-300 px-3 py-2 text-center">${escape_html(exam.subject_name || exam.title || "")}</td><td class="border-2 border-slate-300 px-3 py-2 text-center">`);
-            if (exam.attempt_status === "selesai" || exam.attempt_status === "remedial") {
+            if (exam.attempt_status === "selesai" || exam.attempt_status === "remedial" || exam.attempt_status === "waktu_habis") {
               $$renderer2.push("<!--[0-->");
               $$renderer2.push(`<span class="text-emerald-600 font-bold">Selesai</span>`);
             } else if (exam.attempt_status === "mengerjakan") {
@@ -208,6 +214,9 @@ function _page($$renderer, $$props) {
               if (exam.end_time && isAttemptExpired(exam.end_time, currentTime)) {
                 $$renderer2.push("<!--[0-->");
                 $$renderer2.push(`<span class="text-rose-600 font-bold">Tidak dikerjakan</span>`);
+              } else if (isExamToday(exam.start_time || exam.end_time)) {
+                $$renderer2.push("<!--[1-->");
+                $$renderer2.push(`<span class="text-emerald-600 font-bold">Hari ini</span>`);
               } else {
                 $$renderer2.push("<!--[-1-->");
                 $$renderer2.push(`<span class="text-slate-400 font-bold">Belum mulai</span>`);

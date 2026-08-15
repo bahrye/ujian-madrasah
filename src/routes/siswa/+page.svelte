@@ -132,6 +132,17 @@
 		return current.getTime() >= end.getTime();
 	}
 
+	function isExamToday(dateStr: string | null) {
+		if (!dateStr) return false;
+		const date = parseDate(dateStr);
+		const today = new Date();
+		return (
+			date.getDate() === today.getDate() &&
+			date.getMonth() === today.getMonth() &&
+			date.getFullYear() === today.getFullYear()
+		);
+	}
+
 	function formatOnlyTime(dateStr: string | null) {
 		if (!dateStr) return '--.--';
 		const date = parseDate(dateStr);
@@ -359,13 +370,15 @@
 									</td>
 									<td class="border-2 border-slate-300 px-3 py-2 text-center">{exam.subject_name || exam.title || ''}</td>
 									<td class="border-2 border-slate-300 px-3 py-2 text-center">
-										{#if exam.attempt_status === 'selesai' || exam.attempt_status === 'remedial'}
+										{#if exam.attempt_status === 'selesai' || exam.attempt_status === 'remedial' || exam.attempt_status === 'waktu_habis'}
 											<span class="text-emerald-600 font-bold">Selesai</span>
 										{:else if exam.attempt_status === 'mengerjakan'}
 											<span class="text-indigo-600 font-bold">Mengerjakan</span>
 										{:else}
 											{#if exam.end_time && isAttemptExpired(exam.end_time, currentTime)}
 												<span class="text-rose-600 font-bold">Tidak dikerjakan</span>
+											{:else if isExamToday(exam.start_time || exam.end_time)}
+												<span class="text-emerald-600 font-bold">Hari ini</span>
 											{:else}
 												<span class="text-slate-400 font-bold">Belum mulai</span>
 											{/if}
