@@ -48,11 +48,20 @@ function _page_($$renderer, $$props) {
     let warnings = 0;
     let warningLogs = [];
     onDestroy(() => {
+      stopWarningSoundLoop();
       if (typeof document !== "undefined" && document.fullscreenElement) {
         document.exitFullscreen().catch(() => {
         });
       }
     });
+    function stopWarningSoundLoop() {
+      try {
+        if (typeof window !== "undefined" && "speechSynthesis" in window) {
+          window.speechSynthesis.cancel();
+        }
+      } catch (e) {
+      }
+    }
     let localAnswers = {};
     let localDoubts = {};
     let lastSavedPayload = null;

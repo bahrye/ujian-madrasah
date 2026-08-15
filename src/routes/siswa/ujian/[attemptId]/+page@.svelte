@@ -315,9 +315,23 @@
 		}
 	}
 
+	function speakWarningAlert() {
+		try {
+			if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+				window.speechSynthesis.cancel();
+				const msg = new SpeechSynthesisUtterance('Peringatan! Segera kembali ke layar penuh!');
+				msg.lang = 'id-ID';
+				msg.volume = 1.0;
+				msg.rate = 1.2;
+				window.speechSynthesis.speak(msg);
+			}
+		} catch (e) {}
+	}
+
 	function startWarningSoundLoop() {
 		stopWarningSoundLoop();
 		playWarningBeep();
+		speakWarningAlert();
 		warningSoundInterval = setInterval(() => {
 			playWarningBeep();
 		}, 600);
@@ -328,6 +342,11 @@
 			clearInterval(warningSoundInterval);
 			warningSoundInterval = null;
 		}
+		try {
+			if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+				window.speechSynthesis.cancel();
+			}
+		} catch (e) {}
 	}
 
 	let isDisqualifying = false;
