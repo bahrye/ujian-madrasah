@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 			s.name as subject,
 			COALESCE(
 				(
-					SELECT GROUP_CONCAT(u.name, ', ')
+					SELECT GROUP_CONCAT(u.name, '||')
 					FROM exam_proctors epr
 					JOIN users u ON epr.proctor_id = u.id
 					WHERE epr.exam_id = e.id

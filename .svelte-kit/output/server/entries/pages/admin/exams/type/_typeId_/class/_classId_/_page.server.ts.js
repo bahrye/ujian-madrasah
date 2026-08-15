@@ -17,7 +17,7 @@ const load = async ({ params, platform, locals }) => {
 			(SELECT COUNT(*) FROM exam_proctors WHERE exam_id = e.id) as proctor_count,
 			COALESCE(
 				(
-					SELECT GROUP_CONCAT(u2.name, ', ')
+					SELECT GROUP_CONCAT(u2.name, '||')
 					FROM exam_proctors epr
 					JOIN users u2 ON epr.proctor_id = u2.id
 					WHERE epr.exam_id = e.id
