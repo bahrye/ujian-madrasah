@@ -3,6 +3,6 @@
 export const index = 51;
 let component_cache;
 export const component = async () => component_cache ??= (await import('../entries/pages/pengawas/tata-tertib/_page.svelte.js')).default;
-export const imports = ["_app/immutable/nodes/51.C-BE0sPE.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/q3ZFHJDQ.js","_app/immutable/chunks/ClRrpZeN.js","_app/immutable/chunks/DbEAIv_x.js","_app/immutable/chunks/COlPN6dD.js","_app/immutable/chunks/BClyc7_g.js","_app/immutable/chunks/i_5gAELL.js","_app/immutable/chunks/CcEXiels.js","_app/immutable/chunks/heyDCscg.js","_app/immutable/chunks/B5xf_oRu.js"];
+export const imports = ["_app/immutable/nodes/51.CGs2NCly.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CJ6315G4.js","_app/immutable/chunks/DU7PTdcz.js","_app/immutable/chunks/KjQSC1ua.js","_app/immutable/chunks/kmaicCfi.js","_app/immutable/chunks/CdvAxIBr.js","_app/immutable/chunks/CPHvxiz7.js","_app/immutable/chunks/C60cHTm1.js","_app/immutable/chunks/B5xf_oRu.js"];
 export const stylesheets = [];
 export const fonts = [];

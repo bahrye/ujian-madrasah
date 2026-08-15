@@ -40,11 +40,11 @@
 declare module '$env/static/private' {
 	export const npm_execpath: string;
 	export const CHROME_CRASHPAD_PIPE_NAME: string;
+	export const EFC_2796_3789132940: string;
 	export const npm_config_node_gyp: string;
 	export const npm_config_init_module: string;
 	export const NODE_ENV: string;
 	export const ALLUSERSPROFILE: string;
-	export const EFC_14632_1262719628: string;
 	export const USERPROFILE: string;
 	export const ANTIGRAVITY_CLI_ALIAS: string;
 	export const APPDATA: string;
@@ -52,7 +52,6 @@ declare module '$env/static/private' {
 	export const ChocolateyLastPathUpdate: string;
 	export const COLOR: string;
 	export const EDITOR: string;
-	export const EFC_14632_1592913036: string;
 	export const npm_config_local_prefix: string;
 	export const CommonProgramW6432: string;
 	export const COLORTERM: string;
@@ -60,6 +59,7 @@ declare module '$env/static/private' {
 	export const GIT_ASKPASS: string;
 	export const PROCESSOR_IDENTIFIER: string;
 	export const npm_config_userconfig: string;
+	export const EFC_2796_1262719628: string;
 	export const COMPUTERNAME: string;
 	export const USERNAME: string;
 	export const ComSpec: string;
@@ -67,15 +67,15 @@ declare module '$env/static/private' {
 	export const OneDrive: string;
 	export const LANG: string;
 	export const DriverData: string;
-	export const FPS_BROWSER_USER_PROFILE_STRING: string;
-	export const EFC_14632_2283032206: string;
+	export const NUMBER_OF_PROCESSORS: string;
+	export const EFC_2796_1592913036: string;
+	export const EFC_2796_2283032206: string;
+	export const EFC_2796_2775293581: string;
 	export const npm_config_npm_version: string;
-	export const EFC_14632_2775293581: string;
-	export const EFC_14632_3789132940: string;
-	export const npm_package_json: string;
-	export const EFC_14632_4126798990: string;
+	export const EFC_2796_4126798990: string;
 	export const npm_config_noproxy: string;
 	export const FPS_BROWSER_APP_PROFILE_STRING: string;
+	export const FPS_BROWSER_USER_PROFILE_STRING: string;
 	export const GOPATH: string;
 	export const npm_config_global_prefix: string;
 	export const VSCODE_GIT_ASKPASS_EXTRA_ARGS: string;
@@ -98,8 +98,8 @@ declare module '$env/static/private' {
 	export const npm_config_user_agent: string;
 	export const npm_lifecycle_script: string;
 	export const npm_node_execpath: string;
+	export const npm_package_json: string;
 	export const npm_package_name: string;
-	export const NUMBER_OF_PROCESSORS: string;
 	export const PATHEXT: string;
 	export const PROCESSOR_ARCHITECTURE: string;
 	export const PROCESSOR_LEVEL: string;
@@ -216,11 +216,11 @@ declare module '$env/dynamic/private' {
 	export const env: {
 		npm_execpath: string;
 		CHROME_CRASHPAD_PIPE_NAME: string;
+		EFC_2796_3789132940: string;
 		npm_config_node_gyp: string;
 		npm_config_init_module: string;
 		NODE_ENV: string;
 		ALLUSERSPROFILE: string;
-		EFC_14632_1262719628: string;
 		USERPROFILE: string;
 		ANTIGRAVITY_CLI_ALIAS: string;
 		APPDATA: string;
@@ -228,7 +228,6 @@ declare module '$env/dynamic/private' {
 		ChocolateyLastPathUpdate: string;
 		COLOR: string;
 		EDITOR: string;
-		EFC_14632_1592913036: string;
 		npm_config_local_prefix: string;
 		CommonProgramW6432: string;
 		COLORTERM: string;
@@ -236,6 +235,7 @@ declare module '$env/dynamic/private' {
 		GIT_ASKPASS: string;
 		PROCESSOR_IDENTIFIER: string;
 		npm_config_userconfig: string;
+		EFC_2796_1262719628: string;
 		COMPUTERNAME: string;
 		USERNAME: string;
 		ComSpec: string;
@@ -243,15 +243,15 @@ declare module '$env/dynamic/private' {
 		OneDrive: string;
 		LANG: string;
 		DriverData: string;
-		FPS_BROWSER_USER_PROFILE_STRING: string;
-		EFC_14632_2283032206: string;
+		NUMBER_OF_PROCESSORS: string;
+		EFC_2796_1592913036: string;
+		EFC_2796_2283032206: string;
+		EFC_2796_2775293581: string;
 		npm_config_npm_version: string;
-		EFC_14632_2775293581: string;
-		EFC_14632_3789132940: string;
-		npm_package_json: string;
-		EFC_14632_4126798990: string;
+		EFC_2796_4126798990: string;
 		npm_config_noproxy: string;
 		FPS_BROWSER_APP_PROFILE_STRING: string;
+		FPS_BROWSER_USER_PROFILE_STRING: string;
 		GOPATH: string;
 		npm_config_global_prefix: string;
 		VSCODE_GIT_ASKPASS_EXTRA_ARGS: string;
@@ -274,8 +274,8 @@ declare module '$env/dynamic/private' {
 		npm_config_user_agent: string;
 		npm_lifecycle_script: string;
 		npm_node_execpath: string;
+		npm_package_json: string;
 		npm_package_name: string;
-		NUMBER_OF_PROCESSORS: string;
 		PATHEXT: string;
 		PROCESSOR_ARCHITECTURE: string;
 		PROCESSOR_LEVEL: string;

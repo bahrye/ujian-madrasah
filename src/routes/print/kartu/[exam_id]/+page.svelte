@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { parseProctors } from '$lib/utils/format';
+
 	export let data;
 	$: school = data.school as any;
 	$: exam = data.exam as any;
@@ -89,6 +91,13 @@
 									<span>:</span>
 									<span class="font-semibold">{p.room_name || '-'} / Sesi {p.session_number || 1}</span>
 								</div>
+								{#each parseProctors(exam.proctors) as pr}
+									<div class="grid grid-cols-[80px_8px_1fr] items-baseline">
+										<span class="text-slate-600">{pr.label}</span>
+										<span>:</span>
+										<span class="font-semibold truncate">{pr.name}</span>
+									</div>
+								{/each}
 								<div class="grid grid-cols-[80px_8px_1fr] items-baseline">
 									<span class="text-slate-600">Password</span>
 									<span>:</span>

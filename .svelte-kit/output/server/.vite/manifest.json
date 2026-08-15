@@ -122,6 +122,10 @@
     "file": "chunks/exports.js",
     "name": "exports"
   },
+  "_format.js": {
+    "file": "chunks/format.js",
+    "name": "format"
+  },
   "_html.js": {
     "file": "chunks/html.js",
     "name": "html"
@@ -1872,7 +1876,8 @@
     "src": "src/routes/print/kartu/[exam_id]/+page.svelte",
     "isEntry": true,
     "imports": [
-      "_index.js"
+      "_index.js",
+      "_format.js"
     ]
   },
   "src/routes/print/kartu/type/[typeId]/+page.server.ts": {
@@ -1953,6 +1958,7 @@
       "_index.js",
       "_constants.js",
       "_date.js",
+      "_format.js",
       "_index-server.js",
       "_ScoreDisplay.js"
     ]
@@ -1996,6 +2002,7 @@
     "imports": [
       "_index.js",
       "_date.js",
+      "_format.js",
       "_constants.js"
     ]
   },

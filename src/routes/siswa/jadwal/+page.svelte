@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { parseDate } from '$lib/utils/date';
-
+	import { parseProctors, formatProctorsText } from '$lib/utils/format';
 	import { ICONS } from '$lib/utils/constants';
 	export let data;
 
@@ -145,7 +145,9 @@
 							<svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.users} />
 							</svg>
-							<span class="line-clamp-1" title={exam.proctors || 'Belum ada pengawas'}>Pengawas: {exam.proctors || '-'}</span>
+							<span class="line-clamp-1" title={formatProctorsText(exam.proctors)}>
+								{formatProctorsText(exam.proctors)}
+							</span>
 						</div>
 					</div>
 				</div>

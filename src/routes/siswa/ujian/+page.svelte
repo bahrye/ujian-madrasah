@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { ICONS } from '$lib/utils/constants';
+	import { parseProctors } from '$lib/utils/format';
 
 	export let data;
 	export let form: { error?: string, success?: boolean, tokenCode?: string } | null;
@@ -182,10 +183,12 @@
 					<span class="text-sm text-slate-500">Durasi</span>
 					<span class="text-sm font-semibold text-slate-800">{data.exam.duration_minutes} Menit</span>
 				</div>
-				<div class="flex justify-between">
-					<span class="text-sm text-slate-500">Pengawas</span>
-					<span class="text-sm font-semibold text-slate-800 text-right max-w-[200px]">{data.exam.proctors || '-'}</span>
-				</div>
+				{#each parseProctors(data.exam.proctors) as p}
+					<div class="flex justify-between">
+						<span class="text-sm text-slate-500">{p.label}</span>
+						<span class="text-sm font-semibold text-slate-800 text-right max-w-[200px]">{p.name}</span>
+					</div>
+				{/each}
 			</div>
 
 			<div class="bg-rose-50 border border-rose-200 rounded-xl p-4 mb-6">

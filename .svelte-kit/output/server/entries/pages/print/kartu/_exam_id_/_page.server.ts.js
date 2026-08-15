@@ -6,7 +6,24 @@ const load = async ({ platform, params, locals }) => {
   const examId = parseInt(examIdStr, 10);
   if (isNaN(examId)) throw error(400, "ID Ujian tidak valid");
   const school = await db.prepare("SELECT * FROM schools WHERE id = ?").bind(locals.user.school_id).first();
-  const exam = await db.prepare("SELECT e.*, s.name as subject_name, et.name as exam_type_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id LEFT JOIN exam_types et ON e.exam_type_id = et.id WHERE e.id = ? AND e.school_id = ?").bind(examId, locals.user.school_id).first();
+  const exam = await db.prepare(`
+		SELECT e.*, s.name as subject_name, et.name as exam_type_name,
+			COALESCE(
+				(
+					SELECT GROUP_CONCAT(u.name, ', ')
+					FROM exam_proctors epr
+					JOIN users u ON epr.proctor_id = u.id
+					WHERE epr.exam_id = e.id
+				),
+				(
+					SELECT u.name FROM users u WHERE u.id = e.created_by AND u.role = 'guru'
+				)
+			) as proctors
+		FROM exams e 
+		LEFT JOIN subjects s ON e.subject_id = s.id 
+		LEFT JOIN exam_types et ON e.exam_type_id = et.id 
+		WHERE e.id = ? AND e.school_id = ?
+	`).bind(examId, locals.user.school_id).first();
   if (!exam) throw error(404, "Ujian tidak ditemukan");
   const participants = await db.prepare(`
 		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name, u.session_number, r.name as room_name
