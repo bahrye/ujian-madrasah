@@ -42,7 +42,7 @@
 		<div class="w-full sm:w-auto sm:ml-auto flex flex-col sm:flex-row gap-2">
 			<button class="btn-outline w-full sm:w-auto justify-center text-indigo-600 border-indigo-200 hover:bg-indigo-50" on:click={() => { showPrintModal = true; }}>
 				<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" /></svg>
-				Cetak Kartu Peserta
+				Cetak & Export
 			</button>
 			<button class="btn-primary w-full sm:w-auto justify-center" on:click={() => (showCreateModal = true)}>
 				<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -457,11 +457,21 @@
 			</div>
 			
 			<div class="p-6 flex flex-col gap-3">
-				<a href="/print/jadwal/type/{data.examType.id}?class_id={data.classData.id}" target="_blank" class="btn-outline flex justify-center w-full" on:click={() => showPrintModal = false}>
-					Cetak Daftar Hadir & Jadwal
-				</a>
-				<a href="/print/kartu/type/{data.examType.id}?class_id={data.classData.id}" target="_blank" class="btn-primary flex justify-center w-full" on:click={() => showPrintModal = false}>
+				<a href="/print/kartu/type/{data.examType.id}?class_id={data.classData.id}" target="_blank" class="btn-primary flex justify-center w-full shadow-sm" on:click={() => showPrintModal = false}>
+					<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" /></svg>
 					Cetak Kartu Login Peserta
+				</a>
+				<a href="/print/jadwal/type/{data.examType.id}?class_id={data.classData.id}" target="_blank" class="btn-outline flex justify-center w-full" on:click={() => showPrintModal = false}>
+					<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+					Cetak Jadwal Ujian Peserta
+				</a>
+				<a href="/print/kehadiran/type/{data.examType.id}?class_id={data.classData.id}" target="_blank" class="btn-outline flex justify-center w-full text-slate-700 hover:bg-slate-50" on:click={() => showPrintModal = false}>
+					<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+					Cetak Semua Daftar Hadir
+				</a>
+				<a href="/print/berita-acara/type/{data.examType.id}?class_id={data.classData.id}" target="_blank" class="btn-outline flex justify-center w-full text-slate-700 hover:bg-slate-50" on:click={() => showPrintModal = false}>
+					<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+					Cetak Semua Berita Acara
 				</a>
 			</div>
 		</div>

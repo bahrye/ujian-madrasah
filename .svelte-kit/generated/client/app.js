@@ -80,7 +80,9 @@ export const nodes = [
 	() => import('./nodes/68'),
 	() => import('./nodes/69'),
 	() => import('./nodes/70'),
-	() => import('./nodes/71')
+	() => import('./nodes/71'),
+	() => import('./nodes/72'),
+	() => import('./nodes/73')
 ];
 
 export const server_loads = [0,2,3,4,5,6,7];
@@ -131,25 +133,27 @@ export const dictionary = {
 		"/pengawas/monitor": [~50,[4]],
 		"/pengawas/tata-tertib": [51,[4]],
 		"/pengawas/tokens": [~52,[4]],
-		"/print/berita-acara/[exam_id]": [~53,[5]],
-		"/print/jadwal/type/[typeId]": [~54,[5]],
-		"/print/kartu/type/[typeId]": [~55,[5]],
-		"/print/kartu/[exam_id]": [~56,[5]],
-		"/print/kehadiran/[exam_id]": [~57,[5]],
-		"/siswa": [~58,[6]],
-		"/siswa/hasil-ujian": [~59,[6]],
-		"/siswa/jadwal": [~60,[6]],
-		"/siswa/papan-peringkat": [~61,[6]],
-		"/siswa/papan-peringkat/type/[typeId]": [~62,[6]],
-		"/siswa/papan-peringkat/type/[typeId]/exams": [~63,[6]],
-		"/siswa/papan-peringkat/[examId]": [~64,[6]],
-		"/siswa/tata-tertib": [65,[6]],
-		"/siswa/ujian": [~66,[6]],
-		"/siswa/ujian/[attemptId]": [~67],
-		"/superadmin": [~68,[7]],
-		"/superadmin/accounts": [~69,[7]],
-		"/superadmin/admins": [~70,[7]],
-		"/superadmin/schools": [~71,[7]]
+		"/print/berita-acara/type/[typeId]": [~53,[5]],
+		"/print/berita-acara/[exam_id]": [~54,[5]],
+		"/print/jadwal/type/[typeId]": [~55,[5]],
+		"/print/kartu/type/[typeId]": [~56,[5]],
+		"/print/kartu/[exam_id]": [~57,[5]],
+		"/print/kehadiran/type/[typeId]": [~58,[5]],
+		"/print/kehadiran/[exam_id]": [~59,[5]],
+		"/siswa": [~60,[6]],
+		"/siswa/hasil-ujian": [~61,[6]],
+		"/siswa/jadwal": [~62,[6]],
+		"/siswa/papan-peringkat": [~63,[6]],
+		"/siswa/papan-peringkat/type/[typeId]": [~64,[6]],
+		"/siswa/papan-peringkat/type/[typeId]/exams": [~65,[6]],
+		"/siswa/papan-peringkat/[examId]": [~66,[6]],
+		"/siswa/tata-tertib": [67,[6]],
+		"/siswa/ujian": [~68,[6]],
+		"/siswa/ujian/[attemptId]": [~69],
+		"/superadmin": [~70,[7]],
+		"/superadmin/accounts": [~71,[7]],
+		"/superadmin/admins": [~72,[7]],
+		"/superadmin/schools": [~73,[7]]
 	};
 
 export const hooks = {

@@ -272,6 +272,11 @@
 		"src/routes/print/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/print/berita-acara/type/[typeId]": [
+		"src/routes/print/berita-acara/type/[typeId]/+page.server.ts",
+		"src/routes/print/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/print/berita-acara/[exam_id]": [
 		"src/routes/print/berita-acara/[exam_id]/+page.server.ts",
 		"src/routes/print/+layout.server.ts",
@@ -289,6 +294,11 @@
 	],
 	"/print/kartu/[exam_id]": [
 		"src/routes/print/kartu/[exam_id]/+page.server.ts",
+		"src/routes/print/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/print/kehadiran/type/[typeId]": [
+		"src/routes/print/kehadiran/type/[typeId]/+page.server.ts",
 		"src/routes/print/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
