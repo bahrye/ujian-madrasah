@@ -7,6 +7,8 @@
 	$: classData = data.classData as any;
 	$: schedules = (data.schedules || []) as any[];
 
+	let orientation: 'portrait' | 'landscape' = 'portrait';
+
 	function formatDate(dateStr: string | null) {
 		if (!dateStr) return '-';
 		const date = parseDate(dateStr);
@@ -81,6 +83,14 @@
 
 <svelte:head>
 	<title>Cetak Jadwal Ujian - {examType.name}</title>
+	<style>
+		@media print {
+			@page {
+				size: {orientation === 'landscape' ? 'A4 landscape' : 'A4 portrait'};
+				margin: 1cm;
+			}
+		}
+	</style>
 </svelte:head>
 
 <style>
@@ -91,10 +101,6 @@
 		font-feature-settings: "lnum" 1, "tnum" 1 !important;
 	}
 	@media print {
-		@page {
-			size: A4 portrait;
-			margin: 1cm;
-		}
 		:global(body) {
 			margin: 0;
 			padding: 0;
@@ -110,8 +116,30 @@
 
 <!-- Control Bar -->
 <div class="no-print p-4 bg-slate-800 text-white border-b border-slate-700 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-md">
-	<div class="text-xs text-slate-300">
-		Gunakan kertas <strong>A4</strong> saat mencetak jadwal ujian.
+	<div class="flex items-center gap-3">
+		<span class="text-xs text-slate-300 font-medium">Orientasi Cetak:</span>
+		<div class="inline-flex rounded-lg bg-slate-700 p-1 border border-slate-600">
+			<button 
+				type="button" 
+				class="px-3 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-1.5 {orientation === 'portrait' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-300 hover:text-white'}"
+				on:click={() => orientation = 'portrait'}
+			>
+				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<rect x="5" y="3" width="14" height="18" rx="2" />
+				</svg>
+				Potrait (Tegak)
+			</button>
+			<button 
+				type="button" 
+				class="px-3 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-1.5 {orientation === 'landscape' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-300 hover:text-white'}"
+				on:click={() => orientation = 'landscape'}
+			>
+				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<rect x="3" y="5" width="18" height="14" rx="2" />
+				</svg>
+				Lansekap (Mendatar)
+			</button>
+		</div>
 	</div>
 
 	<div class="flex items-center gap-2">
@@ -125,7 +153,7 @@
 	</div>
 </div>
 
-<div class="p-4 md:p-8 print:p-0 print:m-0 max-w-[21cm] mx-auto bg-white" style="font-family: 'Times New Roman', Times, Arial, serif; font-variant-numeric: lining-nums tabular-nums;">
+<div class="p-4 md:p-8 print:p-0 print:m-0 mx-auto bg-white transition-all {orientation === 'landscape' ? 'max-w-[29.7cm]' : 'max-w-[21cm]'}" style="font-family: 'Times New Roman', Times, Arial, serif; font-variant-numeric: lining-nums tabular-nums;">
 	<!-- Kop Surat -->
 	<div class="flex items-center justify-between gap-4 pb-2 relative">
 		<img 
@@ -175,23 +203,23 @@
 		{/if}
 	</div>
 
-	<!-- Tabel Jadwal Ujian (Sama seperti dashboard siswa, tanpa RUANG, SESI, dan STATUS) -->
+	<!-- Tabel Jadwal Ujian -->
 	{#if days.length === 0}
 		<div class="p-12 text-center text-slate-500 italic border border-black">
 			Belum ada jadwal ujian untuk ditampilkan.
 		</div>
 	{:else}
 		<div class="w-full">
-			<table class="w-full text-sm border-collapse border-2 border-black">
+			<table class="w-full border-collapse border-2 border-black whitespace-nowrap {orientation === 'portrait' ? 'text-xs' : 'text-sm'}">
 				<thead>
 					<tr class="bg-gray-100 text-black font-bold">
-						<th class="border-2 border-black px-2 py-2 text-center uppercase w-10">NO</th>
-						<th class="border-2 border-black px-3 py-2 text-center uppercase w-44 whitespace-nowrap">HARI, TANGGAL</th>
-						<th class="border-2 border-black px-2 py-2 text-center uppercase w-16 whitespace-nowrap">JAM KE</th>
-						<th class="border-2 border-black px-3 py-2 text-center uppercase w-32 whitespace-nowrap">WAKTU</th>
-						<th class="border-2 border-black px-3 py-2 text-center uppercase">MATA PELAJARAN</th>
-						<th class="border-2 border-black px-2 py-2 text-center uppercase w-24 whitespace-nowrap">PENGAWAS</th>
-						<th class="border-2 border-black px-3 py-2 text-left uppercase w-48">DAFTAR PENGAWAS</th>
+						<th class="border-2 border-black {orientation === 'portrait' ? 'px-1.5 py-1.5 w-8' : 'px-2 py-2 w-12'} text-center uppercase">NO</th>
+						<th class="border-2 border-black {orientation === 'portrait' ? 'px-2 py-1.5 w-36' : 'px-3 py-2 w-48'} text-center uppercase">HARI, TANGGAL</th>
+						<th class="border-2 border-black {orientation === 'portrait' ? 'px-1.5 py-1.5 w-12' : 'px-2 py-2 w-16'} text-center uppercase">JAM KE</th>
+						<th class="border-2 border-black {orientation === 'portrait' ? 'px-2 py-1.5 w-28' : 'px-3 py-2 w-36'} text-center uppercase">WAKTU</th>
+						<th class="border-2 border-black {orientation === 'portrait' ? 'px-2 py-1.5' : 'px-4 py-2'} text-center uppercase">MATA PELAJARAN</th>
+						<th class="border-2 border-black {orientation === 'portrait' ? 'px-1.5 py-1.5 w-20' : 'px-2 py-2 w-28'} text-center uppercase">PENGAWAS</th>
+						<th class="border-2 border-black {orientation === 'portrait' ? 'px-2 py-1.5 w-44' : 'px-3 py-2 w-56'} text-left uppercase">DAFTAR PENGAWAS</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -199,19 +227,19 @@
 						{#each group.exams as exam, eIdx}
 							<tr class="bg-white text-black">
 								{#if eIdx === 0}
-									<td class="border-2 border-black px-2 py-2 text-center align-middle" rowspan={group.exams.length}>{gIdx + 1}</td>
-									<td class="border-2 border-black px-3 py-2 text-center align-middle font-medium whitespace-nowrap" rowspan={group.exams.length}>{group.dateStr}</td>
+									<td class="border-2 border-black {orientation === 'portrait' ? 'px-1.5 py-1.5' : 'px-2 py-2'} text-center align-middle" rowspan={group.exams.length}>{gIdx + 1}</td>
+									<td class="border-2 border-black {orientation === 'portrait' ? 'px-2 py-1.5' : 'px-3 py-2'} text-center align-middle font-medium" rowspan={group.exams.length}>{group.dateStr}</td>
 								{/if}
-								<td class="border-2 border-black px-2 py-2 text-center">{eIdx + 1}</td>
-								<td class="border-2 border-black px-3 py-2 text-center tracking-wider whitespace-nowrap">
+								<td class="border-2 border-black {orientation === 'portrait' ? 'px-1.5 py-1.5' : 'px-2 py-2'} text-center">{eIdx + 1}</td>
+								<td class="border-2 border-black {orientation === 'portrait' ? 'px-2 py-1.5' : 'px-3 py-2'} text-center tracking-wider">
 									{formatOnlyTime(exam.start_time || '')} - {formatOnlyTime(exam.end_time || '')}
 								</td>
-								<td class="border-2 border-black px-3 py-2 text-center font-medium leading-snug">{exam.subject_name || exam.title || ''}</td>
-								<td class="border-2 border-black px-2 py-2 text-center font-semibold whitespace-nowrap">
+								<td class="border-2 border-black {orientation === 'portrait' ? 'px-2 py-1.5' : 'px-4 py-2'} text-center font-medium">{exam.subject_name || exam.title || ''}</td>
+								<td class="border-2 border-black {orientation === 'portrait' ? 'px-1.5 py-1.5' : 'px-2 py-2'} text-center font-semibold">
 									{getProctorNumbers(exam.proctor_names || '', proctorMap)}
 								</td>
 								{#if gIdx === 0 && eIdx === 0}
-									<td class="border-2 border-black px-4 py-2 align-top bg-white" rowspan={totalExams}>
+									<td class="border-2 border-black {orientation === 'portrait' ? 'px-2 py-1.5' : 'px-4 py-2'} align-top bg-white" rowspan={totalExams}>
 										<div class="space-y-1 text-xs">
 											{#each Array.from(proctorMap.entries()) as [name, num]}
 												<div class="leading-tight">
