@@ -238,7 +238,7 @@
 						<th class="border-2 border-black {orientation === 'portrait' ? 'px-2 py-1.5 w-28' : 'px-3 py-2 w-36'} text-center uppercase">WAKTU</th>
 						<th class="border-2 border-black {orientation === 'portrait' ? 'px-2 py-1.5' : 'px-4 py-2'} text-center uppercase">MATA PELAJARAN</th>
 						<th class="border-2 border-black {orientation === 'portrait' ? 'px-1.5 py-1.5 w-20' : 'px-2 py-2 w-28'} text-center uppercase">PENGAWAS</th>
-						<th class="border-2 border-black {orientation === 'portrait' ? 'px-2 py-1.5 w-36 whitespace-normal' : 'px-3 py-2 w-48 whitespace-nowrap'} text-left uppercase">DAFTAR PENGAWAS</th>
+						<th class="border-2 border-black {orientation === 'portrait' ? 'px-2 py-1.5 w-36' : 'px-3 py-2 w-48'} text-left uppercase whitespace-nowrap">DAFTAR PENGAWAS</th>
 					</tr>
 				</thead>
 				<tbody>
