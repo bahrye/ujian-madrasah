@@ -141,6 +141,12 @@ export const actions: Actions = {
 						}
 					}
 					if (sessionBatch.length > 0) await db.batch(sessionBatch);
+				} else {
+					await db.prepare(`
+						UPDATE users 
+						SET session_number = 1, updated_at = datetime('now')
+						WHERE id IN (SELECT student_id FROM exam_participants WHERE exam_id = ?)
+					`).bind(newExamId).run();
 				}
 			}
 
@@ -215,6 +221,12 @@ export const actions: Actions = {
 					}
 				}
 				if (sessionBatch.length > 0) await db.batch(sessionBatch);
+			} else {
+				await db.prepare(`
+					UPDATE users 
+					SET session_number = 1, updated_at = datetime('now')
+					WHERE id IN (SELECT student_id FROM exam_participants WHERE exam_id = ?)
+				`).bind(parsedId).run();
 			}
 
 			return { success: 'Ujian berhasil diperbarui.' };

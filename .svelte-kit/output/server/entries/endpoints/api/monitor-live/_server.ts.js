@@ -36,7 +36,11 @@ const GET = async ({ url, platform, locals }) => {
 			WHERE epart.exam_id = ? AND e.school_id = ?
 		`;
     const bindings = [examId, locals.user.school_id];
-    if (!isNaN(sessionFilter)) {
+    const dbSessions = await db.prepare(`
+			SELECT session_number FROM exam_sessions WHERE exam_id = ?
+		`).bind(examId).all();
+    const availableSessions = (dbSessions.results || []).map((s) => s.session_number);
+    if (availableSessions.length > 0 && !isNaN(sessionFilter) && availableSessions.includes(sessionFilter)) {
       query += ` AND COALESCE(u.session_number, 1) = ?`;
       bindings.push(sessionFilter);
     }

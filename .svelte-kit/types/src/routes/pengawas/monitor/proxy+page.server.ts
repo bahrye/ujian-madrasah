@@ -53,7 +53,7 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 			if (dbSessions.results.length > 0) {
 				availableSessions = dbSessions.results.map(s => s.session_number);
 			} else {
-				availableSessions = [1];
+				availableSessions = [];
 			}
 
 			if (allowedProctorSessions && allowedProctorSessions.length > 0) {
@@ -63,12 +63,14 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 
 		// Determine active session filter
 		let activeSessionFilter: number | null = null;
-		if (!isNaN(sessionFilter) && availableSessions.includes(sessionFilter)) {
-			activeSessionFilter = sessionFilter;
-		} else if (allowedProctorSessions && allowedProctorSessions.length === 1) {
-			activeSessionFilter = allowedProctorSessions[0];
-		} else if (availableSessions.length === 1) {
-			activeSessionFilter = availableSessions[0];
+		if (availableSessions.length > 0) {
+			if (!isNaN(sessionFilter) && availableSessions.includes(sessionFilter)) {
+				activeSessionFilter = sessionFilter;
+			} else if (allowedProctorSessions && allowedProctorSessions.length === 1) {
+				activeSessionFilter = allowedProctorSessions[0];
+			} else if (availableSessions.length === 1) {
+				activeSessionFilter = availableSessions[0];
+			}
 		}
 
 		let attempts: any[] = [];

@@ -35,7 +35,7 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 			if (dbSessions.results.length > 0) {
 				availableSessions = dbSessions.results.map(s => s.session_number);
 			} else {
-				availableSessions = [1];
+				availableSessions = [];
 			}
 		}
 
@@ -70,7 +70,7 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 
 			const bindings: any[] = [examFilter, locals.user.school_id];
 
-			if (!isNaN(sessionFilter) && availableSessions.includes(sessionFilter)) {
+			if (availableSessions.length > 0 && !isNaN(sessionFilter) && availableSessions.includes(sessionFilter)) {
 				query += ` AND COALESCE(u.session_number, 1) = ?`;
 				bindings.push(sessionFilter);
 			}

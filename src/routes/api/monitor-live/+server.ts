@@ -43,7 +43,13 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 
 		const bindings: any[] = [examId, locals.user.school_id];
 
-		if (!isNaN(sessionFilter)) {
+		const dbSessions = await db.prepare(`
+			SELECT session_number FROM exam_sessions WHERE exam_id = ?
+		`).bind(examId).all<{ session_number: number }>();
+
+		const availableSessions = (dbSessions.results || []).map(s => s.session_number);
+
+		if (availableSessions.length > 0 && !isNaN(sessionFilter) && availableSessions.includes(sessionFilter)) {
 			query += ` AND COALESCE(u.session_number, 1) = ?`;
 			bindings.push(sessionFilter);
 		}
