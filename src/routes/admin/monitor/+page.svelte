@@ -26,20 +26,57 @@
 
 	let attemptsMap = new Map<string | number, number>();
 
+	let audioCtx: AudioContext | null = null;
+
+	function enableAudio() {
+		if (typeof window === 'undefined') return;
+		if (!audioCtx) {
+			const AudioCtxClass = window.AudioContext || (window as any).webkitAudioContext;
+			if (AudioCtxClass) {
+				audioCtx = new AudioCtxClass();
+			}
+		}
+		if (audioCtx && audioCtx.state === 'suspended') {
+			audioCtx.resume();
+		}
+	}
+
 	function playViolationBeep() {
 		try {
-			const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-			const osc = ctx.createOscillator();
-			const gain = ctx.createGain();
-			osc.type = 'sine';
-			osc.frequency.setValueAtTime(880, ctx.currentTime);
-			gain.gain.setValueAtTime(0.15, ctx.currentTime);
-			gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-			osc.connect(gain);
-			gain.connect(ctx.destination);
-			osc.start();
-			osc.stop(ctx.currentTime + 0.4);
-		} catch (e) {}
+			enableAudio();
+			if (!audioCtx) return;
+			if (audioCtx.state === 'suspended') {
+				audioCtx.resume();
+			}
+
+			const now = audioCtx.currentTime;
+
+			// Tone 1 (880Hz)
+			const osc1 = audioCtx.createOscillator();
+			const gain1 = audioCtx.createGain();
+			osc1.type = 'sine';
+			osc1.frequency.setValueAtTime(880, now);
+			gain1.gain.setValueAtTime(0.3, now);
+			gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+			osc1.connect(gain1);
+			gain1.connect(audioCtx.destination);
+			osc1.start(now);
+			osc1.stop(now + 0.2);
+
+			// Tone 2 (1174Hz)
+			const osc2 = audioCtx.createOscillator();
+			const gain2 = audioCtx.createGain();
+			osc2.type = 'sine';
+			osc2.frequency.setValueAtTime(1174, now + 0.15);
+			gain2.gain.setValueAtTime(0.3, now + 0.15);
+			gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+			osc2.connect(gain2);
+			gain2.connect(audioCtx.destination);
+			osc2.start(now + 0.15);
+			osc2.stop(now + 0.4);
+		} catch (e) {
+			console.warn('Audio play error:', e);
+		}
 	}
 
 	async function pollLiveStatus() {
@@ -70,6 +107,16 @@
 	}
 
 	onMount(() => {
+		const handleUserInteraction = () => {
+			enableAudio();
+			window.removeEventListener('click', handleUserInteraction);
+			window.removeEventListener('keydown', handleUserInteraction);
+			window.removeEventListener('touchstart', handleUserInteraction);
+		};
+		window.addEventListener('click', handleUserInteraction);
+		window.addEventListener('keydown', handleUserInteraction);
+		window.addEventListener('touchstart', handleUserInteraction);
+
 		if (attempts && Array.isArray(attempts)) {
 			attempts.forEach(a => {
 				const key = a.attempt_id || a.student_id;
@@ -91,9 +138,23 @@
 <svelte:head><title>Monitoring Ujian — Ujian Online Madrasah</title></svelte:head>
 
 <div class="space-y-6 animate-in">
-	<div>
-		<h1 class="text-2xl font-bold text-slate-800">Monitoring Ujian</h1>
-		<p class="text-sm text-slate-500 mt-1">Pantau seluruh siswa yang terdaftar dalam ujian</p>
+	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+		<div>
+			<h1 class="text-2xl font-bold text-slate-800">Monitoring Ujian</h1>
+			<p class="text-sm text-slate-500 mt-1">Pantau seluruh siswa yang terdaftar dalam ujian</p>
+		</div>
+		<div>
+			<button 
+				type="button" 
+				class="btn-sm btn-ghost border border-slate-200 bg-white hover:bg-slate-50 flex items-center gap-1.5 text-xs text-slate-700 font-medium shadow-sm transition-colors"
+				on:click={() => { enableAudio(); playViolationBeep(); toasts.info('🔊 Suara notifikasi aktif!'); }}
+			>
+				<svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+				</svg>
+				Tes Suara Peringatan
+			</button>
+		</div>
 	</div>
 
 	<!-- Filter -->
