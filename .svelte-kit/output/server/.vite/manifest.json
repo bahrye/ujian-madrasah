@@ -1546,7 +1546,8 @@
       "_root.js",
       "_state.svelte.js",
       "_constants.js",
-      "_toast.js"
+      "_toast.js",
+      "_html.js"
     ]
   },
   "src/routes/guru/remedial/+page.server.ts": {

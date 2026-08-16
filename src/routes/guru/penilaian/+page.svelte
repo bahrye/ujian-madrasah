@@ -11,6 +11,17 @@
 	$: if (form?.success) toasts.success(form.success);
 	$: if (form?.error) toasts.error(form.error);
 	$: answers = data.answers as any[];
+
+	function parseAnswerKey(jsonStr: string | null) {
+		if (!jsonStr) return null;
+		try {
+			const parsed = JSON.parse(jsonStr);
+			if (typeof parsed === 'string') return parsed;
+			return JSON.stringify(parsed);
+		} catch (e) {
+			return jsonStr;
+		}
+	}
 </script>
 
 <svelte:head><title>Penilaian — Ujian Online Madrasah</title></svelte:head>
@@ -80,23 +91,54 @@
 					<div class="flex flex-wrap items-center gap-2 mb-3">
 						<span class="badge-info">{a.exam_title}</span>
 						<span class="badge-primary">{QUESTION_TYPE_LABELS[a.type]}</span>
+						{#if a.question_number}
+							<span class="badge bg-slate-100 text-slate-700">Soal #{a.question_number}</span>
+						{/if}
 						<span class="text-sm font-semibold text-slate-700">{a.student_name}</span>
 					</div>
 
-					<p class="text-sm font-medium text-slate-700 mb-2">{a.question_text}</p>
+					<!-- Question Content (Render HTML) -->
+					<div class="prose prose-sm max-w-none text-slate-800 mb-3 bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+						{@html a.question_text || ''}
+					</div>
 
-					{#if a.correct_answer_json && (a.type === 'isian_singkat' || a.type === 'essay')}
-						<div class="bg-emerald-50 border border-emerald-100 rounded-lg p-3 mb-3">
-							<p class="text-xs font-semibold text-emerald-700 mb-1">Kunci Jawaban / Penjelasan:</p>
-							<p class="text-sm text-emerald-900 whitespace-pre-wrap">{JSON.parse(a.correct_answer_json)}</p>
+					<!-- Media Attached to Question -->
+					{#if a.media_url}
+						<div class="mb-3">
+							{#if a.media_type === 'image' || (!a.media_type && (a.media_url.endsWith('.png') || a.media_url.endsWith('.jpg') || a.media_url.endsWith('.jpeg') || a.media_url.endsWith('.webp') || a.media_url.endsWith('.gif')))}
+								<img src={a.media_url} alt="Media Soal" class="max-h-64 rounded-lg border border-slate-200 object-contain my-1" />
+							{:else if a.media_type === 'audio' || (!a.media_type && (a.media_url.endsWith('.mp3') || a.media_url.endsWith('.wav') || a.media_url.endsWith('.ogg')))}
+								<audio controls src={a.media_url} class="w-full max-w-md my-1"></audio>
+							{:else if a.media_type === 'video' || (!a.media_type && (a.media_url.endsWith('.mp4') || a.media_url.endsWith('.webm')))}
+								<video controls src={a.media_url} class="max-h-64 rounded-lg border border-slate-200 my-1"></video>
+							{/if}
 						</div>
 					{/if}
 
-					<div class="bg-slate-50 rounded-xl p-3 mb-3">
+					<!-- Kunci Jawaban / Penjelasan -->
+					{#if a.correct_answer_json && (a.type === 'isian_singkat' || a.type === 'essay')}
+						{@const keyText = parseAnswerKey(a.correct_answer_json)}
+						<div class="bg-emerald-50 border border-emerald-100 rounded-xl p-3.5 mb-3">
+							<p class="text-xs font-semibold text-emerald-700 mb-1">Kunci Jawaban / Penjelasan:</p>
+							<div class="prose prose-sm max-w-none text-emerald-900">
+								{@html keyText || ''}
+							</div>
+						</div>
+					{/if}
+
+					<!-- Jawaban Siswa -->
+					<div class="bg-slate-50 rounded-xl p-3.5 mb-3 border border-slate-100">
 						<p class="text-xs font-semibold text-slate-500 mb-1">Jawaban Siswa:</p>
-						<p class="text-sm text-slate-800 whitespace-pre-wrap">{a.answer_given || '(Tidak dijawab)'}</p>
+						<div class="prose prose-sm max-w-none text-slate-800">
+							{#if a.answer_given}
+								{@html a.answer_given}
+							{:else}
+								<span class="italic text-slate-400">(Tidak dijawab)</span>
+							{/if}
+						</div>
 					</div>
 
+					<!-- Form Penilaian -->
 					<form method="POST" action="?/grade" use:enhance class="flex items-center gap-3">
 						<input type="hidden" name="answer_id" value={a.answer_id} />
 						<input type="hidden" name="max_points" value={a.points} />

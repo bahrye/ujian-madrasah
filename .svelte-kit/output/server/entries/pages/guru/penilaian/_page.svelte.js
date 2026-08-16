@@ -8,11 +8,22 @@ import "../../../../chunks/state.svelte.js";
 import { Q as QUESTION_TYPE_LABELS } from "../../../../chunks/constants.js";
 import { t as toasts } from "../../../../chunks/toast.js";
 import "katex/dist/contrib/auto-render.mjs";
+import { h as html } from "../../../../chunks/html.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let answers;
     let data = $$props["data"];
     let form = $$props["form"];
+    function parseAnswerKey(jsonStr) {
+      if (!jsonStr) return null;
+      try {
+        const parsed = JSON.parse(jsonStr);
+        if (typeof parsed === "string") return parsed;
+        return JSON.stringify(parsed);
+      } catch (e) {
+        return jsonStr;
+      }
+    }
     if (form?.success) toasts.success(form.success);
     if (form?.error) toasts.error(form.error);
     answers = data.answers;
@@ -74,14 +85,50 @@ function _page($$renderer, $$props) {
       const each_array_2 = ensure_array_like(answers);
       for (let $$index_2 = 0, $$length = each_array_2.length; $$index_2 < $$length; $$index_2++) {
         let a = each_array_2[$$index_2];
-        $$renderer2.push(`<div${attr_class(`card p-5 ${a.score_given != null ? "border-l-4 border-emerald-400" : "border-l-4 border-amber-400"}`)}><div class="flex flex-wrap items-center gap-2 mb-3"><span class="badge-info">${escape_html(a.exam_title)}</span> <span class="badge-primary">${escape_html(QUESTION_TYPE_LABELS[a.type])}</span> <span class="text-sm font-semibold text-slate-700">${escape_html(a.student_name)}</span></div> <p class="text-sm font-medium text-slate-700 mb-2">${escape_html(a.question_text)}</p> `);
-        if (a.correct_answer_json && (a.type === "isian_singkat" || a.type === "essay")) {
+        $$renderer2.push(`<div${attr_class(`card p-5 ${a.score_given != null ? "border-l-4 border-emerald-400" : "border-l-4 border-amber-400"}`)}><div class="flex flex-wrap items-center gap-2 mb-3"><span class="badge-info">${escape_html(a.exam_title)}</span> <span class="badge-primary">${escape_html(QUESTION_TYPE_LABELS[a.type])}</span> `);
+        if (a.question_number) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<div class="bg-emerald-50 border border-emerald-100 rounded-lg p-3 mb-3"><p class="text-xs font-semibold text-emerald-700 mb-1">Kunci Jawaban / Penjelasan:</p> <p class="text-sm text-emerald-900 whitespace-pre-wrap">${escape_html(JSON.parse(a.correct_answer_json))}</p></div>`);
+          $$renderer2.push(`<span class="badge bg-slate-100 text-slate-700">Soal #${escape_html(a.question_number)}</span>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
-        $$renderer2.push(`<!--]--> <div class="bg-slate-50 rounded-xl p-3 mb-3"><p class="text-xs font-semibold text-slate-500 mb-1">Jawaban Siswa:</p> <p class="text-sm text-slate-800 whitespace-pre-wrap">${escape_html(a.answer_given || "(Tidak dijawab)")}</p></div> <form method="POST" action="?/grade" class="flex items-center gap-3"><input type="hidden" name="answer_id"${attr("value", a.answer_id)}/> <input type="hidden" name="max_points"${attr("value", a.points)}/> <label class="text-sm font-medium text-slate-600">Nilai:</label> <input name="score_given" type="number" min="0"${attr("max", a.points)} step="0.5" class="input w-24"${attr("value", a.score_given ?? "")}${attr("placeholder", `0-${stringify(a.points)}`)}/> <span class="text-xs text-slate-400">/ ${escape_html(a.points)}</span> <button type="submit" class="btn-success btn-sm">Simpan</button> `);
+        $$renderer2.push(`<!--]--> <span class="text-sm font-semibold text-slate-700">${escape_html(a.student_name)}</span></div> <div class="prose prose-sm max-w-none text-slate-800 mb-3 bg-slate-50 p-3.5 rounded-xl border border-slate-100">${html(a.question_text || "")}</div> `);
+        if (a.media_url) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<div class="mb-3">`);
+          if (a.media_type === "image" || !a.media_type && (a.media_url.endsWith(".png") || a.media_url.endsWith(".jpg") || a.media_url.endsWith(".jpeg") || a.media_url.endsWith(".webp") || a.media_url.endsWith(".gif"))) {
+            $$renderer2.push("<!--[0-->");
+            $$renderer2.push(`<img${attr("src", a.media_url)} alt="Media Soal" class="max-h-64 rounded-lg border border-slate-200 object-contain my-1"/>`);
+          } else if (a.media_type === "audio" || !a.media_type && (a.media_url.endsWith(".mp3") || a.media_url.endsWith(".wav") || a.media_url.endsWith(".ogg"))) {
+            $$renderer2.push("<!--[1-->");
+            $$renderer2.push(`<audio controls=""${attr("src", a.media_url)} class="w-full max-w-md my-1"></audio>`);
+          } else if (a.media_type === "video" || !a.media_type && (a.media_url.endsWith(".mp4") || a.media_url.endsWith(".webm"))) {
+            $$renderer2.push("<!--[2-->");
+            $$renderer2.push(`<video controls=""${attr("src", a.media_url)} class="max-h-64 rounded-lg border border-slate-200 my-1"></video>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+          }
+          $$renderer2.push(`<!--]--></div>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+        }
+        $$renderer2.push(`<!--]--> `);
+        if (a.correct_answer_json && (a.type === "isian_singkat" || a.type === "essay")) {
+          $$renderer2.push("<!--[0-->");
+          const keyText = parseAnswerKey(a.correct_answer_json);
+          $$renderer2.push(`<div class="bg-emerald-50 border border-emerald-100 rounded-xl p-3.5 mb-3"><p class="text-xs font-semibold text-emerald-700 mb-1">Kunci Jawaban / Penjelasan:</p> <div class="prose prose-sm max-w-none text-emerald-900">${html(keyText || "")}</div></div>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+        }
+        $$renderer2.push(`<!--]--> <div class="bg-slate-50 rounded-xl p-3.5 mb-3 border border-slate-100"><p class="text-xs font-semibold text-slate-500 mb-1">Jawaban Siswa:</p> <div class="prose prose-sm max-w-none text-slate-800">`);
+        if (a.answer_given) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`${html(a.answer_given)}`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<span class="italic text-slate-400">(Tidak dijawab)</span>`);
+        }
+        $$renderer2.push(`<!--]--></div></div> <form method="POST" action="?/grade" class="flex items-center gap-3"><input type="hidden" name="answer_id"${attr("value", a.answer_id)}/> <input type="hidden" name="max_points"${attr("value", a.points)}/> <label class="text-sm font-medium text-slate-600">Nilai:</label> <input name="score_given" type="number" min="0"${attr("max", a.points)} step="0.5" class="input w-24"${attr("value", a.score_given ?? "")}${attr("placeholder", `0-${stringify(a.points)}`)}/> <span class="text-xs text-slate-400">/ ${escape_html(a.points)}</span> <button type="submit" class="btn-success btn-sm">Simpan</button> `);
         if (a.score_given !== null && a.score_given !== void 0) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<span class="badge-success">✓ Sudah dinilai</span>`);
