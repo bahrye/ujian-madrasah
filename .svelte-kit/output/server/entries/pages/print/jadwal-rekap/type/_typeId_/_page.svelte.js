@@ -104,7 +104,7 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<div class="p-12 text-center text-slate-500 italic border border-black">Belum ada jadwal ujian untuk ditampilkan.</div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="w-full"><table class="w-full text-sm border-collapse border-2 border-black whitespace-nowrap"><thead><tr class="bg-gray-100 text-black font-bold"><th class="border-2 border-black px-2 py-2 text-center uppercase w-10">NO</th><th class="border-2 border-black px-3 py-2 text-center uppercase">HARI, TANGGAL</th><th class="border-2 border-black px-2 py-2 text-center uppercase w-16">JAM KE</th><th class="border-2 border-black px-3 py-2 text-center uppercase">WAKTU</th><th class="border-2 border-black px-3 py-2 text-center uppercase">MATA PELAJARAN</th><th class="border-2 border-black px-3 py-2 text-center uppercase w-24">PENGAWAS</th><th class="border-2 border-black px-3 py-2 text-left uppercase">Daftar Pengawas</th></tr></thead><tbody><!--[-->`);
+      $$renderer2.push(`<div class="w-full"><table class="w-full text-sm border-collapse border-2 border-black"><thead><tr class="bg-gray-100 text-black font-bold"><th class="border-2 border-black px-2 py-2 text-center uppercase w-10">NO</th><th class="border-2 border-black px-3 py-2 text-center uppercase w-44 whitespace-nowrap">HARI, TANGGAL</th><th class="border-2 border-black px-2 py-2 text-center uppercase w-16 whitespace-nowrap">JAM KE</th><th class="border-2 border-black px-3 py-2 text-center uppercase w-32 whitespace-nowrap">WAKTU</th><th class="border-2 border-black px-3 py-2 text-center uppercase">MATA PELAJARAN</th><th class="border-2 border-black px-2 py-2 text-center uppercase w-24 whitespace-nowrap">PENGAWAS</th><th class="border-2 border-black px-3 py-2 text-left uppercase w-48">DAFTAR PENGAWAS</th></tr></thead><tbody><!--[-->`);
       const each_array = ensure_array_like(days);
       for (let gIdx = 0, $$length = each_array.length; gIdx < $$length; gIdx++) {
         let group = each_array[gIdx];
@@ -115,18 +115,18 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<tr class="bg-white text-black">`);
           if (eIdx === 0) {
             $$renderer2.push("<!--[0-->");
-            $$renderer2.push(`<td class="border-2 border-black px-2 py-2 text-center align-middle"${attr("rowspan", group.exams.length)}>${escape_html(gIdx + 1)}</td> <td class="border-2 border-black px-3 py-2 text-center align-middle font-medium"${attr("rowspan", group.exams.length)}>${escape_html(group.dateStr)}</td>`);
+            $$renderer2.push(`<td class="border-2 border-black px-2 py-2 text-center align-middle"${attr("rowspan", group.exams.length)}>${escape_html(gIdx + 1)}</td> <td class="border-2 border-black px-3 py-2 text-center align-middle font-medium whitespace-nowrap"${attr("rowspan", group.exams.length)}>${escape_html(group.dateStr)}</td>`);
           } else {
             $$renderer2.push("<!--[-1-->");
           }
-          $$renderer2.push(`<!--]--><td class="border-2 border-black px-2 py-2 text-center">${escape_html(eIdx + 1)}</td><td class="border-2 border-black px-3 py-2 text-center tracking-wider">${escape_html(formatOnlyTime(exam.start_time || ""))} - ${escape_html(formatOnlyTime(exam.end_time || ""))}</td><td class="border-2 border-black px-3 py-2 text-center font-medium">${escape_html(exam.subject_name || exam.title || "")}</td><td class="border-2 border-black px-3 py-2 text-center font-semibold">${escape_html(getProctorNumbers(exam.proctor_names || "", proctorMap))}</td>`);
+          $$renderer2.push(`<!--]--><td class="border-2 border-black px-2 py-2 text-center">${escape_html(eIdx + 1)}</td><td class="border-2 border-black px-3 py-2 text-center tracking-wider whitespace-nowrap">${escape_html(formatOnlyTime(exam.start_time || ""))} - ${escape_html(formatOnlyTime(exam.end_time || ""))}</td><td class="border-2 border-black px-3 py-2 text-center font-medium leading-snug">${escape_html(exam.subject_name || exam.title || "")}</td><td class="border-2 border-black px-2 py-2 text-center font-semibold whitespace-nowrap">${escape_html(getProctorNumbers(exam.proctor_names || "", proctorMap))}</td>`);
           if (gIdx === 0 && eIdx === 0) {
             $$renderer2.push("<!--[0-->");
             $$renderer2.push(`<td class="border-2 border-black px-4 py-2 align-top bg-white"${attr("rowspan", totalExams)}><div class="space-y-1 text-xs"><!--[-->`);
             const each_array_2 = ensure_array_like(Array.from(proctorMap.entries()));
             for (let $$index = 0, $$length3 = each_array_2.length; $$index < $$length3; $$index++) {
               let [name, num] = each_array_2[$$index];
-              $$renderer2.push(`<div><span class="inline-block w-4 font-bold">${escape_html(num)}.</span> ${escape_html(name)}</div>`);
+              $$renderer2.push(`<div class="leading-tight"><span class="inline-block w-4 font-bold">${escape_html(num)}.</span> ${escape_html(name)}</div>`);
             }
             $$renderer2.push(`<!--]--> `);
             if (proctorMap.size === 0) {

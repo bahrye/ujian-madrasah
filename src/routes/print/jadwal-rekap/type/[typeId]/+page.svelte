@@ -182,16 +182,16 @@
 		</div>
 	{:else}
 		<div class="w-full">
-			<table class="w-full text-sm border-collapse border-2 border-black whitespace-nowrap">
+			<table class="w-full text-sm border-collapse border-2 border-black">
 				<thead>
 					<tr class="bg-gray-100 text-black font-bold">
 						<th class="border-2 border-black px-2 py-2 text-center uppercase w-10">NO</th>
-						<th class="border-2 border-black px-3 py-2 text-center uppercase">HARI, TANGGAL</th>
-						<th class="border-2 border-black px-2 py-2 text-center uppercase w-16">JAM KE</th>
-						<th class="border-2 border-black px-3 py-2 text-center uppercase">WAKTU</th>
+						<th class="border-2 border-black px-3 py-2 text-center uppercase w-44 whitespace-nowrap">HARI, TANGGAL</th>
+						<th class="border-2 border-black px-2 py-2 text-center uppercase w-16 whitespace-nowrap">JAM KE</th>
+						<th class="border-2 border-black px-3 py-2 text-center uppercase w-32 whitespace-nowrap">WAKTU</th>
 						<th class="border-2 border-black px-3 py-2 text-center uppercase">MATA PELAJARAN</th>
-						<th class="border-2 border-black px-3 py-2 text-center uppercase w-24">PENGAWAS</th>
-						<th class="border-2 border-black px-3 py-2 text-left uppercase">Daftar Pengawas</th>
+						<th class="border-2 border-black px-2 py-2 text-center uppercase w-24 whitespace-nowrap">PENGAWAS</th>
+						<th class="border-2 border-black px-3 py-2 text-left uppercase w-48">DAFTAR PENGAWAS</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -200,21 +200,21 @@
 							<tr class="bg-white text-black">
 								{#if eIdx === 0}
 									<td class="border-2 border-black px-2 py-2 text-center align-middle" rowspan={group.exams.length}>{gIdx + 1}</td>
-									<td class="border-2 border-black px-3 py-2 text-center align-middle font-medium" rowspan={group.exams.length}>{group.dateStr}</td>
+									<td class="border-2 border-black px-3 py-2 text-center align-middle font-medium whitespace-nowrap" rowspan={group.exams.length}>{group.dateStr}</td>
 								{/if}
 								<td class="border-2 border-black px-2 py-2 text-center">{eIdx + 1}</td>
-								<td class="border-2 border-black px-3 py-2 text-center tracking-wider">
+								<td class="border-2 border-black px-3 py-2 text-center tracking-wider whitespace-nowrap">
 									{formatOnlyTime(exam.start_time || '')} - {formatOnlyTime(exam.end_time || '')}
 								</td>
-								<td class="border-2 border-black px-3 py-2 text-center font-medium">{exam.subject_name || exam.title || ''}</td>
-								<td class="border-2 border-black px-3 py-2 text-center font-semibold">
+								<td class="border-2 border-black px-3 py-2 text-center font-medium leading-snug">{exam.subject_name || exam.title || ''}</td>
+								<td class="border-2 border-black px-2 py-2 text-center font-semibold whitespace-nowrap">
 									{getProctorNumbers(exam.proctor_names || '', proctorMap)}
 								</td>
 								{#if gIdx === 0 && eIdx === 0}
 									<td class="border-2 border-black px-4 py-2 align-top bg-white" rowspan={totalExams}>
 										<div class="space-y-1 text-xs">
 											{#each Array.from(proctorMap.entries()) as [name, num]}
-												<div>
+												<div class="leading-tight">
 													<span class="inline-block w-4 font-bold">{num}.</span> {name}
 												</div>
 											{/each}
