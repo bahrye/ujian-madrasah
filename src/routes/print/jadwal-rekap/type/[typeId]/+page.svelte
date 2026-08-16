@@ -100,6 +100,25 @@
 		-webkit-font-feature-settings: "lnum" 1, "tnum" 1 !important;
 		font-feature-settings: "lnum" 1, "tnum" 1 !important;
 	}
+
+	@page page-landscape {
+		size: A4 landscape;
+		margin: 1cm;
+	}
+
+	@page page-portrait {
+		size: A4 portrait;
+		margin: 1cm;
+	}
+
+	.mode-landscape {
+		page: page-landscape;
+	}
+
+	.mode-portrait {
+		page: page-portrait;
+	}
+
 	@media print {
 		:global(body) {
 			margin: 0;
@@ -153,7 +172,7 @@
 	</div>
 </div>
 
-<div class="p-4 md:p-8 print:p-0 print:m-0 mx-auto bg-white transition-all {orientation === 'landscape' ? 'max-w-[29.7cm]' : 'max-w-[21cm]'}" style="font-family: 'Times New Roman', Times, Arial, serif; font-variant-numeric: lining-nums tabular-nums;">
+<div class="p-4 md:p-8 print:p-0 print:m-0 mx-auto bg-white transition-all {orientation === 'landscape' ? 'max-w-[29.7cm] mode-landscape' : 'max-w-[21cm] mode-portrait'}" style="font-family: 'Times New Roman', Times, Arial, serif; font-variant-numeric: lining-nums tabular-nums;">
 	<!-- Kop Surat -->
 	<div class="flex items-center justify-between gap-4 pb-2 relative">
 		<img 
@@ -219,7 +238,7 @@
 						<th class="border-2 border-black {orientation === 'portrait' ? 'px-2 py-1.5 w-28' : 'px-3 py-2 w-36'} text-center uppercase">WAKTU</th>
 						<th class="border-2 border-black {orientation === 'portrait' ? 'px-2 py-1.5' : 'px-4 py-2'} text-center uppercase">MATA PELAJARAN</th>
 						<th class="border-2 border-black {orientation === 'portrait' ? 'px-1.5 py-1.5 w-20' : 'px-2 py-2 w-28'} text-center uppercase">PENGAWAS</th>
-						<th class="border-2 border-black {orientation === 'portrait' ? 'px-2 py-1.5 w-44' : 'px-3 py-2 w-56'} text-left uppercase">DAFTAR PENGAWAS</th>
+						<th class="border-2 border-black {orientation === 'portrait' ? 'px-2 py-1.5 w-36 whitespace-normal' : 'px-3 py-2 w-48 whitespace-nowrap'} text-left uppercase">DAFTAR PENGAWAS</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -239,11 +258,12 @@
 									{getProctorNumbers(exam.proctor_names || '', proctorMap)}
 								</td>
 								{#if gIdx === 0 && eIdx === 0}
-									<td class="border-2 border-black {orientation === 'portrait' ? 'px-2 py-1.5' : 'px-4 py-2'} align-top bg-white" rowspan={totalExams}>
-										<div class="space-y-1 text-xs">
+									<td class="border-2 border-black {orientation === 'portrait' ? 'px-2 py-1.5 whitespace-normal' : 'px-4 py-2 whitespace-nowrap'} align-top bg-white" rowspan={totalExams}>
+										<div class="space-y-1 text-xs {orientation === 'portrait' ? 'whitespace-normal max-w-[160px] sm:max-w-[200px]' : 'whitespace-nowrap'}">
 											{#each Array.from(proctorMap.entries()) as [name, num]}
-												<div class="leading-tight">
-													<span class="inline-block w-4 font-bold">{num}.</span> {name}
+												<div class="leading-tight flex items-start gap-1">
+													<span class="font-bold shrink-0">{num}.</span>
+													<span class="font-normal {orientation === 'portrait' ? 'whitespace-normal break-words' : 'whitespace-nowrap'}">{name}</span>
 												</div>
 											{/each}
 											{#if proctorMap.size === 0}
