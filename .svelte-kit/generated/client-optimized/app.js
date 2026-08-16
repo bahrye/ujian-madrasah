@@ -83,7 +83,8 @@ export const nodes = [
 	() => import('./nodes/71'),
 	() => import('./nodes/72'),
 	() => import('./nodes/73'),
-	() => import('./nodes/74')
+	() => import('./nodes/74'),
+	() => import('./nodes/75')
 ];
 
 export const server_loads = [0,2,3,4,5,6,7];
@@ -136,26 +137,27 @@ export const dictionary = {
 		"/pengawas/tokens": [~52,[4]],
 		"/print/berita-acara/type/[typeId]": [~53,[5]],
 		"/print/berita-acara/[exam_id]": [~54,[5]],
+		"/print/jadwal-rekap/type/[typeId]": [~56,[5]],
 		"/print/jadwal/type/[typeId]": [~55,[5]],
-		"/print/kartu/type/[typeId]": [~56,[5]],
-		"/print/kartu/[exam_id]": [~57,[5]],
-		"/print/kehadiran/type/[typeId]": [~58,[5]],
-		"/print/kehadiran/[exam_id]": [~59,[5]],
-		"/print/results/[attemptId]": [~60,[5]],
-		"/siswa": [~61,[6]],
-		"/siswa/hasil-ujian": [~62,[6]],
-		"/siswa/jadwal": [~63,[6]],
-		"/siswa/papan-peringkat": [~64,[6]],
-		"/siswa/papan-peringkat/type/[typeId]": [~65,[6]],
-		"/siswa/papan-peringkat/type/[typeId]/exams": [~66,[6]],
-		"/siswa/papan-peringkat/[examId]": [~67,[6]],
-		"/siswa/tata-tertib": [68,[6]],
-		"/siswa/ujian": [~69,[6]],
-		"/siswa/ujian/[attemptId]": [~70],
-		"/superadmin": [~71,[7]],
-		"/superadmin/accounts": [~72,[7]],
-		"/superadmin/admins": [~73,[7]],
-		"/superadmin/schools": [~74,[7]]
+		"/print/kartu/type/[typeId]": [~57,[5]],
+		"/print/kartu/[exam_id]": [~58,[5]],
+		"/print/kehadiran/type/[typeId]": [~59,[5]],
+		"/print/kehadiran/[exam_id]": [~60,[5]],
+		"/print/results/[attemptId]": [~61,[5]],
+		"/siswa": [~62,[6]],
+		"/siswa/hasil-ujian": [~63,[6]],
+		"/siswa/jadwal": [~64,[6]],
+		"/siswa/papan-peringkat": [~65,[6]],
+		"/siswa/papan-peringkat/type/[typeId]": [~66,[6]],
+		"/siswa/papan-peringkat/type/[typeId]/exams": [~67,[6]],
+		"/siswa/papan-peringkat/[examId]": [~68,[6]],
+		"/siswa/tata-tertib": [69,[6]],
+		"/siswa/ujian": [~70,[6]],
+		"/siswa/ujian/[attemptId]": [~71],
+		"/superadmin": [~72,[7]],
+		"/superadmin/accounts": [~73,[7]],
+		"/superadmin/admins": [~74,[7]],
+		"/superadmin/schools": [~75,[7]]
 	};
 
 export const hooks = {

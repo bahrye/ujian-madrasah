@@ -162,6 +162,12 @@
 				<div class="mt-auto flex items-center gap-2 pt-3 border-t border-slate-100">
 					<a href="/admin/exams/type/{type.id}" class="btn-sm btn-outline flex-1 text-center">Lihat Ujian</a>
 					
+					<a href="/print/jadwal-rekap/type/{type.id}" target="_blank" class="btn-sm btn-ghost text-amber-600 hover:text-amber-800 hover:bg-amber-50" title="Cetak Jadwal Ujian">
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+						</svg>
+					</a>
+
 					<!-- Tombol Peserta -->
 					<button class="btn-sm btn-ghost text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50" on:click={() => openParticipantsModal(type)} title="Kelola Peserta Default">
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">

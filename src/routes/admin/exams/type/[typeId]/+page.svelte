@@ -24,6 +24,12 @@
 				<p class="text-sm text-slate-500 mt-1">Daftar kelas yang terdaftar pada tipe ujian ini</p>
 			</div>
 		</div>
+		<a href="/print/jadwal-rekap/type/{data.examType.id}" target="_blank" class="btn-outline text-indigo-600 border-indigo-200 hover:bg-indigo-50 flex items-center justify-center gap-2">
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+			</svg>
+			Cetak Jadwal Ujian
+		</a>
 	</div>
 
 	<!-- Class Cards -->

@@ -475,6 +475,10 @@
 					<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" /></svg>
 					Cetak Kartu Login Peserta
 				</a>
+				<a href="/print/jadwal-rekap/type/{data.examType.id}?class_id={data.classData.id}" target="_blank" class="btn-outline flex justify-center w-full text-indigo-700 border-indigo-200 hover:bg-indigo-50 font-semibold" on:click={() => showPrintModal = false}>
+					<svg class="w-4 h-4 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+					Cetak Jadwal Ujian
+				</a>
 				<a href="/print/jadwal/type/{data.examType.id}?class_id={data.classData.id}" target="_blank" class="btn-outline flex justify-center w-full" on:click={() => showPrintModal = false}>
 					<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
 					Cetak Jadwal Ujian Peserta

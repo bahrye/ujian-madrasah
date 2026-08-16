@@ -285,6 +285,11 @@
 		"src/routes/print/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/print/jadwal-rekap/type/[typeId]": [
+		"src/routes/print/jadwal-rekap/type/[typeId]/+page.server.ts",
+		"src/routes/print/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/print/jadwal/type/[typeId]": [
 		"src/routes/print/jadwal/type/[typeId]/+page.server.ts",
 		"src/routes/print/+layout.server.ts",

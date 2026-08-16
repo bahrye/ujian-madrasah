@@ -71,6 +71,10 @@
 			</button>
 			<div class="absolute right-0 mt-1 w-56 bg-white border border-slate-100 rounded-xl shadow-lg shadow-slate-200/50 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20">
 
+				<a href="/print/jadwal-rekap/type/{exam.exam_type_id}{exam.class_id ? `?class_id=${exam.class_id}` : ''}" target="_blank" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
+					<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+					Cetak Jadwal Ujian
+				</a>
 				<a href="/print/kehadiran/{exam.id}" target="_blank" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
 					<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
 					Cetak Daftar Hadir
