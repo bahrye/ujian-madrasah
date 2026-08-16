@@ -3,29 +3,7 @@ import type { PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { error } from '@sveltejs/kit';
 
-export const load = async ({ platform, params, locals, url }: Parameters<PageServerLoad>[0]) => {
-	const db = getDB(platform);
-	const typeIdStr = params.typeId;
-	const typeId = parseInt(typeIdStr, 10);
-	
-	if (isNaN(typeId)) throw error(400, 'ID Tipe Ujian tidak valid');
-
-	// 1. Get school info (for Kop Surat)
-	const school = await db.prepare('SELECT * FROM schools WHERE id = ?').bind(locals.user!.school_id).first();
-	
-	// 2. Get exam type info
-	const examType = await db.prepare('SELECT * FROM exam_types WHERE id = ? AND school_id = ?').bind(typeId, locals.user!.school_id).first();
-	if (!examType) throw error(404, 'Tipe Ujian tidak ditemukan');
-
-	// 3. Class info if class_id is passed
-	const classIdStr = url.searchParams.get('class_id');
-	const classId = parseInt(classIdStr || '', 10);
-	let classData = null;
-	if (!isNaN(classId)) {
-		classData = await db.prepare('SELECT * FROM classes WHERE id = ? AND school_id = ?').bind(classId, locals.user!.school_id).first();
-	}
-
-	// 4. Fetch exam schedules belonging to this exam type
+async function fetchSchedulesForClass(db: any, typeId: number, schoolId: number, classId: number | null) {
 	let scheduleQuery = `
 		SELECT DISTINCT
 			e.id,
@@ -45,12 +23,12 @@ export const load = async ({ platform, params, locals, url }: Parameters<PageSer
 		LEFT JOIN subjects s ON e.subject_id = s.id
 	`;
 	let whereClauses = ['e.exam_type_id = ?', 'e.school_id = ?', 'e.is_active = 1'];
-	let queryParams: any[] = [typeId, locals.user!.school_id];
+	let queryParams: any[] = [typeId, schoolId];
 
-	if (!isNaN(classId)) {
-		scheduleQuery += ` JOIN exam_participants ep ON ep.exam_id = e.id JOIN users u ON ep.student_id = u.id `;
-		whereClauses.push('u.class_id = ?');
-		queryParams.push(classId);
+	if (classId !== null) {
+		scheduleQuery += ` LEFT JOIN exam_participants ep ON ep.exam_id = e.id LEFT JOIN users u ON ep.student_id = u.id `;
+		whereClauses.push('(e.class_id = ? OR e.class_id IS NULL OR u.class_id = ?)');
+		queryParams.push(classId, classId);
 	}
 
 	scheduleQuery += ` WHERE ` + whereClauses.join(' AND ') + ` ORDER BY e.start_time ASC, e.id ASC`;
@@ -58,15 +36,14 @@ export const load = async ({ platform, params, locals, url }: Parameters<PageSer
 	const schedulesRes = await db.prepare(scheduleQuery).bind(...queryParams).all();
 	let rawSchedules: any[] = schedulesRes.results || [];
 
-	// Fetch sessions if any exams have exam_sessions
 	if (rawSchedules.length > 0) {
 		const examIds = rawSchedules.map((s: any) => s.id);
 		const placeholders = examIds.map(() => '?').join(',');
 		try {
 			const sessionsQuery = await db.prepare(`SELECT * FROM exam_sessions WHERE exam_id IN (${placeholders}) ORDER BY session_number ASC`)
-				.bind(...examIds).all<any>();
+				.bind(...examIds).all();
 			const sessionsByExam = new Map<number, any[]>();
-			for (const row of (sessionsQuery.results || [])) {
+			for (const row of ((sessionsQuery.results as any[]) || [])) {
 				if (!sessionsByExam.has(row.exam_id)) sessionsByExam.set(row.exam_id, []);
 				sessionsByExam.get(row.exam_id)!.push(row);
 			}
@@ -85,6 +62,79 @@ export const load = async ({ platform, params, locals, url }: Parameters<PageSer
 			console.warn('Failed to fetch exam_sessions for print:', e);
 		}
 	}
+	return rawSchedules;
+}
+
+export const load = async ({ platform, params, locals, url }: Parameters<PageServerLoad>[0]) => {
+	const db = getDB(platform);
+	const typeIdStr = params.typeId;
+	const typeId = parseInt(typeIdStr, 10);
+	const schoolId = Number(locals.user?.school_id || 0);
+	
+	if (isNaN(typeId)) throw error(400, 'ID Tipe Ujian tidak valid');
+
+	// 1. Get school info (for Kop Surat)
+	const school = await db.prepare('SELECT * FROM schools WHERE id = ?').bind(schoolId).first();
+	
+	// 2. Get exam type info
+	const examType = await db.prepare('SELECT * FROM exam_types WHERE id = ? AND school_id = ?').bind(typeId, schoolId).first();
+	if (!examType) throw error(404, 'Tipe Ujian tidak ditemukan');
+
+	// 3. Class info if class_id is passed in query
+	const classIdStr = url.searchParams.get('class_id');
+	const classId = parseInt(classIdStr || '', 10);
+	
+	let targetClasses: any[] = [];
+	if (!isNaN(classId)) {
+		const c = await db.prepare('SELECT id, name FROM classes WHERE id = ? AND school_id = ?').bind(classId, schoolId).first();
+		if (c) targetClasses = [c];
+	} else {
+		// Fetch classes registered in exam_type_classes for this exam_type_id
+		const cRes = await db.prepare(`
+			SELECT c.id, c.name
+			FROM classes c
+			INNER JOIN exam_type_classes etc ON etc.class_id = c.id
+			WHERE etc.exam_type_id = ? AND c.school_id = ?
+			ORDER BY CASE c.level
+				WHEN 'I' THEN 1 WHEN 'II' THEN 2 WHEN 'III' THEN 3 WHEN 'IV' THEN 4 WHEN 'V' THEN 5 WHEN 'VI' THEN 6 WHEN 'VII' THEN 7 WHEN 'VIII' THEN 8 WHEN 'IX' THEN 9 WHEN 'X' THEN 10 WHEN 'XI' THEN 11 WHEN 'XII' THEN 12
+				WHEN '1' THEN 1 WHEN '2' THEN 2 WHEN '3' THEN 3 WHEN '4' THEN 4 WHEN '5' THEN 5 WHEN '6' THEN 6 WHEN '7' THEN 7 WHEN '8' THEN 8 WHEN '9' THEN 9 WHEN '10' THEN 10 WHEN '11' THEN 11 WHEN '12' THEN 12
+				ELSE 99 END ASC, c.name ASC
+		`).bind(typeId, schoolId).all();
+		targetClasses = cRes.results || [];
+
+		// Fallback: If no classes in exam_type_classes, fetch classes with active exams/participants
+		if (targetClasses.length === 0) {
+			const fallbackRes = await db.prepare(`
+				SELECT DISTINCT c.id, c.name
+				FROM classes c
+				JOIN users u ON u.class_id = c.id
+				JOIN exam_participants ep ON ep.student_id = u.id
+				JOIN exams e ON ep.exam_id = e.id
+				WHERE e.exam_type_id = ? AND e.school_id = ? AND e.is_active = 1
+				ORDER BY c.name ASC
+			`).bind(typeId, schoolId).all();
+			targetClasses = fallbackRes.results || [];
+		}
+	}
+
+	// 4. Fetch schedules for each class
+	const classSchedulesList: any[] = [];
+
+	if (targetClasses.length === 0) {
+		const schedules = await fetchSchedulesForClass(db, typeId, schoolId, null);
+		classSchedulesList.push({
+			classData: null,
+			schedules
+		});
+	} else {
+		for (const cls of targetClasses) {
+			const schedules = await fetchSchedulesForClass(db, typeId, schoolId, cls.id);
+			classSchedulesList.push({
+				classData: cls,
+				schedules
+			});
+		}
+	}
 
 	// 5. Fetch Panitia (committee) assigned to this Exam Type (proctor_role = 'cm')
 	const committee = await db.prepare(`
@@ -99,8 +149,7 @@ export const load = async ({ platform, params, locals, url }: Parameters<PageSer
 	return {
 		school,
 		examType,
-		classData,
-		schedules: rawSchedules,
+		classList: classSchedulesList,
 		committeeName: committee?.name || null,
 		committeeNip: committee?.nip || null
 	};
