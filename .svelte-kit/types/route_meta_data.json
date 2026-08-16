@@ -153,6 +153,9 @@
 	"/api/migrate-sessions": [
 		"src/routes/api/migrate-sessions/+server.ts"
 	],
+	"/api/monitor-live": [
+		"src/routes/api/monitor-live/+server.ts"
+	],
 	"/api/profile": [
 		"src/routes/api/profile/+server.ts"
 	],

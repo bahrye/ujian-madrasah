@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg","kemenag.png","panduan-ui-ujian.jpeg","template_soal_ujian.docx"]),
 	mimeTypes: {".svg":"image/svg+xml",".png":"image/png",".jpeg":"image/jpeg"},
 	_: {
-		client: {start:"_app/immutable/entry/start.1wafUI1S.js",app:"_app/immutable/entry/app.aXeui6Hz.js",imports:["_app/immutable/entry/start.1wafUI1S.js","_app/immutable/chunks/BGrbW7OA.js","_app/immutable/chunks/CQiepFix.js","_app/immutable/chunks/DU7PTdcz.js","_app/immutable/chunks/KjQSC1ua.js","_app/immutable/chunks/CcMrtkbm.js","_app/immutable/chunks/DYFg-3Jq.js","_app/immutable/entry/app.aXeui6Hz.js","_app/immutable/chunks/DU7PTdcz.js","_app/immutable/chunks/KjQSC1ua.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CQiepFix.js","_app/immutable/chunks/kmaicCfi.js","_app/immutable/chunks/BgX6hkEH.js","_app/immutable/chunks/DcB8fGZ9.js","_app/immutable/chunks/7z2sG6KI.js","_app/immutable/chunks/DYFg-3Jq.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
+		client: {start:"_app/immutable/entry/start.H5qXJMEU.js",app:"_app/immutable/entry/app.Bj_TU9N8.js",imports:["_app/immutable/entry/start.H5qXJMEU.js","_app/immutable/chunks/CWzs5vE5.js","_app/immutable/chunks/CQiepFix.js","_app/immutable/chunks/DU7PTdcz.js","_app/immutable/chunks/KjQSC1ua.js","_app/immutable/chunks/CN3e43Vm.js","_app/immutable/chunks/DYFg-3Jq.js","_app/immutable/entry/app.Bj_TU9N8.js","_app/immutable/chunks/DU7PTdcz.js","_app/immutable/chunks/KjQSC1ua.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CQiepFix.js","_app/immutable/chunks/kmaicCfi.js","_app/immutable/chunks/BgX6hkEH.js","_app/immutable/chunks/DcB8fGZ9.js","_app/immutable/chunks/7z2sG6KI.js","_app/immutable/chunks/DYFg-3Jq.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
 		nodes: [
 			__memo(() => import('./nodes/0.js')),
 			__memo(() => import('./nodes/1.js')),
@@ -337,6 +337,13 @@ return {
 				params: [],
 				page: null,
 				endpoint: __memo(() => import('./entries/endpoints/api/migrate-sessions/_server.ts.js'))
+			},
+			{
+				id: "/api/monitor-live",
+				pattern: /^\/api\/monitor-live\/?$/,
+				params: [],
+				page: null,
+				endpoint: __memo(() => import('./entries/endpoints/api/monitor-live/_server.ts.js'))
 			},
 			{
 				id: "/api/profile",

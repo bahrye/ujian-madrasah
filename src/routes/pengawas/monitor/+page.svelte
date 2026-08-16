@@ -24,11 +24,63 @@
 	let currentTime = Date.now();
 	let interval: any;
 
+	let attemptsMap = new Map<string | number, number>();
+
+	function playViolationBeep() {
+		try {
+			const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+			const osc = ctx.createOscillator();
+			const gain = ctx.createGain();
+			osc.type = 'sine';
+			osc.frequency.setValueAtTime(880, ctx.currentTime);
+			gain.gain.setValueAtTime(0.15, ctx.currentTime);
+			gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+			osc.connect(gain);
+			gain.connect(ctx.destination);
+			osc.start();
+			osc.stop(ctx.currentTime + 0.4);
+		} catch (e) {}
+	}
+
+	async function pollLiveStatus() {
+		if (!data.examFilter) return;
+		try {
+			const queryParams = new URLSearchParams({ exam_id: data.examFilter });
+			if (data.sessionFilter) queryParams.set('session_number', data.sessionFilter);
+			
+			const res = await fetch(`/api/monitor-live?${queryParams.toString()}`);
+			if (!res.ok) return;
+			const result = await res.json();
+			if (result.attempts && Array.isArray(result.attempts)) {
+				result.attempts.forEach((newA: any) => {
+					const key = newA.attempt_id || newA.student_id;
+					const prevWarnings = attemptsMap.get(key) ?? (newA.warnings || 0);
+					
+					if (newA.warnings > prevWarnings) {
+						toasts.warning(`⚠️ Pelanggaran! ${newA.student_name} (${newA.warnings}x pelanggaran)`);
+						playViolationBeep();
+					}
+					attemptsMap.set(key, newA.warnings || 0);
+				});
+				attempts = result.attempts;
+			}
+		} catch (e) {
+			console.warn('Live monitoring poll error:', e);
+		}
+	}
+
 	onMount(() => {
+		if (attempts && Array.isArray(attempts)) {
+			attempts.forEach(a => {
+				const key = a.attempt_id || a.student_id;
+				attemptsMap.set(key, a.warnings || 0);
+			});
+		}
+
 		interval = setInterval(() => {
 			currentTime = Date.now();
-			invalidateAll();
-		}, 5000); // 5 detik lebih cepat dan responsif untuk pengawas
+			pollLiveStatus();
+		}, 2500);
 	});
 
 	onDestroy(() => {

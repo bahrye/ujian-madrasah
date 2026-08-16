@@ -1270,6 +1270,15 @@
       "_db.js"
     ]
   },
+  "src/routes/api/monitor-live/+server.ts": {
+    "file": "entries/endpoints/api/monitor-live/_server.ts.js",
+    "name": "entries/endpoints/api/monitor-live/_server.ts",
+    "src": "src/routes/api/monitor-live/+server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
   "src/routes/api/profile/+server.ts": {
     "file": "entries/endpoints/api/profile/_server.ts.js",
     "name": "entries/endpoints/api/profile/_server.ts",
