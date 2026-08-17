@@ -419,10 +419,10 @@
 			<p class="font-bold m-0 mt-0.5">Kepala {school?.name || 'Madrasah'}</p>
 			<div class="h-20"></div>
 			<p class="font-bold underline uppercase m-0 leading-none">
-				{school?.headmaster_name || '......................................................'}
+				{school?.principal_name || '......................................................'}
 			</p>
 			<p class="m-0 mt-1 leading-none">
-				NIP. {school?.headmaster_nip || '............................................'}
+				NIP. {school?.principal_nip || '............................................'}
 			</p>
 		</div>
 
