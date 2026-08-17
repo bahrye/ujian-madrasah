@@ -1,4 +1,5 @@
 import { g as getDB } from "../../../chunks/db.js";
+import { f as formatExamTitle } from "../../../chunks/exam.js";
 const load = async ({ platform, locals }) => {
   const db = getDB(platform);
   const [activeExams, tokenCount, activeAttempts, schedules] = await Promise.all([
@@ -6,12 +7,13 @@ const load = async ({ platform, locals }) => {
     db.prepare("SELECT COUNT(*) as c FROM tokens WHERE school_id = ?").bind(locals.user.school_id).first(),
     db.prepare("SELECT COUNT(*) as c FROM student_attempts sa JOIN exams e ON sa.exam_id = e.id WHERE sa.status = 'mengerjakan' AND e.school_id = ?").bind(locals.user.school_id).first(),
     db.prepare(`
-			SELECT e.id as exam_id, e.title, e.start_time, e.end_time, e.duration_minutes, s.name as subject_name, e.is_active,
+			SELECT e.id as exam_id, e.title, e.start_time, e.end_time, e.duration_minutes, s.name as subject_name, et.code as exam_type_code, c.name as class_name, e.is_active,
 			(SELECT token_code FROM tokens WHERE exam_id = e.id AND expires_at > datetime('now') LIMIT 1) as token_code
 			FROM exams e
 			JOIN exam_proctors ep ON e.id = ep.exam_id
 			LEFT JOIN subjects s ON e.subject_id = s.id
 			JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN classes c ON e.class_id = c.id
 			WHERE ep.proctor_id = ? AND e.school_id = ? AND et.is_active = 1 AND e.is_active = 1
 			ORDER BY e.start_time ASC
 		`).bind(locals.user.id, locals.user.school_id).all()
@@ -30,7 +32,7 @@ const load = async ({ platform, locals }) => {
   const participants = participantsDb.results;
   const today = /* @__PURE__ */ new Date();
   today.setHours(0, 0, 0, 0);
-  const schedulesWithParticipants = schedules.results.filter((schedule) => {
+  const schedulesWithParticipants = (schedules.results || []).filter((schedule) => {
     if (!schedule.start_time) return false;
     const examDate = new Date(schedule.start_time);
     examDate.setHours(0, 0, 0, 0);
@@ -39,6 +41,12 @@ const load = async ({ platform, locals }) => {
     const examParticipants = participants.filter((p) => p.exam_id === schedule.exam_id);
     return {
       ...schedule,
+      title: formatExamTitle({
+        title: schedule.title,
+        examTypeCode: schedule.exam_type_code,
+        subjectName: schedule.subject_name,
+        className: schedule.class_name
+      }),
       participant_count: examParticipants.length,
       participants: examParticipants
     };

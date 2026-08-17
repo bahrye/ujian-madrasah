@@ -1744,7 +1744,8 @@
     "src": "src/routes/pengawas/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/pengawas/+page.svelte": {
@@ -1766,7 +1767,8 @@
     "src": "src/routes/pengawas/jadwal/saya/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/pengawas/jadwal/saya/+page.svelte": {
@@ -1786,7 +1788,8 @@
     "src": "src/routes/pengawas/jadwal/semua/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/pengawas/jadwal/semua/+page.svelte": {

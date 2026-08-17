@@ -2,6 +2,7 @@
 import { redirect } from '@sveltejs/kit';
 import type { ServerLoad } from '@sveltejs/kit';
 import { getDB } from '$lib/server/db';
+import { formatExamTitle } from '$lib/utils/exam';
 
 export interface ScheduleItem {
 	id: number;
@@ -12,6 +13,8 @@ export interface ScheduleItem {
 	is_active: number;
 	subject_name: string | null;
 	exam_type_name: string | null;
+	exam_type_code: string | null;
+	class_name: string | null;
 	proctor_names: string | null;
 	participant_count: number;
 	class_names: string | null;
@@ -30,11 +33,13 @@ export const load = async ({ locals, platform }: Parameters<ServerLoad>[0]) => {
 	const db = getDB(platform);
 
 	// Ambil semua jadwal ujian yang aktif beserta nama pengawas dan kelas yang terlibat
-	const { results: schedules } = await db.prepare(`
+	const { results: rawSchedules } = await db.prepare(`
 		SELECT 
 			e.*, 
 			s.name as subject_name, 
+			et.code as exam_type_code,
 			et.name as exam_type_name,
+			c.name as class_name,
 			(
 				SELECT GROUP_CONCAT(u2.name, ', ')
 				FROM exam_proctors ep2
@@ -47,18 +52,29 @@ export const load = async ({ locals, platform }: Parameters<ServerLoad>[0]) => {
 				WHERE ep.exam_id = e.id
 			) as participant_count,
 			(
-				SELECT GROUP_CONCAT(DISTINCT c.name)
+				SELECT GROUP_CONCAT(DISTINCT c2.name)
 				FROM exam_participants ep
 				JOIN users u3 ON ep.student_id = u3.id
-				JOIN classes c ON u3.class_id = c.id
+				JOIN classes c2 ON u3.class_id = c2.id
 				WHERE ep.exam_id = e.id
 			) as class_names
 		FROM exams e
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		LEFT JOIN exam_types et ON e.exam_type_id = et.id
+		LEFT JOIN classes c ON e.class_id = c.id
 		WHERE e.school_id = ? AND e.is_active = 1
 		ORDER BY e.start_time ASC
-	`).bind(locals.user.school_id).all<ScheduleItem>();
+	`).bind(locals.user.school_id).all<any>();
+
+	const schedules = (rawSchedules || []).map((s: any) => ({
+		...s,
+		title: formatExamTitle({
+			title: s.title,
+			examTypeCode: s.exam_type_code,
+			subjectName: s.subject_name,
+			className: s.class_name
+		})
+	}));
 
 	// Ambil daftar kelas untuk filter
 	const { results: classes } = await db.prepare(`
