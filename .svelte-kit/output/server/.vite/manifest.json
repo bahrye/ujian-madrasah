@@ -1257,6 +1257,12 @@
       "_date.js"
     ]
   },
+  "src/routes/api/heartbeat/+server.ts": {
+    "file": "entries/endpoints/api/heartbeat/_server.ts.js",
+    "name": "entries/endpoints/api/heartbeat/_server.ts",
+    "src": "src/routes/api/heartbeat/+server.ts",
+    "isEntry": true
+  },
   "src/routes/api/logout/+server.ts": {
     "file": "entries/endpoints/api/logout/_server.ts.js",
     "name": "entries/endpoints/api/logout/_server.ts",

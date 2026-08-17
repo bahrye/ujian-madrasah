@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg","kemenag.png","panduan-ui-ujian.jpeg","template_soal_ujian.docx"]),
 	mimeTypes: {".svg":"image/svg+xml",".png":"image/png",".jpeg":"image/jpeg"},
 	_: {
-		client: {start:"_app/immutable/entry/start.pCMoKeos.js",app:"_app/immutable/entry/app.Tmr-9oRO.js",imports:["_app/immutable/entry/start.pCMoKeos.js","_app/immutable/chunks/DLb5LCJ1.js","_app/immutable/chunks/_o5hkGCt.js","_app/immutable/chunks/DOZg3a7v.js","_app/immutable/chunks/Dg9RuzyS.js","_app/immutable/chunks/BA-vAwG_.js","_app/immutable/entry/app.Tmr-9oRO.js","_app/immutable/chunks/DOZg3a7v.js","_app/immutable/chunks/Dg9RuzyS.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/_o5hkGCt.js","_app/immutable/chunks/DOI8Cl5d.js","_app/immutable/chunks/BSI2mhrl.js","_app/immutable/chunks/BasuolqT.js","_app/immutable/chunks/BJRsbCec.js","_app/immutable/chunks/BA-vAwG_.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
+		client: {start:"_app/immutable/entry/start.CYEBQMYX.js",app:"_app/immutable/entry/app.877umrAR.js",imports:["_app/immutable/entry/start.CYEBQMYX.js","_app/immutable/chunks/C2wZDVUm.js","_app/immutable/chunks/_o5hkGCt.js","_app/immutable/chunks/DOZg3a7v.js","_app/immutable/chunks/Dg9RuzyS.js","_app/immutable/chunks/BA-vAwG_.js","_app/immutable/entry/app.877umrAR.js","_app/immutable/chunks/DOZg3a7v.js","_app/immutable/chunks/Dg9RuzyS.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/_o5hkGCt.js","_app/immutable/chunks/DOI8Cl5d.js","_app/immutable/chunks/BSI2mhrl.js","_app/immutable/chunks/BasuolqT.js","_app/immutable/chunks/BJRsbCec.js","_app/immutable/chunks/BA-vAwG_.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
 		nodes: [
 			__memo(() => import('../output/server/nodes/0.js')),
 			__memo(() => import('../output/server/nodes/1.js')),
@@ -318,6 +318,13 @@ return {
 				params: [{"name":"exam_id","optional":false,"rest":false,"chained":false}],
 				page: null,
 				endpoint: __memo(() => import('../output/server/entries/endpoints/api/export/excel/_exam_id_/_server.ts.js'))
+			},
+			{
+				id: "/api/heartbeat",
+				pattern: /^\/api\/heartbeat\/?$/,
+				params: [],
+				page: null,
+				endpoint: __memo(() => import('../output/server/entries/endpoints/api/heartbeat/_server.ts.js'))
 			},
 			{
 				id: "/api/logout",

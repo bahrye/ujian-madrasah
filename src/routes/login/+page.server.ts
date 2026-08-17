@@ -50,12 +50,44 @@ export const actions: Actions = {
 
 			let sessionToken: string | null = null;
 
-			// Proteksi Login Siswa Multi-Perangkat
+			// Proteksi Login Siswa Multi-Perangkat (dengan toleransi 3 menit tidak ada aktivitas)
 			if (user.role === 'siswa') {
-				if (user.is_logged_in === 1) {
-					return fail(400, {
-						error: `Siswa atas nama "${user.name}" sudah terdeteksi login di perangkat lain. Silahkan meminta Pengawas Ruang untuk me-reset login siswa tersebut.`
-					});
+				if (user.is_logged_in === 1 && user.last_active_at) {
+					let inactiveSec = 9999;
+
+					try {
+						const diffRes = await db.prepare(`
+							SELECT (strftime('%s', 'now') - strftime('%s', last_active_at)) as inactive_sec
+							FROM users WHERE id = ?
+						`).bind(user.id).first<{ inactive_sec: number | null }>();
+
+						if (diffRes && diffRes.inactive_sec !== null) {
+							inactiveSec = diffRes.inactive_sec;
+						}
+					} catch (e) {}
+
+					if (inactiveSec === 9999 && user.last_active_at) {
+						let lastActiveStr = String(user.last_active_at).trim();
+						if (!lastActiveStr.includes('T')) {
+							lastActiveStr = lastActiveStr.replace(' ', 'T') + 'Z';
+						}
+						const lastActiveMs = new Date(lastActiveStr).getTime();
+						if (!isNaN(lastActiveMs)) {
+							inactiveSec = Math.floor((Date.now() - lastActiveMs) / 1000);
+						}
+					}
+
+					// Jika aktivitas terakhir kurang dari 180 detik (3 menit)
+					if (inactiveSec < 180) {
+						const remainingSec = 180 - Math.max(0, inactiveSec);
+						const remMin = Math.floor(remainingSec / 60);
+						const remSec = remainingSec % 60;
+						const timeStr = remMin > 0 ? `${remMin} menit ${remSec} detik` : `${remSec} detik`;
+
+						return fail(400, {
+							error: `Siswa atas nama "${user.name}" terdeteksi masih aktif di perangkat lain. Login di perangkat ini dapat diakses setelah 3 menit tidak ada aktivitas pada perangkat sebelumnya (${timeStr} lagi) atau silakan minta Pengawas Ruang untuk me-reset login.`
+						});
+					}
 				}
 
 				sessionToken = crypto.randomUUID();

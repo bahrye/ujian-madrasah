@@ -7,7 +7,7 @@ export const GET: RequestHandler = async ({ cookies, locals, platform }) => {
 	if (locals.user) {
 		try {
 			const db = getDB(platform);
-			await db.prepare('UPDATE users SET is_logged_in = 0, session_token = NULL WHERE id = ?')
+			await db.prepare('UPDATE users SET is_logged_in = 0, session_token = NULL, last_active_at = NULL WHERE id = ?')
 				.bind(locals.user.id)
 				.run();
 		} catch (e) {
@@ -18,4 +18,6 @@ export const GET: RequestHandler = async ({ cookies, locals, platform }) => {
 	cookies.delete(COOKIE_NAME, { path: '/' });
 	throw redirect(302, '/login');
 };
+
+export const POST: RequestHandler = GET;
 

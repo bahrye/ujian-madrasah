@@ -144,6 +144,9 @@
 	"/api/export/excel/[exam_id]": [
 		"src/routes/api/export/excel/[exam_id]/+server.ts"
 	],
+	"/api/heartbeat": [
+		"src/routes/api/heartbeat/+server.ts"
+	],
 	"/api/logout": [
 		"src/routes/api/logout/+server.ts"
 	],
