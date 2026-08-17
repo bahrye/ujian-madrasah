@@ -153,7 +153,7 @@ const load = async ({ platform, url, locals }) => {
 				SELECT sa.attempt_id, COUNT(*) as c
 				FROM student_answers sa
 				JOIN student_attempts st ON sa.attempt_id = st.id
-				WHERE st.exam_id = ? AND sa.answer_given IS NOT NULL AND sa.answer_given != ''
+				WHERE st.exam_id = ? AND sa.answer_given IS NOT NULL AND sa.answer_given != '' AND sa.answer_given != '[]' AND sa.answer_given != '{}'
 				GROUP BY sa.attempt_id
 			`).bind(examFilter).all();
       countsResult.results.forEach((r) => {
@@ -163,10 +163,14 @@ const load = async ({ platform, url, locals }) => {
     const kv = platform?.env?.EXAM_ANSWERS;
     const attemptsWithProgress = await Promise.all(
       attempts.map(async (a) => {
-        let answeredCount = 0;
-        let warnings = 0;
+        let status = a.status || "belum_mengerjakan";
+        let answeredCount = a.attempt_id ? answeredCountsMap[a.attempt_id] || 0 : 0;
+        let warnings = a.violation_count || 0;
         let warningLogs = [];
-        const status = a.status || "belum_mengerjakan";
+        try {
+          warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : [];
+        } catch (e) {
+        }
         if (status === "mengerjakan") {
           if (kv && a.attempt_id) {
             try {
@@ -174,26 +178,19 @@ const load = async ({ platform, url, locals }) => {
               if (stored) {
                 const data = JSON.parse(stored);
                 if (data && data.answers) {
-                  answeredCount = Object.values(data.answers).filter((val) => val !== null && val !== "").length;
+                  const kvAnswered = Object.values(data.answers).filter((val) => val !== null && val !== "" && val !== "[]" && val !== "{}").length;
+                  if (kvAnswered > answeredCount) {
+                    answeredCount = kvAnswered;
+                  }
                 }
-                if (data && data.warnings) warnings = data.warnings;
-                if (data && data.warningLogs) warningLogs = data.warningLogs;
+                if (data && data.warnings && data.warnings > warnings) warnings = data.warnings;
+                if (data && data.warningLogs && Array.isArray(data.warningLogs) && data.warningLogs.length > warningLogs.length) {
+                  warningLogs = data.warningLogs;
+                }
               }
             } catch (e) {
               console.error("KV get error:", e);
             }
-          }
-          if (answeredCount === 0 && a.attempt_id) {
-            answeredCount = answeredCountsMap[a.attempt_id] || 0;
-          }
-        } else if (status === "selesai" || status === "waktu_habis") {
-          warnings = a.violation_count || 0;
-          try {
-            warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : [];
-          } catch (e) {
-          }
-          if (a.attempt_id) {
-            answeredCount = answeredCountsMap[a.attempt_id] || 0;
           }
         }
         return {

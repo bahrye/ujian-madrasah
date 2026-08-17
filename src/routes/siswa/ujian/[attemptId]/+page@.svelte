@@ -363,7 +363,7 @@
 		localStorage.setItem(`warnings_${attempt.id}`, warnings.toString());
 		localStorage.setItem(`warningLogs_${attempt.id}`, JSON.stringify(warningLogs));
 		
-		triggerAutoSave();
+		saveCurrentAnswer(true);
 		isExamBlurred = false;
 
 		if (warnings > MAX_WARNINGS) {

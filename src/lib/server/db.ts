@@ -105,4 +105,8 @@ export async function ensureUserLoginColumns(db: D1Database) {
 	} catch (e: any) {}
 }
 
-
+export async function ensureStudentAnswersUniqueIndex(db: D1Database) {
+	try {
+		await db.prepare('CREATE UNIQUE INDEX IF NOT EXISTS idx_answers_attempt_question ON student_answers(attempt_id, question_id)').run();
+	} catch (e: any) {}
+}

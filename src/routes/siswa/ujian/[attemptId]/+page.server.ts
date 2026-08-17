@@ -1,6 +1,6 @@
 import { fail, redirect, error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getDB } from '$lib/server/db';
+import { getDB, ensureStudentAnswersUniqueIndex } from '$lib/server/db';
 import { verifyExamTokenSignature } from '$lib/server/auth';
 
 import { formatExamTitle } from '$lib/utils/exam';
@@ -8,6 +8,7 @@ import { formatExamTitle } from '$lib/utils/exam';
 export const load: PageServerLoad = async ({ platform, locals, params, cookies }) => {
 	if (!locals.user) throw redirect(302, '/login');
 	const db = getDB(platform);
+	await ensureStudentAnswersUniqueIndex(db);
 	const attemptIdStr = params.attemptId;
 	const parsedAttemptId = parseInt(attemptIdStr, 10);
 	if (isNaN(parsedAttemptId)) throw error(400, 'ID Ujian tidak valid');
@@ -141,6 +142,7 @@ export const actions: Actions = {
 	saveAnswer: async ({ request, platform, params, locals, cookies }) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
+		await ensureStudentAnswersUniqueIndex(db);
 
 		const attemptIdStr = params.attemptId;
 		const parsedAttemptId = parseInt(attemptIdStr, 10);
@@ -192,7 +194,10 @@ export const actions: Actions = {
 				);
 
 				if (syncStmts.length > 0) {
-					await db.batch(syncStmts);
+					const chunkSize = 50;
+					for (let i = 0; i < syncStmts.length; i += chunkSize) {
+						await db.batch(syncStmts.slice(i, i + chunkSize));
+					}
 				}
 
 				// Optional KV sync for legacy/fallback compatibility
@@ -205,9 +210,9 @@ export const actions: Actions = {
 						warningLogs: JSON.parse(warningLogs)
 					})).catch(() => {});
 				}
-			} catch (e) {
-				console.error("Save answer error:", e);
-				return fail(400, { error: 'Gagal menyimpan jawaban.' });
+			} catch (e: any) {
+				console.error("Save answer error:", e?.message || e);
+				return fail(400, { error: 'Gagal menyimpan jawaban: ' + (e?.message || '') });
 			}
 		}
 
@@ -217,6 +222,7 @@ export const actions: Actions = {
 	submit: async ({ request, platform, params, locals, cookies }) => {
 		if (!locals.user) return fail(401, { error: 'Sesi telah berakhir. Silakan login kembali.' });
 		const db = getDB(platform);
+		await ensureStudentAnswersUniqueIndex(db);
 		const attemptIdStr = params.attemptId;
 		const parsedAttemptId = parseInt(attemptIdStr, 10);
 		if (isNaN(parsedAttemptId)) return fail(400, { error: 'ID tidak valid' });
@@ -277,7 +283,10 @@ export const actions: Actions = {
 			}
 
 			if (syncStmts.length > 0) {
-				await db.batch(syncStmts);
+				const chunkSize = 50;
+				for (let i = 0; i < syncStmts.length; i += chunkSize) {
+					await db.batch(syncStmts.slice(i, i + chunkSize));
+				}
 			}
 
 			// Cleanup KV key if exists
@@ -297,7 +306,7 @@ export const actions: Actions = {
 			let totalScore = 0;
 			let totalPoints = 0;
 
-			const updateStmts = [];
+			const updateStmts: any[] = [];
 
 			for (const ans of answers.results as any[]) {
 				totalPoints += ans.points;
@@ -397,7 +406,12 @@ export const actions: Actions = {
 					.bind(finalScore, totalPoints, warnings, warningLogs, parsedAttemptId)
 			);
 
-			await db.batch(updateStmts);
+			if (updateStmts.length > 0) {
+				const chunkSize = 50;
+				for (let i = 0; i < updateStmts.length; i += chunkSize) {
+					await db.batch(updateStmts.slice(i, i + chunkSize));
+				}
+			}
 
 			// Hapus cookie sesi ujian
 			cookies.delete('exam_token_verified_' + parsedAttemptId, { path: '/' });
@@ -405,7 +419,7 @@ export const actions: Actions = {
 			throw redirect(302, '/siswa');
 		} catch (e: any) {
 			if (e.status === 302) throw e;
-			console.error("Submit error:", e);
+			console.error("Submit error:", e?.message || e);
 			return fail(500, { error: e.message || 'Gagal mengirim ujian.' });
 		}
 	}

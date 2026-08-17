@@ -1,10 +1,11 @@
 import { fail, redirect, error } from "@sveltejs/kit";
-import { g as getDB } from "../../../../../chunks/db.js";
+import { g as getDB, i as ensureStudentAnswersUniqueIndex } from "../../../../../chunks/db.js";
 import { b as verifyExamTokenSignature } from "../../../../../chunks/auth.js";
 import { f as formatExamTitle } from "../../../../../chunks/exam.js";
 const load = async ({ platform, locals, params, cookies }) => {
   if (!locals.user) throw redirect(302, "/login");
   const db = getDB(platform);
+  await ensureStudentAnswersUniqueIndex(db);
   const attemptIdStr = params.attemptId;
   const parsedAttemptId = parseInt(attemptIdStr, 10);
   if (isNaN(parsedAttemptId)) throw error(400, "ID Ujian tidak valid");
@@ -115,6 +116,7 @@ const actions = {
   saveAnswer: async ({ request, platform, params, locals, cookies }) => {
     if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
+    await ensureStudentAnswersUniqueIndex(db);
     const attemptIdStr = params.attemptId;
     const parsedAttemptId = parseInt(attemptIdStr, 10);
     if (isNaN(parsedAttemptId)) return fail(400, { error: "ID tidak valid" });
@@ -157,7 +159,10 @@ const actions = {
 					`).bind(warnings, warningLogs, parsedAttemptId, locals.user.id)
         );
         if (syncStmts.length > 0) {
-          await db.batch(syncStmts);
+          const chunkSize = 50;
+          for (let i = 0; i < syncStmts.length; i += chunkSize) {
+            await db.batch(syncStmts.slice(i, i + chunkSize));
+          }
         }
         const kv = platform?.env?.EXAM_ANSWERS;
         if (kv) {
@@ -170,8 +175,8 @@ const actions = {
           });
         }
       } catch (e) {
-        console.error("Save answer error:", e);
-        return fail(400, { error: "Gagal menyimpan jawaban." });
+        console.error("Save answer error:", e?.message || e);
+        return fail(400, { error: "Gagal menyimpan jawaban: " + (e?.message || "") });
       }
     }
     return { saved: true };
@@ -179,6 +184,7 @@ const actions = {
   submit: async ({ request, platform, params, locals, cookies }) => {
     if (!locals.user) return fail(401, { error: "Sesi telah berakhir. Silakan login kembali." });
     const db = getDB(platform);
+    await ensureStudentAnswersUniqueIndex(db);
     const attemptIdStr = params.attemptId;
     const parsedAttemptId = parseInt(attemptIdStr, 10);
     if (isNaN(parsedAttemptId)) return fail(400, { error: "ID tidak valid" });
@@ -235,7 +241,10 @@ const actions = {
         }
       }
       if (syncStmts.length > 0) {
-        await db.batch(syncStmts);
+        const chunkSize = 50;
+        for (let i = 0; i < syncStmts.length; i += chunkSize) {
+          await db.batch(syncStmts.slice(i, i + chunkSize));
+        }
       }
       const kv = platform?.env?.EXAM_ANSWERS;
       if (kv) {
@@ -329,12 +338,17 @@ const actions = {
         db.prepare(`UPDATE student_attempts SET status = 'selesai', submit_time = datetime('now'),
 					score = ?, total_points = ?, violation_count = ?, violation_logs = ? WHERE id = ?`).bind(finalScore, totalPoints, warnings, warningLogs, parsedAttemptId)
       );
-      await db.batch(updateStmts);
+      if (updateStmts.length > 0) {
+        const chunkSize = 50;
+        for (let i = 0; i < updateStmts.length; i += chunkSize) {
+          await db.batch(updateStmts.slice(i, i + chunkSize));
+        }
+      }
       cookies.delete("exam_token_verified_" + parsedAttemptId, { path: "/" });
       throw redirect(302, "/siswa");
     } catch (e) {
       if (e.status === 302) throw e;
-      console.error("Submit error:", e);
+      console.error("Submit error:", e?.message || e);
       return fail(500, { error: e.message || "Gagal mengirim ujian." });
     }
   }

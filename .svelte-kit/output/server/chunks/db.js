@@ -70,6 +70,12 @@ async function ensureUserLoginColumns(db) {
   } catch (e) {
   }
 }
+async function ensureStudentAnswersUniqueIndex(db) {
+  try {
+    await db.prepare("CREATE UNIQUE INDEX IF NOT EXISTS idx_answers_attempt_question ON student_answers(attempt_id, question_id)").run();
+  } catch (e) {
+  }
+}
 export {
   ensureExamTypeProctorsTable as a,
   ensureProctorRoleColumn as b,
@@ -78,5 +84,6 @@ export {
   ensureUserLoginColumns as e,
   dbRun as f,
   getDB as g,
-  ensureStudentAttemptsGradedColumn as h
+  ensureStudentAttemptsGradedColumn as h,
+  ensureStudentAnswersUniqueIndex as i
 };

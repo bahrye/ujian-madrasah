@@ -109,7 +109,7 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 				SELECT sa.attempt_id, COUNT(*) as c
 				FROM student_answers sa
 				JOIN student_attempts st ON sa.attempt_id = st.id
-				WHERE st.exam_id = ? AND sa.answer_given IS NOT NULL AND sa.answer_given != ''
+				WHERE st.exam_id = ? AND sa.answer_given IS NOT NULL AND sa.answer_given != '' AND sa.answer_given != '[]' AND sa.answer_given != '{}'
 				GROUP BY sa.attempt_id
 			`).bind(examFilter).all();
 			
@@ -121,14 +121,12 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 		const attemptsWithProgress = await Promise.all(
 			attempts.map(async (a) => {
 				let status = a.status || 'belum_mulai';
-				let answeredCount = 0;
-				let warnings = 0;
+				let answeredCount = a.attempt_id ? (answeredCountsMap[a.attempt_id] || 0) : 0;
+				let warnings = a.violation_count || 0;
 				let warningLogs: any[] = [];
+				try { warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : []; } catch(e) {}
 
 				if (status === 'mengerjakan') {
-					warnings = a.violation_count || 0;
-					try { warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : []; } catch(e) {}
-
 					const kv = (platform?.env as any)?.EXAM_ANSWERS || (platform?.env as any)?.ANSWER_KV;
 					if (kv && a.attempt_id) {
 						try {
@@ -136,21 +134,19 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 							if (stored) {
 								const kvData = typeof stored === 'string' ? JSON.parse(stored) : stored;
 								if (kvData && kvData.answers) {
-									answeredCount = Object.keys(kvData.answers).length;
+									const kvAnswered = Object.values(kvData.answers).filter(val => val !== null && val !== '' && val !== '[]' && val !== '{}').length;
+									if (kvAnswered > answeredCount) {
+										answeredCount = kvAnswered;
+									}
+								}
+								if (kvData && kvData.warnings && kvData.warnings > warnings) warnings = kvData.warnings;
+								if (kvData && kvData.warningLogs && Array.isArray(kvData.warningLogs) && kvData.warningLogs.length > warningLogs.length) {
+									warningLogs = kvData.warningLogs;
 								}
 							}
 						} catch (e) {
 							console.error("KV get error:", e);
 						}
-					}
-					if (answeredCount === 0 && a.attempt_id) {
-						answeredCount = answeredCountsMap[a.attempt_id] || 0;
-					}
-				} else if (status === 'selesai' || status === 'waktu_habis') {
-					warnings = a.violation_count || 0;
-					try { warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : []; } catch(e) {}
-					if (a.attempt_id) {
-						answeredCount = answeredCountsMap[a.attempt_id] || 0;
 					}
 				}
 

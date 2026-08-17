@@ -73,7 +73,7 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 				SELECT sa.attempt_id, COUNT(*) as c
 				FROM student_answers sa
 				JOIN student_attempts st ON sa.attempt_id = st.id
-				WHERE st.exam_id = ? AND sa.answer_given IS NOT NULL AND sa.answer_given != ''
+				WHERE st.exam_id = ? AND sa.answer_given IS NOT NULL AND sa.answer_given != '' AND sa.answer_given != '[]' AND sa.answer_given != '{}'
 				GROUP BY sa.attempt_id
 			`).bind(examId).all();
 			
