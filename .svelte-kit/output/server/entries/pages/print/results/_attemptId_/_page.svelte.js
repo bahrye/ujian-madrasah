@@ -7,6 +7,29 @@ function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let school, attempt, answers, locationStr;
     let data = $$props["data"];
+    function safeParseJson(str, fallback = null) {
+      if (!str) return fallback;
+      try {
+        const parsed = JSON.parse(str);
+        if (typeof parsed === "string") {
+          try {
+            return JSON.parse(parsed);
+          } catch {
+            return parsed;
+          }
+        }
+        return parsed;
+      } catch {
+        return fallback;
+      }
+    }
+    function safeParseObjectEntries(str) {
+      const parsed = safeParseJson(str, {});
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        return Object.entries(parsed);
+      }
+      return [];
+    }
     school = data.school;
     attempt = data.attempt;
     answers = data.answers || [];
@@ -135,7 +158,7 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<p class="italic text-slate-500 text-[10px]">Penilaian manual oleh Guru</p>`);
         } else {
           $$renderer2.push("<!--[-1-->");
-          $$renderer2.push(`<p class="font-bold text-emerald-900 text-[11px]">${escape_html(ans.correct_answer_json ? JSON.parse(ans.correct_answer_json) : "-")}</p>`);
+          $$renderer2.push(`<p class="font-bold text-emerald-900 text-[11px]">${escape_html(safeParseJson(ans.correct_answer_json, "-"))}</p>`);
         }
         $$renderer2.push(`<!--]-->`);
       } else {
@@ -145,7 +168,7 @@ function _page($$renderer, $$props) {
           if (ans.type === "menjodohkan") {
             $$renderer2.push("<!--[0-->");
             $$renderer2.push(`<div class="space-y-0.5 text-[10px]"><!--[-->`);
-            const each_array_3 = ensure_array_like(Object.entries(typeof JSON.parse(ans.correct_answer_json) === "string" ? JSON.parse(JSON.parse(ans.correct_answer_json)) : JSON.parse(ans.correct_answer_json)));
+            const each_array_3 = ensure_array_like(safeParseObjectEntries(ans.correct_answer_json));
             for (let $$index_2 = 0, $$length2 = each_array_3.length; $$index_2 < $$length2; $$index_2++) {
               let [key, value] = each_array_3[$$index_2];
               $$renderer2.push(`<div class="flex border-b border-emerald-200/60 last:border-0 pb-0.5"><span class="font-medium text-emerald-900 w-1/2">${escape_html(key)}</span> <span class="text-emerald-950 font-bold w-1/2">➔ ${escape_html(value)}</span></div>`);
@@ -156,18 +179,18 @@ function _page($$renderer, $$props) {
             $$renderer2.push(`<p class="font-bold text-emerald-900 text-[11px]">`);
             if (ans.options_json) {
               $$renderer2.push("<!--[0-->");
-              const opts = JSON.parse(ans.options_json);
-              const correctOptId = JSON.parse(ans.correct_answer_json);
-              const correctOpt = opts.find((o) => String(o.id) === String(correctOptId));
+              const opts = safeParseJson(ans.options_json, []);
+              const correctOptId = safeParseJson(ans.correct_answer_json, "");
+              const correctOpt = Array.isArray(opts) ? opts.find((o) => String(o.id) === String(correctOptId)) : null;
               $$renderer2.push(`${escape_html(correctOpt ? correctOpt.text : correctOptId)}`);
             } else {
               $$renderer2.push("<!--[-1-->");
-              $$renderer2.push(`${escape_html(JSON.parse(ans.correct_answer_json))}`);
+              $$renderer2.push(`${escape_html(safeParseJson(ans.correct_answer_json, "-"))}`);
             }
             $$renderer2.push(`<!--]--></p>`);
           } else if (ans.type === "pilihan_ganda_kompleks") {
             $$renderer2.push("<!--[2-->");
-            const correctArr = typeof ans.correct_answer_json === "string" ? JSON.parse(ans.correct_answer_json) : ans.correct_answer_json;
+            const correctArr = safeParseJson(ans.correct_answer_json, []);
             if (Array.isArray(correctArr)) {
               $$renderer2.push("<!--[0-->");
               $$renderer2.push(`<div class="flex flex-wrap gap-1"><!--[-->`);
@@ -179,12 +202,12 @@ function _page($$renderer, $$props) {
               $$renderer2.push(`<!--]--></div>`);
             } else {
               $$renderer2.push("<!--[-1-->");
-              $$renderer2.push(`<p class="font-bold text-emerald-900 text-[11px]">${escape_html(JSON.parse(ans.correct_answer_json))}</p>`);
+              $$renderer2.push(`<p class="font-bold text-emerald-900 text-[11px]">${escape_html(safeParseJson(ans.correct_answer_json, "-"))}</p>`);
             }
             $$renderer2.push(`<!--]-->`);
           } else {
             $$renderer2.push("<!--[-1-->");
-            $$renderer2.push(`<p class="font-bold text-emerald-900 text-[11px]">${escape_html(JSON.parse(ans.correct_answer_json))}</p>`);
+            $$renderer2.push(`<p class="font-bold text-emerald-900 text-[11px]">${escape_html(safeParseJson(ans.correct_answer_json, "-"))}</p>`);
           }
           $$renderer2.push(`<!--]-->`);
         } else {

@@ -19,6 +19,27 @@
 		return () => clearTimeout(timer);
 	});
 
+	function safeParseJson(str: string | null | undefined, fallback: any = null) {
+		if (!str) return fallback;
+		try {
+			const parsed = JSON.parse(str);
+			if (typeof parsed === 'string') {
+				try { return JSON.parse(parsed); } catch { return parsed; }
+			}
+			return parsed;
+		} catch {
+			return fallback;
+		}
+	}
+
+	function safeParseObjectEntries(str: string | null | undefined): [string, any][] {
+		const parsed = safeParseJson(str, {});
+		if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+			return Object.entries(parsed);
+		}
+		return [];
+	}
+
 	$: locationStr = [
 		school?.district ? `Kec. ${school.district}` : '',
 		school?.city ? (school.city.toLowerCase().startsWith('kab') || school.city.toLowerCase().startsWith('kota') ? school.city : `Kab. ${school.city}`) : '',
@@ -250,14 +271,14 @@
 										<p class="italic text-slate-500 text-[10px]">Penilaian manual oleh Guru</p>
 									{:else}
 										<p class="font-bold text-emerald-900 text-[11px]">
-											{ans.correct_answer_json ? JSON.parse(ans.correct_answer_json) : '-'}
+											{safeParseJson(ans.correct_answer_json, '-')}
 										</p>
 									{/if}
 								{:else}
 									{#if ans.correct_answer_json}
 										{#if ans.type === 'menjodohkan'}
 											<div class="space-y-0.5 text-[10px]">
-												{#each Object.entries(typeof JSON.parse(ans.correct_answer_json) === 'string' ? JSON.parse(JSON.parse(ans.correct_answer_json)) : JSON.parse(ans.correct_answer_json)) as [key, value]}
+												{#each safeParseObjectEntries(ans.correct_answer_json) as [key, value]}
 													<div class="flex border-b border-emerald-200/60 last:border-0 pb-0.5">
 														<span class="font-medium text-emerald-900 w-1/2">{key}</span>
 														<span class="text-emerald-950 font-bold w-1/2">➔ {value}</span>
@@ -267,16 +288,16 @@
 										{:else if ans.type === 'pilihan_ganda'}
 											<p class="font-bold text-emerald-900 text-[11px]">
 												{#if ans.options_json}
-													{@const opts = JSON.parse(ans.options_json)}
-													{@const correctOptId = JSON.parse(ans.correct_answer_json)}
-													{@const correctOpt = opts.find((o: any) => String(o.id) === String(correctOptId))}
+													{@const opts = safeParseJson(ans.options_json, [])}
+													{@const correctOptId = safeParseJson(ans.correct_answer_json, '')}
+													{@const correctOpt = Array.isArray(opts) ? opts.find((o: any) => String(o.id) === String(correctOptId)) : null}
 													{correctOpt ? correctOpt.text : correctOptId}
 												{:else}
-													{JSON.parse(ans.correct_answer_json)}
+													{safeParseJson(ans.correct_answer_json, '-')}
 												{/if}
 											</p>
 										{:else if ans.type === 'pilihan_ganda_kompleks'}
-											{@const correctArr = typeof ans.correct_answer_json === 'string' ? JSON.parse(ans.correct_answer_json) : ans.correct_answer_json}
+											{@const correctArr = safeParseJson(ans.correct_answer_json, [])}
 											{#if Array.isArray(correctArr)}
 												<div class="flex flex-wrap gap-1">
 													{#each correctArr as item}
@@ -284,10 +305,10 @@
 													{/each}
 												</div>
 											{:else}
-												<p class="font-bold text-emerald-900 text-[11px]">{JSON.parse(ans.correct_answer_json)}</p>
+												<p class="font-bold text-emerald-900 text-[11px]">{safeParseJson(ans.correct_answer_json, '-')}</p>
 											{/if}
 										{:else}
-											<p class="font-bold text-emerald-900 text-[11px]">{JSON.parse(ans.correct_answer_json)}</p>
+											<p class="font-bold text-emerald-900 text-[11px]">{safeParseJson(ans.correct_answer_json, '-')}</p>
 										{/if}
 									{:else}
 										<p class="italic text-slate-500 text-[10px]">Tidak ada kunci jawaban</p>

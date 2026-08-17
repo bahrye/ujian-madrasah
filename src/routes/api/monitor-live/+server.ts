@@ -82,58 +82,32 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 			});
 		}
 
-		const kv = platform?.env?.EXAM_ANSWERS;
-		const attemptsWithProgress = await Promise.all(
-			attempts.map(async (a: any) => {
-				let answeredCount = 0;
-				let warnings = 0;
-				let warningLogs: any[] = [];
-				const status = a.status || 'belum_mengerjakan';
+		const attemptsWithProgress = attempts.map((a: any) => {
+			let answeredCount = 0;
+			let warnings = a.violation_count || 0;
+			let warningLogs: any[] = [];
+			const status = a.status || 'belum_mengerjakan';
 
-				if (status === 'mengerjakan') {
-					if (kv && a.attempt_id) {
-						try {
-							const stored = await kv.get(`attempt_${a.attempt_id}_answers`);
-							if (stored) {
-								const data = JSON.parse(stored);
-								if (data && data.answers) {
-									answeredCount = Object.values(data.answers).filter(val => val !== null && val !== '').length;
-								}
-								if (data && data.warnings) warnings = data.warnings;
-								if (data && data.warningLogs) warningLogs = data.warningLogs;
-							}
-						} catch (e) {
-							console.error("KV get error:", e);
-						}
-					}
-					if (answeredCount === 0 && a.attempt_id) {
-						answeredCount = answeredCountsMap[a.attempt_id] || 0;
-					}
-					if (warnings === 0) {
-						warnings = a.violation_count || 0;
-						try { warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : []; } catch(e) {}
-					}
-				} else if (status === 'selesai' || status === 'waktu_habis') {
-					warnings = a.violation_count || 0;
-					try { warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : []; } catch(e) {}
-					if (a.attempt_id) {
-						answeredCount = answeredCountsMap[a.attempt_id] || 0;
-					}
-				}
+			if (a.attempt_id) {
+				answeredCount = answeredCountsMap[a.attempt_id] || 0;
+			}
 
-				return {
-					...a,
-					id: a.attempt_id || `no_attempt_${a.student_id}`,
-					attempt_id: a.attempt_id,
-					status,
-					answeredCount,
-					warnings,
-					warningLogs,
-					is_paused: a.is_paused,
-					paused_at: a.paused_at
-				};
-			})
-		);
+			try {
+				warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : [];
+			} catch (e) {}
+
+			return {
+				...a,
+				id: a.attempt_id || `no_attempt_${a.student_id}`,
+				attempt_id: a.attempt_id,
+				status,
+				answeredCount,
+				warnings,
+				warningLogs,
+				is_paused: a.is_paused,
+				paused_at: a.paused_at
+			};
+		});
 
 		return json({ attempts: attemptsWithProgress });
 	} catch (e: any) {

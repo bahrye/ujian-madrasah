@@ -206,7 +206,7 @@ CREATE TABLE IF NOT EXISTS student_answers (
 );
 CREATE INDEX IF NOT EXISTS idx_answers_attempt ON student_answers(attempt_id);
 CREATE INDEX IF NOT EXISTS idx_answers_question ON student_answers(question_id);
-CREATE INDEX IF NOT EXISTS idx_answers_attempt_question ON student_answers(attempt_id, question_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_answers_attempt_question ON student_answers(attempt_id, question_id);
 
 -- 14. Tabel Peserta Ujian
 CREATE TABLE IF NOT EXISTS exam_participants (

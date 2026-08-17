@@ -109,7 +109,7 @@
 			
 			const res = await fetch(`/api/monitor-live?${queryParams.toString()}`);
 			if (!res.ok) return;
-			const result = await res.json();
+			const result = (await res.json()) as any;
 			if (result.attempts && Array.isArray(result.attempts)) {
 				result.attempts.forEach((newA: any) => {
 					const key = newA.attempt_id || newA.student_id;
@@ -159,10 +159,35 @@
 			});
 		}
 
+		const handleVisibilityChange = () => {
+			if (document.hidden) {
+				if (interval) {
+					clearInterval(interval);
+					interval = null;
+				}
+			} else {
+				pollLiveStatus();
+				if (!interval) {
+					interval = setInterval(() => {
+						currentTime = Date.now();
+						pollLiveStatus();
+					}, 3000);
+				}
+			}
+		};
+
+		document.addEventListener('visibilitychange', handleVisibilityChange);
+
 		interval = setInterval(() => {
-			currentTime = Date.now();
-			pollLiveStatus();
-		}, 2500);
+			if (!document.hidden) {
+				currentTime = Date.now();
+				pollLiveStatus();
+			}
+		}, 3000);
+
+		return () => {
+			document.removeEventListener('visibilitychange', handleVisibilityChange);
+		};
 	});
 
 	onDestroy(() => {

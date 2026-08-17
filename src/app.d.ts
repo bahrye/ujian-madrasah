@@ -1,6 +1,10 @@
 /// <reference types="@sveltejs/kit" />
 /// <reference types="@cloudflare/workers-types" />
 
+declare module 'katex/dist/contrib/auto-render.mjs' {
+	export default function renderMathInElement(elem: HTMLElement, options?: any): void;
+}
+
 declare global {
 	namespace App {
 		interface Platform {
@@ -33,7 +37,3 @@ declare global {
 }
 
 export {};
-
-declare module 'katex/dist/contrib/auto-render.mjs' {
-	export default function renderMathInElement(elem: HTMLElement, options?: any): void;
-}

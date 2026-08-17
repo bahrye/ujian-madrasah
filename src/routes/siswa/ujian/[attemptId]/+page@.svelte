@@ -166,7 +166,7 @@
 		}, 3000);
 
 		statusPollingInterval = setInterval(async () => {
-			if (isUnloading || submitting || showSubmitConfirm) return;
+			if (isUnloading || submitting || showSubmitConfirm || typeof document !== 'undefined' && document.hidden) return;
 			try {
 				const res = await fetch(`/api/attempt-status/${attempt.id}`);
 				if (res.ok) {

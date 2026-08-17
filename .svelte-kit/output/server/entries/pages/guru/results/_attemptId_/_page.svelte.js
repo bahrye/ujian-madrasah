@@ -7,6 +7,29 @@ function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let attempt, answers;
     let data = $$props["data"];
+    function safeParseJson(str, fallback = null) {
+      if (!str) return fallback;
+      try {
+        const parsed = JSON.parse(str);
+        if (typeof parsed === "string") {
+          try {
+            return JSON.parse(parsed);
+          } catch {
+            return parsed;
+          }
+        }
+        return parsed;
+      } catch {
+        return fallback;
+      }
+    }
+    function safeParseObjectEntries(str) {
+      const parsed = safeParseJson(str, {});
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        return Object.entries(parsed);
+      }
+      return [];
+    }
     attempt = data.attempt;
     answers = data.answers;
     head("1w23tv2", $$renderer2, ($$renderer3) => {
@@ -92,7 +115,7 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<p class="text-sm italic text-slate-400">Dinilai manual oleh guru</p>`);
         } else {
           $$renderer2.push("<!--[-1-->");
-          $$renderer2.push(`<p class="text-sm text-emerald-700 bg-emerald-50 p-2 rounded border border-emerald-100">${escape_html(ans.correct_answer_json ? JSON.parse(ans.correct_answer_json) : "Tidak ada")}</p>`);
+          $$renderer2.push(`<p class="text-sm text-emerald-700 bg-emerald-50 p-2 rounded border border-emerald-100">${escape_html(safeParseJson(ans.correct_answer_json, "Tidak ada"))}</p>`);
         }
         $$renderer2.push(`<!--]-->`);
       } else {
@@ -102,7 +125,7 @@ function _page($$renderer, $$props) {
           if (ans.type === "menjodohkan") {
             $$renderer2.push("<!--[0-->");
             $$renderer2.push(`<div class="space-y-2 text-sm bg-emerald-50 p-2 rounded border border-emerald-100"><!--[-->`);
-            const each_array_3 = ensure_array_like(Object.entries(typeof JSON.parse(ans.correct_answer_json) === "string" ? JSON.parse(JSON.parse(ans.correct_answer_json)) : JSON.parse(ans.correct_answer_json)));
+            const each_array_3 = ensure_array_like(safeParseObjectEntries(ans.correct_answer_json));
             for (let $$index_2 = 0, $$length2 = each_array_3.length; $$index_2 < $$length2; $$index_2++) {
               let [key, value] = each_array_3[$$index_2];
               $$renderer2.push(`<div class="flex border-b border-emerald-200/50 last:border-0 pb-1 last:pb-0"><span class="font-medium text-emerald-800 w-1/2">${escape_html(key)}</span> <span class="text-emerald-900 w-1/2">-> ${escape_html(value)}</span></div>`);
@@ -113,18 +136,18 @@ function _page($$renderer, $$props) {
             $$renderer2.push(`<p class="text-sm text-emerald-800 bg-emerald-50 p-2 rounded border border-emerald-100">`);
             if (ans.options_json) {
               $$renderer2.push("<!--[0-->");
-              const opts = JSON.parse(ans.options_json);
-              const correctOptId = JSON.parse(ans.correct_answer_json);
-              const correctOpt = opts.find((o) => String(o.id) === String(correctOptId));
+              const opts = safeParseJson(ans.options_json, []);
+              const correctOptId = safeParseJson(ans.correct_answer_json, "");
+              const correctOpt = Array.isArray(opts) ? opts.find((o) => String(o.id) === String(correctOptId)) : null;
               $$renderer2.push(`${escape_html(correctOpt ? correctOpt.text : correctOptId)}`);
             } else {
               $$renderer2.push("<!--[-1-->");
-              $$renderer2.push(`${escape_html(JSON.parse(ans.correct_answer_json))}`);
+              $$renderer2.push(`${escape_html(safeParseJson(ans.correct_answer_json, "Tidak ada"))}`);
             }
             $$renderer2.push(`<!--]--></p>`);
           } else if (ans.type === "pilihan_ganda_kompleks") {
             $$renderer2.push("<!--[2-->");
-            const correctArr = typeof ans.correct_answer_json === "string" ? JSON.parse(ans.correct_answer_json) : ans.correct_answer_json;
+            const correctArr = safeParseJson(ans.correct_answer_json, []);
             $$renderer2.push(`<div class="space-y-1 text-sm bg-emerald-50 p-2 rounded border border-emerald-100">`);
             if (Array.isArray(correctArr)) {
               $$renderer2.push("<!--[0-->");
@@ -137,12 +160,12 @@ function _page($$renderer, $$props) {
               $$renderer2.push(`<!--]--></div>`);
             } else {
               $$renderer2.push("<!--[-1-->");
-              $$renderer2.push(`<p class="text-emerald-800">${escape_html(JSON.parse(ans.correct_answer_json))}</p>`);
+              $$renderer2.push(`<p class="text-emerald-800">${escape_html(safeParseJson(ans.correct_answer_json, "Tidak ada"))}</p>`);
             }
             $$renderer2.push(`<!--]--></div>`);
           } else {
             $$renderer2.push("<!--[-1-->");
-            $$renderer2.push(`<p class="text-sm text-emerald-800 bg-emerald-50 p-2 rounded border border-emerald-100">${escape_html(JSON.parse(ans.correct_answer_json))}</p>`);
+            $$renderer2.push(`<p class="text-sm text-emerald-800 bg-emerald-50 p-2 rounded border border-emerald-100">${escape_html(safeParseJson(ans.correct_answer_json, "Tidak ada"))}</p>`);
           }
           $$renderer2.push(`<!--]-->`);
         } else {

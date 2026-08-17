@@ -1,6 +1,6 @@
 import renderMathInElement from 'katex/dist/contrib/auto-render.mjs';
 
-export function mathRender(node: HTMLElement) {
+export function mathRender(node: HTMLElement, trigger?: any) {
 	function render() {
 		try {
 			renderMathInElement(node, {

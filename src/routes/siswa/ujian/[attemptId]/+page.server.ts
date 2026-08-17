@@ -118,8 +118,7 @@ export const load: PageServerLoad = async ({ platform, locals, params, cookies }
 export const actions: Actions = {
 	saveAnswer: async ({ request, platform, params, locals, cookies }) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
-		const kv = platform?.env?.EXAM_ANSWERS;
-		if (!kv) return fail(500, { error: 'KV not configured' });
+		const db = getDB(platform);
 
 		const attemptIdStr = params.attemptId;
 		const parsedAttemptId = parseInt(attemptIdStr, 10);
@@ -137,16 +136,56 @@ export const actions: Actions = {
 
 		if (answersStr || warningsStr) {
 			try {
-				const payload = {
-					answers: answersStr ? JSON.parse(answersStr) : {},
-					doubts: doubtsStr ? JSON.parse(doubtsStr) : {},
-					warnings: warningsStr ? parseInt(warningsStr, 10) : 0,
-					warningLogs: warningLogsStr ? JSON.parse(warningLogsStr) : []
-				};
+				const parsedAnswers = answersStr ? JSON.parse(answersStr) : {};
+				const parsedDoubts = doubtsStr ? JSON.parse(doubtsStr) : {};
+				const warnings = warningsStr ? parseInt(warningsStr, 10) : 0;
+				const warningLogs = warningLogsStr || '[]';
 
-				await kv.put(`attempt_${parsedAttemptId}_answers`, JSON.stringify(payload));
+				const syncStmts: any[] = [];
+
+				for (const [qIdStr, ansVal] of Object.entries(parsedAnswers)) {
+					const qId = parseInt(qIdStr, 10);
+					if (isNaN(qId)) continue;
+					const valStr = ansVal !== null && typeof ansVal !== 'undefined' ? String(ansVal) : null;
+					const isDoubted = parsedDoubts[qId] ? 1 : 0;
+
+					syncStmts.push(
+						db.prepare(`
+							INSERT INTO student_answers (attempt_id, question_id, answer_given, is_doubted, answered_at)
+							VALUES (?, ?, ?, ?, datetime('now'))
+							ON CONFLICT(attempt_id, question_id) DO UPDATE SET
+								answer_given = excluded.answer_given,
+								is_doubted = excluded.is_doubted,
+								answered_at = datetime('now')
+						`).bind(parsedAttemptId, qId, valStr, isDoubted)
+					);
+				}
+
+				syncStmts.push(
+					db.prepare(`
+						UPDATE student_attempts 
+						SET violation_count = ?, violation_logs = ?
+						WHERE id = ? AND student_id = ?
+					`).bind(warnings, warningLogs, parsedAttemptId, locals.user.id)
+				);
+
+				if (syncStmts.length > 0) {
+					await db.batch(syncStmts);
+				}
+
+				// Optional KV sync for legacy/fallback compatibility
+				const kv = platform?.env?.EXAM_ANSWERS;
+				if (kv) {
+					kv.put(`attempt_${parsedAttemptId}_answers`, JSON.stringify({
+						answers: parsedAnswers,
+						doubts: parsedDoubts,
+						warnings,
+						warningLogs: JSON.parse(warningLogs)
+					})).catch(() => {});
+				}
 			} catch (e) {
-				return fail(400, { error: 'Invalid JSON payload' });
+				console.error("Save answer error:", e);
+				return fail(400, { error: 'Gagal menyimpan jawaban.' });
 			}
 		}
 
@@ -195,51 +234,34 @@ export const actions: Actions = {
 				}
 			}
 
-			let kvAnswers: Record<string, any> = { ...formAnswers };
-			let kvDoubts: Record<string, any> = { ...formDoubts };
-
-			const kv = platform?.env?.EXAM_ANSWERS;
-			if (kv) {
-				const stored = await kv.get(`attempt_${parsedAttemptId}_answers`);
-				if (stored) {
-					try {
-						const kvData = JSON.parse(stored);
-						if (kvData && kvData.warnings) warnings = kvData.warnings;
-						if (kvData && kvData.warningLogs) warningLogs = JSON.stringify(kvData.warningLogs);
-						if (kvData && kvData.answers) kvAnswers = { ...kvAnswers, ...kvData.answers };
-						if (kvData && kvData.doubts) kvDoubts = { ...kvDoubts, ...kvData.doubts };
-						await kv.delete(`attempt_${parsedAttemptId}_answers`);
-					} catch (e) {}
-				}
-			}
-
-			// Sync answers to student_answers database
+			// Sync any last second submitted form answers directly to D1
 			const examQuestions = await db.prepare('SELECT id FROM questions WHERE exam_id = ?').bind(attempt.exam_id).all<{ id: number }>();
-			const existingAnswers = await db.prepare('SELECT question_id, id FROM student_answers WHERE attempt_id = ?').bind(parsedAttemptId).all<{ question_id: number; id: number }>();
-			const existingMap = new Map<number, number>(existingAnswers.results.map(a => [a.question_id, a.id]));
-
-			const syncStmts = [];
+			const syncStmts: any[] = [];
 			for (const q of examQuestions.results) {
-				const ansVal = typeof kvAnswers[q.id] !== 'undefined' && kvAnswers[q.id] !== null ? String(kvAnswers[q.id]) : null;
-				const isDoubted = kvDoubts[q.id] ? 1 : 0;
-
-				if (existingMap.has(q.id)) {
-					if (ansVal !== null) {
-						syncStmts.push(
-							db.prepare(`UPDATE student_answers SET answer_given = ?, is_doubted = ?, answered_at = datetime('now') WHERE attempt_id = ? AND question_id = ?`)
-								.bind(ansVal, isDoubted, parsedAttemptId, q.id)
-						);
-					}
-				} else {
+				if (typeof formAnswers[q.id] !== 'undefined' && formAnswers[q.id] !== null) {
+					const ansVal = String(formAnswers[q.id]);
+					const isDoubted = formDoubts[q.id] ? 1 : 0;
 					syncStmts.push(
-						db.prepare(`INSERT INTO student_answers (attempt_id, question_id, answer_given, is_doubted, answered_at) VALUES (?, ?, ?, ?, datetime('now'))`)
-							.bind(parsedAttemptId, q.id, ansVal, isDoubted)
+						db.prepare(`
+							INSERT INTO student_answers (attempt_id, question_id, answer_given, is_doubted, answered_at)
+							VALUES (?, ?, ?, ?, datetime('now'))
+							ON CONFLICT(attempt_id, question_id) DO UPDATE SET
+								answer_given = excluded.answer_given,
+								is_doubted = excluded.is_doubted,
+								answered_at = datetime('now')
+						`).bind(parsedAttemptId, q.id, ansVal, isDoubted)
 					);
 				}
 			}
 
 			if (syncStmts.length > 0) {
 				await db.batch(syncStmts);
+			}
+
+			// Cleanup KV key if exists
+			const kv = platform?.env?.EXAM_ANSWERS;
+			if (kv) {
+				kv.delete(`attempt_${parsedAttemptId}_answers`).catch(() => {});
 			}
 
 			// Auto-grade soal objektif
