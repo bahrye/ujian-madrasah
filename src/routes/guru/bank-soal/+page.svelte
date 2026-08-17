@@ -93,6 +93,16 @@
 					{#if exam.question_count > 0}
 						<div class="flex items-center gap-1" on:click|stopPropagation>
 							<a 
+								href="/admin/exams/{exam.id}/analisis" 
+								class="btn-sm btn-ghost p-2 hover:bg-indigo-50 rounded-lg text-indigo-600 transition-colors z-10 relative"
+								title="Analisis Butir Soal"
+								on:click|stopPropagation
+							>
+								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+								</svg>
+							</a>
+							<a 
 								href="/guru/bank-soal/{exam.id}/preview?from=bank" 
 								class="btn-sm btn-ghost p-2 hover:bg-indigo-50 rounded-lg text-indigo-600 transition-colors z-10 relative"
 								title="Preview Soal"
