@@ -1835,7 +1835,8 @@
       "_root.js",
       "_state.svelte.js",
       "_StatCard.js",
-      "_constants.js"
+      "_constants.js",
+      "_date.js"
     ]
   },
   "src/routes/pengawas/tata-tertib/+page.svelte": {

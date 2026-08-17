@@ -7,6 +7,7 @@ import "../../../../chunks/root.js";
 import "../../../../chunks/state.svelte.js";
 import { S as StatCard } from "../../../../chunks/StatCard.js";
 import { I as ICONS } from "../../../../chunks/constants.js";
+import { p as parseDate } from "../../../../chunks/date.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let data = $$props["data"];
@@ -21,7 +22,7 @@ function _page($$renderer, $$props) {
     function formatTime(timeStr) {
       if (!timeStr) return "Belum pernah";
       try {
-        const date = new Date(timeStr);
+        const date = parseDate(timeStr);
         if (isNaN(date.getTime())) return timeStr;
         return new Intl.DateTimeFormat("id-ID", {
           day: "numeric",

@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import StatCard from '$lib/components/dashboard/StatCard.svelte';
 	import { ICONS } from '$lib/utils/constants';
+	import { parseDate } from '$lib/utils/date';
 
 	export let data;
 	export let form;
@@ -50,7 +51,7 @@
 	function formatTime(timeStr: string | null) {
 		if (!timeStr) return 'Belum pernah';
 		try {
-			const date = new Date(timeStr);
+			const date = parseDate(timeStr);
 			if (isNaN(date.getTime())) return timeStr;
 			return new Intl.DateTimeFormat('id-ID', {
 				day: 'numeric',
