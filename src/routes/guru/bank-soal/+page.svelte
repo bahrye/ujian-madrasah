@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { ICONS } from '$lib/utils/constants';
 	import { enhance } from '$app/forms';
+	import { goto } from '$app/navigation';
 	export let data;
 
 	let showCopyModal = false;
@@ -61,7 +62,13 @@
 
 	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 		{#each data.exams as exam (exam.id)}
-			<a href="/guru/bank-soal/{exam.id}" class="card-hover p-5 group flex flex-col justify-between">
+			<div 
+				class="card-hover p-5 group flex flex-col justify-between cursor-pointer"
+				on:click={() => goto(`/guru/bank-soal/${exam.id}`)}
+				on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && goto(`/guru/bank-soal/${exam.id}`)}
+				role="button"
+				tabindex="0"
+			>
 				<div>
 					<div class="flex items-start justify-between mb-2">
 						<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -84,11 +91,12 @@
 						</svg>
 					</div>
 					{#if exam.question_count > 0}
-						<div class="flex items-center gap-1">
+						<div class="flex items-center gap-1" on:click|stopPropagation>
 							<a 
 								href="/guru/bank-soal/{exam.id}/preview?from=bank" 
 								class="btn-sm btn-ghost p-2 hover:bg-indigo-50 rounded-lg text-indigo-600 transition-colors z-10 relative"
 								title="Preview Soal"
+								on:click|stopPropagation
 							>
 								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
@@ -98,7 +106,7 @@
 							<button 
 								type="button" 
 								class="btn-sm btn-ghost p-2 hover:bg-indigo-50 rounded-lg text-indigo-600 transition-colors z-10 relative"
-								on:click|preventDefault={() => openCopyModal(exam)}
+								on:click|stopPropagation|preventDefault={() => openCopyModal(exam)}
 								title="Salin Soal"
 							>
 								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -108,7 +116,7 @@
 						</div>
 					{/if}
 				</div>
-			</a>
+			</div>
 		{:else}
 			<div class="col-span-full text-center py-12 text-slate-400">Belum ada ujian. Hubungi admin untuk membuat ujian.</div>
 		{/each}
