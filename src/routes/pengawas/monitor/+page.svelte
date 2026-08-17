@@ -225,7 +225,11 @@
 	<!-- Filter -->
 	<div class="card p-4">
 		<form method="GET" class="flex flex-wrap gap-3 mb-4" bind:this={formElement}>
-			<select name="exam_id" class="select flex-1 min-w-[200px]" required on:change={() => formElement?.submit()}>
+			<select name="exam_id" class="select flex-1 min-w-[200px]" required on:change={() => {
+				const sessionEl = formElement?.querySelector('select[name="session_number"]') as HTMLSelectElement;
+				if (sessionEl) sessionEl.value = '';
+				formElement?.submit();
+			}}>
 				<option value="">-- Pilih Ujian --</option>
 				{#each data.exams as exam}
 					<option value={exam.id} selected={String(data.examFilter) === String(exam.id)}>{exam.title}</option>

@@ -139,9 +139,14 @@ export const load: PageServerLoad = async ({ platform, locals, url }) => {
 
 		const params: any[] = [examFilter, examFilter, examFilter];
 
-		if (!isNaN(sessionFilter)) {
+		let activeSessionFilter: number | null = null;
+		if (!isNaN(sessionFilter) && availableSessions.length > 0 && availableSessions.includes(sessionFilter)) {
+			activeSessionFilter = sessionFilter;
+		}
+
+		if (activeSessionFilter !== null) {
 			query += ` AND COALESCE(u.session_number, 1) = ?`;
-			params.push(sessionFilter);
+			params.push(activeSessionFilter);
 		}
 
 		if (search) {
@@ -171,7 +176,7 @@ export const load: PageServerLoad = async ({ platform, locals, url }) => {
 			filters: {
 				q: search,
 				exam_id: String(examFilter),
-				session_number: isNaN(sessionFilter) ? '' : String(sessionFilter)
+				session_number: activeSessionFilter !== null ? String(activeSessionFilter) : ''
 			}
 		};
 	} catch (e: any) {

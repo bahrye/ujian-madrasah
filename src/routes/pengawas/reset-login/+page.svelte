@@ -31,6 +31,11 @@
 		goto(`?${params.toString()}`, { keepFocus: true, replaceState: true });
 	}
 
+	function handleExamChange() {
+		selectedSession = '';
+		applyFilters();
+	}
+
 	function handleSearchInput() {
 		applyFilters();
 	}
@@ -151,7 +156,7 @@
 				</label>
 				<select 
 					bind:value={selectedExam} 
-					on:change={applyFilters}
+					on:change={handleExamChange}
 					class="select text-sm font-bold text-slate-800 border-slate-300 hover:border-indigo-400 focus:border-indigo-500 bg-white shadow-xs"
 				>
 					<option value="">-- Pilih Ujian --</option>

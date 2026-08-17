@@ -150,9 +150,13 @@ const load = async ({ platform, locals, url }) => {
 			WHERE ep.exam_id = ? AND u.role = 'siswa' AND u.is_active = 1
 		`;
     const params = [examFilter, examFilter, examFilter];
-    if (!isNaN(sessionFilter)) {
+    let activeSessionFilter = null;
+    if (!isNaN(sessionFilter) && availableSessions.length > 0 && availableSessions.includes(sessionFilter)) {
+      activeSessionFilter = sessionFilter;
+    }
+    if (activeSessionFilter !== null) {
       query += ` AND COALESCE(u.session_number, 1) = ?`;
-      params.push(sessionFilter);
+      params.push(activeSessionFilter);
     }
     if (search) {
       query += ` AND (u.name LIKE ? OR u.username LIKE ? OR u.nisn LIKE ?)`;
@@ -176,7 +180,7 @@ const load = async ({ platform, locals, url }) => {
       filters: {
         q: search,
         exam_id: String(examFilter),
-        session_number: isNaN(sessionFilter) ? "" : String(sessionFilter)
+        session_number: activeSessionFilter !== null ? String(activeSessionFilter) : ""
       }
     };
   } catch (e) {
