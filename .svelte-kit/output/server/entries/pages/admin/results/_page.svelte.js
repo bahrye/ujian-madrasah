@@ -93,14 +93,14 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<div class="p-12 text-center text-slate-400">Belum ada hasil ujian.</div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Siswa</th><th>Ujian</th><th>Mapel</th><th>Nilai</th><th>Status Ujian</th><th class="whitespace-nowrap text-xs">Status Nilai</th><th>Waktu Selesai</th><th class="w-28 text-center">Aksi</th></tr></thead><tbody><!--[-->`);
+      $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Siswa</th><th>Ujian</th><th>Nilai</th><th>Status Ujian</th><th class="whitespace-nowrap text-xs">Status Nilai</th><th>Waktu Selesai</th><th class="w-28 text-center">Aksi</th></tr></thead><tbody><!--[-->`);
       const each_array_1 = ensure_array_like(results);
       for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
         let r = each_array_1[$$index_1];
         const isComplete = r.is_graded === 1 || r.ungraded_count === 0;
         const isManual = r.show_score_type === "manual";
         const released = isAttemptScoreReleased(r, currentTime);
-        $$renderer2.push(`<tr><td class="font-semibold text-slate-800">${escape_html(r.student_name)}</td><td>${escape_html(r.exam_title)}</td><td class="text-slate-500">${escape_html(r.subject || "-")}</td><td><span${attr_class(`text-lg font-bold ${(r.score ?? 0) >= 70 ? "text-emerald-600" : "text-rose-600"}`)}>${escape_html(r.score != null ? r.score.toFixed(1) : "-")}</span></td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[r.status] || "badge-info"))}>${escape_html(ATTEMPT_STATUS_LABELS[r.status])}</span></td><td class="whitespace-nowrap text-xs">`);
+        $$renderer2.push(`<tr><td class="font-semibold text-slate-800">${escape_html(r.student_name)}</td><td>${escape_html(r.exam_title)}</td><td><span${attr_class(`text-lg font-bold ${(r.score ?? 0) >= 70 ? "text-emerald-600" : "text-rose-600"}`)}>${escape_html(r.score != null ? r.score.toFixed(1) : "-")}</span></td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[r.status] || "badge-info"))}>${escape_html(ATTEMPT_STATUS_LABELS[r.status])}</span></td><td class="whitespace-nowrap text-xs">`);
         if (released) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<span class="badge-success text-[11px] whitespace-nowrap px-2 py-0.5 font-medium">🟢 Terkirim</span>`);

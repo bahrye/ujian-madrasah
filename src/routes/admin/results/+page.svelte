@@ -127,7 +127,6 @@
 						<tr>
 							<th>Siswa</th>
 							<th>Ujian</th>
-							<th>Mapel</th>
 							<th>Nilai</th>
 							<th>Status Ujian</th>
 							<th class="whitespace-nowrap text-xs">Status Nilai</th>
@@ -143,7 +142,6 @@
 							<tr>
 								<td class="font-semibold text-slate-800">{r.student_name}</td>
 								<td>{r.exam_title}</td>
-								<td class="text-slate-500">{r.subject || '-'}</td>
 								<td>
 									<span class="text-lg font-bold {(r.score ?? 0) >= 70 ? 'text-emerald-600' : 'text-rose-600'}">
 										{r.score != null ? r.score.toFixed(1) : '-'}
