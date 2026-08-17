@@ -8,6 +8,9 @@
 	export let form;
 
 	let searchQuery = data.filters.q || '';
+	let selectedExam = data.filters.exam_id || '';
+	let selectedSession = data.filters.session_number || '';
+	let selectedRoom = data.filters.room_id || '';
 	let selectedClass = data.filters.class_id || '';
 	let selectedStatus = data.filters.status || '';
 
@@ -19,6 +22,9 @@
 	function applyFilters() {
 		const params = new URLSearchParams();
 		if (searchQuery.trim()) params.set('q', searchQuery.trim());
+		if (selectedExam) params.set('exam_id', selectedExam);
+		if (selectedSession) params.set('session_number', selectedSession);
+		if (selectedRoom) params.set('room_id', selectedRoom);
 		if (selectedClass) params.set('class_id', selectedClass);
 		if (selectedStatus) params.set('status', selectedStatus);
 
@@ -126,7 +132,7 @@
 	<!-- Statistics Cards -->
 	<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 		<StatCard 
-			label="Total Siswa" 
+			label="Total Peserta Diawasi" 
 			value={String(data.stats.total)} 
 			icon={ICONS.users} 
 			gradient="indigo" 
@@ -146,8 +152,8 @@
 	</div>
 
 	<!-- Filters & Search Toolbar -->
-	<div class="card p-4 border border-slate-100 bg-white">
-		<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+	<div class="card p-4 border border-slate-100 bg-white space-y-3">
+		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
 			<!-- Search Box -->
 			<div class="relative">
 				<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
@@ -162,6 +168,52 @@
 					placeholder="Cari nama, username, atau NISN..."
 					class="input-field pl-9 text-sm"
 				/>
+			</div>
+
+			<!-- Filter Ujian -->
+			<div>
+				<select 
+					bind:value={selectedExam} 
+					on:change={applyFilters}
+					class="input-field text-sm font-medium text-slate-700"
+				>
+					<option value="">-- Semua Ujian --</option>
+					{#each data.exams as e}
+						<option value={e.id}>{e.title}</option>
+					{/each}
+				</select>
+			</div>
+
+			<!-- Filter Sesi Ujian -->
+			<div>
+				<select 
+					bind:value={selectedSession} 
+					on:change={applyFilters}
+					class="input-field text-sm"
+				>
+					<option value="">-- Semua Sesi Ujian --</option>
+					<option value="1">Sesi 1</option>
+					<option value="2">Sesi 2</option>
+					<option value="3">Sesi 3</option>
+					<option value="4">Sesi 4</option>
+					<option value="5">Sesi 5</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-100">
+			<!-- Filter Ruang -->
+			<div>
+				<select 
+					bind:value={selectedRoom} 
+					on:change={applyFilters}
+					class="input-field text-sm"
+				>
+					<option value="">-- Semua Ruang --</option>
+					{#each data.rooms as r}
+						<option value={r.id}>{r.name}</option>
+					{/each}
+				</select>
 			</div>
 
 			<!-- Filter Kelas -->
@@ -183,7 +235,7 @@
 				<select 
 					bind:value={selectedStatus} 
 					on:change={applyFilters}
-					class="input-field text-sm"
+					class="input-field text-sm font-medium"
 				>
 					<option value="">-- Semua Status Login --</option>
 					<option value="active">🔴 Sedang Logged In (Aktif)</option>
@@ -202,6 +254,7 @@
 						<th class="px-4 py-3 text-center w-12">No</th>
 						<th class="px-4 py-3">Nama Siswa</th>
 						<th class="px-4 py-3">Username / NISN</th>
+						<th class="px-4 py-3">Ujian & Sesi</th>
 						<th class="px-4 py-3">Kelas & Ruang</th>
 						<th class="px-4 py-3 text-center">Status Login</th>
 						<th class="px-4 py-3">Waktu Aktif</th>
@@ -225,9 +278,17 @@
 								</td>
 								<td class="px-4 py-3">
 									<div class="flex flex-col gap-0.5">
+										<span class="font-medium text-slate-800 text-xs truncate max-w-[160px]" title={student.exam_title || '-'}>{student.exam_title || '-'}</span>
+										<span class="inline-flex items-center gap-1 w-fit px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+											Sesi {student.student_session_number || 1}
+										</span>
+									</div>
+								</td>
+								<td class="px-4 py-3">
+									<div class="flex flex-col gap-0.5">
 										<span class="font-medium text-slate-700">{student.class_name}</span>
 										{#if student.room_name}
-											<span class="text-xs text-indigo-600 font-medium">Ruang: {student.room_name}</span>
+											<span class="text-xs text-emerald-600 font-medium">Ruang: {student.room_name}</span>
 										{/if}
 									</div>
 								</td>
@@ -247,7 +308,7 @@
 								<td class="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">
 									{formatTime(student.last_active_at)}
 								</td>
-								<td class="px-4 py-3 text-xs text-slate-600 max-w-[180px] truncate" title={student.login_device || '-'}>
+								<td class="px-4 py-3 text-xs text-slate-600 max-w-[160px] truncate" title={student.login_device || '-'}>
 									{getDeviceLabel(student.login_device)}
 								</td>
 								<td class="px-4 py-3 text-right">
@@ -288,14 +349,14 @@
 						{/each}
 					{:else}
 						<tr>
-							<td colspan="8" class="px-4 py-12 text-center text-slate-400">
+							<td colspan="9" class="px-4 py-12 text-center text-slate-400">
 								<div class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-3">
 									<svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={ICONS.users} />
 									</svg>
 								</div>
-								<p class="font-medium text-slate-600">Tidak ada data siswa ditemukan.</p>
-								<p class="text-xs text-slate-400 mt-1">Coba sesuaikan kata kunci pencarian atau filter kelas.</p>
+								<p class="font-medium text-slate-600">Tidak ada data siswa diawasi yang sesuai filter.</p>
+								<p class="text-xs text-slate-400 mt-1">Coba sesuaikan kata kunci pencarian, filter ujian, atau sesi ujian.</p>
 							</td>
 						</tr>
 					{/if}
@@ -327,7 +388,7 @@
 				{#if isResetAll}
 					<h3 class="font-bold text-lg text-slate-800 text-center">Reset Semua Login Active?</h3>
 					<p class="text-sm text-slate-500 text-center mt-2">
-						Aksi ini akan me-reset status login seluruh <strong class="text-slate-700">{data.stats.active} siswa</strong> yang saat ini terdeteksi aktif. Siswa akan diwajibkan untuk login kembali pada perangkat mereka.
+						Aksi ini akan me-reset status login seluruh <strong class="text-slate-700">{data.stats.active} siswa</strong> dalam pengawasan Anda yang saat ini terdeteksi aktif. Siswa akan diwajibkan untuk login kembali pada perangkat mereka.
 					</p>
 				{:else if targetStudent}
 					<h3 class="font-bold text-lg text-slate-800 text-center">Konfirmasi Reset Login</h3>
