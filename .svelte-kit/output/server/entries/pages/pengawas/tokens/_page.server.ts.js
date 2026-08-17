@@ -2,6 +2,7 @@ import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB, d as ensureTokenSessionColumn } from "../../../../chunks/db.js";
 import { g as generateTokenCode } from "../../../../chunks/auth.js";
 import { c as checkSessionTimeWindow } from "../../../../chunks/date.js";
+import { f as formatExamTitle } from "../../../../chunks/exam.js";
 const load = async ({ platform, locals }) => {
   if (!locals.user) throw redirect(302, "/login");
   const db = getDB(platform);
@@ -40,17 +41,46 @@ const load = async ({ platform, locals }) => {
     used_by_students: []
     // Placeholder to maintain structure compatibility
   }));
-  const examsRaw = await db.prepare(`
-		SELECT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name, ep.sessions as proctor_sessions
-		FROM exams e
-		JOIN exam_proctors ep ON e.id = ep.exam_id
-		LEFT JOIN subjects s ON e.subject_id = s.id
-		JOIN exam_types et ON e.exam_type_id = et.id
-		LEFT JOIN classes c ON e.class_id = c.id
-		WHERE e.is_active = 1 AND et.is_active = 1 AND e.school_id = ? AND ep.proctor_id = ?
-		ORDER BY e.title
-	`).bind(locals.user.school_id, locals.user.id).all();
-  const examIds = examsRaw.results.map((e) => e.id);
+  const isSuperAdmin = locals.user.role === "superadmin" || locals.user.school_id === null;
+  const isAdmin = locals.user.role === "admin";
+  let rawExamsList = [];
+  if (isSuperAdmin || isAdmin) {
+    const examsRes = await db.prepare(`
+			SELECT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name, NULL as proctor_sessions
+			FROM exams e
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN classes c ON e.class_id = c.id
+			WHERE e.is_active = 1 AND et.is_active = 1 AND e.school_id = ?
+			ORDER BY e.title
+		`).bind(locals.user.school_id).all();
+    rawExamsList = examsRes.results || [];
+  } else {
+    const proctorExamsRes = await db.prepare(`
+			SELECT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name, ep.sessions as proctor_sessions
+			FROM exams e
+			JOIN exam_proctors ep ON e.id = ep.exam_id
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN classes c ON e.class_id = c.id
+			WHERE e.is_active = 1 AND et.is_active = 1 AND e.school_id = ? AND ep.proctor_id = ?
+			ORDER BY e.title
+		`).bind(locals.user.school_id, locals.user.id).all();
+    rawExamsList = proctorExamsRes.results || [];
+    if (rawExamsList.length === 0) {
+      const schoolExamsRes = await db.prepare(`
+				SELECT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name, NULL as proctor_sessions
+				FROM exams e
+				LEFT JOIN subjects s ON e.subject_id = s.id
+				JOIN exam_types et ON e.exam_type_id = et.id
+				LEFT JOIN classes c ON e.class_id = c.id
+				WHERE e.is_active = 1 AND et.is_active = 1 AND e.school_id = ?
+				ORDER BY e.title
+			`).bind(locals.user.school_id).all();
+      rawExamsList = schoolExamsRes.results || [];
+    }
+  }
+  const examIds = rawExamsList.map((e) => e.id);
   let dbSessions = [];
   if (examIds.length > 0) {
     const placeholders = examIds.map(() => "?").join(",");
@@ -59,7 +89,7 @@ const load = async ({ platform, locals }) => {
     ).bind(...examIds).all();
     dbSessions = sessionsResult.results;
   }
-  const processedExams = examsRaw.results.map((exam) => {
+  const processedExams = rawExamsList.map((exam) => {
     let allowedProctorSessions = null;
     if (exam.proctor_sessions) {
       try {
@@ -106,10 +136,10 @@ const load = async ({ platform, locals }) => {
       sessions: finalSessions
     };
   });
-  const processedTokens = tokens.results.map((t) => {
+  const processedTokens = tokens.map((t) => {
     let usedBy = [];
     try {
-      usedBy = t.used_by_students_json ? JSON.parse(t.used_by_students_json) : [];
+      usedBy = t.active_students_json ? JSON.parse(t.active_students_json) : [];
       if (usedBy.length === 1 && usedBy[0].id === null) usedBy = [];
     } catch (e) {
     }

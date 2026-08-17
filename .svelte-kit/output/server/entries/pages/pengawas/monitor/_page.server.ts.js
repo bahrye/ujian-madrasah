@@ -11,17 +11,46 @@ const load = async ({ platform, url, locals }) => {
     const examFilter = parseInt(examFilterStr, 10);
     const sessionFilterStr = url.searchParams.get("session_number") || "";
     const sessionFilter = parseInt(sessionFilterStr, 10);
-    const rawExams = await db.prepare(`
-			SELECT e.id, e.title, s.name as subject_name, et.code as exam_type_code, c.name as class_name
-			FROM exams e 
-			JOIN exam_proctors ep ON e.id = ep.exam_id
-			LEFT JOIN subjects s ON e.subject_id = s.id
-			LEFT JOIN exam_types et ON e.exam_type_id = et.id
-			LEFT JOIN classes c ON e.class_id = c.id
-			WHERE e.is_active = 1 AND e.school_id = ? AND ep.proctor_id = ?
-			ORDER BY e.title
-		`).bind(locals.user.school_id, locals.user.id).all();
-    const exams = (rawExams.results || []).map((e) => ({
+    const isSuperAdmin = locals.user.role === "superadmin" || locals.user.school_id === null;
+    const isAdmin = locals.user.role === "admin";
+    let rawExamsList = [];
+    if (isSuperAdmin || isAdmin) {
+      const examsRes = await db.prepare(`
+				SELECT e.id, e.title, s.name as subject_name, et.code as exam_type_code, c.name as class_name
+				FROM exams e 
+				LEFT JOIN subjects s ON e.subject_id = s.id
+				LEFT JOIN exam_types et ON e.exam_type_id = et.id
+				LEFT JOIN classes c ON e.class_id = c.id
+				WHERE e.is_active = 1 AND (et.is_active IS NULL OR et.is_active = 1) AND e.school_id = ?
+				ORDER BY e.title
+			`).bind(locals.user.school_id).all();
+      rawExamsList = examsRes.results || [];
+    } else {
+      const proctorExamsRes = await db.prepare(`
+				SELECT DISTINCT e.id, e.title, s.name as subject_name, et.code as exam_type_code, c.name as class_name
+				FROM exams e 
+				JOIN exam_proctors ep ON e.id = ep.exam_id
+				LEFT JOIN subjects s ON e.subject_id = s.id
+				LEFT JOIN exam_types et ON e.exam_type_id = et.id
+				LEFT JOIN classes c ON e.class_id = c.id
+				WHERE e.is_active = 1 AND (et.is_active IS NULL OR et.is_active = 1) AND e.school_id = ? AND ep.proctor_id = ?
+				ORDER BY e.title
+			`).bind(locals.user.school_id, locals.user.id).all();
+      rawExamsList = proctorExamsRes.results || [];
+      if (rawExamsList.length === 0) {
+        const schoolExamsRes = await db.prepare(`
+					SELECT e.id, e.title, s.name as subject_name, et.code as exam_type_code, c.name as class_name
+					FROM exams e 
+					LEFT JOIN subjects s ON e.subject_id = s.id
+					LEFT JOIN exam_types et ON e.exam_type_id = et.id
+					LEFT JOIN classes c ON e.class_id = c.id
+					WHERE e.is_active = 1 AND (et.is_active IS NULL OR et.is_active = 1) AND e.school_id = ?
+					ORDER BY e.title
+				`).bind(locals.user.school_id).all();
+        rawExamsList = schoolExamsRes.results || [];
+      }
+    }
+    const exams = rawExamsList.map((e) => ({
       id: e.id,
       title: formatExamTitle({
         title: e.title,
@@ -181,7 +210,7 @@ const load = async ({ platform, url, locals }) => {
       })
     );
     return {
-      exams: exams.results,
+      exams,
       attempts: attemptsWithProgress,
       examFilter: isNaN(examFilter) ? "" : String(examFilter),
       availableSessions,

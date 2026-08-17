@@ -1872,7 +1872,8 @@
     "imports": [
       "_db.js",
       "_auth.js",
-      "_date.js"
+      "_date.js",
+      "_exam.js"
     ]
   },
   "src/routes/pengawas/tokens/+page.svelte": {

@@ -4,6 +4,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { getDB, ensureTokenSessionColumn } from '$lib/server/db';
 import { generateTokenCode } from '$lib/server/auth';
 import { checkSessionTimeWindow } from '$lib/utils/date';
+import { formatExamTitle } from '$lib/utils/exam';
 
 export interface ExamSessionItem {
 	session_number: number;
@@ -59,18 +60,50 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 		used_by_students: [] // Placeholder to maintain structure compatibility
 	}));
 
-	const examsRaw = await db.prepare(`
-		SELECT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name, ep.sessions as proctor_sessions
-		FROM exams e
-		JOIN exam_proctors ep ON e.id = ep.exam_id
-		LEFT JOIN subjects s ON e.subject_id = s.id
-		JOIN exam_types et ON e.exam_type_id = et.id
-		LEFT JOIN classes c ON e.class_id = c.id
-		WHERE e.is_active = 1 AND et.is_active = 1 AND e.school_id = ? AND ep.proctor_id = ?
-		ORDER BY e.title
-	`).bind(locals.user.school_id, locals.user.id).all<any>();
+	const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
+	const isAdmin = locals.user.role === 'admin';
+	let rawExamsList: any[] = [];
 
-	const examIds = examsRaw.results.map((e: any) => e.id);
+	if (isSuperAdmin || isAdmin) {
+		const examsRes = await db.prepare(`
+			SELECT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name, NULL as proctor_sessions
+			FROM exams e
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN classes c ON e.class_id = c.id
+			WHERE e.is_active = 1 AND et.is_active = 1 AND e.school_id = ?
+			ORDER BY e.title
+		`).bind(locals.user.school_id).all<any>();
+		rawExamsList = examsRes.results || [];
+	} else {
+		const proctorExamsRes = await db.prepare(`
+			SELECT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name, ep.sessions as proctor_sessions
+			FROM exams e
+			JOIN exam_proctors ep ON e.id = ep.exam_id
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN classes c ON e.class_id = c.id
+			WHERE e.is_active = 1 AND et.is_active = 1 AND e.school_id = ? AND ep.proctor_id = ?
+			ORDER BY e.title
+		`).bind(locals.user.school_id, locals.user.id).all<any>();
+
+		rawExamsList = proctorExamsRes.results || [];
+
+		if (rawExamsList.length === 0) {
+			const schoolExamsRes = await db.prepare(`
+				SELECT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name, NULL as proctor_sessions
+				FROM exams e
+				LEFT JOIN subjects s ON e.subject_id = s.id
+				JOIN exam_types et ON e.exam_type_id = et.id
+				LEFT JOIN classes c ON e.class_id = c.id
+				WHERE e.is_active = 1 AND et.is_active = 1 AND e.school_id = ?
+				ORDER BY e.title
+			`).bind(locals.user.school_id).all<any>();
+			rawExamsList = schoolExamsRes.results || [];
+		}
+	}
+
+	const examIds = rawExamsList.map((e: any) => e.id);
 	let dbSessions: any[] = [];
 	if (examIds.length > 0) {
 		const placeholders = examIds.map(() => '?').join(',');
@@ -80,7 +113,7 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 		dbSessions = sessionsResult.results;
 	}
 
-	const processedExams: ExamSelectItem[] = examsRaw.results.map((exam: any) => {
+	const processedExams: ExamSelectItem[] = rawExamsList.map((exam: any) => {
 		let allowedProctorSessions: number[] | null = null;
 		if (exam.proctor_sessions) {
 			try {
@@ -133,10 +166,10 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 		};
 	});
 
-	const processedTokens = tokens.results.map((t: any) => {
+	const processedTokens = tokens.map((t: any) => {
 		let usedBy = [];
 		try {
-			usedBy = t.used_by_students_json ? JSON.parse(t.used_by_students_json) : [];
+			usedBy = t.active_students_json ? JSON.parse(t.active_students_json) : [];
 			if (usedBy.length === 1 && usedBy[0].id === null) usedBy = [];
 		} catch (e) {}
 		return {
