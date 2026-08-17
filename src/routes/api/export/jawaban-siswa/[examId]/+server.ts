@@ -100,10 +100,9 @@ export const GET: RequestHandler = async ({ params, platform, locals }) => {
 
 	// Compute question stats
 	const questionDiagnostics = questions.map((q, idx) => {
-		const qAnswers = answersByQuestion[q.id] || [];
 		let correctCount = 0;
 		let wrongCount = 0;
-		let emptyCount = totalAttempts - qAnswers.length;
+		let emptyCount = 0;
 
 		const distribution: Record<string, number> = { A: 0, B: 0, C: 0, D: 0, E: 0 };
 		const wrongDistribution: Record<string, number> = {};
@@ -113,11 +112,10 @@ export const GET: RequestHandler = async ({ params, platform, locals }) => {
 			cleanCorrectKey = '-';
 		} else if (q.type === 'benar_salah') {
 			try {
-				if (q.correct_answer_json) {
-					const parsed = JSON.parse(q.correct_answer_json);
-					const str = (typeof parsed === 'string' ? parsed : String(parsed)).toLowerCase().trim();
-					cleanCorrectKey = (str === 'true' || str === 'benar' || str === 'b' || str === '1') ? 'B' : 'S';
-				}
+				let raw = q.correct_answer_json;
+				if (typeof raw === 'string' && (raw.startsWith('{') || raw.startsWith('['))) raw = JSON.parse(raw);
+				const str = String(raw).toLowerCase().trim();
+				cleanCorrectKey = (str === 'true' || str === 'benar' || str === 'b' || str === '1') ? 'B' : 'S';
 			} catch {
 				const str = (q.correct_answer_json || '').toLowerCase().trim();
 				cleanCorrectKey = (str === 'true' || str === 'benar' || str === 'b' || str === '1') ? 'B' : 'S';
@@ -126,7 +124,13 @@ export const GET: RequestHandler = async ({ params, platform, locals }) => {
 			try {
 				if (q.correct_answer_json) {
 					const parsed = JSON.parse(q.correct_answer_json);
-					cleanCorrectKey = typeof parsed === 'string' ? parsed.trim().toUpperCase() : JSON.stringify(parsed);
+					if (Array.isArray(parsed)) {
+						cleanCorrectKey = parsed.map(x => String(x).trim().toUpperCase()).join(', ');
+					} else if (typeof parsed === 'object' && parsed !== null) {
+						cleanCorrectKey = Object.entries(parsed).map(([k, v]) => `${k}:${v}`).join(', ');
+					} else {
+						cleanCorrectKey = String(parsed).trim().toUpperCase();
+					}
 				}
 			} catch {
 				cleanCorrectKey = (q.correct_answer_json || '-').trim().toUpperCase();

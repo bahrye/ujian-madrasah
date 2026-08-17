@@ -50,16 +50,38 @@
 		return 'bg-emerald-50 text-emerald-700 font-normal';
 	}
 
-	function formatAnswerDisplay(type: string, answerGiven: any): string {
-		if (answerGiven == null || answerGiven === '') return '-';
+	function formatAnswerDisplay(type: string, val: any): string {
+		if (val == null || val === '') return '-';
+
+		let parsed = val;
+		if (typeof val === 'string') {
+			const trimmed = val.trim();
+			if ((trimmed.startsWith('[') && trimmed.endsWith(']')) || (trimmed.startsWith('{') && trimmed.endsWith('}'))) {
+				try {
+					parsed = JSON.parse(trimmed);
+				} catch {
+					parsed = trimmed;
+				}
+			} else {
+				parsed = trimmed;
+			}
+		}
+
+		if (Array.isArray(parsed)) {
+			return parsed.map(item => String(item).trim().toUpperCase()).join(', ');
+		}
+
+		if (typeof parsed === 'object' && parsed !== null) {
+			return Object.entries(parsed).map(([k, v]) => `${k}:${v}`).join(', ');
+		}
+
 		if (type === 'benar_salah') {
-			const str = String(answerGiven).toLowerCase().trim();
+			const str = String(parsed).toLowerCase().trim();
 			if (str === 'true' || str === 'benar' || str === 'b' || str === '1') return 'B';
 			if (str === 'false' || str === 'salah' || str === 's' || str === '0') return 'S';
 		}
-		const s = String(answerGiven).trim();
-		if (s.length > 2) return s.substring(0, 2) + '.';
-		return s.toUpperCase();
+
+		return String(parsed).trim().toUpperCase();
 	}
 
 	function toggleQuestionAccordion(id: number) {
@@ -727,7 +749,7 @@
 									<th class="py-2.5 px-3">Nama Siswa</th>
 									<th class="w-24 text-center py-2.5 px-2">Kelas</th>
 									<th class="w-28 text-center py-2.5 px-2">Skor Ujian</th>
-									<th class="w-28 text-center py-2.5 px-2">Status</th>
+									<th class="w-32 text-center py-2.5 px-2 whitespace-nowrap">Status</th>
 									<th class="w-24 text-center py-2.5 px-2">Aksi</th>
 								</tr>
 							</thead>
@@ -753,13 +775,13 @@
 										<td class="text-center py-2.5 px-2 font-bold text-sm {(att.score || 0) >= 75 ? 'text-emerald-600' : 'text-rose-600'}">
 											{att.score != null ? att.score : 0}
 										</td>
-										<td class="text-center py-2.5 px-2">
+										<td class="text-center py-2.5 px-2 whitespace-nowrap">
 											{#if (att.score || 0) >= 75}
-												<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+												<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 whitespace-nowrap inline-flex items-center gap-1">
 													✓ Tuntas
 												</span>
 											{:else}
-												<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+												<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-200 whitespace-nowrap inline-flex items-center gap-1">
 													⚠ Remedial
 												</span>
 											{/if}

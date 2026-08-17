@@ -52,6 +52,40 @@
 		if (pct >= 20) return 'bg-amber-50 text-amber-800 font-medium';
 		return 'bg-emerald-50 text-emerald-800 font-normal';
 	}
+
+	function formatAnswerDisplay(type: string, val: any): string {
+		if (val == null || val === '') return '-';
+
+		let parsed = val;
+		if (typeof val === 'string') {
+			const trimmed = val.trim();
+			if ((trimmed.startsWith('[') && trimmed.endsWith(']')) || (trimmed.startsWith('{') && trimmed.endsWith('}'))) {
+				try {
+					parsed = JSON.parse(trimmed);
+				} catch {
+					parsed = trimmed;
+				}
+			} else {
+				parsed = trimmed;
+			}
+		}
+
+		if (Array.isArray(parsed)) {
+			return parsed.map(item => String(item).trim().toUpperCase()).join(', ');
+		}
+
+		if (typeof parsed === 'object' && parsed !== null) {
+			return Object.entries(parsed).map(([k, v]) => `${k}:${v}`).join(', ');
+		}
+
+		if (type === 'benar_salah') {
+			const str = String(parsed).toLowerCase().trim();
+			if (str === 'true' || str === 'benar' || str === 'b' || str === '1') return 'B';
+			if (str === 'false' || str === 'salah' || str === 's' || str === '0') return 'S';
+		}
+
+		return String(parsed).trim().toUpperCase();
+	}
 </script>
 
 <svelte:head>
@@ -255,12 +289,13 @@
 
 							{#each questions as q}
 								{@const ans = answerMatrixMap[`${att.id}_${q.id}`]}
+								{@const displayAns = formatAnswerDisplay(q.type, ans?.answer_given)}
 								{#if !ans || ans.answer_given == null || ans.answer_given === ''}
 									<td class="border border-black py-0.5 text-slate-400 bg-slate-50">-</td>
 								{:else if ans.is_correct === 1 || ans.is_correct === true}
-									<td class="border border-black py-0.5 font-bold text-emerald-800 bg-emerald-50">✓</td>
+									<td class="border border-black py-0.5 font-bold text-emerald-800 bg-emerald-50">{displayAns}</td>
 								{:else}
-									<td class="border border-black py-0.5 font-bold text-rose-800 bg-rose-50">{ans.answer_given.length > 2 ? 'X' : ans.answer_given}</td>
+									<td class="border border-black py-0.5 font-bold text-rose-800 bg-rose-50">{displayAns}</td>
 								{/if}
 							{/each}
 						</tr>
