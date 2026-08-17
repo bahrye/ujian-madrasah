@@ -41,36 +41,106 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 		const examFilter = parseInt(examFilterStr, 10);
 		const sessionFilterStr = url.searchParams.get('session_number') || '';
 		const sessionFilter = parseInt(sessionFilterStr, 10);
-		const roomFilterStr = url.searchParams.get('room_id') || '';
-		const roomFilter = parseInt(roomFilterStr, 10);
-		const classFilterStr = url.searchParams.get('class_id') || '';
-		const classFilter = parseInt(classFilterStr, 10);
-		const statusFilter = url.searchParams.get('status') || ''; // 'active', 'offline', ''
-		const scopeFilter = url.searchParams.get('scope') || 'all';
 
-		// 1. Fetch available exams
-		const examsQuery = isSuperAdmin
-			? `SELECT e.id, e.title FROM exams e ORDER BY e.is_active DESC, e.title ASC`
-			: `SELECT e.id, e.title FROM exams e WHERE e.school_id = ? ORDER BY e.is_active DESC, e.title ASC`;
-		const examsParams: any[] = isSuperAdmin ? [] : [userSchoolId];
-		const examsRes = await db.prepare(examsQuery).bind(...examsParams).all<{ id: number; title: string }>();
-		const exams = examsRes.results || [];
+		// 1. Fetch available exams specifically monitored by this proctor
+		let exams: { id: number; title: string }[] = [];
 
-		// 2. Fetch classes for dropdown filter
-		const classesQuery = isSuperAdmin
-			? `SELECT id, name FROM classes ORDER BY name ASC`
-			: `SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC`;
-		const classesParams: any[] = isSuperAdmin ? [] : [userSchoolId];
-		const classesRes = await db.prepare(classesQuery).bind(...classesParams).all<{ id: number; name: string }>();
+		if (isSuperAdmin || locals.user.role === 'admin') {
+			const examsQuery = userSchoolId !== null 
+				? `SELECT e.id, e.title FROM exams e WHERE e.school_id = ? ORDER BY e.is_active DESC, e.title ASC`
+				: `SELECT e.id, e.title FROM exams e ORDER BY e.is_active DESC, e.title ASC`;
+			const examsParams = userSchoolId !== null ? [userSchoolId] : [];
+			const examsRes = await db.prepare(examsQuery).bind(...examsParams).all<{ id: number; title: string }>();
+			exams = examsRes.results || [];
+		} else {
+			// For pengawas / guru role: fetch exams assigned to this proctor in exam_proctors
+			const proctorExamsRes = await db.prepare(`
+				SELECT DISTINCT e.id, e.title 
+				FROM exams e 
+				JOIN exam_proctors ep ON e.id = ep.exam_id 
+				WHERE ep.proctor_id = ? 
+				ORDER BY e.is_active DESC, e.title ASC
+			`).bind(userId).all<{ id: number; title: string }>();
 
-		// 3. Fetch rooms for dropdown filter (exam_rooms joins with exams for school_id)
-		const roomsQuery = isSuperAdmin
-			? `SELECT DISTINCT er.id, er.name FROM exam_rooms er ORDER BY er.name ASC`
-			: `SELECT DISTINCT er.id, er.name FROM exam_rooms er JOIN exams e ON er.exam_id = e.id WHERE e.school_id = ? ORDER BY er.name ASC`;
-		const roomsParams: any[] = isSuperAdmin ? [] : [userSchoolId];
-		const roomsRes = await db.prepare(roomsQuery).bind(...roomsParams).all<{ id: number; name: string }>();
+			exams = proctorExamsRes.results || [];
 
-		// 4. Build query for students
+			// Fallback to school exams if no specific exam_proctor assignment
+			if (exams.length === 0 && userSchoolId !== null) {
+				const schoolExamsRes = await db.prepare(`
+					SELECT e.id, e.title 
+					FROM exams e 
+					WHERE e.school_id = ? 
+					ORDER BY e.is_active DESC, e.title ASC
+				`).bind(userSchoolId).all<{ id: number; title: string }>();
+				exams = schoolExamsRes.results || [];
+			}
+		}
+
+		// REQUIRE EXAM SELECTION FIRST
+		// If no exam selected, return empty students list with prompt
+		if (isNaN(examFilter)) {
+			return {
+				students: [],
+				exams,
+				availableSessions: [],
+				hasExamSelected: false,
+				stats: { total: 0, active: 0, offline: 0 },
+				filters: {
+					q: search,
+					exam_id: '',
+					session_number: ''
+				}
+			};
+		}
+
+		// 2. Fetch available sessions for the selected exam
+		let availableSessions: number[] = [];
+		const dbSessions = await db.prepare(`
+			SELECT DISTINCT session_number FROM exam_sessions WHERE exam_id = ? ORDER BY session_number
+		`).bind(examFilter).all<{ session_number: number }>();
+
+		if (dbSessions.results && dbSessions.results.length > 0) {
+			availableSessions = dbSessions.results.map(s => s.session_number);
+		} else {
+			// Check if participants in this exam have session_number > 1
+			const studentSessions = await db.prepare(`
+				SELECT DISTINCT COALESCE(u.session_number, 1) as session_number
+				FROM exam_participants ep
+				JOIN users u ON ep.student_id = u.id
+				WHERE ep.exam_id = ?
+				ORDER BY session_number
+			`).bind(examFilter).all<{ session_number: number }>();
+
+			if (studentSessions.results && studentSessions.results.length > 1) {
+				availableSessions = studentSessions.results.map(s => s.session_number);
+			}
+		}
+
+		// Restrict sessions if proctor has specific session assignment
+		if (!isSuperAdmin && ['pengawas', 'guru'].includes(locals.user.role)) {
+			const proctorAssignment = await db.prepare(`
+				SELECT sessions FROM exam_proctors WHERE exam_id = ? AND proctor_id = ?
+			`).bind(examFilter, userId).first<{ sessions: string | null }>();
+
+			if (proctorAssignment?.sessions) {
+				try {
+					const parsed = JSON.parse(proctorAssignment.sessions);
+					if (Array.isArray(parsed) && parsed.length > 0) {
+						const allowed = parsed.map((s: any) => parseInt(s, 10));
+						if (availableSessions.length > 0) {
+							availableSessions = availableSessions.filter(sn => allowed.includes(sn));
+						} else {
+							availableSessions = allowed;
+						}
+					}
+				} catch (e) {}
+			}
+		}
+
+		// Sort available sessions
+		availableSessions.sort((a, b) => a - b);
+
+		// 3. Build query for students in this selected exam
 		let query = `
 			SELECT DISTINCT
 				u.id,
@@ -83,77 +153,28 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 					SELECT er.name 
 					FROM exam_participants ep 
 					JOIN exam_rooms er ON ep.room_id = er.id 
-					WHERE ep.student_id = u.id 
+					WHERE ep.student_id = u.id AND ep.exam_id = ?
 					LIMIT 1
 				) as room_name,
 				(
 					SELECT e.title 
-					FROM exam_participants ep 
-					JOIN exams e ON ep.exam_id = e.id 
-					WHERE ep.student_id = u.id AND e.is_active = 1
-					LIMIT 1
+					FROM exams e 
+					WHERE e.id = ?
 				) as exam_title,
 				COALESCE(u.is_logged_in, 0) as is_logged_in,
 				u.last_active_at,
 				u.login_device
 			FROM users u
+			JOIN exam_participants ep ON u.id = ep.student_id
 			LEFT JOIN classes c ON u.class_id = c.id
-			WHERE u.role = 'siswa' AND u.is_active = 1
+			WHERE ep.exam_id = ? AND u.role = 'siswa' AND u.is_active = 1
 		`;
 
-		const params: any[] = [];
-
-		if (!isSuperAdmin && userSchoolId !== null) {
-			query += ` AND (u.school_id = ? OR u.id IN (
-				SELECT epart.student_id
-				FROM exam_participants epart
-				JOIN exams e ON epart.exam_id = e.id
-				JOIN exam_proctors ep ON e.id = ep.exam_id
-				WHERE ep.proctor_id = ?
-			))`;
-			params.push(userSchoolId, userId);
-		}
-
-		if (scopeFilter === 'proctored' && ['pengawas', 'guru'].includes(locals.user.role)) {
-			query += `
-				AND u.id IN (
-					SELECT epart.student_id
-					FROM exam_participants epart
-					JOIN exams e ON epart.exam_id = e.id
-					JOIN exam_proctors ep ON e.id = ep.exam_id
-					WHERE ep.proctor_id = ?
-					  AND (ep.room_id IS NULL OR ep.room_id = epart.room_id)
-				)
-			`;
-			params.push(userId);
-		}
-
-		if (!isNaN(examFilter)) {
-			query += `
-				AND u.id IN (
-					SELECT student_id FROM exam_participants WHERE exam_id = ?
-				)
-			`;
-			params.push(examFilter);
-		}
+		const params: any[] = [examFilter, examFilter, examFilter];
 
 		if (!isNaN(sessionFilter)) {
 			query += ` AND COALESCE(u.session_number, 1) = ?`;
 			params.push(sessionFilter);
-		}
-
-		if (!isNaN(roomFilter)) {
-			query += `
-				AND u.id IN (
-					SELECT student_id FROM exam_participants WHERE room_id = ?
-				)
-			`;
-			params.push(roomFilter);
-		}
-
-		if (!isNaN(classFilter)) {
-			query += ` AND u.class_id = ?`;
-			params.push(classFilter);
 		}
 
 		if (search) {
@@ -161,46 +182,10 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 			params.push(`%${search}%`, `%${search}%`, `%${search}%`);
 		}
 
-		if (statusFilter === 'active') {
-			query += ` AND COALESCE(u.is_logged_in, 0) = 1`;
-		} else if (statusFilter === 'offline') {
-			query += ` AND COALESCE(u.is_logged_in, 0) = 0`;
-		}
-
 		query += ` ORDER BY COALESCE(u.is_logged_in, 0) DESC, u.name ASC`;
 
 		const result = await db.prepare(query).bind(...params).all<StudentLoginItem>();
-		let students = result.results || [];
-
-		// Ultimate Fallback: If 0 students found, query all active students
-		if (students.length === 0 && !search && isNaN(examFilter) && isNaN(roomFilter) && isNaN(classFilter) && !statusFilter) {
-			const fallbackResult = await db.prepare(`
-				SELECT DISTINCT
-					u.id,
-					u.name,
-					u.username,
-					u.nisn,
-					COALESCE(u.session_number, 1) as student_session_number,
-					COALESCE(c.name, '-') as class_name,
-					(
-						SELECT er.name 
-						FROM exam_participants ep 
-						JOIN exam_rooms er ON ep.room_id = er.id 
-						WHERE ep.student_id = u.id 
-						LIMIT 1
-					) as room_name,
-					'-' as exam_title,
-					COALESCE(u.is_logged_in, 0) as is_logged_in,
-					u.last_active_at,
-					u.login_device
-				FROM users u
-				LEFT JOIN classes c ON u.class_id = c.id
-				WHERE u.role = 'siswa' AND u.is_active = 1
-				ORDER BY COALESCE(u.is_logged_in, 0) DESC, u.name ASC
-			`).all<StudentLoginItem>();
-
-			students = fallbackResult.results || [];
-		}
+		const students = result.results || [];
 
 		// Summary stats
 		const activeCount = students.filter(s => s.is_logged_in === 1).length;
@@ -209,8 +194,8 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 		return {
 			students,
 			exams,
-			classes: classesRes.results || [],
-			rooms: roomsRes.results || [],
+			availableSessions,
+			hasExamSelected: true,
 			stats: {
 				total: students.length,
 				active: activeCount,
@@ -218,12 +203,8 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 			},
 			filters: {
 				q: search,
-				exam_id: isNaN(examFilter) ? '' : String(examFilter),
-				session_number: isNaN(sessionFilter) ? '' : String(sessionFilter),
-				room_id: isNaN(roomFilter) ? '' : String(roomFilter),
-				class_id: isNaN(classFilter) ? '' : String(classFilter),
-				status: statusFilter,
-				scope: scopeFilter
+				exam_id: String(examFilter),
+				session_number: isNaN(sessionFilter) ? '' : String(sessionFilter)
 			}
 		};
 	} catch (e: any) {
@@ -231,10 +212,10 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 		return {
 			students: [],
 			exams: [],
-			classes: [],
-			rooms: [],
+			availableSessions: [],
+			hasExamSelected: false,
 			stats: { total: 0, active: 0, offline: 0 },
-			filters: { q: '', exam_id: '', session_number: '', room_id: '', class_id: '', status: '', scope: 'all' },
+			filters: { q: '', exam_id: '', session_number: '' },
 			error: e.message || String(e)
 		};
 	}
