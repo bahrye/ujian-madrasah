@@ -32,7 +32,7 @@ function _page($$renderer, $$props) {
         $$renderer4.push(`<title>Penilaian — Ujian Online Madrasah</title>`);
       });
     });
-    $$renderer2.push(`<div class="space-y-6 animate-in"><div><h1 class="text-2xl font-bold text-slate-800">Penilaian Jawaban</h1> <p class="text-sm text-slate-500 mt-1">Nilai jawaban essay dan isian singkat siswa</p></div> <div class="card p-4"><form method="GET" class="flex flex-col md:flex-row items-center gap-3"><select name="exam_id" class="select flex-1 w-full">`);
+    $$renderer2.push(`<div class="space-y-6 animate-in"><div><h1 class="text-2xl font-bold text-slate-800">Penilaian Jawaban</h1> <p class="text-sm text-slate-500 mt-1">Nilai jawaban essay dan isian singkat siswa</p></div> <div class="card p-4 flex flex-col md:flex-row items-center gap-3"><form method="GET" class="flex flex-col md:flex-row items-center gap-3 flex-1 w-full"><select name="exam_id" class="select flex-1 w-full">`);
     $$renderer2.option({ value: "", disabled: true, selected: data.examParam === null }, ($$renderer3) => {
       $$renderer3.push(`-- Pilih Ujian Terlebih Dahulu --`);
     });
@@ -65,12 +65,12 @@ function _page($$renderer, $$props) {
         }
       );
     }
-    $$renderer2.push(`<!--]--></select> `);
+    $$renderer2.push(`<!--]--></select></form> `);
     if (data.examParam !== null) {
       $$renderer2.push("<!--[0-->");
       const currentStudent = data.students.find((s) => String(s.id) === String(data.studentFilter));
       const isCurrentLocked = currentStudent ? currentStudent.is_graded : data.students.length > 0 && data.students.every((s) => s.is_graded);
-      $$renderer2.push(`<form method="POST"${attr("action", isCurrentLocked ? "?/unlockGrading" : "?/finalizeGrading")} class="w-full md:w-auto"><input type="hidden" name="exam_id"${attr("value", data.examParam)}/> <input type="hidden" name="student_id"${attr("value", data.studentFilter)}/> `);
+      $$renderer2.push(`<form method="POST"${attr("action", isCurrentLocked ? "?/unlockGrading" : "?/finalizeGrading")} class="w-full md:w-auto flex-shrink-0"><input type="hidden" name="exam_id"${attr("value", data.examParam)}/> <input type="hidden" name="student_id"${attr("value", data.studentFilter)}/> `);
       if (isCurrentLocked) {
         $$renderer2.push("<!--[0-->");
         $$renderer2.push(`<button type="submit" class="btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 font-semibold text-sm transition-all shadow-sm flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl w-full md:w-auto"><svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg> Batalkan Kunci</button>`);
@@ -82,7 +82,7 @@ function _page($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--></form></div> `);
+    $$renderer2.push(`<!--]--></div> `);
     if (data.selectedExam && data.selectedExam.show_score_type === "manual") {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div class="card p-4 flex items-center justify-between bg-indigo-50/50 border-indigo-100"><div><h3 class="font-bold text-slate-800">Status Rilis Nilai Manual</h3> <p class="text-xs text-slate-500 mt-0.5">Pengaturan ujian ini mewajibkan nilai dirilis secara manual oleh Guru/Admin.</p></div> <form method="POST" action="?/toggleScoreRelease"><input type="hidden" name="exam_id"${attr("value", data.selectedExam.id)}/> <button type="submit"${attr_class(`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${data.selectedExam.is_score_released ? "bg-indigo-600" : "bg-slate-200"}`)} role="switch"${attr("aria-checked", data.selectedExam.is_score_released)}><span class="sr-only">Rilis Nilai</span> <span${attr_class(`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${data.selectedExam.is_score_released ? "translate-x-6" : "translate-x-1"}`)}></span></button> <span${attr_class(`ml-2 text-sm font-medium ${data.selectedExam.is_score_released ? "text-indigo-600" : "text-slate-400"}`)}>${escape_html(data.selectedExam.is_score_released ? "Nilai Dirilis" : "Disembunyikan")}</span></form></div>`);
