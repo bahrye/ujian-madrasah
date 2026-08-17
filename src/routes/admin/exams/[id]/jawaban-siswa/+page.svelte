@@ -441,25 +441,25 @@
 				<div class="overflow-x-auto max-h-[600px] relative touch-pan-x touch-pan-y" style="-webkit-overflow-scrolling: touch;">
 					<table class="table min-w-full text-xs text-left border-collapse">
 						<thead class="sticky top-0 z-20 shadow-md">
-							<tr class="text-white">
+							<tr>
 								<!-- Ungu: Kolom No sampai Soal Terakhir -->
-								<th class="w-8 sm:w-10 text-center sticky left-0 z-30 bg-purple-800 text-white font-bold border-r border-purple-700 px-1 py-2 text-[10px] sm:text-xs">No</th>
-								<th class="w-32 sm:min-w-[170px] max-w-[135px] sm:max-w-none sticky left-8 sm:left-10 z-30 bg-purple-800 text-white font-bold border-r border-purple-700 px-1.5 sm:px-2 py-2 text-[10px] sm:text-xs">
+								<th style="color: #fff; text-transform: none;" class="w-8 sm:w-10 text-center sticky left-0 z-30 bg-purple-800 font-bold border-r border-purple-700 px-1 py-2 text-[10px] sm:text-xs">No</th>
+								<th style="color: #fff; text-transform: none;" class="w-32 sm:min-w-[170px] max-w-[135px] sm:max-w-none sticky left-8 sm:left-10 z-30 bg-purple-800 font-bold border-r border-purple-700 px-1.5 sm:px-2 py-2 text-[10px] sm:text-xs">
 									Nama Siswa
 								</th>
-								<th class="w-14 sm:w-20 text-center bg-purple-800 text-white font-bold border-r border-purple-700 px-1 py-2 text-[10px] sm:text-xs">Kelas</th>
-								<th class="w-12 sm:w-16 text-center bg-purple-800 text-white font-bold border-r border-purple-700 px-1 py-2 text-[10px] sm:text-xs">Nilai</th>
+								<th style="color: #fff; text-transform: none;" class="w-14 sm:w-20 text-center bg-purple-800 font-bold border-r border-purple-700 px-1 py-2 text-[10px] sm:text-xs">Kelas</th>
+								<th style="color: #fff; text-transform: none;" class="w-12 sm:w-16 text-center bg-purple-800 font-bold border-r border-purple-700 px-1 py-2 text-[10px] sm:text-xs">Nilai</th>
 								{#each questions as q, idx}
-									<th class="w-8 sm:w-11 min-w-[32px] sm:min-w-[40px] text-center bg-purple-800 text-white font-bold hover:bg-purple-700 border-r border-purple-700 px-0.5 sm:px-1 py-2 font-mono cursor-pointer text-[10px] sm:text-xs whitespace-nowrap" title="Soal #{q.question_number} ({q.type})">
+									<th style="color: #fff; text-transform: none;" class="w-8 sm:w-11 min-w-[32px] sm:min-w-[40px] text-center bg-purple-800 font-bold hover:bg-purple-700 border-r border-purple-700 px-0.5 sm:px-1 py-2 font-mono cursor-pointer text-[10px] sm:text-xs whitespace-nowrap" title="Soal #{q.question_number} ({q.type})">
 										S{q.question_number || idx + 1}
 									</th>
 								{/each}
 
 								<!-- Orange: Kolom Benar dan % -->
-								<th class="w-12 sm:w-16 min-w-[38px] text-center bg-orange-600 text-white font-bold border-r border-orange-500 px-1 py-2 text-[10px] sm:text-xs whitespace-nowrap" title="Jumlah Soal Benar (contoh 2/6)">
+								<th style="color: #fff; text-transform: none;" class="w-12 sm:w-16 min-w-[38px] text-center bg-orange-600 font-bold border-r border-orange-500 px-1 py-2 text-[10px] sm:text-xs whitespace-nowrap" title="Jumlah Soal Benar (contoh 2/6)">
 									Benar
 								</th>
-								<th class="w-12 sm:w-16 min-w-[38px] text-center bg-orange-600 text-white font-bold border-r border-orange-500 px-1 py-2 text-[10px] sm:text-xs whitespace-nowrap" title="Persentase Benar">
+								<th style="color: #fff; text-transform: none;" class="w-12 sm:w-16 min-w-[38px] text-center bg-orange-600 font-bold border-r border-orange-500 px-1 py-2 text-[10px] sm:text-xs whitespace-nowrap" title="Persentase Benar">
 									%
 								</th>
 							</tr>
