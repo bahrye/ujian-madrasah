@@ -4,6 +4,8 @@ import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { verifyExamTokenSignature } from '$lib/server/auth';
 
+import { formatExamTitle } from '$lib/utils/exam';
+
 export const load = async ({ platform, locals, params, cookies }: Parameters<PageServerLoad>[0]) => {
 	if (!locals.user) throw redirect(302, '/login');
 	const db = getDB(platform);
@@ -14,17 +16,37 @@ export const load = async ({ platform, locals, params, cookies }: Parameters<Pag
 	try {
 	// Ambil data attempt
 	const attempt = await db.prepare(`
-		SELECT sa.*, e.title as exam_title, s.name as subject, e.duration_minutes, e.shuffle_questions,
-		       t.is_released as token_is_released, t.released_at as token_released_at, t.expires_at as token_expires_at,
+		SELECT sa.*, 
+		       e.title as exam_title, 
+		       s.name as subject_name, 
+		       et.code as exam_type_code,
+		       c.name as class_name, 
+		       c.level as class_level,
+		       e.duration_minutes, 
+		       e.shuffle_questions,
+		       t.is_released as token_is_released, 
+		       t.released_at as token_released_at, 
+		       t.expires_at as token_expires_at,
 		       e.is_active as exam_active
 		FROM student_attempts sa
 		JOIN exams e ON sa.exam_id = e.id
 		LEFT JOIN tokens t ON sa.token_id = t.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
+		LEFT JOIN exam_types et ON e.exam_type_id = et.id
+		JOIN users u ON sa.student_id = u.id
+		LEFT JOIN classes c ON u.class_id = c.id
 		WHERE sa.id = ? AND sa.student_id = ?
 	`).bind(parsedAttemptId, locals.user.id).first<any>();
 
 	if (!attempt) throw error(404, 'Sesi ujian tidak ditemukan.');
+
+	attempt.exam_title = formatExamTitle({
+		title: attempt.exam_title,
+		examTypeCode: attempt.exam_type_code,
+		subjectName: attempt.subject_name,
+		className: attempt.class_name,
+		classLevel: attempt.class_level
+	});
 
 	if (attempt.status !== 'mengerjakan') {
 		throw redirect(302, '/siswa');

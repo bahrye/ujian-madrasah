@@ -4,6 +4,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { getDB, ensureTokenSessionColumn } from '$lib/server/db';
 import { generateTokenCode } from '$lib/server/auth';
 import { checkSessionTimeWindow } from '$lib/utils/date';
+import { formatExamTitle } from '$lib/utils/exam';
 
 export interface ExamSessionItem {
 	session_number: number;
@@ -24,8 +25,8 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 	const db = getDB(platform);
 	await ensureTokenSessionColumn(db);
 
-	const tokens = await db.prepare(`
-		SELECT t.*, e.title as exam_title,
+	const tokensRaw = await db.prepare(`
+		SELECT t.*, e.title as exam_title, s.name as subject_name, et.code as exam_type_code, c.name as class_name,
 		COALESCE((
 			SELECT json_group_array(
 				json_object(
@@ -41,14 +42,19 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 		), '[]') as used_by_students_json
 		FROM tokens t 
 		JOIN exams e ON t.exam_id = e.id
+		LEFT JOIN subjects s ON e.subject_id = s.id
+		LEFT JOIN exam_types et ON e.exam_type_id = et.id
+		LEFT JOIN classes c ON e.class_id = c.id
 		WHERE t.school_id = ?
 		ORDER BY t.created_at DESC
-	`).bind(locals.user.school_id).all();
+	`).bind(locals.user.school_id).all<any>();
 
 	const examsRaw = await db.prepare(`
-		SELECT e.id, e.title, e.start_time, e.end_time
+		SELECT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name
 		FROM exams e
+		LEFT JOIN subjects s ON e.subject_id = s.id
 		JOIN exam_types et ON e.exam_type_id = et.id
+		LEFT JOIN classes c ON e.class_id = c.id
 		WHERE e.is_active = 1 AND et.is_active = 1 AND e.school_id = ?
 		ORDER BY e.title
 	`).bind(locals.user.school_id).all<any>();
@@ -83,21 +89,33 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 
 		return {
 			id: exam.id,
-			title: exam.title,
+			title: formatExamTitle({
+				title: exam.title,
+				examTypeCode: exam.exam_type_code,
+				subjectName: exam.subject_name,
+				className: exam.class_name
+			}),
 			start_time: exam.start_time,
 			end_time: exam.end_time,
 			sessions: finalSessions
 		};
 	});
 
-	const processedTokens = tokens.results.map((t: any) => {
+	const processedTokens = (tokensRaw.results || []).map((t: any) => {
 		let usedBy = [];
 		try {
 			usedBy = t.used_by_students_json ? JSON.parse(t.used_by_students_json) : [];
 			if (usedBy.length === 1 && usedBy[0].id === null) usedBy = [];
 		} catch (e) {}
+
 		return {
 			...t,
+			exam_title: formatExamTitle({
+				title: t.exam_title,
+				examTypeCode: t.exam_type_code,
+				subjectName: t.subject_name,
+				className: t.class_name
+			}),
 			used_by_students: usedBy
 		};
 	});

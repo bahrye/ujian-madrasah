@@ -1,14 +1,26 @@
 import { fail } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
+import { f as formatExamTitle } from "../../../../chunks/exam.js";
 const load = async ({ platform, locals }) => {
   const db = getDB(platform);
-  const exams = await db.prepare(`
-		SELECT e.*, s.name as subject, (SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count
+  const examsRes = await db.prepare(`
+		SELECT e.*, s.name as subject_name, et.code as exam_type_code, c.name as class_name, (SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count
 		FROM exams e 
 		LEFT JOIN subjects s ON e.subject_id = s.id
+		LEFT JOIN exam_types et ON e.exam_type_id = et.id
+		LEFT JOIN classes c ON e.class_id = c.id
 		WHERE e.school_id = ? ORDER BY e.created_at DESC
 	`).bind(locals.user.school_id).all();
-  return { exams: exams.results };
+  const exams = (examsRes.results || []).map((e) => ({
+    ...e,
+    title: formatExamTitle({
+      title: e.title,
+      examTypeCode: e.exam_type_code,
+      subjectName: e.subject_name,
+      className: e.class_name
+    })
+  }));
+  return { exams };
 };
 const actions = {
   copyQuestions: async ({ request, locals, platform }) => {

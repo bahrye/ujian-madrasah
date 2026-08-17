@@ -674,16 +674,10 @@
 	<!-- Exam Header -->
 	<header class="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-200 px-4 py-3">
 		<div class="max-w-4xl mx-auto flex items-center justify-between gap-3">
-			<div class="flex-1 min-w-0 overflow-hidden flex flex-col gap-0.5" bind:clientWidth={titleClientWidth}>
+			<div class="flex-1 min-w-0 flex flex-col gap-0.5">
 				<div class="flex items-center gap-2">
-					<h1 
-						bind:this={titleElement}
-						class="text-sm font-bold text-slate-800 whitespace-nowrap {isTitleOverflowing ? 'animate-[marquee_10s_linear_infinite]' : 'truncate'}"
-					>
+					<h1 class="text-sm sm:text-base font-bold text-slate-800 leading-snug break-words">
 						{attempt.exam_title}
-						{#if isTitleOverflowing}
-							<span class="pl-8">{attempt.exam_title}</span>
-						{/if}
 					</h1>
 				</div>
 				<div class="flex items-center gap-2 overflow-hidden w-full">
@@ -696,7 +690,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="flex items-center gap-2 sm:gap-3">
+			<div class="flex items-center gap-2 sm:gap-3 shrink-0">
 				{#if warnings > 0}
 					<div class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 bg-red-50 text-red-600 rounded-full border border-red-200 animate-in fade-in slide-in-from-right-4">
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">

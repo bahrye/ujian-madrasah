@@ -2,6 +2,8 @@ import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 
+import { formatExamTitle } from '$lib/utils/exam';
+
 export const load: PageServerLoad = async ({ params, platform, locals }) => {
 	const db = getDB(platform);
 	const typeId = parseInt(params.typeId, 10);
@@ -20,7 +22,7 @@ export const load: PageServerLoad = async ({ params, platform, locals }) => {
 	if (!classData) throw new Error('Kelas tidak ditemukan');
 
 	const exams = await db.prepare(`
-		SELECT e.*, u.name as creator_name, s.name as subject_name,
+		SELECT e.*, u.name as creator_name, s.name as subject_name, c.name as class_name, et.code as exam_type_code,
 			(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count,
 			(SELECT COUNT(*) FROM exam_participants WHERE exam_id = e.id) as participant_count,
 			(SELECT COUNT(*) FROM exam_teachers WHERE exam_id = e.id) as teacher_count,
@@ -39,6 +41,8 @@ export const load: PageServerLoad = async ({ params, platform, locals }) => {
 		FROM exams e
 		LEFT JOIN users u ON e.created_by = u.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
+		LEFT JOIN classes c ON e.class_id = c.id
+		LEFT JOIN exam_types et ON e.exam_type_id = et.id
 		WHERE e.school_id = ? AND e.exam_type_id = ? AND (e.class_id = ? OR e.class_id IS NULL)
 		ORDER BY e.created_at DESC
 	`).bind(locals.user!.school_id, typeId, classId).all();
@@ -57,6 +61,12 @@ export const load: PageServerLoad = async ({ params, platform, locals }) => {
 
 	const examsWithSessions = exams.results.map((e: any) => ({
 		...e,
+		title: formatExamTitle({
+			title: e.title,
+			examTypeCode: e.exam_type_code || examType.code,
+			subjectName: e.subject_name,
+			className: e.class_name || classData.name
+		}),
 		sessions: allSessions.filter(s => s.exam_id === e.id)
 	}));
 
@@ -78,12 +88,19 @@ export const actions: Actions = {
 			.bind(typeId, locals.user!.school_id).first() as any;
 		if (!examType) return fail(400, { error: 'Tipe Ujian tidak valid.' });
 
+		const classData = await db.prepare('SELECT * FROM classes WHERE id = ? AND school_id = ?')
+			.bind(classId, locals.user!.school_id).first() as any;
+
 		const subjectIdStr = form.get('subject_id')?.toString() || null;
 		const parsedSubjectId = parseInt(subjectIdStr || '', 10);
 		if (isNaN(parsedSubjectId)) return fail(400, { error: 'Mata Pelajaran wajib dipilih.' });
 
 		const subject = await db.prepare('SELECT name FROM subjects WHERE id = ?').bind(parsedSubjectId).first() as any;
-		let title = `${examType.code} - ${subject.name}`;
+		let title = formatExamTitle({
+			examTypeCode: examType.code,
+			subjectName: subject.name,
+			className: classData?.name
+		});
 
 		const description = form.get('description')?.toString().trim() || '';
 		const durationMinutes = parseInt(form.get('duration_minutes')?.toString() || '60');

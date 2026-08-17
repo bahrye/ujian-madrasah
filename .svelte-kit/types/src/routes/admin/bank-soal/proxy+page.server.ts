@@ -3,15 +3,30 @@ import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 
+import { formatExamTitle } from '$lib/utils/exam';
+
 export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) => {
 	const db = getDB(platform);
-	const exams = await db.prepare(`
-		SELECT e.*, s.name as subject, (SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count
+	const examsRes = await db.prepare(`
+		SELECT e.*, s.name as subject_name, et.code as exam_type_code, c.name as class_name, (SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count
 		FROM exams e 
 		LEFT JOIN subjects s ON e.subject_id = s.id
+		LEFT JOIN exam_types et ON e.exam_type_id = et.id
+		LEFT JOIN classes c ON e.class_id = c.id
 		WHERE e.school_id = ? ORDER BY e.created_at DESC
-	`).bind(locals.user!.school_id).all();
-	return { exams: exams.results };
+	`).bind(locals.user!.school_id).all<any>();
+
+	const exams = (examsRes.results || []).map((e: any) => ({
+		...e,
+		title: formatExamTitle({
+			title: e.title,
+			examTypeCode: e.exam_type_code,
+			subjectName: e.subject_name,
+			className: e.class_name
+		})
+	}));
+
+	return { exams };
 };
 
 export const actions = {

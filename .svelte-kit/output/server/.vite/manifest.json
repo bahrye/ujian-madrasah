@@ -118,6 +118,10 @@
     "file": "chunks/db.js",
     "name": "db"
   },
+  "_exam.js": {
+    "file": "chunks/exam.js",
+    "name": "exam"
+  },
   "_exports.js": {
     "file": "chunks/exports.js",
     "name": "exports"
@@ -519,7 +523,7 @@
       "_stores.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.DUHtEgv8.css"
+      "_app/immutable/assets/_layout.DPxEk2bi.css"
     ],
     "assets": [
       "_app/immutable/assets/KaTeX_AMS-Regular.BQhdFMY1.woff2",
@@ -639,7 +643,8 @@
     "src": "src/routes/admin/bank-soal/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/admin/bank-soal/+page.svelte": {
@@ -832,7 +837,8 @@
     "src": "src/routes/admin/exams/type/[typeId]/class/[classId]/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/admin/exams/type/[typeId]/class/[classId]/+page.svelte": {
@@ -886,7 +892,8 @@
     "imports": [
       "_db.js",
       "_cloudinary.js",
-      "_shared-server.js"
+      "_shared-server.js",
+      "_exam.js"
     ]
   },
   "src/routes/admin/monitor/+page.svelte": {
@@ -1122,7 +1129,8 @@
     "imports": [
       "_db.js",
       "_auth.js",
-      "_date.js"
+      "_date.js",
+      "_exam.js"
     ]
   },
   "src/routes/admin/tokens/+page.svelte": {
@@ -1365,7 +1373,8 @@
     "src": "src/routes/guru/bank-soal/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/guru/bank-soal/+page.svelte": {
@@ -1794,7 +1803,8 @@
     "imports": [
       "_db.js",
       "_cloudinary.js",
-      "_shared-server.js"
+      "_shared-server.js",
+      "_exam.js"
     ]
   },
   "src/routes/pengawas/monitor/+page.svelte": {
@@ -1820,7 +1830,8 @@
     "src": "src/routes/pengawas/reset-login/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/pengawas/reset-login/+page.svelte": {
@@ -2107,7 +2118,8 @@
     "src": "src/routes/siswa/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/siswa/+page.svelte": {
@@ -2152,7 +2164,8 @@
     "src": "src/routes/siswa/jadwal/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/siswa/jadwal/+page.svelte": {
@@ -2259,7 +2272,8 @@
       "_db.js",
       "_auth.js",
       "_cloudinary.js",
-      "_shared-server.js"
+      "_shared-server.js",
+      "_exam.js"
     ]
   },
   "src/routes/siswa/ujian/+page.svelte": {
@@ -2283,7 +2297,8 @@
     "isEntry": true,
     "imports": [
       "_db.js",
-      "_auth.js"
+      "_auth.js",
+      "_exam.js"
     ]
   },
   "src/routes/siswa/ujian/[attemptId]/+page@.svelte": {

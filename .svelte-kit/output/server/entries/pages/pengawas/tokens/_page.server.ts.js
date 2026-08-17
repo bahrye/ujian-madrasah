@@ -6,8 +6,8 @@ const load = async ({ platform, locals }) => {
   if (!locals.user) throw redirect(302, "/login");
   const db = getDB(platform);
   await ensureTokenSessionColumn(db);
-  const tokens = await db.prepare(`
-		SELECT t.*, e.title as exam_title,
+  const tokensRaw = await db.prepare(`
+		SELECT t.*, e.title as exam_title, s.name as subject_name, et.code as exam_type_code, c.name as class_name,
 		COALESCE((
 			SELECT json_group_array(
 				json_object(
@@ -19,19 +19,34 @@ const load = async ({ platform, locals }) => {
 			)
 			FROM student_attempts sa
 			JOIN users u ON sa.student_id = u.id
-			WHERE sa.token_id = t.id AND (ep.sessions IS NULL OR ep.sessions = '[]' OR u.session_number IN (SELECT value FROM json_each(ep.sessions)))
-		), '[]') as used_by_students_json
+			WHERE sa.token_id = t.id AND sa.status = 'mengerjakan'
+		), '[]') as active_students_json
 		FROM tokens t 
 		JOIN exams e ON t.exam_id = e.id
-		JOIN exam_proctors ep ON e.id = ep.exam_id
-		WHERE t.school_id = ? AND ep.proctor_id = ?
+		LEFT JOIN subjects s ON e.subject_id = s.id
+		LEFT JOIN exam_types et ON e.exam_type_id = et.id
+		LEFT JOIN classes c ON e.class_id = c.id
+		WHERE e.school_id = ?
 		ORDER BY t.created_at DESC
-	`).bind(locals.user.school_id, locals.user.id).all();
+	`).bind(locals.user.school_id).all();
+  const tokens = (tokensRaw.results || []).map((t) => ({
+    ...t,
+    exam_title: formatExamTitle({
+      title: t.exam_title,
+      examTypeCode: t.exam_type_code,
+      subjectName: t.subject_name,
+      className: t.class_name
+    }),
+    used_by_students: []
+    // Placeholder to maintain structure compatibility
+  }));
   const examsRaw = await db.prepare(`
-		SELECT e.id, e.title, e.start_time, e.end_time, ep.sessions as proctor_sessions
+		SELECT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name, ep.sessions as proctor_sessions
 		FROM exams e
 		JOIN exam_proctors ep ON e.id = ep.exam_id
+		LEFT JOIN subjects s ON e.subject_id = s.id
 		JOIN exam_types et ON e.exam_type_id = et.id
+		LEFT JOIN classes c ON e.class_id = c.id
 		WHERE e.is_active = 1 AND et.is_active = 1 AND e.school_id = ? AND ep.proctor_id = ?
 		ORDER BY e.title
 	`).bind(locals.user.school_id, locals.user.id).all();
@@ -80,7 +95,12 @@ const load = async ({ platform, locals }) => {
     }
     return {
       id: exam.id,
-      title: exam.title,
+      title: formatExamTitle({
+        title: exam.title,
+        examTypeCode: exam.exam_type_code,
+        subjectName: exam.subject_name,
+        className: exam.class_name
+      }),
       start_time: exam.start_time,
       end_time: exam.end_time,
       sessions: finalSessions

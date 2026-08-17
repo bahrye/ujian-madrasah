@@ -1,5 +1,6 @@
 import { g as getDB } from "../../../../chunks/db.js";
 import { redirect } from "@sveltejs/kit";
+import { f as formatExamTitle } from "../../../../chunks/exam.js";
 const load = async ({ platform, locals }) => {
   if (locals.user?.role !== "siswa") throw redirect(302, "/");
   const db = getDB(platform);
@@ -7,6 +8,9 @@ const load = async ({ platform, locals }) => {
 		SELECT 
 			e.*, 
 			s.name as subject,
+			et.code as exam_type_code,
+			c.name as class_name,
+			c.level as class_level,
 			(
 				SELECT status 
 				FROM student_attempts 
@@ -31,13 +35,24 @@ const load = async ({ platform, locals }) => {
 		FROM exams e
 		JOIN exam_participants ep ON e.id = ep.exam_id
 		JOIN users u ON ep.student_id = u.id
+		LEFT JOIN classes c ON u.class_id = c.id
 		LEFT JOIN exam_rooms r ON ep.room_id = r.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		JOIN exam_types et ON e.exam_type_id = et.id
 		WHERE ep.student_id = ? AND e.school_id = ? AND e.is_active = 1 AND et.is_active = 1
 		ORDER BY CASE WHEN e.start_time IS NULL THEN 1 ELSE 0 END, e.start_time ASC, e.created_at DESC
 	`).bind(locals.user.id, locals.user.id, locals.user.school_id).all();
-  let schedules = examsQuery.results || [];
+  let rawSchedules = examsQuery.results || [];
+  let schedules = rawSchedules.map((item) => ({
+    ...item,
+    title: formatExamTitle({
+      title: item.title,
+      examTypeCode: item.exam_type_code,
+      subjectName: item.subject,
+      className: item.class_name,
+      classLevel: item.class_level
+    })
+  }));
   let studentSession = 1;
   try {
     const studentRecord = await db.prepare("SELECT session_number FROM users WHERE id = ?").bind(locals.user.id).first();

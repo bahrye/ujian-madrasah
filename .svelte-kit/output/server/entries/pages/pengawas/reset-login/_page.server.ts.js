@@ -1,5 +1,6 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB, e as ensureUserLoginColumns } from "../../../../chunks/db.js";
+import { f as formatExamTitle } from "../../../../chunks/exam.js";
 const load = async ({ platform, locals, url }) => {
   if (!locals.user) throw redirect(302, "/login");
   if (!["pengawas", "guru", "admin", "superadmin", "panitia"].includes(locals.user.role)) {
@@ -17,31 +18,57 @@ const load = async ({ platform, locals, url }) => {
     const examFilter = parseInt(examFilterStr, 10);
     const sessionFilterStr = url.searchParams.get("session_number") || "";
     const sessionFilter = parseInt(sessionFilterStr, 10);
-    let exams = [];
+    let rawExams = [];
     if (isSuperAdmin || locals.user.role === "admin") {
-      const examsQuery = userSchoolId !== null ? `SELECT e.id, e.title FROM exams e WHERE e.school_id = ? ORDER BY e.is_active DESC, e.title ASC` : `SELECT e.id, e.title FROM exams e ORDER BY e.is_active DESC, e.title ASC`;
+      const examsQuery = userSchoolId !== null ? `SELECT e.id, e.title, s.name as subject_name, et.code as exam_type_code, c.name as class_name 
+				   FROM exams e 
+				   LEFT JOIN subjects s ON e.subject_id = s.id
+				   LEFT JOIN exam_types et ON e.exam_type_id = et.id
+				   LEFT JOIN classes c ON e.class_id = c.id
+				   WHERE e.school_id = ? 
+				   ORDER BY e.is_active DESC, e.title ASC` : `SELECT e.id, e.title, s.name as subject_name, et.code as exam_type_code, c.name as class_name 
+				   FROM exams e 
+				   LEFT JOIN subjects s ON e.subject_id = s.id
+				   LEFT JOIN exam_types et ON e.exam_type_id = et.id
+				   LEFT JOIN classes c ON e.class_id = c.id
+				   ORDER BY e.is_active DESC, e.title ASC`;
       const examsParams = userSchoolId !== null ? [userSchoolId] : [];
       const examsRes = await db.prepare(examsQuery).bind(...examsParams).all();
-      exams = examsRes.results || [];
+      rawExams = examsRes.results || [];
     } else {
       const proctorExamsRes = await db.prepare(`
-				SELECT DISTINCT e.id, e.title 
+				SELECT DISTINCT e.id, e.title, s.name as subject_name, et.code as exam_type_code, c.name as class_name 
 				FROM exams e 
 				JOIN exam_proctors ep ON e.id = ep.exam_id 
+				LEFT JOIN subjects s ON e.subject_id = s.id
+				LEFT JOIN exam_types et ON e.exam_type_id = et.id
+				LEFT JOIN classes c ON e.class_id = c.id
 				WHERE ep.proctor_id = ? 
 				ORDER BY e.is_active DESC, e.title ASC
 			`).bind(userId).all();
-      exams = proctorExamsRes.results || [];
-      if (exams.length === 0 && userSchoolId !== null) {
+      rawExams = proctorExamsRes.results || [];
+      if (rawExams.length === 0 && userSchoolId !== null) {
         const schoolExamsRes = await db.prepare(`
-					SELECT e.id, e.title 
+					SELECT e.id, e.title, s.name as subject_name, et.code as exam_type_code, c.name as class_name 
 					FROM exams e 
+					LEFT JOIN subjects s ON e.subject_id = s.id
+					LEFT JOIN exam_types et ON e.exam_type_id = et.id
+					LEFT JOIN classes c ON e.class_id = c.id
 					WHERE e.school_id = ? 
 					ORDER BY e.is_active DESC, e.title ASC
 				`).bind(userSchoolId).all();
-        exams = schoolExamsRes.results || [];
+        rawExams = schoolExamsRes.results || [];
       }
     }
+    let exams = rawExams.map((e) => ({
+      id: e.id,
+      title: formatExamTitle({
+        title: e.title,
+        examTypeCode: e.exam_type_code,
+        subjectName: e.subject_name,
+        className: e.class_name
+      })
+    }));
     if (isNaN(examFilter)) {
       return {
         students: [],

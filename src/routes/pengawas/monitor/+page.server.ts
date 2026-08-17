@@ -3,6 +3,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { getDB, ensureUserLoginColumns } from '$lib/server/db';
 import { deleteFromCloudinary } from '$lib/server/cloudinary';
 import { env } from '$env/dynamic/private';
+import { formatExamTitle } from '$lib/utils/exam';
 
 export interface ExamFilterOption {
 	id: number;
@@ -18,13 +19,26 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 		const sessionFilterStr = url.searchParams.get('session_number') || '';
 		const sessionFilter = parseInt(sessionFilterStr, 10);
 
-		const exams = await db.prepare(`
-			SELECT e.id, e.title 
+		const rawExams = await db.prepare(`
+			SELECT e.id, e.title, s.name as subject_name, et.code as exam_type_code, c.name as class_name
 			FROM exams e 
 			JOIN exam_proctors ep ON e.id = ep.exam_id
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			LEFT JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN classes c ON e.class_id = c.id
 			WHERE e.is_active = 1 AND e.school_id = ? AND ep.proctor_id = ?
 			ORDER BY e.title
-		`).bind(locals.user.school_id, locals.user.id).all<ExamFilterOption>();
+		`).bind(locals.user.school_id, locals.user.id).all<any>();
+
+		const exams: ExamFilterOption[] = (rawExams.results || []).map((e: any) => ({
+			id: e.id,
+			title: formatExamTitle({
+				title: e.title,
+				examTypeCode: e.exam_type_code,
+				subjectName: e.subject_name,
+				className: e.class_name
+			})
+		}));
 
 		let availableSessions: number[] = [];
 		let allowedProctorSessions: number[] | null = null;

@@ -7,6 +7,8 @@ import { signExamToken } from '$lib/server/auth';
 import { uploadToCloudinary } from '$lib/server/cloudinary';
 import { env } from '$env/dynamic/private';
 
+import { formatExamTitle } from '$lib/utils/exam';
+
 export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>[0]) => {
 	const db = getDB(platform);
 
@@ -16,7 +18,15 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 
 	try {
 		const exam = await db.prepare(`
-		SELECT e.id, e.title, e.duration_minutes, e.start_time, e.end_time, s.name as subject,
+		SELECT e.id, 
+		       e.title, 
+		       e.duration_minutes, 
+		       e.start_time, 
+		       e.end_time, 
+		       s.name as subject_name,
+		       et.code as exam_type_code,
+		       c.name as class_name,
+		       c.level as class_level,
 			COALESCE(
 				(
 					SELECT GROUP_CONCAT(u.name, '||')
@@ -32,10 +42,20 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 		FROM exams e 
 		LEFT JOIN subjects s ON e.subject_id = s.id 
 		JOIN exam_types et ON e.exam_type_id = et.id
+		JOIN users u ON u.id = ?
+		LEFT JOIN classes c ON u.class_id = c.id
 		WHERE e.id = ? AND e.school_id = ? AND et.is_active = 1
-	`).bind(parsedExamId, locals.user!.school_id).first();
+	`).bind(locals.user!.id, parsedExamId, locals.user!.school_id).first<any>();
 
 		if (!exam) throw redirect(302, '/siswa/jadwal');
+
+		exam.title = formatExamTitle({
+			title: exam.title,
+			examTypeCode: exam.exam_type_code,
+			subjectName: exam.subject_name,
+			className: exam.class_name,
+			classLevel: exam.class_level
+		});
 
 		return { exam };
 	} catch (e: any) {

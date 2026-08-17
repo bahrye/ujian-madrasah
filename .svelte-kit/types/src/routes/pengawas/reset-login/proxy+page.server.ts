@@ -2,6 +2,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB, ensureUserLoginColumns } from '$lib/server/db';
+import { formatExamTitle } from '$lib/utils/exam';
 
 export interface StudentLoginItem {
 	id: number;
@@ -43,38 +44,65 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 		const sessionFilter = parseInt(sessionFilterStr, 10);
 
 		// 1. Fetch available exams specifically monitored by this proctor
-		let exams: { id: number; title: string }[] = [];
+		let rawExams: any[] = [];
 
 		if (isSuperAdmin || locals.user.role === 'admin') {
 			const examsQuery = userSchoolId !== null 
-				? `SELECT e.id, e.title FROM exams e WHERE e.school_id = ? ORDER BY e.is_active DESC, e.title ASC`
-				: `SELECT e.id, e.title FROM exams e ORDER BY e.is_active DESC, e.title ASC`;
+				? `SELECT e.id, e.title, s.name as subject_name, et.code as exam_type_code, c.name as class_name 
+				   FROM exams e 
+				   LEFT JOIN subjects s ON e.subject_id = s.id
+				   LEFT JOIN exam_types et ON e.exam_type_id = et.id
+				   LEFT JOIN classes c ON e.class_id = c.id
+				   WHERE e.school_id = ? 
+				   ORDER BY e.is_active DESC, e.title ASC`
+				: `SELECT e.id, e.title, s.name as subject_name, et.code as exam_type_code, c.name as class_name 
+				   FROM exams e 
+				   LEFT JOIN subjects s ON e.subject_id = s.id
+				   LEFT JOIN exam_types et ON e.exam_type_id = et.id
+				   LEFT JOIN classes c ON e.class_id = c.id
+				   ORDER BY e.is_active DESC, e.title ASC`;
 			const examsParams = userSchoolId !== null ? [userSchoolId] : [];
-			const examsRes = await db.prepare(examsQuery).bind(...examsParams).all<{ id: number; title: string }>();
-			exams = examsRes.results || [];
+			const examsRes = await db.prepare(examsQuery).bind(...examsParams).all<any>();
+			rawExams = examsRes.results || [];
 		} else {
 			// For pengawas / guru role: fetch exams assigned to this proctor in exam_proctors
 			const proctorExamsRes = await db.prepare(`
-				SELECT DISTINCT e.id, e.title 
+				SELECT DISTINCT e.id, e.title, s.name as subject_name, et.code as exam_type_code, c.name as class_name 
 				FROM exams e 
 				JOIN exam_proctors ep ON e.id = ep.exam_id 
+				LEFT JOIN subjects s ON e.subject_id = s.id
+				LEFT JOIN exam_types et ON e.exam_type_id = et.id
+				LEFT JOIN classes c ON e.class_id = c.id
 				WHERE ep.proctor_id = ? 
 				ORDER BY e.is_active DESC, e.title ASC
-			`).bind(userId).all<{ id: number; title: string }>();
+			`).bind(userId).all<any>();
 
-			exams = proctorExamsRes.results || [];
+			rawExams = proctorExamsRes.results || [];
 
 			// Fallback to school exams if no specific exam_proctor assignment
-			if (exams.length === 0 && userSchoolId !== null) {
+			if (rawExams.length === 0 && userSchoolId !== null) {
 				const schoolExamsRes = await db.prepare(`
-					SELECT e.id, e.title 
+					SELECT e.id, e.title, s.name as subject_name, et.code as exam_type_code, c.name as class_name 
 					FROM exams e 
+					LEFT JOIN subjects s ON e.subject_id = s.id
+					LEFT JOIN exam_types et ON e.exam_type_id = et.id
+					LEFT JOIN classes c ON e.class_id = c.id
 					WHERE e.school_id = ? 
 					ORDER BY e.is_active DESC, e.title ASC
-				`).bind(userSchoolId).all<{ id: number; title: string }>();
-				exams = schoolExamsRes.results || [];
+				`).bind(userSchoolId).all<any>();
+				rawExams = schoolExamsRes.results || [];
 			}
 		}
+
+		let exams: { id: number; title: string }[] = rawExams.map((e: any) => ({
+			id: e.id,
+			title: formatExamTitle({
+				title: e.title,
+				examTypeCode: e.exam_type_code,
+				subjectName: e.subject_name,
+				className: e.class_name
+			})
+		}));
 
 		// REQUIRE EXAM SELECTION FIRST
 		// If no exam selected, return empty students list with prompt

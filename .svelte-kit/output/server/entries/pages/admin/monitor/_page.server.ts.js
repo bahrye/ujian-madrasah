@@ -2,6 +2,7 @@ import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
 import { d as deleteFromCloudinary } from "../../../../chunks/cloudinary.js";
 import { b as private_env } from "../../../../chunks/shared-server.js";
+import { f as formatExamTitle } from "../../../../chunks/exam.js";
 const load = async ({ platform, url, locals }) => {
   if (!locals.user) throw redirect(302, "/login");
   try {
@@ -10,12 +11,24 @@ const load = async ({ platform, url, locals }) => {
     const examFilter = parseInt(examFilterStr, 10);
     const sessionFilterStr = url.searchParams.get("session_number") || "";
     const sessionFilter = parseInt(sessionFilterStr, 10);
-    const exams = await db.prepare(`
-			SELECT e.id, e.title 
+    const rawExams = await db.prepare(`
+			SELECT e.id, e.title, s.name as subject_name, et.code as exam_type_code, c.name as class_name
 			FROM exams e 
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			LEFT JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN classes c ON e.class_id = c.id
 			WHERE e.is_active = 1 AND e.school_id = ?
 			ORDER BY e.title
 		`).bind(locals.user.school_id).all();
+    const exams = (rawExams.results || []).map((e) => ({
+      id: e.id,
+      title: formatExamTitle({
+        title: e.title,
+        examTypeCode: e.exam_type_code,
+        subjectName: e.subject_name,
+        className: e.class_name
+      })
+    }));
     let availableSessions = [];
     if (!isNaN(examFilter)) {
       const dbSessions = await db.prepare(`

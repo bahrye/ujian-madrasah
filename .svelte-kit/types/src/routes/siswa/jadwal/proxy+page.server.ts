@@ -3,6 +3,8 @@ import type { PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { redirect } from '@sveltejs/kit';
 
+import { formatExamTitle } from '$lib/utils/exam';
+
 export interface StudentScheduleItem {
 	id: number;
 	title: string;
@@ -11,6 +13,9 @@ export interface StudentScheduleItem {
 	end_time: string | null;
 	is_active: number;
 	subject: string | null;
+	exam_type_code?: string | null;
+	class_name?: string | null;
+	class_level?: string | number | null;
 	proctors: string | null;
 	question_count: number;
 	session_number?: number;
@@ -33,6 +38,9 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 		SELECT 
 			e.*, 
 			s.name as subject,
+			et.code as exam_type_code,
+			c.name as class_name,
+			c.level as class_level,
 			(
 				SELECT status 
 				FROM student_attempts 
@@ -57,6 +65,7 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 		FROM exams e
 		JOIN exam_participants ep ON e.id = ep.exam_id
 		JOIN users u ON ep.student_id = u.id
+		LEFT JOIN classes c ON u.class_id = c.id
 		LEFT JOIN exam_rooms r ON ep.room_id = r.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		JOIN exam_types et ON e.exam_type_id = et.id
@@ -64,7 +73,17 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 		ORDER BY CASE WHEN e.start_time IS NULL THEN 1 ELSE 0 END, e.start_time ASC, e.created_at DESC
 	`).bind(locals.user.id, locals.user.id, locals.user.school_id).all<StudentScheduleItem>();
 
-	let schedules = examsQuery.results || [];
+	let rawSchedules = examsQuery.results || [];
+	let schedules = rawSchedules.map(item => ({
+		...item,
+		title: formatExamTitle({
+			title: item.title,
+			examTypeCode: item.exam_type_code,
+			subjectName: item.subject,
+			className: item.class_name,
+			classLevel: item.class_level
+		})
+	}));
 	
 	// Fetch student's session_number
 	let studentSession = 1;

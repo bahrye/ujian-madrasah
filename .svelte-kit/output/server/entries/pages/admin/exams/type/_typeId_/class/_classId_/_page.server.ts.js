@@ -1,5 +1,6 @@
 import { fail } from "@sveltejs/kit";
 import { g as getDB } from "../../../../../../../../chunks/db.js";
+import { f as formatExamTitle } from "../../../../../../../../chunks/exam.js";
 const load = async ({ params, platform, locals }) => {
   const db = getDB(platform);
   const typeId = parseInt(params.typeId, 10);
@@ -10,7 +11,7 @@ const load = async ({ params, platform, locals }) => {
   const classData = await db.prepare("SELECT * FROM classes WHERE id = ? AND school_id = ?").bind(classId, locals.user.school_id).first();
   if (!classData) throw new Error("Kelas tidak ditemukan");
   const exams = await db.prepare(`
-		SELECT e.*, u.name as creator_name, s.name as subject_name,
+		SELECT e.*, u.name as creator_name, s.name as subject_name, c.name as class_name, et.code as exam_type_code,
 			(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count,
 			(SELECT COUNT(*) FROM exam_participants WHERE exam_id = e.id) as participant_count,
 			(SELECT COUNT(*) FROM exam_teachers WHERE exam_id = e.id) as teacher_count,
@@ -29,6 +30,8 @@ const load = async ({ params, platform, locals }) => {
 		FROM exams e
 		LEFT JOIN users u ON e.created_by = u.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
+		LEFT JOIN classes c ON e.class_id = c.id
+		LEFT JOIN exam_types et ON e.exam_type_id = et.id
 		WHERE e.school_id = ? AND e.exam_type_id = ? AND (e.class_id = ? OR e.class_id IS NULL)
 		ORDER BY e.created_at DESC
 	`).bind(locals.user.school_id, typeId, classId).all();
@@ -45,6 +48,12 @@ const load = async ({ params, platform, locals }) => {
   }
   const examsWithSessions = exams.results.map((e) => ({
     ...e,
+    title: formatExamTitle({
+      title: e.title,
+      examTypeCode: e.exam_type_code || examType.code,
+      subjectName: e.subject_name,
+      className: e.class_name || classData.name
+    }),
     sessions: allSessions.filter((s) => s.exam_id === e.id)
   }));
   const subjects = await db.prepare("SELECT id, name FROM subjects WHERE school_id = ? ORDER BY name").bind(locals.user.school_id).all();
@@ -59,11 +68,16 @@ const actions = {
     if (isNaN(typeId) || isNaN(classId)) return fail(400, { error: "ID tidak valid" });
     const examType = await db.prepare("SELECT * FROM exam_types WHERE id = ? AND school_id = ?").bind(typeId, locals.user.school_id).first();
     if (!examType) return fail(400, { error: "Tipe Ujian tidak valid." });
+    const classData = await db.prepare("SELECT * FROM classes WHERE id = ? AND school_id = ?").bind(classId, locals.user.school_id).first();
     const subjectIdStr = form.get("subject_id")?.toString() || null;
     const parsedSubjectId = parseInt(subjectIdStr || "", 10);
     if (isNaN(parsedSubjectId)) return fail(400, { error: "Mata Pelajaran wajib dipilih." });
     const subject = await db.prepare("SELECT name FROM subjects WHERE id = ?").bind(parsedSubjectId).first();
-    let title = `${examType.code} - ${subject.name}`;
+    let title = formatExamTitle({
+      examTypeCode: examType.code,
+      subjectName: subject.name,
+      className: classData?.name
+    });
     const description = form.get("description")?.toString().trim() || "";
     const durationMinutes = parseInt(form.get("duration_minutes")?.toString() || "60");
     const maxAttempts = parseInt(form.get("max_attempts")?.toString() || "1");
