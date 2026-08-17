@@ -1411,6 +1411,26 @@
       "_app/immutable/assets/QuestionRenderer.CwYmYea-.css"
     ]
   },
+  "src/routes/guru/bank-soal/[examId]/analisis/+page.server.ts": {
+    "file": "entries/pages/guru/bank-soal/_examId_/analisis/_page.server.ts.js",
+    "name": "entries/pages/guru/bank-soal/_examId_/analisis/_page.server.ts",
+    "src": "src/routes/guru/bank-soal/[examId]/analisis/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/guru/bank-soal/[examId]/analisis/+page.svelte": {
+    "file": "entries/pages/guru/bank-soal/_examId_/analisis/_page.svelte.js",
+    "name": "entries/pages/guru/bank-soal/_examId_/analisis/_page.svelte",
+    "src": "src/routes/guru/bank-soal/[examId]/analisis/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_constants.js",
+      "_html.js"
+    ]
+  },
   "src/routes/guru/bank-soal/[examId]/preview/+page.server.ts": {
     "file": "entries/pages/guru/bank-soal/_examId_/preview/_page.server.ts.js",
     "name": "entries/pages/guru/bank-soal/_examId_/preview/_page.server.ts",

@@ -185,6 +185,11 @@
 		"src/routes/guru/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/guru/bank-soal/[examId]/analisis": [
+		"src/routes/guru/bank-soal/[examId]/analisis/+page.server.ts",
+		"src/routes/guru/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/guru/bank-soal/[examId]/preview": [
 		"src/routes/guru/bank-soal/[examId]/preview/+page.server.ts",
 		"src/routes/+layout.server.ts"

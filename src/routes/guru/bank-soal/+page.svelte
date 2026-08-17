@@ -93,7 +93,7 @@
 					{#if exam.question_count > 0}
 						<div class="flex items-center gap-1" on:click|stopPropagation>
 							<a 
-								href="/admin/exams/{exam.id}/analisis" 
+								href="/guru/bank-soal/{exam.id}/analisis" 
 								class="btn-sm btn-ghost p-2 hover:bg-indigo-50 rounded-lg text-indigo-600 transition-colors z-10 relative"
 								title="Analisis Butir Soal"
 								on:click|stopPropagation
