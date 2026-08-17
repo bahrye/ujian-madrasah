@@ -34,7 +34,7 @@ const load = async ({ platform, url, locals }) => {
       const dbSessions = await db.prepare(`
 				SELECT session_number FROM exam_sessions WHERE exam_id = ? ORDER BY session_number
 			`).bind(examFilter).all();
-      if (dbSessions.results.length > 0) {
+      if (dbSessions.results && dbSessions.results.length > 0) {
         availableSessions = dbSessions.results.map((s) => s.session_number);
       } else {
         availableSessions = [];
@@ -81,7 +81,7 @@ const load = async ({ platform, url, locals }) => {
 					u.name ASC
 			`;
       const result = await db.prepare(query).bind(...bindings).all();
-      attempts = result.results;
+      attempts = result.results || [];
     }
     let answeredCountsMap = {};
     const attemptIds = attempts.map((a) => a.attempt_id).filter((id) => id);
@@ -93,7 +93,7 @@ const load = async ({ platform, url, locals }) => {
 				WHERE st.exam_id = ? AND sa.answer_given IS NOT NULL AND sa.answer_given != '' AND sa.answer_given != '[]' AND sa.answer_given != '{}'
 				GROUP BY sa.attempt_id
 			`).bind(examFilter).all();
-      countsResult.results.forEach((r) => {
+      (countsResult.results || []).forEach((r) => {
         answeredCountsMap[r.attempt_id] = r.c;
       });
     }

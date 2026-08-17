@@ -100,10 +100,13 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<span class="text-xs text-slate-400">0%</span>`);
         }
         $$renderer2.push(`<!--]--></td><td class="text-xs">`);
-        if (attempt.status === "mengerjakan") {
+        if (!attempt.start_time) {
           $$renderer2.push("<!--[0-->");
-          const startStr = attempt.start_time.replace(" ", "T") + (attempt.start_time.includes(" ") && !attempt.start_time.includes("Z") ? "Z" : "");
-          const start = parseDate(startStr).getTime();
+          $$renderer2.push(`<span class="text-slate-400 font-medium opacity-80">-</span>`);
+        } else if (attempt.status === "mengerjakan") {
+          $$renderer2.push("<!--[1-->");
+          const startStr = attempt.start_time ? attempt.start_time.replace(" ", "T") + (attempt.start_time.includes(" ") && !attempt.start_time.includes("Z") ? "Z" : "") : "";
+          const start = startStr ? parseDate(startStr).getTime() : 0;
           const end = start + exam.duration_minutes * 60 * 1e3;
           const remainingMs = end - currentTime;
           if (remainingMs > 0) {
@@ -126,10 +129,10 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<!--]-->`);
         } else {
           $$renderer2.push("<!--[-1-->");
-          const startStr = attempt.start_time.replace(" ", "T") + (attempt.start_time.includes(" ") && !attempt.start_time.includes("Z") ? "Z" : "");
+          const startStr = attempt.start_time ? attempt.start_time.replace(" ", "T") + (attempt.start_time.includes(" ") && !attempt.start_time.includes("Z") ? "Z" : "") : "";
           const submitStr = attempt.submit_time ? attempt.submit_time.replace(" ", "T") + (attempt.submit_time.includes(" ") && !attempt.submit_time.includes("Z") ? "Z" : "") : startStr;
-          const start = parseDate(startStr).getTime();
-          const submit = parseDate(submitStr).getTime();
+          const start = startStr ? parseDate(startStr).getTime() : 0;
+          const submit = submitStr ? parseDate(submitStr).getTime() : 0;
           const end = start + exam.duration_minutes * 60 * 1e3;
           const remainingMs = end - submit;
           if (remainingMs > 0) {

@@ -230,9 +230,11 @@
 										{/if}
 									</td>
 									<td class="text-xs">
-										{#if attempt.status === 'mengerjakan'}
-											{@const startStr = attempt.start_time.replace(' ', 'T') + (attempt.start_time.includes(' ') && !attempt.start_time.includes('Z') ? 'Z' : '')}
-											{@const start = parseDate(startStr).getTime()}
+										{#if !attempt.start_time}
+											<span class="text-slate-400 font-medium opacity-80">-</span>
+										{:else if attempt.status === 'mengerjakan'}
+											{@const startStr = attempt.start_time ? (attempt.start_time.replace(' ', 'T') + (attempt.start_time.includes(' ') && !attempt.start_time.includes('Z') ? 'Z' : '')) : ''}
+											{@const start = startStr ? parseDate(startStr).getTime() : 0}
 											{@const end = start + (exam.duration_minutes * 60 * 1000)}
 											{@const remainingMs = end - currentTime}
 											{#if remainingMs > 0}
@@ -246,10 +248,10 @@
 												<span class="text-rose-500 font-bold">Habis</span>
 											{/if}
 										{:else}
-											{@const startStr = attempt.start_time.replace(' ', 'T') + (attempt.start_time.includes(' ') && !attempt.start_time.includes('Z') ? 'Z' : '')}
+											{@const startStr = attempt.start_time ? (attempt.start_time.replace(' ', 'T') + (attempt.start_time.includes(' ') && !attempt.start_time.includes('Z') ? 'Z' : '')) : ''}
 											{@const submitStr = attempt.submit_time ? (attempt.submit_time.replace(' ', 'T') + (attempt.submit_time.includes(' ') && !attempt.submit_time.includes('Z') ? 'Z' : '')) : startStr}
-											{@const start = parseDate(startStr).getTime()}
-											{@const submit = parseDate(submitStr).getTime()}
+											{@const start = startStr ? parseDate(startStr).getTime() : 0}
+											{@const submit = submitStr ? parseDate(submitStr).getTime() : 0}
 											{@const end = start + (exam.duration_minutes * 60 * 1000)}
 											{@const remainingMs = end - submit}
 											{#if remainingMs > 0}

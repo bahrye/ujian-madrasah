@@ -45,7 +45,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 				SELECT session_number FROM exam_sessions WHERE exam_id = ? ORDER BY session_number
 			`).bind(examFilter).all<{ session_number: number }>();
 
-			if (dbSessions.results.length > 0) {
+			if (dbSessions.results && dbSessions.results.length > 0) {
 				availableSessions = dbSessions.results.map(s => s.session_number);
 			} else {
 				availableSessions = [];
@@ -97,7 +97,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 			`;
 
 			const result = await db.prepare(query).bind(...bindings).all();
-			attempts = result.results;
+			attempts = result.results || [];
 		}
 
 		// Fetch all answers count from DB to avoid N+1 queries
@@ -112,7 +112,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 				GROUP BY sa.attempt_id
 			`).bind(examFilter).all();
 			
-			countsResult.results.forEach((r: any) => {
+			(countsResult.results || []).forEach((r: any) => {
 				answeredCountsMap[r.attempt_id] = r.c;
 			});
 		}

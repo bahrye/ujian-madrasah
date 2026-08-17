@@ -130,16 +130,16 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<span class="text-xs text-slate-400">0%</span>`);
         }
         $$renderer2.push(`<!--]--></td><td class="text-xs">`);
-        if (a.status === "belum_mengerjakan") {
+        if (a.status === "belum_mengerjakan" || !a.end_time) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<span class="text-slate-400 font-medium opacity-80">-</span>`);
         } else if (a.status === "mengerjakan") {
           $$renderer2.push("<!--[1-->");
-          const endStr = a.end_time.replace(" ", "T") + (a.end_time.includes(" ") && !a.end_time.includes("Z") ? "Z" : "");
-          const end = parseDate(endStr).getTime();
+          const endStr = a.end_time ? a.end_time.replace(" ", "T") + (a.end_time.includes(" ") && !a.end_time.includes("Z") ? "Z" : "") : "";
+          const end = endStr ? parseDate(endStr).getTime() : 0;
           const compareTime = a.is_paused && a.paused_at ? parseDate(a.paused_at).getTime() : currentTime;
-          const remainingMs = end - compareTime;
-          if (remainingMs > 0) {
+          const remainingMs = end > 0 ? end - compareTime : 0;
+          if (end > 0 && remainingMs > 0) {
             $$renderer2.push("<!--[0-->");
             const totalM = Math.floor(remainingMs / 6e4);
             const h = Math.floor(totalM / 60);
@@ -152,19 +152,22 @@ function _page($$renderer, $$props) {
               $$renderer2.push("<!--[-1-->");
             }
             $$renderer2.push(`<!--]-->${escape_html(m)} mnt</span>`);
+          } else if (end > 0) {
+            $$renderer2.push("<!--[1-->");
+            $$renderer2.push(`<span class="text-rose-500 font-bold">Habis</span>`);
           } else {
             $$renderer2.push("<!--[-1-->");
-            $$renderer2.push(`<span class="text-rose-500 font-bold">Habis</span>`);
+            $$renderer2.push(`<span class="text-slate-400 font-medium opacity-80">-</span>`);
           }
           $$renderer2.push(`<!--]-->`);
         } else {
           $$renderer2.push("<!--[-1-->");
-          const endStr = a.end_time.replace(" ", "T") + (a.end_time.includes(" ") && !a.end_time.includes("Z") ? "Z" : "");
+          const endStr = a.end_time ? a.end_time.replace(" ", "T") + (a.end_time.includes(" ") && !a.end_time.includes("Z") ? "Z" : "") : "";
           const submitStr = a.submit_time ? a.submit_time.replace(" ", "T") + (a.submit_time.includes(" ") && !a.submit_time.includes("Z") ? "Z" : "") : endStr;
-          const end = parseDate(endStr).getTime();
-          const submit = parseDate(submitStr).getTime();
-          const remainingMs = end - submit;
-          if (remainingMs > 0) {
+          const end = endStr ? parseDate(endStr).getTime() : 0;
+          const submit = submitStr ? parseDate(submitStr).getTime() : 0;
+          const remainingMs = end > 0 && submit > 0 ? end - submit : 0;
+          if (end > 0 && remainingMs > 0) {
             $$renderer2.push("<!--[0-->");
             const totalM = Math.floor(remainingMs / 6e4);
             const h = Math.floor(totalM / 60);
@@ -177,9 +180,12 @@ function _page($$renderer, $$props) {
               $$renderer2.push("<!--[-1-->");
             }
             $$renderer2.push(`<!--]-->${escape_html(m)} mnt</span>`);
+          } else if (end > 0) {
+            $$renderer2.push("<!--[1-->");
+            $$renderer2.push(`<span class="text-slate-400 font-medium opacity-80">Habis</span>`);
           } else {
             $$renderer2.push("<!--[-1-->");
-            $$renderer2.push(`<span class="text-slate-400 font-medium opacity-80">Habis</span>`);
+            $$renderer2.push(`<span class="text-slate-400 font-medium opacity-80">-</span>`);
           }
           $$renderer2.push(`<!--]-->`);
         }

@@ -343,38 +343,42 @@
 									{/if}
 								</td>
 								<td class="text-xs">
-									{#if a.status === 'belum_mengerjakan'}
+									{#if a.status === 'belum_mengerjakan' || !a.end_time}
 										<span class="text-slate-400 font-medium opacity-80">-</span>
 									{:else if a.status === 'mengerjakan'}
-										{@const endStr = a.end_time.replace(' ', 'T') + (a.end_time.includes(' ') && !a.end_time.includes('Z') ? 'Z' : '')}
-										{@const end = parseDate(endStr).getTime()}
+										{@const endStr = a.end_time ? (a.end_time.replace(' ', 'T') + (a.end_time.includes(' ') && !a.end_time.includes('Z') ? 'Z' : '')) : ''}
+										{@const end = endStr ? parseDate(endStr).getTime() : 0}
 										{@const compareTime = a.is_paused && a.paused_at ? parseDate(a.paused_at).getTime() : currentTime}
-										{@const remainingMs = end - compareTime}
-										{#if remainingMs > 0}
+										{@const remainingMs = end > 0 ? end - compareTime : 0}
+										{#if end > 0 && remainingMs > 0}
 											{@const totalM = Math.floor(remainingMs / 60000)}
 											{@const h = Math.floor(totalM / 60)}
 											{@const m = totalM % 60}
 											<span class="text-slate-600 font-medium">
 												{#if h > 0}{h} jam {/if}{m} mnt
 											</span>
-										{:else}
+										{:else if end > 0}
 											<span class="text-rose-500 font-bold">Habis</span>
+										{:else}
+											<span class="text-slate-400 font-medium opacity-80">-</span>
 										{/if}
 									{:else}
-										{@const endStr = a.end_time.replace(' ', 'T') + (a.end_time.includes(' ') && !a.end_time.includes('Z') ? 'Z' : '')}
+										{@const endStr = a.end_time ? (a.end_time.replace(' ', 'T') + (a.end_time.includes(' ') && !a.end_time.includes('Z') ? 'Z' : '')) : ''}
 										{@const submitStr = a.submit_time ? (a.submit_time.replace(' ', 'T') + (a.submit_time.includes(' ') && !a.submit_time.includes('Z') ? 'Z' : '')) : endStr}
-										{@const end = parseDate(endStr).getTime()}
-										{@const submit = parseDate(submitStr).getTime()}
-										{@const remainingMs = end - submit}
-										{#if remainingMs > 0}
+										{@const end = endStr ? parseDate(endStr).getTime() : 0}
+										{@const submit = submitStr ? parseDate(submitStr).getTime() : 0}
+										{@const remainingMs = (end > 0 && submit > 0) ? end - submit : 0}
+										{#if end > 0 && remainingMs > 0}
 											{@const totalM = Math.floor(remainingMs / 60000)}
 											{@const h = Math.floor(totalM / 60)}
 											{@const m = totalM % 60}
 											<span class="text-slate-500 font-medium" title="Sisa Waktu Saat Selesai">
 												{#if h > 0}{h} jam {/if}{m} mnt
 											</span>
-										{:else}
+										{:else if end > 0}
 											<span class="text-slate-400 font-medium opacity-80">Habis</span>
+										{:else}
+											<span class="text-slate-400 font-medium opacity-80">-</span>
 										{/if}
 									{/if}
 								</td>
