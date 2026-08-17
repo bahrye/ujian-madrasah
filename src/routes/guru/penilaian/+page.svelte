@@ -55,7 +55,7 @@
 
 		{#if data.examParam !== null}
 			{@const currentStudent = data.students.find(s => String(s.id) === String(data.studentFilter))}
-			{@const isCurrentLocked = currentStudent ? currentStudent.is_graded : (data.students.length > 0 && data.students.every(s => s.is_graded))}
+			{@const isCurrentLocked = currentStudent ? currentStudent.is_locked : (data.students.length > 0 && data.students.every(s => s.is_locked))}
 			
 			<form method="POST" action={isCurrentLocked ? "?/unlockGrading" : "?/finalizeGrading"} use:enhance class="w-full md:w-auto flex-shrink-0">
 				<input type="hidden" name="exam_id" value={data.examParam} />
@@ -113,7 +113,7 @@
 	{:else}
 		<div class="space-y-4" use:mathRender={answers} use:arabicRender={answers}>
 			{#each answers as a (a.answer_id)}
-				<div class="card p-5 {a.is_graded === 1 ? 'border-l-4 border-slate-400 opacity-90' : (a.score_given != null ? 'border-l-4 border-emerald-400' : 'border-l-4 border-amber-400')}">
+				<div class="card p-5 {a.is_locked === 1 ? 'border-l-4 border-slate-400 opacity-90' : (a.score_given != null ? 'border-l-4 border-emerald-400' : 'border-l-4 border-amber-400')}">
 					<div class="flex flex-wrap items-center gap-2 mb-3">
 						<span class="badge-info">{a.exam_title}</span>
 						<span class="badge-primary">{QUESTION_TYPE_LABELS[a.type]}</span>
@@ -178,11 +178,11 @@
 							class="input w-24"
 							value={a.score_given ?? ''}
 							placeholder="0-{a.points}"
-							disabled={a.is_graded === 1}
+							disabled={a.is_locked === 1}
 						/>
 						<span class="text-xs text-slate-400">/ {a.points}</span>
-						<button type="submit" class="btn-success btn-sm" disabled={a.is_graded === 1}>Simpan</button>
-						{#if a.is_graded === 1}
+						<button type="submit" class="btn-success btn-sm" disabled={a.is_locked === 1}>Simpan</button>
+						{#if a.is_locked === 1}
 							<span class="badge bg-slate-100 text-slate-600 border border-slate-200">🔒 Dikunci (Selesai)</span>
 						{:else if a.score_given !== null && a.score_given !== undefined}
 							<span class="badge-success">✓ Sudah dinilai</span>

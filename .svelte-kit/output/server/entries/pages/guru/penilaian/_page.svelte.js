@@ -69,7 +69,7 @@ function _page($$renderer, $$props) {
     if (data.examParam !== null) {
       $$renderer2.push("<!--[0-->");
       const currentStudent = data.students.find((s) => String(s.id) === String(data.studentFilter));
-      const isCurrentLocked = currentStudent ? currentStudent.is_graded : data.students.length > 0 && data.students.every((s) => s.is_graded);
+      const isCurrentLocked = currentStudent ? currentStudent.is_locked : data.students.length > 0 && data.students.every((s) => s.is_locked);
       $$renderer2.push(`<form method="POST"${attr("action", isCurrentLocked ? "?/unlockGrading" : "?/finalizeGrading")} class="w-full md:w-auto flex-shrink-0"><input type="hidden" name="exam_id"${attr("value", data.examParam)}/> <input type="hidden" name="student_id"${attr("value", data.studentFilter)}/> `);
       if (isCurrentLocked) {
         $$renderer2.push("<!--[0-->");
@@ -102,7 +102,7 @@ function _page($$renderer, $$props) {
       const each_array_2 = ensure_array_like(answers);
       for (let $$index_2 = 0, $$length = each_array_2.length; $$index_2 < $$length; $$index_2++) {
         let a = each_array_2[$$index_2];
-        $$renderer2.push(`<div${attr_class(`card p-5 ${a.is_graded === 1 ? "border-l-4 border-slate-400 opacity-90" : a.score_given != null ? "border-l-4 border-emerald-400" : "border-l-4 border-amber-400"}`)}><div class="flex flex-wrap items-center gap-2 mb-3"><span class="badge-info">${escape_html(a.exam_title)}</span> <span class="badge-primary">${escape_html(QUESTION_TYPE_LABELS[a.type])}</span> `);
+        $$renderer2.push(`<div${attr_class(`card p-5 ${a.is_locked === 1 ? "border-l-4 border-slate-400 opacity-90" : a.score_given != null ? "border-l-4 border-emerald-400" : "border-l-4 border-amber-400"}`)}><div class="flex flex-wrap items-center gap-2 mb-3"><span class="badge-info">${escape_html(a.exam_title)}</span> <span class="badge-primary">${escape_html(QUESTION_TYPE_LABELS[a.type])}</span> `);
         if (a.question_number) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<span class="badge bg-slate-100 text-slate-700">Soal #${escape_html(a.question_number)}</span>`);
@@ -145,8 +145,8 @@ function _page($$renderer, $$props) {
           $$renderer2.push("<!--[-1-->");
           $$renderer2.push(`<span class="italic text-slate-400">(Tidak dijawab)</span>`);
         }
-        $$renderer2.push(`<!--]--></div></div> <form method="POST" action="?/grade" class="flex items-center gap-3"><input type="hidden" name="answer_id"${attr("value", a.answer_id)}/> <input type="hidden" name="max_points"${attr("value", a.points)}/> <label class="text-sm font-medium text-slate-600">Nilai:</label> <input name="score_given" type="number" min="0"${attr("max", a.points)} step="0.5" class="input w-24"${attr("value", a.score_given ?? "")}${attr("placeholder", `0-${stringify(a.points)}`)}${attr("disabled", a.is_graded === 1, true)}/> <span class="text-xs text-slate-400">/ ${escape_html(a.points)}</span> <button type="submit" class="btn-success btn-sm"${attr("disabled", a.is_graded === 1, true)}>Simpan</button> `);
-        if (a.is_graded === 1) {
+        $$renderer2.push(`<!--]--></div></div> <form method="POST" action="?/grade" class="flex items-center gap-3"><input type="hidden" name="answer_id"${attr("value", a.answer_id)}/> <input type="hidden" name="max_points"${attr("value", a.points)}/> <label class="text-sm font-medium text-slate-600">Nilai:</label> <input name="score_given" type="number" min="0"${attr("max", a.points)} step="0.5" class="input w-24"${attr("value", a.score_given ?? "")}${attr("placeholder", `0-${stringify(a.points)}`)}${attr("disabled", a.is_locked === 1, true)}/> <span class="text-xs text-slate-400">/ ${escape_html(a.points)}</span> <button type="submit" class="btn-success btn-sm"${attr("disabled", a.is_locked === 1, true)}>Simpan</button> `);
+        if (a.is_locked === 1) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<span class="badge bg-slate-100 text-slate-600 border border-slate-200">🔒 Dikunci (Selesai)</span>`);
         } else if (a.score_given !== null && a.score_given !== void 0) {

@@ -42,12 +42,13 @@ const load = async ({ platform, url, locals }) => {
       students = (studentsResult.results || []).map((s) => ({
         id: s.id,
         name: s.name,
+        is_locked: s.is_locked === 1,
         is_graded: s.is_locked === 1 || s.ungraded_count === 0
       }));
       let query = `SELECT sa.id as answer_id, sa.answer_given, sa.score_given, sa.is_correct,
 				q.id as question_id, q.question_text, q.question_number, q.type, q.points, q.correct_answer_json,
 				q.media_type, q.media_url,
-				st.id as attempt_id, COALESCE(st.is_graded, 0) as is_graded, u.name as student_name, e.title as exam_title, e.id as exam_id
+				st.id as attempt_id, COALESCE(st.is_graded, 0) as is_locked, u.name as student_name, e.title as exam_title, e.id as exam_id
 				FROM student_answers sa
 				JOIN questions q ON sa.question_id = q.id
 				JOIN student_attempts st ON sa.attempt_id = st.id
