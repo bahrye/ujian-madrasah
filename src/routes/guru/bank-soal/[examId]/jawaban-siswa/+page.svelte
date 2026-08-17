@@ -485,12 +485,17 @@
 								<!-- Expandable Dropdown Row: Kunci Jawaban Resmi -->
 								{#if expandedStudentAttemptId === att.id}
 									<tr class="bg-indigo-50/90 border-b-2 border-indigo-300 animate-in fade-in">
-										<td class="sticky left-0 z-10 bg-indigo-100 border-r border-indigo-200 text-center py-1">
-											<span class="text-[9px] font-bold text-indigo-700">KUNCI</span>
+										<td class="sticky left-0 z-10 bg-indigo-100 border-r border-indigo-200 text-center py-1 font-bold text-[9px] text-indigo-700">
+											KUNCI
 										</td>
-										<td colspan="3" class="sticky left-8 sm:left-10 z-10 bg-indigo-100 border-r border-indigo-200 py-1 px-2 text-[10px] sm:text-xs font-bold text-indigo-900">
-											🔑 Kunci Jawaban Resmi:
+										<td class="sticky left-8 sm:left-10 z-10 bg-indigo-100 border-r border-indigo-200 py-1 px-1.5 sm:px-2 max-w-[135px] sm:max-w-none">
+											<div class="flex items-center gap-1 font-bold text-indigo-900 text-[10px] sm:text-xs whitespace-nowrap overflow-hidden text-ellipsis">
+												<span>🔑</span>
+												<span>Kunci Resmi</span>
+											</div>
 										</td>
+										<td class="text-center border-r border-indigo-200 bg-indigo-50/90 py-1 text-indigo-300 font-mono text-[10px]">-</td>
+										<td class="text-center border-r border-indigo-200 bg-indigo-50/90 py-1 text-indigo-300 font-mono text-[10px]">-</td>
 										{#each questions as q}
 											{@const diag = questionDiagnostics.find(d => d.id === q.id)}
 											<td class="text-center p-0.5 sm:p-1 border-r border-indigo-200 bg-indigo-50/80 font-bold text-indigo-900 text-[10px] sm:text-[11px] min-w-[26px] sm:min-w-[34px]" title="Kunci Soal #{q.question_number}: {diag?.correctKey || '-'}">
@@ -505,9 +510,14 @@
 						<!-- Summary Footer Row: Tingkat Kesalahan (%) per Soal -->
 						<tfoot class="sticky bottom-0 z-20 bg-slate-900 text-white font-bold text-[10px] sm:text-xs shadow-lg">
 							<tr>
-								<td colspan="4" class="py-2 sm:py-2.5 px-2 sm:px-3 sticky left-0 z-30 bg-slate-900 text-right tracking-wider uppercase border-r border-slate-700">
-									% Salah
+								<td class="py-2 sm:py-2.5 px-1 sticky left-0 z-30 bg-slate-900 text-center border-r border-slate-700 text-slate-500">
+									#
 								</td>
+								<td class="py-2 sm:py-2.5 px-1.5 sm:px-2 sticky left-8 sm:left-10 z-30 bg-slate-900 text-left tracking-wider uppercase border-r border-slate-700 whitespace-nowrap text-[10px] sm:text-xs max-w-[135px] sm:max-w-none">
+									% SALAH
+								</td>
+								<td class="text-center py-2 px-1 border-r border-slate-700 bg-slate-900 text-slate-500">-</td>
+								<td class="text-center py-2 px-1 border-r border-slate-700 bg-slate-900 text-slate-500">-</td>
 								{#each questionDiagnostics as q}
 									<td class="text-center py-1.5 sm:py-2 px-0.5 sm:px-1 border-r border-slate-700 {getWrongHeatColor(q.wrongPercentage)}" title="Soal #{q.question_number}: {q.wrongPercentage}% salah">
 										{q.wrongPercentage}%
