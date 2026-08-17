@@ -58,7 +58,7 @@ function _page($$renderer, $$props) {
       $$renderer2.option(
         {
           value: student.id,
-          selected: data.studentFilter === String(student.id)
+          selected: String(data.studentFilter) === String(student.id)
         },
         ($$renderer3) => {
           $$renderer3.push(`${escape_html(student.is_graded ? "🟢" : "🔴")} ${escape_html(student.name)} (${escape_html(student.is_graded ? "Sudah Dinilai" : "Belum Dinilai")})`);
@@ -70,7 +70,7 @@ function _page($$renderer, $$props) {
       $$renderer2.push("<!--[0-->");
       const currentStudent = data.students.find((s) => String(s.id) === String(data.studentFilter));
       const isCurrentLocked = currentStudent ? currentStudent.is_locked : data.students.length > 0 && data.students.every((s) => s.is_locked);
-      $$renderer2.push(`<form method="POST"${attr("action", isCurrentLocked ? "?/unlockGrading" : "?/finalizeGrading")} class="w-full md:w-auto flex-shrink-0"><input type="hidden" name="exam_id"${attr("value", data.examParam)}/> <input type="hidden" name="student_id"${attr("value", data.studentFilter)}/> `);
+      $$renderer2.push(`<form method="POST"${attr("action", isCurrentLocked ? `?/unlockGrading&exam_id=${data.examParam}&student_id=${data.studentFilter}` : `?/finalizeGrading&exam_id=${data.examParam}&student_id=${data.studentFilter}`)} class="w-full md:w-auto flex-shrink-0"><input type="hidden" name="exam_id"${attr("value", data.examParam)}/> <input type="hidden" name="student_id"${attr("value", data.studentFilter)}/> `);
       if (isCurrentLocked) {
         $$renderer2.push("<!--[0-->");
         $$renderer2.push(`<button type="submit" class="btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 font-semibold text-sm transition-all shadow-sm flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl w-full md:w-auto"><svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg> Batalkan Kunci</button>`);

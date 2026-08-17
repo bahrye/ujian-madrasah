@@ -71,7 +71,7 @@ const load = async ({ platform, url, locals }) => {
       const answersResult = await db.prepare(query).bind(...params).all();
       answers = answersResult.results;
     }
-    return { answers, exams: exams.results, students, examParam, studentFilter: isNaN(studentFilter) ? "" : studentFilter, selectedExam };
+    return { answers, exams: exams.results, students, examParam, studentFilter: isNaN(studentFilter) ? "" : String(studentFilter), selectedExam };
   } catch (e) {
     console.error("Load Error in guru penilaian:", e);
     return { answers: [], exams: [], students: [], examParam: "", studentFilter: "", selectedExam: null, loadError: e.message || String(e) };
