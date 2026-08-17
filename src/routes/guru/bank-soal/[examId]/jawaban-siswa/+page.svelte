@@ -91,6 +91,52 @@
 	function toggleStudentRow(attemptId: number) {
 		expandedStudentAttemptId = expandedStudentAttemptId === attemptId ? null : attemptId;
 	}
+
+	function marqueeAction(node: HTMLElement) {
+		let anim: Animation | null = null;
+
+		function updateMarquee() {
+			if (anim) {
+				anim.cancel();
+				anim = null;
+			}
+			const parent = node.parentElement;
+			if (!parent) return;
+			const overflow = node.scrollWidth - parent.clientWidth;
+			if (overflow > 4) {
+				anim = node.animate(
+					[
+						{ transform: 'translateX(0px)', offset: 0 },
+						{ transform: 'translateX(0px)', offset: 0.25 },
+						{ transform: `translateX(-${overflow + 4}px)`, offset: 0.75 },
+						{ transform: `translateX(-${overflow + 4}px)`, offset: 0.9 },
+						{ transform: 'translateX(0px)', offset: 1.0 }
+					],
+					{
+						duration: Math.max(4000, overflow * 50),
+						iterations: Infinity,
+						easing: 'ease-in-out'
+					}
+				);
+			} else {
+				node.style.transform = 'none';
+			}
+		}
+
+		const timer = setTimeout(updateMarquee, 120);
+		window.addEventListener('resize', updateMarquee);
+
+		return {
+			update() {
+				setTimeout(updateMarquee, 60);
+			},
+			destroy() {
+				clearTimeout(timer);
+				window.removeEventListener('resize', updateMarquee);
+				if (anim) anim.cancel();
+			}
+		};
+	}
 </script>
 
 <svelte:head>
@@ -368,7 +414,7 @@
 						<thead class="sticky top-0 z-20 bg-slate-100 text-slate-700 shadow-sm border-b border-slate-300">
 							<tr>
 								<th class="w-8 sm:w-10 text-center sticky left-0 z-30 bg-slate-100 border-r border-slate-300 px-1 py-2 text-[10px] sm:text-xs">No</th>
-								<th class="w-28 sm:min-w-[170px] max-w-[115px] sm:max-w-none sticky left-8 sm:left-10 z-30 bg-slate-100 border-r border-slate-300 px-1.5 sm:px-2 py-2 text-[10px] sm:text-xs">
+								<th class="w-32 sm:min-w-[170px] max-w-[135px] sm:max-w-none sticky left-8 sm:left-10 z-30 bg-slate-100 border-r border-slate-300 px-1.5 sm:px-2 py-2 text-[10px] sm:text-xs">
 									Nama Siswa
 								</th>
 								<th class="w-14 sm:w-20 text-center border-r border-slate-300 px-1 py-2 text-[10px] sm:text-xs">Kelas</th>
@@ -397,14 +443,18 @@
 										</div>
 									</td>
 									
-									<!-- Student Name with Running / Marquee text on mobile -->
-									<td class="sticky left-8 sm:left-10 z-10 bg-white border-r border-slate-200 py-1.5 px-1.5 sm:px-2 max-w-[115px] sm:max-w-none">
-										<div class="marquee-wrapper max-w-[110px] sm:max-w-none overflow-hidden">
-											<span class="marquee-content font-semibold text-slate-800 text-[11px] sm:text-xs whitespace-nowrap block sm:inline">
+									<!-- Student Name with Dynamic Marquee Action on mobile -->
+									<td class="sticky left-8 sm:left-10 z-10 bg-white border-r border-slate-200 py-1.5 px-1.5 sm:px-2 max-w-[135px] sm:max-w-none">
+										<div class="overflow-hidden max-w-[125px] sm:max-w-none">
+											<span 
+												use:marqueeAction
+												class="font-semibold text-slate-800 text-[11px] sm:text-xs whitespace-nowrap inline-block"
+												title={att.student_name}
+											>
 												{att.student_name}
 											</span>
 										</div>
-										<p class="text-[9px] sm:text-[10px] text-slate-400 truncate">{att.nisn || att.username}</p>
+										<p class="text-[9px] sm:text-[10px] text-slate-400 font-mono truncate">{att.nisn || att.username}</p>
 									</td>
 
 									<td class="text-center text-slate-600 border-r border-slate-200 px-1 py-1.5 text-[10px] sm:text-xs whitespace-nowrap">{att.class_name || '-'}</td>
@@ -809,37 +859,3 @@
 		</div>
 	{/if}
 </div>
-
-<style>
-	/* Running / Marquee text effect on mobile devices for long student names */
-	@media (max-width: 640px) {
-		.marquee-wrapper {
-			display: block;
-			width: 100%;
-			max-width: 110px;
-			overflow: hidden;
-			position: relative;
-			white-space: nowrap;
-		}
-
-		.marquee-content {
-			display: inline-block;
-			white-space: nowrap;
-			animation: marquee-slide 6.5s ease-in-out infinite alternate;
-		}
-
-		.marquee-wrapper:hover .marquee-content,
-		.marquee-wrapper:active .marquee-content {
-			animation-play-state: paused;
-		}
-
-		@keyframes marquee-slide {
-			0%, 25% {
-				transform: translateX(0%);
-			}
-			75%, 100% {
-				transform: translateX(-35%);
-			}
-		}
-	}
-</style>

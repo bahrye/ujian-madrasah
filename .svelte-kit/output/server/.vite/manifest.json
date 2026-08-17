@@ -523,7 +523,7 @@
       "_stores.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.DiAT_5LF.css"
+      "_app/immutable/assets/_layout.Dxnlbnfc.css"
     ],
     "assets": [
       "_app/immutable/assets/KaTeX_AMS-Regular.BQhdFMY1.woff2",
@@ -831,9 +831,6 @@
     "imports": [
       "_index.js",
       "_constants.js"
-    ],
-    "css": [
-      "_app/immutable/assets/_page.DAKDsere.css"
     ]
   },
   "src/routes/admin/exams/type/[typeId]/+page.server.ts": {
@@ -1545,9 +1542,6 @@
     "imports": [
       "_index.js",
       "_constants.js"
-    ],
-    "css": [
-      "_app/immutable/assets/_page.DAUxf1Ne.css"
     ]
   },
   "src/routes/guru/bank-soal/[examId]/preview/+page.server.ts": {
