@@ -771,7 +771,8 @@
     "src": "src/routes/admin/exams/[id]/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/admin/exams/[id]/+page.svelte": {
@@ -998,7 +999,8 @@
     "imports": [
       "_db.js",
       "_cloudinary.js",
-      "_shared-server.js"
+      "_shared-server.js",
+      "_exam.js"
     ]
   },
   "src/routes/admin/results/+page.svelte": {
@@ -1353,7 +1355,8 @@
     "src": "src/routes/guru/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/guru/+page.svelte": {
@@ -1399,7 +1402,8 @@
     "imports": [
       "_db.js",
       "_cloudinary.js",
-      "_shared-server.js"
+      "_shared-server.js",
+      "_exam.js"
     ]
   },
   "src/routes/guru/bank-soal/[examId]/+page.svelte": {
@@ -1650,7 +1654,8 @@
     "src": "src/routes/guru/results/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/guru/results/+page.svelte": {
@@ -1993,7 +1998,8 @@
     "src": "src/routes/print/kartu/[exam_id]/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/print/kartu/[exam_id]/+page.svelte": {

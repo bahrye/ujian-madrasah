@@ -52,9 +52,9 @@
 
 				<!-- Body Kartu -->
 				<div class="p-4 flex-1 flex flex-col">
-					<div class="text-center font-bold text-xs mb-3 pb-2 border-b border-slate-300">
-							{exam.exam_type_name || 'Ujian'} - {exam.subject_name || 'Umum'}
-						</div>
+					<div class="text-center font-bold text-xs mb-3 pb-2 border-b border-slate-300 leading-snug break-words">
+						{exam.title}
+					</div>
 						<div class="flex-1 flex gap-4">
 							<div class="w-24 flex flex-col items-center gap-2">
 								<div class="w-20 h-24 bg-slate-200 border border-slate-400 flex items-center justify-center text-[10px] text-slate-400 font-semibold text-center leading-tight p-1">

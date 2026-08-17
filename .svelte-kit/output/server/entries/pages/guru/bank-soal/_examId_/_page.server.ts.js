@@ -2,13 +2,27 @@ import { fail, error } from "@sveltejs/kit";
 import { g as getDB } from "../../../../../chunks/db.js";
 import { d as deleteFromCloudinary } from "../../../../../chunks/cloudinary.js";
 import { b as private_env } from "../../../../../chunks/shared-server.js";
+import { f as formatExamTitle } from "../../../../../chunks/exam.js";
 const load = async ({ platform, params, locals }) => {
   const db = getDB(platform);
   const examIdStr = params.examId;
   const parsedExamId = parseInt(examIdStr, 10);
   if (isNaN(parsedExamId)) throw error(400, "ID Ujian tidak valid");
-  const exam = await db.prepare("SELECT * FROM exams WHERE id = ? AND school_id = ?").bind(parsedExamId, locals.user.school_id).first();
+  const exam = await db.prepare(`
+		SELECT e.*, s.name as subject_name, et.code as exam_type_code, c.name as class_name
+		FROM exams e
+		LEFT JOIN subjects s ON e.subject_id = s.id
+		LEFT JOIN exam_types et ON e.exam_type_id = et.id
+		LEFT JOIN classes c ON e.class_id = c.id
+		WHERE e.id = ? AND e.school_id = ?
+	`).bind(parsedExamId, locals.user.school_id).first();
   if (!exam) throw error(404, "Ujian tidak ditemukan");
+  exam.title = formatExamTitle({
+    title: exam.title,
+    examTypeCode: exam.exam_type_code,
+    subjectName: exam.subject_name,
+    className: exam.class_name
+  });
   const isTeacher = await db.prepare("SELECT 1 FROM exam_teachers WHERE exam_id = ? AND teacher_id = ?").bind(parsedExamId, locals.user.id).first();
   if (exam.created_by !== locals.user.id && !isTeacher) {
     throw error(403, "Anda tidak memiliki akses ke ujian ini.");

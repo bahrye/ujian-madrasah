@@ -1,5 +1,6 @@
 import { g as getDB } from "../../../../../chunks/db.js";
 import { error } from "@sveltejs/kit";
+import { f as formatExamTitle } from "../../../../../chunks/exam.js";
 const load = async ({ platform, params, locals }) => {
   const db = getDB(platform);
   const examIdStr = params.exam_id;
@@ -7,7 +8,7 @@ const load = async ({ platform, params, locals }) => {
   if (isNaN(examId)) throw error(400, "ID Ujian tidak valid");
   const school = await db.prepare("SELECT * FROM schools WHERE id = ?").bind(locals.user.school_id).first();
   const exam = await db.prepare(`
-		SELECT e.*, s.name as subject_name, et.name as exam_type_name,
+		SELECT e.*, s.name as subject_name, et.code as exam_type_code, et.name as exam_type_name, c.name as class_name,
 			COALESCE(
 				(
 					SELECT GROUP_CONCAT(u.name, '||')
@@ -22,9 +23,16 @@ const load = async ({ platform, params, locals }) => {
 		FROM exams e 
 		LEFT JOIN subjects s ON e.subject_id = s.id 
 		LEFT JOIN exam_types et ON e.exam_type_id = et.id 
+		LEFT JOIN classes c ON e.class_id = c.id
 		WHERE e.id = ? AND e.school_id = ?
 	`).bind(examId, locals.user.school_id).first();
   if (!exam) throw error(404, "Ujian tidak ditemukan");
+  exam.title = formatExamTitle({
+    title: exam.title,
+    examTypeCode: exam.exam_type_code,
+    subjectName: exam.subject_name,
+    className: exam.class_name
+  });
   const participants = await db.prepare(`
 		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name, u.session_number, r.name as room_name
 		FROM exam_participants p

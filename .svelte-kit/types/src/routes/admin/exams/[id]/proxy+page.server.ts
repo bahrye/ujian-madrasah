@@ -3,6 +3,8 @@ import type { PageServerLoad, Actions } from './$types';
 import { getDB, ensureProctorRoleColumn } from '$lib/server/db';
 import { error, fail } from '@sveltejs/kit';
 
+import { formatExamTitle } from '$lib/utils/exam';
+
 export const load = async ({ platform, params, locals }: Parameters<PageServerLoad>[0]) => {
 	const db = getDB(platform);
 	await ensureProctorRoleColumn(db);
@@ -11,8 +13,15 @@ export const load = async ({ platform, params, locals }: Parameters<PageServerLo
 	
 	if (isNaN(examId)) throw error(400, 'ID Ujian tidak valid');
 
-	const exam = await db.prepare('SELECT e.*, s.name as subject_name, et.code as exam_type_code, et.name as exam_type_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id LEFT JOIN exam_types et ON e.exam_type_id = et.id WHERE e.id = ? AND e.school_id = ?').bind(examId, locals.user!.school_id).first();
+	const exam = await db.prepare('SELECT e.*, s.name as subject_name, et.code as exam_type_code, et.name as exam_type_name, c.name as class_name FROM exams e LEFT JOIN subjects s ON e.subject_id = s.id LEFT JOIN exam_types et ON e.exam_type_id = et.id LEFT JOIN classes c ON e.class_id = c.id WHERE e.id = ? AND e.school_id = ?').bind(examId, locals.user!.school_id).first<any>();
 	if (!exam) throw error(404, 'Ujian tidak ditemukan');
+
+	exam.title = formatExamTitle({
+		title: exam.title,
+		examTypeCode: exam.exam_type_code,
+		subjectName: exam.subject_name,
+		className: exam.class_name
+	});
 
 	const questions = await db.prepare('SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number').bind(examId).all();
 	const attempts = await db.prepare(`

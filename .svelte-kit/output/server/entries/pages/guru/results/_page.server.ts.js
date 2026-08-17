@@ -1,15 +1,29 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB, c as ensureStudentAttemptsScoreReleasedColumn } from "../../../../chunks/db.js";
+import { f as formatExamTitle } from "../../../../chunks/exam.js";
 const load = async ({ platform, url, locals }) => {
   if (!locals.user) throw redirect(302, "/login");
   const db = getDB(platform);
   await ensureStudentAttemptsScoreReleasedColumn(db);
   const examFilter = url.searchParams.get("exam_id") || "";
-  const exams = await db.prepare(`
-		SELECT id, title, show_score_type FROM exams 
-		WHERE school_id = ? AND (created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = exams.id AND et.teacher_id = ?))
-		ORDER BY title
+  const examsRes = await db.prepare(`
+		SELECT e.id, e.title, e.show_score_type, s.name as subject_name, et.code as exam_type_code, c.name as class_name
+		FROM exams e 
+		LEFT JOIN subjects s ON e.subject_id = s.id
+		LEFT JOIN exam_types et ON e.exam_type_id = et.id
+		LEFT JOIN classes c ON e.class_id = c.id
+		WHERE e.school_id = ? AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))
+		ORDER BY e.title
 	`).bind(locals.user.school_id, locals.user.id, locals.user.id).all();
+  const exams = (examsRes.results || []).map((e) => ({
+    ...e,
+    title: formatExamTitle({
+      title: e.title,
+      examTypeCode: e.exam_type_code,
+      subjectName: e.subject_name,
+      className: e.class_name
+    })
+  }));
   let query = `
 		SELECT sa.*, 
 		       COALESCE(sa.is_score_released, 0) as is_score_released,
@@ -22,12 +36,13 @@ const load = async ({ platform, url, locals }) => {
 		          AND q.type IN ('essay', 'isian') 
 		          AND ans.is_correct IS NULL
 		       ) as ungraded_count,
-		       u.name as student_name, e.title as exam_title, s.name as subject, e.show_score_type, e.end_time as exam_end_time, et.end_time as exam_type_end_time
+		       u.name as student_name, e.title as exam_title, s.name as subject_name, et.code as exam_type_code, c.name as class_name, e.show_score_type, e.end_time as exam_end_time, et.end_time as exam_type_end_time
 		FROM student_attempts sa
 		JOIN users u ON sa.student_id = u.id
 		JOIN exams e ON sa.exam_id = e.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		LEFT JOIN exam_types et ON e.exam_type_id = et.id
+		LEFT JOIN classes c ON e.class_id = c.id
 		WHERE sa.status IN ('selesai', 'waktu_habis') 
 		AND e.school_id = ?
 		AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = e.id AND et.teacher_id = ?))
@@ -37,9 +52,22 @@ const load = async ({ platform, url, locals }) => {
     query += " AND e.id = ?";
     params.push(examFilter);
   }
-  query += " ORDER BY sa.submit_time DESC";
-  const results = await db.prepare(query).bind(...params).all();
-  return { results: results.results, exams: exams.results, examFilter };
+  query += " ORDER BY sa.created_at DESC";
+  const resultsRes = await db.prepare(query).bind(...params).all();
+  const results = (resultsRes.results || []).map((r) => ({
+    ...r,
+    exam_title: formatExamTitle({
+      title: r.exam_title,
+      examTypeCode: r.exam_type_code,
+      subjectName: r.subject_name,
+      className: r.class_name
+    })
+  }));
+  return {
+    exams,
+    results,
+    examFilter
+  };
 };
 const actions = {
   toggleRelease: async ({ request, platform, locals }) => {

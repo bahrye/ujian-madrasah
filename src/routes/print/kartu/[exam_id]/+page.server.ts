@@ -2,6 +2,8 @@ import type { PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { error } from '@sveltejs/kit';
 
+import { formatExamTitle } from '$lib/utils/exam';
+
 export const load: PageServerLoad = async ({ platform, params, locals }) => {
 	const db = getDB(platform);
 	const examIdStr = params.exam_id;
@@ -13,7 +15,7 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 	const school = await db.prepare('SELECT * FROM schools WHERE id = ?').bind(locals.user!.school_id).first();
 	
 	const exam = await db.prepare(`
-		SELECT e.*, s.name as subject_name, et.name as exam_type_name,
+		SELECT e.*, s.name as subject_name, et.code as exam_type_code, et.name as exam_type_name, c.name as class_name,
 			COALESCE(
 				(
 					SELECT GROUP_CONCAT(u.name, '||')
@@ -28,10 +30,18 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 		FROM exams e 
 		LEFT JOIN subjects s ON e.subject_id = s.id 
 		LEFT JOIN exam_types et ON e.exam_type_id = et.id 
+		LEFT JOIN classes c ON e.class_id = c.id
 		WHERE e.id = ? AND e.school_id = ?
-	`).bind(examId, locals.user!.school_id).first();
+	`).bind(examId, locals.user!.school_id).first<any>();
 	
 	if (!exam) throw error(404, 'Ujian tidak ditemukan');
+
+	exam.title = formatExamTitle({
+		title: exam.title,
+		examTypeCode: exam.exam_type_code,
+		subjectName: exam.subject_name,
+		className: exam.class_name
+	});
 
 	// Get participants
 	const participants = await db.prepare(`

@@ -534,7 +534,7 @@
 				</svg>
 			</a>
 			<div>
-				<h1 class="text-2xl font-bold text-slate-800 leading-tight">{exam.title}</h1>
+				<h1 class="text-2xl font-bold text-slate-800 leading-snug break-words">{exam.title}</h1>
 				<p class="text-sm text-slate-500 mt-1">{exam.subject || 'Umum'} · {questions.length} soal</p>
 			</div>
 		</div>
