@@ -1,4 +1,4 @@
-import { h as head, i as ensure_array_like, k as attr, e as escape_html, c as stringify, f as bind_props } from "../../../../chunks/index.js";
+import { h as head, k as attr, i as ensure_array_like, e as escape_html, c as stringify, f as bind_props } from "../../../../chunks/index.js";
 import { I as ICONS } from "../../../../chunks/constants.js";
 import "@sveltejs/kit/internal";
 import "../../../../chunks/exports.js";
@@ -8,14 +8,27 @@ import "../../../../chunks/root.js";
 import "../../../../chunks/state.svelte.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
+    let filteredExams;
     let data = $$props["data"];
+    let searchQuery = "";
+    filteredExams = data.exams.filter((exam) => {
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase().trim();
+      const titleMatch = (exam.title || "").toLowerCase().includes(q);
+      const subjectMatch = (exam.subject || "").toLowerCase().includes(q);
+      return titleMatch || subjectMatch;
+    });
     head("1jq38cd", $$renderer2, ($$renderer3) => {
       $$renderer3.title(($$renderer4) => {
         $$renderer4.push(`<title>Bank Soal — Ujian Online Madrasah</title>`);
       });
     });
-    $$renderer2.push(`<div class="space-y-6 animate-in"><div><h1 class="text-2xl font-bold text-slate-800">Bank Soal</h1> <p class="text-sm text-slate-500 mt-1">Pilih ujian untuk mengelola soal</p></div> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`);
-    const each_array = ensure_array_like(data.exams);
+    $$renderer2.push(`<div class="space-y-6 animate-in"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div><h1 class="text-2xl font-bold text-slate-800">Bank Soal</h1> <p class="text-sm text-slate-500 mt-1">Pilih ujian untuk mengelola soal</p></div> <div class="relative w-full sm:w-72"><input type="text"${attr("value", searchQuery)} placeholder="Cari ujian atau mapel..." class="input pl-10 pr-9 py-2 w-full text-sm rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm"/> <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg> `);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--></div></div> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`);
+    const each_array = ensure_array_like(filteredExams);
     if (each_array.length !== 0) {
       $$renderer2.push("<!--[-->");
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
@@ -38,7 +51,11 @@ function _page($$renderer, $$props) {
       }
     } else {
       $$renderer2.push("<!--[!-->");
-      $$renderer2.push(`<div class="col-span-full text-center py-12 text-slate-400">Belum ada ujian. Hubungi admin untuk membuat ujian.</div>`);
+      {
+        $$renderer2.push("<!--[-1-->");
+        $$renderer2.push(`<div class="col-span-full text-center py-12 text-slate-400">Belum ada ujian. Hubungi admin untuk membuat ujian.</div>`);
+      }
+      $$renderer2.push(`<!--]-->`);
     }
     $$renderer2.push(`<!--]--></div></div> `);
     {

@@ -11,8 +11,18 @@ import "../../../../../../../../chunks/state.svelte.js";
 import { t as toasts } from "../../../../../../../../chunks/toast.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
+    let filteredExams;
     let data = $$props["data"];
     let form = $$props["form"];
+    let searchQuery = "";
+    filteredExams = data.exams.filter((exam) => {
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase().trim();
+      const titleMatch = (exam.title || "").toLowerCase().includes(q);
+      const subjectMatch = (exam.subject_name || "").toLowerCase().includes(q);
+      const proctorMatch = (exam.proctors || "").toLowerCase().includes(q);
+      return titleMatch || subjectMatch || proctorMatch;
+    });
     if (form?.success) toasts.success(form.success);
     if (form?.error) toasts.error(form.error);
     head("fphu4z", $$renderer2, ($$renderer3) => {
@@ -20,8 +30,12 @@ function _page($$renderer, $$props) {
         $$renderer4.push(`<title>${escape_html(data.classData.name)} - ${escape_html(data.examType.name)} — Ujian Online</title>`);
       });
     });
-    $$renderer2.push(`<div class="space-y-6 animate-in"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div class="flex items-start sm:items-center gap-3"><a${attr("href", `/admin/exams/type/${stringify(data.examType.id)}`)} class="btn-ghost p-2 rounded-lg text-slate-500 hover:text-slate-800 mt-1 sm:mt-0" title="Kembali ke Daftar Kelas"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg></a> <div><div class="flex flex-wrap items-center gap-2"><span class="text-xs font-mono font-bold tracking-wider text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded">${escape_html(data.examType.code)}</span> <h1 class="text-2xl font-bold text-slate-800">${escape_html(data.examType.name)} - ${escape_html(data.classData.name)}</h1></div> <p class="text-sm text-slate-500 mt-1">Kelola ujian khusus untuk kelas ini</p></div></div> <div class="w-full sm:w-auto sm:ml-auto flex flex-col sm:flex-row gap-2"><button class="btn-outline w-full sm:w-auto justify-center text-indigo-600 border-indigo-200 hover:bg-indigo-50"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path></svg> Cetak &amp; Export</button> <button class="btn-primary w-full sm:w-auto justify-center"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> Buat Ujian Baru</button></div></div> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`);
-    const each_array = ensure_array_like(data.exams);
+    $$renderer2.push(`<div class="space-y-6 animate-in"><div class="flex flex-col md:flex-row md:items-center justify-between gap-4"><div class="flex items-start sm:items-center gap-3"><a${attr("href", `/admin/exams/type/${stringify(data.examType.id)}`)} class="btn-ghost p-2 rounded-lg text-slate-500 hover:text-slate-800 mt-1 sm:mt-0" title="Kembali ke Daftar Kelas"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg></a> <div><div class="flex flex-wrap items-center gap-2"><span class="text-xs font-mono font-bold tracking-wider text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded">${escape_html(data.examType.code)}</span> <h1 class="text-2xl font-bold text-slate-800">${escape_html(data.examType.name)} - ${escape_html(data.classData.name)}</h1></div> <p class="text-sm text-slate-500 mt-1">Kelola ujian khusus untuk kelas ini</p></div></div> <div class="w-full md:w-auto flex flex-col sm:flex-row gap-2 items-stretch sm:items-center"><div class="relative w-full sm:w-60"><input type="text"${attr("value", searchQuery)} placeholder="Cari mapel, pengawas, ujian..." class="input pl-10 pr-9 py-2 w-full text-sm rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm"/> <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg> `);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--></div> <button class="btn-outline w-full sm:w-auto justify-center text-indigo-600 border-indigo-200 hover:bg-indigo-50 shrink-0"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path></svg> Cetak &amp; Export</button> <button class="btn-primary w-full sm:w-auto justify-center shrink-0"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> Buat Ujian Baru</button></div></div> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`);
+    const each_array = ensure_array_like(filteredExams);
     if (each_array.length !== 0) {
       $$renderer2.push("<!--[-->");
       for (let $$index_2 = 0, $$length = each_array.length; $$index_2 < $$length; $$index_2++) {
@@ -107,7 +121,12 @@ function _page($$renderer, $$props) {
       }
     } else {
       $$renderer2.push("<!--[!-->");
-      $$renderer2.push(`<div class="col-span-full text-center py-12 text-slate-400"><svg class="w-16 h-16 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg> <p>Belum ada ujian di kelas ini. Klik "Buat Ujian Baru" untuk memulai.</p></div>`);
+      $$renderer2.push(`<div class="col-span-full text-center py-12 text-slate-400"><svg class="w-16 h-16 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg> `);
+      {
+        $$renderer2.push("<!--[-1-->");
+        $$renderer2.push(`<p>Belum ada ujian di kelas ini. Klik "Buat Ujian Baru" untuk memulai.</p>`);
+      }
+      $$renderer2.push(`<!--]--></div>`);
     }
     $$renderer2.push(`<!--]--></div></div> `);
     {

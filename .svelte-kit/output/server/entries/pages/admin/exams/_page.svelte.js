@@ -10,17 +10,28 @@ import { I as ICONS } from "../../../../chunks/constants.js";
 import { t as toasts } from "../../../../chunks/toast.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
+    let filteredExamTypes;
     let data = $$props["data"];
     let form = $$props["form"];
+    let searchQuery = "";
     if (form?.success) toasts.success(form.success);
     if (form?.error) toasts.error(form.error);
+    filteredExamTypes = data.examTypes.filter((type) => {
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase().trim();
+      return (type.name || "").toLowerCase().includes(q) || (type.code || "").toLowerCase().includes(q) || (type.description || "").toLowerCase().includes(q) || (type.class_names || "").toLowerCase().includes(q) || (type.proctor_names || "").toLowerCase().includes(q) || (type.committee_names || "").toLowerCase().includes(q);
+    });
     head("x07xsv", $$renderer2, ($$renderer3) => {
       $$renderer3.title(($$renderer4) => {
         $$renderer4.push(`<title>Manajemen Tipe Ujian — Ujian Online Madrasah</title>`);
       });
     });
-    $$renderer2.push(`<div class="space-y-6 animate-in"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div><h1 class="text-2xl font-bold text-slate-800">Manajemen Ujian</h1> <p class="text-sm text-slate-500 mt-1">Kelola tipe ujian (contoh: UAS, UM) beserta rentang waktunya</p></div> <button class="btn-primary"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> Buat Tipe Ujian Baru</button></div> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`);
-    const each_array = ensure_array_like(data.examTypes);
+    $$renderer2.push(`<div class="space-y-6 animate-in"><div class="flex flex-col md:flex-row md:items-center justify-between gap-4"><div><h1 class="text-2xl font-bold text-slate-800">Manajemen Ujian</h1> <p class="text-sm text-slate-500 mt-1">Kelola tipe ujian (contoh: UAS, UM) beserta rentang waktunya</p></div> <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3"><div class="relative w-full sm:w-64"><input type="text"${attr("value", searchQuery)} placeholder="Cari ujian, pengawas, kelas..." class="input pl-10 pr-9 py-2 w-full text-sm rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm"/> <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg> `);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--></div> <button class="btn-primary shrink-0"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> Buat Tipe Ujian Baru</button></div></div> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`);
+    const each_array = ensure_array_like(filteredExamTypes);
     if (each_array.length !== 0) {
       $$renderer2.push("<!--[-->");
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
@@ -64,7 +75,12 @@ function _page($$renderer, $$props) {
       }
     } else {
       $$renderer2.push("<!--[!-->");
-      $$renderer2.push(`<div class="col-span-full text-center py-12 text-slate-400"><svg class="w-16 h-16 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg> <p>Belum ada tipe ujian. Klik "Buat Tipe Ujian Baru" untuk memulai.</p></div>`);
+      $$renderer2.push(`<div class="col-span-full text-center py-12 text-slate-400"><svg class="w-16 h-16 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg> `);
+      {
+        $$renderer2.push("<!--[-1-->");
+        $$renderer2.push(`<p>Belum ada tipe ujian. Klik "Buat Tipe Ujian Baru" untuk memulai.</p>`);
+      }
+      $$renderer2.push(`<!--]--></div>`);
     }
     $$renderer2.push(`<!--]--></div></div> `);
     {

@@ -71,6 +71,19 @@
 		}
 		expandedClassIds = expandedClassIds;
 	}
+
+	let searchQuery = '';
+
+	$: filteredExamTypes = data.examTypes.filter((type: any) => {
+		if (!searchQuery.trim()) return true;
+		const q = searchQuery.toLowerCase().trim();
+		return (type.name || '').toLowerCase().includes(q) ||
+			   (type.code || '').toLowerCase().includes(q) ||
+			   (type.description || '').toLowerCase().includes(q) ||
+			   (type.class_names || '').toLowerCase().includes(q) ||
+			   (type.proctor_names || '').toLowerCase().includes(q) ||
+			   (type.committee_names || '').toLowerCase().includes(q);
+	});
 </script>
 
 <svelte:head>
@@ -78,22 +91,47 @@
 </svelte:head>
 
 <div class="space-y-6 animate-in">
-	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+	<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
 		<div>
 			<h1 class="text-2xl font-bold text-slate-800">Manajemen Ujian</h1>
 			<p class="text-sm text-slate-500 mt-1">Kelola tipe ujian (contoh: UAS, UM) beserta rentang waktunya</p>
 		</div>
-		<button class="btn-primary" on:click={() => (showCreateModal = true)}>
-			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-				<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
-			</svg>
-			Buat Tipe Ujian Baru
-		</button>
+		<div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+			<div class="relative w-full sm:w-64">
+				<input 
+					type="text" 
+					bind:value={searchQuery}
+					placeholder="Cari ujian, pengawas, kelas..." 
+					class="input pl-10 pr-9 py-2 w-full text-sm rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm"
+				/>
+				<svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+				</svg>
+				{#if searchQuery}
+					<button 
+						type="button" 
+						class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full hover:bg-slate-100 transition-colors" 
+						on:click={() => searchQuery = ''}
+						title="Hapus pencarian"
+					>
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+						</svg>
+					</button>
+				{/if}
+			</div>
+			<button class="btn-primary shrink-0" on:click={() => (showCreateModal = true)}>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
+				</svg>
+				Buat Tipe Ujian Baru
+			</button>
+		</div>
 	</div>
 
 	<!-- Exam Types Cards -->
 	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-		{#each data.examTypes as type (type.id)}
+		{#each filteredExamTypes as type (type.id)}
 			<div class="card-hover p-5 flex flex-col border-t-4 border-t-indigo-500">
 				<div class="flex items-start justify-between mb-3">
 					<div class="flex-1 min-w-0">
@@ -200,7 +238,11 @@
 				<svg class="w-16 h-16 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
 					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.exam} />
 				</svg>
-				<p>Belum ada tipe ujian. Klik "Buat Tipe Ujian Baru" untuk memulai.</p>
+				{#if searchQuery}
+					<p>Tidak ada ujian atau pengawas yang cocok dengan pencarian "{searchQuery}".</p>
+				{:else}
+					<p>Belum ada tipe ujian. Klik "Buat Tipe Ujian Baru" untuk memulai.</p>
+				{/if}
 			</div>
 		{/each}
 	</div>

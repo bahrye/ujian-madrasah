@@ -6,7 +6,7 @@ import { o as onDestroy } from "../../../chunks/index-server.js";
 import { S as ScoreDisplay } from "../../../chunks/ScoreDisplay.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
-    let activeExams, myAttempts, activeAttempt, groupedByType;
+    let activeExams, myAttempts, activeAttempt, groupedByType, filteredActiveExams;
     let data = $$props["data"];
     let currentTime = /* @__PURE__ */ new Date();
     onDestroy(() => {
@@ -72,6 +72,7 @@ function _page($$renderer, $$props) {
       return numbers.join(" & ");
     }
     const rowColors = ["bg-white", "bg-slate-50"];
+    let searchQuery = "";
     activeExams = data.activeExams.filter((exam) => {
       const now = /* @__PURE__ */ new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -137,6 +138,14 @@ function _page($$renderer, $$props) {
       });
       return typeGroups;
     })();
+    filteredActiveExams = activeExams.filter((exam) => {
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase().trim();
+      const titleMatch = (exam.title || "").toLowerCase().includes(q);
+      const subjectMatch = (exam.subject || "").toLowerCase().includes(q);
+      const proctorsStr = (exam.proctors || "").toString().toLowerCase();
+      return titleMatch || subjectMatch || proctorsStr.includes(q);
+    });
     head("1sjgise", $$renderer2, ($$renderer3) => {
       $$renderer3.title(($$renderer4) => {
         $$renderer4.push(`<title>Dashboard Siswa — Ujian Online Madrasah</title>`);
@@ -149,14 +158,30 @@ function _page($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--> <div><h2 class="text-lg font-bold text-slate-800 mb-3">Ujian Tersedia Hari Ini</h2> `);
-    if (activeExams.length === 0) {
+    $$renderer2.push(`<!--]--> <div><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3"><h2 class="text-lg font-bold text-slate-800">Ujian Tersedia Hari Ini</h2> `);
+    if (activeExams.length > 0) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="card p-8 text-center text-slate-400"><svg class="w-12 h-12 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg> <p>Tidak ada ujian yang tersedia saat ini.</p></div>`);
+      $$renderer2.push(`<div class="relative w-full sm:w-64"><input type="text"${attr("value", searchQuery)} placeholder="Cari mapel, pengawas..." class="input pl-10 pr-9 py-1.5 w-full text-xs rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm bg-white"/> <svg class="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg> `);
+      {
+        $$renderer2.push("<!--[-1-->");
+      }
+      $$renderer2.push(`<!--]--></div>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--></div> `);
+    if (filteredActiveExams.length === 0) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<div class="card p-8 text-center text-slate-400"><svg class="w-12 h-12 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg> `);
+      {
+        $$renderer2.push("<!--[-1-->");
+        $$renderer2.push(`<p>Tidak ada ujian yang tersedia saat ini.</p>`);
+      }
+      $$renderer2.push(`<!--]--></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
       $$renderer2.push(`<div class="grid grid-cols-1 md:grid-cols-2 gap-4"><!--[-->`);
-      const each_array = ensure_array_like(activeExams);
+      const each_array = ensure_array_like(filteredActiveExams);
       for (let $$index_1 = 0, $$length = each_array.length; $$index_1 < $$length; $$index_1++) {
         let exam = each_array[$$index_1];
         $$renderer2.push(`<div class="card-hover p-5 flex flex-col h-full"><div class="flex items-start justify-between mb-3"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg></div> <span class="badge-success">Tersedia</span></div> <h3 class="font-bold text-slate-800">${escape_html(exam.title)}</h3> <p class="text-sm text-slate-500 mt-1 mb-4">${escape_html(exam.subject || "Umum")}</p> <div class="space-y-2 mb-4 mt-auto"><div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> <span>Pukul: ${escape_html(formatTimeRange(exam.start_time, exam.end_time))} `);

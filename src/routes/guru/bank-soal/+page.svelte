@@ -50,18 +50,52 @@
 		}
 		selectedQuestionIds = selectedQuestionIds;
 	}
+	let searchQuery = '';
+
+	$: filteredExams = data.exams.filter((exam: any) => {
+		if (!searchQuery.trim()) return true;
+		const q = searchQuery.toLowerCase().trim();
+		const titleMatch = (exam.title || '').toLowerCase().includes(q);
+		const subjectMatch = (exam.subject || '').toLowerCase().includes(q);
+		return titleMatch || subjectMatch;
+	});
 </script>
 
 <svelte:head><title>Bank Soal — Ujian Online Madrasah</title></svelte:head>
 
 <div class="space-y-6 animate-in">
-	<div>
-		<h1 class="text-2xl font-bold text-slate-800">Bank Soal</h1>
-		<p class="text-sm text-slate-500 mt-1">Pilih ujian untuk mengelola soal</p>
+	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+		<div>
+			<h1 class="text-2xl font-bold text-slate-800">Bank Soal</h1>
+			<p class="text-sm text-slate-500 mt-1">Pilih ujian untuk mengelola soal</p>
+		</div>
+		<div class="relative w-full sm:w-72">
+			<input 
+				type="text" 
+				bind:value={searchQuery}
+				placeholder="Cari ujian atau mapel..." 
+				class="input pl-10 pr-9 py-2 w-full text-sm rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm"
+			/>
+			<svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+			</svg>
+			{#if searchQuery}
+				<button 
+					type="button" 
+					class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full hover:bg-slate-100 transition-colors" 
+					on:click={() => searchQuery = ''}
+					title="Hapus pencarian"
+				>
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			{/if}
+		</div>
 	</div>
 
 	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-		{#each data.exams as exam (exam.id)}
+		{#each filteredExams as exam (exam.id)}
 			<div 
 				class="card-hover p-5 group flex flex-col justify-between cursor-pointer"
 				on:click={() => goto(`/guru/bank-soal/${exam.id}`)}
@@ -128,7 +162,11 @@
 				</div>
 			</div>
 		{:else}
-			<div class="col-span-full text-center py-12 text-slate-400">Belum ada ujian. Hubungi admin untuk membuat ujian.</div>
+			{#if searchQuery}
+				<div class="col-span-full text-center py-12 text-slate-400">Tidak ada ujian atau mapel yang cocok dengan pencarian "{searchQuery}".</div>
+			{:else}
+				<div class="col-span-full text-center py-12 text-slate-400">Belum ada ujian. Hubungi admin untuk membuat ujian.</div>
+			{/if}
 		{/each}
 	</div>
 </div>

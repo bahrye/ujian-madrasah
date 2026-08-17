@@ -216,6 +216,16 @@
 		'bg-white',
 		'bg-slate-50'
 	];
+	let searchQuery = '';
+
+	$: filteredActiveExams = activeExams.filter((exam: any) => {
+		if (!searchQuery.trim()) return true;
+		const q = searchQuery.toLowerCase().trim();
+		const titleMatch = (exam.title || '').toLowerCase().includes(q);
+		const subjectMatch = (exam.subject || '').toLowerCase().includes(q);
+		const proctorsStr = (exam.proctors || '').toString().toLowerCase();
+		return titleMatch || subjectMatch || proctorsStr.includes(q);
+	});
 </script>
 
 <svelte:head><title>Dashboard Siswa — Ujian Online Madrasah</title></svelte:head>
@@ -251,17 +261,48 @@
 
 	<!-- Active Exams -->
 	<div>
-		<h2 class="text-lg font-bold text-slate-800 mb-3">Ujian Tersedia Hari Ini</h2>
-		{#if activeExams.length === 0}
+		<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+			<h2 class="text-lg font-bold text-slate-800">Ujian Tersedia Hari Ini</h2>
+			{#if activeExams.length > 0}
+				<div class="relative w-full sm:w-64">
+					<input 
+						type="text" 
+						bind:value={searchQuery}
+						placeholder="Cari mapel, pengawas..." 
+						class="input pl-10 pr-9 py-1.5 w-full text-xs rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm bg-white"
+					/>
+					<svg class="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+					</svg>
+					{#if searchQuery}
+						<button 
+							type="button" 
+							class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full hover:bg-slate-100 transition-colors" 
+							on:click={() => searchQuery = ''}
+							title="Hapus pencarian"
+						>
+							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+							</svg>
+						</button>
+					{/if}
+				</div>
+			{/if}
+		</div>
+		{#if filteredActiveExams.length === 0}
 			<div class="card p-8 text-center text-slate-400">
 				<svg class="w-12 h-12 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
 					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.exam} />
 				</svg>
-				<p>Tidak ada ujian yang tersedia saat ini.</p>
+				{#if searchQuery}
+					<p>Tidak ada ujian atau pengawas yang cocok dengan pencarian "{searchQuery}".</p>
+				{:else}
+					<p>Tidak ada ujian yang tersedia saat ini.</p>
+				{/if}
 			</div>
 		{:else}
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-				{#each activeExams as exam (exam.id)}
+				{#each filteredActiveExams as exam (exam.id)}
 					<div class="card-hover p-5 flex flex-col h-full">
 						<div class="flex items-start justify-between mb-3">
 							<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center">

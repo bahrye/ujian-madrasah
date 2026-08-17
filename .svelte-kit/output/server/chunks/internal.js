@@ -98,7 +98,7 @@ const options = {
     app: ({ head, body, assets, nonce, env }) => '<!DOCTYPE html>\n<html lang="id">\n	<head>\n		<meta charset="utf-8" />\n		<meta name="viewport" content="width=device-width, initial-scale=1.0" />\n		<meta name="description" content="Aplikasi Ujian Online Madrasah — Platform ujian digital modern untuk madrasah" />\n		<meta name="theme-color" content="#4F46E5" />\n		<link rel="icon" href="' + assets + '/favicon.svg" type="image/svg+xml" />\n		<link rel="preconnect" href="https://fonts.googleapis.com" />\n		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />\n		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />\n		<title>Ujian Online Madrasah</title>\n		' + head + '\n	</head>\n	<body data-sveltekit-preload-data="hover">\n		<div style="display: contents">' + body + "</div>\n	</body>\n</html>\n",
     error
   },
-  version_hash: "9kcqjb"
+  version_hash: "1durwlw"
 };
 async function get_hooks() {
   let handle;

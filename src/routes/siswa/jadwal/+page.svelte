@@ -75,18 +75,55 @@
 		}
 		return 'active';
 	}
+
+	let searchQuery = '';
+
+	$: filteredSchedules = (data.schedules || []).filter((exam: any) => {
+		if (!searchQuery.trim()) return true;
+		const q = searchQuery.toLowerCase().trim();
+		const titleMatch = (exam.title || '').toLowerCase().includes(q);
+		const subjectMatch = (exam.subject || '').toLowerCase().includes(q);
+		const roomMatch = (exam.room_name || '').toLowerCase().includes(q);
+		const proctorsStr = (exam.proctors || '').toString().toLowerCase();
+		return titleMatch || subjectMatch || roomMatch || proctorsStr.includes(q);
+	});
 </script>
 
 <svelte:head><title>Jadwal Ujian — Ujian Online Madrasah</title></svelte:head>
 
 <div class="space-y-6 animate-in">
-	<div>
-		<h1 class="text-2xl font-bold text-slate-800">Jadwal Ujian</h1>
-		<p class="text-sm text-slate-500 mt-1">Daftar ujian yang harus Anda ikuti beserta jadwalnya</p>
+	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+		<div>
+			<h1 class="text-2xl font-bold text-slate-800">Jadwal Ujian</h1>
+			<p class="text-sm text-slate-500 mt-1">Daftar ujian yang harus Anda ikuti beserta jadwalnya</p>
+		</div>
+		<div class="relative w-full sm:w-72">
+			<input 
+				type="text" 
+				bind:value={searchQuery}
+				placeholder="Cari mapel, pengawas, ruang..." 
+				class="input pl-10 pr-9 py-2 w-full text-sm rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm bg-white"
+			/>
+			<svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+			</svg>
+			{#if searchQuery}
+				<button 
+					type="button" 
+					class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full hover:bg-slate-100 transition-colors" 
+					on:click={() => searchQuery = ''}
+					title="Hapus pencarian"
+				>
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			{/if}
+		</div>
 	</div>
 
 	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-		{#each data.schedules as exam}
+		{#each filteredSchedules as exam}
 			<div class="card-hover p-5 bg-white border border-slate-200 flex flex-col justify-between h-full">
 				<div>
 					<div class="flex items-start justify-between mb-3">
@@ -196,8 +233,13 @@
 						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.calendar} />
 					</svg>
 				</div>
-				<h3 class="text-lg font-bold text-slate-800 mb-1">Belum Ada Jadwal</h3>
-				<p class="text-slate-500 max-w-sm mx-auto">Anda belum terdaftar dalam jadwal ujian manapun saat ini. Silakan hubungi guru atau admin jika ini adalah sebuah kesalahan.</p>
+				{#if searchQuery}
+					<h3 class="text-lg font-bold text-slate-800 mb-1">Hasil Pencarian Kosong</h3>
+					<p class="text-slate-500 max-w-sm mx-auto">Tidak ada jadwal ujian, mapel, atau pengawas yang cocok dengan kata kunci "{searchQuery}".</p>
+				{:else}
+					<h3 class="text-lg font-bold text-slate-800 mb-1">Belum Ada Jadwal</h3>
+					<p class="text-slate-500 max-w-sm mx-auto">Anda belum terdaftar dalam jadwal ujian manapun saat ini. Silakan hubungi guru atau admin jika ini adalah sebuah kesalahan.</p>
+				{/if}
 			</div>
 		{/each}
 	</div>

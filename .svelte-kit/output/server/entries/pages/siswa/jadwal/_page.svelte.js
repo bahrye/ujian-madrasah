@@ -1,9 +1,10 @@
-import { h as head, i as ensure_array_like, k as attr, e as escape_html, c as stringify, f as bind_props } from "../../../../chunks/index.js";
+import { h as head, k as attr, i as ensure_array_like, e as escape_html, c as stringify, f as bind_props } from "../../../../chunks/index.js";
 import { p as parseDate } from "../../../../chunks/date.js";
 import { p as parseProctors } from "../../../../chunks/format.js";
 import { I as ICONS } from "../../../../chunks/constants.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
+    let filteredSchedules;
     let data = $$props["data"];
     function formatScheduleDate(dateString) {
       if (!dateString) return "Belum ditentukan";
@@ -50,13 +51,27 @@ function _page($$renderer, $$props) {
       }
       return "active";
     }
+    let searchQuery = "";
+    filteredSchedules = (data.schedules || []).filter((exam) => {
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase().trim();
+      const titleMatch = (exam.title || "").toLowerCase().includes(q);
+      const subjectMatch = (exam.subject || "").toLowerCase().includes(q);
+      const roomMatch = (exam.room_name || "").toLowerCase().includes(q);
+      const proctorsStr = (exam.proctors || "").toString().toLowerCase();
+      return titleMatch || subjectMatch || roomMatch || proctorsStr.includes(q);
+    });
     head("8o0fw0", $$renderer2, ($$renderer3) => {
       $$renderer3.title(($$renderer4) => {
         $$renderer4.push(`<title>Jadwal Ujian — Ujian Online Madrasah</title>`);
       });
     });
-    $$renderer2.push(`<div class="space-y-6 animate-in"><div><h1 class="text-2xl font-bold text-slate-800">Jadwal Ujian</h1> <p class="text-sm text-slate-500 mt-1">Daftar ujian yang harus Anda ikuti beserta jadwalnya</p></div> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`);
-    const each_array = ensure_array_like(data.schedules);
+    $$renderer2.push(`<div class="space-y-6 animate-in"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div><h1 class="text-2xl font-bold text-slate-800">Jadwal Ujian</h1> <p class="text-sm text-slate-500 mt-1">Daftar ujian yang harus Anda ikuti beserta jadwalnya</p></div> <div class="relative w-full sm:w-72"><input type="text"${attr("value", searchQuery)} placeholder="Cari mapel, pengawas, ruang..." class="input pl-10 pr-9 py-2 w-full text-sm rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm bg-white"/> <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg> `);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--></div></div> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`);
+    const each_array = ensure_array_like(filteredSchedules);
     if (each_array.length !== 0) {
       $$renderer2.push("<!--[-->");
       for (let $$index_1 = 0, $$length = each_array.length; $$index_1 < $$length; $$index_1++) {
@@ -124,7 +139,12 @@ function _page($$renderer, $$props) {
       }
     } else {
       $$renderer2.push("<!--[!-->");
-      $$renderer2.push(`<div class="col-span-full py-12 text-center bg-white rounded-2xl border border-slate-200 border-dashed"><div class="w-16 h-16 mx-auto bg-slate-50 rounded-full flex items-center justify-center text-slate-400 mb-4"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.calendar)}></path></svg></div> <h3 class="text-lg font-bold text-slate-800 mb-1">Belum Ada Jadwal</h3> <p class="text-slate-500 max-w-sm mx-auto">Anda belum terdaftar dalam jadwal ujian manapun saat ini. Silakan hubungi guru atau admin jika ini adalah sebuah kesalahan.</p></div>`);
+      $$renderer2.push(`<div class="col-span-full py-12 text-center bg-white rounded-2xl border border-slate-200 border-dashed"><div class="w-16 h-16 mx-auto bg-slate-50 rounded-full flex items-center justify-center text-slate-400 mb-4"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.calendar)}></path></svg></div> `);
+      {
+        $$renderer2.push("<!--[-1-->");
+        $$renderer2.push(`<h3 class="text-lg font-bold text-slate-800 mb-1">Belum Ada Jadwal</h3> <p class="text-slate-500 max-w-sm mx-auto">Anda belum terdaftar dalam jadwal ujian manapun saat ini. Silakan hubungi guru atau admin jika ini adalah sebuah kesalahan.</p>`);
+      }
+      $$renderer2.push(`<!--]--></div>`);
     }
     $$renderer2.push(`<!--]--></div></div>`);
     bind_props($$props, { data });
