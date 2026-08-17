@@ -18,17 +18,21 @@
 	$: passPercentage = data.passPercentage || 0;
 	$: passCount = data.passCount || 0;
 
-	let activeTab: 'matrix' | 'diagnostics' = 'matrix';
+	let activeTab: 'matrix' | 'diagnostics' | 'rekap' = 'matrix';
 	let selectedClass = 'ALL';
 	let searchQuery = '';
 	let diagnosticFilter: 'all' | 'critical' | 'medium' | 'mastered' = 'all';
+	let rekapStatusFilter: 'ALL' | 'TUNTAS' | 'REMEDIAL' = 'ALL';
 	let expandedQuestionId: number | null = null;
+	let expandedStudentAttemptId: number | null = null;
 
 	// Filter attempts
 	$: filteredAttempts = attempts.filter((att: any) => {
 		const matchClass = selectedClass === 'ALL' || att.class_name === selectedClass;
 		const matchSearch = !searchQuery || (att.student_name || '').toLowerCase().includes(searchQuery.toLowerCase()) || (att.nisn || '').includes(searchQuery);
-		return matchClass && matchSearch;
+		const isPass = (att.score || 0) >= 75;
+		const matchStatus = rekapStatusFilter === 'ALL' || (rekapStatusFilter === 'TUNTAS' ? isPass : !isPass);
+		return matchClass && matchSearch && matchStatus;
 	});
 
 	// Filter diagnostic questions
@@ -46,8 +50,24 @@
 		return 'bg-emerald-50 text-emerald-700 font-normal';
 	}
 
+	function formatAnswerDisplay(type: string, answerGiven: any): string {
+		if (answerGiven == null || answerGiven === '') return '-';
+		if (type === 'benar_salah') {
+			const str = String(answerGiven).toLowerCase().trim();
+			if (str === 'true' || str === 'benar' || str === 'b' || str === '1') return 'B';
+			if (str === 'false' || str === 'salah' || str === 's' || str === '0') return 'S';
+		}
+		const s = String(answerGiven).trim();
+		if (s.length > 2) return s.substring(0, 2) + '.';
+		return s.toUpperCase();
+	}
+
 	function toggleQuestionAccordion(id: number) {
 		expandedQuestionId = expandedQuestionId === id ? null : id;
+	}
+
+	function toggleStudentRow(attemptId: number) {
+		expandedStudentAttemptId = expandedStudentAttemptId === attemptId ? null : attemptId;
 	}
 </script>
 
@@ -219,7 +239,7 @@
 		</div>
 	</div>
 
-	<!-- Tab Navigation -->
+	<!-- Tab Navigation (3 Tabs) -->
 	<div class="flex items-center justify-between border-b border-slate-200 pt-1 overflow-x-auto scrollbar-none">
 		<div class="flex gap-1.5 sm:gap-2 whitespace-nowrap">
 			<button
@@ -242,6 +262,17 @@
 					<path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
 				</svg>
 				<span>🔍 Diagnosa per Soal</span>
+			</button>
+
+			<button
+				type="button"
+				class="px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-1.5 sm:gap-2 {activeTab === 'rekap' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700'}"
+				on:click={() => (activeTab = 'rekap')}
+			>
+				<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+				</svg>
+				<span>📊 Rekap & Status Nilai</span>
 			</button>
 		</div>
 
@@ -286,24 +317,25 @@
 					</div>
 				</div>
 
-				<!-- Legend -->
+				<!-- Legend & Petunjuk Klik Kunci -->
 				<div class="flex items-center gap-2.5 sm:gap-3 text-[10px] sm:text-xs font-medium text-slate-600 flex-wrap">
+					<span class="text-indigo-600 font-semibold hidden md:inline">💡 Klik baris siswa untuk melihat Kunci Jawaban</span>
 					<div class="flex items-center gap-1">
-						<span class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded bg-emerald-500 text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center">✓</span>
+						<span class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-300 text-[9px] sm:text-[10px] font-bold flex items-center justify-center">A</span>
 						<span>Benar</span>
 					</div>
 					<div class="flex items-center gap-1">
-						<span class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded bg-rose-500 text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center">X</span>
+						<span class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded bg-rose-50 text-rose-700 border border-rose-300 text-[9px] sm:text-[10px] font-bold flex items-center justify-center">B</span>
 						<span>Salah</span>
 					</div>
 					<div class="flex items-center gap-1">
-						<span class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded bg-slate-200 text-slate-500 text-[9px] sm:text-[10px] font-bold flex items-center justify-center">-</span>
+						<span class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded bg-slate-100 text-slate-400 border border-slate-200 text-[9px] sm:text-[10px] font-bold flex items-center justify-center">-</span>
 						<span>Kosong</span>
 					</div>
 				</div>
 			</div>
 
-			<!-- Matrix Table with Smooth Touch Scrolling & Running Student Name on Mobile -->
+			<!-- Matrix Table with Expandable Answer Key Row -->
 			{#if filteredAttempts.length === 0}
 				<div class="p-8 sm:p-12 text-center text-slate-400 text-xs sm:text-sm">
 					Tidak ada data siswa yang cocok dengan filter.
@@ -327,9 +359,21 @@
 							</tr>
 						</thead>
 						<tbody>
-							{#each filteredAttempts as att, attIdx}
-								<tr class="hover:bg-slate-50/80 transition-colors border-b border-slate-100">
-									<td class="text-center font-bold text-slate-600 sticky left-0 z-10 bg-white border-r border-slate-200 px-1 py-1.5 text-[10px] sm:text-xs">{attIdx + 1}</td>
+							{#each filteredAttempts as att, attIdx (att.id)}
+								<!-- Student Row -->
+								<tr 
+									class="hover:bg-indigo-50/40 transition-colors border-b border-slate-100 cursor-pointer {expandedStudentAttemptId === att.id ? 'bg-indigo-50/60' : ''}"
+									on:click={() => toggleStudentRow(att.id)}
+									title="Klik untuk melihat Kunci Jawaban Resmi"
+								>
+									<td class="text-center font-bold text-slate-600 sticky left-0 z-10 bg-white border-r border-slate-200 px-1 py-1.5 text-[10px] sm:text-xs">
+										<div class="flex items-center justify-center gap-0.5">
+											<span>{attIdx + 1}</span>
+											<svg class="w-2.5 h-2.5 text-slate-400 transition-transform {expandedStudentAttemptId === att.id ? 'rotate-180 text-indigo-600' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+											</svg>
+										</div>
+									</td>
 									
 									<!-- Student Name with Running / Marquee text on mobile -->
 									<td class="sticky left-8 sm:left-10 z-10 bg-white border-r border-slate-200 py-1.5 px-1.5 sm:px-2 max-w-[115px] sm:max-w-none">
@@ -349,21 +393,40 @@
 									<!-- Answer cells per question -->
 									{#each questions as q}
 										{@const ans = answerMatrixMap[`${att.id}_${q.id}`]}
+										{@const displayAns = formatAnswerDisplay(q.type, ans?.answer_given)}
 										{#if !ans || ans.answer_given == null || ans.answer_given === ''}
 											<td class="text-center p-0.5 sm:p-1 border-r border-slate-100 bg-slate-50 text-slate-400 text-[9px] sm:text-[10px] min-w-[26px] sm:min-w-[34px]" title="Tidak Menjawab">
 												-
 											</td>
 										{:else if ans.is_correct === 1 || ans.is_correct === true}
 											<td class="text-center p-0.5 sm:p-1 border-r border-slate-100 bg-emerald-50 text-emerald-700 font-bold text-[10px] sm:text-[11px] min-w-[26px] sm:min-w-[34px]" title="Benar: {ans.answer_given}">
-												✓
+												{displayAns}
 											</td>
 										{:else}
 											<td class="text-center p-0.5 sm:p-1 border-r border-slate-100 bg-rose-50 text-rose-700 font-bold text-[9px] sm:text-[10px] min-w-[26px] sm:min-w-[34px]" title="Salah (Siswa: {ans.answer_given})">
-												{ans.answer_given.length > 2 ? 'X' : ans.answer_given}
+												{displayAns}
 											</td>
 										{/if}
 									{/each}
 								</tr>
+
+								<!-- Expandable Dropdown Row: Kunci Jawaban Resmi -->
+								{#if expandedStudentAttemptId === att.id}
+									<tr class="bg-indigo-50/90 border-b-2 border-indigo-300 animate-in fade-in">
+										<td class="sticky left-0 z-10 bg-indigo-100 border-r border-indigo-200 text-center py-1">
+											<span class="text-[9px] font-bold text-indigo-700">KUNCI</span>
+										</td>
+										<td colspan="3" class="sticky left-8 sm:left-10 z-10 bg-indigo-100 border-r border-indigo-200 py-1 px-2 text-[10px] sm:text-xs font-bold text-indigo-900">
+											🔑 Kunci Jawaban Resmi:
+										</td>
+										{#each questions as q}
+											{@const diag = questionDiagnostics.find(d => d.id === q.id)}
+											<td class="text-center p-0.5 sm:p-1 border-r border-indigo-200 bg-indigo-50/80 font-bold text-indigo-900 text-[10px] sm:text-[11px] min-w-[26px] sm:min-w-[34px]" title="Kunci Soal #{q.question_number}: {diag?.correctKey || '-'}">
+												{diag?.correctKey || '-'}
+											</td>
+										{/each}
+									</tr>
+								{/if}
 							{/each}
 						</tbody>
 
@@ -426,18 +489,18 @@
 				</div>
 
 				<p class="text-[11px] sm:text-xs text-slate-400">
-					{filteredDiagnostics.length} Soal
+					Menampilkan {filteredDiagnostics.length} dari {questionDiagnostics.length} Butir Soal
 				</p>
 			</div>
 
-			<!-- Question Cards List -->
+			<!-- Question Cards List with Keyed Loop -->
 			{#if filteredDiagnostics.length === 0}
 				<div class="card p-8 sm:p-12 text-center text-slate-400 text-xs sm:text-sm">
 					Tidak ada soal yang memenuhi kriteria filter ini.
 				</div>
 			{:else}
 				<div class="space-y-3" use:mathRender={filteredDiagnostics} use:arabicRender={filteredDiagnostics}>
-					{#each filteredDiagnostics as q}
+					{#each filteredDiagnostics as q (q.id)}
 						<div class="card overflow-hidden border transition-all duration-200 {q.wrongPercentage >= 50 ? 'border-rose-200 bg-rose-50/10' : 'border-slate-200 bg-white'}">
 							<div class="p-3.5 sm:p-5 flex flex-col md:flex-row items-start justify-between gap-3.5 sm:gap-4">
 								<div class="flex-1 min-w-0 w-full">
@@ -551,6 +614,170 @@
 							{/if}
 						</div>
 					{/each}
+				</div>
+			{/if}
+		</div>
+	{/if}
+
+	<!-- TAB 3: REKAP & STATUS NILAI SISWA -->
+	{#if activeTab === 'rekap'}
+		<div class="space-y-4">
+			<!-- Rekap Summary Cards -->
+			<div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+				<div class="card p-3.5 bg-white border border-slate-200 text-center">
+					<p class="text-[10px] sm:text-xs text-slate-500 uppercase font-semibold">Total Peserta</p>
+					<p class="text-lg sm:text-2xl font-bold text-slate-800 mt-0.5">{filteredAttempts.length}</p>
+				</div>
+				<div class="card p-3.5 bg-emerald-50/70 border border-emerald-200 text-center">
+					<p class="text-[10px] sm:text-xs text-emerald-700 uppercase font-semibold">Tuntas (&ge;75)</p>
+					<p class="text-lg sm:text-2xl font-bold text-emerald-700 mt-0.5">
+						{filteredAttempts.filter(a => (a.score || 0) >= 75).length} Siswa
+					</p>
+				</div>
+				<div class="card p-3.5 bg-rose-50/70 border border-rose-200 text-center">
+					<p class="text-[10px] sm:text-xs text-rose-700 uppercase font-semibold">Remedial (&lt;75)</p>
+					<p class="text-lg sm:text-2xl font-bold text-rose-700 mt-0.5">
+						{filteredAttempts.filter(a => (a.score || 0) < 75).length} Siswa
+					</p>
+				</div>
+				<div class="card p-3.5 bg-indigo-50/70 border border-indigo-200 text-center">
+					<p class="text-[10px] sm:text-xs text-indigo-700 uppercase font-semibold">Rata-Rata Nilai</p>
+					<p class="text-lg sm:text-2xl font-bold text-indigo-700 mt-0.5">{avgScore}</p>
+				</div>
+			</div>
+
+			<!-- Filters Bar -->
+			<div class="card p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white">
+				<div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+					<!-- Filter Status -->
+					<div class="flex items-center gap-1.5">
+						<span class="text-[11px] sm:text-xs font-semibold text-slate-600">Status:</span>
+						<div class="flex gap-1">
+							<button
+								type="button"
+								class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-all {rekapStatusFilter === 'ALL' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}"
+								on:click={() => (rekapStatusFilter = 'ALL')}
+							>
+								Semua
+							</button>
+							<button
+								type="button"
+								class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-all {rekapStatusFilter === 'TUNTAS' ? 'bg-emerald-600 text-white' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'}"
+								on:click={() => (rekapStatusFilter = 'TUNTAS')}
+							>
+								Tuntas
+							</button>
+							<button
+								type="button"
+								class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-all {rekapStatusFilter === 'REMEDIAL' ? 'bg-rose-600 text-white' : 'bg-rose-50 text-rose-700 hover:bg-rose-100'}"
+								on:click={() => (rekapStatusFilter = 'REMEDIAL')}
+							>
+								Remedial
+							</button>
+						</div>
+					</div>
+
+					<!-- Filter Kelas -->
+					{#if availableClasses.length > 0}
+						<div class="flex items-center gap-1.5">
+							<span class="text-[11px] sm:text-xs font-semibold text-slate-600">Kelas:</span>
+							<select
+								bind:value={selectedClass}
+								class="select select-sm bg-white border border-slate-300 text-xs rounded-lg px-2 py-1 max-w-[130px] sm:max-w-none"
+							>
+								<option value="ALL">Semua Kelas</option>
+								{#each availableClasses as c}
+									<option value={c}>{c}</option>
+								{/each}
+							</select>
+						</div>
+					{/if}
+
+					<!-- Search Siswa -->
+					<div class="relative min-w-[140px]">
+						<input
+							type="text"
+							bind:value={searchQuery}
+							placeholder="Cari siswa..."
+							class="input input-sm pl-7 pr-2 text-xs w-full sm:w-48 rounded-lg bg-white border-slate-300"
+						/>
+						<svg class="w-3.5 h-3.5 text-slate-400 absolute left-2 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+						</svg>
+					</div>
+				</div>
+
+				<p class="text-[11px] sm:text-xs text-slate-400">
+					{filteredAttempts.length} Siswa
+				</p>
+			</div>
+
+			<!-- Rekapitulasi Table -->
+			{#if filteredAttempts.length === 0}
+				<div class="card p-8 sm:p-12 text-center text-slate-400 text-xs sm:text-sm">
+					Tidak ada data siswa yang cocok dengan kriteria filter.
+				</div>
+			{:else}
+				<div class="card overflow-hidden">
+					<div class="overflow-x-auto">
+						<table class="table min-w-full text-xs text-left border-collapse">
+							<thead class="bg-slate-100 text-slate-700 border-b border-slate-200">
+								<tr>
+									<th class="w-12 text-center py-2.5 px-2">Peringkat</th>
+									<th class="py-2.5 px-3">Nama Siswa</th>
+									<th class="w-24 text-center py-2.5 px-2">Kelas</th>
+									<th class="w-28 text-center py-2.5 px-2">Skor Ujian</th>
+									<th class="w-28 text-center py-2.5 px-2">Status</th>
+									<th class="w-24 text-center py-2.5 px-2">Aksi</th>
+								</tr>
+							</thead>
+							<tbody class="divide-y divide-slate-100">
+								{#each filteredAttempts as att, idx (att.id)}
+									<tr class="hover:bg-slate-50 transition-colors">
+										<td class="text-center font-bold text-slate-500 py-2.5 px-2">
+											{#if idx === 0}
+												<span class="badge-warning font-bold">🥇 1</span>
+											{:else if idx === 1}
+												<span class="badge-neutral font-bold">🥈 2</span>
+											{:else if idx === 2}
+												<span class="badge-neutral font-bold">🥉 3</span>
+											{:else}
+												<span>{idx + 1}</span>
+											{/if}
+										</td>
+										<td class="py-2.5 px-3">
+											<p class="font-semibold text-slate-800">{att.student_name}</p>
+											<p class="text-[10px] text-slate-400 font-mono">{att.nisn || att.username}</p>
+										</td>
+										<td class="text-center text-slate-600 py-2.5 px-2">{att.class_name || '-'}</td>
+										<td class="text-center py-2.5 px-2 font-bold text-sm {(att.score || 0) >= 75 ? 'text-emerald-600' : 'text-rose-600'}">
+											{att.score != null ? att.score : 0}
+										</td>
+										<td class="text-center py-2.5 px-2">
+											{#if (att.score || 0) >= 75}
+												<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+													✓ Tuntas
+												</span>
+											{:else}
+												<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+													⚠ Remedial
+												</span>
+											{/if}
+										</td>
+										<td class="text-center py-2.5 px-2">
+											<a
+												href={`/guru/results/${att.id}`}
+												class="btn-xs btn-outline text-indigo-600 hover:bg-indigo-50"
+												title="Lihat Detail Lembar Jawaban Siswa"
+											>
+												Detail
+											</a>
+										</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					</div>
 				</div>
 			{/if}
 		</div>

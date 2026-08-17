@@ -115,13 +115,28 @@ export const load: PageServerLoad = async ({ params, platform, locals }) => {
 		const wrongDistribution: Record<string, number> = {};
 
 		let cleanCorrectKey = '-';
-		try {
-			if (q.correct_answer_json) {
-				const parsed = JSON.parse(q.correct_answer_json);
-				cleanCorrectKey = typeof parsed === 'string' ? parsed.trim().toUpperCase() : JSON.stringify(parsed);
+		if (q.type === 'essay' || q.type === 'isian') {
+			cleanCorrectKey = '-';
+		} else if (q.type === 'benar_salah') {
+			try {
+				if (q.correct_answer_json) {
+					const parsed = JSON.parse(q.correct_answer_json);
+					const str = (typeof parsed === 'string' ? parsed : String(parsed)).toLowerCase().trim();
+					cleanCorrectKey = (str === 'true' || str === 'benar' || str === 'b' || str === '1') ? 'B' : 'S';
+				}
+			} catch {
+				const str = (q.correct_answer_json || '').toLowerCase().trim();
+				cleanCorrectKey = (str === 'true' || str === 'benar' || str === 'b' || str === '1') ? 'B' : 'S';
 			}
-		} catch {
-			cleanCorrectKey = (q.correct_answer_json || '-').trim().toUpperCase();
+		} else {
+			try {
+				if (q.correct_answer_json) {
+					const parsed = JSON.parse(q.correct_answer_json);
+					cleanCorrectKey = typeof parsed === 'string' ? parsed.trim().toUpperCase() : JSON.stringify(parsed);
+				}
+			} catch {
+				cleanCorrectKey = (q.correct_answer_json || '-').trim().toUpperCase();
+			}
 		}
 
 		for (const att of attempts) {
