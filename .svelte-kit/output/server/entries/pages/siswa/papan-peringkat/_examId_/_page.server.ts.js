@@ -10,7 +10,7 @@ const load = async ({ platform, locals, params }) => {
     throw error(400, "Anda belum terdaftar dalam kelas mana pun.");
   }
   const exam = await db.prepare(`
-		SELECT e.id, e.title, e.subject_id, e.exam_type_id 
+		SELECT e.id, e.title, e.subject_id, e.exam_type_id, e.duration_minutes 
 		FROM exams e
 		JOIN exam_participants ep ON e.id = ep.exam_id
 		WHERE e.id = ? AND e.school_id = ? AND ep.student_id = ?
@@ -25,6 +25,7 @@ const load = async ({ platform, locals, params }) => {
 		SELECT 
 			u.name as student_name,
 			u.photo,
+			sa.start_time,
 			sa.submit_time
 		FROM student_attempts sa
 		JOIN users u ON sa.student_id = u.id

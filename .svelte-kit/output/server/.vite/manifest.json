@@ -2150,7 +2150,8 @@
     "src": "src/routes/siswa/papan-peringkat/[examId]/+page.svelte",
     "isEntry": true,
     "imports": [
-      "_index.js"
+      "_index.js",
+      "_date.js"
     ]
   },
   "src/routes/siswa/papan-peringkat/type/[typeId]/+page.server.ts": {

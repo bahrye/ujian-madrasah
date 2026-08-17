@@ -1,7 +1,20 @@
 import { h as head, k as attr, c as stringify, e as escape_html, i as ensure_array_like, f as bind_props } from "../../../../../chunks/index.js";
+import { p as parseDate } from "../../../../../chunks/date.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let data = $$props["data"];
+    function formatTime(ms) {
+      if (!ms || ms <= 0) return "0m 0s";
+      const seconds = Math.floor(ms / 1e3);
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      if (m >= 60) {
+        const h = Math.floor(m / 60);
+        const remM = m % 60;
+        return `${h}j ${remM}m ${s}s`;
+      }
+      return `${m}m ${s}s`;
+    }
     head("aegoy", $$renderer2, ($$renderer3) => {
       $$renderer3.title(($$renderer4) => {
         $$renderer4.push(`<title>Papan Peringkat - ${escape_html(data.exam.title)}</title>`);
@@ -13,25 +26,28 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<div class="p-10 text-center text-slate-500"><p>Belum ada siswa di kelas Anda yang menyelesaikan ujian ini.</p></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="divide-y divide-slate-100"><!--[-->`);
+      $$renderer2.push(`<div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 border-b border-slate-200 text-sm font-semibold text-slate-600"><th class="p-4 w-16 text-center">Peringkat</th><th class="p-4">Siswa</th><th class="p-4 text-center">Waktu Pengerjaan</th><th class="p-4 text-center">Waktu Tersisa</th></tr></thead><tbody class="divide-y divide-slate-100"><!--[-->`);
       const each_array = ensure_array_like(data.leaderboard);
       for (let index = 0, $$length = each_array.length; index < $$length; index++) {
         let student = each_array[index];
-        $$renderer2.push(`<div class="flex items-center px-6 py-4 hover:bg-slate-50 transition-colors"><div class="w-12 flex-shrink-0 flex justify-center">`);
+        const totalDurationMs = (data.exam.duration_minutes || 0) * 60 * 1e3;
+        const timeSpent = Math.max(0, parseDate(student.submit_time).getTime() - parseDate(student.start_time).getTime());
+        const remainingMs = Math.max(0, totalDurationMs - timeSpent);
+        $$renderer2.push(`<tr class="hover:bg-slate-50 transition-colors"><td class="p-4 text-center align-middle">`);
         if (index === 0) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<span class="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 font-bold text-lg">1</span>`);
+          $$renderer2.push(`<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 font-bold text-lg shadow-sm">1</span>`);
         } else if (index === 1) {
           $$renderer2.push("<!--[1-->");
-          $$renderer2.push(`<span class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-bold text-lg">2</span>`);
+          $$renderer2.push(`<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-bold text-lg shadow-sm">2</span>`);
         } else if (index === 2) {
           $$renderer2.push("<!--[2-->");
-          $$renderer2.push(`<span class="flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-600 font-bold text-lg">3</span>`);
+          $$renderer2.push(`<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-600 font-bold text-lg shadow-sm">3</span>`);
         } else {
           $$renderer2.push("<!--[-1-->");
-          $$renderer2.push(`<span class="flex items-center justify-center w-8 h-8 font-semibold text-slate-400">${escape_html(index + 1)}</span>`);
+          $$renderer2.push(`<span class="inline-flex items-center justify-center w-8 h-8 font-semibold text-slate-400">${escape_html(index + 1)}</span>`);
         }
-        $$renderer2.push(`<!--]--></div> <div class="ml-4 flex items-center gap-4 flex-grow">`);
+        $$renderer2.push(`<!--]--></td><td class="p-4"><div class="flex items-center gap-3">`);
         if (student.photo) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<img${attr("src", student.photo)}${attr("alt", student.student_name)} class="w-10 h-10 rounded-full object-cover border border-slate-200"/>`);
@@ -39,9 +55,9 @@ function _page($$renderer, $$props) {
           $$renderer2.push("<!--[-1-->");
           $$renderer2.push(`<div class="w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold">${escape_html(student.student_name.charAt(0).toUpperCase())}</div>`);
         }
-        $$renderer2.push(`<!--]--> <div><p class="font-bold text-slate-800">${escape_html(student.student_name)}</p> <p class="text-xs text-slate-400">Telah Menyelesaikan</p></div></div></div>`);
+        $$renderer2.push(`<!--]--> <div><p class="font-bold text-slate-800">${escape_html(student.student_name)}</p> <p class="text-xs text-slate-400">Telah Menyelesaikan</p></div></div></td><td class="p-4 text-center text-slate-500 text-sm">${escape_html(formatTime(timeSpent))}</td><td class="p-4 text-center text-slate-500 text-sm">${escape_html(remainingMs > 0 ? formatTime(remainingMs) : "Habis")}</td></tr>`);
       }
-      $$renderer2.push(`<!--]--></div>`);
+      $$renderer2.push(`<!--]--></tbody></table></div>`);
     }
     $$renderer2.push(`<!--]--></div></div>`);
     bind_props($$props, { data });

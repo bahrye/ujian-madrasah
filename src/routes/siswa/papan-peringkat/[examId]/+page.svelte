@@ -1,6 +1,20 @@
 <script lang="ts">
+	import { parseDate } from '$lib/utils/date';
 	import type { PageData } from './$types';
 	export let data: PageData;
+
+	function formatTime(ms: number) {
+		if (!ms || ms <= 0) return '0m 0s';
+		const seconds = Math.floor(ms / 1000);
+		const m = Math.floor(seconds / 60);
+		const s = seconds % 60;
+		if (m >= 60) {
+			const h = Math.floor(m / 60);
+			const remM = m % 60;
+			return `${h}j ${remM}m ${s}s`;
+		}
+		return `${m}m ${s}s`;
+	}
 </script>
 
 <svelte:head>
@@ -34,39 +48,65 @@
 				<p>Belum ada siswa di kelas Anda yang menyelesaikan ujian ini.</p>
 			</div>
 		{:else}
-			<div class="divide-y divide-slate-100">
-				{#each data.leaderboard as student, index}
-					<div class="flex items-center px-6 py-4 hover:bg-slate-50 transition-colors">
-						<!-- Rank -->
-						<div class="w-12 flex-shrink-0 flex justify-center">
-							{#if index === 0}
-								<span class="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 font-bold text-lg">1</span>
-							{:else if index === 1}
-								<span class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-bold text-lg">2</span>
-							{:else if index === 2}
-								<span class="flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-600 font-bold text-lg">3</span>
-							{:else}
-								<span class="flex items-center justify-center w-8 h-8 font-semibold text-slate-400">{index + 1}</span>
-							{/if}
-						</div>
+			<div class="overflow-x-auto">
+				<table class="w-full text-left border-collapse">
+					<thead>
+						<tr class="bg-slate-50 border-b border-slate-200 text-sm font-semibold text-slate-600">
+							<th class="p-4 w-16 text-center">Peringkat</th>
+							<th class="p-4">Siswa</th>
+							<th class="p-4 text-center">Waktu Pengerjaan</th>
+							<th class="p-4 text-center">Waktu Tersisa</th>
+						</tr>
+					</thead>
+					<tbody class="divide-y divide-slate-100">
+						{#each data.leaderboard as student, index}
+							{@const totalDurationMs = (data.exam.duration_minutes || 0) * 60 * 1000}
+							{@const timeSpent = Math.max(0, parseDate(student.submit_time).getTime() - parseDate(student.start_time).getTime())}
+							{@const remainingMs = Math.max(0, totalDurationMs - timeSpent)}
+							<tr class="hover:bg-slate-50 transition-colors">
+								<!-- Rank -->
+								<td class="p-4 text-center align-middle">
+									{#if index === 0}
+										<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 font-bold text-lg shadow-sm">1</span>
+									{:else if index === 1}
+										<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-bold text-lg shadow-sm">2</span>
+									{:else if index === 2}
+										<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-600 font-bold text-lg shadow-sm">3</span>
+									{:else}
+										<span class="inline-flex items-center justify-center w-8 h-8 font-semibold text-slate-400">{index + 1}</span>
+									{/if}
+								</td>
 
-						<!-- Student Info -->
-						<div class="ml-4 flex items-center gap-4 flex-grow">
-							{#if student.photo}
-								<img src={student.photo} alt={student.student_name} class="w-10 h-10 rounded-full object-cover border border-slate-200" />
-							{:else}
-								<div class="w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold">
-									{student.student_name.charAt(0).toUpperCase()}
-								</div>
-							{/if}
-							
-							<div>
-								<p class="font-bold text-slate-800">{student.student_name}</p>
-								<p class="text-xs text-slate-400">Telah Menyelesaikan</p>
-							</div>
-						</div>
-					</div>
-				{/each}
+								<!-- Student Info -->
+								<td class="p-4">
+									<div class="flex items-center gap-3">
+										{#if student.photo}
+											<img src={student.photo} alt={student.student_name} class="w-10 h-10 rounded-full object-cover border border-slate-200" />
+										{:else}
+											<div class="w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold">
+												{student.student_name.charAt(0).toUpperCase()}
+											</div>
+										{/if}
+										<div>
+											<p class="font-bold text-slate-800">{student.student_name}</p>
+											<p class="text-xs text-slate-400">Telah Menyelesaikan</p>
+										</div>
+									</div>
+								</td>
+
+								<!-- Waktu Pengerjaan -->
+								<td class="p-4 text-center text-slate-500 text-sm">
+									{formatTime(timeSpent)}
+								</td>
+
+								<!-- Waktu Tersisa -->
+								<td class="p-4 text-center text-slate-500 text-sm">
+									{remainingMs > 0 ? formatTime(remainingMs) : 'Habis'}
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
 			</div>
 		{/if}
 	</div>

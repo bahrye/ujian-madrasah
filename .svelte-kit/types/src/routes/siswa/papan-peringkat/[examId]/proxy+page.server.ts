@@ -16,11 +16,11 @@ export const load = async ({ platform, locals, params }: Parameters<PageServerLo
 	}
 
 	const exam = await db.prepare(`
-		SELECT e.id, e.title, e.subject_id, e.exam_type_id 
+		SELECT e.id, e.title, e.subject_id, e.exam_type_id, e.duration_minutes 
 		FROM exams e
 		JOIN exam_participants ep ON e.id = ep.exam_id
 		WHERE e.id = ? AND e.school_id = ? AND ep.student_id = ?
-	`).bind(examId, schoolId, locals.user.id).first<{ id: number; title: string; subject_id: number; exam_type_id: number }>();
+	`).bind(examId, schoolId, locals.user.id).first<{ id: number; title: string; subject_id: number; exam_type_id: number; duration_minutes: number }>();
 
 	if (!exam) {
 		throw error(404, 'Ujian tidak ditemukan atau Anda bukan peserta ujian ini.');
@@ -36,13 +36,14 @@ export const load = async ({ platform, locals, params }: Parameters<PageServerLo
 		SELECT 
 			u.name as student_name,
 			u.photo,
+			sa.start_time,
 			sa.submit_time
 		FROM student_attempts sa
 		JOIN users u ON sa.student_id = u.id
 		WHERE sa.exam_id = ? AND sa.status = 'selesai' AND u.class_id = ?
 		GROUP BY u.id
 		ORDER BY MAX(sa.score) DESC, (julianday(sa.submit_time) - julianday(sa.start_time)) ASC
-	`).bind(examId, classId).all<{ student_name: string; photo: string | null; submit_time: string }>();
+	`).bind(examId, classId).all<{ student_name: string; photo: string | null; start_time: string; submit_time: string }>();
 
 	return {
 		exam: {
