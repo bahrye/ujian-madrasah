@@ -8,8 +8,10 @@ const load = async ({ platform, locals, url }) => {
   try {
     const db = getDB(platform);
     await ensureUserLoginColumns(db);
-    const userSchoolId = locals.user.school_id;
+    const rawSchoolId = locals.user.school_id;
+    const userSchoolId = rawSchoolId !== void 0 && rawSchoolId !== null && !isNaN(Number(rawSchoolId)) ? Number(rawSchoolId) : null;
     const isSuperAdmin = locals.user.role === "superadmin" || userSchoolId === null;
+    const userId = Number(locals.user.id);
     const search = url.searchParams.get("q")?.trim() || "";
     const examFilterStr = url.searchParams.get("exam_id") || "";
     const examFilter = parseInt(examFilterStr, 10);
@@ -28,7 +30,7 @@ const load = async ({ platform, locals, url }) => {
     const classesQuery = isSuperAdmin ? `SELECT id, name FROM classes ORDER BY name ASC` : `SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC`;
     const classesParams = isSuperAdmin ? [] : [userSchoolId];
     const classesRes = await db.prepare(classesQuery).bind(...classesParams).all();
-    const roomsQuery = isSuperAdmin ? `SELECT id, name FROM exam_rooms WHERE is_active = 1 ORDER BY name ASC` : `SELECT id, name FROM exam_rooms WHERE school_id = ? AND is_active = 1 ORDER BY name ASC`;
+    const roomsQuery = isSuperAdmin ? `SELECT DISTINCT er.id, er.name FROM exam_rooms er ORDER BY er.name ASC` : `SELECT DISTINCT er.id, er.name FROM exam_rooms er JOIN exams e ON er.exam_id = e.id WHERE e.school_id = ? ORDER BY er.name ASC`;
     const roomsParams = isSuperAdmin ? [] : [userSchoolId];
     const roomsRes = await db.prepare(roomsQuery).bind(...roomsParams).all();
     let query = `
@@ -61,7 +63,7 @@ const load = async ({ platform, locals, url }) => {
 			WHERE u.role = 'siswa' AND u.is_active = 1
 		`;
     const params = [];
-    if (!isSuperAdmin) {
+    if (!isSuperAdmin && userSchoolId !== null) {
       query += ` AND (u.school_id = ? OR u.id IN (
 				SELECT epart.student_id
 				FROM exam_participants epart
@@ -69,7 +71,7 @@ const load = async ({ platform, locals, url }) => {
 				JOIN exam_proctors ep ON e.id = ep.exam_id
 				WHERE ep.proctor_id = ?
 			))`;
-      params.push(userSchoolId, locals.user.id);
+      params.push(userSchoolId, userId);
     }
     if (scopeFilter === "proctored" && ["pengawas", "guru"].includes(locals.user.role)) {
       query += `
@@ -82,7 +84,7 @@ const load = async ({ platform, locals, url }) => {
 					  AND (ep.room_id IS NULL OR ep.room_id = epart.room_id)
 				)
 			`;
-      params.push(locals.user.id);
+      params.push(userId);
     }
     if (!isNaN(examFilter)) {
       query += `
@@ -214,7 +216,8 @@ const actions = {
     const db = getDB(platform);
     try {
       await ensureUserLoginColumns(db);
-      const userSchoolId = locals.user.school_id;
+      const rawSchoolId = locals.user.school_id;
+      const userSchoolId = rawSchoolId !== void 0 && rawSchoolId !== null && !isNaN(Number(rawSchoolId)) ? Number(rawSchoolId) : null;
       let query = `UPDATE users SET is_logged_in = 0, session_token = NULL WHERE role = 'siswa' AND is_logged_in = 1`;
       const params = [];
       if (userSchoolId !== null) {

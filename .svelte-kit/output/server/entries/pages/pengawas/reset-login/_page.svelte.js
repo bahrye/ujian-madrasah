@@ -57,6 +57,13 @@ function _page($$renderer, $$props) {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]--></div> `);
+    if (data.error) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm flex items-center gap-3 animate-in"><svg class="w-5 h-5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"${attr("d", ICONS.warning)}></path></svg> <p>Gagal memuat data: ${escape_html(data.error)}</p></div>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--> `);
     if (form?.error) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-center gap-3 animate-in"><svg class="w-5 h-5 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"${attr("d", ICONS.warning)}></path></svg> <p>${escape_html(form.error)}</p></div>`);

@@ -26,8 +26,14 @@ export const load: PageServerLoad = async ({ platform, locals, url }) => {
 		const db = getDB(platform);
 		await ensureUserLoginColumns(db);
 
-		const userSchoolId = locals.user.school_id;
+		// Robust school_id extraction and sanitization
+		const rawSchoolId = locals.user.school_id;
+		const userSchoolId = (rawSchoolId !== undefined && rawSchoolId !== null && !isNaN(Number(rawSchoolId))) 
+			? Number(rawSchoolId) 
+			: null;
+		
 		const isSuperAdmin = locals.user.role === 'superadmin' || userSchoolId === null;
+		const userId = Number(locals.user.id);
 
 		const search = url.searchParams.get('q')?.trim() || '';
 		const examFilterStr = url.searchParams.get('exam_id') || '';
@@ -45,7 +51,7 @@ export const load: PageServerLoad = async ({ platform, locals, url }) => {
 		const examsQuery = isSuperAdmin
 			? `SELECT e.id, e.title FROM exams e ORDER BY e.is_active DESC, e.title ASC`
 			: `SELECT e.id, e.title FROM exams e WHERE e.school_id = ? ORDER BY e.is_active DESC, e.title ASC`;
-		const examsParams = isSuperAdmin ? [] : [userSchoolId];
+		const examsParams: any[] = isSuperAdmin ? [] : [userSchoolId];
 		const examsRes = await db.prepare(examsQuery).bind(...examsParams).all<{ id: number; title: string }>();
 		const exams = examsRes.results || [];
 
@@ -53,14 +59,14 @@ export const load: PageServerLoad = async ({ platform, locals, url }) => {
 		const classesQuery = isSuperAdmin
 			? `SELECT id, name FROM classes ORDER BY name ASC`
 			: `SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC`;
-		const classesParams = isSuperAdmin ? [] : [userSchoolId];
+		const classesParams: any[] = isSuperAdmin ? [] : [userSchoolId];
 		const classesRes = await db.prepare(classesQuery).bind(...classesParams).all<{ id: number; name: string }>();
 
-		// 3. Fetch active rooms for dropdown filter
+		// 3. Fetch rooms for dropdown filter (exam_rooms joins with exams for school_id)
 		const roomsQuery = isSuperAdmin
-			? `SELECT id, name FROM exam_rooms WHERE is_active = 1 ORDER BY name ASC`
-			: `SELECT id, name FROM exam_rooms WHERE school_id = ? AND is_active = 1 ORDER BY name ASC`;
-		const roomsParams = isSuperAdmin ? [] : [userSchoolId];
+			? `SELECT DISTINCT er.id, er.name FROM exam_rooms er ORDER BY er.name ASC`
+			: `SELECT DISTINCT er.id, er.name FROM exam_rooms er JOIN exams e ON er.exam_id = e.id WHERE e.school_id = ? ORDER BY er.name ASC`;
+		const roomsParams: any[] = isSuperAdmin ? [] : [userSchoolId];
 		const roomsRes = await db.prepare(roomsQuery).bind(...roomsParams).all<{ id: number; name: string }>();
 
 		// 4. Build query for students
@@ -96,7 +102,7 @@ export const load: PageServerLoad = async ({ platform, locals, url }) => {
 
 		const params: any[] = [];
 
-		if (!isSuperAdmin) {
+		if (!isSuperAdmin && userSchoolId !== null) {
 			query += ` AND (u.school_id = ? OR u.id IN (
 				SELECT epart.student_id
 				FROM exam_participants epart
@@ -104,7 +110,7 @@ export const load: PageServerLoad = async ({ platform, locals, url }) => {
 				JOIN exam_proctors ep ON e.id = ep.exam_id
 				WHERE ep.proctor_id = ?
 			))`;
-			params.push(userSchoolId, locals.user.id);
+			params.push(userSchoolId, userId);
 		}
 
 		if (scopeFilter === 'proctored' && ['pengawas', 'guru'].includes(locals.user.role)) {
@@ -118,7 +124,7 @@ export const load: PageServerLoad = async ({ platform, locals, url }) => {
 					  AND (ep.room_id IS NULL OR ep.room_id = epart.room_id)
 				)
 			`;
-			params.push(locals.user.id);
+			params.push(userId);
 		}
 
 		if (!isNaN(examFilter)) {
@@ -165,7 +171,7 @@ export const load: PageServerLoad = async ({ platform, locals, url }) => {
 		const result = await db.prepare(query).bind(...params).all<StudentLoginItem>();
 		let students = result.results || [];
 
-		// Ultimate Fallback: If 0 students found, query all active students without school filter
+		// Ultimate Fallback: If 0 students found, query all active students
 		if (students.length === 0 && !search && isNaN(examFilter) && isNaN(roomFilter) && isNaN(classFilter) && !statusFilter) {
 			const fallbackResult = await db.prepare(`
 				SELECT DISTINCT
@@ -276,7 +282,11 @@ export const actions: Actions = {
 		try {
 			await ensureUserLoginColumns(db);
 
-			const userSchoolId = locals.user.school_id;
+			const rawSchoolId = locals.user.school_id;
+			const userSchoolId = (rawSchoolId !== undefined && rawSchoolId !== null && !isNaN(Number(rawSchoolId))) 
+				? Number(rawSchoolId) 
+				: null;
+
 			let query = `UPDATE users SET is_logged_in = 0, session_token = NULL WHERE role = 'siswa' AND is_logged_in = 1`;
 			const params: any[] = [];
 

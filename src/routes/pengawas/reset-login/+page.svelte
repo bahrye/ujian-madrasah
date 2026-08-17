@@ -111,6 +111,15 @@
 	</div>
 
 	<!-- Alert Messages -->
+	{#if data.error}
+		<div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm flex items-center gap-3 animate-in">
+			<svg class="w-5 h-5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={ICONS.warning} />
+			</svg>
+			<p>Gagal memuat data: {data.error}</p>
+		</div>
+	{/if}
+
 	{#if form?.error}
 		<div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-center gap-3 animate-in">
 			<svg class="w-5 h-5 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
