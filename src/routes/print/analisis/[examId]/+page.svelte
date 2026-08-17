@@ -10,6 +10,30 @@
 	$: summary = data.summary as any;
 	$: totalAttempts = data.totalAttempts as number;
 	$: groupSize = data.groupSize as number;
+	$: teachers = (data.teachers || []) as any[];
+
+	// Pilihan Guru Pengampu
+	let selectedTeacherId = '';
+	let customTeacherName = '';
+	let customTeacherNip = '';
+
+	$: if (!selectedTeacherId && data?.exam) {
+		selectedTeacherId = data.exam.created_by ? String(data.exam.created_by) : (data.teachers?.[0]?.id ? String(data.teachers[0].id) : '');
+	}
+
+	$: selectedTeacher = teachers.find(t => String(t.id) === String(selectedTeacherId));
+	$: currentTeacherName = selectedTeacherId === 'custom' 
+		? (customTeacherName || '......................................................')
+		: (selectedTeacher ? selectedTeacher.name : (exam?.teacher_name || '......................................................'));
+	$: currentTeacherNip = selectedTeacherId === 'custom'
+		? (customTeacherNip || '............................................')
+		: (selectedTeacher ? (selectedTeacher.nip || '-') : (exam?.teacher_nip || '............................................'));
+
+	$: locationStr = [
+		school?.district ? `Kecamatan ${school.district}` : '',
+		school?.city ? (String(school.city).toLowerCase().startsWith('kab') || String(school.city).toLowerCase().startsWith('kota') ? school.city : `Kabupaten ${school.city}`) : '',
+		school?.province ? school.province : ''
+	].filter(Boolean).join(', ');
 
 	function formatDateNow() {
 		return new Date().toLocaleDateString('id-ID', {
@@ -18,13 +42,6 @@
 			month: 'long',
 			year: 'numeric'
 		});
-	}
-
-	function formatShortDate(dateStr: string | null) {
-		if (!dateStr) return '-';
-		const d = parseDate(dateStr);
-		if (isNaN(d.getTime())) return dateStr;
-		return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 	}
 
 	function getStatusBadge(status: string) {
@@ -50,8 +67,8 @@
 
 	@media print {
 		@page {
-			size: 215.9mm 330mm; /* F4 / Folio Landscape or Portrait */
-			margin: 1.2cm;
+			size: 215.9mm 330mm; /* F4 / Folio */
+			margin: 1cm;
 		}
 		:global(body) {
 			margin: 0;
@@ -68,10 +85,6 @@
 		tr {
 			page-break-inside: avoid !important;
 		}
-	}
-
-	.kop-border {
-		border-bottom: 3px double #000;
 	}
 
 	table.print-table {
@@ -94,62 +107,117 @@
 	}
 </style>
 
-<!-- Floating Toolbar for Screen View (Hidden when printing) -->
-<div class="no-print fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-slate-900/90 backdrop-blur-md text-white p-2.5 px-4 rounded-2xl shadow-2xl border border-slate-700">
-	<button
-		type="button"
-		on:click={() => history.back()}
-		class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-all"
-	>
-		<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-			<path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-		</svg>
-		Kembali
-	</button>
+<!-- Control Bar (Sticky Header, Hidden when printing) -->
+<div class="no-print p-4 bg-slate-800 text-white border-b border-slate-700 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-md">
+	<div class="flex items-center gap-3 flex-wrap">
+		<div class="flex items-center gap-2">
+			<label for="teacher-select" class="text-xs text-slate-300 font-semibold flex items-center gap-1">
+				<svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+				</svg>
+				Guru Pengampu:
+			</label>
+			<select
+				id="teacher-select"
+				bind:value={selectedTeacherId}
+				class="bg-slate-700 text-white text-xs rounded-lg px-3 py-1.5 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 max-w-[260px]"
+			>
+				{#each teachers as t}
+					<option value={String(t.id)}>{t.name} {t.nip ? `(NIP: ${t.nip})` : ''}</option>
+				{/each}
+				<option value="custom">-- Input Manual / Lainnya --</option>
+			</select>
+		</div>
 
-	<a
-		href={`/api/export/analisis/${exam.id}`}
-		class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md shadow-emerald-900/40"
-	>
-		<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-			<path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-		</svg>
-		Export Excel (.xlsx)
-	</a>
+		{#if selectedTeacherId === 'custom'}
+			<div class="flex items-center gap-2 animate-in fade-in">
+				<input
+					type="text"
+					bind:value={customTeacherName}
+					placeholder="Nama Guru Pengampu"
+					class="bg-slate-700 text-white text-xs rounded-lg px-3 py-1.5 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-48"
+				/>
+				<input
+					type="text"
+					bind:value={customTeacherNip}
+					placeholder="NIP (opsional)"
+					class="bg-slate-700 text-white text-xs rounded-lg px-3 py-1.5 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-36"
+				/>
+			</div>
+		{/if}
+	</div>
 
-	<button
-		type="button"
-		on:click={() => window.print()}
-		class="px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md shadow-indigo-900/40"
-	>
-		<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-			<path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-		</svg>
-		Cetak / Simpan PDF
-	</button>
+	<div class="flex items-center gap-2">
+		<button
+			type="button"
+			on:click={() => history.back()}
+			class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-medium transition-colors"
+		>
+			Kembali
+		</button>
+
+		<a
+			href={`/api/export/analisis/${exam.id}`}
+			class="px-3.5 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 transition-colors shadow"
+		>
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+			</svg>
+			Export Excel
+		</a>
+
+		<button
+			type="button"
+			on:click={() => window.print()}
+			class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-xs font-bold transition-colors flex items-center gap-1.5 shadow"
+		>
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+			</svg>
+			Cetak / Simpan PDF
+		</button>
+	</div>
 </div>
 
-<!-- Print Document Page Container -->
-<div class="max-w-[21.5cm] mx-auto p-4 sm:p-8 bg-white print:max-w-none print:p-0">
-	<!-- KOP SURAT RESMI MADRASAH -->
-	<div class="flex items-center gap-4 pb-3 kop-border mb-4">
-		{#if school?.logo_url}
-			<img src={school.logo_url} alt="Logo" class="w-20 h-20 object-contain flex-shrink-0" />
-		{/if}
-		<div class="flex-1 text-center">
-			<h2 class="text-sm font-semibold tracking-wider uppercase text-slate-700">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h2>
-			<h1 class="text-xl font-bold uppercase tracking-tight text-slate-900 leading-tight">
-				{school?.name || 'MADRASAH ALIYAH / TSANAWIYAH'}
-			</h1>
-			<p class="text-xs text-slate-600 mt-0.5 leading-snug">
-				{school?.address || 'Jl. Pendidikan Madrasah'}
-				{#if school?.phone} | Telp: {school.phone}{/if}
-				{#if school?.email} | Email: {school.email}{/if}
-			</p>
-			{#if school?.npsn}
-				<p class="text-[11px] font-semibold text-slate-700">NPSN: {school.npsn} | Akreditasi: {school?.accreditation || '-'}</p>
+<!-- Print Document Page Container (F4 / Folio) -->
+<div class="p-4 md:p-8 print:p-0 print:m-0 max-w-[215.9mm] mx-auto bg-white" style="font-family: 'Times New Roman', Times, Arial, serif; font-variant-numeric: lining-nums tabular-nums;">
+	<!-- KOP SURAT PERSIS SEPERTI DAFTAR HADIR -->
+	<div class="flex items-center justify-between gap-4 pb-2 relative">
+		<img 
+			src="/kemenag.png" 
+			alt="Logo Kemenag" 
+			class="w-20 h-20 object-contain shrink-0" 
+			on:error={(e) => { (e.currentTarget as HTMLElement).style.visibility = 'hidden'; }}
+		/>
+		<div class="flex-1 text-center font-serif px-2">
+			<h4 class="font-semibold text-sm uppercase tracking-wider text-black m-0 leading-tight">
+				KEMENTERIAN AGAMA REPUBLIK INDONESIA
+			</h4>
+			<h3 class="font-bold text-xl uppercase tracking-wide text-black m-0 my-0.5">
+				{school?.name || 'NAMA SEKOLAH'}
+			</h3>
+			{#if school?.address}
+				<p class="text-xs italic text-black m-0 leading-tight">{school.address}</p>
+			{/if}
+			{#if locationStr}
+				<p class="text-xs italic text-black m-0 leading-tight mt-0.5">{locationStr}</p>
 			{/if}
 		</div>
+		{#if school?.logo_url}
+			<img 
+				src={school.logo_url} 
+				alt="Logo Sekolah" 
+				class="w-20 h-20 object-contain shrink-0" 
+			/>
+		{:else}
+			<div class="w-20 h-20 shrink-0"></div>
+		{/if}
+	</div>
+
+	<!-- Garis Kop Surat (Tipis atas, Agak tebal bawah) -->
+	<div class="mt-2 mb-5">
+		<div style="border-bottom: 1px solid #000;"></div>
+		<div style="border-bottom: 2.5px solid #000; margin-top: 2px;"></div>
 	</div>
 
 	<!-- TITLE -->
@@ -166,7 +234,7 @@
 			<div class="flex">
 				<span class="w-36 font-semibold text-slate-700">Nama Ujian</span>
 				<span class="mr-2">:</span>
-				<span class="font-bold text-slate-900 flex-1">{exam.display_title || exam.title}</span>
+				<span class="font-bold text-slate-900 flex-1">{exam?.display_title || exam?.title || 'Ujian'}</span>
 			</div>
 			<div class="flex">
 				<span class="w-36 font-semibold text-slate-700">Jumlah Peserta Selesai</span>
@@ -176,7 +244,7 @@
 			<div class="flex">
 				<span class="w-36 font-semibold text-slate-700">Mata Pelajaran</span>
 				<span class="mr-2">:</span>
-				<span class="font-semibold text-slate-900 flex-1">{exam.subject_name || 'Umum'}</span>
+				<span class="font-semibold text-slate-900 flex-1">{exam?.subject_name || 'Umum'}</span>
 			</div>
 			<div class="flex">
 				<span class="w-36 font-semibold text-slate-700">Sampel 27% (Atas / Bawah)</span>
@@ -186,22 +254,22 @@
 			<div class="flex">
 				<span class="w-36 font-semibold text-slate-700">Kelas / Tingkat</span>
 				<span class="mr-2">:</span>
-				<span class="font-semibold text-slate-900 flex-1">{exam.class_name || (exam.class_level ? `Kelas ${exam.class_level}` : 'Semua Kelas')}</span>
+				<span class="font-semibold text-slate-900 flex-1">{exam?.class_name || (exam?.class_level ? `Kelas ${exam.class_level}` : 'Semua Kelas')}</span>
 			</div>
 			<div class="flex">
 				<span class="w-36 font-semibold text-slate-700">Rata-rata Skor Ujian</span>
 				<span class="mr-2">:</span>
-				<span class="font-bold text-slate-900 flex-1">{summary.avgScore} (Maks: {summary.maxScore}, Min: {summary.minScore})</span>
+				<span class="font-bold text-slate-900 flex-1">{summary?.avgScore ?? 0} (Maks: {summary?.maxScore ?? 0}, Min: {summary?.minScore ?? 0})</span>
 			</div>
 			<div class="flex">
 				<span class="w-36 font-semibold text-slate-700">Guru Pengampu</span>
 				<span class="mr-2">:</span>
-				<span class="font-semibold text-slate-900 flex-1">{exam.teacher_name || '-'}</span>
+				<span class="font-bold text-indigo-900 flex-1">{currentTeacherName}</span>
 			</div>
 			<div class="flex">
 				<span class="w-36 font-semibold text-slate-700">Total Butir Soal</span>
 				<span class="mr-2">:</span>
-				<span class="font-semibold text-slate-900 flex-1">{analysis.length} Soal</span>
+				<span class="font-semibold text-slate-900 flex-1">{analysis?.length || 0} Soal</span>
 			</div>
 		</div>
 	</div>
@@ -385,8 +453,8 @@
 			<p>{school?.city || 'Madrasah'}, {formatDateNow()}</p>
 			<p class="font-semibold">Guru Mata Pelajaran</p>
 			<div class="h-20"></div>
-			<p class="font-bold underline text-sm">{exam.teacher_name || '......................................................'}</p>
-			<p class="text-[11px] text-slate-600">NIP. {exam.teacher_nip || '............................................'}</p>
+			<p class="font-bold underline text-sm">{currentTeacherName}</p>
+			<p class="text-[11px] text-slate-600">NIP. {currentTeacherNip}</p>
 		</div>
 	</div>
 </div>

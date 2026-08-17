@@ -4,28 +4,46 @@ import { error, redirect } from '@sveltejs/kit';
 import { formatExamTitle } from '$lib/utils/exam';
 
 export const load: PageServerLoad = async ({ platform, params, locals }) => {
-	if (!locals.user) throw redirect(302, '/login');
+	if (!locals.user || !['superadmin', 'admin', 'guru', 'panitia'].includes(locals.user.role)) {
+		throw redirect(302, '/login');
+	}
 
 	const db = getDB(platform);
 	const examId = parseInt(params.examId, 10);
 	if (isNaN(examId)) throw error(400, 'ID Ujian tidak valid');
 
-	// Get school info
-	const school = await db.prepare('SELECT * FROM schools WHERE id = ?').bind(locals.user.school_id).first<any>();
-
 	// Get exam info
-	const exam = await db.prepare(`
-		SELECT e.*, s.name as subject_name, et.code as exam_type_code, et.name as exam_type_name,
-		       c.name as class_name, c.level as class_level, u.name as teacher_name, u.nip as teacher_nip
-		FROM exams e
-		LEFT JOIN subjects s ON e.subject_id = s.id
-		LEFT JOIN exam_types et ON e.exam_type_id = et.id
-		LEFT JOIN classes c ON e.class_id = c.id
-		LEFT JOIN users u ON e.created_by = u.id
-		WHERE e.id = ? AND (e.school_id = ? OR ? IS NULL)
-	`).bind(examId, locals.user.school_id, locals.user.school_id).first<any>();
+	let exam: any = null;
+	if (locals.user.role === 'superadmin') {
+		exam = await db.prepare(`
+			SELECT e.*, s.name as subject_name, et.code as exam_type_code, et.name as exam_type_name,
+			       c.name as class_name, c.level as class_level, u.name as teacher_name, u.nip as teacher_nip
+			FROM exams e
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			LEFT JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN classes c ON e.class_id = c.id
+			LEFT JOIN users u ON e.created_by = u.id
+			WHERE e.id = ?
+		`).bind(examId).first<any>();
+	} else {
+		exam = await db.prepare(`
+			SELECT e.*, s.name as subject_name, et.code as exam_type_code, et.name as exam_type_name,
+			       c.name as class_name, c.level as class_level, u.name as teacher_name, u.nip as teacher_nip
+			FROM exams e
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			LEFT JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN classes c ON e.class_id = c.id
+			LEFT JOIN users u ON e.created_by = u.id
+			WHERE e.id = ? AND e.school_id = ?
+		`).bind(examId, locals.user.school_id).first<any>();
+	}
 
 	if (!exam) throw error(404, 'Ujian tidak ditemukan');
+
+	const effectiveSchoolId = locals.user.school_id || exam.school_id || 1;
+
+	// Get school info
+	const school = await db.prepare('SELECT * FROM schools WHERE id = ?').bind(effectiveSchoolId).first<any>();
 
 	exam.display_title = formatExamTitle({
 		title: exam.title,
@@ -203,12 +221,19 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 		minScore: minExamScore
 	};
 
+	const teachersRes = await db.prepare(`
+		SELECT id, name, nip, role FROM users 
+		WHERE school_id = ? AND role IN ('guru', 'admin', 'superadmin', 'panitia') AND is_active = 1 
+		ORDER BY name ASC
+	`).bind(effectiveSchoolId).all<any>();
+
 	return {
 		school,
 		exam,
 		totalAttempts,
 		groupSize,
 		analysis,
-		summary
+		summary,
+		teachers: teachersRes.results || []
 	};
 };

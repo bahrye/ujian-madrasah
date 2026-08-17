@@ -14,17 +14,32 @@ export const GET: RequestHandler = async ({ params, platform, locals }) => {
 	if (isNaN(examId)) throw error(400, 'ID Ujian tidak valid');
 
 	// Verify exam
-	const exam = await db.prepare(`
-		SELECT e.*, s.name as subject_name, et.code as exam_type_code, c.name as class_name, c.level as class_level,
-		       sch.name as school_name, u.name as teacher_name
-		FROM exams e
-		LEFT JOIN subjects s ON e.subject_id = s.id
-		LEFT JOIN exam_types et ON e.exam_type_id = et.id
-		LEFT JOIN classes c ON e.class_id = c.id
-		LEFT JOIN schools sch ON e.school_id = sch.id
-		LEFT JOIN users u ON e.created_by = u.id
-		WHERE e.id = ? AND (e.school_id = ? OR ? IS NULL)
-	`).bind(examId, locals.user.school_id, locals.user.school_id).first<any>();
+	let exam: any = null;
+	if (locals.user.role === 'superadmin') {
+		exam = await db.prepare(`
+			SELECT e.*, s.name as subject_name, et.code as exam_type_code, c.name as class_name, c.level as class_level,
+			       sch.name as school_name, u.name as teacher_name
+			FROM exams e
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			LEFT JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN classes c ON e.class_id = c.id
+			LEFT JOIN schools sch ON e.school_id = sch.id
+			LEFT JOIN users u ON e.created_by = u.id
+			WHERE e.id = ?
+		`).bind(examId).first<any>();
+	} else {
+		exam = await db.prepare(`
+			SELECT e.*, s.name as subject_name, et.code as exam_type_code, c.name as class_name, c.level as class_level,
+			       sch.name as school_name, u.name as teacher_name
+			FROM exams e
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			LEFT JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN classes c ON e.class_id = c.id
+			LEFT JOIN schools sch ON e.school_id = sch.id
+			LEFT JOIN users u ON e.created_by = u.id
+			WHERE e.id = ? AND e.school_id = ?
+		`).bind(examId, locals.user.school_id).first<any>();
+	}
 
 	if (!exam) throw error(404, 'Ujian tidak ditemukan');
 
