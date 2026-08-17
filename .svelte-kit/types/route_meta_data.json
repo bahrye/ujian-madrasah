@@ -157,6 +157,9 @@
 	"/api/export/excel/[exam_id]": [
 		"src/routes/api/export/excel/[exam_id]/+server.ts"
 	],
+	"/api/export/jawaban-siswa/[examId]": [
+		"src/routes/api/export/jawaban-siswa/[examId]/+server.ts"
+	],
 	"/api/heartbeat": [
 		"src/routes/api/heartbeat/+server.ts"
 	],
@@ -331,6 +334,11 @@
 	],
 	"/print/jadwal/type/[typeId]": [
 		"src/routes/print/jadwal/type/[typeId]/+page.server.ts",
+		"src/routes/print/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/print/jawaban-siswa/[examId]": [
+		"src/routes/print/jawaban-siswa/[examId]/+page.server.ts",
 		"src/routes/print/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],

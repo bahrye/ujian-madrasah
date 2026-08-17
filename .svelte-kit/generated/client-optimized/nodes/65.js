@@ -1,1 +1,1 @@
-export { default as component } from "../../../../src/routes/print/kehadiran/type/[typeId]/+page.svelte";
+export { default as component } from "../../../../src/routes/print/kartu/[exam_id]/+page.svelte";

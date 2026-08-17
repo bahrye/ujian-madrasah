@@ -90,7 +90,8 @@ export const nodes = [
 	() => import('./nodes/78'),
 	() => import('./nodes/79'),
 	() => import('./nodes/80'),
-	() => import('./nodes/81')
+	() => import('./nodes/81'),
+	() => import('./nodes/82')
 ];
 
 export const server_loads = [0,2,3,4,5,6,7];
@@ -151,25 +152,26 @@ export const dictionary = {
 		"/print/berita-acara/[exam_id]": [~60,[5]],
 		"/print/jadwal-rekap/type/[typeId]": [~62,[5]],
 		"/print/jadwal/type/[typeId]": [~61,[5]],
-		"/print/kartu/type/[typeId]": [~63,[5]],
-		"/print/kartu/[exam_id]": [~64,[5]],
-		"/print/kehadiran/type/[typeId]": [~65,[5]],
-		"/print/kehadiran/[exam_id]": [~66,[5]],
-		"/print/results/[attemptId]": [~67,[5]],
-		"/siswa": [~68,[6]],
-		"/siswa/hasil-ujian": [~69,[6]],
-		"/siswa/jadwal": [~70,[6]],
-		"/siswa/papan-peringkat": [~71,[6]],
-		"/siswa/papan-peringkat/type/[typeId]": [~72,[6]],
-		"/siswa/papan-peringkat/type/[typeId]/exams": [~73,[6]],
-		"/siswa/papan-peringkat/[examId]": [~74,[6]],
-		"/siswa/tata-tertib": [75,[6]],
-		"/siswa/ujian": [~76,[6]],
-		"/siswa/ujian/[attemptId]": [~77],
-		"/superadmin": [~78,[7]],
-		"/superadmin/accounts": [~79,[7]],
-		"/superadmin/admins": [~80,[7]],
-		"/superadmin/schools": [~81,[7]]
+		"/print/jawaban-siswa/[examId]": [~63,[5]],
+		"/print/kartu/type/[typeId]": [~64,[5]],
+		"/print/kartu/[exam_id]": [~65,[5]],
+		"/print/kehadiran/type/[typeId]": [~66,[5]],
+		"/print/kehadiran/[exam_id]": [~67,[5]],
+		"/print/results/[attemptId]": [~68,[5]],
+		"/siswa": [~69,[6]],
+		"/siswa/hasil-ujian": [~70,[6]],
+		"/siswa/jadwal": [~71,[6]],
+		"/siswa/papan-peringkat": [~72,[6]],
+		"/siswa/papan-peringkat/type/[typeId]": [~73,[6]],
+		"/siswa/papan-peringkat/type/[typeId]/exams": [~74,[6]],
+		"/siswa/papan-peringkat/[examId]": [~75,[6]],
+		"/siswa/tata-tertib": [76,[6]],
+		"/siswa/ujian": [~77,[6]],
+		"/siswa/ujian/[attemptId]": [~78],
+		"/superadmin": [~79,[7]],
+		"/superadmin/accounts": [~80,[7]],
+		"/superadmin/admins": [~81,[7]],
+		"/superadmin/schools": [~82,[7]]
 	};
 
 export const hooks = {
