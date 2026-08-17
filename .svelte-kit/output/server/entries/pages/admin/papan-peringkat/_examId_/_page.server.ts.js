@@ -6,7 +6,7 @@ const load = async ({ platform, locals, params }) => {
   const examId = params.examId;
   const schoolId = locals.user.school_id;
   const exam = await db.prepare(`
-		SELECT id, title, subject_id, exam_type_id FROM exams WHERE id = ? AND school_id = ?
+		SELECT id, title, subject_id, exam_type_id, duration_minutes FROM exams WHERE id = ? AND school_id = ?
 	`).bind(examId, schoolId).first();
   if (!exam) {
     throw error(404, "Ujian tidak ditemukan.");

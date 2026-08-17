@@ -4,10 +4,15 @@ function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let data = $$props["data"];
     function formatTime(ms) {
-      if (!ms || ms < 0) return "0m 0s";
+      if (!ms || ms <= 0) return "0m 0s";
       const seconds = Math.floor(ms / 1e3);
       const m = Math.floor(seconds / 60);
       const s = seconds % 60;
+      if (m >= 60) {
+        const h = Math.floor(m / 60);
+        const remM = m % 60;
+        return `${h}j ${remM}m ${s}s`;
+      }
       return `${m}m ${s}s`;
     }
     head("1c5nvxa", $$renderer2, ($$renderer3) => {
@@ -21,11 +26,13 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<div class="p-10 text-center text-slate-500"><p>Belum ada siswa yang menyelesaikan ujian ini.</p></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 border-b border-slate-200 text-sm font-semibold text-slate-600"><th class="p-4 w-16 text-center">Peringkat</th><th class="p-4">Siswa</th><th class="p-4 text-center">Total Poin (Maks)</th><th class="p-4 text-center">Total Nilai</th><th class="p-4 text-center">Waktu Pengerjaan</th></tr></thead><tbody class="divide-y divide-slate-100"><!--[-->`);
+      $$renderer2.push(`<div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 border-b border-slate-200 text-sm font-semibold text-slate-600"><th class="p-4 w-16 text-center">Peringkat</th><th class="p-4">Siswa</th><th class="p-4 text-center">Total Poin (Maks)</th><th class="p-4 text-center">Total Nilai</th><th class="p-4 text-center">Waktu Pengerjaan</th><th class="p-4 text-center">Waktu Tersisa</th></tr></thead><tbody class="divide-y divide-slate-100"><!--[-->`);
       const each_array = ensure_array_like(data.leaderboard);
       for (let index = 0, $$length = each_array.length; index < $$length; index++) {
         let student = each_array[index];
+        const totalDurationMs = (data.exam.duration_minutes || 0) * 60 * 1e3;
         const timeSpent = Math.max(0, parseDate(student.submit_time).getTime() - parseDate(student.start_time).getTime());
+        const remainingMs = Math.max(0, totalDurationMs - timeSpent);
         $$renderer2.push(`<tr class="hover:bg-slate-50 transition-colors"><td class="p-4 text-center align-middle">`);
         if (index === 0) {
           $$renderer2.push("<!--[0-->");
@@ -48,7 +55,7 @@ function _page($$renderer, $$props) {
           $$renderer2.push("<!--[-1-->");
           $$renderer2.push(`<div class="w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold">${escape_html(student.student_name.charAt(0).toUpperCase())}</div>`);
         }
-        $$renderer2.push(`<!--]--> <div><p class="font-bold text-slate-800">${escape_html(student.student_name)}</p> <p class="text-xs text-slate-500">${escape_html(student.class_name || "Tidak ada kelas")}</p></div></div></td><td class="p-4 text-center text-slate-600 font-medium">${escape_html(student.total_points)}</td><td class="p-4 text-center"><span class="inline-block px-3 py-1 bg-green-100 text-green-700 font-bold rounded-lg">${escape_html(student.score)}</span></td><td class="p-4 text-center text-slate-500 text-sm">${escape_html(formatTime(timeSpent))}</td></tr>`);
+        $$renderer2.push(`<!--]--> <div><p class="font-bold text-slate-800">${escape_html(student.student_name)}</p> <p class="text-xs text-slate-500">${escape_html(student.class_name || "Tidak ada kelas")}</p></div></div></td><td class="p-4 text-center text-slate-600 font-medium">${escape_html(student.total_points)}</td><td class="p-4 text-center"><span class="inline-block px-3 py-1 bg-green-100 text-green-700 font-bold rounded-lg">${escape_html(student.score)}</span></td><td class="p-4 text-center text-slate-500 text-sm">${escape_html(formatTime(timeSpent))}</td><td class="p-4 text-center text-slate-500 text-sm">${escape_html(remainingMs > 0 ? formatTime(remainingMs) : "Habis")}</td></tr>`);
       }
       $$renderer2.push(`<!--]--></tbody></table></div>`);
     }

@@ -7,7 +7,7 @@ const load = async ({ platform, locals, params }) => {
   const schoolId = locals.user.school_id;
   const userId = locals.user.id;
   const exam = await db.prepare(`
-		SELECT id, title, subject_id, exam_type_id FROM exams 
+		SELECT id, title, subject_id, exam_type_id, duration_minutes FROM exams 
 		WHERE id = ? AND school_id = ? 
 		AND (created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers teacher_join WHERE teacher_join.exam_id = exams.id AND teacher_join.teacher_id = ?))
 	`).bind(examId, schoolId, userId, userId).first();

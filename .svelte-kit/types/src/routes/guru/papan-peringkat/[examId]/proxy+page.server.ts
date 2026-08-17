@@ -12,10 +12,10 @@ export const load = async ({ platform, locals, params }: Parameters<PageServerLo
 	const userId = locals.user.id;
 
 	const exam = await db.prepare(`
-		SELECT id, title, subject_id, exam_type_id FROM exams 
+		SELECT id, title, subject_id, exam_type_id, duration_minutes FROM exams 
 		WHERE id = ? AND school_id = ? 
 		AND (created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers teacher_join WHERE teacher_join.exam_id = exams.id AND teacher_join.teacher_id = ?))
-	`).bind(examId, schoolId, userId, userId).first<{ id: number; title: string; subject_id: number; exam_type_id: number }>();
+	`).bind(examId, schoolId, userId, userId).first<{ id: number; title: string; subject_id: number; exam_type_id: number; duration_minutes: number }>();
 
 	if (!exam) {
 		throw error(404, 'Ujian tidak ditemukan atau Anda tidak memiliki akses ke ujian ini.');

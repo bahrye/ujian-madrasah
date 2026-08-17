@@ -10,8 +10,8 @@ export const load: PageServerLoad = async ({ platform, locals, params }) => {
 	const schoolId = locals.user.school_id;
 
 	const exam = await db.prepare(`
-		SELECT id, title, subject_id, exam_type_id FROM exams WHERE id = ? AND school_id = ?
-	`).bind(examId, schoolId).first<{ id: number; title: string; subject_id: number; exam_type_id: number }>();
+		SELECT id, title, subject_id, exam_type_id, duration_minutes FROM exams WHERE id = ? AND school_id = ?
+	`).bind(examId, schoolId).first<{ id: number; title: string; subject_id: number; exam_type_id: number; duration_minutes: number }>();
 
 	if (!exam) {
 		throw error(404, 'Ujian tidak ditemukan.');

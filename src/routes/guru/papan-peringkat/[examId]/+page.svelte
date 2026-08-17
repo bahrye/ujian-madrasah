@@ -5,10 +5,15 @@
 	export let data: PageData;
 
 	function formatTime(ms: number) {
-		if (!ms || ms < 0) return '0m 0s';
+		if (!ms || ms <= 0) return '0m 0s';
 		const seconds = Math.floor(ms / 1000);
 		const m = Math.floor(seconds / 60);
 		const s = seconds % 60;
+		if (m >= 60) {
+			const h = Math.floor(m / 60);
+			const remM = m % 60;
+			return `${h}j ${remM}m ${s}s`;
+		}
 		return `${m}m ${s}s`;
 	}
 </script>
@@ -53,11 +58,14 @@
 							<th class="p-4 text-center">Total Poin (Maks)</th>
 							<th class="p-4 text-center">Total Nilai</th>
 							<th class="p-4 text-center">Waktu Pengerjaan</th>
+							<th class="p-4 text-center">Waktu Tersisa</th>
 						</tr>
 					</thead>
 					<tbody class="divide-y divide-slate-100">
 						{#each data.leaderboard as student, index}
+							{@const totalDurationMs = (data.exam.duration_minutes || 0) * 60 * 1000}
 							{@const timeSpent = Math.max(0, parseDate(student.submit_time).getTime() - parseDate(student.start_time).getTime())}
+							{@const remainingMs = Math.max(0, totalDurationMs - timeSpent)}
 							<tr class="hover:bg-slate-50 transition-colors">
 								<!-- Rank -->
 								<td class="p-4 text-center align-middle">
@@ -101,9 +109,14 @@
 									</span>
 								</td>
 
-								<!-- Waktu -->
+								<!-- Waktu Pengerjaan -->
 								<td class="p-4 text-center text-slate-500 text-sm">
 									{formatTime(timeSpent)}
+								</td>
+
+								<!-- Waktu Tersisa -->
+								<td class="p-4 text-center text-slate-500 text-sm">
+									{remainingMs > 0 ? formatTime(remainingMs) : 'Habis'}
 								</td>
 							</tr>
 						{/each}
