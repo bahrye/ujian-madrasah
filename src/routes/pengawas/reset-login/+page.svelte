@@ -12,6 +12,11 @@
 	let selectedExam = data.filters.exam_id || '';
 	let selectedSession = data.filters.session_number || '';
 
+	// Reactive synchronization with data.filters on navigation/reload
+	$: searchQuery = data.filters.q || '';
+	$: selectedExam = data.filters.exam_id || '';
+	$: selectedSession = data.filters.session_number || '';
+
 	let showConfirmModal = false;
 	let targetStudent: { id: number; name: string } | null = null;
 	let isResetAll = false;
@@ -134,18 +139,24 @@
 	{/if}
 
 	<!-- Filters & Search Toolbar -->
-	<div class="card p-4 border border-slate-100 bg-white shadow-xs">
-		<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+	<div class="card p-5 border border-slate-200 bg-white shadow-xs rounded-2xl space-y-4">
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
 			<!-- Filter Ujian (Primary Requirement) -->
 			<div>
+				<label class="label text-xs uppercase tracking-wider text-slate-500 font-bold flex items-center gap-1.5 mb-1.5">
+					<svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+					</svg>
+					Pilih Ujian
+				</label>
 				<select 
 					bind:value={selectedExam} 
 					on:change={applyFilters}
-					class="input-field text-sm font-semibold text-slate-800 border-indigo-200 focus:border-indigo-500 bg-indigo-50/20"
+					class="select text-sm font-bold text-slate-800 border-slate-300 hover:border-indigo-400 focus:border-indigo-500 bg-white shadow-xs"
 				>
 					<option value="">-- Pilih Ujian --</option>
 					{#each data.exams as e}
-						<option value={e.id}>{e.title}</option>
+						<option value={String(e.id)}>{e.title}</option>
 					{/each}
 				</select>
 			</div>
@@ -153,10 +164,16 @@
 			<!-- Dynamic Filter Sesi Ujian (Shown ONLY if selected exam has sessions) -->
 			{#if data.hasExamSelected && data.availableSessions && data.availableSessions.length > 0}
 				<div>
+					<label class="label text-xs uppercase tracking-wider text-slate-500 font-bold flex items-center gap-1.5 mb-1.5">
+						<svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+						</svg>
+						Pilih Sesi Ujian
+					</label>
 					<select 
 						bind:value={selectedSession} 
 						on:change={applyFilters}
-						class="input-field text-sm font-medium text-slate-700"
+						class="select text-sm font-semibold text-slate-800 border-slate-300 hover:border-indigo-400 focus:border-indigo-500 bg-white shadow-xs"
 					>
 						<option value="">-- Semua Sesi --</option>
 						{#each data.availableSessions as s}
@@ -168,19 +185,27 @@
 
 			<!-- Search Box (Shown when exam is selected) -->
 			{#if data.hasExamSelected}
-				<div class="relative">
-					<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<div class={data.availableSessions && data.availableSessions.length > 0 ? '' : 'md:col-span-2'}>
+					<label class="label text-xs uppercase tracking-wider text-slate-500 font-bold flex items-center gap-1.5 mb-1.5">
+						<svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={ICONS.search} />
 						</svg>
+						Cari Peserta
+					</label>
+					<div class="relative w-full">
+						<div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+							<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={ICONS.search} />
+							</svg>
+						</div>
+						<input
+							type="text"
+							bind:value={searchQuery}
+							on:input={handleSearchInput}
+							placeholder="Cari nama siswa, username, atau NISN..."
+							class="input pl-10 pr-4 text-sm font-medium text-slate-800 border-slate-300 hover:border-indigo-400 focus:border-indigo-500 bg-white shadow-xs"
+						/>
 					</div>
-					<input
-						type="text"
-						bind:value={searchQuery}
-						on:input={handleSearchInput}
-						placeholder="Cari nama, username, NISN..."
-						class="input-field pl-9 text-sm"
-					/>
 				</div>
 			{/if}
 		</div>
@@ -188,8 +213,8 @@
 
 	{#if !data.hasExamSelected}
 		<!-- Prompt Card when No Exam Selected -->
-		<div class="card p-12 border border-slate-100 bg-white text-center shadow-xs space-y-4 animate-in">
-			<div class="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto shadow-inner">
+		<div class="card p-12 border border-slate-200 bg-white text-center shadow-xs space-y-4 animate-in rounded-2xl">
+			<div class="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto shadow-inner border border-indigo-100">
 				<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
 				</svg>
@@ -225,18 +250,18 @@
 		</div>
 
 		<!-- Student Table -->
-		<div class="card border border-slate-100 overflow-hidden shadow-xs">
+		<div class="card border border-slate-200 overflow-hidden shadow-xs rounded-2xl">
 			<div class="overflow-x-auto">
 				<table class="w-full text-left text-sm text-slate-600">
-					<thead class="bg-slate-50/80 text-xs uppercase font-semibold text-slate-500 border-b border-slate-100">
+					<thead class="bg-slate-50/90 text-xs uppercase font-bold text-slate-600 border-b border-slate-200">
 						<tr>
-							<th class="px-4 py-3.5 text-center w-12">No</th>
-							<th class="px-4 py-3.5">Nama Siswa</th>
-							<th class="px-4 py-3.5">Username / NISN</th>
-							<th class="px-4 py-3.5">Kelas & Ruang</th>
-							<th class="px-4 py-3.5 text-center">Status Login</th>
-							<th class="px-4 py-3.5">Waktu Aktif</th>
-							<th class="px-4 py-3.5">Perangkat</th>
+							<th class="px-4 py-3.5 text-center w-12 border-r border-slate-100">No</th>
+							<th class="px-4 py-3.5 border-r border-slate-100">Nama Siswa</th>
+							<th class="px-4 py-3.5 border-r border-slate-100">Username / NISN</th>
+							<th class="px-4 py-3.5 border-r border-slate-100">Kelas & Ruang</th>
+							<th class="px-4 py-3.5 text-center border-r border-slate-100">Status Login</th>
+							<th class="px-4 py-3.5 border-r border-slate-100">Waktu Aktif</th>
+							<th class="px-4 py-3.5 border-r border-slate-100">Perangkat</th>
 							<th class="px-4 py-3.5 text-center w-36">Aksi</th>
 						</tr>
 					</thead>
@@ -244,8 +269,8 @@
 						{#if data.students && data.students.length > 0}
 							{#each data.students as student, i}
 								<tr class="hover:bg-slate-50/60 transition-colors">
-									<td class="px-4 py-3.5 text-center text-slate-400 font-mono text-xs">{i + 1}</td>
-									<td class="px-4 py-3.5">
+									<td class="px-4 py-3.5 text-center text-slate-400 font-mono text-xs border-r border-slate-100">{i + 1}</td>
+									<td class="px-4 py-3.5 border-r border-slate-100">
 										<div class="font-bold text-slate-800">{student.name}</div>
 										{#if student.student_session_number}
 											<div class="mt-0.5">
@@ -255,23 +280,23 @@
 											</div>
 										{/if}
 									</td>
-									<td class="px-4 py-3.5 font-mono text-xs text-slate-600">
-										<div>{student.username}</div>
+									<td class="px-4 py-3.5 font-mono text-xs text-slate-600 border-r border-slate-100">
+										<div class="font-semibold text-slate-700">{student.username}</div>
 										{#if student.nisn && student.nisn !== student.username}
-											<div class="text-slate-400">NISN: {student.nisn}</div>
+											<div class="text-slate-400 text-[11px]">NISN: {student.nisn}</div>
 										{/if}
 									</td>
-									<td class="px-4 py-3.5">
+									<td class="px-4 py-3.5 border-r border-slate-100">
 										<div class="flex flex-col gap-0.5">
-											<span class="font-medium text-slate-700">{student.class_name}</span>
+											<span class="font-semibold text-slate-700">{student.class_name}</span>
 											{#if student.room_name}
 												<span class="text-xs text-emerald-600 font-medium">Ruang: {student.room_name}</span>
 											{/if}
 										</div>
 									</td>
-									<td class="px-4 py-3.5 text-center">
+									<td class="px-4 py-3.5 text-center border-r border-slate-100">
 										{#if student.is_logged_in === 1}
-											<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+											<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
 												<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
 												Aktif Login
 											</span>
@@ -282,10 +307,10 @@
 											</span>
 										{/if}
 									</td>
-									<td class="px-4 py-3.5 text-xs text-slate-500 whitespace-nowrap">
+									<td class="px-4 py-3.5 text-xs text-slate-600 whitespace-nowrap border-r border-slate-100">
 										{formatTime(student.last_active_at)}
 									</td>
-									<td class="px-4 py-3.5 text-xs text-slate-600 max-w-[160px] truncate" title={student.login_device || '-'}>
+									<td class="px-4 py-3.5 text-xs text-slate-600 max-w-[160px] truncate border-r border-slate-100" title={student.login_device || '-'}>
 										{getDeviceLabel(student.login_device)}
 									</td>
 									<td class="px-4 py-3.5 text-center">
@@ -310,7 +335,7 @@
 						{:else}
 							<tr>
 								<td colspan="8" class="px-4 py-12 text-center text-slate-400">
-									<div class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-3">
+									<div class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-3 border border-slate-100">
 										<svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={ICONS.users} />
 										</svg>
@@ -336,7 +361,7 @@
 		on:click={() => showConfirmModal = false}
 	>
 		<div 
-			class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-xl animate-in" 
+			class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-xl animate-in border border-slate-100" 
 			on:click|stopPropagation
 		>
 			<div class="p-6">
