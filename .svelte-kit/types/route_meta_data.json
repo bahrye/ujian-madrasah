@@ -146,6 +146,9 @@
 	"/api/export-results/[examId]": [
 		"src/routes/api/export-results/[examId]/+server.ts"
 	],
+	"/api/export/analisis/[examId]": [
+		"src/routes/api/export/analisis/[examId]/+server.ts"
+	],
 	"/api/export/excel/[exam_id]": [
 		"src/routes/api/export/excel/[exam_id]/+server.ts"
 	],
@@ -293,6 +296,11 @@
 		"src/routes/+layout.server.ts"
 	],
 	"/print": [
+		"src/routes/print/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/print/analisis/[examId]": [
+		"src/routes/print/analisis/[examId]/+page.server.ts",
 		"src/routes/print/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],

@@ -10,8 +10,8 @@ type OutputDataShape<T> = MaybeWithVoid<Omit<App.PageData, RequiredKeys<T>> & Pa
 type EnsureDefined<T> = T extends null | undefined ? {} : T;
 type OptionalUnion<U extends Record<string, any>, A extends keyof U = U extends U ? keyof U : never> = U extends unknown ? { [P in Exclude<A, keyof U>]?: never } & U : never;
 export type Snapshot<T = any> = Kit.Snapshot<T>;
-type LayoutRouteId = RouteId | "/print/berita-acara/type/[typeId]" | "/print/berita-acara/[exam_id]" | "/print/jadwal/type/[typeId]" | "/print/jadwal-rekap/type/[typeId]" | "/print/kartu/type/[typeId]" | "/print/kartu/[exam_id]" | "/print/kehadiran/type/[typeId]" | "/print/kehadiran/[exam_id]" | "/print/results/[attemptId]"
-type LayoutParams = RouteParams & { typeId?: string | undefined; exam_id?: string | undefined; attemptId?: string | undefined }
+type LayoutRouteId = RouteId | "/print/analisis/[examId]" | "/print/berita-acara/type/[typeId]" | "/print/berita-acara/[exam_id]" | "/print/jadwal/type/[typeId]" | "/print/jadwal-rekap/type/[typeId]" | "/print/kartu/type/[typeId]" | "/print/kartu/[exam_id]" | "/print/kehadiran/type/[typeId]" | "/print/kehadiran/[exam_id]" | "/print/results/[attemptId]"
+type LayoutParams = RouteParams & { examId?: string | undefined; typeId?: string | undefined; exam_id?: string | undefined; attemptId?: string | undefined }
 type LayoutServerParentData = EnsureDefined<import('../$types.js').LayoutServerData>;
 type LayoutParentData = EnsureDefined<import('../$types.js').LayoutData>;
 

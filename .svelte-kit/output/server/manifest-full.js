@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg","kemenag.png","panduan-ui-ujian.jpeg","template_soal_ujian.docx"]),
 	mimeTypes: {".svg":"image/svg+xml",".png":"image/png",".jpeg":"image/jpeg"},
 	_: {
-		client: {start:"_app/immutable/entry/start.4XVzuggZ.js",app:"_app/immutable/entry/app.BjmICWec.js",imports:["_app/immutable/entry/start.4XVzuggZ.js","_app/immutable/chunks/CRaadrkq.js","_app/immutable/chunks/DemquJGR.js","_app/immutable/chunks/C1hmICTo.js","_app/immutable/chunks/w4CWCeqT.js","_app/immutable/chunks/DY3k6_nC.js","_app/immutable/entry/app.BjmICWec.js","_app/immutable/chunks/C1hmICTo.js","_app/immutable/chunks/w4CWCeqT.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/DemquJGR.js","_app/immutable/chunks/By9fOhy2.js","_app/immutable/chunks/iSSBcAib.js","_app/immutable/chunks/WM6WaA-1.js","_app/immutable/chunks/B5bXpDSO.js","_app/immutable/chunks/DY3k6_nC.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
+		client: {start:"_app/immutable/entry/start.Cd4VccYq.js",app:"_app/immutable/entry/app.ScRVpLYV.js",imports:["_app/immutable/entry/start.Cd4VccYq.js","_app/immutable/chunks/H3rwBZnW.js","_app/immutable/chunks/DemquJGR.js","_app/immutable/chunks/C1hmICTo.js","_app/immutable/chunks/w4CWCeqT.js","_app/immutable/chunks/DY3k6_nC.js","_app/immutable/entry/app.ScRVpLYV.js","_app/immutable/chunks/C1hmICTo.js","_app/immutable/chunks/w4CWCeqT.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/DemquJGR.js","_app/immutable/chunks/By9fOhy2.js","_app/immutable/chunks/iSSBcAib.js","_app/immutable/chunks/WM6WaA-1.js","_app/immutable/chunks/B5bXpDSO.js","_app/immutable/chunks/DY3k6_nC.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
 		nodes: [
 			__memo(() => import('./nodes/0.js')),
 			__memo(() => import('./nodes/1.js')),
@@ -90,7 +90,8 @@ return {
 			__memo(() => import('./nodes/75.js')),
 			__memo(() => import('./nodes/76.js')),
 			__memo(() => import('./nodes/77.js')),
-			__memo(() => import('./nodes/78.js'))
+			__memo(() => import('./nodes/78.js')),
+			__memo(() => import('./nodes/79.js'))
 		],
 		remotes: {
 			
@@ -319,6 +320,13 @@ return {
 				params: [{"name":"examId","optional":false,"rest":false,"chained":false}],
 				page: null,
 				endpoint: __memo(() => import('./entries/endpoints/api/export-results/_examId_/_server.ts.js'))
+			},
+			{
+				id: "/api/export/analisis/[examId]",
+				pattern: /^\/api\/export\/analisis\/([^/]+?)\/?$/,
+				params: [{"name":"examId","optional":false,"rest":false,"chained":false}],
+				page: null,
+				endpoint: __memo(() => import('./entries/endpoints/api/export/analisis/_examId_/_server.ts.js'))
 			},
 			{
 				id: "/api/export/excel/[exam_id]",
@@ -552,164 +560,171 @@ return {
 				endpoint: null
 			},
 			{
+				id: "/print/analisis/[examId]",
+				pattern: /^\/print\/analisis\/([^/]+?)\/?$/,
+				params: [{"name":"examId","optional":false,"rest":false,"chained":false}],
+				page: { layouts: [0,5,], errors: [1,,], leaf: 56 },
+				endpoint: null
+			},
+			{
 				id: "/print/berita-acara/type/[typeId]",
 				pattern: /^\/print\/berita-acara\/type\/([^/]+?)\/?$/,
 				params: [{"name":"typeId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 56 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 57 },
 				endpoint: null
 			},
 			{
 				id: "/print/berita-acara/[exam_id]",
 				pattern: /^\/print\/berita-acara\/([^/]+?)\/?$/,
 				params: [{"name":"exam_id","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 57 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 58 },
 				endpoint: null
 			},
 			{
 				id: "/print/jadwal-rekap/type/[typeId]",
 				pattern: /^\/print\/jadwal-rekap\/type\/([^/]+?)\/?$/,
 				params: [{"name":"typeId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 59 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 60 },
 				endpoint: null
 			},
 			{
 				id: "/print/jadwal/type/[typeId]",
 				pattern: /^\/print\/jadwal\/type\/([^/]+?)\/?$/,
 				params: [{"name":"typeId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 58 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 59 },
 				endpoint: null
 			},
 			{
 				id: "/print/kartu/type/[typeId]",
 				pattern: /^\/print\/kartu\/type\/([^/]+?)\/?$/,
 				params: [{"name":"typeId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 60 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 61 },
 				endpoint: null
 			},
 			{
 				id: "/print/kartu/[exam_id]",
 				pattern: /^\/print\/kartu\/([^/]+?)\/?$/,
 				params: [{"name":"exam_id","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 61 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 62 },
 				endpoint: null
 			},
 			{
 				id: "/print/kehadiran/type/[typeId]",
 				pattern: /^\/print\/kehadiran\/type\/([^/]+?)\/?$/,
 				params: [{"name":"typeId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 62 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 63 },
 				endpoint: null
 			},
 			{
 				id: "/print/kehadiran/[exam_id]",
 				pattern: /^\/print\/kehadiran\/([^/]+?)\/?$/,
 				params: [{"name":"exam_id","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 63 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 64 },
 				endpoint: null
 			},
 			{
 				id: "/print/results/[attemptId]",
 				pattern: /^\/print\/results\/([^/]+?)\/?$/,
 				params: [{"name":"attemptId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,5,], errors: [1,,], leaf: 64 },
+				page: { layouts: [0,5,], errors: [1,,], leaf: 65 },
 				endpoint: null
 			},
 			{
 				id: "/siswa",
 				pattern: /^\/siswa\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 65 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 66 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/hasil-ujian",
 				pattern: /^\/siswa\/hasil-ujian\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 66 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 67 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/jadwal",
 				pattern: /^\/siswa\/jadwal\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 67 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 68 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/papan-peringkat",
 				pattern: /^\/siswa\/papan-peringkat\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 68 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 69 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/papan-peringkat/type/[typeId]",
 				pattern: /^\/siswa\/papan-peringkat\/type\/([^/]+?)\/?$/,
 				params: [{"name":"typeId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 69 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 70 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/papan-peringkat/type/[typeId]/exams",
 				pattern: /^\/siswa\/papan-peringkat\/type\/([^/]+?)\/exams\/?$/,
 				params: [{"name":"typeId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 70 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 71 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/papan-peringkat/[examId]",
 				pattern: /^\/siswa\/papan-peringkat\/([^/]+?)\/?$/,
 				params: [{"name":"examId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 71 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 72 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/tata-tertib",
 				pattern: /^\/siswa\/tata-tertib\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 72 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 73 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/ujian",
 				pattern: /^\/siswa\/ujian\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 73 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 74 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/ujian/[attemptId]",
 				pattern: /^\/siswa\/ujian\/([^/]+?)\/?$/,
 				params: [{"name":"attemptId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,], errors: [1,], leaf: 74 },
+				page: { layouts: [0,], errors: [1,], leaf: 75 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin",
 				pattern: /^\/superadmin\/?$/,
 				params: [],
-				page: { layouts: [0,7,], errors: [1,,], leaf: 75 },
+				page: { layouts: [0,7,], errors: [1,,], leaf: 76 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin/accounts",
 				pattern: /^\/superadmin\/accounts\/?$/,
 				params: [],
-				page: { layouts: [0,7,], errors: [1,,], leaf: 76 },
+				page: { layouts: [0,7,], errors: [1,,], leaf: 77 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin/admins",
 				pattern: /^\/superadmin\/admins\/?$/,
 				params: [],
-				page: { layouts: [0,7,], errors: [1,,], leaf: 77 },
+				page: { layouts: [0,7,], errors: [1,,], leaf: 78 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin/schools",
 				pattern: /^\/superadmin\/schools\/?$/,
 				params: [],
-				page: { layouts: [0,7,], errors: [1,,], leaf: 78 },
+				page: { layouts: [0,7,], errors: [1,,], leaf: 79 },
 				endpoint: null
 			}
 		],

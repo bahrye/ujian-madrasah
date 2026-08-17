@@ -87,7 +87,8 @@ export const nodes = [
 	() => import('./nodes/75'),
 	() => import('./nodes/76'),
 	() => import('./nodes/77'),
-	() => import('./nodes/78')
+	() => import('./nodes/78'),
+	() => import('./nodes/79')
 ];
 
 export const server_loads = [0,2,3,4,5,6,7];
@@ -141,29 +142,30 @@ export const dictionary = {
 		"/pengawas/reset-login": [~53,[4]],
 		"/pengawas/tata-tertib": [54,[4]],
 		"/pengawas/tokens": [~55,[4]],
-		"/print/berita-acara/type/[typeId]": [~56,[5]],
-		"/print/berita-acara/[exam_id]": [~57,[5]],
-		"/print/jadwal-rekap/type/[typeId]": [~59,[5]],
-		"/print/jadwal/type/[typeId]": [~58,[5]],
-		"/print/kartu/type/[typeId]": [~60,[5]],
-		"/print/kartu/[exam_id]": [~61,[5]],
-		"/print/kehadiran/type/[typeId]": [~62,[5]],
-		"/print/kehadiran/[exam_id]": [~63,[5]],
-		"/print/results/[attemptId]": [~64,[5]],
-		"/siswa": [~65,[6]],
-		"/siswa/hasil-ujian": [~66,[6]],
-		"/siswa/jadwal": [~67,[6]],
-		"/siswa/papan-peringkat": [~68,[6]],
-		"/siswa/papan-peringkat/type/[typeId]": [~69,[6]],
-		"/siswa/papan-peringkat/type/[typeId]/exams": [~70,[6]],
-		"/siswa/papan-peringkat/[examId]": [~71,[6]],
-		"/siswa/tata-tertib": [72,[6]],
-		"/siswa/ujian": [~73,[6]],
-		"/siswa/ujian/[attemptId]": [~74],
-		"/superadmin": [~75,[7]],
-		"/superadmin/accounts": [~76,[7]],
-		"/superadmin/admins": [~77,[7]],
-		"/superadmin/schools": [~78,[7]]
+		"/print/analisis/[examId]": [~56,[5]],
+		"/print/berita-acara/type/[typeId]": [~57,[5]],
+		"/print/berita-acara/[exam_id]": [~58,[5]],
+		"/print/jadwal-rekap/type/[typeId]": [~60,[5]],
+		"/print/jadwal/type/[typeId]": [~59,[5]],
+		"/print/kartu/type/[typeId]": [~61,[5]],
+		"/print/kartu/[exam_id]": [~62,[5]],
+		"/print/kehadiran/type/[typeId]": [~63,[5]],
+		"/print/kehadiran/[exam_id]": [~64,[5]],
+		"/print/results/[attemptId]": [~65,[5]],
+		"/siswa": [~66,[6]],
+		"/siswa/hasil-ujian": [~67,[6]],
+		"/siswa/jadwal": [~68,[6]],
+		"/siswa/papan-peringkat": [~69,[6]],
+		"/siswa/papan-peringkat/type/[typeId]": [~70,[6]],
+		"/siswa/papan-peringkat/type/[typeId]/exams": [~71,[6]],
+		"/siswa/papan-peringkat/[examId]": [~72,[6]],
+		"/siswa/tata-tertib": [73,[6]],
+		"/siswa/ujian": [~74,[6]],
+		"/siswa/ujian/[attemptId]": [~75],
+		"/superadmin": [~76,[7]],
+		"/superadmin/accounts": [~77,[7]],
+		"/superadmin/admins": [~78,[7]],
+		"/superadmin/schools": [~79,[7]]
 	};
 
 export const hooks = {

@@ -39,18 +39,43 @@
 </svelte:head>
 
 <div class="space-y-6 animate-in">
-	<div class="flex items-center gap-3">
+	<div class="flex items-center justify-between flex-wrap gap-3">
 		<button type="button" on:click={() => history.back()} class="btn-ghost btn-sm">
 			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 				<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.chevronLeft} />
 			</svg>
 			Kembali
 		</button>
+
+		<div class="flex items-center gap-2.5">
+			<a
+				href={`/api/export/analisis/${exam.id}`}
+				class="btn-sm btn-success shadow-md shadow-emerald-500/20 gap-1.5"
+				title="Download Rekap Analisis Butir Soal (Excel .xlsx)"
+			>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+				</svg>
+				Export Excel
+			</a>
+
+			<a
+				href={`/print/analisis/${exam.id}`}
+				target="_blank"
+				class="btn-sm btn-primary shadow-md shadow-indigo-500/20 gap-1.5"
+				title="Buka Lembar Cetak & Simpan PDF Resmi"
+			>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+				</svg>
+				Cetak / Export PDF
+			</a>
+		</div>
 	</div>
 
 	<!-- Header -->
 	<div class="card p-6">
-		<div class="flex flex-col md:flex-row justify-between gap-4">
+		<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
 			<div>
 				<h1 class="text-2xl font-bold text-slate-800">Analisis Butir Soal</h1>
 				<p class="text-sm text-slate-500 mt-1">{exam.title} ({exam.subject_name || 'Umum'})</p>
