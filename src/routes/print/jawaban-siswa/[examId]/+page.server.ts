@@ -201,12 +201,17 @@ export const load: PageServerLoad = async ({ params, platform, locals }) => {
 	const passCount = attempts.filter(a => (a.score || 0) >= 75).length;
 	const passPercentage = totalAttempts > 0 ? Math.round((passCount / totalAttempts) * 100) : 0;
 
-	// Teachers list for dropdown
-	const teachersRes = await db.prepare(`
-		SELECT id, name, nip, role FROM users 
-		WHERE school_id = ? AND role IN ('guru', 'admin', 'superadmin', 'panitia') AND is_active = 1 
-		ORDER BY name ASC
-	`).bind(effectiveSchoolId).all<any>();
+	// Teachers list: exam-specific teachers from Daftar Pengajar + exam creator
+	const examTeachersRes = await db.prepare(`
+		SELECT DISTINCT u.id, u.name, u.nip, u.role FROM users u
+		WHERE u.id IN (
+			SELECT et.teacher_id FROM exam_teachers et WHERE et.exam_id = ?
+			UNION
+			SELECT ? 
+		)
+		AND u.is_active = 1
+		ORDER BY u.name ASC
+	`).bind(examId, exam.created_by).all<any>();
 
 	return {
 		school,
@@ -219,6 +224,6 @@ export const load: PageServerLoad = async ({ params, platform, locals }) => {
 		avgScore,
 		passPercentage,
 		passCount,
-		teachers: teachersRes.results || []
+		teachers: examTeachersRes.results || []
 	};
 };
