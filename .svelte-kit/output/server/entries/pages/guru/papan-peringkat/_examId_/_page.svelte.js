@@ -4,6 +4,7 @@ function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let data = $$props["data"];
     function formatTime(ms) {
+      if (!ms || ms < 0) return "0m 0s";
       const seconds = Math.floor(ms / 1e3);
       const m = Math.floor(seconds / 60);
       const s = seconds % 60;
@@ -24,7 +25,7 @@ function _page($$renderer, $$props) {
       const each_array = ensure_array_like(data.leaderboard);
       for (let index = 0, $$length = each_array.length; index < $$length; index++) {
         let student = each_array[index];
-        const timeSpent = new Date(student.submit_time).getTime() - parseDate(student.start_time).getTime();
+        const timeSpent = Math.max(0, parseDate(student.submit_time).getTime() - parseDate(student.start_time).getTime());
         $$renderer2.push(`<tr class="hover:bg-slate-50 transition-colors"><td class="p-4 text-center align-middle">`);
         if (index === 0) {
           $$renderer2.push("<!--[0-->");

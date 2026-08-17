@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { parseDate } from '$lib/utils/date';
+
   export let show = false;
   export let classes: { id: number | string; name: string }[] = [];
   export let students: { id: number | string; name: string; username: string; class_id: number | string | null; class_name: string | null; place_of_birth?: string | null; date_of_birth?: string | null; photo?: string | null; nisn?: string | null; nomor_peserta?: string | null; }[] = [];
@@ -19,7 +21,7 @@
     let formattedDate = '';
     if (dateStr) {
       try {
-        formattedDate = new Date(String(dateStr).replace(' ', 'T')).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        formattedDate = parseDate(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
       } catch {
         formattedDate = dateStr;
       }

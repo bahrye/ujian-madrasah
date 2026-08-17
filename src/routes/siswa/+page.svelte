@@ -441,10 +441,8 @@
 												{getAttemptRemainingTime(a.end_time, currentTime, a.is_paused === 1, a.paused_at)}
 											</span>
 										{:else}
-											{@const startStr = String(a.start_time).replace(' ', 'T') + (String(a.start_time).includes(' ') && !String(a.start_time).includes('Z') ? 'Z' : '')}
-											{@const submitStr = a.submit_time ? (String(a.submit_time).replace(' ', 'T') + (String(a.submit_time).includes(' ') && !String(a.submit_time).includes('Z') ? 'Z' : '')) : (a.updated_at ? (String(a.updated_at).replace(' ', 'T') + (String(a.updated_at).includes(' ') && !String(a.updated_at).includes('Z') ? 'Z' : '')) : startStr)}
-											{@const submitMs = new Date(submitStr).getTime()}
-											{@const endMs = new Date(String(a.end_time).replace(' ', 'T') + (String(a.end_time).includes(' ') && !String(a.end_time).includes('Z') ? 'Z' : '')).getTime()}
+											{@const submitMs = parseDate(a.submit_time || a.updated_at || a.start_time).getTime()}
+											{@const endMs = parseDate(a.end_time).getTime()}
 											{@const remainingMs = endMs - submitMs}
 											{#if remainingMs > 0}
 												{@const totalS = Math.floor(remainingMs / 1000)}
@@ -468,7 +466,7 @@
 									<td class="font-bold bg-indigo-50/30">
 										<ScoreDisplay attempt={a} {currentTime} type="akhir" />
 									</td>
-									<td class="text-xs text-slate-500">{new Date(String(a.created_at).replace(' ', 'T') + (String(a.created_at).includes(' ') && !String(a.created_at).includes('Z') ? 'Z' : '')).toLocaleDateString('id-ID')}</td>
+									<td class="text-xs text-slate-500">{parseDate(a.created_at).toLocaleDateString('id-ID')}</td>
 								</tr>
 							{/each}
 						</tbody>

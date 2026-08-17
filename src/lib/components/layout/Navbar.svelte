@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { ICONS, ROLE_LABELS } from '$lib/utils/constants';
 	import { createEventDispatcher } from 'svelte';
+	import { parseDate } from '$lib/utils/date';
 
 	export let user: App.Locals['user'];
 	export let userInfo: any = null;
@@ -14,7 +15,7 @@
 		let formattedDate = '';
 		if (dateStr) {
 			try {
-				formattedDate = new Date(String(dateStr).replace(' ', 'T')).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+				formattedDate = parseDate(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 			} catch {
 				formattedDate = dateStr;
 			}

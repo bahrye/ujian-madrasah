@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx';
 import { ATTEMPT_STATUS_LABELS } from './constants';
+import { parseDate } from './date';
 
 export async function exportExamResults(examId: string, examTitle: string) {
 	try {
@@ -41,13 +42,13 @@ export async function exportExamResults(examId: string, examTitle: string) {
 		});
 
 		const rows1 = participants.map((p: any) => {
-			let startTime = p.start_time ? new Date(p.start_time + 'Z').toLocaleString('id-ID') : '-';
-			let endTime = p.submit_time ? new Date(p.submit_time + 'Z').toLocaleString('id-ID') : '-';
+			let startTime = p.start_time ? parseDate(p.start_time).toLocaleString('id-ID') : '-';
+			let endTime = p.submit_time ? parseDate(p.submit_time).toLocaleString('id-ID') : '-';
 			
 			let remainingTime = '-';
 			if (p.start_time) {
-				const startMs = new Date(p.start_time + 'Z').getTime();
-				const endMs = p.submit_time ? new Date(p.submit_time + 'Z').getTime() : Date.now();
+				const startMs = parseDate(p.start_time).getTime();
+				const endMs = p.submit_time ? parseDate(p.submit_time).getTime() : Date.now();
 				const examEndMs = startMs + (exam.duration_minutes * 60 * 1000);
 				const leftMs = examEndMs - endMs;
 				if (leftMs > 0) {

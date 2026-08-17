@@ -8,6 +8,7 @@
 	import { toasts } from '$lib/stores/toast';
 	import { ICONS } from '$lib/utils/constants';
 	import { env } from '$env/dynamic/public';
+	import { parseDate } from '$lib/utils/date';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -149,7 +150,7 @@
 		let formattedDate = '';
 		if (dateStr) {
 			try {
-				formattedDate = new Date(String(dateStr).replace(' ', 'T')).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+				formattedDate = parseDate(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 			} catch {
 				formattedDate = dateStr;
 			}

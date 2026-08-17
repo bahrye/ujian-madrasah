@@ -9,6 +9,7 @@ import "../../../../chunks/state.svelte.js";
 import { C as ConfirmForm } from "../../../../chunks/ConfirmForm.js";
 import { t as toasts } from "../../../../chunks/toast.js";
 import { I as ICONS } from "../../../../chunks/constants.js";
+import { p as parseDate } from "../../../../chunks/date.js";
 function ImportStudentsModal($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let show = fallback($$props["show"], false);
@@ -111,7 +112,7 @@ function _page($$renderer, $$props) {
       let formattedDate = "";
       if (dateStr) {
         try {
-          formattedDate = new Date(String(dateStr).replace(" ", "T")).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
+          formattedDate = parseDate(dateStr).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
         } catch {
           formattedDate = dateStr;
         }
