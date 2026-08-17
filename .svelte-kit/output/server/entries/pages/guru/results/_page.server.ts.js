@@ -1,5 +1,5 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { g as getDB, b as ensureStudentAttemptsScoreReleasedColumn } from "../../../../chunks/db.js";
+import { g as getDB, c as ensureStudentAttemptsScoreReleasedColumn } from "../../../../chunks/db.js";
 const load = async ({ platform, url, locals }) => {
   if (!locals.user) throw redirect(302, "/login");
   const db = getDB(platform);

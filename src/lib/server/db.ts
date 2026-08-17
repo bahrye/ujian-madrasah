@@ -90,3 +90,19 @@ export async function ensureStudentAttemptsScoreReleasedColumn(db: D1Database) {
 	}
 }
 
+export async function ensureUserLoginColumns(db: D1Database) {
+	try {
+		await db.prepare('ALTER TABLE users ADD COLUMN is_logged_in INTEGER DEFAULT 0').run();
+	} catch (e: any) {}
+	try {
+		await db.prepare('ALTER TABLE users ADD COLUMN session_token TEXT').run();
+	} catch (e: any) {}
+	try {
+		await db.prepare('ALTER TABLE users ADD COLUMN last_active_at TEXT').run();
+	} catch (e: any) {}
+	try {
+		await db.prepare('ALTER TABLE users ADD COLUMN login_device TEXT').run();
+	} catch (e: any) {}
+}
+
+

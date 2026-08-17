@@ -57,6 +57,10 @@ CREATE TABLE IF NOT EXISTS users (
     nomor_peserta TEXT,
     session_number INTEGER DEFAULT 1,
     is_active INTEGER NOT NULL DEFAULT 1,
+    is_logged_in INTEGER NOT NULL DEFAULT 0,
+    session_token TEXT,
+    last_active_at TEXT,
+    login_device TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );

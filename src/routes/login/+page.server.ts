@@ -1,6 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getDB } from '$lib/server/db';
+import { getDB, ensureUserLoginColumns } from '$lib/server/db';
 import { verifyPassword, createToken, COOKIE_NAME } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -22,6 +22,8 @@ export const actions: Actions = {
 
 		try {
 			const db = getDB(platform);
+			await ensureUserLoginColumns(db);
+
 			const user = await db.prepare('SELECT * FROM users WHERE username = ? AND is_active = 1')
 				.bind(username)
 				.first<{
@@ -33,6 +35,8 @@ export const actions: Actions = {
 					name: string;
 					role: string;
 					photo: string | null;
+					is_logged_in?: number;
+					session_token?: string | null;
 				}>();
 
 			if (!user) {
@@ -44,6 +48,27 @@ export const actions: Actions = {
 				return fail(401, { error: 'Username atau kata sandi salah.' });
 			}
 
+			let sessionToken: string | null = null;
+
+			// Proteksi Login Siswa Multi-Perangkat
+			if (user.role === 'siswa') {
+				if (user.is_logged_in === 1) {
+					return fail(400, {
+						error: `Siswa atas nama "${user.name}" sudah terdeteksi login di perangkat lain. Silahkan meminta Pengawas Ruang untuk me-reset login siswa tersebut.`
+					});
+				}
+
+				sessionToken = crypto.randomUUID();
+				const userAgent = request.headers.get('user-agent') || 'Browser';
+				const cleanDevice = userAgent.length > 120 ? userAgent.substring(0, 120) + '...' : userAgent;
+
+				await db.prepare(`
+					UPDATE users 
+					SET is_logged_in = 1, session_token = ?, last_active_at = datetime('now'), login_device = ? 
+					WHERE id = ?
+				`).bind(sessionToken, cleanDevice, user.id).run();
+			}
+
 			const token = await createToken({
 				id: user.id,
 				school_id: user.school_id,
@@ -51,7 +76,8 @@ export const actions: Actions = {
 				username: user.username,
 				name: user.name,
 				role: user.role as 'superadmin' | 'admin' | 'guru' | 'pengawas' | 'siswa',
-				photo: user.photo
+				photo: user.photo,
+				session_token: sessionToken
 			});
 
 			cookies.set(COOKIE_NAME, token, {
@@ -73,3 +99,4 @@ export const actions: Actions = {
 		}
 	}
 };
+

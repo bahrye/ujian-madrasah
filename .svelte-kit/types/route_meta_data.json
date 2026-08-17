@@ -270,6 +270,11 @@
 		"src/routes/pengawas/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/pengawas/reset-login": [
+		"src/routes/pengawas/reset-login/+page.server.ts",
+		"src/routes/pengawas/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/pengawas/tata-tertib": [
 		"src/routes/pengawas/+layout.server.ts",
 		"src/routes/+layout.server.ts"

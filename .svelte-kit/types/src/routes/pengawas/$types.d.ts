@@ -12,7 +12,7 @@ type OptionalUnion<U extends Record<string, any>, A extends keyof U = U extends 
 export type Snapshot<T = any> = Kit.Snapshot<T>;
 type PageServerParentData = Omit<EnsureDefined<import('../$types.js').LayoutServerData>, keyof LayoutServerData> & EnsureDefined<LayoutServerData>;
 type PageParentData = Omit<EnsureDefined<import('../$types.js').LayoutData>, keyof LayoutData> & EnsureDefined<LayoutData>;
-type LayoutRouteId = RouteId | "/pengawas" | "/pengawas/jadwal/saya" | "/pengawas/jadwal/semua" | "/pengawas/monitor" | "/pengawas/tata-tertib" | "/pengawas/tokens"
+type LayoutRouteId = RouteId | "/pengawas" | "/pengawas/jadwal/saya" | "/pengawas/jadwal/semua" | "/pengawas/monitor" | "/pengawas/reset-login" | "/pengawas/tata-tertib" | "/pengawas/tokens"
 type LayoutParams = RouteParams & {  }
 type LayoutServerParentData = EnsureDefined<import('../$types.js').LayoutServerData>;
 type LayoutParentData = EnsureDefined<import('../$types.js').LayoutData>;

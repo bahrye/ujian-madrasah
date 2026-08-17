@@ -1,5 +1,5 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { g as getDB } from "../../../../chunks/db.js";
+import { g as getDB, e as ensureUserLoginColumns } from "../../../../chunks/db.js";
 import { d as deleteFromCloudinary } from "../../../../chunks/cloudinary.js";
 import { b as private_env } from "../../../../chunks/shared-server.js";
 const load = async ({ platform, url, locals }) => {
@@ -62,6 +62,7 @@ const load = async ({ platform, url, locals }) => {
 					u.name as student_name, 
 					u.username, 
 					COALESCE(u.session_number, 1) as student_session_number,
+					COALESCE(u.is_logged_in, 0) as is_logged_in,
 					e.title as exam_title,
 					e.duration_minutes,
 					(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count,
@@ -256,6 +257,24 @@ const actions = {
     } catch (e) {
       console.error(e);
       return fail(500, { error: e.message || "Gagal mereset sesi ujian siswa." });
+    }
+  },
+  resetLogin: async ({ request, platform, locals }) => {
+    if (!locals.user) return fail(401, { error: "Unauthorized" });
+    const db = getDB(platform);
+    const form = await request.formData();
+    const studentIdStr = form.get("student_id")?.toString();
+    const parsedStudentId = parseInt(studentIdStr || "", 10);
+    if (isNaN(parsedStudentId)) return fail(400, { error: "ID Siswa tidak valid." });
+    try {
+      await ensureUserLoginColumns(db);
+      await db.prepare(`
+				UPDATE users SET is_logged_in = 0, session_token = NULL WHERE id = ? AND school_id = ?
+			`).bind(parsedStudentId, locals.user.school_id).run();
+      return { success: "Login perangkat siswa berhasil direset." };
+    } catch (e) {
+      console.error(e);
+      return fail(500, { error: e.message || "Gagal mereset login perangkat siswa." });
     }
   }
 };

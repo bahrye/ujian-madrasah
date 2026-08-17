@@ -67,7 +67,8 @@ async function verifyToken(token) {
       name: payload.name,
       role: payload.role,
       class_id: payload.class_id,
-      photo: payload.photo
+      photo: payload.photo,
+      session_token: payload.session_token
     };
   } catch {
     return null;

@@ -52,12 +52,31 @@ async function ensureStudentAttemptsScoreReleasedColumn(db) {
   } catch (e) {
   }
 }
+async function ensureUserLoginColumns(db) {
+  try {
+    await db.prepare("ALTER TABLE users ADD COLUMN is_logged_in INTEGER DEFAULT 0").run();
+  } catch (e) {
+  }
+  try {
+    await db.prepare("ALTER TABLE users ADD COLUMN session_token TEXT").run();
+  } catch (e) {
+  }
+  try {
+    await db.prepare("ALTER TABLE users ADD COLUMN last_active_at TEXT").run();
+  } catch (e) {
+  }
+  try {
+    await db.prepare("ALTER TABLE users ADD COLUMN login_device TEXT").run();
+  } catch (e) {
+  }
+}
 export {
-  ensureProctorRoleColumn as a,
-  ensureStudentAttemptsScoreReleasedColumn as b,
-  ensureTokenSessionColumn as c,
-  dbRun as d,
-  ensureExamTypeProctorsTable as e,
-  ensureStudentAttemptsGradedColumn as f,
-  getDB as g
+  ensureExamTypeProctorsTable as a,
+  ensureProctorRoleColumn as b,
+  ensureStudentAttemptsScoreReleasedColumn as c,
+  ensureTokenSessionColumn as d,
+  ensureUserLoginColumns as e,
+  dbRun as f,
+  getDB as g,
+  ensureStudentAttemptsGradedColumn as h
 };

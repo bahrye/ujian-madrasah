@@ -1,5 +1,5 @@
 import { fail } from "@sveltejs/kit";
-import { g as getDB, e as ensureExamTypeProctorsTable } from "../../../../chunks/db.js";
+import { g as getDB, a as ensureExamTypeProctorsTable } from "../../../../chunks/db.js";
 const load = async ({ platform, locals }) => {
   const db = getDB(platform);
   await ensureExamTypeProctorsTable(db);

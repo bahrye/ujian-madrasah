@@ -83,7 +83,8 @@ const SIDEBAR_MENUS = {
       ]
     },
     { label: "Token Ujian", href: "/pengawas/tokens", icon: "token" },
-    { label: "Monitoring", href: "/pengawas/monitor", icon: "monitor" }
+    { label: "Monitoring", href: "/pengawas/monitor", icon: "monitor" },
+    { label: "Reset Login Siswa", href: "/pengawas/reset-login", icon: "refresh" }
   ],
   siswa: [
     { label: "Dashboard", href: "/siswa", icon: "dashboard" },

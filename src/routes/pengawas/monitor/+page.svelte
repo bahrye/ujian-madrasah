@@ -379,8 +379,8 @@
 									{/if}
 								</td>
 								<td class="text-right">
-									{#if a.status === 'mengerjakan'}
-										<div class="flex items-center justify-end gap-2">
+									<div class="flex items-center justify-end gap-1.5">
+										{#if a.status === 'mengerjakan'}
 											<form method="POST" action="?/togglePause" use:enhance>
 												<input type="hidden" name="attempt_id" value={a.attempt_id} />
 												{#if a.is_paused}
@@ -405,16 +405,28 @@
 											<button
 												class="btn-sm btn-danger"
 												on:click={() => (resetConfirm = a.attempt_id)}
+												title="Reset Jawaban Ujian"
 											>
 												<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 													<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.refresh} />
 												</svg>
-												Reset
+												Reset Ujian
 											</button>
-										</div>
-									{:else}
-										<span class="text-slate-300">-</span>
-									{/if}
+										{/if}
+										<form method="POST" action="?/resetLogin" use:enhance>
+											<input type="hidden" name="student_id" value={a.student_id} />
+											<button 
+												type="submit" 
+												class="btn-sm btn-ghost border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100" 
+												title="Reset status login perangkat siswa"
+											>
+												<svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+													<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.refresh} />
+												</svg>
+												Reset Login
+											</button>
+										</form>
+									</div>
 								</td>
 							</tr>
 						{/each}

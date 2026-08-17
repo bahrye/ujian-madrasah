@@ -1,5 +1,5 @@
 import { json } from "@sveltejs/kit";
-import { g as getDB, e as ensureExamTypeProctorsTable } from "../../../../chunks/db.js";
+import { g as getDB, a as ensureExamTypeProctorsTable } from "../../../../chunks/db.js";
 const GET = async ({ url, platform, locals }) => {
   if (!locals.user) return json({ error: "Unauthorized" }, { status: 401 });
   const db = getDB(platform);

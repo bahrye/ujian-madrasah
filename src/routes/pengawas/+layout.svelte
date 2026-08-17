@@ -16,7 +16,8 @@
 						{ label: 'Jadwal Saya', href: '/pengawas/jadwal/saya' },
 						{ label: 'Jadwal Semua', href: '/pengawas/jadwal/semua' },
 						{ label: 'Generate Token', href: '/pengawas/tokens' },
-						{ label: 'Monitoring Siswa', href: '/pengawas/monitor' }
+						{ label: 'Monitoring Siswa', href: '/pengawas/monitor' },
+						{ label: 'Reset Login Siswa', href: '/pengawas/reset-login' }
 					]
 				}
 			];

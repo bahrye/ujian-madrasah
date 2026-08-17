@@ -17,6 +17,7 @@ export interface UserPayload {
 	role: 'superadmin' | 'admin' | 'guru' | 'pengawas' | 'siswa' | 'panitia';
 	class_id?: number | null;
 	photo?: string | null;
+	session_token?: string | null;
 }
 
 /**
@@ -115,7 +116,8 @@ export async function verifyToken(token: string): Promise<UserPayload | null> {
 			name: payload.name as string,
 			role: payload.role as UserPayload['role'],
 			class_id: payload.class_id as number | null | undefined,
-			photo: payload.photo as string | null | undefined
+			photo: payload.photo as string | null | undefined,
+			session_token: payload.session_token as string | null | undefined
 		};
 	} catch {
 		return null;

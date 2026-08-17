@@ -1,5 +1,5 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { g as getDB } from "../../../chunks/db.js";
+import { g as getDB, e as ensureUserLoginColumns } from "../../../chunks/db.js";
 import { a as verifyPassword, c as createToken, C as COOKIE_NAME } from "../../../chunks/auth.js";
 const load = async ({ locals }) => {
   if (locals.user) {
@@ -17,6 +17,7 @@ const actions = {
     }
     try {
       const db = getDB(platform);
+      await ensureUserLoginColumns(db);
       const user = await db.prepare("SELECT * FROM users WHERE username = ? AND is_active = 1").bind(username).first();
       if (!user) {
         return fail(401, { error: "Username atau kata sandi salah." });
@@ -25,6 +26,22 @@ const actions = {
       if (!valid) {
         return fail(401, { error: "Username atau kata sandi salah." });
       }
+      let sessionToken = null;
+      if (user.role === "siswa") {
+        if (user.is_logged_in === 1) {
+          return fail(400, {
+            error: `Siswa atas nama "${user.name}" sudah terdeteksi login di perangkat lain. Silahkan meminta Pengawas Ruang untuk me-reset login siswa tersebut.`
+          });
+        }
+        sessionToken = crypto.randomUUID();
+        const userAgent = request.headers.get("user-agent") || "Browser";
+        const cleanDevice = userAgent.length > 120 ? userAgent.substring(0, 120) + "..." : userAgent;
+        await db.prepare(`
+					UPDATE users 
+					SET is_logged_in = 1, session_token = ?, last_active_at = datetime('now'), login_device = ? 
+					WHERE id = ?
+				`).bind(sessionToken, cleanDevice, user.id).run();
+      }
       const token = await createToken({
         id: user.id,
         school_id: user.school_id,
@@ -32,7 +49,8 @@ const actions = {
         username: user.username,
         name: user.name,
         role: user.role,
-        photo: user.photo
+        photo: user.photo,
+        session_token: sessionToken
       });
       cookies.set(COOKIE_NAME, token, {
         path: "/",

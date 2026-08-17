@@ -1,5 +1,5 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { g as getDB, b as ensureStudentAttemptsScoreReleasedColumn } from "../../../../chunks/db.js";
+import { g as getDB, c as ensureStudentAttemptsScoreReleasedColumn } from "../../../../chunks/db.js";
 import { d as deleteFromCloudinary } from "../../../../chunks/cloudinary.js";
 import { b as private_env } from "../../../../chunks/shared-server.js";
 const load = async ({ platform, url, locals }) => {
