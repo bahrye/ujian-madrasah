@@ -6,7 +6,7 @@
 	import ScoreDisplay from '$lib/components/exam/ScoreDisplay.svelte';
 
 	export let data;
-	$: activeExams = (data.activeExams as any[]).filter(exam => {
+	$: activeExams = ((data.activeExams || []) as any[]).filter(exam => {
 		const now = new Date();
 		const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
@@ -20,7 +20,7 @@
 		
 		return true;
 	});
-	$: myAttempts = (data.myAttempts as any[]).filter(a => {
+	$: myAttempts = ((data.myAttempts || []) as any[]).filter(a => {
 		const attemptDate = parseDate(a.created_at);
 		const today = new Date();
 		return attemptDate.getDate() === today.getDate() && 

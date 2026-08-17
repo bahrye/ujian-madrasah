@@ -73,7 +73,7 @@ function _page($$renderer, $$props) {
     }
     const rowColors = ["bg-white", "bg-slate-50"];
     let searchQuery = "";
-    activeExams = data.activeExams.filter((exam) => {
+    activeExams = (data.activeExams || []).filter((exam) => {
       const now = /* @__PURE__ */ new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       if (exam.end_time && parseDate(exam.end_time) <= now) return false;
@@ -84,7 +84,7 @@ function _page($$renderer, $$props) {
       }
       return true;
     });
-    myAttempts = data.myAttempts.filter((a) => {
+    myAttempts = (data.myAttempts || []).filter((a) => {
       const attemptDate = parseDate(a.created_at);
       const today = /* @__PURE__ */ new Date();
       return attemptDate.getDate() === today.getDate() && attemptDate.getMonth() === today.getMonth() && attemptDate.getFullYear() === today.getFullYear();
