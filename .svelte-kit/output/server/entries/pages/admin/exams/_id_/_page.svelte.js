@@ -362,7 +362,7 @@ function _page($$renderer, $$props) {
       }
       $$renderer2.push(`<!--]--></tbody></table></div></form>`);
     }
-    $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden mb-6"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><h2 class="text-lg font-bold text-slate-800">Daftar Soal</h2> <div class="flex items-center gap-2 flex-wrap"><a${attr("href", `/admin/results?exam_id=${stringify(exam.id)}`)} class="btn-sm btn-outline text-emerald-600 border-emerald-200 hover:bg-emerald-50">Analisis Jawaban Siswa</a> <a${attr("href", `/admin/exams/${stringify(exam.id)}/analisis`)} class="btn-sm btn-outline text-indigo-600 border-indigo-200 hover:bg-indigo-50">Analisis Butir Soal</a> <a${attr("href", `/admin/bank-soal/${stringify(exam.id)}`)} class="btn-sm btn-primary">Kelola Soal</a></div></div> `);
+    $$renderer2.push(`<!--]--></div> <div class="card overflow-hidden mb-6"><div class="p-5 border-b border-slate-100 flex items-center justify-between"><h2 class="text-lg font-bold text-slate-800">Daftar Soal</h2> <div class="flex items-center gap-2 flex-wrap"><a${attr("href", `/admin/exams/${stringify(exam.id)}/jawaban-siswa`)} class="btn-sm btn-outline text-emerald-600 border-emerald-200 hover:bg-emerald-50">Analisis Jawaban Siswa</a> <a${attr("href", `/admin/exams/${stringify(exam.id)}/analisis`)} class="btn-sm btn-outline text-indigo-600 border-indigo-200 hover:bg-indigo-50">Analisis Butir Soal</a> <a${attr("href", `/admin/bank-soal/${stringify(exam.id)}`)} class="btn-sm btn-primary">Kelola Soal</a></div></div> `);
     if (questions.length === 0) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div class="p-8 text-center text-slate-400 text-sm">Belum ada soal untuk ujian ini.</div>`);

@@ -137,7 +137,7 @@
 								</svg>
 							</a>
 							<a 
-								href="/admin/results?exam_id={exam.id}" 
+								href="/admin/exams/{exam.id}/jawaban-siswa" 
 								class="btn-sm btn-ghost p-2 hover:bg-emerald-50 rounded-lg text-emerald-600 transition-colors z-10 relative"
 								title="Analisis Jawaban Siswa"
 								on:click|stopPropagation

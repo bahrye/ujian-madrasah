@@ -523,7 +523,7 @@
       "_stores.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.B6yeethd.css"
+      "_app/immutable/assets/_layout.Ci-9MV49.css"
     ],
     "assets": [
       "_app/immutable/assets/KaTeX_AMS-Regular.BQhdFMY1.woff2",
@@ -811,6 +811,26 @@
       "_index.js",
       "_constants.js",
       "_html.js"
+    ]
+  },
+  "src/routes/admin/exams/[id]/jawaban-siswa/+page.server.ts": {
+    "file": "entries/pages/admin/exams/_id_/jawaban-siswa/_page.server.ts.js",
+    "name": "entries/pages/admin/exams/_id_/jawaban-siswa/_page.server.ts",
+    "src": "src/routes/admin/exams/[id]/jawaban-siswa/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js",
+      "_exam.js"
+    ]
+  },
+  "src/routes/admin/exams/[id]/jawaban-siswa/+page.svelte": {
+    "file": "entries/pages/admin/exams/_id_/jawaban-siswa/_page.svelte.js",
+    "name": "entries/pages/admin/exams/_id_/jawaban-siswa/_page.svelte",
+    "src": "src/routes/admin/exams/[id]/jawaban-siswa/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_constants.js"
     ]
   },
   "src/routes/admin/exams/type/[typeId]/+page.server.ts": {
@@ -1492,6 +1512,26 @@
       "_index.js",
       "_constants.js",
       "_html.js"
+    ]
+  },
+  "src/routes/guru/bank-soal/[examId]/jawaban-siswa/+page.server.ts": {
+    "file": "entries/pages/guru/bank-soal/_examId_/jawaban-siswa/_page.server.ts.js",
+    "name": "entries/pages/guru/bank-soal/_examId_/jawaban-siswa/_page.server.ts",
+    "src": "src/routes/guru/bank-soal/[examId]/jawaban-siswa/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js",
+      "_exam.js"
+    ]
+  },
+  "src/routes/guru/bank-soal/[examId]/jawaban-siswa/+page.svelte": {
+    "file": "entries/pages/guru/bank-soal/_examId_/jawaban-siswa/_page.svelte.js",
+    "name": "entries/pages/guru/bank-soal/_examId_/jawaban-siswa/_page.svelte",
+    "src": "src/routes/guru/bank-soal/[examId]/jawaban-siswa/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_constants.js"
     ]
   },
   "src/routes/guru/bank-soal/[examId]/preview/+page.server.ts": {

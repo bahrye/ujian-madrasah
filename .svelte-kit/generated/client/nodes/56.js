@@ -1,1 +1,1 @@
-export { default as component } from "../../../../src/routes/print/analisis/[examId]/+page.svelte";
+export { default as component } from "../../../../src/routes/pengawas/tata-tertib/+page.svelte";

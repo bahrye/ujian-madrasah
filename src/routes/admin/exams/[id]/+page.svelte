@@ -517,7 +517,7 @@
 		<div class="p-5 border-b border-slate-100 flex items-center justify-between">
 			<h2 class="text-lg font-bold text-slate-800">Daftar Soal</h2>
 			<div class="flex items-center gap-2 flex-wrap">
-				<a href="/admin/results?exam_id={exam.id}" class="btn-sm btn-outline text-emerald-600 border-emerald-200 hover:bg-emerald-50">Analisis Jawaban Siswa</a>
+				<a href="/admin/exams/{exam.id}/jawaban-siswa" class="btn-sm btn-outline text-emerald-600 border-emerald-200 hover:bg-emerald-50">Analisis Jawaban Siswa</a>
 				<a href="/admin/exams/{exam.id}/analisis" class="btn-sm btn-outline text-indigo-600 border-indigo-200 hover:bg-indigo-50">Analisis Butir Soal</a>
 				<a href="/admin/bank-soal/{exam.id}" class="btn-sm btn-primary">Kelola Soal</a>
 			</div>

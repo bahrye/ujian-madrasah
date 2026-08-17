@@ -55,6 +55,11 @@
 		"src/routes/admin/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/admin/exams/[id]/jawaban-siswa": [
+		"src/routes/admin/exams/[id]/jawaban-siswa/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/admin/media-bank": [
 		"src/routes/admin/media-bank/+page.server.ts",
 		"src/routes/admin/+layout.server.ts",
@@ -198,6 +203,11 @@
 	],
 	"/guru/bank-soal/[examId]/analisis": [
 		"src/routes/guru/bank-soal/[examId]/analisis/+page.server.ts",
+		"src/routes/guru/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/guru/bank-soal/[examId]/jawaban-siswa": [
+		"src/routes/guru/bank-soal/[examId]/jawaban-siswa/+page.server.ts",
 		"src/routes/guru/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],

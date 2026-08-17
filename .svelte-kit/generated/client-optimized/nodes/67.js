@@ -1,1 +1,1 @@
-export { default as component } from "../../../../src/routes/siswa/hasil-ujian/+page.svelte";
+export { default as component } from "../../../../src/routes/print/results/[attemptId]/+page.svelte";

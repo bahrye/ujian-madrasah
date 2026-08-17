@@ -1,1 +1,1 @@
-export { default as component } from "../../../../src/routes/pengawas/tokens/+page.svelte";
+export { default as component } from "../../../../src/routes/pengawas/reset-login/+page.svelte";

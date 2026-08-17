@@ -1,1 +1,1 @@
-export { default as component } from "../../../../src/routes/guru/papan-peringkat/type/[typeId]/exams/+page.svelte";
+export { default as component } from "../../../../src/routes/guru/papan-peringkat/+page.svelte";
