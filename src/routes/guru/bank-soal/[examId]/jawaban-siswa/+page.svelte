@@ -521,7 +521,7 @@
 					Tidak ada soal yang memenuhi kriteria filter ini.
 				</div>
 			{:else}
-				<div class="space-y-3" use:mathRender={filteredDiagnostics} use:arabicRender={filteredDiagnostics}>
+				<div class="space-y-3">
 					{#each filteredDiagnostics as q (q.id)}
 						<div class="card overflow-hidden border transition-all duration-200 {q.wrongPercentage >= 50 ? 'border-rose-200 bg-rose-50/10' : 'border-slate-200 bg-white'}">
 							<div class="p-3.5 sm:p-5 flex flex-col md:flex-row items-start justify-between gap-3.5 sm:gap-4">
@@ -551,7 +551,11 @@
 									</div>
 
 									<!-- Question Text -->
-									<div class="text-xs sm:text-sm text-slate-800 leading-relaxed font-medium mb-3 prose prose-sm max-w-none overflow-x-auto">
+									<div 
+										class="text-xs sm:text-sm text-slate-800 leading-relaxed font-medium mb-3 prose prose-sm max-w-none overflow-x-auto"
+										use:mathRender={q.raw_text} 
+										use:arabicRender={q.raw_text}
+									>
 										{@html q.raw_text}
 									</div>
 
