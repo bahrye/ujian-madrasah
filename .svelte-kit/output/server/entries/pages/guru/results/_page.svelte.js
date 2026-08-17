@@ -1,5 +1,6 @@
 import { h as head, i as ensure_array_like, e as escape_html, k as attr, j as attr_class, l as clsx, c as stringify, f as bind_props } from "../../../../chunks/index.js";
 import { p as parseDate } from "../../../../chunks/date.js";
+import { o as onDestroy } from "../../../../chunks/index-server.js";
 import "@sveltejs/kit/internal";
 import "../../../../chunks/exports.js";
 import "../../../../chunks/utils2.js";
@@ -10,14 +11,35 @@ import { A as ATTEMPT_STATUS_COLORS, a as ATTEMPT_STATUS_LABELS } from "../../..
 import { t as toasts } from "../../../../chunks/toast.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
-    let results, selectedExam, isManualExamSelected, showStatusColumn;
+    let results, selectedExam, isManualExamSelected;
     let data = $$props["data"];
     let form = $$props["form"];
+    let currentTime = /* @__PURE__ */ new Date();
+    onDestroy(() => {
+    });
+    function isAttemptScoreReleased(r, now) {
+      if (r.is_score_released === 1) return true;
+      const type = r.show_score_type || "after_submit";
+      if (type === "after_submit" || type === "objective_only") return true;
+      if (type === "manual") return false;
+      if (type === "after_end_time") {
+        if (!r.exam_end_time) return false;
+        const str = String(r.exam_end_time).replace(" ", "T");
+        const end = (/* @__PURE__ */ new Date(str + (str.includes("T") && !str.includes("Z") ? "Z" : ""))).getTime();
+        return now.getTime() >= end;
+      }
+      if (type === "after_type_end_time") {
+        if (!r.exam_type_end_time) return false;
+        const str = String(r.exam_type_end_time).replace(" ", "T");
+        const end = (/* @__PURE__ */ new Date(str + (str.includes("T") && !str.includes("Z") ? "Z" : ""))).getTime();
+        return now.getTime() >= end;
+      }
+      return true;
+    }
     let isExporting = false;
     results = data.results;
     selectedExam = data.exams.find((e) => String(e.id) === String(data.examFilter));
     isManualExamSelected = selectedExam ? selectedExam.show_score_type === "manual" : false;
-    showStatusColumn = Boolean(data.examFilter) && isManualExamSelected;
     if (form?.error) toasts.error(form.error);
     if (form?.released === true) toasts.success("Nilai siswa berhasil dikirim ke siswa!");
     if (form?.released === false) toasts.success("Kirim nilai berhasil dibatalkan!");
@@ -70,43 +92,23 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<div class="p-12 text-center text-slate-400">Belum ada hasil ujian.</div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Siswa</th><th>Ujian</th><th>Mapel</th><th>Nilai</th><th>Status Ujian</th>`);
-      if (showStatusColumn) {
-        $$renderer2.push("<!--[0-->");
-        $$renderer2.push(`<th class="whitespace-nowrap text-xs">Status Nilai</th>`);
-      } else {
-        $$renderer2.push("<!--[-1-->");
-      }
-      $$renderer2.push(`<!--]--><th>Waktu Selesai</th><th class="w-24 text-center">Aksi</th></tr></thead><tbody><!--[-->`);
+      $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Siswa</th><th>Ujian</th><th>Mapel</th><th>Nilai</th><th>Status Ujian</th><th class="whitespace-nowrap text-xs">Status Nilai</th><th>Waktu Selesai</th><th class="w-24 text-center">Aksi</th></tr></thead><tbody><!--[-->`);
       const each_array_1 = ensure_array_like(results);
       for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
         let r = each_array_1[$$index_1];
         const isComplete = r.is_graded === 1 || r.ungraded_count === 0;
         const isManual = r.show_score_type === "manual";
-        $$renderer2.push(`<tr><td class="font-semibold text-slate-800">${escape_html(r.student_name)}</td><td>${escape_html(r.exam_title)}</td><td class="text-slate-500">${escape_html(r.subject || "-")}</td><td><span${attr_class(`text-lg font-bold ${(r.score ?? 0) >= 70 ? "text-emerald-600" : "text-rose-600"}`)}>${escape_html(r.score != null ? r.score.toFixed(1) : "-")}</span></td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[r.status] || "badge-info"))}>${escape_html(ATTEMPT_STATUS_LABELS[r.status])}</span></td>`);
-        if (showStatusColumn) {
+        const released = isAttemptScoreReleased(r, currentTime);
+        $$renderer2.push(`<tr><td class="font-semibold text-slate-800">${escape_html(r.student_name)}</td><td>${escape_html(r.exam_title)}</td><td class="text-slate-500">${escape_html(r.subject || "-")}</td><td><span${attr_class(`text-lg font-bold ${(r.score ?? 0) >= 70 ? "text-emerald-600" : "text-rose-600"}`)}>${escape_html(r.score != null ? r.score.toFixed(1) : "-")}</span></td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[r.status] || "badge-info"))}>${escape_html(ATTEMPT_STATUS_LABELS[r.status])}</span></td><td class="whitespace-nowrap text-xs">`);
+        if (released) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<td class="whitespace-nowrap text-xs">`);
-          if (isManual) {
-            $$renderer2.push("<!--[0-->");
-            if (r.is_score_released === 1) {
-              $$renderer2.push("<!--[0-->");
-              $$renderer2.push(`<span class="badge-success text-[11px] whitespace-nowrap px-2 py-0.5 font-medium">🟢 Terkirim</span>`);
-            } else {
-              $$renderer2.push("<!--[-1-->");
-              $$renderer2.push(`<span class="badge-error text-[11px] whitespace-nowrap px-2 py-0.5 font-medium">🔴 Belum Terkirim</span>`);
-            }
-            $$renderer2.push(`<!--]-->`);
-          } else {
-            $$renderer2.push("<!--[-1-->");
-            $$renderer2.push(`<span class="text-slate-400 text-xs">-</span>`);
-          }
-          $$renderer2.push(`<!--]--></td>`);
+          $$renderer2.push(`<span class="badge-success text-[11px] whitespace-nowrap px-2 py-0.5 font-medium">🟢 Terkirim</span>`);
         } else {
           $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<span class="badge-error text-[11px] whitespace-nowrap px-2 py-0.5 font-medium">🔴 Belum Terkirim</span>`);
         }
-        $$renderer2.push(`<!--]--><td class="text-xs text-slate-500">${escape_html(r.submit_time ? parseDate(r.submit_time).toLocaleString("id-ID") : "-")}</td><td class="text-center"><div class="flex items-center justify-center gap-1.5">`);
-        if (showStatusColumn && isManual) {
+        $$renderer2.push(`<!--]--></td><td class="text-xs text-slate-500">${escape_html(r.submit_time ? parseDate(r.submit_time).toLocaleString("id-ID") : "-")}</td><td class="text-center"><div class="flex items-center justify-center gap-1.5">`);
+        if (isManual) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<form method="POST" action="?/toggleRelease" class="inline-block"><input type="hidden" name="attempt_id"${attr("value", r.id)}/> `);
           if (r.is_score_released === 1) {

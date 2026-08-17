@@ -25,11 +25,12 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 		          AND q.type IN ('essay', 'isian') 
 		          AND ans.is_correct IS NULL
 		       ) as ungraded_count,
-		       u.name as student_name, e.title as exam_title, s.name as subject, e.show_score_type
+		       u.name as student_name, e.title as exam_title, s.name as subject, e.show_score_type, e.end_time as exam_end_time, et.end_time as exam_type_end_time
 		FROM student_attempts sa
 		JOIN users u ON sa.student_id = u.id
 		JOIN exams e ON sa.exam_id = e.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
+		LEFT JOIN exam_types et ON e.exam_type_id = et.id
 		WHERE sa.status IN ('selesai', 'waktu_habis') AND e.school_id = ?
 	`;
 	const params: any[] = [locals.user.school_id];

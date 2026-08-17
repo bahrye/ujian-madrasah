@@ -4,6 +4,7 @@
 	import { ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS } from '$lib/utils/constants';
 	import { exportExamResults } from '$lib/utils/excel';
 	import { toasts } from '$lib/stores/toast';
+	import { onMount, onDestroy } from 'svelte';
 
 	export let data;
 	export let form: any;
@@ -11,7 +12,39 @@
 	$: results = data.results as any[];
 	$: selectedExam = data.exams.find((e: any) => String(e.id) === String(data.examFilter));
 	$: isManualExamSelected = selectedExam ? selectedExam.show_score_type === 'manual' : false;
-	$: showStatusColumn = Boolean(data.examFilter) && isManualExamSelected;
+
+	let currentTime = new Date();
+	let timer: any;
+
+	onMount(() => {
+		timer = setInterval(() => {
+			currentTime = new Date();
+		}, 1000);
+	});
+
+	onDestroy(() => {
+		if (timer) clearInterval(timer);
+	});
+
+	function isAttemptScoreReleased(r: any, now: Date) {
+		if (r.is_score_released === 1) return true;
+		const type = r.show_score_type || 'after_submit';
+		if (type === 'after_submit' || type === 'objective_only') return true;
+		if (type === 'manual') return false;
+		if (type === 'after_end_time') {
+			if (!r.exam_end_time) return false;
+			const str = String(r.exam_end_time).replace(' ', 'T');
+			const end = new Date(str + (str.includes('T') && !str.includes('Z') ? 'Z' : '')).getTime();
+			return now.getTime() >= end;
+		}
+		if (type === 'after_type_end_time') {
+			if (!r.exam_type_end_time) return false;
+			const str = String(r.exam_type_end_time).replace(' ', 'T');
+			const end = new Date(str + (str.includes('T') && !str.includes('Z') ? 'Z' : '')).getTime();
+			return now.getTime() >= end;
+		}
+		return true;
+	}
 
 	$: if (form?.error) toasts.error(form.error);
 	$: if (form?.released === true) toasts.success('Nilai siswa berhasil dikirim ke siswa!');
@@ -95,9 +128,7 @@
 							<th>Mapel</th>
 							<th>Nilai</th>
 							<th>Status Ujian</th>
-							{#if showStatusColumn}
-								<th class="whitespace-nowrap text-xs">Status Nilai</th>
-							{/if}
+							<th class="whitespace-nowrap text-xs">Status Nilai</th>
 							<th>Waktu Selesai</th>
 							<th class="w-24 text-center">Aksi</th>
 						</tr>
@@ -106,6 +137,7 @@
 						{#each results as r}
 							{@const isComplete = r.is_graded === 1 || r.ungraded_count === 0}
 							{@const isManual = r.show_score_type === 'manual'}
+							{@const released = isAttemptScoreReleased(r, currentTime)}
 							<tr>
 								<td class="font-semibold text-slate-800">{r.student_name}</td>
 								<td>{r.exam_title}</td>
@@ -116,23 +148,17 @@
 									</span>
 								</td>
 								<td><span class={ATTEMPT_STATUS_COLORS[r.status] || 'badge-info'}>{ATTEMPT_STATUS_LABELS[r.status]}</span></td>
-								{#if showStatusColumn}
-									<td class="whitespace-nowrap text-xs">
-										{#if isManual}
-											{#if r.is_score_released === 1}
-												<span class="badge-success text-[11px] whitespace-nowrap px-2 py-0.5 font-medium">🟢 Terkirim</span>
-											{:else}
-												<span class="badge-error text-[11px] whitespace-nowrap px-2 py-0.5 font-medium">🔴 Belum Terkirim</span>
-											{/if}
-										{:else}
-											<span class="text-slate-400 text-xs">-</span>
-										{/if}
-									</td>
-								{/if}
+								<td class="whitespace-nowrap text-xs">
+									{#if released}
+										<span class="badge-success text-[11px] whitespace-nowrap px-2 py-0.5 font-medium">🟢 Terkirim</span>
+									{:else}
+										<span class="badge-error text-[11px] whitespace-nowrap px-2 py-0.5 font-medium">🔴 Belum Terkirim</span>
+									{/if}
+								</td>
 								<td class="text-xs text-slate-500">{r.submit_time ? parseDate(r.submit_time).toLocaleString('id-ID') : '-'}</td>
 								<td class="text-center">
 									<div class="flex items-center justify-center gap-1.5">
-										{#if showStatusColumn && isManual}
+										{#if isManual}
 											<form method="POST" action="?/toggleRelease" use:enhance class="inline-block">
 												<input type="hidden" name="attempt_id" value={r.id} />
 												{#if r.is_score_released === 1}
