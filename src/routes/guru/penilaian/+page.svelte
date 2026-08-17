@@ -36,7 +36,7 @@
 	<div class="card p-4 flex flex-col md:flex-row items-center gap-3">
 		<form method="GET" class="flex flex-col md:flex-row items-center gap-3 flex-1 w-full">
 			<select name="exam_id" class="select flex-1 w-full" on:change={(e) => {
-				const studentSelect = e.currentTarget.form?.querySelector<HTMLSelectElement>('select[name="student_id"]');
+				const studentSelect = e.currentTarget.form?.querySelector('select[name="student_id"]') as any;
 				if (studentSelect) studentSelect.value = '';
 				e.currentTarget.form?.submit();
 			}}>
@@ -60,12 +60,22 @@
 		{#if data.examParam !== null}
 			{@const currentStudent = data.students.find(s => String(s.id) === String(data.studentFilter))}
 			{@const isCurrentLocked = currentStudent ? currentStudent.is_locked : (data.students.length > 0 && data.students.every(s => s.is_locked))}
+			{@const isAllStudentsSelected = !data.studentFilter || data.studentFilter === ''}
+			{@const hasUngradedStudents = data.students.some(s => !s.is_graded)}
+			{@const isButtonDisabled = isAllStudentsSelected && hasUngradedStudents}
 			
 			<form method="POST" action={isCurrentLocked ? `?/unlockGrading&exam_id=${data.examParam}&student_id=${data.studentFilter}` : `?/finalizeGrading&exam_id=${data.examParam}&student_id=${data.studentFilter}`} use:enhance class="w-full md:w-auto flex-shrink-0">
 				<input type="hidden" name="exam_id" value={data.examParam} />
 				<input type="hidden" name="student_id" value={data.studentFilter} />
 				
-				{#if isCurrentLocked}
+				{#if isButtonDisabled}
+					<button type="button" disabled class="btn bg-slate-200 text-slate-400 border border-slate-200 cursor-not-allowed font-semibold text-sm transition-all flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl w-full md:w-auto" title="Semua siswa harus dinilai terlebih dahulu sebelum dapat mengunci/membatalkan penilaian secara bersamaan">
+						<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+						</svg>
+						Kunci Penilaian
+					</button>
+				{:else if isCurrentLocked}
 					<button type="submit" class="btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 font-semibold text-sm transition-all shadow-sm flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl w-full md:w-auto">
 						<svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
