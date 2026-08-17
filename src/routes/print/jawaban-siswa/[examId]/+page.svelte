@@ -71,11 +71,11 @@
 		}
 
 		if (Array.isArray(parsed)) {
-			return parsed.map(item => String(item).trim().toUpperCase()).join(', ');
+			return parsed.map(item => String(item).trim().toUpperCase()).join(',');
 		}
 
 		if (typeof parsed === 'object' && parsed !== null) {
-			return Object.entries(parsed).map(([k, v]) => `${k}:${v}`).join(', ');
+			return Object.entries(parsed).map(([k, v]) => `${k}:${v}`).join(',');
 		}
 
 		if (type === 'benar_salah') {

@@ -68,11 +68,11 @@
 		}
 
 		if (Array.isArray(parsed)) {
-			return parsed.map(item => String(item).trim().toUpperCase()).join(', ');
+			return parsed.map(item => String(item).trim().toUpperCase()).join(',');
 		}
 
 		if (typeof parsed === 'object' && parsed !== null) {
-			return Object.entries(parsed).map(([k, v]) => `${k}:${v}`).join(', ');
+			return Object.entries(parsed).map(([k, v]) => `${k}:${v}`).join(',');
 		}
 
 		if (type === 'benar_salah') {
@@ -420,7 +420,7 @@
 								<th class="w-14 sm:w-20 text-center border-r border-slate-300 px-1 py-2 text-[10px] sm:text-xs">Kelas</th>
 								<th class="w-12 sm:w-16 text-center border-r border-slate-300 px-1 py-2 text-[10px] sm:text-xs">Nilai</th>
 								{#each questions as q, idx}
-									<th class="w-7 sm:w-10 min-w-[26px] sm:min-w-[34px] text-center border-r border-slate-200 px-0.5 sm:px-1 py-2 font-mono hover:bg-slate-200 cursor-pointer text-[10px] sm:text-xs" title="Soal #{q.question_number} ({q.type})">
+									<th class="w-8 sm:w-11 min-w-[32px] sm:min-w-[40px] text-center border-r border-slate-200 px-0.5 sm:px-1 py-2 font-mono hover:bg-slate-200 cursor-pointer text-[10px] sm:text-xs whitespace-nowrap" title="Soal #{q.question_number} ({q.type})">
 										S{q.question_number || idx + 1}
 									</th>
 								{/each}
@@ -467,15 +467,15 @@
 										{@const ans = answerMatrixMap[`${att.id}_${q.id}`]}
 										{@const displayAns = formatAnswerDisplay(q.type, ans?.answer_given)}
 										{#if !ans || ans.answer_given == null || ans.answer_given === ''}
-											<td class="text-center p-0.5 sm:p-1 border-r border-slate-100 bg-slate-50 text-slate-400 text-[9px] sm:text-[10px] min-w-[26px] sm:min-w-[34px]" title="Tidak Menjawab">
+											<td class="text-center p-0.5 sm:p-1 border-r border-slate-100 bg-slate-50 text-slate-400 text-[9px] sm:text-[10px] min-w-[32px] sm:min-w-[40px] whitespace-nowrap" title="Tidak Menjawab">
 												-
 											</td>
 										{:else if ans.is_correct === 1 || ans.is_correct === true}
-											<td class="text-center p-0.5 sm:p-1 border-r border-slate-100 bg-emerald-50 text-emerald-700 font-bold text-[10px] sm:text-[11px] min-w-[26px] sm:min-w-[34px]" title="Benar: {ans.answer_given}">
+											<td class="text-center p-0.5 sm:p-1 border-r border-slate-100 bg-emerald-50 text-emerald-700 font-bold text-[10px] sm:text-[11px] min-w-[32px] sm:min-w-[40px] whitespace-nowrap" title="Benar: {ans.answer_given}">
 												{displayAns}
 											</td>
 										{:else}
-											<td class="text-center p-0.5 sm:p-1 border-r border-slate-100 bg-rose-50 text-rose-700 font-bold text-[9px] sm:text-[10px] min-w-[26px] sm:min-w-[34px]" title="Salah (Siswa: {ans.answer_given})">
+											<td class="text-center p-0.5 sm:p-1 border-r border-slate-100 bg-rose-50 text-rose-700 font-bold text-[9px] sm:text-[10px] min-w-[32px] sm:min-w-[40px] whitespace-nowrap" title="Salah (Siswa: {ans.answer_given})">
 												{displayAns}
 											</td>
 										{/if}
@@ -498,7 +498,7 @@
 										<td class="text-center border-r border-indigo-200 bg-indigo-50/90 py-1 text-indigo-300 font-mono text-[10px]">-</td>
 										{#each questions as q}
 											{@const diag = questionDiagnostics.find(d => d.id === q.id)}
-											<td class="text-center p-0.5 sm:p-1 border-r border-indigo-200 bg-indigo-50/80 font-bold text-indigo-900 text-[10px] sm:text-[11px] min-w-[26px] sm:min-w-[34px]" title="Kunci Soal #{q.question_number}: {diag?.correctKey || '-'}">
+											<td class="text-center p-0.5 sm:p-1 border-r border-indigo-200 bg-indigo-50/80 font-bold text-indigo-900 text-[10px] sm:text-[11px] min-w-[32px] sm:min-w-[40px] whitespace-nowrap" title="Kunci Soal #{q.question_number}: {diag?.correctKey || '-'}">
 												{diag?.correctKey || '-'}
 											</td>
 										{/each}
