@@ -1,4 +1,4 @@
-import { g as getDB, b as ensureProctorRoleColumn, a as ensureExamTypeProctorsTable } from "../../../../../chunks/db.js";
+import { g as getDB } from "../../../../../chunks/db.js";
 import { error } from "@sveltejs/kit";
 const load = async ({ platform, params, locals }) => {
   const db = getDB(platform);
@@ -44,8 +44,6 @@ const load = async ({ platform, params, locals }) => {
       sessionMap[s.session_number] = s;
     }
   }
-  await ensureProctorRoleColumn(db);
-  await ensureExamTypeProctorsTable(db);
   const assignedProctorsRes = await db.prepare(`
 		SELECT DISTINCT u.id, u.name, u.nip, u.role, COALESCE(ep.proctor_role, 'p1') as proctor_role
 		FROM exam_proctors ep

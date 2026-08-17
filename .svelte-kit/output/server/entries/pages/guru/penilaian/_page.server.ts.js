@@ -1,8 +1,7 @@
 import { fail } from "@sveltejs/kit";
-import { g as getDB, h as ensureStudentAttemptsGradedColumn } from "../../../../chunks/db.js";
+import { g as getDB } from "../../../../chunks/db.js";
 const load = async ({ platform, url, locals }) => {
   const db = getDB(platform);
-  await ensureStudentAttemptsGradedColumn(db);
   const examParam = url.searchParams.get("exam_id");
   const studentFilterStr = url.searchParams.get("student_id") || "";
   const studentFilter = parseInt(studentFilterStr, 10);
@@ -81,7 +80,6 @@ const actions = {
   grade: async ({ request, platform, locals }) => {
     if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
-    await ensureStudentAttemptsGradedColumn(db);
     const form = await request.formData();
     const answerIdStr = form.get("answer_id")?.toString();
     const parsedAnswerId = parseInt(answerIdStr || "", 10);
@@ -125,7 +123,6 @@ const actions = {
   finalizeGrading: async ({ request, platform, locals }) => {
     if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
-    await ensureStudentAttemptsGradedColumn(db);
     const form = await request.formData();
     const examIdStr = form.get("exam_id")?.toString();
     const studentIdStr = form.get("student_id")?.toString();
@@ -189,7 +186,6 @@ const actions = {
   unlockGrading: async ({ request, platform, locals }) => {
     if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
-    await ensureStudentAttemptsGradedColumn(db);
     const form = await request.formData();
     const examIdStr = form.get("exam_id")?.toString();
     const studentIdStr = form.get("student_id")?.toString();

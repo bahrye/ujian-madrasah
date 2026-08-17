@@ -1,9 +1,8 @@
 import { json } from "@sveltejs/kit";
-import { g as getDB, a as ensureExamTypeProctorsTable } from "../../../../chunks/db.js";
+import { g as getDB } from "../../../../chunks/db.js";
 const GET = async ({ url, platform, locals }) => {
   if (!locals.user) return json({ error: "Unauthorized" }, { status: 401 });
   const db = getDB(platform);
-  await ensureExamTypeProctorsTable(db);
   const examTypeIdStr = url.searchParams.get("exam_type_id");
   const examTypeId = parseInt(examTypeIdStr || "", 10);
   if (isNaN(examTypeId)) return json({ error: "Invalid ID" }, { status: 400 });

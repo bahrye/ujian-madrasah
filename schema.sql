@@ -190,12 +190,15 @@ CREATE TABLE IF NOT EXISTS student_attempts (
     is_paused INTEGER NOT NULL DEFAULT 0,
     paused_at TEXT,
     signature TEXT,
+    is_graded INTEGER NOT NULL DEFAULT 0,
+    is_score_released INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_attempts_student ON student_attempts(student_id);
 CREATE INDEX IF NOT EXISTS idx_attempts_exam ON student_attempts(exam_id);
 CREATE INDEX IF NOT EXISTS idx_attempts_exam_student ON student_attempts(exam_id, student_id);
 CREATE INDEX IF NOT EXISTS idx_attempts_status ON student_attempts(status);
+CREATE INDEX IF NOT EXISTS idx_attempts_student_status ON student_attempts(student_id, status);
 
 -- 13. Tabel Jawaban Siswa
 CREATE TABLE IF NOT EXISTS student_answers (
@@ -244,6 +247,7 @@ CREATE TABLE IF NOT EXISTS exam_proctors (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	exam_id INTEGER NOT NULL,
 	proctor_id INTEGER NOT NULL,
+	proctor_role TEXT DEFAULT 'p1',
 	room_id INTEGER REFERENCES exam_rooms(id) ON DELETE SET NULL,
 	sessions TEXT,
 	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -253,6 +257,17 @@ CREATE TABLE IF NOT EXISTS exam_proctors (
 );
 CREATE INDEX IF NOT EXISTS idx_exam_proctors_exam ON exam_proctors(exam_id);
 CREATE INDEX IF NOT EXISTS idx_exam_proctors_proctor ON exam_proctors(proctor_id);
+
+-- 16b. Tabel Pengawas per Tipe Ujian
+CREATE TABLE IF NOT EXISTS exam_type_proctors (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    exam_type_id INTEGER NOT NULL REFERENCES exam_types(id) ON DELETE CASCADE,
+    proctor_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    proctor_role TEXT DEFAULT 'pt',
+    UNIQUE(exam_type_id, proctor_id)
+);
+CREATE INDEX IF NOT EXISTS idx_exam_type_proctors_type ON exam_type_proctors(exam_type_id);
+CREATE INDEX IF NOT EXISTS idx_exam_type_proctors_proctor ON exam_type_proctors(proctor_id);
 
 -- 17. Tabel Pelacak Media (Media Logs / Orphan Tracker)
 CREATE TABLE IF NOT EXISTS uploaded_media (
@@ -268,3 +283,7 @@ CREATE TABLE IF NOT EXISTS uploaded_media (
 CREATE INDEX IF NOT EXISTS idx_uploaded_media_url ON uploaded_media(url);
 CREATE INDEX IF NOT EXISTS idx_uploaded_media_school ON uploaded_media(school_id);
 CREATE INDEX IF NOT EXISTS idx_uploaded_media_school_public ON uploaded_media(school_id, is_public);
+
+-- Additional High Performance Indexes
+CREATE INDEX IF NOT EXISTS idx_questions_exam_number ON questions(exam_id, question_number);
+CREATE INDEX IF NOT EXISTS idx_users_username_active ON users(username, is_active);

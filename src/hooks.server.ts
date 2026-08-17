@@ -1,6 +1,6 @@
 import { type Handle } from '@sveltejs/kit';
 import { verifyToken, COOKIE_NAME } from '$lib/server/auth';
-import { getDB, ensureUserLoginColumns } from '$lib/server/db';
+import { getDB } from '$lib/server/db';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const token = event.cookies.get(COOKIE_NAME);
@@ -11,7 +11,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 			if (user.role === 'siswa' && user.session_token) {
 				try {
 					const db = getDB(event.platform);
-					await ensureUserLoginColumns(db);
 					const dbUser = await db.prepare('SELECT is_logged_in, session_token FROM users WHERE id = ?')
 						.bind(user.id)
 						.first<{ is_logged_in: number; session_token: string | null }>();
@@ -23,8 +22,15 @@ export const handle: Handle = async ({ event, resolve }) => {
 						return resolve(event);
 					}
 
-					// Update active timestamp asynchronously
-					db.prepare(`UPDATE users SET last_active_at = datetime('now') WHERE id = ?`).bind(user.id).run().catch(() => {});
+					// Update active timestamp in background without blocking response
+					const updatePromise = db.prepare(`UPDATE users SET last_active_at = datetime('now') WHERE id = ?`)
+						.bind(user.id)
+						.run()
+						.catch(() => {});
+
+					if (event.platform?.context?.waitUntil) {
+						event.platform.context.waitUntil(updatePromise);
+					}
 				} catch (e) {
 					// Fallback if db is unavailable
 				}
@@ -39,4 +45,5 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	return resolve(event);
 };
+
 

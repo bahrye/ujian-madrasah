@@ -1,5 +1,5 @@
 import { json } from "@sveltejs/kit";
-import { g as getDB, f as dbRun } from "../../../../chunks/db.js";
+import { g as getDB, d as dbRun } from "../../../../chunks/db.js";
 const GET = async ({ platform }) => {
   try {
     const db2 = getDB(platform);

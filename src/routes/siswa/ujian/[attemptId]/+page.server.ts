@@ -1,6 +1,6 @@
 import { fail, redirect, error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getDB, ensureStudentAnswersUniqueIndex } from '$lib/server/db';
+import { getDB } from '$lib/server/db';
 import { verifyExamTokenSignature } from '$lib/server/auth';
 
 import { formatExamTitle } from '$lib/utils/exam';
@@ -8,7 +8,6 @@ import { formatExamTitle } from '$lib/utils/exam';
 export const load: PageServerLoad = async ({ platform, locals, params, cookies }) => {
 	if (!locals.user) throw redirect(302, '/login');
 	const db = getDB(platform);
-	await ensureStudentAnswersUniqueIndex(db);
 	const attemptIdStr = params.attemptId;
 	const parsedAttemptId = parseInt(attemptIdStr, 10);
 	if (isNaN(parsedAttemptId)) throw error(400, 'ID Ujian tidak valid');
@@ -142,7 +141,6 @@ export const actions: Actions = {
 	saveAnswer: async ({ request, platform, params, locals, cookies }) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
-		await ensureStudentAnswersUniqueIndex(db);
 
 		const attemptIdStr = params.attemptId;
 		const parsedAttemptId = parseInt(attemptIdStr, 10);
@@ -222,7 +220,6 @@ export const actions: Actions = {
 	submit: async ({ request, platform, params, locals, cookies }) => {
 		if (!locals.user) return fail(401, { error: 'Sesi telah berakhir. Silakan login kembali.' });
 		const db = getDB(platform);
-		await ensureStudentAnswersUniqueIndex(db);
 		const attemptIdStr = params.attemptId;
 		const parsedAttemptId = parseInt(attemptIdStr, 10);
 		if (isNaN(parsedAttemptId)) return fail(400, { error: 'ID tidak valid' });

@@ -1,8 +1,7 @@
 import { fail } from "@sveltejs/kit";
-import { g as getDB, a as ensureExamTypeProctorsTable } from "../../../../chunks/db.js";
+import { g as getDB } from "../../../../chunks/db.js";
 const load = async ({ platform, locals }) => {
   const db = getDB(platform);
-  await ensureExamTypeProctorsTable(db);
   const examTypes = await db.prepare(`
 		SELECT et.*, 
 			(SELECT COUNT(*) FROM exams WHERE exam_type_id = et.id) as exam_count,
@@ -223,7 +222,6 @@ const actions = {
   },
   addTypeProctor: async ({ request, platform, locals }) => {
     const db = getDB(platform);
-    await ensureExamTypeProctorsTable(db);
     const form = await request.formData();
     const examTypeIdStr = form.get("exam_type_id")?.toString();
     const proctorIdStr = form.get("proctor_id")?.toString();
@@ -244,7 +242,6 @@ const actions = {
   },
   removeTypeProctor: async ({ request, platform, locals }) => {
     const db = getDB(platform);
-    await ensureExamTypeProctorsTable(db);
     const form = await request.formData();
     const idStr = form.get("id")?.toString();
     const id = parseInt(idStr || "", 10);

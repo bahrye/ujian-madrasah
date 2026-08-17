@@ -1,12 +1,11 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { g as getDB, c as ensureStudentAttemptsScoreReleasedColumn } from "../../../../chunks/db.js";
+import { g as getDB } from "../../../../chunks/db.js";
 import { d as deleteFromCloudinary } from "../../../../chunks/cloudinary.js";
 import { b as private_env } from "../../../../chunks/shared-server.js";
 import { f as formatExamTitle } from "../../../../chunks/exam.js";
 const load = async ({ platform, url, locals }) => {
   if (!locals.user) throw redirect(302, "/login");
   const db = getDB(platform);
-  await ensureStudentAttemptsScoreReleasedColumn(db);
   const examFilterStr = url.searchParams.get("exam_id") || "";
   const examFilter = parseInt(examFilterStr, 10);
   const examsRes = await db.prepare(`
@@ -74,7 +73,6 @@ const actions = {
   toggleRelease: async ({ request, platform, locals }) => {
     if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
-    await ensureStudentAttemptsScoreReleasedColumn(db);
     const form = await request.formData();
     const attemptId = parseInt(form.get("attempt_id")?.toString() || "", 10);
     if (isNaN(attemptId)) return fail(400, { error: "ID tidak valid" });
@@ -97,7 +95,6 @@ const actions = {
   releaseAll: async ({ request, platform, locals }) => {
     if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
-    await ensureStudentAttemptsScoreReleasedColumn(db);
     const form = await request.formData();
     const examId = parseInt(form.get("exam_id")?.toString() || "", 10);
     if (isNaN(examId)) return fail(400, { error: "Pilih ujian terlebih dahulu" });

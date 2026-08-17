@@ -1,13 +1,12 @@
 // @ts-nocheck
 import type { PageServerLoad, Actions } from './$types';
-import { getDB, ensureProctorRoleColumn } from '$lib/server/db';
+import { getDB } from '$lib/server/db';
 import { error, fail } from '@sveltejs/kit';
 
 import { formatExamTitle } from '$lib/utils/exam';
 
 export const load = async ({ platform, params, locals }: Parameters<PageServerLoad>[0]) => {
 	const db = getDB(platform);
-	await ensureProctorRoleColumn(db);
 	const examIdStr = params.id;
 	const examId = parseInt(examIdStr, 10);
 	

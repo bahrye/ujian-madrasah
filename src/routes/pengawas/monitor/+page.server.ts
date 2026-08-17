@@ -1,6 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getDB, ensureUserLoginColumns } from '$lib/server/db';
+import { getDB } from '$lib/server/db';
 import { deleteFromCloudinary } from '$lib/server/cloudinary';
 import { env } from '$env/dynamic/private';
 import { formatExamTitle } from '$lib/utils/exam';
@@ -347,7 +347,6 @@ export const actions: Actions = {
 		if (isNaN(parsedStudentId)) return fail(400, { error: 'ID Siswa tidak valid.' });
 
 		try {
-			await ensureUserLoginColumns(db);
 			await db.prepare(`
 				UPDATE users SET is_logged_in = 0, session_token = NULL WHERE id = ? AND school_id = ?
 			`).bind(parsedStudentId, locals.user.school_id).run();

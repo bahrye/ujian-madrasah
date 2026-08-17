@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getDB, ensureUserLoginColumns } from '$lib/server/db';
+import { getDB } from '$lib/server/db';
 import { deleteFromCloudinary } from '$lib/server/cloudinary';
 import { env } from '$env/dynamic/private';
 import { formatExamTitle } from '$lib/utils/exam';

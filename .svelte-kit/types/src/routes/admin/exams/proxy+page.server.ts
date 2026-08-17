@@ -1,11 +1,10 @@
 // @ts-nocheck
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getDB, ensureExamTypeProctorsTable } from '$lib/server/db';
+import { getDB } from '$lib/server/db';
 
 export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) => {
 	const db = getDB(platform);
-	await ensureExamTypeProctorsTable(db);
 
 	const examTypes = await db.prepare(`
 		SELECT et.*, 
@@ -303,7 +302,6 @@ export const actions = {
 
 	addTypeProctor: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
-		await ensureExamTypeProctorsTable(db);
 		const form = await request.formData();
 		const examTypeIdStr = form.get('exam_type_id')?.toString();
 		const proctorIdStr = form.get('proctor_id')?.toString();
@@ -332,7 +330,6 @@ export const actions = {
 
 	removeTypeProctor: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
 		const db = getDB(platform);
-		await ensureExamTypeProctorsTable(db);
 		const form = await request.formData();
 		const idStr = form.get('id')?.toString();
 		const id = parseInt(idStr || '', 10);

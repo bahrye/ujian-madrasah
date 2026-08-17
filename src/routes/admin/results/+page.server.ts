@@ -1,6 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
-import { getDB, ensureStudentAttemptsScoreReleasedColumn } from '$lib/server/db';
+import { getDB } from '$lib/server/db';
 import { deleteFromCloudinary } from '$lib/server/cloudinary';
 import { env } from '$env/dynamic/private';
 import { formatExamTitle } from '$lib/utils/exam';
@@ -8,7 +8,6 @@ import { formatExamTitle } from '$lib/utils/exam';
 export const load: PageServerLoad = async ({ platform, url, locals }) => {
 	if (!locals.user) throw redirect(302, '/login');
 	const db = getDB(platform);
-	await ensureStudentAttemptsScoreReleasedColumn(db);
 	const examFilterStr = url.searchParams.get('exam_id') || '';
 	const examFilter = parseInt(examFilterStr, 10);
 
@@ -85,7 +84,6 @@ export const actions: Actions = {
 	toggleRelease: async ({ request, platform, locals }) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
-		await ensureStudentAttemptsScoreReleasedColumn(db);
 		const form = await request.formData();
 		const attemptId = parseInt(form.get('attempt_id')?.toString() || '', 10);
 		if (isNaN(attemptId)) return fail(400, { error: 'ID tidak valid' });
@@ -114,7 +112,6 @@ export const actions: Actions = {
 	releaseAll: async ({ request, platform, locals }) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
-		await ensureStudentAttemptsScoreReleasedColumn(db);
 		const form = await request.formData();
 		const examId = parseInt(form.get('exam_id')?.toString() || '', 10);
 		if (isNaN(examId)) return fail(400, { error: 'Pilih ujian terlebih dahulu' });

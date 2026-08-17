@@ -1,5 +1,5 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { g as getDB, e as ensureUserLoginColumns } from "../../../chunks/db.js";
+import { g as getDB } from "../../../chunks/db.js";
 import { a as verifyPassword, c as createToken, C as COOKIE_NAME } from "../../../chunks/auth.js";
 const load = async ({ locals }) => {
   if (locals.user) {
@@ -17,7 +17,6 @@ const actions = {
     }
     try {
       const db = getDB(platform);
-      await ensureUserLoginColumns(db);
       const user = await db.prepare("SELECT * FROM users WHERE username = ? AND is_active = 1").bind(username).first();
       if (!user) {
         return fail(401, { error: "Username atau kata sandi salah." });
@@ -30,25 +29,13 @@ const actions = {
       if (user.role === "siswa") {
         if (user.is_logged_in === 1 && user.last_active_at) {
           let inactiveSec = 9999;
-          try {
-            const diffRes = await db.prepare(`
-							SELECT (strftime('%s', 'now') - strftime('%s', last_active_at)) as inactive_sec
-							FROM users WHERE id = ?
-						`).bind(user.id).first();
-            if (diffRes && diffRes.inactive_sec !== null) {
-              inactiveSec = diffRes.inactive_sec;
-            }
-          } catch (e) {
+          let lastActiveStr = String(user.last_active_at).trim();
+          if (!lastActiveStr.includes("T")) {
+            lastActiveStr = lastActiveStr.replace(" ", "T") + "Z";
           }
-          if (inactiveSec === 9999 && user.last_active_at) {
-            let lastActiveStr = String(user.last_active_at).trim();
-            if (!lastActiveStr.includes("T")) {
-              lastActiveStr = lastActiveStr.replace(" ", "T") + "Z";
-            }
-            const lastActiveMs = new Date(lastActiveStr).getTime();
-            if (!isNaN(lastActiveMs)) {
-              inactiveSec = Math.floor((Date.now() - lastActiveMs) / 1e3);
-            }
+          const lastActiveMs = new Date(lastActiveStr).getTime();
+          if (!isNaN(lastActiveMs)) {
+            inactiveSec = Math.floor((Date.now() - lastActiveMs) / 1e3);
           }
           if (inactiveSec < 180) {
             const remainingSec = 180 - Math.max(0, inactiveSec);

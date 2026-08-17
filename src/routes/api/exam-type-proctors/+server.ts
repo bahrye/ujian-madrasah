@@ -1,11 +1,10 @@
 import { json } from '@sveltejs/kit';
-import { getDB, ensureExamTypeProctorsTable } from '$lib/server/db';
+import { getDB } from '$lib/server/db';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ url, platform, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	const db = getDB(platform);
-	await ensureExamTypeProctorsTable(db);
 
 	const examTypeIdStr = url.searchParams.get('exam_type_id');
 	const examTypeId = parseInt(examTypeIdStr || '', 10);

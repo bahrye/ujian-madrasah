@@ -1,13 +1,12 @@
 // @ts-nocheck
 import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
-import { getDB, ensureStudentAttemptsScoreReleasedColumn } from '$lib/server/db';
+import { getDB } from '$lib/server/db';
 import { formatExamTitle } from '$lib/utils/exam';
 
 export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>[0]) => {
 	if (!locals.user) throw redirect(302, '/login');
 	const db = getDB(platform);
-	await ensureStudentAttemptsScoreReleasedColumn(db);
 	const examFilter = url.searchParams.get('exam_id') || '';
 
 	const examsRes = await db.prepare(`
@@ -84,7 +83,6 @@ export const actions = {
 	toggleRelease: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
-		await ensureStudentAttemptsScoreReleasedColumn(db);
 		const form = await request.formData();
 		const attemptId = parseInt(form.get('attempt_id')?.toString() || '', 10);
 		if (isNaN(attemptId)) return fail(400, { error: 'ID tidak valid' });
@@ -113,7 +111,6 @@ export const actions = {
 	releaseAll: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
-		await ensureStudentAttemptsScoreReleasedColumn(db);
 		const form = await request.formData();
 		const examId = parseInt(form.get('exam_id')?.toString() || '', 10);
 		if (isNaN(examId)) return fail(400, { error: 'Pilih ujian terlebih dahulu' });

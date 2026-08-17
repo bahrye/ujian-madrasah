@@ -1,10 +1,9 @@
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getDB, ensureStudentAttemptsGradedColumn } from '$lib/server/db';
+import { getDB } from '$lib/server/db';
 
 export const load: PageServerLoad = async ({ platform, url, locals }) => {
 	const db = getDB(platform);
-	await ensureStudentAttemptsGradedColumn(db);
 
 	const examParam = url.searchParams.get('exam_id');
 	const studentFilterStr = url.searchParams.get('student_id') || '';
@@ -96,7 +95,6 @@ export const actions: Actions = {
 	grade: async ({ request, platform, locals }) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
-		await ensureStudentAttemptsGradedColumn(db);
 		const form = await request.formData();
 
 		const answerIdStr = form.get('answer_id')?.toString();
@@ -155,7 +153,6 @@ export const actions: Actions = {
 	finalizeGrading: async ({ request, platform, locals }) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
-		await ensureStudentAttemptsGradedColumn(db);
 		const form = await request.formData();
 		const examIdStr = form.get('exam_id')?.toString();
 		const studentIdStr = form.get('student_id')?.toString();
@@ -234,7 +231,6 @@ export const actions: Actions = {
 	unlockGrading: async ({ request, platform, locals }) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
-		await ensureStudentAttemptsGradedColumn(db);
 		const form = await request.formData();
 		const examIdStr = form.get('exam_id')?.toString();
 		const studentIdStr = form.get('student_id')?.toString();

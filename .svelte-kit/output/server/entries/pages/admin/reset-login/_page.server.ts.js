@@ -1,5 +1,5 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { g as getDB, e as ensureUserLoginColumns } from "../../../../chunks/db.js";
+import { g as getDB } from "../../../../chunks/db.js";
 import { f as formatExamTitle } from "../../../../chunks/exam.js";
 const load = async ({ platform, locals, url }) => {
   if (!locals.user) throw redirect(302, "/login");
@@ -8,7 +8,6 @@ const load = async ({ platform, locals, url }) => {
   }
   try {
     const db = getDB(platform);
-    await ensureUserLoginColumns(db);
     const rawSchoolId = locals.user.school_id;
     const userSchoolId = rawSchoolId !== void 0 && rawSchoolId !== null && !isNaN(Number(rawSchoolId)) ? Number(rawSchoolId) : null;
     const search = url.searchParams.get("q")?.trim() || "";
@@ -159,7 +158,6 @@ const actions = {
       return fail(400, { error: "ID Siswa tidak valid." });
     }
     try {
-      await ensureUserLoginColumns(db);
       const student = await db.prepare("SELECT name FROM users WHERE id = ? AND role = 'siswa'").bind(studentId).first();
       if (!student) {
         return fail(404, { error: "Data siswa tidak ditemukan." });
@@ -179,7 +177,6 @@ const actions = {
     if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
     try {
-      await ensureUserLoginColumns(db);
       const rawSchoolId = locals.user.school_id;
       const userSchoolId = rawSchoolId !== void 0 && rawSchoolId !== null && !isNaN(Number(rawSchoolId)) ? Number(rawSchoolId) : null;
       let query = `UPDATE users SET is_logged_in = 0, session_token = NULL WHERE role = 'siswa' AND is_logged_in = 1`;

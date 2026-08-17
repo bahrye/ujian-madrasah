@@ -1,9 +1,7 @@
-import { g as getDB, b as ensureProctorRoleColumn, a as ensureExamTypeProctorsTable } from "../../../../../../chunks/db.js";
+import { g as getDB } from "../../../../../../chunks/db.js";
 import { error } from "@sveltejs/kit";
 const load = async ({ platform, params, locals, url }) => {
   const db = getDB(platform);
-  await ensureProctorRoleColumn(db);
-  await ensureExamTypeProctorsTable(db);
   const typeIdStr = params.typeId;
   const typeId = parseInt(typeIdStr, 10);
   if (isNaN(typeId)) throw error(400, "ID Tipe Ujian tidak valid");

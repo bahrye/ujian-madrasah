@@ -1,12 +1,11 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { g as getDB, d as ensureTokenSessionColumn } from "../../../../chunks/db.js";
+import { g as getDB } from "../../../../chunks/db.js";
 import { g as generateTokenCode } from "../../../../chunks/auth.js";
 import { c as checkSessionTimeWindow } from "../../../../chunks/date.js";
 import { f as formatExamTitle } from "../../../../chunks/exam.js";
 const load = async ({ platform, locals }) => {
   if (!locals.user) throw redirect(302, "/login");
   const db = getDB(platform);
-  await ensureTokenSessionColumn(db);
   const tokensRaw = await db.prepare(`
 		SELECT t.*, e.title as exam_title, s.name as subject_name, et.code as exam_type_code, c.name as class_name,
 		COALESCE((
@@ -154,7 +153,6 @@ const actions = {
   generate: async ({ request, platform, locals }) => {
     if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
-    await ensureTokenSessionColumn(db);
     const form = await request.formData();
     const examIdStr = form.get("exam_id")?.toString();
     const parsedExamId = parseInt(examIdStr || "", 10);

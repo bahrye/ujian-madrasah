@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { getDB, ensureProctorRoleColumn, ensureExamTypeProctorsTable } from '$lib/server/db';
+import { getDB } from '$lib/server/db';
 import { error } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ platform, params, locals }) => {
@@ -59,9 +59,6 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 			sessionMap[s.session_number] = s;
 		}
 	}
-
-	await ensureProctorRoleColumn(db);
-	await ensureExamTypeProctorsTable(db);
 
 	// Fetch proctors assigned to this specific exam (Pengawas 1 & 2)
 	const assignedProctorsRes = await db.prepare(`

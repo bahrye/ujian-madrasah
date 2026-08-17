@@ -1,8 +1,7 @@
-import { g as getDB, b as ensureProctorRoleColumn } from "../../../../../chunks/db.js";
+import { g as getDB } from "../../../../../chunks/db.js";
 import { error } from "@sveltejs/kit";
 const load = async ({ platform, params, locals }) => {
   const db = getDB(platform);
-  await ensureProctorRoleColumn(db);
   const examIdStr = params.exam_id;
   const examId = parseInt(examIdStr, 10);
   if (isNaN(examId)) throw error(400, "ID Ujian tidak valid");

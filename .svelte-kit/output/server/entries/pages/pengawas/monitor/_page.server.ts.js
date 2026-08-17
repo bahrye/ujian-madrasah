@@ -1,5 +1,5 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { g as getDB, e as ensureUserLoginColumns } from "../../../../chunks/db.js";
+import { g as getDB } from "../../../../chunks/db.js";
 import { d as deleteFromCloudinary } from "../../../../chunks/cloudinary.js";
 import { b as private_env } from "../../../../chunks/shared-server.js";
 import { f as formatExamTitle } from "../../../../chunks/exam.js";
@@ -306,7 +306,6 @@ const actions = {
     const parsedStudentId = parseInt(studentIdStr || "", 10);
     if (isNaN(parsedStudentId)) return fail(400, { error: "ID Siswa tidak valid." });
     try {
-      await ensureUserLoginColumns(db);
       await db.prepare(`
 				UPDATE users SET is_logged_in = 0, session_token = NULL WHERE id = ? AND school_id = ?
 			`).bind(parsedStudentId, locals.user.school_id).run();

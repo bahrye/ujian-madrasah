@@ -1,6 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getDB, ensureUserLoginColumns } from '$lib/server/db';
+import { getDB } from '$lib/server/db';
 import { formatExamTitle } from '$lib/utils/exam';
 
 export interface StudentLoginItem {
@@ -25,7 +25,6 @@ export const load: PageServerLoad = async ({ platform, locals, url }) => {
 
 	try {
 		const db = getDB(platform);
-		await ensureUserLoginColumns(db);
 
 		const rawSchoolId = locals.user.school_id;
 		const userSchoolId = (rawSchoolId !== undefined && rawSchoolId !== null && !isNaN(Number(rawSchoolId))) 
@@ -206,8 +205,6 @@ export const actions: Actions = {
 		}
 
 		try {
-			await ensureUserLoginColumns(db);
-			
 			const student = await db.prepare('SELECT name FROM users WHERE id = ? AND role = \'siswa\'')
 				.bind(studentId)
 				.first<{ name: string }>();
@@ -234,8 +231,6 @@ export const actions: Actions = {
 		const db = getDB(platform);
 
 		try {
-			await ensureUserLoginColumns(db);
-
 			const rawSchoolId = locals.user.school_id;
 			const userSchoolId = (rawSchoolId !== undefined && rawSchoolId !== null && !isNaN(Number(rawSchoolId))) 
 				? Number(rawSchoolId) 

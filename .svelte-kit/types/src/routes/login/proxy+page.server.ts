@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getDB, ensureUserLoginColumns } from '$lib/server/db';
+import { getDB } from '$lib/server/db';
 import { verifyPassword, createToken, COOKIE_NAME } from '$lib/server/auth';
 
 export const load = async ({ locals }: Parameters<PageServerLoad>[0]) => {
@@ -23,7 +23,6 @@ export const actions = {
 
 		try {
 			const db = getDB(platform);
-			await ensureUserLoginColumns(db);
 
 			const user = await db.prepare('SELECT * FROM users WHERE username = ? AND is_active = 1')
 				.bind(username)
@@ -38,6 +37,7 @@ export const actions = {
 					photo: string | null;
 					is_logged_in?: number;
 					session_token?: string | null;
+					last_active_at?: string | null;
 				}>();
 
 			if (!user) {
@@ -55,27 +55,13 @@ export const actions = {
 			if (user.role === 'siswa') {
 				if (user.is_logged_in === 1 && user.last_active_at) {
 					let inactiveSec = 9999;
-
-					try {
-						const diffRes = await db.prepare(`
-							SELECT (strftime('%s', 'now') - strftime('%s', last_active_at)) as inactive_sec
-							FROM users WHERE id = ?
-						`).bind(user.id).first<{ inactive_sec: number | null }>();
-
-						if (diffRes && diffRes.inactive_sec !== null) {
-							inactiveSec = diffRes.inactive_sec;
-						}
-					} catch (e) {}
-
-					if (inactiveSec === 9999 && user.last_active_at) {
-						let lastActiveStr = String(user.last_active_at).trim();
-						if (!lastActiveStr.includes('T')) {
-							lastActiveStr = lastActiveStr.replace(' ', 'T') + 'Z';
-						}
-						const lastActiveMs = new Date(lastActiveStr).getTime();
-						if (!isNaN(lastActiveMs)) {
-							inactiveSec = Math.floor((Date.now() - lastActiveMs) / 1000);
-						}
+					let lastActiveStr = String(user.last_active_at).trim();
+					if (!lastActiveStr.includes('T')) {
+						lastActiveStr = lastActiveStr.replace(' ', 'T') + 'Z';
+					}
+					const lastActiveMs = new Date(lastActiveStr).getTime();
+					if (!isNaN(lastActiveMs)) {
+						inactiveSec = Math.floor((Date.now() - lastActiveMs) / 1000);
 					}
 
 					// Jika aktivitas terakhir kurang dari 180 detik (3 menit)

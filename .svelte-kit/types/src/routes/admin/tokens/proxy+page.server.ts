@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getDB, ensureTokenSessionColumn } from '$lib/server/db';
+import { getDB } from '$lib/server/db';
 import { generateTokenCode } from '$lib/server/auth';
 import { checkSessionTimeWindow } from '$lib/utils/date';
 import { formatExamTitle } from '$lib/utils/exam';
@@ -23,7 +23,6 @@ export interface ExamSelectItem {
 export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) => {
 	if (!locals.user) throw redirect(302, '/login');
 	const db = getDB(platform);
-	await ensureTokenSessionColumn(db);
 
 	const tokensRaw = await db.prepare(`
 		SELECT t.*, e.title as exam_title, s.name as subject_name, et.code as exam_type_code, c.name as class_name,
@@ -127,7 +126,6 @@ export const actions = {
 	generate: async ({ request, platform, locals }: import('./$types').RequestEvent) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
-		await ensureTokenSessionColumn(db);
 
 		const form = await request.formData();
 		const examIdStr = form.get('exam_id')?.toString();

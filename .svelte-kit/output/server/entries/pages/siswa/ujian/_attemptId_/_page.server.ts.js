@@ -1,11 +1,10 @@
 import { fail, redirect, error } from "@sveltejs/kit";
-import { g as getDB, i as ensureStudentAnswersUniqueIndex } from "../../../../../chunks/db.js";
+import { g as getDB } from "../../../../../chunks/db.js";
 import { b as verifyExamTokenSignature } from "../../../../../chunks/auth.js";
 import { f as formatExamTitle } from "../../../../../chunks/exam.js";
 const load = async ({ platform, locals, params, cookies }) => {
   if (!locals.user) throw redirect(302, "/login");
   const db = getDB(platform);
-  await ensureStudentAnswersUniqueIndex(db);
   const attemptIdStr = params.attemptId;
   const parsedAttemptId = parseInt(attemptIdStr, 10);
   if (isNaN(parsedAttemptId)) throw error(400, "ID Ujian tidak valid");
@@ -116,7 +115,6 @@ const actions = {
   saveAnswer: async ({ request, platform, params, locals, cookies }) => {
     if (!locals.user) return fail(401, { error: "Unauthorized" });
     const db = getDB(platform);
-    await ensureStudentAnswersUniqueIndex(db);
     const attemptIdStr = params.attemptId;
     const parsedAttemptId = parseInt(attemptIdStr, 10);
     if (isNaN(parsedAttemptId)) return fail(400, { error: "ID tidak valid" });
@@ -184,7 +182,6 @@ const actions = {
   submit: async ({ request, platform, params, locals, cookies }) => {
     if (!locals.user) return fail(401, { error: "Sesi telah berakhir. Silakan login kembali." });
     const db = getDB(platform);
-    await ensureStudentAnswersUniqueIndex(db);
     const attemptIdStr = params.attemptId;
     const parsedAttemptId = parseInt(attemptIdStr, 10);
     if (isNaN(parsedAttemptId)) return fail(400, { error: "ID tidak valid" });
