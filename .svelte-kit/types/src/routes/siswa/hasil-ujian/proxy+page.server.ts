@@ -9,11 +9,12 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 	// Ambil semua ujian yang berstatus selesai atau waktu_habis
 	const finishedAttempts = await db.prepare(`
 		SELECT sa.*, 
+			   COALESCE(sa.is_score_released, 0) as student_is_score_released,
 			   e.title as exam_title, 
 			   s.name as subject, 
 			   e.duration_minutes, 
 			   e.show_score_type, 
-			   e.is_score_released, 
+			   e.is_score_released as exam_is_score_released, 
 			   e.end_time as exam_end_time,
 			   et.end_time as exam_type_end_time,
 			   (SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count,

@@ -10,7 +10,7 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 	const examFilter = url.searchParams.get('exam_id') || '';
 
 	const exams = await db.prepare(`
-		SELECT id, title FROM exams 
+		SELECT id, title, show_score_type FROM exams 
 		WHERE school_id = ? AND (created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = exams.id AND et.teacher_id = ?))
 		ORDER BY title
 	`).bind(locals.user!.school_id, locals.user!.id, locals.user!.id).all();
@@ -27,7 +27,7 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 		          AND q.type IN ('essay', 'isian') 
 		          AND ans.is_correct IS NULL
 		       ) as ungraded_count,
-		       u.name as student_name, e.title as exam_title, s.name as subject
+		       u.name as student_name, e.title as exam_title, s.name as subject, e.show_score_type
 		FROM student_attempts sa
 		JOIN users u ON sa.student_id = u.id
 		JOIN exams e ON sa.exam_id = e.id

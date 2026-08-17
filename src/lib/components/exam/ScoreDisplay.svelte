@@ -20,8 +20,10 @@
 	$: typeEndTime = parseDate(attempt.exam_type_end_time);
 	$: endTime = parseDate(attempt.exam_end_time);
 
+	$: isReleased = attempt.student_is_score_released === 1 || attempt.is_score_released === 1 || attempt.exam_is_score_released === 1;
+
 	$: isScoreVisible = (() => {
-		if (attempt.is_score_released === 1) return true;
+		if (isReleased) return true;
 		if (isManual) return false;
 		if (isAfterTypeEndTime) return typeEndTime && currentTime >= typeEndTime;
 		if (isAfterEndTime) return endTime && currentTime >= endTime;
@@ -29,7 +31,7 @@
 	})();
 
 	$: statusLabel = (() => {
-		if (isManual && attempt.is_score_released !== 1) return 'Belum dirilis';
+		if (isManual && !isReleased) return 'Belum dirilis';
 		if (isAfterTypeEndTime && (!typeEndTime || currentTime < typeEndTime)) return 'Menunggu jadwal tipe ujian';
 		if (isAfterEndTime && (!endTime || currentTime < endTime)) return 'Menunggu jadwal berakhir';
 		return '';

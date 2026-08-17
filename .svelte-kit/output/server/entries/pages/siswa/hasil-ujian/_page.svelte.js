@@ -22,7 +22,7 @@ function _page($$renderer, $$props) {
       }).replace(/\./g, ":");
     }
     function checkIsScoreVisible(attempt) {
-      if (attempt.is_score_released === 1) return true;
+      if (attempt.student_is_score_released === 1 || attempt.is_score_released === 1 || attempt.exam_is_score_released === 1) return true;
       const type = attempt.show_score_type || "after_submit";
       if (type === "manual") return false;
       if (type === "after_type_end_time" || type === "after_end_time") {
