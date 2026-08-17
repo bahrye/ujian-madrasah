@@ -920,7 +920,8 @@
     "src": "src/routes/admin/papan-peringkat/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/admin/papan-peringkat/+page.svelte": {
@@ -938,7 +939,8 @@
     "src": "src/routes/admin/papan-peringkat/[examId]/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/admin/papan-peringkat/[examId]/+page.svelte": {
@@ -979,7 +981,8 @@
     "src": "src/routes/admin/papan-peringkat/type/[typeId]/exams/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/admin/papan-peringkat/type/[typeId]/exams/+page.svelte": {
@@ -1053,7 +1056,8 @@
     "src": "src/routes/admin/results/[attemptId]/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/admin/results/[attemptId]/+page.svelte": {
@@ -1533,7 +1537,8 @@
     "src": "src/routes/guru/papan-peringkat/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/guru/papan-peringkat/+page.svelte": {
@@ -1551,7 +1556,8 @@
     "src": "src/routes/guru/papan-peringkat/[examId]/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/guru/papan-peringkat/[examId]/+page.svelte": {
@@ -1592,7 +1598,8 @@
     "src": "src/routes/guru/papan-peringkat/type/[typeId]/exams/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/guru/papan-peringkat/type/[typeId]/exams/+page.svelte": {
@@ -1713,7 +1720,8 @@
     "src": "src/routes/guru/results/[attemptId]/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/guru/results/[attemptId]/+page.svelte": {
@@ -2119,7 +2127,8 @@
     "src": "src/routes/print/results/[attemptId]/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/print/results/[attemptId]/+page.svelte": {
@@ -2184,7 +2193,8 @@
     "src": "src/routes/siswa/hasil-ujian/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/siswa/hasil-ujian/+page.svelte": {
@@ -2228,7 +2238,8 @@
     "src": "src/routes/siswa/papan-peringkat/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/siswa/papan-peringkat/+page.svelte": {
@@ -2246,7 +2257,8 @@
     "src": "src/routes/siswa/papan-peringkat/[examId]/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/siswa/papan-peringkat/[examId]/+page.svelte": {
@@ -2283,7 +2295,8 @@
     "src": "src/routes/siswa/papan-peringkat/type/[typeId]/exams/+page.server.ts",
     "isEntry": true,
     "imports": [
-      "_db.js"
+      "_db.js",
+      "_exam.js"
     ]
   },
   "src/routes/siswa/papan-peringkat/type/[typeId]/exams/+page.svelte": {

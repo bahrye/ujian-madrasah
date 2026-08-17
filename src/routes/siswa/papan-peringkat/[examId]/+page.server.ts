@@ -1,6 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { redirect, error } from '@sveltejs/kit';
+import { formatExamTitle } from '$lib/utils/exam';
 
 export const load: PageServerLoad = async ({ platform, locals, params }) => {
 	if (locals.user?.role !== 'siswa') throw redirect(302, '/');
@@ -15,20 +16,26 @@ export const load: PageServerLoad = async ({ platform, locals, params }) => {
 	}
 
 	const exam = await db.prepare(`
-		SELECT e.id, e.title, e.subject_id, e.exam_type_id, e.duration_minutes 
+		SELECT e.id, e.title, e.subject_id, e.exam_type_id, e.duration_minutes,
+		       s.name as subject_name, et.code as exam_type_code, c.name as class_name
 		FROM exams e
 		JOIN exam_participants ep ON e.id = ep.exam_id
+		LEFT JOIN subjects s ON e.subject_id = s.id
+		LEFT JOIN exam_types et ON e.exam_type_id = et.id
+		LEFT JOIN classes c ON e.class_id = c.id
 		WHERE e.id = ? AND e.school_id = ? AND ep.student_id = ?
-	`).bind(examId, schoolId, locals.user.id).first<{ id: number; title: string; subject_id: number; exam_type_id: number; duration_minutes: number }>();
+	`).bind(examId, schoolId, locals.user.id).first<any>();
 
 	if (!exam) {
 		throw error(404, 'Ujian tidak ditemukan atau Anda bukan peserta ujian ini.');
 	}
 
-	// Ambil subject name
-	const subject = await db.prepare(`
-		SELECT name FROM subjects WHERE id = ?
-	`).bind(exam.subject_id).first<{ name: string }>();
+	const formattedTitle = formatExamTitle({
+		title: exam.title,
+		examTypeCode: exam.exam_type_code,
+		subjectName: exam.subject_name,
+		className: exam.class_name
+	});
 
 	// Ambil leaderboard khusus untuk kelas siswa ini
 	const leaderboardQuery = await db.prepare(`
@@ -47,7 +54,8 @@ export const load: PageServerLoad = async ({ platform, locals, params }) => {
 	return {
 		exam: {
 			...exam,
-			subject_name: subject ? subject.name : 'Ujian'
+			title: formattedTitle,
+			subject_name: exam.subject_name || 'Ujian'
 		},
 		leaderboard: leaderboardQuery.results || []
 	};

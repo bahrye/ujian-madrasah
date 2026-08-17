@@ -1,5 +1,6 @@
 import { g as getDB } from "../../../../../../../chunks/db.js";
 import { redirect } from "@sveltejs/kit";
+import { f as formatExamTitle } from "../../../../../../../chunks/exam.js";
 const load = async ({ params, platform, locals }) => {
   if (locals.user?.role !== "siswa") throw redirect(302, "/");
   const db = getDB(platform);
@@ -16,18 +17,31 @@ const load = async ({ params, platform, locals }) => {
 			e.id,
 			e.title,
 			s.name as subject,
+			s.name as subject_name,
 			et.name as type_name,
+			et.code as exam_type_code,
+			c.name as class_name,
 			e.exam_type_id
 		FROM exams e
 		JOIN exam_participants ep ON e.id = ep.exam_id
 		LEFT JOIN subjects s ON e.subject_id = s.id
+		LEFT JOIN classes c ON e.class_id = c.id
 		JOIN exam_types et ON e.exam_type_id = et.id
 		WHERE ep.student_id = ? AND e.school_id = ? AND e.is_active = 1 AND e.exam_type_id = ?
 		ORDER BY e.created_at DESC
 	`).bind(userId, schoolId, typeId).all();
+  const exams = (examsQuery.results || []).map((e) => ({
+    ...e,
+    title: formatExamTitle({
+      title: e.title,
+      examTypeCode: e.exam_type_code,
+      subjectName: e.subject_name,
+      className: e.class_name
+    })
+  }));
   return {
     type_name: typeQuery.type_name,
-    exams: examsQuery.results || []
+    exams
   };
 };
 export {

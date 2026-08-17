@@ -1,6 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { redirect } from '@sveltejs/kit';
+import { formatExamTitle } from '$lib/utils/exam';
 
 export const load: PageServerLoad = async ({ params, platform, locals }) => {
 	if (locals.user?.role !== 'admin' && locals.user?.role !== 'panitia') throw redirect(302, '/');
@@ -22,17 +23,31 @@ export const load: PageServerLoad = async ({ params, platform, locals }) => {
 			e.id,
 			e.title,
 			s.name as subject,
+			s.name as subject_name,
 			et.name as type_name,
+			et.code as exam_type_code,
+			c.name as class_name,
 			e.exam_type_id
 		FROM exams e
 		LEFT JOIN subjects s ON e.subject_id = s.id
+		LEFT JOIN classes c ON e.class_id = c.id
 		LEFT JOIN exam_types et ON e.exam_type_id = et.id
 		WHERE e.school_id = ? AND e.is_active = 1 AND e.exam_type_id = ?
 		ORDER BY e.created_at DESC
-	`).bind(schoolId, typeId).all<{ id: number; title: string; subject: string | null; type_name: string | null; exam_type_id: number | null }>();
+	`).bind(schoolId, typeId).all<any>();
+
+	const exams = (examsQuery.results || []).map((e: any) => ({
+		...e,
+		title: formatExamTitle({
+			title: e.title,
+			examTypeCode: e.exam_type_code,
+			subjectName: e.subject_name,
+			className: e.class_name
+		})
+	}));
 
 	return {
 		type_name: typeQuery.type_name,
-		exams: examsQuery.results || []
+		exams
 	};
 };

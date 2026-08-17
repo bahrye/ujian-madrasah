@@ -1,5 +1,6 @@
 import { g as getDB } from "../../../../../chunks/db.js";
 import { redirect, error } from "@sveltejs/kit";
+import { f as formatExamTitle } from "../../../../../chunks/exam.js";
 const load = async ({ platform, locals, params }) => {
   if (locals.user?.role !== "guru") throw redirect(302, "/");
   const db = getDB(platform);
@@ -7,16 +8,24 @@ const load = async ({ platform, locals, params }) => {
   const schoolId = locals.user.school_id;
   const userId = locals.user.id;
   const exam = await db.prepare(`
-		SELECT id, title, subject_id, exam_type_id, duration_minutes FROM exams 
-		WHERE id = ? AND school_id = ? 
-		AND (created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers teacher_join WHERE teacher_join.exam_id = exams.id AND teacher_join.teacher_id = ?))
+		SELECT e.id, e.title, e.subject_id, e.exam_type_id, e.duration_minutes,
+		       s.name as subject_name, et.code as exam_type_code, c.name as class_name
+		FROM exams e
+		LEFT JOIN subjects s ON e.subject_id = s.id
+		LEFT JOIN exam_types et ON e.exam_type_id = et.id
+		LEFT JOIN classes c ON e.class_id = c.id
+		WHERE e.id = ? AND e.school_id = ? 
+		AND (e.created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers teacher_join WHERE teacher_join.exam_id = e.id AND teacher_join.teacher_id = ?))
 	`).bind(examId, schoolId, userId, userId).first();
   if (!exam) {
     throw error(404, "Ujian tidak ditemukan atau Anda tidak memiliki akses ke ujian ini.");
   }
-  const subject = await db.prepare(`
-		SELECT name FROM subjects WHERE id = ?
-	`).bind(exam.subject_id).first();
+  const formattedTitle = formatExamTitle({
+    title: exam.title,
+    examTypeCode: exam.exam_type_code,
+    subjectName: exam.subject_name,
+    className: exam.class_name
+  });
   const leaderboardQuery = await db.prepare(`
 		SELECT 
 			u.name as student_name,
@@ -36,7 +45,8 @@ const load = async ({ platform, locals, params }) => {
   return {
     exam: {
       ...exam,
-      subject_name: subject ? subject.name : "Ujian"
+      title: formattedTitle,
+      subject_name: exam.subject_name || "Ujian"
     },
     leaderboard: leaderboardQuery.results || []
   };

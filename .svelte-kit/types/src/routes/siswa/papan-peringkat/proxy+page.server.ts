@@ -2,6 +2,7 @@
 import type { PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { redirect } from '@sveltejs/kit';
+import { formatExamTitle } from '$lib/utils/exam';
 
 export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) => {
 	if (locals.user?.role !== 'siswa') throw redirect(302, '/');
@@ -16,15 +17,29 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 			e.id,
 			e.title,
 			s.name as subject,
+			s.name as subject_name,
 			et.name as type_name,
+			et.code as exam_type_code,
+			c.name as class_name,
 			e.exam_type_id
 		FROM exams e
 		JOIN exam_participants ep ON e.id = ep.exam_id
 		LEFT JOIN subjects s ON e.subject_id = s.id
+		LEFT JOIN classes c ON e.class_id = c.id
 		JOIN exam_types et ON e.exam_type_id = et.id
 		WHERE ep.student_id = ? AND e.school_id = ? AND e.is_active = 1
 		ORDER BY e.created_at DESC
-	`).bind(userId, schoolId).all<{ id: number; title: string; subject: string; type_name: string; exam_type_id: number }>();
+	`).bind(userId, schoolId).all<any>();
+
+	const exams = (examsQuery.results || []).map((e: any) => ({
+		...e,
+		title: formatExamTitle({
+			title: e.title,
+			examTypeCode: e.exam_type_code,
+			subjectName: e.subject_name,
+			className: e.class_name
+		})
+	}));
 
 	// Ambil tipe ujian dari ujian-ujian tersebut
 	const examTypesQuery = await db.prepare(`
@@ -40,7 +55,7 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 	`).bind(userId, schoolId).all<{ id: number; type_name: string; code: string }>();
 
 	return {
-		exams: examsQuery.results || [],
+		exams,
 		examTypes: examTypesQuery.results || []
 	};
 };

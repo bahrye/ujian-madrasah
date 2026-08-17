@@ -1,5 +1,6 @@
 import type { PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
+import { formatExamTitle } from '$lib/utils/exam';
 
 export const load: PageServerLoad = async ({ platform, locals }) => {
 	const db = getDB(platform);
@@ -9,8 +10,11 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 	const finishedAttempts = await db.prepare(`
 		SELECT sa.*, 
 			   COALESCE(sa.is_score_released, 0) as student_is_score_released,
-			   e.title as exam_title, 
+			   e.title, 
 			   s.name as subject, 
+			   s.name as subject_name,
+			   et.code as exam_type_code,
+			   c.name as class_name,
 			   e.duration_minutes, 
 			   e.show_score_type, 
 			   e.is_score_released as exam_is_score_released, 
@@ -23,11 +27,22 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		JOIN exams e ON sa.exam_id = e.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		LEFT JOIN exam_types et ON e.exam_type_id = et.id
+		LEFT JOIN classes c ON e.class_id = c.id
 		WHERE sa.student_id = ? AND sa.status IN ('selesai', 'waktu_habis')
 		ORDER BY sa.created_at DESC
-	`).bind(userId).all();
+	`).bind(userId).all<any>();
+
+	const results = (finishedAttempts.results || []).map(sa => ({
+		...sa,
+		exam_title: formatExamTitle({
+			title: sa.title,
+			examTypeCode: sa.exam_type_code,
+			subjectName: sa.subject_name,
+			className: sa.class_name
+		})
+	}));
 
 	return {
-		finishedAttempts: finishedAttempts.results
+		finishedAttempts: results
 	};
 };
