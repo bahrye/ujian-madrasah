@@ -8,7 +8,8 @@ const load = async ({ platform, locals, url }) => {
   try {
     const db = getDB(platform);
     await ensureUserLoginColumns(db);
-    const schoolId = locals.user.school_id;
+    const userSchoolId = locals.user.school_id;
+    const isSuperAdmin = locals.user.role === "superadmin" || userSchoolId === null;
     const search = url.searchParams.get("q")?.trim() || "";
     const examFilterStr = url.searchParams.get("exam_id") || "";
     const examFilter = parseInt(examFilterStr, 10);
@@ -20,19 +21,16 @@ const load = async ({ platform, locals, url }) => {
     const classFilter = parseInt(classFilterStr, 10);
     const statusFilter = url.searchParams.get("status") || "";
     const scopeFilter = url.searchParams.get("scope") || "all";
-    const examsRes = await db.prepare(`
-			SELECT e.id, e.title 
-			FROM exams e 
-			WHERE e.school_id = ? 
-			ORDER BY e.is_active DESC, e.title ASC
-		`).bind(schoolId).all();
+    const examsQuery = isSuperAdmin ? `SELECT e.id, e.title FROM exams e ORDER BY e.is_active DESC, e.title ASC` : `SELECT e.id, e.title FROM exams e WHERE e.school_id = ? ORDER BY e.is_active DESC, e.title ASC`;
+    const examsParams = isSuperAdmin ? [] : [userSchoolId];
+    const examsRes = await db.prepare(examsQuery).bind(...examsParams).all();
     const exams = examsRes.results || [];
-    const classesRes = await db.prepare(`
-			SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC
-		`).bind(schoolId).all();
-    const roomsRes = await db.prepare(`
-			SELECT id, name FROM exam_rooms WHERE school_id = ? AND is_active = 1 ORDER BY name ASC
-		`).bind(schoolId).all();
+    const classesQuery = isSuperAdmin ? `SELECT id, name FROM classes ORDER BY name ASC` : `SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC`;
+    const classesParams = isSuperAdmin ? [] : [userSchoolId];
+    const classesRes = await db.prepare(classesQuery).bind(...classesParams).all();
+    const roomsQuery = isSuperAdmin ? `SELECT id, name FROM exam_rooms WHERE is_active = 1 ORDER BY name ASC` : `SELECT id, name FROM exam_rooms WHERE school_id = ? AND is_active = 1 ORDER BY name ASC`;
+    const roomsParams = isSuperAdmin ? [] : [userSchoolId];
+    const roomsRes = await db.prepare(roomsQuery).bind(...roomsParams).all();
     let query = `
 			SELECT DISTINCT
 				u.id,
@@ -60,9 +58,19 @@ const load = async ({ platform, locals, url }) => {
 				u.login_device
 			FROM users u
 			LEFT JOIN classes c ON u.class_id = c.id
-			WHERE u.role = 'siswa' AND u.is_active = 1 AND u.school_id = ?
+			WHERE u.role = 'siswa' AND u.is_active = 1
 		`;
-    const params = [schoolId];
+    const params = [];
+    if (!isSuperAdmin) {
+      query += ` AND (u.school_id = ? OR u.id IN (
+				SELECT epart.student_id
+				FROM exam_participants epart
+				JOIN exams e ON epart.exam_id = e.id
+				JOIN exam_proctors ep ON e.id = ep.exam_id
+				WHERE ep.proctor_id = ?
+			))`;
+      params.push(userSchoolId, locals.user.id);
+    }
     if (scopeFilter === "proctored" && ["pengawas", "guru"].includes(locals.user.role)) {
       query += `
 				AND u.id IN (
@@ -112,7 +120,7 @@ const load = async ({ platform, locals, url }) => {
     query += ` ORDER BY COALESCE(u.is_logged_in, 0) DESC, u.name ASC`;
     const result = await db.prepare(query).bind(...params).all();
     let students = result.results || [];
-    if (students.length === 0 && scopeFilter === "proctored" && !search && isNaN(examFilter) && isNaN(roomFilter) && isNaN(classFilter) && !statusFilter) {
+    if (students.length === 0 && !search && isNaN(examFilter) && isNaN(roomFilter) && isNaN(classFilter) && !statusFilter) {
       const fallbackResult = await db.prepare(`
 				SELECT DISTINCT
 					u.id,
@@ -134,9 +142,9 @@ const load = async ({ platform, locals, url }) => {
 					u.login_device
 				FROM users u
 				LEFT JOIN classes c ON u.class_id = c.id
-				WHERE u.role = 'siswa' AND u.is_active = 1 AND u.school_id = ?
+				WHERE u.role = 'siswa' AND u.is_active = 1
 				ORDER BY COALESCE(u.is_logged_in, 0) DESC, u.name ASC
-			`).bind(schoolId).all();
+			`).all();
       students = fallbackResult.results || [];
     }
     const activeCount = students.filter((s) => s.is_logged_in === 1).length;
@@ -186,15 +194,15 @@ const actions = {
     }
     try {
       await ensureUserLoginColumns(db);
-      const student = await db.prepare("SELECT name FROM users WHERE id = ? AND school_id = ? AND role = 'siswa'").bind(studentId, locals.user.school_id).first();
+      const student = await db.prepare("SELECT name FROM users WHERE id = ? AND role = 'siswa'").bind(studentId).first();
       if (!student) {
         return fail(404, { error: "Data siswa tidak ditemukan." });
       }
       await db.prepare(`
 				UPDATE users 
 				SET is_logged_in = 0, session_token = NULL 
-				WHERE id = ? AND school_id = ?
-			`).bind(studentId, locals.user.school_id).run();
+				WHERE id = ?
+			`).bind(studentId).run();
       return { success: `Login siswa "${student.name}" berhasil di-reset. Siswa sekarang dapat login kembali.` };
     } catch (e) {
       console.error("Reset login error:", e);
@@ -206,11 +214,14 @@ const actions = {
     const db = getDB(platform);
     try {
       await ensureUserLoginColumns(db);
-      const result = await db.prepare(`
-				UPDATE users 
-				SET is_logged_in = 0, session_token = NULL 
-				WHERE role = 'siswa' AND school_id = ? AND is_logged_in = 1
-			`).bind(locals.user.school_id).run();
+      const userSchoolId = locals.user.school_id;
+      let query = `UPDATE users SET is_logged_in = 0, session_token = NULL WHERE role = 'siswa' AND is_logged_in = 1`;
+      const params = [];
+      if (userSchoolId !== null) {
+        query += ` AND school_id = ?`;
+        params.push(userSchoolId);
+      }
+      const result = await db.prepare(query).bind(...params).run();
       return { success: `Berhasil me-reset seluruh login siswa yang sedang aktif (${result.meta.changes || 0} siswa).` };
     } catch (e) {
       console.error("Reset all login error:", e);

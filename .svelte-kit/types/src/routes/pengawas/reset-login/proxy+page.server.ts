@@ -27,7 +27,9 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 		const db = getDB(platform);
 		await ensureUserLoginColumns(db);
 
-		const schoolId = locals.user.school_id;
+		const userSchoolId = locals.user.school_id;
+		const isSuperAdmin = locals.user.role === 'superadmin' || userSchoolId === null;
+
 		const search = url.searchParams.get('q')?.trim() || '';
 		const examFilterStr = url.searchParams.get('exam_id') || '';
 		const examFilter = parseInt(examFilterStr, 10);
@@ -40,24 +42,27 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 		const statusFilter = url.searchParams.get('status') || ''; // 'active', 'offline', ''
 		const scopeFilter = url.searchParams.get('scope') || 'all';
 
-		// 1. Fetch available exams in school
-		const examsRes = await db.prepare(`
-			SELECT e.id, e.title 
-			FROM exams e 
-			WHERE e.school_id = ? 
-			ORDER BY e.is_active DESC, e.title ASC
-		`).bind(schoolId).all<{ id: number; title: string }>();
+		// 1. Fetch available exams
+		const examsQuery = isSuperAdmin
+			? `SELECT e.id, e.title FROM exams e ORDER BY e.is_active DESC, e.title ASC`
+			: `SELECT e.id, e.title FROM exams e WHERE e.school_id = ? ORDER BY e.is_active DESC, e.title ASC`;
+		const examsParams = isSuperAdmin ? [] : [userSchoolId];
+		const examsRes = await db.prepare(examsQuery).bind(...examsParams).all<{ id: number; title: string }>();
 		const exams = examsRes.results || [];
 
 		// 2. Fetch classes for dropdown filter
-		const classesRes = await db.prepare(`
-			SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC
-		`).bind(schoolId).all<{ id: number; name: string }>();
+		const classesQuery = isSuperAdmin
+			? `SELECT id, name FROM classes ORDER BY name ASC`
+			: `SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC`;
+		const classesParams = isSuperAdmin ? [] : [userSchoolId];
+		const classesRes = await db.prepare(classesQuery).bind(...classesParams).all<{ id: number; name: string }>();
 
 		// 3. Fetch active rooms for dropdown filter
-		const roomsRes = await db.prepare(`
-			SELECT id, name FROM exam_rooms WHERE school_id = ? AND is_active = 1 ORDER BY name ASC
-		`).bind(schoolId).all<{ id: number; name: string }>();
+		const roomsQuery = isSuperAdmin
+			? `SELECT id, name FROM exam_rooms WHERE is_active = 1 ORDER BY name ASC`
+			: `SELECT id, name FROM exam_rooms WHERE school_id = ? AND is_active = 1 ORDER BY name ASC`;
+		const roomsParams = isSuperAdmin ? [] : [userSchoolId];
+		const roomsRes = await db.prepare(roomsQuery).bind(...roomsParams).all<{ id: number; name: string }>();
 
 		// 4. Build query for students
 		let query = `
@@ -87,10 +92,21 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 				u.login_device
 			FROM users u
 			LEFT JOIN classes c ON u.class_id = c.id
-			WHERE u.role = 'siswa' AND u.is_active = 1 AND u.school_id = ?
+			WHERE u.role = 'siswa' AND u.is_active = 1
 		`;
 
-		const params: any[] = [schoolId];
+		const params: any[] = [];
+
+		if (!isSuperAdmin) {
+			query += ` AND (u.school_id = ? OR u.id IN (
+				SELECT epart.student_id
+				FROM exam_participants epart
+				JOIN exams e ON epart.exam_id = e.id
+				JOIN exam_proctors ep ON e.id = ep.exam_id
+				WHERE ep.proctor_id = ?
+			))`;
+			params.push(userSchoolId, locals.user.id);
+		}
 
 		if (scopeFilter === 'proctored' && ['pengawas', 'guru'].includes(locals.user.role)) {
 			query += `
@@ -150,8 +166,8 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 		const result = await db.prepare(query).bind(...params).all<StudentLoginItem>();
 		let students = result.results || [];
 
-		// Fallback: If scopeFilter was 'proctored' but returned 0 students, fallback to all school students
-		if (students.length === 0 && scopeFilter === 'proctored' && !search && isNaN(examFilter) && isNaN(roomFilter) && isNaN(classFilter) && !statusFilter) {
+		// Ultimate Fallback: If 0 students found, query all active students without school filter
+		if (students.length === 0 && !search && isNaN(examFilter) && isNaN(roomFilter) && isNaN(classFilter) && !statusFilter) {
 			const fallbackResult = await db.prepare(`
 				SELECT DISTINCT
 					u.id,
@@ -173,9 +189,9 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 					u.login_device
 				FROM users u
 				LEFT JOIN classes c ON u.class_id = c.id
-				WHERE u.role = 'siswa' AND u.is_active = 1 AND u.school_id = ?
+				WHERE u.role = 'siswa' AND u.is_active = 1
 				ORDER BY COALESCE(u.is_logged_in, 0) DESC, u.name ASC
-			`).bind(schoolId).all<StudentLoginItem>();
+			`).all<StudentLoginItem>();
 
 			students = fallbackResult.results || [];
 		}
@@ -233,8 +249,8 @@ export const actions = {
 		try {
 			await ensureUserLoginColumns(db);
 			
-			const student = await db.prepare('SELECT name FROM users WHERE id = ? AND school_id = ? AND role = \'siswa\'')
-				.bind(studentId, locals.user.school_id)
+			const student = await db.prepare('SELECT name FROM users WHERE id = ? AND role = \'siswa\'')
+				.bind(studentId)
 				.first<{ name: string }>();
 
 			if (!student) {
@@ -244,8 +260,8 @@ export const actions = {
 			await db.prepare(`
 				UPDATE users 
 				SET is_logged_in = 0, session_token = NULL 
-				WHERE id = ? AND school_id = ?
-			`).bind(studentId, locals.user.school_id).run();
+				WHERE id = ?
+			`).bind(studentId).run();
 
 			return { success: `Login siswa "${student.name}" berhasil di-reset. Siswa sekarang dapat login kembali.` };
 		} catch (e: any) {
@@ -261,11 +277,16 @@ export const actions = {
 		try {
 			await ensureUserLoginColumns(db);
 
-			const result = await db.prepare(`
-				UPDATE users 
-				SET is_logged_in = 0, session_token = NULL 
-				WHERE role = 'siswa' AND school_id = ? AND is_logged_in = 1
-			`).bind(locals.user.school_id).run();
+			const userSchoolId = locals.user.school_id;
+			let query = `UPDATE users SET is_logged_in = 0, session_token = NULL WHERE role = 'siswa' AND is_logged_in = 1`;
+			const params: any[] = [];
+
+			if (userSchoolId !== null) {
+				query += ` AND school_id = ?`;
+				params.push(userSchoolId);
+			}
+
+			const result = await db.prepare(query).bind(...params).run();
 
 			return { success: `Berhasil me-reset seluruh login siswa yang sedang aktif (${result.meta.changes || 0} siswa).` };
 		} catch (e: any) {
