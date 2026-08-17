@@ -237,28 +237,6 @@
 	</div>
 
 	<!-- Active Attempt Banner -->
-	{#if activeAttempt}
-		<div class="card p-5 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300">
-			<div class="flex items-center gap-4">
-				<div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center animate-pulse">
-					<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} />
-					</svg>
-				</div>
-				<div class="flex-1">
-					<h3 class="font-bold text-amber-800">Ujian Sedang Berlangsung</h3>
-					<p class="text-sm text-amber-600">{activeAttempt.exam_title}</p>
-				</div>
-				<a href="/siswa/ujian?exam_id={activeAttempt.exam_id}" class="btn-warning">
-					Lanjutkan
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.chevronRight} />
-					</svg>
-				</a>
-			</div>
-		</div>
-	{/if}
-
 	<!-- Active Exams -->
 	<div>
 		<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
@@ -303,60 +281,85 @@
 		{:else}
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 				{#each filteredActiveExams as exam (exam.id)}
-					<div class="card-hover p-5 flex flex-col h-full">
+					{@const inProgressAttempt = (activeAttempt && activeAttempt.exam_id === exam.id) ? activeAttempt : myAttempts.find(a => a.exam_id === exam.id && a.status === 'mengerjakan')}
+					{@const isInProgress = !!inProgressAttempt}
+					{@const isFinished = myAttempts.some(a => a.exam_id === exam.id && ['selesai', 'waktu_habis', 'remedial'].includes(a.status))}
+
+					<div class="p-5 flex flex-col h-full rounded-2xl transition-all duration-200 {isInProgress ? 'bg-gradient-to-br from-amber-50/90 via-orange-50/40 to-white border-2 border-amber-400 shadow-md shadow-amber-500/10 ring-2 ring-amber-400/20' : 'card-hover'}">
 						<div class="flex items-start justify-between mb-3">
-							<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center">
+							<div class="w-10 h-10 rounded-xl {isInProgress ? 'bg-gradient-to-br from-amber-400 to-orange-500 shadow-md shadow-orange-500/20 animate-pulse' : 'bg-gradient-to-br from-indigo-500 to-violet-500'} flex items-center justify-center">
 								<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.exam} />
+									{#if isInProgress}
+										<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} />
+									{:else}
+										<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.exam} />
+									{/if}
 								</svg>
 							</div>
-							<span class="badge-success">Tersedia</span>
+							{#if isInProgress}
+								<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-1.5 shadow-xs">
+									<span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+									Ujian Sedang Berlangsung
+								</span>
+							{:else if isFinished}
+								<span class="badge-success bg-emerald-100 text-emerald-800 border border-emerald-200">Selesai</span>
+							{:else}
+								<span class="badge-success">Tersedia</span>
+							{/if}
 						</div>
-						<h3 class="font-bold text-slate-800">{exam.title}</h3>
-						<p class="text-sm text-slate-500 mt-1 mb-4">{exam.subject || 'Umum'}</p>
+
+						<h3 class="font-bold {isInProgress ? 'text-amber-950' : 'text-slate-800'} text-base leading-snug">{exam.title}</h3>
+						<p class="text-sm {isInProgress ? 'text-amber-700/80 font-medium' : 'text-slate-500'} mt-1 mb-4">{exam.subject || 'Umum'}</p>
 						
 						<div class="space-y-2 mb-4 mt-auto">
-							<div class="flex items-center text-sm text-slate-600">
-								<svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<div class="flex items-center text-sm {isInProgress ? 'text-amber-900/80' : 'text-slate-600'}">
+								<svg class="w-4 h-4 mr-2 {isInProgress ? 'text-amber-500' : 'text-slate-400'} min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} />
 								</svg>
 								<span>
 									Pukul: {formatTimeRange(exam.start_time, exam.end_time)}
 									{#if exam.has_sessions && exam.session_number}
-										<span class="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-md ml-1.5 inline-block">
+										<span class="text-xs font-semibold px-2 py-0.5 {isInProgress ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-indigo-50 text-indigo-700 border-indigo-100'} border rounded-md ml-1.5 inline-block">
 											Sesi {exam.session_number}
 										</span>
 									{/if}
 								</span>
 							</div>
-							<div class="flex items-center text-sm text-slate-600">
-								<svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<div class="flex items-center text-sm {isInProgress ? 'text-amber-900/80' : 'text-slate-600'}">
+								<svg class="w-4 h-4 mr-2 {isInProgress ? 'text-amber-500' : 'text-slate-400'} min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.exam} />
 								</svg>
 								<span>Durasi: {exam.duration_minutes} menit</span>
 							</div>
-							<div class="flex items-center text-sm text-slate-600">
-								<svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<div class="flex items-center text-sm {isInProgress ? 'text-amber-900/80' : 'text-slate-600'}">
+								<svg class="w-4 h-4 mr-2 {isInProgress ? 'text-amber-500' : 'text-slate-400'} min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
 								</svg>
 								<span>Soal: {exam.question_count}</span>
 							</div>
-							<div class="flex items-start text-sm text-slate-600">
-								<svg class="w-4 h-4 mr-2 text-slate-400 min-w-4 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<div class="flex items-start text-sm {isInProgress ? 'text-amber-900/80' : 'text-slate-600'}">
+								<svg class="w-4 h-4 mr-2 {isInProgress ? 'text-amber-500' : 'text-slate-400'} min-w-4 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.users} />
 								</svg>
 								<div class="space-y-0.5">
 									{#each parseProctors(exam.proctors) as p}
 										<div>
-											<span class="font-medium text-slate-700">{p.label}:</span> {p.name}
+											<span class="font-medium {isInProgress ? 'text-amber-950' : 'text-slate-700'}">{p.label}:</span> {p.name}
 										</div>
 									{/each}
 								</div>
 							</div>
 						</div>
 						
-						<div class="pt-4 border-t border-slate-100 mt-auto">
-							{#if myAttempts.some(a => a.exam_id === exam.id && ['selesai', 'waktu_habis', 'remedial'].includes(a.status))}
+						<div class="pt-4 border-t {isInProgress ? 'border-amber-200/80' : 'border-slate-100'} mt-auto">
+							{#if isInProgress}
+								<a href="/siswa/ujian?exam_id={exam.id}" class="btn w-full justify-center bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold shadow-lg shadow-orange-500/25 transition-all flex items-center gap-1.5">
+									Lanjutkan
+									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+										<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.chevronRight} />
+									</svg>
+								</a>
+							{:else if isFinished}
 								<button disabled class="btn w-full justify-center bg-emerald-50 text-emerald-600 border border-emerald-200 cursor-not-allowed shadow-none">
 									<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />

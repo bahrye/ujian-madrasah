@@ -1,4 +1,4 @@
-import { h as head, e as escape_html, k as attr, c as stringify, i as ensure_array_like, j as attr_class, l as clsx, f as bind_props } from "../../../chunks/index.js";
+import { h as head, e as escape_html, k as attr, i as ensure_array_like, j as attr_class, c as stringify, l as clsx, f as bind_props } from "../../../chunks/index.js";
 import { A as ATTEMPT_STATUS_COLORS, a as ATTEMPT_STATUS_LABELS, I as ICONS } from "../../../chunks/constants.js";
 import { p as parseDate } from "../../../chunks/date.js";
 import { p as parseProctors } from "../../../chunks/format.js";
@@ -151,14 +151,7 @@ function _page($$renderer, $$props) {
         $$renderer4.push(`<title>Dashboard Siswa — Ujian Online Madrasah</title>`);
       });
     });
-    $$renderer2.push(`<div class="space-y-6 animate-in"><div><h1 class="text-2xl font-bold text-slate-800">Dashboard Siswa</h1> <p class="text-sm text-slate-500 mt-1">Selamat datang, ${escape_html(data.user.name)}.</p></div> `);
-    if (activeAttempt) {
-      $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="card p-5 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center animate-pulse"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg></div> <div class="flex-1"><h3 class="font-bold text-amber-800">Ujian Sedang Berlangsung</h3> <p class="text-sm text-amber-600">${escape_html(activeAttempt.exam_title)}</p></div> <a${attr("href", `/siswa/ujian?exam_id=${stringify(activeAttempt.exam_id)}`)} class="btn-warning">Lanjutkan <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.chevronRight)}></path></svg></a></div></div>`);
-    } else {
-      $$renderer2.push("<!--[-1-->");
-    }
-    $$renderer2.push(`<!--]--> <div><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3"><h2 class="text-lg font-bold text-slate-800">Ujian Tersedia Hari Ini</h2> `);
+    $$renderer2.push(`<div class="space-y-6 animate-in"><div><h1 class="text-2xl font-bold text-slate-800">Dashboard Siswa</h1> <p class="text-sm text-slate-500 mt-1">Selamat datang, ${escape_html(data.user.name)}.</p></div>  <div><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3"><h2 class="text-lg font-bold text-slate-800">Ujian Tersedia Hari Ini</h2> `);
     if (activeExams.length > 0) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div class="relative w-full sm:w-64"><input type="text"${attr("value", searchQuery)} placeholder="Cari mapel, pengawas..." class="input pl-10 pr-9 py-1.5 w-full text-xs rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm bg-white"/> <svg class="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg> `);
@@ -184,25 +177,50 @@ function _page($$renderer, $$props) {
       const each_array = ensure_array_like(filteredActiveExams);
       for (let $$index_1 = 0, $$length = each_array.length; $$index_1 < $$length; $$index_1++) {
         let exam = each_array[$$index_1];
-        $$renderer2.push(`<div class="card-hover p-5 flex flex-col h-full"><div class="flex items-start justify-between mb-3"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg></div> <span class="badge-success">Tersedia</span></div> <h3 class="font-bold text-slate-800">${escape_html(exam.title)}</h3> <p class="text-sm text-slate-500 mt-1 mb-4">${escape_html(exam.subject || "Umum")}</p> <div class="space-y-2 mb-4 mt-auto"><div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> <span>Pukul: ${escape_html(formatTimeRange(exam.start_time, exam.end_time))} `);
+        const inProgressAttempt = activeAttempt && activeAttempt.exam_id === exam.id ? activeAttempt : myAttempts.find((a) => a.exam_id === exam.id && a.status === "mengerjakan");
+        const isInProgress = !!inProgressAttempt;
+        const isFinished = myAttempts.some((a) => a.exam_id === exam.id && ["selesai", "waktu_habis", "remedial"].includes(a.status));
+        $$renderer2.push(`<div${attr_class(`p-5 flex flex-col h-full rounded-2xl transition-all duration-200 ${isInProgress ? "bg-gradient-to-br from-amber-50/90 via-orange-50/40 to-white border-2 border-amber-400 shadow-md shadow-amber-500/10 ring-2 ring-amber-400/20" : "card-hover"}`)}><div class="flex items-start justify-between mb-3"><div${attr_class(`w-10 h-10 rounded-xl ${isInProgress ? "bg-gradient-to-br from-amber-400 to-orange-500 shadow-md shadow-orange-500/20 animate-pulse" : "bg-gradient-to-br from-indigo-500 to-violet-500"} flex items-center justify-center`)}><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">`);
+        if (isInProgress) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path>`);
+        }
+        $$renderer2.push(`<!--]--></svg></div> `);
+        if (isInProgress) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<span class="px-2.5 py-1 text-xs font-bold rounded-full bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-1.5 shadow-xs"><span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span> Ujian Sedang Berlangsung</span>`);
+        } else if (isFinished) {
+          $$renderer2.push("<!--[1-->");
+          $$renderer2.push(`<span class="badge-success bg-emerald-100 text-emerald-800 border border-emerald-200">Selesai</span>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<span class="badge-success">Tersedia</span>`);
+        }
+        $$renderer2.push(`<!--]--></div> <h3${attr_class(`font-bold ${isInProgress ? "text-amber-950" : "text-slate-800"} text-base leading-snug`)}>${escape_html(exam.title)}</h3> <p${attr_class(`text-sm ${isInProgress ? "text-amber-700/80 font-medium" : "text-slate-500"} mt-1 mb-4`)}>${escape_html(exam.subject || "Umum")}</p> <div class="space-y-2 mb-4 mt-auto"><div${attr_class(`flex items-center text-sm ${isInProgress ? "text-amber-900/80" : "text-slate-600"}`)}><svg${attr_class(`w-4 h-4 mr-2 ${isInProgress ? "text-amber-500" : "text-slate-400"} min-w-4`)} fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> <span>Pukul: ${escape_html(formatTimeRange(exam.start_time, exam.end_time))} `);
         if (exam.has_sessions && exam.session_number) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<span class="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-md ml-1.5 inline-block">Sesi ${escape_html(exam.session_number)}</span>`);
+          $$renderer2.push(`<span${attr_class(`text-xs font-semibold px-2 py-0.5 ${isInProgress ? "bg-amber-100 text-amber-800 border-amber-200" : "bg-indigo-50 text-indigo-700 border-indigo-100"} border rounded-md ml-1.5 inline-block`)}>Sesi ${escape_html(exam.session_number)}</span>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
-        $$renderer2.push(`<!--]--></span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg> <span>Durasi: ${escape_html(exam.duration_minutes)} menit</span></div> <div class="flex items-center text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> <span>Soal: ${escape_html(exam.question_count)}</span></div> <div class="flex items-start text-sm text-slate-600"><svg class="w-4 h-4 mr-2 text-slate-400 min-w-4 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.users)}></path></svg> <div class="space-y-0.5"><!--[-->`);
+        $$renderer2.push(`<!--]--></span></div> <div${attr_class(`flex items-center text-sm ${isInProgress ? "text-amber-900/80" : "text-slate-600"}`)}><svg${attr_class(`w-4 h-4 mr-2 ${isInProgress ? "text-amber-500" : "text-slate-400"} min-w-4`)} fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.exam)}></path></svg> <span>Durasi: ${escape_html(exam.duration_minutes)} menit</span></div> <div${attr_class(`flex items-center text-sm ${isInProgress ? "text-amber-900/80" : "text-slate-600"}`)}><svg${attr_class(`w-4 h-4 mr-2 ${isInProgress ? "text-amber-500" : "text-slate-400"} min-w-4`)} fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> <span>Soal: ${escape_html(exam.question_count)}</span></div> <div${attr_class(`flex items-start text-sm ${isInProgress ? "text-amber-900/80" : "text-slate-600"}`)}><svg${attr_class(`w-4 h-4 mr-2 ${isInProgress ? "text-amber-500" : "text-slate-400"} min-w-4 mt-0.5`)} fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.users)}></path></svg> <div class="space-y-0.5"><!--[-->`);
         const each_array_1 = ensure_array_like(parseProctors(exam.proctors));
         for (let $$index = 0, $$length2 = each_array_1.length; $$index < $$length2; $$index++) {
           let p = each_array_1[$$index];
-          $$renderer2.push(`<div><span class="font-medium text-slate-700">${escape_html(p.label)}:</span> ${escape_html(p.name)}</div>`);
+          $$renderer2.push(`<div><span${attr_class(`font-medium ${isInProgress ? "text-amber-950" : "text-slate-700"}`)}>${escape_html(p.label)}:</span> ${escape_html(p.name)}</div>`);
         }
-        $$renderer2.push(`<!--]--></div></div></div> <div class="pt-4 border-t border-slate-100 mt-auto">`);
-        if (myAttempts.some((a) => a.exam_id === exam.id && ["selesai", "waktu_habis", "remedial"].includes(a.status))) {
+        $$renderer2.push(`<!--]--></div></div></div> <div${attr_class(`pt-4 border-t ${isInProgress ? "border-amber-200/80" : "border-slate-100"} mt-auto`)}>`);
+        if (isInProgress) {
           $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<a${attr("href", `/siswa/ujian?exam_id=${stringify(exam.id)}`)} class="btn w-full justify-center bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold shadow-lg shadow-orange-500/25 transition-all flex items-center gap-1.5">Lanjutkan <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.chevronRight)}></path></svg></a>`);
+        } else if (isFinished) {
+          $$renderer2.push("<!--[1-->");
           $$renderer2.push(`<button disabled="" class="btn w-full justify-center bg-emerald-50 text-emerald-600 border border-emerald-200 cursor-not-allowed shadow-none"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> Selesai</button>`);
         } else if (exam.start_time && getCountdownString(exam.start_time, currentTime)) {
-          $$renderer2.push("<!--[1-->");
+          $$renderer2.push("<!--[2-->");
           $$renderer2.push(`<button disabled="" class="btn w-full justify-center bg-slate-800 text-white cursor-not-allowed flex gap-2 border-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),_0_2px_4px_rgba(0,0,0,0.3)]"><svg class="w-5 h-5 animate-spin-slow opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.clock)}></path></svg> <span class="font-mono text-lg tracking-widest font-bold">${escape_html(getCountdownString(exam.start_time, currentTime))}</span></button>`);
         } else {
           $$renderer2.push("<!--[-1-->");
