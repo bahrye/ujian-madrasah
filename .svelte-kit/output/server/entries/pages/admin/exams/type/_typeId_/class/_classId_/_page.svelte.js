@@ -41,15 +41,7 @@ function _page($$renderer, $$props) {
       for (let $$index_2 = 0, $$length = each_array.length; $$index_2 < $$length; $$index_2++) {
         let exam = each_array[$$index_2];
         const isOutOfBounds = exam.start_time && exam.start_time < data.examType.start_time || exam.end_time && exam.end_time > data.examType.end_time;
-        $$renderer2.push(`<div class="card-hover p-5 flex flex-col"><div class="flex items-start justify-between mb-3"><div class="flex-1 min-w-0">`);
-        if (exam.title.length > 20) {
-          $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<marquee scrollamount="4" class="font-bold text-slate-800 text-base block">${escape_html(exam.title)}</marquee>`);
-        } else {
-          $$renderer2.push("<!--[-1-->");
-          $$renderer2.push(`<h3 class="font-bold text-slate-800">${escape_html(exam.title)}</h3>`);
-        }
-        $$renderer2.push(`<!--]--> <p class="text-xs text-slate-500 mt-0.5">${escape_html(exam.subject_name || "Tanpa Mapel")}</p></div> `);
+        $$renderer2.push(`<div class="card-hover p-5 flex flex-col"><div class="flex items-start justify-between mb-3"><div class="flex-1 min-w-0"><h3 class="font-bold text-slate-800 text-base leading-snug break-words">${escape_html(exam.title)}</h3> <p class="text-xs text-slate-500 mt-0.5">${escape_html(exam.subject_name || "Tanpa Mapel")}</p></div> `);
         if (exam.is_active) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<span class="badge-success ml-2 flex-shrink-0">Aktif</span>`);

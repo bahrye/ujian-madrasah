@@ -76,15 +76,7 @@ function _page($$renderer, $$props) {
       $$renderer2.push("<!--[-->");
       for (let $$index_1 = 0, $$length = each_array.length; $$index_1 < $$length; $$index_1++) {
         let exam = each_array[$$index_1];
-        $$renderer2.push(`<div class="card-hover p-5 bg-white border border-slate-200 flex flex-col justify-between h-full"><div><div class="flex items-start justify-between mb-3"><div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.calendar)}></path></svg></div> <span class="badge-primary text-xs font-semibold px-2.5 py-1 rounded-md">${escape_html(formatScheduleDate(exam.start_time))}</span></div> `);
-        if (exam.title.length > 22) {
-          $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<marquee scrollamount="4" class="font-bold text-slate-800 text-lg mb-1">${escape_html(exam.title)}</marquee>`);
-        } else {
-          $$renderer2.push("<!--[-1-->");
-          $$renderer2.push(`<h3 class="font-bold text-slate-800 text-lg mb-1">${escape_html(exam.title)}</h3>`);
-        }
-        $$renderer2.push(`<!--]--> <p class="text-sm text-slate-500 mb-2">${escape_html(exam.subject || "Umum")}</p> `);
+        $$renderer2.push(`<div class="card-hover p-5 bg-white border border-slate-200 flex flex-col justify-between h-full"><div><div class="flex items-start justify-between mb-3"><div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.calendar)}></path></svg></div> <span class="badge-primary text-xs font-semibold px-2.5 py-1 rounded-md">${escape_html(formatScheduleDate(exam.start_time))}</span></div> <h3 class="font-bold text-slate-800 text-lg mb-1 leading-snug break-words">${escape_html(exam.title)}</h3> <p class="text-sm text-slate-500 mb-2">${escape_html(exam.subject || "Umum")}</p> `);
         if (exam.room_name || exam.session_number) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<div class="mb-4 flex items-center gap-2">`);

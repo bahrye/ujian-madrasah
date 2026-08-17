@@ -136,12 +136,7 @@
 							{formatScheduleDate(exam.start_time)}
 						</span>
 					</div>
-					{#if exam.title.length > 22}
-						<!-- svelte-ignore a11y-distracting-elements -->
-						<marquee scrollamount="4" class="font-bold text-slate-800 text-lg mb-1">{exam.title}</marquee>
-					{:else}
-						<h3 class="font-bold text-slate-800 text-lg mb-1">{exam.title}</h3>
-					{/if}
+					<h3 class="font-bold text-slate-800 text-lg mb-1 leading-snug break-words">{exam.title}</h3>
 					<p class="text-sm text-slate-500 mb-2">{exam.subject || 'Umum'}</p>
 					
 					{#if exam.room_name || exam.session_number}

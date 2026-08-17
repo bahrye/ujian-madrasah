@@ -99,8 +99,8 @@
 						{/if}
 					</div>
 					
-					<h3 class="font-bold text-slate-800 text-lg leading-tight mb-1" title={exam.title}>
-						{exam.title.length > 35 ? exam.title.substring(0, 35) + '...' : exam.title}
+					<h3 class="font-bold text-slate-800 text-lg leading-snug break-words mb-1">
+						{exam.title}
 					</h3>
 					
 					<div class="flex items-center gap-2 mb-4">

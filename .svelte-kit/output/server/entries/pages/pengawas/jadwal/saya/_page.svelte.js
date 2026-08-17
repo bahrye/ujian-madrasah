@@ -73,7 +73,7 @@ function _page($$renderer, $$props) {
           $$renderer2.push("<!--[-1-->");
           $$renderer2.push(`<span class="badge-danger text-xs font-semibold px-2.5 py-1 rounded-md">Telah Berakhir</span>`);
         }
-        $$renderer2.push(`<!--]--></div> <h3 class="font-bold text-slate-800 text-lg leading-tight mb-1"${attr("title", exam.title)}>${escape_html(exam.title.length > 35 ? exam.title.substring(0, 35) + "..." : exam.title)}</h3> <div class="flex items-center gap-2 mb-4"><span class="text-xs font-medium px-2 py-0.5 rounded bg-slate-100 text-slate-600">${escape_html(exam.exam_type_name || "Ujian")}</span> `);
+        $$renderer2.push(`<!--]--></div> <h3 class="font-bold text-slate-800 text-lg leading-snug break-words mb-1">${escape_html(exam.title)}</h3> <div class="flex items-center gap-2 mb-4"><span class="text-xs font-medium px-2 py-0.5 rounded bg-slate-100 text-slate-600">${escape_html(exam.exam_type_name || "Ujian")}</span> `);
         if (exam.subject_name) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<span class="text-xs font-medium px-2 py-0.5 rounded bg-slate-100 text-slate-600 truncate max-w-[120px]"${attr("title", exam.subject_name)}>${escape_html(exam.subject_name)}</span>`);

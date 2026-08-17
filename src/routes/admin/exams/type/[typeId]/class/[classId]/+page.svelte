@@ -107,12 +107,7 @@
 			<div class="card-hover p-5 flex flex-col">
 				<div class="flex items-start justify-between mb-3">
 					<div class="flex-1 min-w-0">
-						{#if exam.title.length > 20}
-							<!-- svelte-ignore a11y-distracting-elements -->
-							<marquee scrollamount="4" class="font-bold text-slate-800 text-base block">{exam.title}</marquee>
-						{:else}
-							<h3 class="font-bold text-slate-800">{exam.title}</h3>
-						{/if}
+						<h3 class="font-bold text-slate-800 text-base leading-snug break-words">{exam.title}</h3>
 						<p class="text-xs text-slate-500 mt-0.5">{exam.subject_name || 'Tanpa Mapel'}</p>
 					</div>
 					{#if exam.is_active}
