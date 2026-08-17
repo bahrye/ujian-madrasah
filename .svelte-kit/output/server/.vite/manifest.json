@@ -523,7 +523,7 @@
       "_stores.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.DPxEk2bi.css"
+      "_app/immutable/assets/_layout.B_2zZgjO.css"
     ],
     "assets": [
       "_app/immutable/assets/KaTeX_AMS-Regular.BQhdFMY1.woff2",
@@ -2333,6 +2333,9 @@
       "_constants.js",
       "_Toast2.js",
       "_toast.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page@.sRl0CCBV.css"
     ]
   },
   "src/routes/superadmin/+layout.server.ts": {
