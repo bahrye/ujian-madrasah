@@ -74,3 +74,11 @@ export async function ensureExamTypeProctorsTable(db: D1Database) {
 	}
 }
 
+export async function ensureStudentAttemptsGradedColumn(db: D1Database) {
+	try {
+		await db.prepare('ALTER TABLE student_attempts ADD COLUMN is_graded INTEGER DEFAULT 0').run();
+	} catch (e: any) {
+		// Ignore error if column already exists
+	}
+}
+

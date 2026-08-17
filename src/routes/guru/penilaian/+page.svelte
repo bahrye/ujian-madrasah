@@ -34,8 +34,8 @@
 
 	<!-- Filter -->
 	<div class="card p-4">
-		<form method="GET" class="flex flex-col md:flex-row gap-3">
-			<select name="exam_id" class="select flex-1" on:change={(e) => e.currentTarget.form?.submit()}>
+		<form method="GET" class="flex flex-col md:flex-row items-center gap-3">
+			<select name="exam_id" class="select flex-1 w-full" on:change={(e) => e.currentTarget.form?.submit()}>
 				<option value="" disabled selected={data.examParam === null}>-- Pilih Ujian Terlebih Dahulu --</option>
 				<option value="all" selected={data.examParam === 'all'}>Semua Ujian</option>
 				{#each data.exams as exam}
@@ -43,14 +43,40 @@
 				{/each}
 			</select>
 			
-			<select name="student_id" class="select flex-1" disabled={data.examParam === null}>
+			<select name="student_id" class="select flex-1 w-full" disabled={data.examParam === null} on:change={(e) => e.currentTarget.form?.submit()}>
 				<option value="">Semua Siswa</option>
 				{#each data.students as student}
-					<option value={student.id} selected={data.studentFilter === String(student.id)}>{student.name}</option>
+					<option value={student.id} selected={data.studentFilter === String(student.id)}>
+						{student.is_graded ? '🟢' : '🔴'} {student.name} ({student.is_graded ? 'Sudah Dinilai' : 'Belum Dinilai'})
+					</option>
 				{/each}
 			</select>
-			
-			<button type="submit" class="btn-secondary md:w-auto w-full" disabled={data.examParam === null}>Tampilkan</button>
+
+			{#if data.examParam !== null}
+				{@const currentStudent = data.students.find(s => String(s.id) === String(data.studentFilter))}
+				{@const isCurrentLocked = currentStudent ? currentStudent.is_graded : (data.students.length > 0 && data.students.every(s => s.is_graded))}
+				
+				<form method="POST" action={isCurrentLocked ? "?/unlockGrading" : "?/finalizeGrading"} use:enhance class="w-full md:w-auto">
+					<input type="hidden" name="exam_id" value={data.examParam} />
+					<input type="hidden" name="student_id" value={data.studentFilter} />
+					
+					{#if isCurrentLocked}
+						<button type="submit" class="btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 font-semibold text-sm transition-all shadow-sm flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl w-full md:w-auto">
+							<svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+							</svg>
+							Batalkan Kunci
+						</button>
+					{:else}
+						<button type="submit" class="btn bg-rose-600 text-white hover:bg-rose-700 font-semibold text-sm transition-all shadow-sm shadow-rose-500/20 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl w-full md:w-auto">
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+							</svg>
+							Kunci Penilaian
+						</button>
+					{/if}
+				</form>
+			{/if}
 		</form>
 	</div>
 
@@ -87,7 +113,7 @@
 	{:else}
 		<div class="space-y-4" use:mathRender={answers} use:arabicRender={answers}>
 			{#each answers as a (a.answer_id)}
-				<div class="card p-5 {a.score_given != null ? 'border-l-4 border-emerald-400' : 'border-l-4 border-amber-400'}">
+				<div class="card p-5 {a.is_graded === 1 ? 'border-l-4 border-slate-400 opacity-90' : (a.score_given != null ? 'border-l-4 border-emerald-400' : 'border-l-4 border-amber-400')}">
 					<div class="flex flex-wrap items-center gap-2 mb-3">
 						<span class="badge-info">{a.exam_title}</span>
 						<span class="badge-primary">{QUESTION_TYPE_LABELS[a.type]}</span>
@@ -152,10 +178,13 @@
 							class="input w-24"
 							value={a.score_given ?? ''}
 							placeholder="0-{a.points}"
+							disabled={a.is_graded === 1}
 						/>
 						<span class="text-xs text-slate-400">/ {a.points}</span>
-						<button type="submit" class="btn-success btn-sm">Simpan</button>
-						{#if a.score_given !== null && a.score_given !== undefined}
+						<button type="submit" class="btn-success btn-sm" disabled={a.is_graded === 1}>Simpan</button>
+						{#if a.is_graded === 1}
+							<span class="badge bg-slate-100 text-slate-600 border border-slate-200">🔒 Dikunci (Selesai)</span>
+						{:else if a.score_given !== null && a.score_given !== undefined}
 							<span class="badge-success">✓ Sudah dinilai</span>
 						{:else}
 							<span class="badge-warning">⚠ Belum dinilai</span>

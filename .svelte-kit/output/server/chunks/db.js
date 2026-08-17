@@ -40,9 +40,16 @@ async function ensureExamTypeProctorsTable(db) {
   } catch (e) {
   }
 }
+async function ensureStudentAttemptsGradedColumn(db) {
+  try {
+    await db.prepare("ALTER TABLE student_attempts ADD COLUMN is_graded INTEGER DEFAULT 0").run();
+  } catch (e) {
+  }
+}
 export {
   ensureProctorRoleColumn as a,
   ensureTokenSessionColumn as b,
+  ensureStudentAttemptsGradedColumn as c,
   dbRun as d,
   ensureExamTypeProctorsTable as e,
   getDB as g
