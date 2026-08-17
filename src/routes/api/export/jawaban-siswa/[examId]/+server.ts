@@ -208,6 +208,7 @@ export const GET: RequestHandler = async ({ params, platform, locals }) => {
 	questions.forEach((q, idx) => {
 		s1Header.push(`S${q.question_number || idx + 1}`);
 	});
+	s1Header.push('Benar', '%');
 	sheet1Data.push(s1Header);
 
 	// Student Rows (sorted by class and name for neat matrix)
@@ -222,16 +223,22 @@ export const GET: RequestHandler = async ({ params, platform, locals }) => {
 			(att.score || 0) >= 75 ? 'Tuntas' : 'Remedial'
 		];
 
+		let studentCorrectCount = 0;
 		questions.forEach(q => {
 			const ans = answerMatrixMap[`${att.id}_${q.id}`];
 			if (!ans || ans.answer_given == null || ans.answer_given === '') {
 				row.push('-');
 			} else if (ans.is_correct === 1 || ans.is_correct === true) {
+				studentCorrectCount++;
 				row.push(ans.answer_given || '✓');
 			} else {
 				row.push(`[${ans.answer_given || 'X'}]`);
 			}
 		});
+
+		const totalQ = questions.length || 1;
+		const pct = Math.round((studentCorrectCount / totalQ) * 1000) / 10;
+		row.push(`${studentCorrectCount}/${questions.length}`, `${pct.toString().replace('.', ',')}%`);
 
 		sheet1Data.push(row);
 	});
@@ -243,6 +250,7 @@ export const GET: RequestHandler = async ({ params, platform, locals }) => {
 		const diag = questionDiagnostics.find(d => d.id === q.id);
 		keyRow.push(diag?.correctKey || '-');
 	});
+	keyRow.push(`${questions.length}/${questions.length}`, '100%');
 	sheet1Data.push(keyRow);
 
 	const correctSumRow: any[] = ['', '', '', 'JUMLAH SISWA BENAR', '', ''];
@@ -250,6 +258,7 @@ export const GET: RequestHandler = async ({ params, platform, locals }) => {
 		const diag = questionDiagnostics.find(d => d.id === q.id);
 		correctSumRow.push(diag?.correctCount ?? 0);
 	});
+	correctSumRow.push('-', '-');
 	sheet1Data.push(correctSumRow);
 
 	const wrongSumRow: any[] = ['', '', '', 'JUMLAH SISWA SALAH', '', ''];
@@ -257,6 +266,7 @@ export const GET: RequestHandler = async ({ params, platform, locals }) => {
 		const diag = questionDiagnostics.find(d => d.id === q.id);
 		wrongSumRow.push((diag?.wrongCount ?? 0) + (diag?.emptyCount ?? 0));
 	});
+	wrongSumRow.push('-', '-');
 	sheet1Data.push(wrongSumRow);
 
 	const wrongPctRow: any[] = ['', '', '', 'TINGKAT KESALAHAN (%)', '', ''];
@@ -264,7 +274,18 @@ export const GET: RequestHandler = async ({ params, platform, locals }) => {
 		const diag = questionDiagnostics.find(d => d.id === q.id);
 		wrongPctRow.push(`${diag?.wrongPercentage ?? 0}%`);
 	});
+	const avgWrongPct = questions.length > 0 ? (Math.round((questionDiagnostics.reduce((acc, q) => acc + q.wrongPercentage, 0) / questions.length) * 10) / 10).toString().replace('.', ',') : '0';
+	wrongPctRow.push('-', `${avgWrongPct}%`);
 	sheet1Data.push(wrongPctRow);
+
+	const correctPctRow: any[] = ['', '', '', 'TINGKAT BENAR (%)', '', ''];
+	questions.forEach(q => {
+		const diag = questionDiagnostics.find(d => d.id === q.id);
+		correctPctRow.push(`${diag?.correctPercentage ?? 0}%`);
+	});
+	const avgCorrectPct = questions.length > 0 ? (Math.round((questionDiagnostics.reduce((acc, q) => acc + q.correctPercentage, 0) / questions.length) * 10) / 10).toString().replace('.', ',') : '0';
+	correctPctRow.push('-', `${avgCorrectPct}%`);
+	sheet1Data.push(correctPctRow);
 
 	const ws1 = xlsx.utils.aoa_to_sheet(sheet1Data);
 	ws1['!cols'] = [

@@ -50,6 +50,13 @@
 		return 'bg-emerald-50 text-emerald-700 font-normal';
 	}
 
+	function getCorrectHeatColor(pct: number) {
+		if (pct >= 80) return 'bg-emerald-500 text-white font-bold';
+		if (pct >= 50) return 'bg-emerald-100 text-emerald-800 font-semibold';
+		if (pct >= 20) return 'bg-amber-100 text-amber-800 font-medium';
+		return 'bg-rose-100 text-rose-800 font-normal';
+	}
+
 	function formatAnswerDisplay(type: string, val: any): string {
 		if (val == null || val === '') return '-';
 
@@ -91,6 +98,28 @@
 	function toggleStudentRow(attemptId: number) {
 		expandedStudentAttemptId = expandedStudentAttemptId === attemptId ? null : attemptId;
 	}
+
+	function getStudentStats(attId: number) {
+		let correctCount = 0;
+		for (const q of questions) {
+			const ans = answerMatrixMap[`${attId}_${q.id}`];
+			if (ans && (ans.is_correct === 1 || ans.is_correct === true)) {
+				correctCount++;
+			}
+		}
+		const total = questions.length || 1;
+		const pct = Math.round((correctCount / total) * 1000) / 10;
+		return {
+			correctCount,
+			total: questions.length,
+			ratio: `${correctCount}/${questions.length}`,
+			percentage: pct,
+			pctStr: `${pct.toString().replace('.', ',')}%`
+		};
+	}
+
+	$: avgWrongPct = questions.length > 0 ? (Math.round((questionDiagnostics.reduce((acc, q) => acc + q.wrongPercentage, 0) / questions.length) * 10) / 10).toString().replace('.', ',') : '0';
+	$: avgCorrectPct = questions.length > 0 ? (Math.round((questionDiagnostics.reduce((acc, q) => acc + q.correctPercentage, 0) / questions.length) * 10) / 10).toString().replace('.', ',') : '0';
 
 	function marqueeAction(node: HTMLElement) {
 		let anim: Animation | null = null;
@@ -411,23 +440,33 @@
 			{:else}
 				<div class="overflow-x-auto max-h-[600px] relative touch-pan-x touch-pan-y" style="-webkit-overflow-scrolling: touch;">
 					<table class="table min-w-full text-xs text-left border-collapse">
-						<thead class="sticky top-0 z-20 bg-slate-100 text-slate-700 shadow-sm border-b border-slate-300">
-							<tr>
-								<th class="w-8 sm:w-10 text-center sticky left-0 z-30 bg-slate-100 border-r border-slate-300 px-1 py-2 text-[10px] sm:text-xs">No</th>
-								<th class="w-32 sm:min-w-[170px] max-w-[135px] sm:max-w-none sticky left-8 sm:left-10 z-30 bg-slate-100 border-r border-slate-300 px-1.5 sm:px-2 py-2 text-[10px] sm:text-xs">
+						<thead class="sticky top-0 z-20 shadow-md">
+							<tr class="text-white">
+								<!-- Ungu: Kolom No sampai Soal Terakhir -->
+								<th class="w-8 sm:w-10 text-center sticky left-0 z-30 bg-purple-800 text-white font-bold border-r border-purple-700 px-1 py-2 text-[10px] sm:text-xs">No</th>
+								<th class="w-32 sm:min-w-[170px] max-w-[135px] sm:max-w-none sticky left-8 sm:left-10 z-30 bg-purple-800 text-white font-bold border-r border-purple-700 px-1.5 sm:px-2 py-2 text-[10px] sm:text-xs">
 									Nama Siswa
 								</th>
-								<th class="w-14 sm:w-20 text-center border-r border-slate-300 px-1 py-2 text-[10px] sm:text-xs">Kelas</th>
-								<th class="w-12 sm:w-16 text-center border-r border-slate-300 px-1 py-2 text-[10px] sm:text-xs">Nilai</th>
+								<th class="w-14 sm:w-20 text-center bg-purple-800 text-white font-bold border-r border-purple-700 px-1 py-2 text-[10px] sm:text-xs">Kelas</th>
+								<th class="w-12 sm:w-16 text-center bg-purple-800 text-white font-bold border-r border-purple-700 px-1 py-2 text-[10px] sm:text-xs">Nilai</th>
 								{#each questions as q, idx}
-									<th class="w-8 sm:w-11 min-w-[32px] sm:min-w-[40px] text-center border-r border-slate-200 px-0.5 sm:px-1 py-2 font-mono hover:bg-slate-200 cursor-pointer text-[10px] sm:text-xs whitespace-nowrap" title="Soal #{q.question_number} ({q.type})">
+									<th class="w-8 sm:w-11 min-w-[32px] sm:min-w-[40px] text-center bg-purple-800 text-white font-bold hover:bg-purple-700 border-r border-purple-700 px-0.5 sm:px-1 py-2 font-mono cursor-pointer text-[10px] sm:text-xs whitespace-nowrap" title="Soal #{q.question_number} ({q.type})">
 										S{q.question_number || idx + 1}
 									</th>
 								{/each}
+
+								<!-- Orange: Kolom Benar dan % -->
+								<th class="w-12 sm:w-16 min-w-[38px] text-center bg-orange-600 text-white font-bold border-r border-orange-500 px-1 py-2 text-[10px] sm:text-xs whitespace-nowrap" title="Jumlah Soal Benar (contoh 2/6)">
+									Benar
+								</th>
+								<th class="w-12 sm:w-16 min-w-[38px] text-center bg-orange-600 text-white font-bold border-r border-orange-500 px-1 py-2 text-[10px] sm:text-xs whitespace-nowrap" title="Persentase Benar">
+									%
+								</th>
 							</tr>
 						</thead>
 						<tbody>
 							{#each filteredAttempts as att, attIdx (att.id)}
+								{@const stats = getStudentStats(att.id)}
 								<!-- Student Row -->
 								<tr 
 									class="hover:bg-indigo-50/40 transition-colors border-b border-slate-100 cursor-pointer {expandedStudentAttemptId === att.id ? 'bg-indigo-50/60' : ''}"
@@ -480,6 +519,14 @@
 											</td>
 										{/if}
 									{/each}
+
+									<!-- Student Total Correct & Percentage -->
+									<td class="text-center font-bold px-1 py-1.5 border-r border-slate-100 bg-orange-50/70 text-orange-900 text-[10px] sm:text-xs whitespace-nowrap" title="{stats.correctCount} dari {stats.total} soal benar">
+										{stats.ratio}
+									</td>
+									<td class="text-center font-bold px-1 py-1.5 border-r border-slate-100 bg-orange-50/70 text-orange-900 text-[10px] sm:text-xs whitespace-nowrap" title="{stats.pctStr} benar">
+										{stats.pctStr}
+									</td>
 								</tr>
 
 								<!-- Expandable Dropdown Row: Kunci Jawaban Resmi -->
@@ -502,27 +549,55 @@
 												{diag?.correctKey || '-'}
 											</td>
 										{/each}
+										<td class="text-center font-bold px-1 py-1 border-r border-indigo-200 bg-indigo-100/90 text-indigo-900 text-[10px] sm:text-xs whitespace-nowrap">
+											{questions.length}/{questions.length}
+										</td>
+										<td class="text-center font-bold px-1 py-1 border-r border-indigo-200 bg-indigo-100/90 text-indigo-900 text-[10px] sm:text-xs whitespace-nowrap">
+											100%
+										</td>
 									</tr>
 								{/if}
 							{/each}
 						</tbody>
 
-						<!-- Summary Footer Row: Tingkat Kesalahan (%) per Soal -->
+						<!-- Summary Footer Rows: Tingkat Kesalahan (%) dan Kebenaran (%) per Soal -->
 						<tfoot class="sticky bottom-0 z-20 bg-slate-900 text-white font-bold text-[10px] sm:text-xs shadow-lg">
-							<tr>
-								<td class="py-2 sm:py-2.5 px-1 sticky left-0 z-30 bg-slate-900 text-center border-r border-slate-700 text-slate-500">
+							<!-- Baris 1: % SALAH -->
+							<tr class="border-b border-slate-800">
+								<td class="py-1.5 sm:py-2 px-1 sticky left-0 z-30 bg-slate-900 text-center border-r border-slate-700 text-slate-500">
 									#
 								</td>
-								<td class="py-2 sm:py-2.5 px-1.5 sm:px-2 sticky left-8 sm:left-10 z-30 bg-slate-900 text-left tracking-wider uppercase border-r border-slate-700 whitespace-nowrap text-[10px] sm:text-xs max-w-[135px] sm:max-w-none">
+								<td class="py-1.5 sm:py-2 px-1.5 sm:px-2 sticky left-8 sm:left-10 z-30 bg-slate-900 text-left tracking-wider uppercase border-r border-slate-700 whitespace-nowrap text-[10px] sm:text-xs max-w-[135px] sm:max-w-none text-rose-400">
 									% SALAH
 								</td>
-								<td class="text-center py-2 px-1 border-r border-slate-700 bg-slate-900 text-slate-500">-</td>
-								<td class="text-center py-2 px-1 border-r border-slate-700 bg-slate-900 text-slate-500">-</td>
+								<td class="text-center py-1.5 px-1 border-r border-slate-700 bg-slate-900 text-slate-500">-</td>
+								<td class="text-center py-1.5 px-1 border-r border-slate-700 bg-slate-900 text-slate-500">-</td>
 								{#each questionDiagnostics as q}
-									<td class="text-center py-1.5 sm:py-2 px-0.5 sm:px-1 border-r border-slate-700 {getWrongHeatColor(q.wrongPercentage)}" title="Soal #{q.question_number}: {q.wrongPercentage}% salah">
+									<td class="text-center py-1 sm:py-1.5 px-0.5 sm:px-1 border-r border-slate-700 {getWrongHeatColor(q.wrongPercentage)} whitespace-nowrap" title="Soal #{q.question_number}: {q.wrongPercentage}% salah">
 										{q.wrongPercentage}%
 									</td>
 								{/each}
+								<td class="text-center py-1.5 px-1 border-r border-slate-700 bg-slate-900 text-rose-400 font-bold whitespace-nowrap">-</td>
+								<td class="text-center py-1.5 px-1 border-r border-slate-700 bg-slate-900 text-rose-400 font-bold whitespace-nowrap" title="Rata-rata salah: {avgWrongPct}%">{avgWrongPct}%</td>
+							</tr>
+
+							<!-- Baris 2: % BENAR -->
+							<tr>
+								<td class="py-1.5 sm:py-2 px-1 sticky left-0 z-30 bg-slate-950 text-center border-r border-slate-700 text-slate-500">
+									#
+								</td>
+								<td class="py-1.5 sm:py-2 px-1.5 sm:px-2 sticky left-8 sm:left-10 z-30 bg-slate-950 text-left tracking-wider uppercase border-r border-slate-700 whitespace-nowrap text-[10px] sm:text-xs max-w-[135px] sm:max-w-none text-emerald-400">
+									% BENAR
+								</td>
+								<td class="text-center py-1.5 px-1 border-r border-slate-700 bg-slate-950 text-slate-500">-</td>
+								<td class="text-center py-1.5 px-1 border-r border-slate-700 bg-slate-950 text-slate-500">-</td>
+								{#each questionDiagnostics as q}
+									<td class="text-center py-1 sm:py-1.5 px-0.5 sm:px-1 border-r border-slate-700 {getCorrectHeatColor(q.correctPercentage)} whitespace-nowrap" title="Soal #{q.question_number}: {q.correctPercentage}% benar">
+										{q.correctPercentage}%
+									</td>
+								{/each}
+								<td class="text-center py-1.5 px-1 border-r border-slate-700 bg-slate-950 text-emerald-400 font-bold whitespace-nowrap">-</td>
+								<td class="text-center py-1.5 px-1 border-r border-slate-700 bg-slate-950 text-emerald-400 font-bold whitespace-nowrap" title="Rata-rata benar: {avgCorrectPct}%">{avgCorrectPct}%</td>
 							</tr>
 						</tfoot>
 					</table>

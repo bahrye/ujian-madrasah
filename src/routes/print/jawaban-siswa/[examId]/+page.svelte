@@ -86,6 +86,28 @@
 
 		return String(parsed).trim().toUpperCase();
 	}
+
+	function getStudentStats(attId: number) {
+		let correctCount = 0;
+		for (const q of questions) {
+			const ans = answerMatrixMap[`${attId}_${q.id}`];
+			if (ans && (ans.is_correct === 1 || ans.is_correct === true)) {
+				correctCount++;
+			}
+		}
+		const total = questions.length || 1;
+		const pct = Math.round((correctCount / total) * 1000) / 10;
+		return {
+			correctCount,
+			total: questions.length,
+			ratio: `${correctCount}/${questions.length}`,
+			percentage: pct,
+			pctStr: `${pct.toString().replace('.', ',')}%`
+		};
+	}
+
+	$: avgWrongPct = questions.length > 0 ? (Math.round((questionDiagnostics.reduce((acc, q) => acc + q.wrongPercentage, 0) / questions.length) * 10) / 10).toString().replace('.', ',') : '0';
+	$: avgCorrectPct = questions.length > 0 ? (Math.round((questionDiagnostics.reduce((acc, q) => acc + q.correctPercentage, 0) / questions.length) * 10) / 10).toString().replace('.', ',') : '0';
 </script>
 
 <svelte:head>
@@ -277,10 +299,13 @@
 								S{q.question_number || idx + 1}
 							</th>
 						{/each}
+						<th class="border border-black px-1 py-1 w-12 bg-amber-50">Benar</th>
+						<th class="border border-black px-1 py-1 w-12 bg-amber-50">%</th>
 					</tr>
 				</thead>
 				<tbody>
 					{#each attempts as att, attIdx}
+						{@const stats = getStudentStats(att.id)}
 						<tr class="border-b border-black">
 							<td class="border border-black py-0.5">{attIdx + 1}</td>
 							<td class="border border-black px-1.5 py-0.5 text-left font-medium truncate max-w-[140px]">{att.student_name}</td>
@@ -298,6 +323,8 @@
 									<td class="border border-black py-0.5 font-bold text-rose-800 bg-rose-50">{displayAns}</td>
 								{/if}
 							{/each}
+							<td class="border border-black py-0.5 font-bold bg-amber-50/50">{stats.ratio}</td>
+							<td class="border border-black py-0.5 font-bold bg-amber-50/50">{stats.pctStr}</td>
 						</tr>
 					{/each}
 				</tbody>
@@ -309,18 +336,32 @@
 						{#each questionDiagnostics as q}
 							<td class="border border-black py-0.5 text-emerald-900 bg-emerald-100 font-bold">{q.correctKey}</td>
 						{/each}
+						<td class="border border-black py-0.5 font-bold bg-emerald-100">{questions.length}/{questions.length}</td>
+						<td class="border border-black py-0.5 font-bold bg-emerald-100">100%</td>
 					</tr>
 					<tr class="font-bold bg-slate-50">
 						<td colspan="4" class="border border-black text-right px-2 py-1">JUMLAH SISWA BENAR</td>
 						{#each questionDiagnostics as q}
 							<td class="border border-black py-0.5 text-emerald-700">{q.correctCount}</td>
 						{/each}
+						<td class="border border-black py-0.5 text-slate-500">-</td>
+						<td class="border border-black py-0.5 text-slate-500">-</td>
 					</tr>
 					<tr class="font-bold bg-slate-50">
 						<td colspan="4" class="border border-black text-right px-2 py-1">TINGKAT KESALAHAN (%)</td>
 						{#each questionDiagnostics as q}
 							<td class="border border-black py-0.5 {getWrongHeatColor(q.wrongPercentage)}">{q.wrongPercentage}%</td>
 						{/each}
+						<td class="border border-black py-0.5 text-slate-500">-</td>
+						<td class="border border-black py-0.5 font-bold text-rose-800">{avgWrongPct}%</td>
+					</tr>
+					<tr class="font-bold bg-slate-50">
+						<td colspan="4" class="border border-black text-right px-2 py-1">TINGKAT BENAR (%)</td>
+						{#each questionDiagnostics as q}
+							<td class="border border-black py-0.5 text-emerald-800">{q.correctPercentage}%</td>
+						{/each}
+						<td class="border border-black py-0.5 text-slate-500">-</td>
+						<td class="border border-black py-0.5 font-bold text-emerald-800">{avgCorrectPct}%</td>
 					</tr>
 				</tfoot>
 			</table>
