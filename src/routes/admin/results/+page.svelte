@@ -29,10 +29,9 @@
 	});
 
 	function isAttemptScoreReleased(r: any, now: Date) {
-		if (r.is_score_released === 1) return true;
 		const type = r.show_score_type || 'after_submit';
+		if (type === 'manual') return r.is_score_released === 1;
 		if (type === 'after_submit' || type === 'objective_only') return true;
-		if (type === 'manual') return false;
 		if (type === 'after_end_time') {
 			if (!r.exam_end_time) return false;
 			const str = String(r.exam_end_time).replace(' ', 'T');

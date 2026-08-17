@@ -27,9 +27,10 @@
 	}
 
 	function checkIsScoreVisible(attempt: any) {
-		if (attempt.student_is_score_released === 1 || attempt.is_score_released === 1 || attempt.exam_is_score_released === 1) return true;
 		const type = attempt.show_score_type || 'after_submit';
-		if (type === 'manual') return false;
+		if (type === 'manual') {
+			return attempt.student_is_score_released === 1 || attempt.is_score_released === 1 || attempt.exam_is_score_released === 1;
+		}
 		
 		if (type === 'after_type_end_time' || type === 'after_end_time') {
 			const timeStr = type === 'after_type_end_time' ? attempt.exam_type_end_time : attempt.exam_end_time;

@@ -20,18 +20,17 @@
 	$: typeEndTime = parseDate(attempt.exam_type_end_time);
 	$: endTime = parseDate(attempt.exam_end_time);
 
-	$: isReleased = attempt.student_is_score_released === 1 || attempt.is_score_released === 1 || attempt.exam_is_score_released === 1;
+	$: isManualReleased = attempt.student_is_score_released === 1 || attempt.is_score_released === 1 || attempt.exam_is_score_released === 1;
 
 	$: isScoreVisible = (() => {
-		if (isReleased) return true;
-		if (isManual) return false;
-		if (isAfterTypeEndTime) return typeEndTime && currentTime >= typeEndTime;
-		if (isAfterEndTime) return endTime && currentTime >= endTime;
+		if (isManual) return isManualReleased;
+		if (isAfterTypeEndTime) return typeEndTime ? currentTime >= typeEndTime : false;
+		if (isAfterEndTime) return endTime ? currentTime >= endTime : false;
 		return true; // objective_only and after_submit are always visible when finished
 	})();
 
 	$: statusLabel = (() => {
-		if (isManual && !isReleased) return 'Belum dirilis';
+		if (isManual && !isManualReleased) return 'Belum dirilis';
 		if (isAfterTypeEndTime && (!typeEndTime || currentTime < typeEndTime)) return 'Menunggu jadwal tipe ujian';
 		if (isAfterEndTime && (!endTime || currentTime < endTime)) return 'Menunggu jadwal berakhir';
 		return '';

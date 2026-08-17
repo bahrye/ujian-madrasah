@@ -1,7 +1,7 @@
 import { m as fallback, e as escape_html, j as attr_class, l as clsx, f as bind_props } from "./index.js";
 function ScoreDisplay($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
-    let showScoreType, isManual, isAfterTypeEndTime, isAfterEndTime, isObjectiveOnly, typeEndTime, endTime, isReleased, isScoreVisible, statusLabel, total_points, objective_raw, akhir_raw, manual_raw, otomatis, akhir, manual;
+    let showScoreType, isManual, isAfterTypeEndTime, isAfterEndTime, isObjectiveOnly, typeEndTime, endTime, isManualReleased, isScoreVisible, statusLabel, total_points, objective_raw, akhir_raw, manual_raw, otomatis, akhir, manual;
     let attempt = $$props["attempt"];
     let currentTime = $$props["currentTime"];
     let type = fallback($$props["type"], "akhir");
@@ -21,16 +21,15 @@ function ScoreDisplay($$renderer, $$props) {
     isObjectiveOnly = showScoreType === "objective_only";
     typeEndTime = parseDate(attempt.exam_type_end_time);
     endTime = parseDate(attempt.exam_end_time);
-    isReleased = attempt.student_is_score_released === 1 || attempt.is_score_released === 1 || attempt.exam_is_score_released === 1;
+    isManualReleased = attempt.student_is_score_released === 1 || attempt.is_score_released === 1 || attempt.exam_is_score_released === 1;
     isScoreVisible = (() => {
-      if (isReleased) return true;
-      if (isManual) return false;
-      if (isAfterTypeEndTime) return typeEndTime && currentTime >= typeEndTime;
-      if (isAfterEndTime) return endTime && currentTime >= endTime;
+      if (isManual) return isManualReleased;
+      if (isAfterTypeEndTime) return typeEndTime ? currentTime >= typeEndTime : false;
+      if (isAfterEndTime) return endTime ? currentTime >= endTime : false;
       return true;
     })();
     statusLabel = (() => {
-      if (isManual && !isReleased) return "Belum dirilis";
+      if (isManual && !isManualReleased) return "Belum dirilis";
       if (isAfterTypeEndTime && (!typeEndTime || currentTime < typeEndTime)) return "Menunggu jadwal tipe ujian";
       if (isAfterEndTime && (!endTime || currentTime < endTime)) return "Menunggu jadwal berakhir";
       return "";
