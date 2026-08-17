@@ -22,7 +22,8 @@ function ScoreDisplay($$renderer, $$props) {
     typeEndTime = parseDate(attempt.exam_type_end_time);
     endTime = parseDate(attempt.exam_end_time);
     isScoreVisible = (() => {
-      if (isManual) return attempt.is_score_released === 1;
+      if (attempt.is_score_released === 1) return true;
+      if (isManual) return false;
       if (isAfterTypeEndTime) return typeEndTime && currentTime >= typeEndTime;
       if (isAfterEndTime) return endTime && currentTime >= endTime;
       return true;

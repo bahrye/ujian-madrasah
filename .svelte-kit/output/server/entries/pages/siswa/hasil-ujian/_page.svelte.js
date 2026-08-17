@@ -22,8 +22,9 @@ function _page($$renderer, $$props) {
       }).replace(/\./g, ":");
     }
     function checkIsScoreVisible(attempt) {
+      if (attempt.is_score_released === 1) return true;
       const type = attempt.show_score_type || "after_submit";
-      if (type === "manual") return attempt.is_score_released === 1;
+      if (type === "manual") return false;
       if (type === "after_type_end_time" || type === "after_end_time") {
         const timeStr = type === "after_type_end_time" ? attempt.exam_type_end_time : attempt.exam_end_time;
         if (!timeStr) return false;

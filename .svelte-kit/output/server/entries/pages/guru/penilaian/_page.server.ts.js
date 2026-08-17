@@ -1,5 +1,5 @@
 import { fail } from "@sveltejs/kit";
-import { g as getDB, c as ensureStudentAttemptsGradedColumn } from "../../../../chunks/db.js";
+import { g as getDB, f as ensureStudentAttemptsGradedColumn } from "../../../../chunks/db.js";
 const load = async ({ platform, url, locals }) => {
   const db = getDB(platform);
   await ensureStudentAttemptsGradedColumn(db);

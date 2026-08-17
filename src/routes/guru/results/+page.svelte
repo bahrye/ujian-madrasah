@@ -1,13 +1,19 @@
 <script lang="ts">
 	import { parseDate } from '$lib/utils/date';
-
 	import { enhance } from '$app/forms';
-	import { ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS, ICONS } from '$lib/utils/constants';
+	import { ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS } from '$lib/utils/constants';
 	import { exportExamResults } from '$lib/utils/excel';
 	import { toasts } from '$lib/stores/toast';
 
 	export let data;
+	export let form: any;
+
 	$: results = data.results as any[];
+
+	$: if (form?.error) toasts.error(form.error);
+	$: if (form?.released === true) toasts.success('Nilai siswa berhasil dikirim ke siswa!');
+	$: if (form?.released === false) toasts.success('Kirim nilai berhasil dibatalkan!');
+	$: if (form?.releaseAll) toasts.success('Nilai seluruh siswa yang sudah lengkap berhasil dikirim!');
 
 	let isExporting = false;
 	async function handleExport() {
@@ -35,8 +41,8 @@
 	</div>
 
 	<!-- Filter -->
-	<div class="card p-4">
-		<form method="GET" class="flex flex-col md:flex-row gap-3">
+	<div class="card p-4 flex flex-col md:flex-row gap-3 items-center">
+		<form method="GET" class="flex flex-col md:flex-row gap-3 flex-1 w-full">
 			<select name="exam_id" class="select flex-1" on:change={(e) => e.currentTarget.form?.submit()}>
 				<option value="">Semua Ujian</option>
 				{#each data.exams as exam}
@@ -44,7 +50,18 @@
 				{/each}
 			</select>
 			<button type="submit" class="btn-secondary md:w-auto w-full">Tampilkan</button>
-			{#if data.examFilter}
+		</form>
+		{#if data.examFilter}
+			<div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+				<form method="POST" action="?/releaseAll" use:enhance class="w-full md:w-auto">
+					<input type="hidden" name="exam_id" value={data.examFilter} />
+					<button type="submit" class="btn bg-indigo-600 hover:bg-indigo-700 text-white md:w-auto w-full flex items-center justify-center gap-2 shadow-sm">
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+						</svg>
+						Kirim Semua
+					</button>
+				</form>
 				<button type="button" class="btn-primary md:w-auto w-full flex items-center justify-center gap-2" on:click={handleExport} disabled={isExporting}>
 					{#if isExporting}
 						<span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
@@ -56,8 +73,8 @@
 						Eksport Excel
 					{/if}
 				</button>
-			{/if}
-		</form>
+			</div>
+		{/if}
 	</div>
 
 	<div class="card overflow-hidden">
@@ -74,11 +91,12 @@
 							<th>Nilai</th>
 							<th>Status</th>
 							<th>Waktu Selesai</th>
-							<th class="w-16 text-center">Aksi</th>
+							<th class="w-24 text-center">Aksi</th>
 						</tr>
 					</thead>
 					<tbody>
 						{#each results as r}
+							{@const isComplete = r.is_graded === 1 || r.ungraded_count === 0}
 							<tr>
 								<td class="font-semibold text-slate-800">{r.student_name}</td>
 								<td>{r.exam_title}</td>
@@ -91,8 +109,43 @@
 								<td><span class={ATTEMPT_STATUS_COLORS[r.status] || 'badge-info'}>{ATTEMPT_STATUS_LABELS[r.status]}</span></td>
 								<td class="text-xs text-slate-500">{r.submit_time ? parseDate(r.submit_time).toLocaleString('id-ID') : '-'}</td>
 								<td class="text-center">
-									<div class="flex items-center justify-center gap-2">
-										<a href="/guru/results/{r.id}" class="p-1.5 text-indigo-500 hover:bg-indigo-50 rounded transition-colors" title="Lihat Detail Ujian">
+									<div class="flex items-center justify-center gap-1.5">
+										<form method="POST" action="?/toggleRelease" use:enhance class="inline-block">
+											<input type="hidden" name="attempt_id" value={r.id} />
+											{#if r.is_score_released === 1}
+												<button 
+													type="submit" 
+													class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors bg-emerald-50/50" 
+													title="Nilai sudah dikirim ke siswa (Klik untuk batalkan)"
+												>
+													<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+														<path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+													</svg>
+												</button>
+											{:else if isComplete}
+												<button 
+													type="submit" 
+													class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" 
+													title="Kirim nilai ke hasil ujian siswa"
+												>
+													<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+														<path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+													</svg>
+												</button>
+											{:else}
+												<button 
+													type="button" 
+													disabled 
+													class="p-1.5 text-slate-300 cursor-not-allowed rounded-lg" 
+													title="Nilai belum lengkap (penilaian essay/isian belum selesai)"
+												>
+													<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+														<path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+													</svg>
+												</button>
+											{/if}
+										</form>
+										<a href="/guru/results/{r.id}" class="p-1.5 text-indigo-500 hover:bg-indigo-50 rounded-lg transition-colors" title="Lihat Detail Ujian">
 											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 												<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
 											</svg>
