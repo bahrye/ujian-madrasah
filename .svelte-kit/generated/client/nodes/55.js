@@ -1,1 +1,1 @@
-export { default as component } from "../../../../src/routes/print/berita-acara/type/[typeId]/+page.svelte";
+export { default as component } from "../../../../src/routes/pengawas/tokens/+page.svelte";

@@ -85,6 +85,11 @@
 		"src/routes/admin/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/admin/reset-login": [
+		"src/routes/admin/reset-login/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/admin/results": [
 		"src/routes/admin/results/+page.server.ts",
 		"src/routes/admin/+layout.server.ts",

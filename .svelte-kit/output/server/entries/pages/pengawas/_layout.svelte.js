@@ -6,6 +6,9 @@ function _layout($$renderer, $$props) {
     let menuItems;
     let data = $$props["data"];
     menuItems = (() => {
+      if (data.user?.role === "admin" || data.user?.role === "superadmin" || data.user?.role === "panitia") {
+        return SIDEBAR_MENUS.admin;
+      }
       if (data.user?.role === "guru") {
         return [
           ...SIDEBAR_MENUS.guru,

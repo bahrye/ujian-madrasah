@@ -1,1 +1,1 @@
-export { default as component } from "../../../../src/routes/guru/penilaian/+page.svelte";
+export { default as component } from "../../../../src/routes/guru/papan-peringkat/[examId]/+page.svelte";

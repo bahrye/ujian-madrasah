@@ -4,6 +4,9 @@
 	export let data;
 
 	$: menuItems = (() => {
+		if (data.user?.role === 'admin' || data.user?.role === 'superadmin' || data.user?.role === 'panitia') {
+			return SIDEBAR_MENUS.admin;
+		}
 		if (data.user?.role === 'guru') {
 			return [
 				...SIDEBAR_MENUS.guru,

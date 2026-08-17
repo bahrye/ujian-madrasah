@@ -1,1 +1,1 @@
-export { default as component } from "../../../../src/routes/print/jadwal/type/[typeId]/+page.svelte";
+export { default as component } from "../../../../src/routes/print/berita-acara/[exam_id]/+page.svelte";
