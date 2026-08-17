@@ -11,8 +11,7 @@
 	$: results = data.results as any[];
 	$: selectedExam = data.exams.find((e: any) => String(e.id) === String(data.examFilter));
 	$: isManualExamSelected = selectedExam ? selectedExam.show_score_type === 'manual' : false;
-	$: hasManualResults = results.some(r => r.show_score_type === 'manual');
-	$: showStatusColumn = data.examFilter ? isManualExamSelected : hasManualResults;
+	$: showStatusColumn = Boolean(data.examFilter) && isManualExamSelected;
 
 	$: if (form?.error) toasts.error(form.error);
 	$: if (form?.released === true) toasts.success('Nilai siswa berhasil dikirim ke siswa!');
@@ -97,7 +96,7 @@
 							<th>Nilai</th>
 							<th>Status Ujian</th>
 							{#if showStatusColumn}
-								<th>Status Nilai</th>
+								<th class="whitespace-nowrap text-xs">Status Nilai</th>
 							{/if}
 							<th>Waktu Selesai</th>
 							<th class="w-24 text-center">Aksi</th>
@@ -118,12 +117,12 @@
 								</td>
 								<td><span class={ATTEMPT_STATUS_COLORS[r.status] || 'badge-info'}>{ATTEMPT_STATUS_LABELS[r.status]}</span></td>
 								{#if showStatusColumn}
-									<td>
+									<td class="whitespace-nowrap text-xs">
 										{#if isManual}
 											{#if r.is_score_released === 1}
-												<span class="badge-success">🟢 Terkirim</span>
+												<span class="badge-success text-[11px] whitespace-nowrap px-2 py-0.5 font-medium">🟢 Terkirim</span>
 											{:else}
-												<span class="badge-error">🔴 Belum Terkirim</span>
+												<span class="badge-error text-[11px] whitespace-nowrap px-2 py-0.5 font-medium">🔴 Belum Terkirim</span>
 											{/if}
 										{:else}
 											<span class="text-slate-400 text-xs">-</span>
@@ -133,7 +132,7 @@
 								<td class="text-xs text-slate-500">{r.submit_time ? parseDate(r.submit_time).toLocaleString('id-ID') : '-'}</td>
 								<td class="text-center">
 									<div class="flex items-center justify-center gap-1.5">
-										{#if isManual}
+										{#if showStatusColumn && isManual}
 											<form method="POST" action="?/toggleRelease" use:enhance class="inline-block">
 												<input type="hidden" name="attempt_id" value={r.id} />
 												{#if r.is_score_released === 1}
