@@ -26,8 +26,8 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 			LEFT JOIN subjects s ON e.subject_id = s.id
 			LEFT JOIN exam_types et ON e.exam_type_id = et.id
 			LEFT JOIN classes c ON e.class_id = c.id
-			WHERE e.is_active = 1 AND e.school_id = ?
-			ORDER BY e.title
+			WHERE e.school_id = ?
+			ORDER BY e.is_active DESC, e.title ASC
 		`).bind(locals.user.school_id).all<any>();
 
 		const exams: ExamFilterOption[] = (rawExams.results || []).map((e: any) => ({
@@ -118,25 +118,26 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 			});
 		}
 
-		const kv = platform?.env?.EXAM_ANSWERS;
 		const attemptsWithProgress = await Promise.all(
 			attempts.map(async (a) => {
+				let status = a.status || 'belum_mulai';
 				let answeredCount = 0;
 				let warnings = 0;
 				let warningLogs: any[] = [];
-				const status = a.status || 'belum_mengerjakan';
 
 				if (status === 'mengerjakan') {
+					warnings = a.violation_count || 0;
+					try { warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : []; } catch(e) {}
+
+					const kv = (platform?.env as any)?.EXAM_ANSWERS || (platform?.env as any)?.ANSWER_KV;
 					if (kv && a.attempt_id) {
 						try {
 							const stored = await kv.get(`attempt_${a.attempt_id}_answers`);
 							if (stored) {
-								const data = JSON.parse(stored);
-								if (data && data.answers) {
-									answeredCount = Object.values(data.answers).filter(val => val !== null && val !== '').length;
+								const kvData = typeof stored === 'string' ? JSON.parse(stored) : stored;
+								if (kvData && kvData.answers) {
+									answeredCount = Object.keys(kvData.answers).length;
 								}
-								if (data && data.warnings) warnings = data.warnings;
-								if (data && data.warningLogs) warningLogs = data.warningLogs;
 							}
 						} catch (e) {
 							console.error("KV get error:", e);
@@ -168,7 +169,7 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 		);
 
 		return {
-			exams: exams.results,
+			exams,
 			attempts: attemptsWithProgress,
 			examFilter: isNaN(examFilter) ? '' : String(examFilter),
 			availableSessions,

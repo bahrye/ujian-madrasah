@@ -86,7 +86,8 @@ export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
 			subItems: [
 				{ label: 'Daftar Ujian', href: '/admin/exams' },
 				{ label: 'Token Ujian', href: '/admin/tokens' },
-				{ label: 'Monitoring', href: '/admin/monitor' }
+				{ label: 'Monitoring', href: '/admin/monitor' },
+				{ label: 'Reset Login Siswa', href: '/pengawas/reset-login' }
 			]
 		},
 		{ label: 'Hasil Ujian', href: '/admin/results', icon: 'results' },
