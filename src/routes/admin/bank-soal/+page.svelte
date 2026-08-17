@@ -243,9 +243,9 @@
 											<span class="badge-primary text-[10px] uppercase tracking-wider">{q.type.replace('_', ' ')}</span>
 											<span class="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">{q.points} Pts</span>
 										</div>
-										<p class="text-sm text-slate-700 line-clamp-2" title={q.question_text}>
-											{q.question_text.replace(/<[^>]*>?/gm, '')}
-										</p>
+										<div class="text-sm text-slate-700 line-clamp-2 prose prose-sm max-w-none prose-p:m-0 prose-img:m-0 prose-ul:m-0" title={q.question_text ? q.question_text.replace(/<[^>]*>?/gm, '') : ''}>
+											{@html q.question_text}
+										</div>
 									</div>
 								</label>
 							{/each}

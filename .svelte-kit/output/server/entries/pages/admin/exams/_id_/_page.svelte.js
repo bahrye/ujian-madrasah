@@ -10,6 +10,7 @@ import { C as ConfirmForm } from "../../../../../chunks/ConfirmForm.js";
 import { Q as QUESTION_TYPE_LABELS, A as ATTEMPT_STATUS_COLORS, a as ATTEMPT_STATUS_LABELS, I as ICONS } from "../../../../../chunks/constants.js";
 import "katex/dist/contrib/auto-render.mjs";
 import { t as toasts } from "../../../../../chunks/toast.js";
+import { h as html } from "../../../../../chunks/html.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let exam, questions, attempts, tokens, participants, examTeachers, examProctors, examSessions, hasSessionsOrRooms;
@@ -371,7 +372,7 @@ function _page($$renderer, $$props) {
       const each_array_9 = ensure_array_like(questions.slice(0, 5));
       for (let $$index_9 = 0, $$length = each_array_9.length; $$index_9 < $$length; $$index_9++) {
         let q = each_array_9[$$index_9];
-        $$renderer2.push(`<div class="p-4 flex items-center gap-3"><span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold flex-shrink-0">${escape_html(q.question_number)}</span> <div class="flex-1 min-w-0"><p class="text-sm text-slate-700 truncate">${escape_html(q.question_text)}</p> <span class="text-[10px] badge-primary mt-0.5">${escape_html(QUESTION_TYPE_LABELS[q.type] || q.type)}</span></div> <span class="text-xs text-slate-400">${escape_html(q.points)} poin</span></div>`);
+        $$renderer2.push(`<div class="p-4 flex items-center gap-3"><span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold flex-shrink-0">${escape_html(q.question_number)}</span> <div class="flex-1 min-w-0"><div class="text-sm text-slate-700 line-clamp-2 prose prose-sm max-w-none prose-p:m-0 prose-img:m-0 prose-ul:m-0">${html(q.question_text)}</div> <span class="text-[10px] badge-primary mt-0.5 inline-block">${escape_html(QUESTION_TYPE_LABELS[q.type] || q.type)}</span></div> <span class="text-xs text-slate-400">${escape_html(q.points)} poin</span></div>`);
       }
       $$renderer2.push(`<!--]--></div> `);
       if (questions.length > 5) {

@@ -529,8 +529,8 @@
 					<div class="p-4 flex items-center gap-3">
 						<span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold flex-shrink-0">{q.question_number}</span>
 						<div class="flex-1 min-w-0">
-							<p class="text-sm text-slate-700 truncate">{q.question_text}</p>
-							<span class="text-[10px] badge-primary mt-0.5">{QUESTION_TYPE_LABELS[q.type] || q.type}</span>
+							<div class="text-sm text-slate-700 line-clamp-2 prose prose-sm max-w-none prose-p:m-0 prose-img:m-0 prose-ul:m-0">{@html q.question_text}</div>
+							<span class="text-[10px] badge-primary mt-0.5 inline-block">{QUESTION_TYPE_LABELS[q.type] || q.type}</span>
 						</div>
 						<span class="text-xs text-slate-400">{q.points} poin</span>
 					</div>

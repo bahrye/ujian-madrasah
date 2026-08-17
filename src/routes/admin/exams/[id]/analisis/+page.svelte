@@ -120,7 +120,7 @@
 							<tr class="hover:bg-slate-50/50 transition-colors">
 								<td class="text-center font-bold text-slate-700">{item.question_number}</td>
 								<td>
-									<div class="line-clamp-2 text-sm text-slate-700" title={item.question_text}>{@html item.question_text}</div>
+									<div class="line-clamp-2 text-sm text-slate-700" title={item.question_text ? item.question_text.replace(/<[^>]*>?/gm, '') : ''}>{@html item.question_text}</div>
 									<!-- Distribution for multiple choice -->
 									{#if Object.keys(item.distribution).length > 0}
 										<div class="flex gap-2 mt-2 text-[10px] font-mono">

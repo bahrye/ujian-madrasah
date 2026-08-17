@@ -46,7 +46,7 @@ function _page($$renderer, $$props) {
       const each_array = ensure_array_like(analysis);
       for (let $$index_1 = 0, $$length = each_array.length; $$index_1 < $$length; $$index_1++) {
         let item = each_array[$$index_1];
-        $$renderer2.push(`<tr class="hover:bg-slate-50/50 transition-colors"><td class="text-center font-bold text-slate-700">${escape_html(item.question_number)}</td><td><div class="line-clamp-2 text-sm text-slate-700"${attr("title", item.question_text)}>${html(item.question_text)}</div> `);
+        $$renderer2.push(`<tr class="hover:bg-slate-50/50 transition-colors"><td class="text-center font-bold text-slate-700">${escape_html(item.question_number)}</td><td><div class="line-clamp-2 text-sm text-slate-700"${attr("title", item.question_text ? item.question_text.replace(/<[^>]*>?/gm, "") : "")}>${html(item.question_text)}</div> `);
         if (Object.keys(item.distribution).length > 0) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<div class="flex gap-2 mt-2 text-[10px] font-mono"><!--[-->`);
