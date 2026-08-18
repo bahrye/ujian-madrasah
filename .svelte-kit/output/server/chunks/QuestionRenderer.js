@@ -293,26 +293,26 @@ function QuestionRenderer($$renderer, $$props) {
       $$renderer2.push("<!--[1-->");
       if (benarSalahStatements.length > 0) {
         $$renderer2.push("<!--[0-->");
-        $$renderer2.push(`<div class="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-xs"><table class="w-full text-sm border-collapse text-left"><thead><tr class="bg-slate-50 border-b border-slate-200 text-slate-700"><th class="py-3 px-3 w-12 text-center font-semibold">No</th><th class="py-3 px-4 font-semibold">Pernyataan</th><th class="py-3 px-3 w-28 text-center font-semibold text-emerald-700 bg-emerald-50/50">Benar</th><th class="py-3 px-3 w-28 text-center font-semibold text-rose-700 bg-rose-50/50">Salah</th></tr></thead><tbody class="divide-y divide-slate-100"><!--[-->`);
+        $$renderer2.push(`<div class="w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs"><table class="w-full text-xs sm:text-sm border-collapse text-left table-fixed"><thead><tr class="bg-slate-50 border-b border-slate-200 text-slate-700"><th class="py-2.5 sm:py-3 px-1.5 sm:px-3 w-8 sm:w-12 text-center font-semibold">No</th><th class="py-2.5 sm:py-3 px-2 sm:px-4 font-semibold">Pernyataan</th><th class="py-2.5 sm:py-3 px-1 sm:px-3 w-14 sm:w-28 text-center font-semibold text-emerald-700 bg-emerald-50/50"><span class="sm:hidden">B</span> <span class="hidden sm:inline">Benar</span></th><th class="py-2.5 sm:py-3 px-1 sm:px-3 w-14 sm:w-28 text-center font-semibold text-rose-700 bg-rose-50/50"><span class="sm:hidden">S</span> <span class="hidden sm:inline">Salah</span></th></tr></thead><tbody class="divide-y divide-slate-100"><!--[-->`);
         const each_array_1 = ensure_array_like(benarSalahStatements);
         for (let idx = 0, $$length = each_array_1.length; idx < $$length; idx++) {
           let stmt = each_array_1[idx];
           const choice = benarSalahAnswers[String(idx)];
-          $$renderer2.push(`<tr class="hover:bg-slate-50/70 transition-colors"><td class="py-3.5 px-3 text-center text-slate-500 font-semibold">${escape_html(idx + 1)}</td><td class="py-3.5 px-4 text-slate-800 prose prose-sm max-w-none">${html(stmt)}</td><td class="py-3.5 px-3 text-center bg-emerald-50/20"><button type="button"${attr_class(`w-full py-1.5 px-2 rounded-lg border-2 font-medium text-xs transition-all flex items-center justify-center gap-1.5 ${choice === "Benar" ? "bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-500/20" : "border-slate-200 text-slate-600 hover:border-emerald-300 hover:bg-emerald-50/50"}`)}><span${attr_class(`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${choice === "Benar" ? "border-white bg-white" : "border-slate-400"}`)}>`);
+          $$renderer2.push(`<tr class="hover:bg-slate-50/70 transition-colors"><td class="py-2.5 sm:py-3.5 px-1.5 sm:px-3 text-center text-slate-500 font-semibold">${escape_html(idx + 1)}</td><td class="py-2.5 sm:py-3.5 px-2 sm:px-4 text-slate-800 prose prose-sm max-w-none break-words">${html(stmt)}</td><td class="py-2.5 sm:py-3.5 px-1 sm:px-2 text-center bg-emerald-50/20"><button type="button"${attr_class(`w-full py-1.5 sm:py-2 px-1 sm:px-2 rounded-lg border-2 font-bold sm:font-medium text-xs transition-all flex items-center justify-center gap-1 sm:gap-1.5 ${choice === "Benar" ? "bg-emerald-500 border-emerald-500 text-white shadow-xs" : "border-slate-200 text-slate-600 hover:border-emerald-300 hover:bg-emerald-50/50"}`)} title="Benar"><span${attr_class(`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border flex items-center justify-center shrink-0 ${choice === "Benar" ? "border-white bg-white" : "border-slate-400"}`)}>`);
           if (choice === "Benar") {
             $$renderer2.push("<!--[0-->");
             $$renderer2.push(`<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>`);
           } else {
             $$renderer2.push("<!--[-1-->");
           }
-          $$renderer2.push(`<!--]--></span> Benar</button></td><td class="py-3.5 px-3 text-center bg-rose-50/20"><button type="button"${attr_class(`w-full py-1.5 px-2 rounded-lg border-2 font-medium text-xs transition-all flex items-center justify-center gap-1.5 ${choice === "Salah" ? "bg-rose-500 border-rose-500 text-white shadow-sm shadow-rose-500/20" : "border-slate-200 text-slate-600 hover:border-rose-300 hover:bg-rose-50/50"}`)}><span${attr_class(`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${choice === "Salah" ? "border-white bg-white" : "border-slate-400"}`)}>`);
+          $$renderer2.push(`<!--]--></span> <span class="sm:hidden">B</span> <span class="hidden sm:inline">Benar</span></button></td><td class="py-2.5 sm:py-3.5 px-1 sm:px-2 text-center bg-rose-50/20"><button type="button"${attr_class(`w-full py-1.5 sm:py-2 px-1 sm:px-2 rounded-lg border-2 font-bold sm:font-medium text-xs transition-all flex items-center justify-center gap-1 sm:gap-1.5 ${choice === "Salah" ? "bg-rose-500 border-rose-500 text-white shadow-xs" : "border-slate-200 text-slate-600 hover:border-rose-300 hover:bg-rose-50/50"}`)} title="Salah"><span${attr_class(`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border flex items-center justify-center shrink-0 ${choice === "Salah" ? "border-white bg-white" : "border-slate-400"}`)}>`);
           if (choice === "Salah") {
             $$renderer2.push("<!--[0-->");
             $$renderer2.push(`<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>`);
           } else {
             $$renderer2.push("<!--[-1-->");
           }
-          $$renderer2.push(`<!--]--></span> Salah</button></td></tr>`);
+          $$renderer2.push(`<!--]--></span> <span class="sm:hidden">S</span> <span class="hidden sm:inline">Salah</span></button></td></tr>`);
         }
         $$renderer2.push(`<!--]--></tbody></table></div>`);
       } else {
