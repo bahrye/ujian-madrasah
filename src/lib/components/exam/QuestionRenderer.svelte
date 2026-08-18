@@ -276,7 +276,7 @@
 	}
 </script>
 
-<div class="space-y-5 animate-in" on:click={handleContentClick} on:keydown={(e) => e.key === 'Enter' && handleContentClick(e as any)} role="presentation" use:mathRender={question.id} use:arabicRender={question.id}>
+<div class="space-y-5 animate-in" on:click={handleContentClick} on:keydown={(e) => e.key === 'Enter' && handleContentClick(e as any)} role="presentation">
 	<!-- Header -->
 	<div class="flex items-center justify-between flex-wrap gap-2">
 		<div class="flex items-center gap-3">
@@ -316,7 +316,7 @@
 	{/if}
 
 	<!-- Question Text -->
-	<div class="text-base text-slate-800 leading-relaxed font-medium prose prose-sm max-w-none">
+	<div class="text-base text-slate-800 leading-relaxed font-medium prose prose-sm max-w-none" use:mathRender={question.question_text} use:arabicRender={question.question_text}>
 		{@html question.question_text}
 	</div>
 

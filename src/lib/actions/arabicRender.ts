@@ -1,8 +1,10 @@
 export function arabicRender(node: HTMLElement, trigger?: any) {
+	let timer: any = null;
+
 	function render() {
-		// Beri jeda sedikit agar Svelte dan mathRender (KaTeX) menyelesaikan pekerjaannya di DOM
-		setTimeout(() => {
-			if (!node) return;
+		if (timer) clearTimeout(timer);
+		timer = setTimeout(() => {
+			if (!node || !node.isConnected) return;
 			const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null);
 			const textNodes: Text[] = [];
 			let currentNode;
@@ -22,6 +24,7 @@ export function arabicRender(node: HTMLElement, trigger?: any) {
 			const arabicRegex = /([\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF\u0660-\u0669\s،؛؟()]+)/g;
 
 			textNodes.forEach((textNode) => {
+				if (!textNode.parentNode) return;
 				const text = textNode.nodeValue || '';
 				// Cek apakah ada setidaknya satu huruf Arab beneran, bukan sekadar spasi/tanda baca
 				if (/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(text)) {
@@ -55,8 +58,10 @@ export function arabicRender(node: HTMLElement, trigger?: any) {
 						fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
 					}
 
-					if (fragment.childNodes.length > 0) {
-						textNode.parentNode?.replaceChild(fragment, textNode);
+					if (fragment.childNodes.length > 0 && textNode.parentNode) {
+						try {
+							textNode.parentNode.replaceChild(fragment, textNode);
+						} catch (e) {}
 					}
 				}
 			});
@@ -69,6 +74,8 @@ export function arabicRender(node: HTMLElement, trigger?: any) {
 		update(newTrigger?: any) {
 			render();
 		},
-		destroy() {}
+		destroy() {
+			if (timer) clearTimeout(timer);
+		}
 	};
 }

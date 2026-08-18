@@ -1,7 +1,10 @@
 import renderMathInElement from 'katex/dist/contrib/auto-render.mjs';
 
 export function mathRender(node: HTMLElement, trigger?: any) {
+	let timer: any = null;
+
 	function render() {
+		if (!node || !node.isConnected) return;
 		try {
 			renderMathInElement(node, {
 				delimiters: [
@@ -22,10 +25,13 @@ export function mathRender(node: HTMLElement, trigger?: any) {
 
 	return {
 		update(trigger: any) {
-			setTimeout(() => {
+			if (timer) clearTimeout(timer);
+			timer = setTimeout(() => {
 				render();
 			}, 10);
 		},
-		destroy() {}
+		destroy() {
+			if (timer) clearTimeout(timer);
+		}
 	};
 }
