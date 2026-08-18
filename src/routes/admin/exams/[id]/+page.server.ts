@@ -420,12 +420,33 @@ export const actions: Actions = {
 		const parsedId = parseInt(params.id, 10);
 		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid' });
 
+		// Get current release status
+		const exam = await db.prepare('SELECT is_score_released FROM exams WHERE id = ? AND school_id = ?')
+			.bind(parsedId, locals.user.school_id).first<{ is_score_released: number }>();
+		
+		if (!exam) return fail(404, { error: 'Ujian tidak ditemukan.' });
+
+		const newReleaseStatus = exam.is_score_released === 1 ? 0 : 1;
+
+		// Update status rilis pada tabel exams
 		await db.prepare(`
 			UPDATE exams 
-			SET is_score_released = CASE WHEN is_score_released = 1 THEN 0 ELSE 1 END, updated_at = datetime('now') 
+			SET is_score_released = ?, updated_at = datetime('now') 
 			WHERE id = ? AND school_id = ?
-		`).bind(parsedId, locals.user.school_id).run();
+		`).bind(newReleaseStatus, parsedId, locals.user.school_id).run();
 
-		return { success: 'Status rilis nilai berhasil diperbarui.' };
+		// Sinkronkan status rilis ke semua student_attempts untuk ujian ini
+		await db.prepare(`
+			UPDATE student_attempts 
+			SET is_score_released = ?
+			WHERE exam_id = ?
+			AND status IN ('selesai', 'waktu_habis')
+		`).bind(newReleaseStatus, parsedId).run();
+
+		if (newReleaseStatus === 1) {
+			return { success: 'Nilai berhasil dirilis! Status nilai pada Hasil Ujian telah diperbarui.' };
+		} else {
+			return { success: 'Rilis nilai dibatalkan. Nilai kembali disembunyikan dari siswa.' };
+		}
 	}
 };

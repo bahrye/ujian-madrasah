@@ -235,19 +235,52 @@ const actions = {
     if (isNaN(parsedExamId)) return fail(400, { error: "ID ujian tidak valid." });
     try {
       const examAuthCheck = await db.prepare(`
-				SELECT id FROM exams
+				SELECT id, is_score_released FROM exams
 				WHERE id = ? AND school_id = ?
 				AND (created_by = ? OR EXISTS (SELECT 1 FROM exam_teachers et WHERE et.exam_id = exams.id AND et.teacher_id = ?))
 			`).bind(parsedExamId, locals.user.school_id, locals.user.id, locals.user.id).first();
       if (!examAuthCheck) {
         return fail(403, { error: "Anda tidak memiliki hak untuk mengubah pengaturan ujian ini." });
       }
+      const currentlyReleased = examAuthCheck.is_score_released === 1;
+      const newReleaseStatus = currentlyReleased ? 0 : 1;
+      if (!currentlyReleased) {
+        const ungradedCheck = await db.prepare(`
+					SELECT COUNT(*) as ungraded_students
+					FROM student_attempts st
+					WHERE st.exam_id = ?
+					AND (st.status IN ('selesai', 'waktu_habis') OR EXISTS (
+						SELECT 1 FROM exams e WHERE e.id = st.exam_id AND e.end_time IS NOT NULL AND e.end_time <= datetime('now')
+					))
+					AND st.is_graded = 0
+					AND EXISTS (
+						SELECT 1 FROM student_answers sa 
+						JOIN questions q ON sa.question_id = q.id 
+						WHERE sa.attempt_id = st.id 
+						AND q.type IN ('essay', 'isian_singkat') 
+						AND sa.score_given IS NULL
+					)
+				`).bind(parsedExamId).first();
+        if (ungradedCheck && ungradedCheck.ungraded_students > 0) {
+          return fail(400, { error: "Tidak dapat merilis nilai. Masih ada siswa yang belum dinilai. Pastikan semua nilai manual siswa terisi." });
+        }
+      }
       await db.prepare(`
 				UPDATE exams 
-				SET is_score_released = CASE WHEN is_score_released = 1 THEN 0 ELSE 1 END, updated_at = datetime('now') 
+				SET is_score_released = ?, updated_at = datetime('now') 
 				WHERE id = ? AND school_id = ?
-			`).bind(parsedExamId, locals.user.school_id).run();
-      return { success: "Status rilis nilai berhasil diperbarui." };
+			`).bind(newReleaseStatus, parsedExamId, locals.user.school_id).run();
+      await db.prepare(`
+				UPDATE student_attempts 
+				SET is_score_released = ?
+				WHERE exam_id = ?
+				AND status IN ('selesai', 'waktu_habis')
+			`).bind(newReleaseStatus, parsedExamId).run();
+      if (newReleaseStatus === 1) {
+        return { success: "Nilai berhasil dirilis! Status nilai pada Hasil Ujian telah diperbarui." };
+      } else {
+        return { success: "Rilis nilai dibatalkan. Nilai kembali disembunyikan dari siswa." };
+      }
     } catch (e) {
       console.error(e);
       return fail(500, { error: e.message || "Gagal memperbarui status rilis nilai." });

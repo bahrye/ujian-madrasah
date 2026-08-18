@@ -12,6 +12,9 @@
 	$: if (form?.error) toasts.error(form.error);
 	$: answers = data.answers as any[];
 
+	// Check if all students are graded for the release toggle
+	$: allStudentsGraded = data.students.length > 0 && data.students.every((s: any) => s.is_graded);
+
 	function parseAnswerKey(jsonStr: string | null) {
 		if (!jsonStr) return null;
 		try {
@@ -95,20 +98,39 @@
 	</div>
 
 	{#if data.selectedExam && data.selectedExam.show_score_type === 'manual'}
-		<div class="card p-4 flex items-center justify-between bg-indigo-50/50 border-indigo-100">
+		<div class="card p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 {allStudentsGraded ? 'bg-indigo-50/50 border-indigo-100' : 'bg-slate-50/50 border-slate-200'}">
 			<div>
 				<h3 class="font-bold text-slate-800">Status Rilis Nilai Manual</h3>
-				<p class="text-xs text-slate-500 mt-0.5">Pengaturan ujian ini mewajibkan nilai dirilis secara manual oleh Guru/Admin.</p>
+				{#if allStudentsGraded}
+					<p class="text-xs text-slate-500 mt-0.5">Semua siswa sudah dinilai. Anda dapat merilis nilai sekarang.</p>
+				{:else}
+					<p class="text-xs text-amber-600 mt-0.5 flex items-center gap-1">
+						<svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+						</svg>
+						Semua nilai manual siswa harus terisi terlebih dahulu sebelum dapat merilis nilai.
+					</p>
+				{/if}
 			</div>
-			<form method="POST" action="?/toggleScoreRelease" use:enhance>
+			<form method="POST" action="?/toggleScoreRelease" use:enhance class="flex items-center flex-shrink-0">
 				<input type="hidden" name="exam_id" value={data.selectedExam.id} />
-				<button type="submit" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 {data.selectedExam.is_score_released ? 'bg-indigo-600' : 'bg-slate-200'}" role="switch" aria-checked={data.selectedExam.is_score_released}>
-					<span class="sr-only">Rilis Nilai</span>
-					<span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {data.selectedExam.is_score_released ? 'translate-x-6' : 'translate-x-1'}"></span>
-				</button>
-				<span class="ml-2 text-sm font-medium {data.selectedExam.is_score_released ? 'text-indigo-600' : 'text-slate-400'}">
-					{data.selectedExam.is_score_released ? 'Nilai Dirilis' : 'Disembunyikan'}
-				</span>
+				{#if allStudentsGraded || data.selectedExam.is_score_released}
+					<button type="submit" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 {data.selectedExam.is_score_released ? 'bg-indigo-600' : 'bg-slate-200'}" role="switch" aria-checked={data.selectedExam.is_score_released}>
+						<span class="sr-only">Rilis Nilai</span>
+						<span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {data.selectedExam.is_score_released ? 'translate-x-6' : 'translate-x-1'}"></span>
+					</button>
+					<span class="ml-2 text-sm font-medium {data.selectedExam.is_score_released ? 'text-indigo-600' : 'text-slate-400'}">
+						{data.selectedExam.is_score_released ? 'Nilai Dirilis' : 'Disembunyikan'}
+					</span>
+				{:else}
+					<button type="button" disabled class="relative inline-flex h-6 w-11 items-center rounded-full bg-slate-200 cursor-not-allowed opacity-50" role="switch" aria-checked="false" title="Semua nilai manual siswa harus terisi terlebih dahulu">
+						<span class="sr-only">Rilis Nilai</span>
+						<span class="inline-block h-4 w-4 transform rounded-full bg-white translate-x-1"></span>
+					</button>
+					<span class="ml-2 text-sm font-medium text-slate-300">
+						Disembunyikan
+					</span>
+				{/if}
 			</form>
 		</div>
 	{/if}

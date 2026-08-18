@@ -11,7 +11,7 @@ import "katex/dist/contrib/auto-render.mjs";
 import { h as html } from "../../../../chunks/html.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
-    let answers;
+    let answers, allStudentsGraded;
     let data = $$props["data"];
     let form = $$props["form"];
     function parseAnswerKey(jsonStr) {
@@ -27,6 +27,7 @@ function _page($$renderer, $$props) {
     if (form?.success) toasts.success(form.success);
     if (form?.error) toasts.error(form.error);
     answers = data.answers;
+    allStudentsGraded = data.students.length > 0 && data.students.every((s) => s.is_graded);
     head("u3u0k6", $$renderer2, ($$renderer3) => {
       $$renderer3.title(($$renderer4) => {
         $$renderer4.push(`<title>Penilaian — Ujian Online Madrasah</title>`);
@@ -91,7 +92,23 @@ function _page($$renderer, $$props) {
     $$renderer2.push(`<!--]--></div> `);
     if (data.selectedExam && data.selectedExam.show_score_type === "manual") {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="card p-4 flex items-center justify-between bg-indigo-50/50 border-indigo-100"><div><h3 class="font-bold text-slate-800">Status Rilis Nilai Manual</h3> <p class="text-xs text-slate-500 mt-0.5">Pengaturan ujian ini mewajibkan nilai dirilis secara manual oleh Guru/Admin.</p></div> <form method="POST" action="?/toggleScoreRelease"><input type="hidden" name="exam_id"${attr("value", data.selectedExam.id)}/> <button type="submit"${attr_class(`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${data.selectedExam.is_score_released ? "bg-indigo-600" : "bg-slate-200"}`)} role="switch"${attr("aria-checked", data.selectedExam.is_score_released)}><span class="sr-only">Rilis Nilai</span> <span${attr_class(`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${data.selectedExam.is_score_released ? "translate-x-6" : "translate-x-1"}`)}></span></button> <span${attr_class(`ml-2 text-sm font-medium ${data.selectedExam.is_score_released ? "text-indigo-600" : "text-slate-400"}`)}>${escape_html(data.selectedExam.is_score_released ? "Nilai Dirilis" : "Disembunyikan")}</span></form></div>`);
+      $$renderer2.push(`<div${attr_class(`card p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 ${allStudentsGraded ? "bg-indigo-50/50 border-indigo-100" : "bg-slate-50/50 border-slate-200"}`)}><div><h3 class="font-bold text-slate-800">Status Rilis Nilai Manual</h3> `);
+      if (allStudentsGraded) {
+        $$renderer2.push("<!--[0-->");
+        $$renderer2.push(`<p class="text-xs text-slate-500 mt-0.5">Semua siswa sudah dinilai. Anda dapat merilis nilai sekarang.</p>`);
+      } else {
+        $$renderer2.push("<!--[-1-->");
+        $$renderer2.push(`<p class="text-xs text-amber-600 mt-0.5 flex items-center gap-1"><svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path></svg> Semua nilai manual siswa harus terisi terlebih dahulu sebelum dapat merilis nilai.</p>`);
+      }
+      $$renderer2.push(`<!--]--></div> <form method="POST" action="?/toggleScoreRelease" class="flex items-center flex-shrink-0"><input type="hidden" name="exam_id"${attr("value", data.selectedExam.id)}/> `);
+      if (allStudentsGraded || data.selectedExam.is_score_released) {
+        $$renderer2.push("<!--[0-->");
+        $$renderer2.push(`<button type="submit"${attr_class(`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${data.selectedExam.is_score_released ? "bg-indigo-600" : "bg-slate-200"}`)} role="switch"${attr("aria-checked", data.selectedExam.is_score_released)}><span class="sr-only">Rilis Nilai</span> <span${attr_class(`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${data.selectedExam.is_score_released ? "translate-x-6" : "translate-x-1"}`)}></span></button> <span${attr_class(`ml-2 text-sm font-medium ${data.selectedExam.is_score_released ? "text-indigo-600" : "text-slate-400"}`)}>${escape_html(data.selectedExam.is_score_released ? "Nilai Dirilis" : "Disembunyikan")}</span>`);
+      } else {
+        $$renderer2.push("<!--[-1-->");
+        $$renderer2.push(`<button type="button" disabled="" class="relative inline-flex h-6 w-11 items-center rounded-full bg-slate-200 cursor-not-allowed opacity-50" role="switch" aria-checked="false" title="Semua nilai manual siswa harus terisi terlebih dahulu"><span class="sr-only">Rilis Nilai</span> <span class="inline-block h-4 w-4 transform rounded-full bg-white translate-x-1"></span></button> <span class="ml-2 text-sm font-medium text-slate-300">Disembunyikan</span>`);
+      }
+      $$renderer2.push(`<!--]--></form></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
