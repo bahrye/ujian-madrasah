@@ -1,4 +1,6 @@
 import { h as head, i as ensure_array_like, e as escape_html, k as attr, j as attr_class, c as stringify, a as attr_style } from "../../../../chunks/index.js";
+import { Q as QuestionRenderer } from "../../../../chunks/QuestionRenderer.js";
+import { h as html } from "../../../../chunks/html.js";
 function _page($$renderer) {
   let activeBadge = 0;
   let currentSlide = 0;
@@ -100,6 +102,172 @@ function _page($$renderer) {
           desc: 'Kotak dialog ini merangkum total soal yang sudah terjawab, ragu-ragu, dan belum dijawab. Klik "Ya, Kumpulkan" untuk menyelesaikan ujian, atau klik "Kembali" jika masih ingin memeriksa jawaban.'
         }
       ]
+    }
+  ];
+  let activeTypeTab = "pilihan_ganda";
+  let demoAnswers = {
+    pilihan_ganda: "",
+    pilihan_ganda_kompleks: "",
+    benar_salah_tunggal: "",
+    benar_salah_multi: "",
+    menjodohkan: "",
+    isian_singkat: "",
+    essay: ""
+  };
+  const questionTypes = [
+    {
+      id: "pilihan_ganda",
+      name: "Pilihan Ganda",
+      badge: "Tunggal",
+      badgeColor: "bg-blue-100 text-blue-700 border-blue-200",
+      icon: "🔘",
+      desc: "Tipe soal dengan memilih 1 jawaban yang paling tepat di antara opsi yang tersedia (A, B, C, D, atau E).",
+      tips: [
+        "Klik pada salah satu kotak pilihan jawaban.",
+        "Opsi yang dipilih akan ditandai dengan warna ungu/biru terang.",
+        "Pilihan dapat diganti kapan saja dengan mengklik opsi lain."
+      ],
+      sampleQuestion: {
+        id: 101,
+        question_text: "<p>Ibukota negara Republik Indonesia yang baru adalah...</p>",
+        question_type: "pilihan_ganda",
+        options_json: JSON.stringify(["Jakarta", "Nusantara (IKN)", "Surabaya", "Bandung"])
+      }
+    },
+    {
+      id: "pilihan_ganda_kompleks",
+      name: "Pilihan Ganda Kompleks",
+      badge: "Centang Banyak",
+      badgeColor: "bg-indigo-100 text-indigo-700 border-indigo-200",
+      icon: "☑️",
+      desc: "Soal yang memiliki lebih dari satu jawaban benar. Peserta dapat mencentang beberapa opsi yang sesuai.",
+      tips: [
+        "Klik kotak opsi untuk mencentang. Klik kembali untuk membatalkan.",
+        "Pilihlah seluruh opsi yang Anda anggap benar.",
+        "Gunakan ketelitian karena bisa terdapat 2 atau lebih jawaban yang tepat."
+      ],
+      sampleQuestion: {
+        id: 102,
+        question_text: "<p>Manakah dari pernyataan berikut yang merupakan rukun Islam? <i>(Pilih semua yang benar)</i></p>",
+        question_type: "pilihan_ganda_kompleks",
+        options_json: JSON.stringify([
+          "Membaca Dua Kalimat Syahadat",
+          "Mendirikan Shalat 5 Waktu",
+          "Menuntut Ilmu",
+          "Menunaikan Zakat"
+        ])
+      }
+    },
+    {
+      id: "benar_salah_tunggal",
+      name: "Benar / Salah (Tunggal)",
+      badge: "B / S Tunggal",
+      badgeColor: "bg-amber-100 text-amber-700 border-amber-200",
+      icon: "⚖️",
+      desc: 'Menentukan kebenaran dari sebuah pernyataan tunggal dengan memilih tombol "Benar" atau "Salah".',
+      tips: [
+        "Pahami isi teks pertanyaan dengan cermat.",
+        "Tekan tombol <b>Benar</b> jika sesuai fakta, atau <b>Salah</b> jika tidak sesuai.",
+        "Tombol akan berubah warna saat aktif dipilih."
+      ],
+      sampleQuestion: {
+        id: 103,
+        question_text: "<p>Matahari terbit dari sebelah barat dan tenggelam di sebelah timur.</p>",
+        question_type: "benar_salah",
+        options_json: JSON.stringify([])
+      }
+    },
+    {
+      id: "benar_salah_multi",
+      name: "Benar / Salah (Banyak Pernyataan)",
+      badge: "Tabel B / S",
+      badgeColor: "bg-teal-100 text-teal-700 border-teal-200",
+      icon: "📋",
+      desc: "Terdapat beberapa baris pernyataan dalam bentuk tabel. Tentukan Benar (B) atau Salah (S) untuk setiap baris.",
+      tips: [
+        "Di ponsel, tombol diringkas menjadi <b>B</b> (Benar) dan <b>S</b> (Salah) agar muat tanpa digeser.",
+        "Pastikan setiap nomor baris pernyataan sudah memiliki pilihan (B atau S).",
+        "Masing-masing baris pernyataan memiliki bobot nilai tersendiri (penilaian parsial)."
+      ],
+      sampleQuestion: {
+        id: 104,
+        question_text: "<p>Tentukan Benar atau Salah untuk setiap pernyataan matematika di bawah ini:</p>",
+        question_type: "benar_salah",
+        options_json: JSON.stringify({
+          statements: [
+            "Hasil dari $5 + 3 \\times 2$ adalah $11$.",
+            "Bilangan $-8$ lebih besar daripada $-2$.",
+            "Nilai dari $25\\%$ dari $80$ adalah $20$."
+          ]
+        })
+      }
+    },
+    {
+      id: "menjodohkan",
+      name: "Menjodohkan (Matching)",
+      badge: "Tarik Garis",
+      badgeColor: "bg-purple-100 text-purple-700 border-purple-200",
+      icon: "🔗",
+      desc: "Menghubungkan pernyataan di Kolom Kiri dengan jawaban di Kolom Kanan menggunakan garis berwarna otomatis.",
+      tips: [
+        "Klik salah satu kartu di <b>Kolom Kiri</b>, lalu klik kartu pasangannya di <b>Kolom Kanan</b>.",
+        "Garis dan warna kartu otomatis sama dan tersambung.",
+        "Di kolom kanan dapat memuat pilihan pengecoh (jumlah pilihan lebih banyak daripada soal).",
+        "Klik tombol silang <b>[✕]</b> pada kartu jika ingin melepas atau mengganti pasangan."
+      ],
+      sampleQuestion: {
+        id: 105,
+        question_text: "<p>Jodohkan nama surah dalam Al-Qur'an dengan artinya yang tepat:</p>",
+        question_type: "menjodohkan",
+        options_json: JSON.stringify({
+          left: ["Al-Fatihah", "Al-Ikhlas", "Al-Falaq"],
+          right: [
+            "Pembukaan",
+            "Waktu Subuh",
+            "Kemurnian Keesaan Allah",
+            "Manusia",
+            "Hari Kiamat"
+          ]
+        })
+      }
+    },
+    {
+      id: "isian_singkat",
+      name: "Isian Singkat",
+      badge: "Teks Pendek",
+      badgeColor: "bg-emerald-100 text-emerald-700 border-emerald-200",
+      icon: "✏️",
+      desc: "Menjawab pertanyaan dengan mengetikkan jawaban singkat berupa satu kata, frasa pendek, atau angka.",
+      tips: [
+        "Ketikkan jawaban Anda pada kolom isian yang disediakan.",
+        "Pastikan ejaan kata atau angka sudah benar sebelum berpindah nomor.",
+        "Jawaban akan langsung tersimpan ke sistem saat Anda mengetik."
+      ],
+      sampleQuestion: {
+        id: 106,
+        question_text: "<p>Berapa jumlah rukun iman dalam ajaran agama Islam?</p>",
+        question_type: "isian_singkat",
+        options_json: JSON.stringify([])
+      }
+    },
+    {
+      id: "essay",
+      name: "Uraian / Essay",
+      badge: "Teks Panjang",
+      badgeColor: "bg-rose-100 text-rose-700 border-rose-200",
+      icon: "📝",
+      desc: "Menjawab soal berupa penjelasan panjang, uraian konsep, atau langkah pengerjaan secara terperinci.",
+      tips: [
+        "Tuliskan uraian jawaban secara jelas dan terstruktur.",
+        "Area ketik dapat diperluas dengan menarik handle di pojok kanan bawah.",
+        "Jawaban uraian akan dikoreksi dan dinilai langsung oleh Guru pengampu."
+      ],
+      sampleQuestion: {
+        id: 107,
+        question_text: "<p>Jelaskan secara singkat hikmah puasa di bulan Ramadhan bagi pembentukan karakter seorang muslim!</p>",
+        question_type: "essay",
+        options_json: JSON.stringify([])
+      }
     }
   ];
   head("17ilvk", $$renderer, ($$renderer2) => {
@@ -213,7 +381,36 @@ function _page($$renderer) {
     let item = each_array_6[$$index_6];
     $$renderer.push(`<div${attr("id", `badge-desc-${stringify(item.no)}`)}${attr_class(`flex items-start gap-3.5 p-3 rounded-xl transition-all border cursor-pointer ${activeBadge === item.no ? "bg-indigo-50 border-indigo-200 shadow-sm ring-1 ring-indigo-200" : "hover:bg-slate-50 border-slate-100 bg-white"}`)}><div${attr_class(`shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center font-bold text-xs md:text-sm transition-colors ${activeBadge === item.no ? "bg-indigo-600 text-white" : "bg-indigo-100 text-indigo-700"}`)}>${escape_html(item.no)}</div> <div class="flex-1 min-w-0"><h4${attr_class(`font-bold text-slate-800 text-sm transition-colors ${activeBadge === item.no ? "text-indigo-700" : ""}`)}>${escape_html(item.title)}</h4> <p class="text-slate-500 text-xs mt-1 leading-relaxed">${escape_html(item.desc)}</p></div></div>`);
   }
-  $$renderer.push(`<!--]--></div></div></div> <div class="rounded-3xl overflow-hidden shadow-md relative h-48 md:h-64 mt-8 group"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&amp;auto=format&amp;fit=crop&amp;w=1200&amp;q=80" alt="Sukses Ujian" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/> <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent flex flex-col items-center justify-end pb-8 text-center px-4"><h3 class="text-2xl md:text-3xl font-bold text-white mb-2 drop-shadow-md">Semoga Berhasil!</h3> <p class="text-slate-200 md:text-lg drop-shadow">Kejujuran adalah kunci kesuksesan yang sesungguhnya.</p></div></div></div>`);
+  $$renderer.push(`<!--]--></div></div></div> <div class="bg-white rounded-3xl p-6 md:p-10 border border-slate-200 shadow-sm relative overflow-hidden"><div class="text-center max-w-2xl mx-auto mb-8 relative z-10"><span class="text-indigo-600 font-semibold tracking-wider uppercase text-sm mb-2 block">Format Soal</span> <h2 class="text-3xl font-bold text-slate-800 mb-3">Mengenal Tipe-Tipe Soal Ujian</h2> <p class="text-slate-500 text-sm md:text-base">Pelajari karakteristik 7 model tipe soal yang digunakan dalam ujian madrasah serta coba simulasinya secara langsung.</p> <div class="flex items-center justify-center gap-2 mt-6 flex-wrap"><!--[-->`);
+  const each_array_7 = ensure_array_like(questionTypes);
+  for (let $$index_7 = 0, $$length = each_array_7.length; $$index_7 < $$length; $$index_7++) {
+    let qType = each_array_7[$$index_7];
+    $$renderer.push(`<button type="button"${attr_class(`px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold transition-all flex items-center gap-2 border ${activeTypeTab === qType.id ? "bg-slate-900 text-white border-slate-900 shadow-sm ring-2 ring-slate-900/10" : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300"}`)}><span>${escape_html(qType.icon)}</span> <span>${escape_html(qType.name)}</span></button>`);
+  }
+  $$renderer.push(`<!--]--></div></div> <!--[-->`);
+  const each_array_8 = ensure_array_like(questionTypes);
+  for (let $$index_9 = 0, $$length = each_array_8.length; $$index_9 < $$length; $$index_9++) {
+    let qType = each_array_8[$$index_9];
+    if (activeTypeTab === qType.id) {
+      $$renderer.push("<!--[0-->");
+      $$renderer.push(`<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-in fade-in duration-300"><div class="lg:col-span-5 space-y-4"><div class="p-5 bg-gradient-to-br from-indigo-50/80 via-white to-purple-50/50 rounded-2xl border border-indigo-100 shadow-xs space-y-3"><div class="flex items-center justify-between"><div class="flex items-center gap-2.5"><span class="text-2xl">${escape_html(qType.icon)}</span> <h3 class="text-lg font-bold text-slate-800">${escape_html(qType.name)}</h3></div> <span${attr_class(`px-2.5 py-1 rounded-full text-xs font-bold border ${stringify(qType.badgeColor)}`)}>${escape_html(qType.badge)}</span></div> <p class="text-slate-600 text-sm leading-relaxed">${escape_html(qType.desc)}</p></div> <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-3"><h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2"><span>💡</span> <span>Petunjuk &amp; Tips Pengerjaan:</span></h4> <ul class="space-y-2.5"><!--[-->`);
+      const each_array_9 = ensure_array_like(qType.tips);
+      for (let $$index_8 = 0, $$length2 = each_array_9.length; $$index_8 < $$length2; $$index_8++) {
+        let tip = each_array_9[$$index_8];
+        $$renderer.push(`<li class="flex items-start gap-2.5 text-xs md:text-sm text-slate-600 leading-relaxed"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0 mt-2"></span> <span>${html(tip)}</span></li>`);
+      }
+      $$renderer.push(`<!--]--></ul></div> <div class="p-4 bg-amber-50/80 rounded-2xl border border-amber-200/70 text-xs text-amber-900 flex items-start gap-3"><span class="text-base shrink-0">🎯</span> <div class="leading-relaxed"><b>Coba Simulasi:</b> Di kolom sebelah kanan, Anda dapat langsung mencoba berinteraksi memilih, mencentang, atau menghubungkan soal simulasi.</div></div></div> <div class="lg:col-span-7 bg-slate-50/70 p-5 md:p-7 rounded-2xl border-2 border-dashed border-slate-300"><div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 text-xs"><div class="flex items-center gap-2 font-bold text-indigo-700"><span>🎮</span> <span>Simulasi Interaktif — ${escape_html(qType.name)}</span></div> <span class="text-slate-400 font-medium italic">Demo Langsung</span></div> <div class="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-xs">`);
+      QuestionRenderer($$renderer, {
+        question: qType.sampleQuestion,
+        answer: demoAnswers[qType.id] || ""
+      });
+      $$renderer.push(`<!----></div></div></div>`);
+    } else {
+      $$renderer.push("<!--[-1-->");
+    }
+    $$renderer.push(`<!--]-->`);
+  }
+  $$renderer.push(`<!--]--></div> <div class="rounded-3xl overflow-hidden shadow-md relative h-48 md:h-64 mt-8 group"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&amp;auto=format&amp;fit=crop&amp;w=1200&amp;q=80" alt="Sukses Ujian" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/> <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent flex flex-col items-center justify-end pb-8 text-center px-4"><h3 class="text-2xl md:text-3xl font-bold text-white mb-2 drop-shadow-md">Semoga Berhasil!</h3> <p class="text-slate-200 md:text-lg drop-shadow">Kejujuran adalah kunci kesuksesan yang sesungguhnya.</p></div></div></div>`);
 }
 export {
   _page as default

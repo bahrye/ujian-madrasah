@@ -523,7 +523,7 @@
       "_stores.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.Dm5HqJz3.css"
+      "_app/immutable/assets/_layout.tvOVtoae.css"
     ],
     "assets": [
       "_app/immutable/assets/KaTeX_AMS-Regular.BQhdFMY1.woff2",
@@ -2420,7 +2420,9 @@
     "src": "src/routes/siswa/tata-tertib/+page.svelte",
     "isEntry": true,
     "imports": [
-      "_index.js"
+      "_index.js",
+      "_QuestionRenderer.js",
+      "_html.js"
     ]
   },
   "src/routes/siswa/ujian/+page.server.ts": {
