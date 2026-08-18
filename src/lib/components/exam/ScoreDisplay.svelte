@@ -20,16 +20,26 @@
 	$: typeEndTime = parseDate(attempt.exam_type_end_time);
 	$: endTime = parseDate(attempt.exam_end_time);
 
+	// Attempt is fully graded if marked as graded OR has no pending ungraded manual answers
+	$: isFullyGraded = attempt.manual_question_count === 0 || 
+		attempt.is_graded === 1 || 
+		(attempt.ungraded_count !== undefined && attempt.ungraded_count === 0) ||
+		(attempt.is_fully_graded !== undefined ? attempt.is_fully_graded : false);
+
 	$: isManualReleased = attempt.student_is_score_released === 1 || attempt.is_score_released === 1 || attempt.exam_is_score_released === 1;
 
 	$: isScoreVisible = (() => {
+		// Siswa yang belum dinilai oleh guru TIDAK BISA melihat nilai
+		if (!isFullyGraded) return false;
+
 		if (isManual) return isManualReleased;
 		if (isAfterTypeEndTime) return typeEndTime ? currentTime >= typeEndTime : false;
 		if (isAfterEndTime) return endTime ? currentTime >= endTime : false;
-		return true; // objective_only and after_submit are always visible when finished
+		return true; // objective_only and after_submit are always visible when finished & graded
 	})();
 
 	$: statusLabel = (() => {
+		if (!isFullyGraded) return 'Menunggu penilaian guru';
 		if (isManual && !isManualReleased) return 'Belum dirilis';
 		if (isAfterTypeEndTime && (!typeEndTime || currentTime < typeEndTime)) return 'Menunggu jadwal tipe ujian';
 		if (isAfterEndTime && (!endTime || currentTime < endTime)) return 'Menunggu jadwal berakhir';

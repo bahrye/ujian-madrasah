@@ -384,12 +384,14 @@ export const actions: Actions = {
 
 			// Hitung skor persentase
 			const finalScore = totalPoints > 0 ? Math.round((totalScore / totalPoints) * 1000) / 10 : 0;
+			const hasManualQuestions = (answers.results as any[]).some((ans: any) => ans.type === 'essay' || ans.type === 'isian_singkat');
+			const isGraded = hasManualQuestions ? 0 : 1;
 
 			// Simpan status selesai ke student_attempts
 			updateStmts.push(
 				db.prepare(`UPDATE student_attempts SET status = 'selesai', submit_time = datetime('now'),
-					score = ?, total_points = ?, violation_count = ?, violation_logs = ? WHERE id = ?`)
-					.bind(finalScore, totalPoints, warnings, warningLogs, parsedAttemptId)
+					score = ?, total_points = ?, violation_count = ?, violation_logs = ?, is_graded = ? WHERE id = ?`)
+					.bind(finalScore, totalPoints, warnings, warningLogs, isGraded, parsedAttemptId)
 			);
 
 			if (updateStmts.length > 0) {

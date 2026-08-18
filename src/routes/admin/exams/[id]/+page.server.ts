@@ -435,16 +435,34 @@ export const actions: Actions = {
 			WHERE id = ? AND school_id = ?
 		`).bind(newReleaseStatus, parsedId, locals.user.school_id).run();
 
-		// Sinkronkan status rilis ke semua student_attempts untuk ujian ini
-		await db.prepare(`
-			UPDATE student_attempts 
-			SET is_score_released = ?
-			WHERE exam_id = ?
-			AND status IN ('selesai', 'waktu_habis')
-		`).bind(newReleaseStatus, parsedId).run();
+		// Sinkronkan status rilis ke student_attempts untuk ujian ini
+		// HANYA untuk siswa yang SUDAH SELESAI DINILAI!
+		if (newReleaseStatus === 1) {
+			await db.prepare(`
+				UPDATE student_attempts 
+				SET is_score_released = 1
+				WHERE exam_id = ?
+				AND status IN ('selesai', 'waktu_habis')
+				AND (
+					is_graded = 1 OR NOT EXISTS (
+						SELECT 1 FROM student_answers sa 
+						JOIN questions q ON sa.question_id = q.id 
+						WHERE sa.attempt_id = student_attempts.id 
+						AND q.type IN ('essay', 'isian_singkat') 
+						AND sa.score_given IS NULL
+					)
+				)
+			`).bind(parsedId).run();
+		} else {
+			await db.prepare(`
+				UPDATE student_attempts 
+				SET is_score_released = 0
+				WHERE exam_id = ?
+			`).bind(parsedId).run();
+		}
 
 		if (newReleaseStatus === 1) {
-			return { success: 'Nilai berhasil dirilis! Status nilai pada Hasil Ujian telah diperbarui.' };
+			return { success: 'Nilai berhasil dirilis untuk siswa yang sudah selesai dinilai! Status nilai pada Hasil Ujian telah diperbarui.' };
 		} else {
 			return { success: 'Rilis nilai dibatalkan. Nilai kembali disembunyikan dari siswa.' };
 		}

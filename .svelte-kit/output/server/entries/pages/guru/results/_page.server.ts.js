@@ -77,7 +77,7 @@ const actions = {
     if (isNaN(attemptId)) return fail(400, { error: "ID tidak valid" });
     const attempt = await db.prepare(`
 			SELECT sa.id, sa.is_score_released, sa.is_graded,
-			       (SELECT COUNT(*) FROM questions q JOIN student_answers ans ON ans.question_id = q.id WHERE q.exam_id = sa.exam_id AND ans.attempt_id = sa.id AND q.type IN ('essay', 'isian') AND ans.is_correct IS NULL) as ungraded_count
+			       (SELECT COUNT(*) FROM questions q JOIN student_answers ans ON ans.question_id = q.id WHERE q.exam_id = sa.exam_id AND ans.attempt_id = sa.id AND q.type IN ('essay', 'isian_singkat') AND ans.score_given IS NULL) as ungraded_count
 			FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
 			WHERE sa.id = ? AND e.school_id = ?
@@ -108,8 +108,8 @@ const actions = {
 					JOIN student_answers ans ON ans.question_id = q.id 
 					WHERE q.exam_id = student_attempts.exam_id 
 					  AND ans.attempt_id = student_attempts.id 
-					  AND q.type IN ('essay', 'isian') 
-					  AND ans.is_correct IS NULL
+					  AND q.type IN ('essay', 'isian_singkat') 
+					  AND ans.score_given IS NULL
 				)
 			  )
 		`).bind(examId).run();

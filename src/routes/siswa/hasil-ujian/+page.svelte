@@ -27,6 +27,13 @@
 	}
 
 	function checkIsScoreVisible(attempt: any) {
+		const isFullyGraded = attempt.manual_question_count === 0 || 
+			attempt.is_graded === 1 || 
+			(attempt.ungraded_count !== undefined && attempt.ungraded_count === 0) ||
+			(attempt.is_fully_graded !== undefined ? attempt.is_fully_graded : false);
+
+		if (!isFullyGraded) return false;
+
 		const type = attempt.show_score_type || 'after_submit';
 		if (type === 'manual') {
 			return attempt.student_is_score_released === 1 || attempt.is_score_released === 1 || attempt.exam_is_score_released === 1;

@@ -22,6 +22,8 @@ function _page($$renderer, $$props) {
       }).replace(/\./g, ":");
     }
     function checkIsScoreVisible(attempt) {
+      const isFullyGraded = attempt.manual_question_count === 0 || attempt.is_graded === 1 || attempt.ungraded_count !== void 0 && attempt.ungraded_count === 0 || (attempt.is_fully_graded !== void 0 ? attempt.is_fully_graded : false);
+      if (!isFullyGraded) return false;
       const type = attempt.show_score_type || "after_submit";
       if (type === "manual") {
         return attempt.student_is_score_released === 1 || attempt.is_score_released === 1 || attempt.exam_is_score_released === 1;

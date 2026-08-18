@@ -1,7 +1,7 @@
 import { m as fallback, e as escape_html, j as attr_class, l as clsx, f as bind_props } from "./index.js";
 function ScoreDisplay($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
-    let showScoreType, isManual, isAfterTypeEndTime, isAfterEndTime, isObjectiveOnly, typeEndTime, endTime, isManualReleased, isScoreVisible, statusLabel, total_points, objective_raw, akhir_raw, manual_raw, otomatis, akhir, manual;
+    let showScoreType, isManual, isAfterTypeEndTime, isAfterEndTime, isObjectiveOnly, typeEndTime, endTime, isFullyGraded, isManualReleased, isScoreVisible, statusLabel, total_points, objective_raw, akhir_raw, manual_raw, otomatis, akhir, manual;
     let attempt = $$props["attempt"];
     let currentTime = $$props["currentTime"];
     let type = fallback($$props["type"], "akhir");
@@ -21,14 +21,17 @@ function ScoreDisplay($$renderer, $$props) {
     isObjectiveOnly = showScoreType === "objective_only";
     typeEndTime = parseDate(attempt.exam_type_end_time);
     endTime = parseDate(attempt.exam_end_time);
+    isFullyGraded = attempt.manual_question_count === 0 || attempt.is_graded === 1 || attempt.ungraded_count !== void 0 && attempt.ungraded_count === 0 || (attempt.is_fully_graded !== void 0 ? attempt.is_fully_graded : false);
     isManualReleased = attempt.student_is_score_released === 1 || attempt.is_score_released === 1 || attempt.exam_is_score_released === 1;
     isScoreVisible = (() => {
+      if (!isFullyGraded) return false;
       if (isManual) return isManualReleased;
       if (isAfterTypeEndTime) return typeEndTime ? currentTime >= typeEndTime : false;
       if (isAfterEndTime) return endTime ? currentTime >= endTime : false;
       return true;
     })();
     statusLabel = (() => {
+      if (!isFullyGraded) return "Menunggu penilaian guru";
       if (isManual && !isManualReleased) return "Belum dirilis";
       if (isAfterTypeEndTime && (!typeEndTime || currentTime < typeEndTime)) return "Menunggu jadwal tipe ujian";
       if (isAfterEndTime && (!endTime || currentTime < endTime)) return "Menunggu jadwal berakhir";

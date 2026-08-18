@@ -105,6 +105,13 @@ const actions = {
       const scoreGiven = parseFloat(scoreStr);
       const isCorrect = scoreGiven >= maxPoints ? 1 : scoreGiven > 0 ? 0 : 0;
       await db.prepare("UPDATE student_answers SET score_given = ?, is_correct = ? WHERE id = ?").bind(scoreGiven, isCorrect, parsedAnswerId).run();
+      const remainingUngraded = await db.prepare(`
+				SELECT COUNT(*) as c
+				FROM student_answers sa
+				JOIN questions q ON sa.question_id = q.id
+				WHERE sa.attempt_id = ? AND q.type IN ('essay', 'isian_singkat') AND sa.score_given IS NULL
+			`).bind(answerAuthCheck.attempt_id).first();
+      const isNowFullyGraded = (remainingUngraded?.c || 0) === 0 ? 1 : 0;
       const totalResult = await db.prepare(`
 				SELECT SUM(COALESCE(sa.score_given, 0)) as total_score, SUM(q.points) as total_points
 				FROM student_answers sa JOIN questions q ON sa.question_id = q.id
@@ -112,7 +119,13 @@ const actions = {
 			`).bind(answerAuthCheck.attempt_id).first();
       if (totalResult && totalResult.total_points > 0) {
         const score = totalResult.total_score / totalResult.total_points * 100;
-        await db.prepare("UPDATE student_attempts SET score = ? WHERE id = ?").bind(Math.round(score * 10) / 10, answerAuthCheck.attempt_id).run();
+        await db.prepare("UPDATE student_attempts SET score = ?, is_graded = ? WHERE id = ?").bind(Math.round(score * 10) / 10, isNowFullyGraded, answerAuthCheck.attempt_id).run();
+      }
+      if (isNowFullyGraded === 1) {
+        const examRel = await db.prepare("SELECT is_score_released FROM exams WHERE id = (SELECT exam_id FROM student_attempts WHERE id = ?)").bind(answerAuthCheck.attempt_id).first();
+        if (examRel && examRel.is_score_released === 1) {
+          await db.prepare("UPDATE student_attempts SET is_score_released = 1 WHERE id = ?").bind(answerAuthCheck.attempt_id).run();
+        }
       }
       return { success: "Nilai berhasil disimpan." };
     } catch (e) {
@@ -176,6 +189,14 @@ const actions = {
 					SET score = ?, is_graded = 1 
 					WHERE id = ?
 				`).bind(Math.round(score * 10) / 10, attemptId).run();
+      }
+      const examRel = await db.prepare("SELECT is_score_released FROM exams WHERE id = ?").bind(parsedExamId).first();
+      if (examRel && examRel.is_score_released === 1) {
+        await db.prepare(`
+					UPDATE student_attempts 
+					SET is_score_released = 1 
+					WHERE id IN (${placeholders})
+				`).bind(...attemptIds).run();
       }
       return { success: "Penilaian berhasil dikunci." };
     } catch (e) {
@@ -270,14 +291,31 @@ const actions = {
 				SET is_score_released = ?, updated_at = datetime('now') 
 				WHERE id = ? AND school_id = ?
 			`).bind(newReleaseStatus, parsedExamId, locals.user.school_id).run();
-      await db.prepare(`
-				UPDATE student_attempts 
-				SET is_score_released = ?
-				WHERE exam_id = ?
-				AND status IN ('selesai', 'waktu_habis')
-			`).bind(newReleaseStatus, parsedExamId).run();
       if (newReleaseStatus === 1) {
-        return { success: "Nilai berhasil dirilis! Status nilai pada Hasil Ujian telah diperbarui." };
+        await db.prepare(`
+					UPDATE student_attempts 
+					SET is_score_released = 1
+					WHERE exam_id = ?
+					AND status IN ('selesai', 'waktu_habis')
+					AND (
+						is_graded = 1 OR NOT EXISTS (
+							SELECT 1 FROM student_answers sa 
+							JOIN questions q ON sa.question_id = q.id 
+							WHERE sa.attempt_id = student_attempts.id 
+							AND q.type IN ('essay', 'isian_singkat') 
+							AND sa.score_given IS NULL
+						)
+					)
+				`).bind(parsedExamId).run();
+      } else {
+        await db.prepare(`
+					UPDATE student_attempts 
+					SET is_score_released = 0
+					WHERE exam_id = ?
+				`).bind(parsedExamId).run();
+      }
+      if (newReleaseStatus === 1) {
+        return { success: "Nilai berhasil dirilis untuk siswa yang sudah selesai dinilai! Status nilai pada Hasil Ujian telah diperbarui." };
       } else {
         return { success: "Rilis nilai dibatalkan. Nilai kembali disembunyikan dari siswa." };
       }
