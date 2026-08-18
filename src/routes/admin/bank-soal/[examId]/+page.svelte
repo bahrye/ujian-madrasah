@@ -797,10 +797,10 @@
 								</div>
 							</div>
 
-							<!-- Kolom Kanan: Pilihan Jawaban & Pengecoh -->
+							<!-- Kolom Kanan: Pilihan Jawaban -->
 							<div class="space-y-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
 								<div class="flex items-center justify-between">
-									<span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Kolom Kanan (Pilihan & Pengecoh)</span>
+									<span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Kolom Kanan (Pilihan Jawaban)</span>
 									<span class="text-xs text-slate-500 font-medium">{createMenjodohkanRightCount} pilihan</span>
 								</div>
 								
@@ -808,14 +808,14 @@
 									{#each Array(createMenjodohkanRightCount) as _, j}
 										<div class="p-2.5 bg-white rounded-lg border border-slate-200 flex items-center gap-2">
 											<span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold flex items-center justify-center shrink-0">{String.fromCharCode(65 + j)}</span>
-											<input id="create_right_{j}" name="right_{j}" type="text" class="input input-sm w-full text-sm" placeholder="Pilihan {String.fromCharCode(65 + j)} (Jawaban / Pengecoh)..." />
+											<input id="create_right_{j}" name="right_{j}" type="text" class="input input-sm w-full text-sm" placeholder="Pilihan {String.fromCharCode(65 + j)}..." />
 											<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-1.5 shrink-0 text-xs" on:click={() => openMediaPickerForOption('create', 'menjodohkan_right', j)} title="Media">🖼️</button>
 										</div>
 									{/each}
 								</div>
 
 								<div class="flex items-center gap-2 pt-1">
-									<button type="button" class="btn-ghost btn-sm text-emerald-600 hover:bg-emerald-50 text-xs" on:click={() => createMenjodohkanRightCount++}>+ Tambah Pilihan / Pengecoh</button>
+									<button type="button" class="btn-ghost btn-sm text-emerald-600 hover:bg-emerald-50 text-xs" on:click={() => createMenjodohkanRightCount++}>+ Tambah Pilihan Jawaban</button>
 									{#if createMenjodohkanRightCount > 1}
 										<button type="button" class="btn-ghost btn-sm text-red-600 hover:bg-red-50 text-xs" on:click={() => createMenjodohkanRightCount--}>- Kurangi</button>
 									{/if}
@@ -1281,10 +1281,10 @@
 									</div>
 								</div>
 
-								<!-- Kolom Kanan: Pilihan Jawaban & Pengecoh -->
+								<!-- Kolom Kanan: Pilihan Jawaban -->
 								<div class="space-y-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
 									<div class="flex items-center justify-between">
-										<span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Kolom Kanan (Pilihan & Pengecoh)</span>
+										<span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Kolom Kanan (Pilihan Jawaban)</span>
 										<span class="text-xs text-slate-500 font-medium">{editMenjodohkanRightCount} pilihan</span>
 									</div>
 									
@@ -1292,14 +1292,14 @@
 										{#each Array(editMenjodohkanRightCount) as _, j}
 											<div class="p-2.5 bg-white rounded-lg border border-slate-200 flex items-center gap-2">
 												<span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold flex items-center justify-center shrink-0">{String.fromCharCode(65 + j)}</span>
-												<input id="edit_right_{j}" name="right_{j}" type="text" class="input input-sm w-full text-sm" placeholder="Pilihan {String.fromCharCode(65 + j)} (Jawaban / Pengecoh)..." value={opts.right?.[j] || ''} />
+												<input id="edit_right_{j}" name="right_{j}" type="text" class="input input-sm w-full text-sm" placeholder="Pilihan {String.fromCharCode(65 + j)}..." value={opts.right?.[j] || ''} />
 												<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-1.5 shrink-0 text-xs" on:click={() => openMediaPickerForOption('edit', 'menjodohkan_right', j)} title="Media">🖼️</button>
 											</div>
 										{/each}
 									</div>
 
 									<div class="flex items-center gap-2 pt-1">
-										<button type="button" class="btn-ghost btn-sm text-emerald-600 hover:bg-emerald-50 text-xs" on:click={() => editMenjodohkanRightCount++}>+ Tambah Pilihan / Pengecoh</button>
+										<button type="button" class="btn-ghost btn-sm text-emerald-600 hover:bg-emerald-50 text-xs" on:click={() => editMenjodohkanRightCount++}>+ Tambah Pilihan Jawaban</button>
 										{#if editMenjodohkanRightCount > 1}
 											<button type="button" class="btn-ghost btn-sm text-red-600 hover:bg-red-50 text-xs" on:click={() => editMenjodohkanRightCount--}>- Kurangi</button>
 										{/if}

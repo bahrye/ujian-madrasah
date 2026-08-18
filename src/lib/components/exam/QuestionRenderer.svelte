@@ -496,8 +496,8 @@
 					{/if}
 				</div>
 
-				<!-- SVG Line Overlay (Desktop/Tablet) -->
-				<svg class="absolute inset-0 w-full h-full pointer-events-none z-20 hidden sm:block">
+				<!-- SVG Line Overlay (Mobile & Desktop) -->
+				<svg class="absolute inset-0 w-full h-full pointer-events-none z-20 block">
 					{#each connectionLines as line}
 						{@const dx = (line.x2 - line.x1) * 0.5}
 						<!-- Glow background path -->
@@ -505,7 +505,7 @@
 							d="M {line.x1} {line.y1} C {line.x1 + dx} {line.y1}, {line.x2 - dx} {line.y2}, {line.x2} {line.y2}"
 							fill="none"
 							stroke={line.color}
-							stroke-width="7"
+							stroke-width="6"
 							stroke-opacity="0.25"
 							stroke-linecap="round"
 						/>
@@ -514,19 +514,19 @@
 							d="M {line.x1} {line.y1} C {line.x1 + dx} {line.y1}, {line.x2 - dx} {line.y2}, {line.x2} {line.y2}"
 							fill="none"
 							stroke={line.color}
-							stroke-width="3"
+							stroke-width="2.5"
 							stroke-linecap="round"
 						/>
-						<circle cx={line.x1} cy={line.y1} r="5" fill={line.color} stroke="#ffffff" stroke-width="2" />
-						<circle cx={line.x2} cy={line.y2} r="5" fill={line.color} stroke="#ffffff" stroke-width="2" />
+						<circle cx={line.x1} cy={line.y1} r="4.5" fill={line.color} stroke="#ffffff" stroke-width="1.5" />
+						<circle cx={line.x2} cy={line.y2} r="4.5" fill={line.color} stroke="#ffffff" stroke-width="1.5" />
 					{/each}
 				</svg>
 
-				<!-- Matching Columns Grid -->
-				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
+				<!-- Matching Columns Grid (Always 2 Columns) -->
+				<div class="grid grid-cols-2 gap-2 sm:gap-4 relative z-10">
 					<!-- Left Column: Pernyataan -->
-					<div class="space-y-3">
-						<div class="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Kolom Kiri (Pernyataan)</div>
+					<div class="space-y-2 sm:space-y-3">
+						<div class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Kolom Kiri (Pernyataan)</div>
 						{#each matchingLeft as leftItem, leftIdx}
 							{@const hasMatch = matchingAnswers[String(leftIdx)] !== undefined}
 							{@const matchedRightIdx = hasMatch ? Number(matchingAnswers[String(leftIdx)]) : null}
@@ -536,32 +536,32 @@
 							<div 
 								role="button"
 								tabindex="0"
-								class="relative flex items-center justify-between gap-3 p-3.5 rounded-2xl border-2 transition-all duration-200 cursor-pointer select-none text-left
-									{hasMatch ? `${pairColor.bg} ${pairColor.border} shadow-sm` : (isSelected ? 'border-indigo-600 bg-indigo-50/70 ring-4 ring-indigo-500/20 shadow-md' : 'border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50/70')}"
+								class="relative flex items-center justify-between gap-1.5 sm:gap-3 p-2 sm:p-3.5 rounded-xl sm:rounded-2xl border-2 transition-all duration-200 cursor-pointer select-none text-left
+									{hasMatch ? `${pairColor.bg} ${pairColor.border} shadow-xs` : (isSelected ? 'border-indigo-600 bg-indigo-50/70 ring-2 sm:ring-4 ring-indigo-500/20 shadow-sm' : 'border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50/70')}"
 								on:click={() => selectLeftItem(leftIdx)}
 								on:keydown={(e) => e.key === 'Enter' && selectLeftItem(leftIdx)}
 							>
-								<div class="flex items-start gap-2.5 flex-1 min-w-0">
-									<span class="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 transition-colors
+								<div class="flex items-start gap-1.5 sm:gap-2.5 flex-1 min-w-0">
+									<span class="w-5 h-5 sm:w-7 sm:h-7 rounded-lg sm:rounded-xl flex items-center justify-center text-[10px] sm:text-xs font-bold shrink-0 transition-colors
 										{hasMatch ? pairColor.badge : (isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600')}">
 										{leftIdx + 1}
 									</span>
 									<div class="flex-1 min-w-0">
-										<div class="text-sm font-medium {hasMatch ? 'text-slate-900 font-semibold' : 'text-slate-700'} prose prose-sm max-w-none">
+										<div class="text-xs sm:text-sm font-medium {hasMatch ? 'text-slate-900 font-semibold' : 'text-slate-700'} prose prose-sm max-w-none break-words">
 											{@html leftItem}
 										</div>
 										{#if hasMatch && matchedRightIdx !== null}
-											<div class="flex items-center gap-1.5 mt-2 flex-wrap">
-												<span class="px-2 py-0.5 rounded-md text-[11px] font-bold {pairColor.badge} shadow-xs">
-													➔ Terhubung: [{String.fromCharCode(65 + matchedRightIdx)}] {matchingRight[matchedRightIdx] || ''}
+											<div class="flex items-center gap-1 mt-1 sm:mt-2 flex-wrap">
+												<span class="px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[11px] font-bold {pairColor.badge} shadow-xs">
+													➔ [{String.fromCharCode(65 + matchedRightIdx)}]
 												</span>
 												<button 
 													type="button" 
-													class="px-1.5 py-0.5 rounded text-[11px] bg-white/80 hover:bg-red-50 text-slate-500 hover:text-red-600 border border-slate-200 transition-colors"
+													class="px-1 py-0.5 rounded text-[9px] sm:text-[11px] bg-white/80 hover:bg-red-50 text-slate-500 hover:text-red-600 border border-slate-200 transition-colors"
 													on:click={(e) => removeMatchingPair(leftIdx, e)}
 													title="Hapus Sambungan"
 												>
-													✕ Lepas
+													✕
 												</button>
 											</div>
 										{/if}
@@ -571,22 +571,22 @@
 								<!-- Connector Port Right -->
 								<div 
 									id="match-port-left-{question.id}-{leftIdx}"
-									class="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ml-1
-										{hasMatch ? `${pairColor.border} bg-white shadow-sm ring-2 ${pairColor.ring}` : (isSelected ? 'border-indigo-600 bg-indigo-600 ring-4 ring-indigo-500/30' : 'border-slate-300 bg-slate-100')}"
+									class="w-4 h-4 sm:w-6 sm:h-6 rounded-full border sm:border-2 flex items-center justify-center shrink-0 transition-all ml-0.5 sm:ml-1
+										{hasMatch ? `${pairColor.border} bg-white shadow-xs ring-1 sm:ring-2 ${pairColor.ring}` : (isSelected ? 'border-indigo-600 bg-indigo-600 ring-2 sm:ring-4 ring-indigo-500/30' : 'border-slate-300 bg-slate-100')}"
 								>
 									{#if hasMatch}
-										<div class="w-2.5 h-2.5 rounded-full" style="background-color: {pairColor.hex};"></div>
+										<div class="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full" style="background-color: {pairColor.hex};"></div>
 									{:else if isSelected}
-										<div class="w-2.5 h-2.5 rounded-full bg-white animate-ping"></div>
+										<div class="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full bg-white animate-ping"></div>
 									{/if}
 								</div>
 							</div>
 						{/each}
 					</div>
 
-					<!-- Right Column: Pilihan Jawaban & Pengecoh -->
-					<div class="space-y-3">
-						<div class="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Kolom Kanan (Pilihan & Pengecoh)</div>
+					<!-- Right Column: Pilihan Jawaban -->
+					<div class="space-y-2 sm:space-y-3">
+						<div class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Kolom Kanan (Pilihan Jawaban)</div>
 						{#each matchingRight as rightItem, rightIdx}
 							{@const matchedLeftKeys = Object.keys(matchingAnswers).filter(k => matchingAnswers[k] === String(rightIdx))}
 							{@const isMatched = matchedLeftKeys.length > 0}
@@ -597,38 +597,38 @@
 							<div 
 								role="button"
 								tabindex="0"
-								class="relative flex items-center justify-between gap-3 p-3.5 rounded-2xl border-2 transition-all duration-200 cursor-pointer select-none text-left
-									{isMatched ? `${pairColor.bg} ${pairColor.border} shadow-sm` : (isSelected ? 'border-indigo-600 bg-indigo-50/70 ring-4 ring-indigo-500/20 shadow-md' : 'border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50/70')}"
+								class="relative flex items-center justify-between gap-1.5 sm:gap-3 p-2 sm:p-3.5 rounded-xl sm:rounded-2xl border-2 transition-all duration-200 cursor-pointer select-none text-left
+									{isMatched ? `${pairColor.bg} ${pairColor.border} shadow-xs` : (isSelected ? 'border-indigo-600 bg-indigo-50/70 ring-2 sm:ring-4 ring-indigo-500/20 shadow-sm' : 'border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50/70')}"
 								on:click={() => selectRightItem(rightIdx)}
 								on:keydown={(e) => e.key === 'Enter' && selectRightItem(rightIdx)}
 							>
 								<!-- Connector Port Left -->
 								<div 
 									id="match-port-right-{question.id}-{rightIdx}"
-									class="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all mr-1
-										{isMatched ? `${pairColor.border} bg-white shadow-sm ring-2 ${pairColor.ring}` : (isSelected ? 'border-indigo-600 bg-indigo-600 ring-4 ring-indigo-500/30' : 'border-slate-300 bg-slate-100')}"
+									class="w-4 h-4 sm:w-6 sm:h-6 rounded-full border sm:border-2 flex items-center justify-center shrink-0 transition-all mr-0.5 sm:mr-1
+										{isMatched ? `${pairColor.border} bg-white shadow-xs ring-1 sm:ring-2 ${pairColor.ring}` : (isSelected ? 'border-indigo-600 bg-indigo-600 ring-2 sm:ring-4 ring-indigo-500/30' : 'border-slate-300 bg-slate-100')}"
 								>
 									{#if isMatched}
-										<div class="w-2.5 h-2.5 rounded-full" style="background-color: {pairColor.hex};"></div>
+										<div class="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full" style="background-color: {pairColor.hex};"></div>
 									{:else if isSelected}
-										<div class="w-2.5 h-2.5 rounded-full bg-white animate-ping"></div>
+										<div class="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full bg-white animate-ping"></div>
 									{/if}
 								</div>
 
-								<div class="flex items-start gap-2.5 flex-1 min-w-0">
-									<span class="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 transition-colors
+								<div class="flex items-start gap-1.5 sm:gap-2.5 flex-1 min-w-0">
+									<span class="w-5 h-5 sm:w-7 sm:h-7 rounded-lg sm:rounded-xl flex items-center justify-center text-[10px] sm:text-xs font-bold shrink-0 transition-colors
 										{isMatched ? pairColor.badge : (isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600')}">
 										{String.fromCharCode(65 + rightIdx)}
 									</span>
 									<div class="flex-1 min-w-0">
-										<div class="text-sm font-medium {isMatched ? 'text-slate-900 font-semibold' : 'text-slate-700'} prose prose-sm max-w-none">
+										<div class="text-xs sm:text-sm font-medium {isMatched ? 'text-slate-900 font-semibold' : 'text-slate-700'} prose prose-sm max-w-none break-words">
 											{@html rightItem}
 										</div>
 										{#if isMatched}
-											<div class="flex items-center gap-1.5 mt-2 flex-wrap">
+											<div class="flex items-center gap-1 mt-1 sm:mt-2 flex-wrap">
 												{#each matchedLeftKeys as lKey}
-													<span class="px-2 py-0.5 rounded-md text-[11px] font-bold {MATCH_COLORS[Number(lKey) % MATCH_COLORS.length].badge} shadow-xs">
-														Pasangan No. {Number(lKey) + 1}
+													<span class="px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[11px] font-bold {MATCH_COLORS[Number(lKey) % MATCH_COLORS.length].badge} shadow-xs">
+														No. {Number(lKey) + 1}
 													</span>
 												{/each}
 											</div>
