@@ -83,8 +83,11 @@
 							<p class="text-[9px] text-slate-700 leading-tight mt-0.5">{school.address}</p>
 						{/if}
 					</div>
-					<!-- QR Code Login Siswa (berada di kanan atas) -->
-					<img src={getQrCodeImageUrl(generateStudentQrData(p.login_username || p.username, p.login_password || p.nisn, p.qr_token))} alt="QR Login" class="w-14 h-14 object-contain mix-blend-multiply" title="Scan QR untuk Login Siswa" />
+					<!-- QR Code Link Website Ujian (berada di kanan atas) -->
+					<div class="flex flex-col items-center flex-shrink-0">
+						<img src={getQrCodeImageUrl('https://ujian-madrasah.pages.dev', 100)} alt="QR Website" class="w-12 h-12 object-contain mix-blend-multiply" title="Scan Link Website Ujian" />
+						<span class="text-[7px] text-slate-500 font-bold tracking-tighter mt-0.5">WEB UJIAN</span>
+					</div>
 				</div>
 
 				<!-- Body Kartu -->
@@ -138,12 +141,22 @@
 					<div class="mt-4 flex justify-between items-end">
 						<div class="flex gap-3 items-end">
 							{#if p.photo}
-								<img src={p.photo} alt="Foto {p.student_name}" class="w-[2cm] h-[3cm] border-2 border-slate-300 object-cover bg-slate-50" />
+								<img src={p.photo} alt="Foto {p.student_name}" class="w-[2cm] h-[3cm] border-2 border-slate-300 object-cover bg-slate-50 flex-shrink-0" />
 							{:else}
-								<div class="w-[2cm] h-[3cm] border-2 border-slate-300 flex items-center justify-center bg-slate-50 text-slate-400 text-[10px] text-center p-1">
+								<div class="w-[2cm] h-[3cm] border-2 border-slate-300 flex items-center justify-center bg-slate-50 text-slate-400 text-[10px] text-center p-1 flex-shrink-0">
 									Pas Foto<br/>2 x 3
 								</div>
 							{/if}
+							<!-- QR Code Login Siswa (berada di samping kanan foto, berukuran agak besar) -->
+							<div class="flex flex-col items-center justify-center">
+								<img 
+									src={getQrCodeImageUrl(generateStudentQrData(p.login_username || p.username, p.login_password || p.nisn, p.qr_token), 180)} 
+									alt="QR Login" 
+									class="w-[2.4cm] h-[2.4cm] object-contain border border-slate-300 p-0.5 rounded bg-white shadow-sm mix-blend-multiply" 
+									title="Scan QR untuk Login Siswa" 
+								/>
+								<span class="text-[8px] font-bold text-slate-600 mt-1 uppercase tracking-tight">QR LOGIN SISWA</span>
+							</div>
 						</div>
 						<div class="text-center mt-3">
 							<p class="text-[10px] mb-6">Panitia Ujian</p>
@@ -175,7 +188,11 @@
 						<p class="font-bold text-xs uppercase leading-tight">{examType.name || 'UJIAN'}</p>
 						<p class="font-bold text-xs uppercase leading-tight">{school?.name || 'NAMA SEKOLAH'}</p>
 					</div>
-					<img src={getQrCodeImageUrl(generateStudentQrData(p.login_username || p.username, p.login_password || p.nisn, p.qr_token), 80)} alt="QR Login" class="w-10 h-10 flex-shrink-0" title="Scan QR untuk Login Siswa" />
+					<!-- QR Code Link Website Ujian -->
+					<div class="flex flex-col items-center flex-shrink-0">
+						<img src={getQrCodeImageUrl('https://ujian-madrasah.pages.dev', 100)} alt="QR Website" class="w-10 h-10 object-contain" title="Scan Link Website Ujian" />
+						<span class="text-[7px] text-slate-500 font-bold tracking-tighter mt-0.5">WEB UJIAN</span>
+					</div>
 				</div>
 
 				<!-- Body: Data full-width -->
@@ -229,16 +246,28 @@
 					</table>
 				</div>
 
-				<!-- Footer: Photo + TTD Panitia -->
+				<!-- Footer: Photo + QR Login di samping kanan + TTD Panitia -->
 				<div class="px-3 pb-3 flex justify-between items-end">
-					<div class="flex-shrink-0">
-						{#if p.photo}
-							<img src={p.photo} alt="Foto {p.student_name}" class="w-[2cm] h-[2.5cm] border border-slate-400 object-cover bg-slate-50" />
-						{:else}
-							<div class="w-[2cm] h-[2.5cm] border border-slate-400 flex items-center justify-center bg-slate-50 text-slate-400 text-[9px] text-center p-1">
-								Foto<br/>2x3
-							</div>
-						{/if}
+					<div class="flex gap-3 items-end">
+						<div class="flex-shrink-0">
+							{#if p.photo}
+								<img src={p.photo} alt="Foto {p.student_name}" class="w-[2cm] h-[2.5cm] border border-slate-400 object-cover bg-slate-50" />
+							{:else}
+								<div class="w-[2cm] h-[2.5cm] border border-slate-400 flex items-center justify-center bg-slate-50 text-slate-400 text-[9px] text-center p-1">
+									Foto<br/>2x3
+								</div>
+							{/if}
+						</div>
+						<!-- QR Code Login Siswa (di samping kanan foto, berukuran agak besar) -->
+						<div class="flex flex-col items-center justify-center flex-shrink-0">
+							<img 
+								src={getQrCodeImageUrl(generateStudentQrData(p.login_username || p.username, p.login_password || p.nisn, p.qr_token), 160)} 
+								alt="QR Login" 
+								class="w-[2.2cm] h-[2.2cm] object-contain border border-slate-300 p-0.5 rounded bg-white shadow-sm" 
+								title="Scan QR untuk Login Siswa" 
+							/>
+							<span class="text-[8px] font-bold text-slate-600 mt-0.5 uppercase tracking-tight">QR LOGIN</span>
+						</div>
 					</div>
 					<div class="text-center">
 						<p class="text-[10px] mb-5">Panitia Ujian</p>

@@ -47,8 +47,11 @@
 							<p class="text-[9px] text-slate-700 leading-tight mt-0.5">{school.address}</p>
 						{/if}
 					</div>
-					<!-- QR Code Login Siswa (berada di kanan atas) -->
-					<img src={getQrCodeImageUrl(generateStudentQrData(p.login_username || p.username, p.login_password || p.nisn, p.qr_token))} alt="QR Login" class="w-14 h-14 object-contain mix-blend-multiply" title="Scan QR untuk Login Siswa" />
+					<!-- QR Code Link Website Ujian (berada di kanan atas) -->
+					<div class="flex flex-col items-center flex-shrink-0">
+						<img src={getQrCodeImageUrl('https://ujian-madrasah.pages.dev', 100)} alt="QR Website" class="w-12 h-12 object-contain mix-blend-multiply" title="Scan Link Website Ujian" />
+						<span class="text-[7px] text-slate-500 font-bold tracking-tighter mt-0.5">WEB UJIAN</span>
+					</div>
 				</div>
 
 				<!-- Body Kartu -->
@@ -56,13 +59,25 @@
 					<div class="text-center font-bold text-xs mb-3 pb-2 border-b border-slate-300 leading-snug break-words">
 						{exam.title}
 					</div>
-						<div class="flex-1 flex gap-4">
-							<div class="w-24 flex flex-col items-center gap-2">
-								<div class="w-20 h-24 bg-slate-200 border border-slate-400 flex items-center justify-center text-[10px] text-slate-400 font-semibold text-center leading-tight p-1">
-									FOTO 3x4
+						<div class="flex-1 flex gap-3">
+							<div class="flex gap-2 items-start flex-shrink-0">
+								<div class="w-20 flex flex-col items-center gap-1">
+									<div class="w-20 h-24 bg-slate-200 border border-slate-400 flex items-center justify-center text-[10px] text-slate-400 font-semibold text-center leading-tight p-1">
+										FOTO 3x4
+									</div>
+									<div class="text-[9px] font-mono font-bold bg-slate-100 px-1 py-0.5 border border-slate-300 rounded text-center w-full truncate" title={p.username}>
+										{p.username}
+									</div>
 								</div>
-								<div class="text-[10px] font-mono font-bold bg-slate-100 px-1 py-0.5 border border-slate-300 rounded text-center w-full truncate" title={p.username}>
-									{p.username}
+								<!-- QR Code Login Siswa (berada di samping kanan foto) -->
+								<div class="flex flex-col items-center justify-center">
+									<img 
+										src={getQrCodeImageUrl(generateStudentQrData(p.login_username || p.username, p.login_password || p.nisn, p.qr_token), 160)} 
+										alt="QR Login" 
+										class="w-20 h-20 object-contain border border-slate-300 p-0.5 rounded bg-white shadow-sm mix-blend-multiply" 
+										title="Scan QR untuk Login Siswa" 
+									/>
+									<span class="text-[7px] font-bold text-slate-600 mt-1 uppercase tracking-tight">QR LOGIN</span>
 								</div>
 							</div>
 							
