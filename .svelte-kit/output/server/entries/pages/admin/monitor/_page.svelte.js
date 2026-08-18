@@ -1,4 +1,4 @@
-import { h as head, i as ensure_array_like, e as escape_html, j as attr_class, k as attr, l as clsx, a as attr_style, f as bind_props, c as stringify } from "../../../../chunks/index.js";
+import { h as head, i as ensure_array_like, e as escape_html, j as attr_class, k as attr, l as clsx, c as stringify, a as attr_style, f as bind_props } from "../../../../chunks/index.js";
 import { p as parseDate } from "../../../../chunks/date.js";
 import { o as onDestroy } from "../../../../chunks/index-server.js";
 import "@sveltejs/kit/internal";
@@ -80,7 +80,7 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<div class="p-12 text-center text-slate-400"><svg class="w-16 h-16 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.monitor)}></path></svg> <p class="text-lg font-medium">Tidak ada siswa yang sesuai filter</p></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Siswa</th><th>Username</th><th>Status</th><th class="w-24 text-center">Pelanggaran</th><th class="w-32">Progress</th><th>Sisa Waktu</th><th class="text-right">Aksi</th></tr></thead><tbody><!--[-->`);
+      $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Siswa</th><th>Username</th><th>Status</th><th class="w-20 text-center">TTD</th><th class="w-24 text-center">Pelanggaran</th><th class="w-32">Progress</th><th>Sisa Waktu</th><th class="text-right">Aksi</th></tr></thead><tbody><!--[-->`);
       const each_array_2 = ensure_array_like(filteredAttempts);
       for (let $$index_2 = 0, $$length = each_array_2.length; $$index_2 < $$length; $$index_2++) {
         let a = each_array_2[$$index_2];
@@ -99,6 +99,14 @@ function _page($$renderer, $$props) {
           $$renderer2.push("<!--[-1-->");
         }
         $$renderer2.push(`<!--]--></div></td><td class="text-center">`);
+        if (a.signature) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<button type="button" class="group relative inline-flex items-center justify-center p-1 rounded-xl border border-slate-200 bg-white hover:border-indigo-400 hover:shadow-md transition-all cursor-pointer" title="Klik untuk memperbesar tanda tangan"><img${attr("src", a.signature)}${attr("alt", `TTD ${stringify(a.student_name)}`)} class="h-7 max-w-[55px] object-contain"/> <span class="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-indigo-600 text-[8px] text-white opacity-0 group-hover:opacity-100 transition-opacity">🔍</span></button>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<span class="text-slate-300 text-xs">-</span>`);
+        }
+        $$renderer2.push(`<!--]--></td><td class="text-center">`);
         if (a.status === "belum_mengerjakan") {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<span class="text-slate-400 text-xs">-</span>`);
@@ -210,6 +218,10 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<!--]--></tbody></table></div>`);
     }
     $$renderer2.push(`<!--]--></div></div> `);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--> `);
     {
       $$renderer2.push("<!--[-1-->");
     }

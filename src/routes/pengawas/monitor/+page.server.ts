@@ -140,7 +140,8 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 					sa.violation_count,
 					sa.violation_logs,
 					sa.is_paused,
-					sa.paused_at
+					sa.paused_at,
+					sa.signature
 				FROM exam_participants epart
 				JOIN users u ON epart.student_id = u.id
 				JOIN exams e ON epart.exam_id = e.id
