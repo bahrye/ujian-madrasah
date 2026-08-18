@@ -20,7 +20,7 @@
 				{ no: 7, top: '85%', left: '3%' },
 				{ no: 8, top: '85%', left: '40%' },
 				{ no: 9, top: '85%', left: '88%' },
-				{ no: 10, top: '96%', left: '88%' }
+				{ no: 10, top: '91%', left: '91%' }
 			],
 			items: [
 				{ no: 1, title: 'Judul Ujian', desc: 'Menampilkan nama mata pelajaran ujian yang sedang dikerjakan.' },
@@ -41,7 +41,7 @@
 			subtitle: 'Tampilan di nomor soal terakhir untuk menyelesaikan ujian.',
 			image: '/panduan-ui-ujian-2.jpeg',
 			badges: [
-				{ no: 11, top: '94%', left: '72%' }
+				{ no: 11, top: '90%', left: '88%' }
 			],
 			items: [
 				{ 
@@ -57,7 +57,7 @@
 			subtitle: 'Kotak dialog verifikasi sebelum lembar jawaban dikirim secara permanen.',
 			image: '/panduan-ui-ujian-3.jpeg',
 			badges: [
-				{ no: 12, top: '69%', left: '72%' }
+				{ no: 12, top: '64%', left: '86%' }
 			],
 			items: [
 				{ 
@@ -355,15 +355,26 @@
 					>
 						›
 					</button>
-
-					<!-- Slide Counter Overlay -->
-					<div class="absolute bottom-2 right-2 px-2.5 py-1 rounded-full bg-slate-900/70 text-white text-[11px] font-semibold backdrop-blur-xs">
-						{currentSlide + 1} / {slides.length}
-					</div>
 				</div>
 
-				<div class="text-xs text-slate-400 flex items-center gap-1.5">
-					<span>👆 Geser atau tekan tombol panah untuk berganti gambar</span>
+				<!-- Slide Controls & Indicator Bar below image -->
+				<div class="flex items-center justify-between w-full max-w-sm px-1 text-xs text-slate-400">
+					<span>👆 Geser atau tekan panah</span>
+					<div class="flex items-center gap-2">
+						<div class="flex items-center gap-1.5">
+							{#each slides as _, i}
+								<button 
+									type="button" 
+									on:click={() => setSlide(i)} 
+									class="w-2 h-2 rounded-full transition-all {currentSlide === i ? 'w-5 bg-indigo-600' : 'bg-slate-300 hover:bg-slate-400'}"
+									title="Slide {i + 1}"
+								></button>
+							{/each}
+						</div>
+						<span class="font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full text-[11px]">
+							{currentSlide + 1} / {slides.length}
+						</span>
+					</div>
 				</div>
 			</div>
 

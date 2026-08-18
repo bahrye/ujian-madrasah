@@ -18,7 +18,7 @@ function _page($$renderer) {
         { no: 7, top: "85%", left: "3%" },
         { no: 8, top: "85%", left: "40%" },
         { no: 9, top: "85%", left: "88%" },
-        { no: 10, top: "96%", left: "88%" }
+        { no: 10, top: "91%", left: "91%" }
       ],
       items: [
         {
@@ -78,7 +78,7 @@ function _page($$renderer) {
       title: "Tombol Selesai & Kumpulkan (No. 11)",
       subtitle: "Tampilan di nomor soal terakhir untuk menyelesaikan ujian.",
       image: "/panduan-ui-ujian-2.jpeg",
-      badges: [{ no: 11, top: "94%", left: "72%" }],
+      badges: [{ no: 11, top: "90%", left: "88%" }],
       items: [
         {
           no: 11,
@@ -92,7 +92,7 @@ function _page($$renderer) {
       title: "Konfirmasi Pengumpulan Jawaban (No. 12)",
       subtitle: "Kotak dialog verifikasi sebelum lembar jawaban dikirim secara permanen.",
       image: "/panduan-ui-ujian-3.jpeg",
-      badges: [{ no: 12, top: "69%", left: "72%" }],
+      badges: [{ no: 12, top: "64%", left: "86%" }],
       items: [
         {
           no: 12,
@@ -201,10 +201,16 @@ function _page($$renderer) {
     let badge = each_array_4[$$index_4];
     $$renderer.push(`<button type="button"${attr_class(`absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all ${activeBadge === badge.no ? "bg-rose-500 scale-125 z-10 animate-bounce" : "bg-indigo-600/95 cursor-pointer"}`)}${attr_style(`top: ${stringify(badge.top)}; left: ${stringify(badge.left)};`)}${attr("title", `Klik untuk melihat penjelasan nomor ${stringify(badge.no)}`)}>${escape_html(badge.no)}</button>`);
   }
-  $$renderer.push(`<!--]--> <button type="button" class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-slate-900/60 hover:bg-slate-900/90 text-white backdrop-blur-xs flex items-center justify-center transition-all shadow-md" title="Gambar Sebelumnya">‹</button> <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-slate-900/60 hover:bg-slate-900/90 text-white backdrop-blur-xs flex items-center justify-center transition-all shadow-md" title="Gambar Selanjutnya">›</button> <div class="absolute bottom-2 right-2 px-2.5 py-1 rounded-full bg-slate-900/70 text-white text-[11px] font-semibold backdrop-blur-xs">${escape_html(currentSlide + 1)} / ${escape_html(slides.length)}</div></div> <div class="text-xs text-slate-400 flex items-center gap-1.5"><span>👆 Geser atau tekan tombol panah untuk berganti gambar</span></div></div> <div class="space-y-2"><div class="p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl mb-3"><h3 class="font-bold text-indigo-900 text-sm">${escape_html(slides[currentSlide].title)}</h3> <p class="text-indigo-700 text-xs mt-0.5">${escape_html(slides[currentSlide].subtitle)}</p></div> <!--[-->`);
-  const each_array_5 = ensure_array_like(slides[currentSlide].items);
-  for (let $$index_5 = 0, $$length = each_array_5.length; $$index_5 < $$length; $$index_5++) {
-    let item = each_array_5[$$index_5];
+  $$renderer.push(`<!--]--> <button type="button" class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-slate-900/60 hover:bg-slate-900/90 text-white backdrop-blur-xs flex items-center justify-center transition-all shadow-md" title="Gambar Sebelumnya">‹</button> <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-slate-900/60 hover:bg-slate-900/90 text-white backdrop-blur-xs flex items-center justify-center transition-all shadow-md" title="Gambar Selanjutnya">›</button></div> <div class="flex items-center justify-between w-full max-w-sm px-1 text-xs text-slate-400"><span>👆 Geser atau tekan panah</span> <div class="flex items-center gap-2"><div class="flex items-center gap-1.5"><!--[-->`);
+  const each_array_5 = ensure_array_like(slides);
+  for (let i = 0, $$length = each_array_5.length; i < $$length; i++) {
+    each_array_5[i];
+    $$renderer.push(`<button type="button"${attr_class(`w-2 h-2 rounded-full transition-all ${currentSlide === i ? "w-5 bg-indigo-600" : "bg-slate-300 hover:bg-slate-400"}`)}${attr("title", `Slide ${stringify(i + 1)}`)}></button>`);
+  }
+  $$renderer.push(`<!--]--></div> <span class="font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full text-[11px]">${escape_html(currentSlide + 1)} / ${escape_html(slides.length)}</span></div></div></div> <div class="space-y-2"><div class="p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl mb-3"><h3 class="font-bold text-indigo-900 text-sm">${escape_html(slides[currentSlide].title)}</h3> <p class="text-indigo-700 text-xs mt-0.5">${escape_html(slides[currentSlide].subtitle)}</p></div> <!--[-->`);
+  const each_array_6 = ensure_array_like(slides[currentSlide].items);
+  for (let $$index_6 = 0, $$length = each_array_6.length; $$index_6 < $$length; $$index_6++) {
+    let item = each_array_6[$$index_6];
     $$renderer.push(`<div${attr("id", `badge-desc-${stringify(item.no)}`)}${attr_class(`flex items-start gap-3.5 p-3 rounded-xl transition-all border cursor-pointer ${activeBadge === item.no ? "bg-indigo-50 border-indigo-200 shadow-sm ring-1 ring-indigo-200" : "hover:bg-slate-50 border-slate-100 bg-white"}`)}><div${attr_class(`shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center font-bold text-xs md:text-sm transition-colors ${activeBadge === item.no ? "bg-indigo-600 text-white" : "bg-indigo-100 text-indigo-700"}`)}>${escape_html(item.no)}</div> <div class="flex-1 min-w-0"><h4${attr_class(`font-bold text-slate-800 text-sm transition-colors ${activeBadge === item.no ? "text-indigo-700" : ""}`)}>${escape_html(item.title)}</h4> <p class="text-slate-500 text-xs mt-1 leading-relaxed">${escape_html(item.desc)}</p></div></div>`);
   }
   $$renderer.push(`<!--]--></div></div></div> <div class="rounded-3xl overflow-hidden shadow-md relative h-48 md:h-64 mt-8 group"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&amp;auto=format&amp;fit=crop&amp;w=1200&amp;q=80" alt="Sukses Ujian" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/> <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent flex flex-col items-center justify-end pb-8 text-center px-4"><h3 class="text-2xl md:text-3xl font-bold text-white mb-2 drop-shadow-md">Semoga Berhasil!</h3> <p class="text-slate-200 md:text-lg drop-shadow">Kejujuran adalah kunci kesuksesan yang sesungguhnya.</p></div></div></div>`);
