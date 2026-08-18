@@ -3,25 +3,59 @@
 	import Toast from '$lib/components/ui/Toast.svelte';
 	import PasswordInput from '$lib/components/ui/PasswordInput.svelte';
 	import QrScannerModal from '$lib/components/auth/QrScannerModal.svelte';
+	import PinInputModal from '$lib/components/auth/PinInputModal.svelte';
 	import type { ParsedQrLogin } from '$lib/utils/qrLogin';
 
 	export let form: { error?: string } | null;
 
 	let loading = false;
 	let showQrModal = false;
+	let showPinModal = false;
+	let pinUserInfo = { name: '', role: '', username: '' };
 	let username = '';
 	let password = '';
 	let qrToken = '';
+	let loginPin = '';
 	let formElement: HTMLFormElement;
 
-	function handleQrScan(event: CustomEvent<ParsedQrLogin>) {
+	async function handleQrScan(event: CustomEvent<ParsedQrLogin>) {
 		const { username: scannedUser, password: scannedPass, qrToken: scannedToken } = event.detail;
 		username = scannedUser || '';
 		password = scannedPass || '';
 		qrToken = scannedToken || '';
+		loginPin = '';
 		showQrModal = false;
 
-		// Automatically submit the form with scanned credentials / token
+		// Check if this user (staff) requires 5-digit PIN
+		try {
+			const res = await fetch(`/api/auth/check-pin?u=${encodeURIComponent(username)}`);
+			if (res.ok) {
+				const data = await res.json();
+				if (data.requires_pin) {
+					pinUserInfo = {
+						name: data.name || '',
+						role: data.role || '',
+						username: data.username || username
+					};
+					showPinModal = true;
+					return;
+				}
+			}
+		} catch (err) {
+			console.debug('Check pin failed:', err);
+		}
+
+		// If no PIN required (e.g. Siswa), automatically submit immediately!
+		submitLoginForm();
+	}
+
+	function handlePinSubmit(event: CustomEvent<{ pin: string }>) {
+		loginPin = event.detail.pin;
+		showPinModal = false;
+		submitLoginForm();
+	}
+
+	function submitLoginForm() {
 		setTimeout(() => {
 			if (formElement) {
 				if (typeof formElement.requestSubmit === 'function') {
@@ -44,6 +78,15 @@
 	show={showQrModal}
 	on:close={() => (showQrModal = false)}
 	on:scan={handleQrScan}
+/>
+
+<PinInputModal
+	show={showPinModal}
+	name={pinUserInfo.name}
+	role={pinUserInfo.role}
+	username={pinUserInfo.username}
+	on:submit={handlePinSubmit}
+	on:cancel={() => (showPinModal = false)}
 />
 
 <div class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-primary-950 via-primary-900 to-violet-900 relative overflow-hidden">
@@ -92,6 +135,7 @@
 				class="space-y-4"
 			>
 				<input type="hidden" name="qr_token" bind:value={qrToken} />
+				<input type="hidden" name="login_pin" bind:value={loginPin} />
 
 				<div>
 					<label for="username" class="label">Username</label>

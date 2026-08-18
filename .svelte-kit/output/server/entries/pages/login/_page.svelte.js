@@ -7,9 +7,10 @@ import "../../../chunks/root.js";
 import "../../../chunks/state.svelte.js";
 import { T as Toast } from "../../../chunks/Toast2.js";
 import { P as PasswordInput } from "../../../chunks/PasswordInput.js";
-import { o as onDestroy } from "../../../chunks/index-server.js";
+import { o as onDestroy, t as tick } from "../../../chunks/index-server.js";
 import { Html5Qrcode } from "html5-qrcode";
 import { p as parseQrLoginData } from "../../../chunks/qrLogin.js";
+import { R as ROLE_LABELS } from "../../../chunks/constants.js";
 function QrScannerModal($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let show = fallback($$props["show"], false);
@@ -215,14 +216,66 @@ function QrScannerModal($$renderer, $$props) {
     bind_props($$props, { show });
   });
 }
+function PinInputModal($$renderer, $$props) {
+  $$renderer.component(($$renderer2) => {
+    let show = fallback($$props["show"], false);
+    let username = fallback($$props["username"], "");
+    let name = fallback($$props["name"], "");
+    let role = fallback($$props["role"], "");
+    let digits = ["", "", "", "", ""];
+    let errorMessage = "";
+    async function focusFirstInput() {
+      await tick();
+    }
+    if (show) {
+      digits = ["", "", "", "", ""];
+      errorMessage = "";
+      focusFirstInput();
+    }
+    if (
+      // Move to next input
+      // Auto submit when all 5 digits are filled
+      show
+    ) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<div class="fixed inset-0 z-[100] flex items-center justify-center p-4"><div class="fixed inset-0 bg-slate-950/80 backdrop-blur-md" role="button" tabindex="-1" aria-label="Batal"></div> <div class="bg-white text-slate-800 w-full max-w-sm rounded-3xl shadow-2xl relative z-10 overflow-hidden flex flex-col animate-bounce-in border border-slate-100"><div class="p-5 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white text-center relative overflow-hidden"><div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div> <button class="absolute top-4 right-4 text-white/70 hover:text-white p-1 rounded-xl hover:bg-white/10 transition-colors" aria-label="Tutup"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button> <div class="w-12 h-12 rounded-2xl bg-white/20 border border-white/30 mx-auto flex items-center justify-center mb-2 shadow-inner"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></div> <h3 class="text-base font-bold">Verifikasi Angka Rahasia</h3> <p class="text-xs text-white/90 mt-0.5">Keamanan Tambahan Login Petugas</p></div> <div class="p-6 flex flex-col items-center text-center space-y-4"><div class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl p-3 flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold flex items-center justify-center flex-shrink-0 text-sm shadow-sm">${escape_html(name ? name.charAt(0).toUpperCase() : "👤")}</div> <div class="text-left min-w-0 flex-1"><p class="text-xs font-bold text-slate-800 truncate">${escape_html(name || username)}</p> <p class="text-[11px] text-slate-500 truncate">@${escape_html(username)}</p></div> <span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 font-bold text-[10px] rounded-lg uppercase tracking-wider">${escape_html(ROLE_LABELS[role] || role || "Petugas")}</span></div> <p class="text-xs text-slate-600">Masukkan <strong>5 digit angka rahasia</strong> yang diberikan oleh Admin untuk menyelesaikan login:</p> <div class="flex items-center justify-center gap-2.5 my-1"><!--[-->`);
+      const each_array = ensure_array_like([0, 1, 2, 3, 4]);
+      for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
+        let i = each_array[$$index];
+        $$renderer2.push(`<input type="password" inputmode="numeric" maxlength="1"${attr("value", digits[i])}${attr_class(`w-12 h-14 text-center text-2xl font-black font-mono rounded-2xl border-2 transition-all duration-200 outline-none ${digits[i] ? "border-amber-500 bg-amber-50/40 text-slate-900 shadow-sm" : "border-slate-200 bg-slate-50 text-slate-800 focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-500/15"}`)}/>`);
+      }
+      $$renderer2.push(`<!--]--></div> `);
+      if (errorMessage) {
+        $$renderer2.push("<!--[0-->");
+        $$renderer2.push(`<p class="text-xs font-semibold text-rose-600 animate-shake">${escape_html(errorMessage)}</p>`);
+      } else {
+        $$renderer2.push("<!--[-1-->");
+      }
+      $$renderer2.push(`<!--]--> <div class="grid grid-cols-3 gap-2 w-full pt-2"><!--[-->`);
+      const each_array_1 = ensure_array_like(["1", "2", "3", "4", "5", "6", "7", "8", "9"]);
+      for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
+        let key = each_array_1[$$index_1];
+        $$renderer2.push(`<button type="button" class="py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 active:bg-slate-300 font-bold text-base text-slate-700 transition-colors shadow-xs">${escape_html(key)}</button>`);
+      }
+      $$renderer2.push(`<!--]--> <button type="button" class="py-2.5 rounded-xl bg-slate-50 hover:bg-rose-50 text-rose-600 font-medium text-xs transition-colors flex items-center justify-center" title="Hapus">⌫ Hapus</button> <button type="button" class="py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 active:bg-slate-300 font-bold text-base text-slate-700 transition-colors shadow-xs">0</button> <button type="button" class="py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition-colors flex items-center justify-center shadow-md shadow-amber-500/20">Masuk ➔</button></div></div> <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex gap-2"><button type="button" class="btn btn-secondary w-full text-xs py-2">Batal</button></div></div></div>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]-->`);
+    bind_props($$props, { show, username, name, role });
+  });
+}
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let form = $$props["form"];
     let loading = false;
     let showQrModal = false;
+    let showPinModal = false;
+    let pinUserInfo = { name: "", role: "", username: "" };
     let username = "";
     let password = "";
     let qrToken = "";
+    let loginPin = "";
     let $$settled = true;
     let $$inner_renderer;
     function $$render_inner($$renderer3) {
@@ -234,6 +287,13 @@ function _page($$renderer, $$props) {
       Toast($$renderer3);
       $$renderer3.push(`<!----> `);
       QrScannerModal($$renderer3, { show: showQrModal });
+      $$renderer3.push(`<!----> `);
+      PinInputModal($$renderer3, {
+        show: showPinModal,
+        name: pinUserInfo.name,
+        role: pinUserInfo.role,
+        username: pinUserInfo.username
+      });
       $$renderer3.push(`<!----> <div class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-primary-950 via-primary-900 to-violet-900 relative overflow-hidden"><div class="absolute inset-0 overflow-hidden pointer-events-none"><div class="absolute -top-40 -right-40 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"></div> <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-violet-500/20 rounded-full blur-3xl"></div> <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/10 rounded-full blur-3xl"></div></div> <div class="w-full max-w-md relative z-10 animate-bounce-in"><div class="card-glass p-8 sm:p-10"><div class="text-center mb-8"><div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 shadow-xl shadow-indigo-500/30 mb-4"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg></div> <h1 class="text-2xl font-bold text-slate-800">Ujian Online Madrasah</h1> <p class="text-sm text-slate-500 mt-1">Masuk ke akun Anda untuk melanjutkan</p></div> `);
       if (form?.error) {
         $$renderer3.push("<!--[0-->");
@@ -241,7 +301,7 @@ function _page($$renderer, $$props) {
       } else {
         $$renderer3.push("<!--[-1-->");
       }
-      $$renderer3.push(`<!--]--> <form method="POST" class="space-y-4"><input type="hidden" name="qr_token"${attr("value", qrToken)}/> <div><label for="username" class="label">Username</label> <div class="relative"><svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg> <input id="username" name="username" type="text" required=""${attr("value", username)} class="input pl-10" placeholder="Masukkan username" autocomplete="username"/></div></div> <div><label for="password" class="label">Kata Sandi</label> `);
+      $$renderer3.push(`<!--]--> <form method="POST" class="space-y-4"><input type="hidden" name="qr_token"${attr("value", qrToken)}/> <input type="hidden" name="login_pin"${attr("value", loginPin)}/> <div><label for="username" class="label">Username</label> <div class="relative"><svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg> <input id="username" name="username" type="text" required=""${attr("value", username)} class="input pl-10" placeholder="Masukkan username" autocomplete="username"/></div></div> <div><label for="password" class="label">Kata Sandi</label> `);
       PasswordInput($$renderer3, {
         id: "password",
         name: "password",

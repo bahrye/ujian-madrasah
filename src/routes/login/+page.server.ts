@@ -16,6 +16,7 @@ export const actions: Actions = {
 		const username = formData.get('username')?.toString().trim();
 		const password = formData.get('password')?.toString();
 		const qrToken = formData.get('qr_token')?.toString().trim();
+		const loginPin = formData.get('login_pin')?.toString().trim();
 
 		if (!username || (!password && !qrToken)) {
 			return fail(400, { error: 'Username dan kata sandi wajib diisi.' });
@@ -35,6 +36,7 @@ export const actions: Actions = {
 					name: string;
 					role: string;
 					photo: string | null;
+					login_pin?: string | null;
 					is_logged_in?: number;
 					session_token?: string | null;
 					last_active_at?: string | null;
@@ -46,11 +48,19 @@ export const actions: Actions = {
 
 			let valid = false;
 			if (qrToken) {
+				// Validasi Angka Rahasia (PIN 5 Digit) KHUSUS login via QR Code untuk Guru / Pengawas / Panitia
+				if (user.role !== 'siswa' && user.login_pin && user.login_pin.trim().length > 0) {
+					if (!loginPin || loginPin !== user.login_pin.trim()) {
+						return fail(401, { error: 'Angka rahasia 5-digit tidak valid atau belum dimasukkan. Silakan minta angka rahasia kepada Admin.' });
+					}
+				}
+
 				valid = await verifyQrLoginToken(user.id, user.username, user.password_hash, qrToken);
 				if (!valid) {
 					return fail(401, { error: 'Kode QR login tidak valid atau sudah kadaluarsa.' });
 				}
 			} else if (password) {
+				// Login biasa menggunakan username & password dapat langsung masuk tanpa PIN
 				valid = await verifyPassword(password, user.password_hash);
 				if (!valid) {
 					return fail(401, { error: 'Username atau kata sandi salah.' });

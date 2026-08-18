@@ -1,6 +1,6 @@
 import { fail, redirect, error } from "@sveltejs/kit";
 import { g as getDB } from "../../../../../chunks/db.js";
-import { e as verifyExamTokenSignature } from "../../../../../chunks/auth.js";
+import { f as verifyExamTokenSignature } from "../../../../../chunks/auth.js";
 import { f as formatExamTitle } from "../../../../../chunks/exam.js";
 const load = async ({ platform, locals, params, cookies }) => {
   if (!locals.user) throw redirect(302, "/login");

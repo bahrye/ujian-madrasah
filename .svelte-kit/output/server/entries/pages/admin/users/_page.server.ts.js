@@ -1,11 +1,12 @@
 import { fail } from "@sveltejs/kit";
-import { g as getDB } from "../../../../chunks/db.js";
-import { h as hashPassword, c as createToken, C as COOKIE_NAME, a as createQrLoginToken } from "../../../../chunks/auth.js";
+import { g as getDB, e as ensureUserLoginPinColumn } from "../../../../chunks/db.js";
+import { h as hashPassword, c as createToken, C as COOKIE_NAME, a as createQrLoginToken, b as generate5DigitPin } from "../../../../chunks/auth.js";
 const load = async ({ platform, url, locals }) => {
   const db = getDB(platform);
+  await ensureUserLoginPinColumn(db);
   const search = url.searchParams.get("search") || "";
   const roleFilter = url.searchParams.get("role") || "";
-  let query = 'SELECT id, username, password_hash, name, nip, role, is_active, created_at, photo FROM users WHERE school_id = ? AND role != "siswa" AND role != "superadmin" AND role != "admin"';
+  let query = 'SELECT id, username, password_hash, name, nip, role, is_active, created_at, photo, login_pin FROM users WHERE school_id = ? AND role != "siswa" AND role != "superadmin" AND role != "admin"';
   const params = [locals.user.school_id];
   if (search) {
     query += " AND (username LIKE ? OR name LIKE ?)";
@@ -35,6 +36,7 @@ const load = async ({ platform, url, locals }) => {
         is_active: u.is_active,
         created_at: u.created_at,
         photo: u.photo,
+        login_pin: u.login_pin || null,
         qr_token: qrToken
       };
     })
@@ -48,6 +50,35 @@ const load = async ({ platform, url, locals }) => {
   };
 };
 const actions = {
+  generatePin: async ({ request, platform, locals }) => {
+    const db = getDB(platform);
+    await ensureUserLoginPinColumn(db);
+    const form = await request.formData();
+    const userId = form.get("id");
+    if (!userId) return fail(400, { error: "ID pengguna tidak valid" });
+    const pin = generate5DigitPin();
+    await db.prepare("UPDATE users SET login_pin = ? WHERE id = ? AND school_id = ?").bind(pin, userId, locals.user.school_id).run();
+    return { success: true, message: `Angka rahasia 5-digit berhasil dibuat: ${pin}` };
+  },
+  clearPin: async ({ request, platform, locals }) => {
+    const db = getDB(platform);
+    await ensureUserLoginPinColumn(db);
+    const form = await request.formData();
+    const userId = form.get("id");
+    if (!userId) return fail(400, { error: "ID pengguna tidak valid" });
+    await db.prepare("UPDATE users SET login_pin = NULL WHERE id = ? AND school_id = ?").bind(userId, locals.user.school_id).run();
+    return { success: true, message: "Angka rahasia berhasil dinonaktifkan" };
+  },
+  generateAllPins: async ({ platform, locals }) => {
+    const db = getDB(platform);
+    await ensureUserLoginPinColumn(db);
+    const users = await db.prepare('SELECT id FROM users WHERE school_id = ? AND role != "siswa"').bind(locals.user.school_id).all();
+    for (const u of users.results || []) {
+      const pin = generate5DigitPin();
+      await db.prepare("UPDATE users SET login_pin = ? WHERE id = ?").bind(pin, u.id).run();
+    }
+    return { success: true, message: "Angka rahasia untuk semua petugas berhasil digenerate" };
+  },
   create: async ({ request, platform, locals }) => {
     const db = getDB(platform);
     const form = await request.formData();

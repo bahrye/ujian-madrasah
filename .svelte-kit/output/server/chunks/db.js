@@ -14,7 +14,15 @@ async function dbRun(db, query, ...params) {
     throw err;
   }
 }
+async function ensureUserLoginPinColumn(db) {
+  if (!db) return;
+  try {
+    await db.prepare("ALTER TABLE users ADD COLUMN login_pin TEXT").run();
+  } catch {
+  }
+}
 export {
   dbRun as d,
+  ensureUserLoginPinColumn as e,
   getDB as g
 };

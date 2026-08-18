@@ -107,13 +107,18 @@ async function verifyQrLoginToken(userId, username, passwordHash, qrToken) {
   const expected = await createQrLoginToken(userId, username, passwordHash);
   return qrToken === expected;
 }
+function generate5DigitPin() {
+  const val = Math.floor(1e4 + Math.random() * 9e4);
+  return String(val);
+}
 export {
   COOKIE_NAME as C,
   createQrLoginToken as a,
-  verifyQrLoginToken as b,
+  generate5DigitPin as b,
   createToken as c,
-  verifyPassword as d,
-  verifyExamTokenSignature as e,
+  verifyQrLoginToken as d,
+  verifyPassword as e,
+  verifyExamTokenSignature as f,
   generateTokenCode as g,
   hashPassword as h,
   signExamToken as s,

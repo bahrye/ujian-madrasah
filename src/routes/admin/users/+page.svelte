@@ -17,6 +17,12 @@
 	let editingUser: any = null;
 	let deleteConfirm: number | null = null;
 
+	function copyPin(pin: string, name: string) {
+		if (!navigator?.clipboard) return;
+		navigator.clipboard.writeText(pin);
+		toasts.success(`Angka rahasia untuk ${name} (${pin}) berhasil disalin!`);
+	}
+
 	$: if (form?.success) { toasts.success(form.success); showImportModal = false; showCreateModal = false; }
 	$: if (form?.error) toasts.error(form.error);
 </script>
@@ -33,6 +39,18 @@
 			<p class="text-sm text-slate-500 mt-1">Kelola data pengguna sistem</p>
 		</div>
 		<div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+			<form method="POST" action="?/generateAllPins" use:enhance class="inline">
+				<button
+					type="submit"
+					class="btn-secondary btn text-xs font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200"
+					on:click={(e) => {
+						if (!confirm('Acak angka rahasia 5-digit baru untuk SEMUA petugas?')) e.preventDefault();
+					}}
+					title="Acak angka rahasia 5 digit untuk semua guru/pengawas/panitia"
+				>
+					🎲 Acak PIN Semua
+				</button>
+			</form>
 			<button class="btn flex-1 sm:flex-none" style="background: linear-gradient(135deg,#0ea5e9,#3b82f6); color:#fff; box-shadow: 0 4px 15px rgba(14,165,233,.3);" on:click={() => (showLoginCardModal = true)}>
 				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0" />
@@ -40,28 +58,34 @@
 				Kartu Login
 			</button>
 			<button class="btn-secondary flex-1 sm:flex-none" on:click={() => (showImportModal = true)}>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
 				</svg>
 				Import Excel
 			</button>
 			<button class="btn-primary flex-1 sm:flex-none" on:click={() => (showCreateModal = true)}>
-				<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
+				<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
 				</svg>
 				Tambah Pengguna
 			</button>
 		</div>
 	</div>
 
-	<!-- Search & Filter -->
+	<!-- Filter & Search -->
 	<div class="card p-4">
 		<form method="GET" class="flex flex-col sm:flex-row gap-3">
 			<div class="relative flex-1">
-				<svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.search} />
+				<svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
 				</svg>
-				<input name="search" type="text" class="input pl-9" placeholder="Cari pengguna..." value={data.search} />
+				<input
+					type="text"
+					name="search"
+					placeholder="Cari nama atau username..."
+					value={data.search}
+					class="input pl-9 text-sm"
+				/>
 			</div>
 			<select name="role" class="select w-full sm:w-40">
 				<option value="">Semua Role</option>
@@ -82,6 +106,7 @@
 						<th class="p-4 font-semibold whitespace-nowrap">Nama</th>
 						<th class="p-4 font-semibold whitespace-nowrap">Username</th>
 						<th class="p-4 font-semibold whitespace-nowrap">Role</th>
+						<th class="p-4 font-semibold whitespace-nowrap">Angka Rahasia (PIN)</th>
 						<th class="p-4 font-semibold whitespace-nowrap">Status</th>
 						<th class="p-4 font-semibold whitespace-nowrap">Dibuat</th>
 						<th class="p-4 font-semibold text-right whitespace-nowrap">Aksi</th>
@@ -96,6 +121,57 @@
 							</td>
 							<td class="p-4 text-slate-600 whitespace-nowrap">@{user.username}</td>
 							<td class="p-4 whitespace-nowrap"><span class="{ROLE_COLORS[user.role] || 'badge-info'} whitespace-nowrap">{ROLE_LABELS[user.role] || user.role}</span></td>
+							<td class="p-4 whitespace-nowrap">
+								{#if user.login_pin}
+									<div class="flex items-center gap-1.5">
+										<span class="inline-flex items-center gap-1 font-mono font-bold text-xs bg-amber-50 text-amber-900 border border-amber-300/80 px-2.5 py-1 rounded-xl shadow-xs">
+											🔒 {user.login_pin}
+										</span>
+										<button
+											type="button"
+											class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+											on:click={() => copyPin(user.login_pin, user.name)}
+											title="Salin PIN"
+										>
+											<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+												<path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+											</svg>
+										</button>
+										<form method="POST" action="?/generatePin" use:enhance class="inline">
+											<input type="hidden" name="id" value={user.id} />
+											<button
+												type="submit"
+												class="p-1.5 rounded-lg hover:bg-amber-100 text-amber-600 transition-colors text-xs font-bold"
+												title="Acak Ulang PIN Baru"
+											>
+												🎲
+											</button>
+										</form>
+										<form method="POST" action="?/clearPin" use:enhance class="inline">
+											<input type="hidden" name="id" value={user.id} />
+											<button
+												type="submit"
+												class="p-1.5 rounded-lg hover:bg-rose-100 text-rose-500 transition-colors text-xs font-bold"
+												title="Hapus / Nonaktifkan PIN"
+												on:click={(e) => { if (!confirm(`Nonaktifkan angka rahasia untuk ${user.name}?`)) e.preventDefault(); }}
+											>
+												✕
+											</button>
+										</form>
+									</div>
+								{:else}
+									<form method="POST" action="?/generatePin" use:enhance class="inline">
+										<input type="hidden" name="id" value={user.id} />
+										<button
+											type="submit"
+											class="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-lg transition-colors border border-indigo-200"
+											title="Buat angka rahasia 5 digit untuk pengguna ini"
+										>
+											+ Buat PIN 5-Digit
+										</button>
+									</form>
+								{/if}
+							</td>
 							<td class="p-4 whitespace-nowrap">
 								{#if user.is_active}
 									<span class="badge-success whitespace-nowrap">Aktif</span>
@@ -144,7 +220,7 @@
 						</tr>
 					{:else}
 						<tr>
-							<td colspan="6" class="text-center py-8 text-slate-400 whitespace-nowrap">Tidak ada pengguna ditemukan.</td>
+							<td colspan="7" class="text-center py-8 text-slate-400 whitespace-nowrap">Tidak ada pengguna ditemukan.</td>
 						</tr>
 					{/each}
 				</tbody>

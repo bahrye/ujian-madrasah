@@ -175,3 +175,12 @@ export async function verifyQrLoginToken(userId: number, username: string, passw
 	return qrToken === expected;
 }
 
+/**
+ * Generate random 5-digit PIN untuk keamanan akun guru/pengawas/panitia
+ */
+export function generate5DigitPin(): string {
+	const val = Math.floor(10000 + Math.random() * 90000);
+	return String(val);
+}
+
+

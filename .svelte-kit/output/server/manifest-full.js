@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg","kemenag.png","panduan-ui-ujian-2.jpeg","panduan-ui-ujian-3.jpeg","panduan-ui-ujian.jpeg","template_soal_ujian.docx"]),
 	mimeTypes: {".svg":"image/svg+xml",".png":"image/png",".jpeg":"image/jpeg"},
 	_: {
-		client: {start:"_app/immutable/entry/start._Adh1Ia8.js",app:"_app/immutable/entry/app.DVGA2q4W.js",imports:["_app/immutable/entry/start._Adh1Ia8.js","_app/immutable/chunks/D9aDCxCX.js","_app/immutable/chunks/CAmwAEK5.js","_app/immutable/chunks/C1iwYQEC.js","_app/immutable/chunks/C4l_QUTv.js","_app/immutable/chunks/BPD4iswW.js","_app/immutable/entry/app.DVGA2q4W.js","_app/immutable/chunks/C1iwYQEC.js","_app/immutable/chunks/C4l_QUTv.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CAmwAEK5.js","_app/immutable/chunks/klE4_vFh.js","_app/immutable/chunks/CJQ_5s9f.js","_app/immutable/chunks/RbyIVtyM.js","_app/immutable/chunks/qu17wuJm.js","_app/immutable/chunks/BPD4iswW.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
+		client: {start:"_app/immutable/entry/start.mwzo5L5V.js",app:"_app/immutable/entry/app.DODd890S.js",imports:["_app/immutable/entry/start.mwzo5L5V.js","_app/immutable/chunks/DfvsBpJx.js","_app/immutable/chunks/CAmwAEK5.js","_app/immutable/chunks/C1iwYQEC.js","_app/immutable/chunks/C4l_QUTv.js","_app/immutable/chunks/BPD4iswW.js","_app/immutable/entry/app.DODd890S.js","_app/immutable/chunks/C1iwYQEC.js","_app/immutable/chunks/C4l_QUTv.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CAmwAEK5.js","_app/immutable/chunks/klE4_vFh.js","_app/immutable/chunks/CsHYDYpd.js","_app/immutable/chunks/RbyIVtyM.js","_app/immutable/chunks/qu17wuJm.js","_app/immutable/chunks/BPD4iswW.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
 		nodes: [
 			__memo(() => import('./nodes/0.js')),
 			__memo(() => import('./nodes/1.js')),
@@ -288,6 +288,13 @@ return {
 				params: [{"name":"id","optional":false,"rest":false,"chained":false}],
 				page: null,
 				endpoint: __memo(() => import('./entries/endpoints/api/attempt-status/_id_/_server.ts.js'))
+			},
+			{
+				id: "/api/auth/check-pin",
+				pattern: /^\/api\/auth\/check-pin\/?$/,
+				params: [],
+				page: null,
+				endpoint: __memo(() => import('./entries/endpoints/api/auth/check-pin/_server.ts.js'))
 			},
 			{
 				id: "/api/delete-media",

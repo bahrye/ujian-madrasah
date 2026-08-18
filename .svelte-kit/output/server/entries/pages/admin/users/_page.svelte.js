@@ -6,7 +6,7 @@ import "../../../../chunks/utils2.js";
 import "@sveltejs/kit/internal/server";
 import "../../../../chunks/root.js";
 import "../../../../chunks/state.svelte.js";
-import { I as ICONS, b as ROLE_COLORS, R as ROLE_LABELS } from "../../../../chunks/constants.js";
+import { b as ROLE_COLORS, R as ROLE_LABELS, I as ICONS } from "../../../../chunks/constants.js";
 import { t as toasts } from "../../../../chunks/toast.js";
 import { P as PasswordInput } from "../../../../chunks/PasswordInput.js";
 function ImportUsersModal($$renderer, $$props) {
@@ -98,7 +98,7 @@ function _page($$renderer, $$props) {
           $$renderer5.push(`<title>Manajemen Pengguna — Ujian Online Madrasah</title>`);
         });
       });
-      $$renderer3.push(`<div class="space-y-6 animate-in"><div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4"><div><h1 class="text-2xl font-bold text-slate-800">Manajemen Pengguna</h1> <p class="text-sm text-slate-500 mt-1">Kelola data pengguna sistem</p></div> <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto"><button class="btn flex-1 sm:flex-none" style="background: linear-gradient(135deg,#0ea5e9,#3b82f6); color:#fff; box-shadow: 0 4px 15px rgba(14,165,233,.3);"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"></path></svg> Kartu Login</button> <button class="btn-secondary flex-1 sm:flex-none"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg> Import Excel</button> <button class="btn-primary flex-1 sm:flex-none"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.plus)}></path></svg> Tambah Pengguna</button></div></div> <div class="card p-4"><form method="GET" class="flex flex-col sm:flex-row gap-3"><div class="relative flex-1"><svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.search)}></path></svg> <input name="search" type="text" class="input pl-9" placeholder="Cari pengguna..."${attr("value", data.search)}/></div> <select name="role" class="select w-full sm:w-40">`);
+      $$renderer3.push(`<div class="space-y-6 animate-in"><div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4"><div><h1 class="text-2xl font-bold text-slate-800">Manajemen Pengguna</h1> <p class="text-sm text-slate-500 mt-1">Kelola data pengguna sistem</p></div> <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto"><form method="POST" action="?/generateAllPins" class="inline"><button type="submit" class="btn-secondary btn text-xs font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200" title="Acak angka rahasia 5 digit untuk semua guru/pengawas/panitia">🎲 Acak PIN Semua</button></form> <button class="btn flex-1 sm:flex-none" style="background: linear-gradient(135deg,#0ea5e9,#3b82f6); color:#fff; box-shadow: 0 4px 15px rgba(14,165,233,.3);"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"></path></svg> Kartu Login</button> <button class="btn-secondary flex-1 sm:flex-none"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg> Import Excel</button> <button class="btn-primary flex-1 sm:flex-none"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg> Tambah Pengguna</button></div></div> <div class="card p-4"><form method="GET" class="flex flex-col sm:flex-row gap-3"><div class="relative flex-1"><svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg> <input type="text" name="search" placeholder="Cari nama atau username..."${attr("value", data.search)} class="input pl-9 text-sm"/></div> <select name="role" class="select w-full sm:w-40">`);
       $$renderer3.option({ value: "" }, ($$renderer4) => {
         $$renderer4.push(`Semua Role`);
       });
@@ -111,7 +111,7 @@ function _page($$renderer, $$props) {
       $$renderer3.option({ value: "panitia", selected: data.roleFilter === "panitia" }, ($$renderer4) => {
         $$renderer4.push(`Panitia Ujian`);
       });
-      $$renderer3.push(`</select> <button type="submit" class="btn-secondary btn-sm">Cari</button></form></div> <div class="card overflow-hidden"><div class="table-container border-0 rounded-none"><table class="table"><thead><tr class="bg-slate-50 text-slate-500 text-sm"><th class="p-4 font-semibold whitespace-nowrap">Nama</th><th class="p-4 font-semibold whitespace-nowrap">Username</th><th class="p-4 font-semibold whitespace-nowrap">Role</th><th class="p-4 font-semibold whitespace-nowrap">Status</th><th class="p-4 font-semibold whitespace-nowrap">Dibuat</th><th class="p-4 font-semibold text-right whitespace-nowrap">Aksi</th></tr></thead><tbody class="divide-y divide-slate-100 text-slate-700">`);
+      $$renderer3.push(`</select> <button type="submit" class="btn-secondary btn-sm">Cari</button></form></div> <div class="card overflow-hidden"><div class="table-container border-0 rounded-none"><table class="table"><thead><tr class="bg-slate-50 text-slate-500 text-sm"><th class="p-4 font-semibold whitespace-nowrap">Nama</th><th class="p-4 font-semibold whitespace-nowrap">Username</th><th class="p-4 font-semibold whitespace-nowrap">Role</th><th class="p-4 font-semibold whitespace-nowrap">Angka Rahasia (PIN)</th><th class="p-4 font-semibold whitespace-nowrap">Status</th><th class="p-4 font-semibold whitespace-nowrap">Dibuat</th><th class="p-4 font-semibold text-right whitespace-nowrap">Aksi</th></tr></thead><tbody class="divide-y divide-slate-100 text-slate-700">`);
       const each_array = ensure_array_like(data.users);
       if (each_array.length !== 0) {
         $$renderer3.push("<!--[-->");
@@ -125,6 +125,14 @@ function _page($$renderer, $$props) {
             $$renderer3.push("<!--[-1-->");
           }
           $$renderer3.push(`<!--]--></td><td class="p-4 text-slate-600 whitespace-nowrap">@${escape_html(user.username)}</td><td class="p-4 whitespace-nowrap"><span${attr_class(`${stringify(ROLE_COLORS[user.role] || "badge-info")} whitespace-nowrap`)}>${escape_html(ROLE_LABELS[user.role] || user.role)}</span></td><td class="p-4 whitespace-nowrap">`);
+          if (user.login_pin) {
+            $$renderer3.push("<!--[0-->");
+            $$renderer3.push(`<div class="flex items-center gap-1.5"><span class="inline-flex items-center gap-1 font-mono font-bold text-xs bg-amber-50 text-amber-900 border border-amber-300/80 px-2.5 py-1 rounded-xl shadow-xs">🔒 ${escape_html(user.login_pin)}</span> <button type="button" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors" title="Salin PIN"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></button> <form method="POST" action="?/generatePin" class="inline"><input type="hidden" name="id"${attr("value", user.id)}/> <button type="submit" class="p-1.5 rounded-lg hover:bg-amber-100 text-amber-600 transition-colors text-xs font-bold" title="Acak Ulang PIN Baru">🎲</button></form> <form method="POST" action="?/clearPin" class="inline"><input type="hidden" name="id"${attr("value", user.id)}/> <button type="submit" class="p-1.5 rounded-lg hover:bg-rose-100 text-rose-500 transition-colors text-xs font-bold" title="Hapus / Nonaktifkan PIN">✕</button></form></div>`);
+          } else {
+            $$renderer3.push("<!--[-1-->");
+            $$renderer3.push(`<form method="POST" action="?/generatePin" class="inline"><input type="hidden" name="id"${attr("value", user.id)}/> <button type="submit" class="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-lg transition-colors border border-indigo-200" title="Buat angka rahasia 5 digit untuk pengguna ini">+ Buat PIN 5-Digit</button></form>`);
+          }
+          $$renderer3.push(`<!--]--></td><td class="p-4 whitespace-nowrap">`);
           if (user.is_active) {
             $$renderer3.push("<!--[0-->");
             $$renderer3.push(`<span class="badge-success whitespace-nowrap">Aktif</span>`);
@@ -144,7 +152,7 @@ function _page($$renderer, $$props) {
         }
       } else {
         $$renderer3.push("<!--[!-->");
-        $$renderer3.push(`<tr><td colspan="6" class="text-center py-8 text-slate-400 whitespace-nowrap">Tidak ada pengguna ditemukan.</td></tr>`);
+        $$renderer3.push(`<tr><td colspan="7" class="text-center py-8 text-slate-400 whitespace-nowrap">Tidak ada pengguna ditemukan.</td></tr>`);
       }
       $$renderer3.push(`<!--]--></tbody></table></div></div></div> `);
       if (showCreateModal) {

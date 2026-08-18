@@ -1,6 +1,6 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB } from "../../../chunks/db.js";
-import { b as verifyQrLoginToken, d as verifyPassword, c as createToken, C as COOKIE_NAME } from "../../../chunks/auth.js";
+import { d as verifyQrLoginToken, e as verifyPassword, c as createToken, C as COOKIE_NAME } from "../../../chunks/auth.js";
 const load = async ({ locals }) => {
   if (locals.user) {
     const redirectRoute = locals.user.role === "panitia" ? "/admin" : `/${locals.user.role}`;
@@ -13,6 +13,7 @@ const actions = {
     const username = formData.get("username")?.toString().trim();
     const password = formData.get("password")?.toString();
     const qrToken = formData.get("qr_token")?.toString().trim();
+    const loginPin = formData.get("login_pin")?.toString().trim();
     if (!username || !password && !qrToken) {
       return fail(400, { error: "Username dan kata sandi wajib diisi." });
     }
@@ -24,6 +25,11 @@ const actions = {
       }
       let valid = false;
       if (qrToken) {
+        if (user.role !== "siswa" && user.login_pin && user.login_pin.trim().length > 0) {
+          if (!loginPin || loginPin !== user.login_pin.trim()) {
+            return fail(401, { error: "Angka rahasia 5-digit tidak valid atau belum dimasukkan. Silakan minta angka rahasia kepada Admin." });
+          }
+        }
         valid = await verifyQrLoginToken(user.id, user.username, user.password_hash, qrToken);
         if (!valid) {
           return fail(401, { error: "Kode QR login tidak valid atau sudah kadaluarsa." });

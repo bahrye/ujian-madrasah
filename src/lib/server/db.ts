@@ -80,3 +80,13 @@ export async function ensureStudentAnswersUniqueIndex(db?: D1Database) {
 	return;
 }
 
+export async function ensureUserLoginPinColumn(db?: D1Database) {
+	if (!db) return;
+	try {
+		await db.prepare('ALTER TABLE users ADD COLUMN login_pin TEXT').run();
+	} catch {
+		// Column already exists
+	}
+}
+
+
