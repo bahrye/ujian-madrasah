@@ -339,19 +339,19 @@ function QuestionRenderer($$renderer, $$props) {
       $$renderer2.push(`</textarea>`);
     } else if (safeType === "menjodohkan") {
       $$renderer2.push("<!--[4-->");
-      $$renderer2.push(`<div class="relative space-y-3"><div class="flex items-center justify-between p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl text-xs text-indigo-800"><div class="flex items-center gap-2"><span class="text-base">🔗</span> <span><b>Petunjuk Menjodohkan:</b> Klik pernyataan di kiri lalu klik jawaban pasangannya di kanan untuk menghubungkan.</span></div> `);
+      $$renderer2.push(`<div class="space-y-3"><div class="flex items-center justify-between p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl text-xs text-indigo-800"><div class="flex items-center gap-2"><span class="text-base">🔗</span> <span><b>Petunjuk Menjodohkan:</b> Klik pernyataan di kiri lalu klik jawaban pasangannya di kanan untuk menghubungkan.</span></div> `);
       if (Object.keys(matchingAnswers).length > 0) {
         $$renderer2.push("<!--[0-->");
         $$renderer2.push(`<span class="font-semibold px-2 py-0.5 bg-indigo-200/70 rounded-full text-indigo-900 text-[11px] shrink-0">${escape_html(Object.keys(matchingAnswers).length)} dari ${escape_html(matchingLeft.length)} terhubung</span>`);
       } else {
         $$renderer2.push("<!--[-1-->");
       }
-      $$renderer2.push(`<!--]--></div> <svg class="absolute inset-0 w-full h-full pointer-events-none z-20 block"><!--[-->`);
+      $$renderer2.push(`<!--]--></div> <div class="relative"><svg${attr("id", `match-svg-${stringify(question.id)}`)} class="absolute inset-0 w-full h-full pointer-events-none z-20 block overflow-visible"><!--[-->`);
       const each_array_3 = ensure_array_like(connectionLines);
       for (let $$index_3 = 0, $$length = each_array_3.length; $$index_3 < $$length; $$index_3++) {
         let line = each_array_3[$$index_3];
-        const dx = (line.x2 - line.x1) * 0.5;
-        $$renderer2.push(`<path${attr("d", `M ${stringify(line.x1)} ${stringify(line.y1)} C ${stringify(line.x1 + dx)} ${stringify(line.y1)}, ${stringify(line.x2 - dx)} ${stringify(line.y2)}, ${stringify(line.x2)} ${stringify(line.y2)}`)} fill="none"${attr("stroke", line.color)} stroke-width="6" stroke-opacity="0.25" stroke-linecap="round"></path><path${attr("d", `M ${stringify(line.x1)} ${stringify(line.y1)} C ${stringify(line.x1 + dx)} ${stringify(line.y1)}, ${stringify(line.x2 - dx)} ${stringify(line.y2)}, ${stringify(line.x2)} ${stringify(line.y2)}`)} fill="none"${attr("stroke", line.color)} stroke-width="2.5" stroke-linecap="round"></path><circle${attr("cx", line.x1)}${attr("cy", line.y1)} r="4.5"${attr("fill", line.color)} stroke="#ffffff" stroke-width="1.5"></circle><circle${attr("cx", line.x2)}${attr("cy", line.y2)} r="4.5"${attr("fill", line.color)} stroke="#ffffff" stroke-width="1.5"></circle>`);
+        const dx = Math.abs(line.x2 - line.x1) * 0.45;
+        $$renderer2.push(`<path${attr("d", `M ${stringify(line.x1)} ${stringify(line.y1)} C ${stringify(line.x1 + dx)} ${stringify(line.y1)}, ${stringify(line.x2 - dx)} ${stringify(line.y2)}, ${stringify(line.x2)} ${stringify(line.y2)}`)} fill="none"${attr("stroke", line.color)} stroke-width="5" stroke-opacity="0.2" stroke-linecap="round"></path><path${attr("d", `M ${stringify(line.x1)} ${stringify(line.y1)} C ${stringify(line.x1 + dx)} ${stringify(line.y1)}, ${stringify(line.x2 - dx)} ${stringify(line.y2)}, ${stringify(line.x2)} ${stringify(line.y2)}`)} fill="none"${attr("stroke", line.color)} stroke-width="2.5" stroke-linecap="round"></path><circle${attr("cx", line.x1)}${attr("cy", line.y1)} r="4"${attr("fill", line.color)} stroke="#ffffff" stroke-width="1.5"></circle><circle${attr("cx", line.x2)}${attr("cy", line.y2)} r="4"${attr("fill", line.color)} stroke="#ffffff" stroke-width="1.5"></circle>`);
       }
       $$renderer2.push(`<!--]--></svg> <div class="grid grid-cols-2 gap-2 sm:gap-4 relative z-10"><div class="space-y-2 sm:space-y-3"><div class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Kolom Kiri (Pernyataan)</div> <!--[-->`);
       const each_array_4 = ensure_array_like(matchingLeft);
@@ -375,15 +375,12 @@ function QuestionRenderer($$renderer, $$props) {
           $$renderer2.push("<!--[-1-->");
         }
         $$renderer2.push(`<!--]--></div></div> <div${attr("id", `match-port-left-${stringify(question.id)}-${stringify(leftIdx)}`)}${attr_class(
-          `w-4 h-4 sm:w-6 sm:h-6 rounded-full border sm:border-2 flex items-center justify-center shrink-0 transition-all ml-0.5 sm:ml-1 ${hasMatch ? `${pairColor.border} bg-white shadow-xs ring-1 sm:ring-2 ${pairColor.ring}` : isSelected ? "border-indigo-600 bg-indigo-600 ring-2 sm:ring-4 ring-indigo-500/30" : "border-slate-300 bg-slate-100"}`,
+          `w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ml-0.5 sm:ml-1 ${hasMatch ? `${pairColor.border} bg-white shadow-xs ring-1 sm:ring-2 ${pairColor.ring}` : isSelected ? "border-indigo-600 bg-indigo-600 ring-2 sm:ring-4 ring-indigo-500/30" : "border-slate-300 bg-slate-100"}`,
           "svelte-v7h8kb"
         )}>`);
-        if (hasMatch) {
+        if (isSelected && !hasMatch) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<div class="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full"${attr_style(`background-color: ${stringify(pairColor.hex)};`)}></div>`);
-        } else if (isSelected) {
-          $$renderer2.push("<!--[1-->");
-          $$renderer2.push(`<div class="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full bg-white animate-ping"></div>`);
+          $$renderer2.push(`<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white animate-ping"></div>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
@@ -402,15 +399,12 @@ function QuestionRenderer($$renderer, $$props) {
           `relative flex items-center justify-between gap-1.5 sm:gap-3 p-2 sm:p-3.5 rounded-xl sm:rounded-2xl border-2 transition-all duration-200 cursor-pointer select-none text-left ${isMatched ? `${pairColor.bg} ${pairColor.border} shadow-xs` : isSelected ? "border-indigo-600 bg-indigo-50/70 ring-2 sm:ring-4 ring-indigo-500/20 shadow-sm" : "border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50/70"}`,
           "svelte-v7h8kb"
         )}><div${attr("id", `match-port-right-${stringify(question.id)}-${stringify(rightIdx)}`)}${attr_class(
-          `w-4 h-4 sm:w-6 sm:h-6 rounded-full border sm:border-2 flex items-center justify-center shrink-0 transition-all mr-0.5 sm:mr-1 ${isMatched ? `${pairColor.border} bg-white shadow-xs ring-1 sm:ring-2 ${pairColor.ring}` : isSelected ? "border-indigo-600 bg-indigo-600 ring-2 sm:ring-4 ring-indigo-500/30" : "border-slate-300 bg-slate-100"}`,
+          `w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all mr-0.5 sm:mr-1 ${isMatched ? `${pairColor.border} bg-white shadow-xs ring-1 sm:ring-2 ${pairColor.ring}` : isSelected ? "border-indigo-600 bg-indigo-600 ring-2 sm:ring-4 ring-indigo-500/30" : "border-slate-300 bg-slate-100"}`,
           "svelte-v7h8kb"
         )}>`);
-        if (isMatched) {
+        if (isSelected && !isMatched) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<div class="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full"${attr_style(`background-color: ${stringify(pairColor.hex)};`)}></div>`);
-        } else if (isSelected) {
-          $$renderer2.push("<!--[1-->");
-          $$renderer2.push(`<div class="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full bg-white animate-ping"></div>`);
+          $$renderer2.push(`<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white animate-ping"></div>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
@@ -432,7 +426,7 @@ function QuestionRenderer($$renderer, $$props) {
         }
         $$renderer2.push(`<!--]--></div></div></div>`);
       }
-      $$renderer2.push(`<!--]--></div></div></div>`);
+      $$renderer2.push(`<!--]--></div></div></div></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
