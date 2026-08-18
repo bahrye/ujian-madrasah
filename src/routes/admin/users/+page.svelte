@@ -42,7 +42,7 @@
 			<form method="POST" action="?/generateAllPins" use:enhance class="inline">
 				<button
 					type="submit"
-					class="btn-secondary btn text-xs font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200"
+					class="btn-secondary btn flex-1 sm:flex-none text-white font-medium"
 					on:click={(e) => {
 						if (!confirm('Acak angka rahasia 5-digit baru untuk SEMUA petugas?')) e.preventDefault();
 					}}
@@ -60,10 +60,10 @@
 			<a
 				href="/print/users{data.roleFilter ? `?role=${data.roleFilter}` : ''}"
 				target="_blank"
-				class="btn-secondary btn flex-1 sm:flex-none text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200"
+				class="btn-secondary btn flex-1 sm:flex-none text-white font-medium inline-flex items-center"
 				title="Cetak dan Ekspor Daftar Pengguna & Angka Rahasia ke PDF"
 			>
-				<svg class="w-4 h-4 mr-1.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+				<svg class="w-4 h-4 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
 				</svg>
 				Export PDF
