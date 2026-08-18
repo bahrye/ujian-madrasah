@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount, tick } from 'svelte';
+	import { createEventDispatcher, onDestroy } from 'svelte';
 	import { ROLE_LABELS } from '$lib/utils/constants';
 
 	export let show = false;
@@ -13,97 +13,39 @@
 	}>();
 
 	let digits: string[] = ['', '', '', '', ''];
-	let inputs: HTMLInputElement[] = [];
 	let errorMessage = '';
 
 	$: if (show) {
 		digits = ['', '', '', '', ''];
 		errorMessage = '';
-		focusFirstInput();
-	}
-
-	async function focusFirstInput() {
-		await tick();
-		if (inputs[0]) {
-			inputs[0].focus();
-		}
-	}
-
-	function handleInput(index: number, event: Event) {
-		const target = event.target as HTMLInputElement;
-		const val = target.value.replace(/[^0-9]/g, '');
-		
-		if (val.length > 0) {
-			digits[index] = val.slice(-1);
-			// Move to next input
-			if (index < 4 && inputs[index + 1]) {
-				inputs[index + 1].focus();
-			}
-		} else {
-			digits[index] = '';
-		}
-
-		// Auto submit when all 5 digits are filled
-		if (digits.every((d) => d !== '')) {
-			submitPin();
-		}
-	}
-
-	function handleKeyDown(index: number, event: KeyboardEvent) {
-		if (event.key === 'Backspace') {
-			if (!digits[index] && index > 0 && inputs[index - 1]) {
-				inputs[index - 1].focus();
-				digits[index - 1] = '';
-			}
-		} else if (event.key === 'ArrowLeft' && index > 0) {
-			inputs[index - 1].focus();
-		} else if (event.key === 'ArrowRight' && index < 4) {
-			inputs[index + 1].focus();
-		}
-	}
-
-	function handlePaste(event: ClipboardEvent) {
-		event.preventDefault();
-		const pasted = event.clipboardData?.getData('text') || '';
-		const numbers = pasted.replace(/[^0-9]/g, '').slice(0, 5).split('');
-		
-		for (let i = 0; i < 5; i++) {
-			digits[i] = numbers[i] || '';
-		}
-
-		const nextEmpty = digits.findIndex((d) => !d);
-		if (nextEmpty !== -1 && inputs[nextEmpty]) {
-			inputs[nextEmpty].focus();
-		} else if (inputs[4]) {
-			inputs[4].focus();
-		}
-
-		if (digits.every((d) => d !== '')) {
-			submitPin();
-		}
 	}
 
 	function pressKeypad(num: string) {
+		errorMessage = '';
 		const firstEmpty = digits.findIndex((d) => !d);
 		if (firstEmpty !== -1) {
 			digits[firstEmpty] = num;
-			if (firstEmpty < 4 && inputs[firstEmpty + 1]) {
-				inputs[firstEmpty + 1].focus();
-			}
+			digits = [...digits];
 			if (digits.every((d) => d !== '')) {
-				submitPin();
+				setTimeout(() => submitPin(), 120);
 			}
 		}
 	}
 
 	function backspaceKeypad() {
+		errorMessage = '';
 		for (let i = 4; i >= 0; i--) {
 			if (digits[i]) {
 				digits[i] = '';
-				if (inputs[i]) inputs[i].focus();
+				digits = [...digits];
 				break;
 			}
 		}
+	}
+
+	function clearAll() {
+		errorMessage = '';
+		digits = ['', '', '', '', ''];
 	}
 
 	function submitPin() {
@@ -118,6 +60,25 @@
 
 	function cancel() {
 		dispatch('cancel');
+	}
+
+	// Physical keyboard listener for Desktop users (without popping up mobile virtual keyboards)
+	function handleWindowKeydown(event: KeyboardEvent) {
+		if (!show) return;
+
+		if (event.key >= '0' && event.key <= '9') {
+			event.preventDefault();
+			pressKeypad(event.key);
+		} else if (event.key === 'Backspace') {
+			event.preventDefault();
+			backspaceKeypad();
+		} else if (event.key === 'Enter') {
+			event.preventDefault();
+			submitPin();
+		} else if (event.key === 'Escape') {
+			event.preventDefault();
+			cancel();
+		}
 	}
 
 	function portal(node: HTMLElement) {
@@ -135,6 +96,8 @@
 		};
 	}
 </script>
+
+<svelte:window on:keydown={handleWindowKeydown} />
 
 {#if show}
 	<div use:portal class="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -187,23 +150,28 @@
 				</div>
 
 				<p class="text-xs text-slate-600">
-					Masukkan <strong>5 digit angka rahasia</strong> yang diberikan oleh Admin untuk menyelesaikan login:
+					Tekan tombol angka di bawah untuk memasukkan <strong>5 digit angka rahasia</strong>:
 				</p>
 
-				<!-- 5-Digit Boxes -->
-				<div class="flex items-center justify-center gap-2.5 my-1" on:paste={handlePaste}>
+				<!-- 5-Digit Display Boxes (No virtual keyboard on mobile) -->
+				<div class="flex items-center justify-center gap-2.5 my-1">
 					{#each [0, 1, 2, 3, 4] as i}
-						<input
-							bind:this={inputs[i]}
-							type="password"
-							inputmode="numeric"
-							maxlength="1"
-							value={digits[i]}
-							class="w-12 h-14 text-center text-2xl font-black font-mono rounded-2xl border-2 transition-all duration-200 outline-none
-								{digits[i] ? 'border-amber-500 bg-amber-50/40 text-slate-900 shadow-sm' : 'border-slate-200 bg-slate-50 text-slate-800 focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-500/15'}"
-							on:input={(e) => handleInput(i, e)}
-							on:keydown={(e) => handleKeyDown(i, e)}
-						/>
+						{@const isFilled = Boolean(digits[i])}
+						{@const isCurrent = digits.findIndex((d) => !d) === i}
+						<div
+							class="w-12 h-14 rounded-2xl border-2 flex items-center justify-center transition-all duration-200 select-none
+								{isFilled ? 'border-amber-500 bg-amber-50/60 shadow-sm text-slate-900' : isCurrent ? 'border-amber-400 bg-white ring-4 ring-amber-500/20' : 'border-slate-200 bg-slate-50 text-slate-400'}"
+						>
+							{#if isFilled}
+								<span class="text-2xl font-black font-mono animate-scale-up">
+									{digits[i]}
+								</span>
+							{:else if isCurrent}
+								<span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+							{:else}
+								<span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+							{/if}
+						</div>
 					{/each}
 				</div>
 
@@ -212,11 +180,11 @@
 				{/if}
 
 				<!-- Numeric Keypad for fast input -->
-				<div class="grid grid-cols-3 gap-2 w-full pt-2">
+				<div class="grid grid-cols-3 gap-2 w-full pt-2 select-none">
 					{#each ['1', '2', '3', '4', '5', '6', '7', '8', '9'] as key}
 						<button
 							type="button"
-							class="py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 active:bg-slate-300 font-bold text-base text-slate-700 transition-colors shadow-xs"
+							class="py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 active:bg-slate-300 font-bold text-lg text-slate-700 transition-colors shadow-xs active:scale-95"
 							on:click={() => pressKeypad(key)}
 						>
 							{key}
@@ -224,22 +192,22 @@
 					{/each}
 					<button
 						type="button"
-						class="py-2.5 rounded-xl bg-slate-50 hover:bg-rose-50 text-rose-600 font-medium text-xs transition-colors flex items-center justify-center"
+						class="py-3 rounded-2xl bg-rose-50 hover:bg-rose-100 active:bg-rose-200 text-rose-600 font-bold text-xs transition-colors flex items-center justify-center active:scale-95 border border-rose-100"
 						on:click={backspaceKeypad}
-						title="Hapus"
+						title="Hapus Digit Terakhir"
 					>
 						⌫ Hapus
 					</button>
 					<button
 						type="button"
-						class="py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 active:bg-slate-300 font-bold text-base text-slate-700 transition-colors shadow-xs"
+						class="py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 active:bg-slate-300 font-bold text-lg text-slate-700 transition-colors shadow-xs active:scale-95"
 						on:click={() => pressKeypad('0')}
 					>
 						0
 					</button>
 					<button
 						type="button"
-						class="py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition-colors flex items-center justify-center shadow-md shadow-amber-500/20"
+						class="py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 active:scale-95 text-white font-bold text-xs transition-all flex items-center justify-center shadow-md shadow-amber-500/25"
 						on:click={submitPin}
 					>
 						Masuk ➔

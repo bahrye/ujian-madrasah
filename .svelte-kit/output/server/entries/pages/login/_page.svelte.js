@@ -7,7 +7,7 @@ import "../../../chunks/root.js";
 import "../../../chunks/state.svelte.js";
 import { T as Toast } from "../../../chunks/Toast2.js";
 import { P as PasswordInput } from "../../../chunks/PasswordInput.js";
-import { o as onDestroy, t as tick } from "../../../chunks/index-server.js";
+import { o as onDestroy } from "../../../chunks/index-server.js";
 import { Html5Qrcode } from "html5-qrcode";
 import { p as parseQrLoginData } from "../../../chunks/qrLogin.js";
 import { R as ROLE_LABELS } from "../../../chunks/constants.js";
@@ -224,25 +224,33 @@ function PinInputModal($$renderer, $$props) {
     let role = fallback($$props["role"], "");
     let digits = ["", "", "", "", ""];
     let errorMessage = "";
-    async function focusFirstInput() {
-      await tick();
-    }
     if (show) {
       digits = ["", "", "", "", ""];
       errorMessage = "";
-      focusFirstInput();
     }
     if (
-      // Move to next input
-      // Auto submit when all 5 digits are filled
+      // Physical keyboard listener for Desktop users (without popping up mobile virtual keyboards)
       show
     ) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="fixed inset-0 z-[100] flex items-center justify-center p-4"><div class="fixed inset-0 bg-slate-950/80 backdrop-blur-md" role="button" tabindex="-1" aria-label="Batal"></div> <div class="bg-white text-slate-800 w-full max-w-sm rounded-3xl shadow-2xl relative z-10 overflow-hidden flex flex-col animate-bounce-in border border-slate-100"><div class="p-5 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white text-center relative overflow-hidden"><div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div> <button class="absolute top-4 right-4 text-white/70 hover:text-white p-1 rounded-xl hover:bg-white/10 transition-colors" aria-label="Tutup"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button> <div class="w-12 h-12 rounded-2xl bg-white/20 border border-white/30 mx-auto flex items-center justify-center mb-2 shadow-inner"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></div> <h3 class="text-base font-bold">Verifikasi Angka Rahasia</h3> <p class="text-xs text-white/90 mt-0.5">Keamanan Tambahan Login Petugas</p></div> <div class="p-6 flex flex-col items-center text-center space-y-4"><div class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl p-3 flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold flex items-center justify-center flex-shrink-0 text-sm shadow-sm">${escape_html(name ? name.charAt(0).toUpperCase() : "👤")}</div> <div class="text-left min-w-0 flex-1"><p class="text-xs font-bold text-slate-800 truncate">${escape_html(name || username)}</p> <p class="text-[11px] text-slate-500 truncate">@${escape_html(username)}</p></div> <span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 font-bold text-[10px] rounded-lg uppercase tracking-wider">${escape_html(ROLE_LABELS[role] || role || "Petugas")}</span></div> <p class="text-xs text-slate-600">Masukkan <strong>5 digit angka rahasia</strong> yang diberikan oleh Admin untuk menyelesaikan login:</p> <div class="flex items-center justify-center gap-2.5 my-1"><!--[-->`);
+      $$renderer2.push(`<div class="fixed inset-0 z-[100] flex items-center justify-center p-4"><div class="fixed inset-0 bg-slate-950/80 backdrop-blur-md" role="button" tabindex="-1" aria-label="Batal"></div> <div class="bg-white text-slate-800 w-full max-w-sm rounded-3xl shadow-2xl relative z-10 overflow-hidden flex flex-col animate-bounce-in border border-slate-100"><div class="p-5 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white text-center relative overflow-hidden"><div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div> <button class="absolute top-4 right-4 text-white/70 hover:text-white p-1 rounded-xl hover:bg-white/10 transition-colors" aria-label="Tutup"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button> <div class="w-12 h-12 rounded-2xl bg-white/20 border border-white/30 mx-auto flex items-center justify-center mb-2 shadow-inner"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></div> <h3 class="text-base font-bold">Verifikasi Angka Rahasia</h3> <p class="text-xs text-white/90 mt-0.5">Keamanan Tambahan Login Petugas</p></div> <div class="p-6 flex flex-col items-center text-center space-y-4"><div class="w-full bg-slate-50 border border-slate-200/80 rounded-2xl p-3 flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold flex items-center justify-center flex-shrink-0 text-sm shadow-sm">${escape_html(name ? name.charAt(0).toUpperCase() : "👤")}</div> <div class="text-left min-w-0 flex-1"><p class="text-xs font-bold text-slate-800 truncate">${escape_html(name || username)}</p> <p class="text-[11px] text-slate-500 truncate">@${escape_html(username)}</p></div> <span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 font-bold text-[10px] rounded-lg uppercase tracking-wider">${escape_html(ROLE_LABELS[role] || role || "Petugas")}</span></div> <p class="text-xs text-slate-600">Tekan tombol angka di bawah untuk memasukkan <strong>5 digit angka rahasia</strong>:</p> <div class="flex items-center justify-center gap-2.5 my-1"><!--[-->`);
       const each_array = ensure_array_like([0, 1, 2, 3, 4]);
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
         let i = each_array[$$index];
-        $$renderer2.push(`<input type="password" inputmode="numeric" maxlength="1"${attr("value", digits[i])}${attr_class(`w-12 h-14 text-center text-2xl font-black font-mono rounded-2xl border-2 transition-all duration-200 outline-none ${digits[i] ? "border-amber-500 bg-amber-50/40 text-slate-900 shadow-sm" : "border-slate-200 bg-slate-50 text-slate-800 focus:border-amber-500 focus:bg-white focus:ring-4 focus:ring-amber-500/15"}`)}/>`);
+        const isFilled = Boolean(digits[i]);
+        const isCurrent = digits.findIndex((d) => !d) === i;
+        $$renderer2.push(`<div${attr_class(`w-12 h-14 rounded-2xl border-2 flex items-center justify-center transition-all duration-200 select-none ${isFilled ? "border-amber-500 bg-amber-50/60 shadow-sm text-slate-900" : isCurrent ? "border-amber-400 bg-white ring-4 ring-amber-500/20" : "border-slate-200 bg-slate-50 text-slate-400"}`)}>`);
+        if (isFilled) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<span class="text-2xl font-black font-mono animate-scale-up">${escape_html(digits[i])}</span>`);
+        } else if (isCurrent) {
+          $$renderer2.push("<!--[1-->");
+          $$renderer2.push(`<span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>`);
+        }
+        $$renderer2.push(`<!--]--></div>`);
       }
       $$renderer2.push(`<!--]--></div> `);
       if (errorMessage) {
@@ -251,13 +259,13 @@ function PinInputModal($$renderer, $$props) {
       } else {
         $$renderer2.push("<!--[-1-->");
       }
-      $$renderer2.push(`<!--]--> <div class="grid grid-cols-3 gap-2 w-full pt-2"><!--[-->`);
+      $$renderer2.push(`<!--]--> <div class="grid grid-cols-3 gap-2 w-full pt-2 select-none"><!--[-->`);
       const each_array_1 = ensure_array_like(["1", "2", "3", "4", "5", "6", "7", "8", "9"]);
       for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
         let key = each_array_1[$$index_1];
-        $$renderer2.push(`<button type="button" class="py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 active:bg-slate-300 font-bold text-base text-slate-700 transition-colors shadow-xs">${escape_html(key)}</button>`);
+        $$renderer2.push(`<button type="button" class="py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 active:bg-slate-300 font-bold text-lg text-slate-700 transition-colors shadow-xs active:scale-95">${escape_html(key)}</button>`);
       }
-      $$renderer2.push(`<!--]--> <button type="button" class="py-2.5 rounded-xl bg-slate-50 hover:bg-rose-50 text-rose-600 font-medium text-xs transition-colors flex items-center justify-center" title="Hapus">⌫ Hapus</button> <button type="button" class="py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 active:bg-slate-300 font-bold text-base text-slate-700 transition-colors shadow-xs">0</button> <button type="button" class="py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition-colors flex items-center justify-center shadow-md shadow-amber-500/20">Masuk ➔</button></div></div> <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex gap-2"><button type="button" class="btn btn-secondary w-full text-xs py-2">Batal</button></div></div></div>`);
+      $$renderer2.push(`<!--]--> <button type="button" class="py-3 rounded-2xl bg-rose-50 hover:bg-rose-100 active:bg-rose-200 text-rose-600 font-bold text-xs transition-colors flex items-center justify-center active:scale-95 border border-rose-100" title="Hapus Digit Terakhir">⌫ Hapus</button> <button type="button" class="py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 active:bg-slate-300 font-bold text-lg text-slate-700 transition-colors shadow-xs active:scale-95">0</button> <button type="button" class="py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 active:scale-95 text-white font-bold text-xs transition-all flex items-center justify-center shadow-md shadow-amber-500/25">Masuk ➔</button></div></div> <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex gap-2"><button type="button" class="btn btn-secondary w-full text-xs py-2">Batal</button></div></div></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
