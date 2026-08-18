@@ -65,35 +65,9 @@ const GET = async ({ params, platform, locals }) => {
 		WHERE sa.exam_id = ?
 	`).bind(examId).all();
   const allAnswers = allAnswersResult.results;
-  const kv = platform?.env?.EXAM_ANSWERS;
-  const formattedParticipants = await Promise.all(participants.results.map(async (p) => {
-    let answers = allAnswers.filter((a) => a.attempt_id === p.attempt_id);
-    let status = p.status || "belum_mengerjakan";
-    if (status === "mengerjakan" && kv && p.attempt_id) {
-      const stored = await kv.get(`attempt_${p.attempt_id}_answers`);
-      if (stored) {
-        try {
-          const data = JSON.parse(stored);
-          if (data && data.answers) {
-            Object.keys(data.answers).forEach((qId) => {
-              const existing = answers.find((a) => a.question_id.toString() === qId);
-              if (existing) {
-                existing.answer_given = data.answers[qId];
-              } else {
-                answers.push({
-                  attempt_id: p.attempt_id,
-                  question_id: parseInt(qId),
-                  answer_given: data.answers[qId],
-                  score_given: 0,
-                  is_correct: 0
-                });
-              }
-            });
-          }
-        } catch (e) {
-        }
-      }
-    }
+  const formattedParticipants = participants.results.map((p) => {
+    const answers = allAnswers.filter((a) => a.attempt_id === p.attempt_id);
+    const status = p.status || "belum_mengerjakan";
     return {
       ...p,
       status,
@@ -102,7 +76,7 @@ const GET = async ({ params, platform, locals }) => {
         return acc;
       }, {})
     };
-  }));
+  });
   return json({
     exam,
     questions: questions.results,

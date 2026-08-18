@@ -78,39 +78,9 @@ export const GET = async ({ params, platform, locals }: any) => {
 	`).bind(examId).all();
 	const allAnswers = allAnswersResult.results;
 
-	// Also check KV for ongoing attempts if we want up-to-date answers for 'mengerjakan' status
-	const kv = platform?.env?.EXAM_ANSWERS;
-	
-	const formattedParticipants = await Promise.all(participants.results.map(async (p: any) => {
-		let answers = allAnswers.filter(a => a.attempt_id === p.attempt_id);
-		let status = p.status || 'belum_mengerjakan';
-		
-		if (status === 'mengerjakan' && kv && p.attempt_id) {
-			const stored = await kv.get(`attempt_${p.attempt_id}_answers`);
-			if (stored) {
-				try {
-					const data = JSON.parse(stored);
-					if (data && data.answers) {
-						// KV only stores answer_given, not score_given (that's calculated on submit).
-						// But for export, we can just show the answer given. Score will be 0.
-						Object.keys(data.answers).forEach(qId => {
-							const existing = answers.find((a: any) => a.question_id.toString() === qId);
-							if (existing) {
-								existing.answer_given = data.answers[qId];
-							} else {
-								answers.push({
-									attempt_id: p.attempt_id,
-									question_id: parseInt(qId),
-									answer_given: data.answers[qId],
-									score_given: 0,
-									is_correct: 0
-								});
-							}
-						});
-					}
-				} catch (e) {}
-			}
-		}
+	const formattedParticipants = participants.results.map((p: any) => {
+		const answers = allAnswers.filter(a => a.attempt_id === p.attempt_id);
+		const status = p.status || 'belum_mengerjakan';
 
 		return {
 			...p,
@@ -120,7 +90,7 @@ export const GET = async ({ params, platform, locals }: any) => {
 				return acc;
 			}, {})
 		};
-	}));
+	});
 
 	return json({
 		exam,

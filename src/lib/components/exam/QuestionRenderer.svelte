@@ -686,7 +686,7 @@
 <ImageZoomModal
 	src={lightboxImage}
 	isOpen={!!lightboxImage}
-	alt="Gambar Soal {displayNumber !== undefined ? displayNumber : question.question_number}"
+	alt="Gambar Soal {displayNumber !== undefined ? displayNumber : (question?.question_number || '')}"
 	on:close={() => (lightboxImage = null)}
 />
 

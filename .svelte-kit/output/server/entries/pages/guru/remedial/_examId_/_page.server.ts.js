@@ -45,41 +45,29 @@ const load = async ({ platform, params, locals }) => {
 		WHERE sa.exam_id = ?
 		ORDER BY sa.created_at DESC
 	`).bind(parsedExamId, parsedExamId).all();
-  const kv = platform?.env?.EXAM_ANSWERS;
-  const attempts = await Promise.all(rawAttempts.results.map(async (a) => {
-    let answeredCount = 0;
-    let warnings = 0;
+  const attemptIds = (rawAttempts.results || []).map((a) => a.id).filter(Boolean);
+  let answeredCountsMap = {};
+  if (attemptIds.length > 0) {
+    const countsResult = await db.prepare(`
+			SELECT attempt_id, COUNT(*) as c 
+			FROM student_answers 
+			WHERE attempt_id IN (${attemptIds.map(() => "?").join(",")}) AND answer_given IS NOT NULL AND answer_given != ''
+			GROUP BY attempt_id
+		`).bind(...attemptIds).all();
+    (countsResult.results || []).forEach((r) => {
+      answeredCountsMap[r.attempt_id] = r.c;
+    });
+  }
+  const attempts = (rawAttempts.results || []).map((a) => {
+    const answeredCount = answeredCountsMap[a.id] || 0;
+    const warnings = a.violation_count || 0;
     let warningLogs = [];
-    if (a.status === "mengerjakan") {
-      if (kv) {
-        const stored = await kv.get(`attempt_${a.id}_answers`);
-        if (stored) {
-          try {
-            const data = JSON.parse(stored);
-            if (data && data.answers) {
-              answeredCount = Object.values(data.answers).filter((val) => val !== null && val !== "").length;
-            }
-            if (data && data.warnings) warnings = data.warnings;
-            if (data && data.warningLogs) warningLogs = data.warningLogs;
-          } catch (e) {
-          }
-        }
-      }
-      if (answeredCount === 0) {
-        const dbAnswers = await db.prepare('SELECT COUNT(*) as c FROM student_answers WHERE attempt_id = ? AND answer_given IS NOT NULL AND answer_given != ""').bind(a.id).first();
-        if (dbAnswers && dbAnswers.c) answeredCount = dbAnswers.c;
-      }
-    } else {
-      warnings = a.violation_count || 0;
-      try {
-        warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : [];
-      } catch (e) {
-      }
-      const dbAnswers = await db.prepare('SELECT COUNT(*) as c FROM student_answers WHERE attempt_id = ? AND answer_given IS NOT NULL AND answer_given != ""').bind(a.id).first();
-      if (dbAnswers && dbAnswers.c) answeredCount = dbAnswers.c;
+    try {
+      warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : [];
+    } catch (e) {
     }
     return { ...a, answeredCount, warnings, warningLogs };
-  }));
+  });
   return {
     exam,
     participants: participants.results,

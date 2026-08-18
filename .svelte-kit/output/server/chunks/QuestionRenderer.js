@@ -469,7 +469,7 @@ function QuestionRenderer($$renderer, $$props) {
     ImageZoomModal($$renderer2, {
       src: lightboxImage,
       isOpen: false,
-      alt: `Gambar Soal ${stringify(displayNumber !== void 0 ? displayNumber : question.question_number)}`
+      alt: `Gambar Soal ${stringify(displayNumber !== void 0 ? displayNumber : question?.question_number || "")}`
     });
     $$renderer2.push(`<!---->`);
     bind_props($$props, { question, answer, isDoubted, displayNumber });

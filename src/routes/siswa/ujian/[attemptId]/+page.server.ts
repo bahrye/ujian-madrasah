@@ -1,4 +1,4 @@
-import { fail, redirect, error } from '@sveltejs/kit';
+import { fail, redirect, error, isRedirect, isHttpError } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { verifyExamTokenSignature } from '$lib/server/auth';
@@ -10,128 +10,112 @@ export const load: PageServerLoad = async ({ platform, locals, params, cookies }
 	const db = getDB(platform);
 	const attemptIdStr = params.attemptId;
 	const parsedAttemptId = parseInt(attemptIdStr, 10);
-	if (isNaN(parsedAttemptId)) throw error(400, 'ID Ujian tidak valid');
+	if (isNaN(parsedAttemptId)) throw redirect(302, '/siswa');
 
 	try {
-	// Ambil data attempt
-	const attempt = await db.prepare(`
-		SELECT sa.*, 
-		       e.title as exam_title, 
-		       s.name as subject_name, 
-		       et.code as exam_type_code,
-		       c.name as class_name, 
-		       c.level as class_level,
-		       e.duration_minutes, 
-		       e.shuffle_questions,
-		       t.is_released as token_is_released, 
-		       t.released_at as token_released_at, 
-		       t.expires_at as token_expires_at,
-		       e.is_active as exam_active
-		FROM student_attempts sa
-		JOIN exams e ON sa.exam_id = e.id
-		LEFT JOIN tokens t ON sa.token_id = t.id
-		LEFT JOIN subjects s ON e.subject_id = s.id
-		LEFT JOIN exam_types et ON e.exam_type_id = et.id
-		JOIN users u ON sa.student_id = u.id
-		LEFT JOIN classes c ON u.class_id = c.id
-		WHERE sa.id = ? AND sa.student_id = ?
-	`).bind(parsedAttemptId, locals.user.id).first<any>();
+		// Ambil data attempt
+		const attempt = await db.prepare(`
+			SELECT sa.*, 
+			       e.title as exam_title, 
+			       s.name as subject_name, 
+			       et.code as exam_type_code,
+			       c.name as class_name, 
+			       c.level as class_level,
+			       e.duration_minutes, 
+			       e.shuffle_questions,
+			       t.is_released as token_is_released, 
+			       t.released_at as token_released_at, 
+			       t.expires_at as token_expires_at,
+			       e.is_active as exam_active
+			FROM student_attempts sa
+			JOIN exams e ON sa.exam_id = e.id
+			LEFT JOIN tokens t ON sa.token_id = t.id
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			LEFT JOIN exam_types et ON e.exam_type_id = et.id
+			JOIN users u ON sa.student_id = u.id
+			LEFT JOIN classes c ON u.class_id = c.id
+			WHERE sa.id = ? AND sa.student_id = ?
+		`).bind(parsedAttemptId, locals.user.id).first<any>();
 
-	if (!attempt) throw error(404, 'Sesi ujian tidak ditemukan.');
+		if (!attempt) {
+			throw redirect(302, '/siswa');
+		}
 
-	attempt.exam_title = formatExamTitle({
-		title: attempt.exam_title,
-		examTypeCode: attempt.exam_type_code,
-		subjectName: attempt.subject_name,
-		className: attempt.class_name,
-		classLevel: attempt.class_level
-	});
+		attempt.exam_title = formatExamTitle({
+			title: attempt.exam_title,
+			examTypeCode: attempt.exam_type_code,
+			subjectName: attempt.subject_name,
+			className: attempt.class_name,
+			classLevel: attempt.class_level
+		});
 
-	if (attempt.status !== 'mengerjakan') {
-		throw redirect(302, '/siswa');
-	}
+		if (attempt.status !== 'mengerjakan') {
+			throw redirect(302, '/siswa');
+		}
 
-	// Verifikasi cookie sesi ujian
-	const cookieVal = cookies.get('exam_token_verified_' + parsedAttemptId);
-	const isVerified = await verifyExamTokenSignature(cookieVal, parsedAttemptId, locals.user.id);
-	
-	if (!isVerified) {
-		// Cookie tidak ada/tidak valid - siswa harus memasukkan token untuk masuk
-		// Di sini baru cek apakah token masih dirilis
-		cookies.delete('exam_token_verified_' + parsedAttemptId, { path: '/' });
-		throw redirect(302, `/siswa/ujian?exam_id=${attempt.exam_id}`);
-	}
-	// Cookie valid = siswa sudah pernah diotorisasi masuk ujian ini
-	// Biarkan lanjut mengerjakan tanpa mengecek status token lagi
-	// Token revocation hanya berlaku saat siswa MENCOBA MASUK BARU (tanpa cookie)
-
-	// Ambil soal
-	let questions = await db.prepare(`
-		SELECT q.* FROM questions q
-		WHERE q.exam_id = ?
-		ORDER BY q.question_number
-	`).bind(attempt.exam_id).all();
-
-	let questionsList = questions.results as any[];
-
-	if (attempt.shuffle_questions === 1) {
-		// Implement deterministic shuffle using attempt.id as seed (Mulberry32 PRNG)
-		let seed = attempt.id * 1234567;
-		const random = () => {
-			seed |= 0; seed = seed + 0x6D2B79F5 | 0;
-			let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
-			t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-			return ((t ^ t >>> 14) >>> 0) / 4294967296;
-		};
+		// Verifikasi cookie sesi ujian
+		const cookieVal = cookies.get('exam_token_verified_' + parsedAttemptId);
+		const isVerified = await verifyExamTokenSignature(cookieVal, parsedAttemptId, locals.user.id);
 		
-		for (let i = questionsList.length - 1; i > 0; i--) {
-			const j = Math.floor(random() * (i + 1));
-			[questionsList[i], questionsList[j]] = [questionsList[j], questionsList[i]];
+		if (!isVerified) {
+			// Cookie tidak ada/tidak valid - siswa harus memasukkan token untuk masuk
+			cookies.delete('exam_token_verified_' + parsedAttemptId, { path: '/' });
+			throw redirect(302, `/siswa/ujian?exam_id=${attempt.exam_id}`);
 		}
-	}
 
-	// Ambil jawaban
-	const answers = await db.prepare(`
-		SELECT sa.* FROM student_answers sa
-		WHERE sa.attempt_id = ?
-	`).bind(parsedAttemptId).all();
-
-	// Map answers by question_id
-	const answerMap: Record<number, any> = {};
-	for (const a of answers.results as any[]) {
-		answerMap[a.question_id] = a;
-	}
-
-	const kv = platform?.env?.EXAM_ANSWERS;
-	let kvData: any = null;
-	if (kv) {
-		const stored = await kv.get(`attempt_${parsedAttemptId}_answers`);
-		if (stored) {
-			try { kvData = JSON.parse(stored); } catch {}
+		// Ambil soal
+		let questionsList: any[] = [];
+		try {
+			const questions = await db.prepare(`
+				SELECT q.* FROM questions q
+				WHERE q.exam_id = ?
+				ORDER BY q.question_number
+			`).bind(attempt.exam_id).all();
+			questionsList = (questions.results || []) as any[];
+		} catch (qErr) {
+			console.error("Error loading questions:", qErr);
+			questionsList = [];
 		}
-	}
 
-	if (kvData) {
-		for (const q of questionsList) {
-			if (!answerMap[q.id]) {
-				answerMap[q.id] = { answer_given: '', is_doubted: 0 };
-			}
-			if (kvData.answers && typeof kvData.answers[q.id] !== 'undefined') {
-				answerMap[q.id].answer_given = kvData.answers[q.id];
-			}
-			if (kvData.doubts && typeof kvData.doubts[q.id] !== 'undefined') {
-				answerMap[q.id].is_doubted = kvData.doubts[q.id] ? 1 : 0;
+		if (attempt.shuffle_questions === 1 && questionsList.length > 0) {
+			// Implement deterministic shuffle using attempt.id as seed (Mulberry32 PRNG)
+			let seed = attempt.id * 1234567;
+			const random = () => {
+				seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+				let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+				t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+				return ((t ^ t >>> 14) >>> 0) / 4294967296;
+			};
+			
+			for (let i = questionsList.length - 1; i > 0; i--) {
+				const j = Math.floor(random() * (i + 1));
+				[questionsList[i], questionsList[j]] = [questionsList[j], questionsList[i]];
 			}
 		}
-	}
 
-	return {
-		attempt,
-		questions: questionsList,
-		answerMap
-	};
+		// Ambil jawaban langsung dari D1
+		const answerMap: Record<number, any> = {};
+		try {
+			const answers = await db.prepare(`
+				SELECT sa.* FROM student_answers sa
+				WHERE sa.attempt_id = ?
+			`).bind(parsedAttemptId).all();
+			if (answers.results) {
+				for (const a of answers.results as any[]) {
+					answerMap[a.question_id] = a;
+				}
+			}
+		} catch (aErr) {
+			console.error("Error loading answers:", aErr);
+		}
+
+		return {
+			attempt,
+			questions: questionsList,
+			answerMap
+		};
 	} catch (e: any) {
-		if (e.status === 302 || e.status === 404) throw e;
+		if (isRedirect(e)) throw e;
 		console.error("Load error in siswa ujian attempt:", e);
 		throw redirect(302, '/siswa');
 	}
@@ -196,17 +180,6 @@ export const actions: Actions = {
 					for (let i = 0; i < syncStmts.length; i += chunkSize) {
 						await db.batch(syncStmts.slice(i, i + chunkSize));
 					}
-				}
-
-				// Optional KV sync for legacy/fallback compatibility
-				const kv = platform?.env?.EXAM_ANSWERS;
-				if (kv) {
-					kv.put(`attempt_${parsedAttemptId}_answers`, JSON.stringify({
-						answers: parsedAnswers,
-						doubts: parsedDoubts,
-						warnings,
-						warningLogs: JSON.parse(warningLogs)
-					})).catch(() => {});
 				}
 			} catch (e: any) {
 				console.error("Save answer error:", e?.message || e);
@@ -284,12 +257,6 @@ export const actions: Actions = {
 				for (let i = 0; i < syncStmts.length; i += chunkSize) {
 					await db.batch(syncStmts.slice(i, i + chunkSize));
 				}
-			}
-
-			// Cleanup KV key if exists
-			const kv = platform?.env?.EXAM_ANSWERS;
-			if (kv) {
-				kv.delete(`attempt_${parsedAttemptId}_answers`).catch(() => {});
 			}
 
 			// Auto-grade soal objektif
@@ -437,9 +404,9 @@ export const actions: Actions = {
 
 			throw redirect(302, '/siswa');
 		} catch (e: any) {
-			if (e.status === 302) throw e;
+			if (isRedirect(e) || isHttpError(e)) throw e;
 			console.error("Submit error:", e?.message || e);
-			return fail(500, { error: e.message || 'Gagal mengirim ujian.' });
+			return fail(500, { error: e?.message || 'Gagal mengirim ujian.' });
 		}
 	}
 };

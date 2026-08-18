@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { parseDate, isStudentExamTimeActive } from '$lib/utils/date';
-import { fail, redirect } from '@sveltejs/kit';
+import { fail, redirect, isRedirect, isHttpError } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { signExamToken } from '$lib/server/auth';
@@ -10,6 +10,7 @@ import { env } from '$env/dynamic/private';
 import { formatExamTitle } from '$lib/utils/exam';
 
 export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>[0]) => {
+	if (!locals.user || locals.user.role !== 'siswa') throw redirect(302, '/login');
 	const db = getDB(platform);
 
 	const examIdStr = url.searchParams.get('exam_id');
@@ -45,7 +46,7 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 		JOIN users u ON u.id = ?
 		LEFT JOIN classes c ON u.class_id = c.id
 		WHERE e.id = ? AND e.school_id = ? AND et.is_active = 1
-	`).bind(locals.user!.id, parsedExamId, locals.user!.school_id).first<any>();
+	`).bind(locals.user.id, parsedExamId, locals.user.school_id || 0).first<any>();
 
 		if (!exam) throw redirect(302, '/siswa/jadwal');
 
@@ -59,6 +60,7 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 
 		return { exam };
 	} catch (e: any) {
+		if (isRedirect(e) || isHttpError(e)) throw e;
 		console.error("Load Error in siswa ujian:", e);
 		throw redirect(302, '/siswa/jadwal');
 	}
@@ -163,9 +165,9 @@ export const actions = {
 
 			return { success: true, tokenCode, examId: parsedExamId };
 		} catch (e: any) {
-			if (e.status === 302) throw e;
+			if (isRedirect(e) || isHttpError(e)) throw e;
 			console.error(e);
-			return fail(500, { error: e.message || 'Gagal memvalidasi token.' });
+			return fail(500, { error: e?.message || 'Gagal memvalidasi token.' });
 		}
 	},
 
@@ -304,9 +306,9 @@ export const actions = {
 			cookies.set('exam_token_verified_' + attemptId, signedCookie, { path: '/', httpOnly: true, sameSite: 'lax' });
 			throw redirect(302, `/siswa/ujian/${attemptId}`);
 		} catch (e: any) {
-			if (e.status === 302) throw e;
+			if (isRedirect(e) || isHttpError(e)) throw e;
 			console.error(e);
-			return fail(500, { error: e.message || 'Gagal memulai ujian.' });
+			return fail(500, { error: e?.message || 'Gagal memulai ujian.' });
 		}
 	}
 };

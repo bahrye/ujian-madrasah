@@ -192,51 +192,25 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 			});
 		}
 
-		const kv = platform?.env?.EXAM_ANSWERS;
-		const attemptsWithProgress = await Promise.all(
-			attempts.map(async (a) => {
-				let status = a.status || 'belum_mengerjakan';
-				let answeredCount = a.attempt_id ? (answeredCountsMap[a.attempt_id] || 0) : 0;
-				let warnings = a.violation_count || 0;
-				let warningLogs: any[] = [];
-				try { warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : []; } catch(e) {}
+		const attemptsWithProgress = attempts.map((a) => {
+			let status = a.status || 'belum_mengerjakan';
+			let answeredCount = a.attempt_id ? (answeredCountsMap[a.attempt_id] || 0) : 0;
+			let warnings = a.violation_count || 0;
+			let warningLogs: any[] = [];
+			try { warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : []; } catch(e) {}
 
-				if (status === 'mengerjakan') {
-					if (kv && a.attempt_id) {
-						try {
-							const stored = await kv.get(`attempt_${a.attempt_id}_answers`);
-							if (stored) {
-								const data = JSON.parse(stored);
-								if (data && data.answers) {
-									const kvAnswered = Object.values(data.answers).filter(val => val !== null && val !== '' && val !== '[]' && val !== '{}').length;
-									if (kvAnswered > answeredCount) {
-										answeredCount = kvAnswered;
-									}
-								}
-								if (data && data.warnings && data.warnings > warnings) warnings = data.warnings;
-								if (data && data.warningLogs && Array.isArray(data.warningLogs) && data.warningLogs.length > warningLogs.length) {
-									warningLogs = data.warningLogs;
-								}
-							}
-						} catch (e) {
-							console.error("KV get error:", e);
-						}
-					}
-				}
-
-				return {
-					...a,
-					id: a.attempt_id || `no_attempt_${a.student_id}`,
-					attempt_id: a.attempt_id,
-					status,
-					answeredCount,
-					warnings,
-					warningLogs,
-					is_paused: a.is_paused,
-					paused_at: a.paused_at
-				};
-			})
-		);
+			return {
+				...a,
+				id: a.attempt_id || `no_attempt_${a.student_id}`,
+				attempt_id: a.attempt_id,
+				status,
+				answeredCount,
+				warnings,
+				warningLogs,
+				is_paused: a.is_paused,
+				paused_at: a.paused_at
+			};
+		});
 
 		return {
 			exams,

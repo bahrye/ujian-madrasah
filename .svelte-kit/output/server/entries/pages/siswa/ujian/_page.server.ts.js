@@ -1,11 +1,12 @@
 import { i as isStudentExamTimeActive, p as parseDate } from "../../../../chunks/date.js";
-import { fail, redirect } from "@sveltejs/kit";
+import { fail, redirect, isRedirect, isHttpError } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
 import { s as signExamToken } from "../../../../chunks/auth.js";
 import { u as uploadToCloudinary } from "../../../../chunks/cloudinary.js";
 import { b as private_env } from "../../../../chunks/shared-server.js";
 import { f as formatExamTitle } from "../../../../chunks/exam.js";
 const load = async ({ platform, locals, url }) => {
+  if (!locals.user || locals.user.role !== "siswa") throw redirect(302, "/login");
   const db = getDB(platform);
   const examIdStr = url.searchParams.get("exam_id");
   const parsedExamId = parseInt(examIdStr || "", 10);
@@ -39,7 +40,7 @@ const load = async ({ platform, locals, url }) => {
 		JOIN users u ON u.id = ?
 		LEFT JOIN classes c ON u.class_id = c.id
 		WHERE e.id = ? AND e.school_id = ? AND et.is_active = 1
-	`).bind(locals.user.id, parsedExamId, locals.user.school_id).first();
+	`).bind(locals.user.id, parsedExamId, locals.user.school_id || 0).first();
     if (!exam) throw redirect(302, "/siswa/jadwal");
     exam.title = formatExamTitle({
       title: exam.title,
@@ -50,6 +51,7 @@ const load = async ({ platform, locals, url }) => {
     });
     return { exam };
   } catch (e) {
+    if (isRedirect(e) || isHttpError(e)) throw e;
     console.error("Load Error in siswa ujian:", e);
     throw redirect(302, "/siswa/jadwal");
   }
@@ -134,9 +136,9 @@ const actions = {
       }
       return { success: true, tokenCode, examId: parsedExamId };
     } catch (e) {
-      if (e.status === 302) throw e;
+      if (isRedirect(e) || isHttpError(e)) throw e;
       console.error(e);
-      return fail(500, { error: e.message || "Gagal memvalidasi token." });
+      return fail(500, { error: e?.message || "Gagal memvalidasi token." });
     }
   },
   startExam: async ({ request, platform, locals, cookies }) => {
@@ -245,9 +247,9 @@ const actions = {
       cookies.set("exam_token_verified_" + attemptId, signedCookie, { path: "/", httpOnly: true, sameSite: "lax" });
       throw redirect(302, `/siswa/ujian/${attemptId}`);
     } catch (e) {
-      if (e.status === 302) throw e;
+      if (isRedirect(e) || isHttpError(e)) throw e;
       console.error(e);
-      return fail(500, { error: e.message || "Gagal memulai ujian." });
+      return fail(500, { error: e?.message || "Gagal memulai ujian." });
     }
   }
 };

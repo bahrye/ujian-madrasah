@@ -12,9 +12,9 @@
 
 	export let data;
 
-	$: attempt = data.attempt as any;
-	$: questions = data.questions as any[];
-	$: answerMap = data.answerMap as Record<number, any>;
+	$: attempt = (data?.attempt || {}) as any;
+	$: questions = (data?.questions || []) as any[];
+	$: answerMap = (data?.answerMap || {}) as Record<number, any>;
 
 	let currentIndex = 0;
 	let showNav = false;
@@ -30,8 +30,14 @@
 	let hasEnteredFullscreenOnce = false; // Track jika siswa sudah pernah masuk fullscreen
 
 	// Anti-cheat state
-	let currentEndTime = data.attempt.end_time;
-	let isPausedByProctor = data.attempt.is_paused === 1;
+	let currentEndTime = data?.attempt?.end_time;
+	let isPausedByProctor = data?.attempt?.is_paused === 1;
+	$: if (data?.attempt) {
+		if (data.attempt.end_time && data.attempt.end_time !== currentEndTime) {
+			currentEndTime = data.attempt.end_time;
+		}
+		isPausedByProctor = data.attempt.is_paused === 1;
+	}
 	let statusPollingInterval: any;
 	
 	let warnings = 0;
@@ -72,6 +78,7 @@
 	let warningLogs: { time: number, type: string }[] = [];
 
 	onMount(() => {
+		if (!attempt?.id) return;
 		requestWakeLock();
 		
 		if (browser) {
@@ -483,16 +490,20 @@
 	let localAnswers: Record<number, string> = {};
 	let localDoubts: Record<number, boolean> = {};
 	let lastSavedPayload: string | null = null;
+	let initializedAttemptId: number | null = null;
 
-	// Initialize from server data
-	$: {
+	// Initialize from server data only once per attempt load (prevents overwriting user clicks)
+	$: if (attempt?.id && attempt.id !== initializedAttemptId && Array.isArray(questions) && questions.length > 0) {
+		const newAnswers: Record<number, string> = {};
+		const newDoubts: Record<number, boolean> = {};
 		for (const q of questions) {
-			const ans = answerMap[q.id];
-			if (ans && !(q.id in localAnswers)) {
-				localAnswers[q.id] = ans.answer_given || '';
-				localDoubts[q.id] = ans.is_doubted === 1;
-			}
+			const ans = answerMap?.[q.id];
+			newAnswers[q.id] = ans?.answer_given || '';
+			newDoubts[q.id] = ans?.is_doubted === 1;
 		}
+		localAnswers = newAnswers;
+		localDoubts = newDoubts;
+		initializedAttemptId = attempt.id;
 		if (lastSavedPayload === null && Object.keys(localAnswers).length > 0) {
 			lastSavedPayload = JSON.stringify({
 				answers: localAnswers,
@@ -503,23 +514,23 @@
 		}
 	}
 
-	$: currentQuestion = questions[currentIndex];
-	$: navQuestions = questions.map((q: any, i: number) => {
+	$: currentQuestion = questions && questions.length > 0 ? questions[currentIndex] : null;
+	$: navQuestions = (questions || []).map((q: any, i: number) => {
 		let isAnswered = false;
-		if (localAnswers[q.id]) {
+		if (localAnswers && localAnswers[q.id]) {
 			isAnswered = localAnswers[q.id] !== '[]' && localAnswers[q.id] !== '{}';
 		}
 		return {
 			id: q.id,
 			question_number: q.question_number,
 			answered: isAnswered,
-			doubted: !!(localDoubts[q.id])
+			doubted: !!(localDoubts && localDoubts[q.id])
 		};
 	});
 
-	$: answeredCount = questions.filter((q: any) => localAnswers[q.id] && localAnswers[q.id] !== '[]' && localAnswers[q.id] !== '{}').length;
-	$: doubtedCount = questions.filter((q: any) => localDoubts[q.id]).length;
-	$: unansweredCount = questions.length - answeredCount;
+	$: answeredCount = (questions || []).filter((q: any) => localAnswers && localAnswers[q.id] && localAnswers[q.id] !== '[]' && localAnswers[q.id] !== '{}').length;
+	$: doubtedCount = (questions || []).filter((q: any) => localDoubts && localDoubts[q.id]).length;
+	$: unansweredCount = (questions?.length || 0) - answeredCount;
 
 	function goToQuestion(index: number) {
 		// Save current only if there are changes before navigating
@@ -653,7 +664,7 @@
 	}
 </script>
 
-<svelte:head><title>{attempt.exam_title} — Ujian Online Madrasah</title></svelte:head>
+<svelte:head><title>{attempt?.exam_title || 'Ujian Online'} — Ujian Online Madrasah</title></svelte:head>
 
 <svelte:window 
 	on:beforeunload={handleBeforeUnload}
@@ -682,16 +693,16 @@
 				{#if isTitleOverflowing}
 					<div class="inline-flex whitespace-nowrap gap-10 animate-marquee py-0.5">
 						<span bind:this={titleElement} class="text-sm sm:text-base font-bold text-slate-800 tracking-tight shrink-0">
-							{attempt.exam_title}
+							{attempt?.exam_title || ''}
 						</span>
 						<span class="text-sm sm:text-base font-bold text-slate-800 tracking-tight shrink-0" aria-hidden="true">
-							{attempt.exam_title}
+							{attempt?.exam_title || ''}
 						</span>
 					</div>
 				{:else}
 					<div class="w-full flex items-center py-0.5">
 						<h1 bind:this={titleElement} class="text-sm sm:text-base font-bold text-slate-800 tracking-tight truncate">
-							{attempt.exam_title}
+							{attempt?.exam_title || ''}
 						</h1>
 					</div>
 				{/if}
@@ -738,7 +749,7 @@
 				<div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
 					<div
 						class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-500"
-						style="width: {((answeredCount) / questions.length) * 100}%"
+						style="width: {questions && questions.length > 0 ? ((answeredCount) / questions.length) * 100 : 0}%"
 					></div>
 				</div>
 			</div>
@@ -815,7 +826,7 @@
 					Sebelumnya
 				</button>
 
-				{#if currentIndex < questions.length - 1}
+				{#if questions && currentIndex < questions.length - 1}
 					<button class="btn-primary flex-1 justify-center" on:click={next}>
 						Selanjutnya
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -852,7 +863,7 @@
 			<h3 class="text-lg font-bold text-slate-800 mb-2">Kumpulkan Jawaban?</h3>
 
 			<div class="bg-slate-50 rounded-xl p-3 mb-4 text-left text-sm space-y-1">
-				<p class="flex justify-between"><span class="text-slate-500">Terjawab:</span> <span class="font-semibold text-emerald-600">{answeredCount} / {questions.length}</span></p>
+				<p class="flex justify-between"><span class="text-slate-500">Terjawab:</span> <span class="font-semibold text-emerald-600">{answeredCount} / {questions?.length || 0}</span></p>
 				<p class="flex justify-between"><span class="text-slate-500">Ragu-ragu:</span> <span class="font-semibold text-amber-600">{doubtedCount}</span></p>
 				<p class="flex justify-between"><span class="text-slate-500">Belum dijawab:</span> <span class="font-semibold text-rose-600">{unansweredCount}</span></p>
 			</div>

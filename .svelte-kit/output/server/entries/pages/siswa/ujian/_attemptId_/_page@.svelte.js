@@ -43,8 +43,8 @@ function _page_($$renderer, $$props) {
     let attempt, questions, answerMap, currentQuestion, answeredCount, doubtedCount, unansweredCount;
     let data = $$props["data"];
     let currentIndex = 0;
-    let currentEndTime = data.attempt.end_time;
-    let isPausedByProctor = data.attempt.is_paused === 1;
+    let currentEndTime = data?.attempt?.end_time;
+    let isPausedByProctor = data?.attempt?.is_paused === 1;
     let warnings = 0;
     let warningLogs = [];
     onDestroy(() => {
@@ -65,17 +65,27 @@ function _page_($$renderer, $$props) {
     let localAnswers = {};
     let localDoubts = {};
     let lastSavedPayload = null;
-    attempt = data.attempt;
-    questions = data.questions;
-    answerMap = data.answerMap;
-    {
-      for (const q of questions) {
-        const ans = answerMap[q.id];
-        if (ans && !(q.id in localAnswers)) {
-          localAnswers[q.id] = ans.answer_given || "";
-          localDoubts[q.id] = ans.is_doubted === 1;
-        }
+    let initializedAttemptId = null;
+    attempt = data?.attempt || {};
+    questions = data?.questions || [];
+    answerMap = data?.answerMap || {};
+    if (data?.attempt) {
+      if (data.attempt.end_time && data.attempt.end_time !== currentEndTime) {
+        currentEndTime = data.attempt.end_time;
       }
+      isPausedByProctor = data.attempt.is_paused === 1;
+    }
+    if (attempt?.id && attempt.id !== initializedAttemptId && Array.isArray(questions) && questions.length > 0) {
+      const newAnswers = {};
+      const newDoubts = {};
+      for (const q of questions) {
+        const ans = answerMap?.[q.id];
+        newAnswers[q.id] = ans?.answer_given || "";
+        newDoubts[q.id] = ans?.is_doubted === 1;
+      }
+      localAnswers = newAnswers;
+      localDoubts = newDoubts;
+      initializedAttemptId = attempt.id;
       if (lastSavedPayload === null && Object.keys(localAnswers).length > 0) {
         lastSavedPayload = JSON.stringify({
           answers: localAnswers,
@@ -85,32 +95,32 @@ function _page_($$renderer, $$props) {
         });
       }
     }
-    currentQuestion = questions[currentIndex];
-    questions.map((q, i) => {
+    currentQuestion = questions && questions.length > 0 ? questions[currentIndex] : null;
+    (questions || []).map((q, i) => {
       let isAnswered = false;
-      if (localAnswers[q.id]) {
+      if (localAnswers && localAnswers[q.id]) {
         isAnswered = localAnswers[q.id] !== "[]" && localAnswers[q.id] !== "{}";
       }
       return {
         id: q.id,
         question_number: q.question_number,
         answered: isAnswered,
-        doubted: !!localDoubts[q.id]
+        doubted: !!(localDoubts && localDoubts[q.id])
       };
     });
-    answeredCount = questions.filter((q) => localAnswers[q.id] && localAnswers[q.id] !== "[]" && localAnswers[q.id] !== "{}").length;
-    doubtedCount = questions.filter((q) => localDoubts[q.id]).length;
-    unansweredCount = questions.length - answeredCount;
+    answeredCount = (questions || []).filter((q) => localAnswers && localAnswers[q.id] && localAnswers[q.id] !== "[]" && localAnswers[q.id] !== "{}").length;
+    doubtedCount = (questions || []).filter((q) => localDoubts && localDoubts[q.id]).length;
+    unansweredCount = (questions?.length || 0) - answeredCount;
     head("1huqvgl", $$renderer2, ($$renderer3) => {
       $$renderer3.title(($$renderer4) => {
-        $$renderer4.push(`<title>${escape_html(attempt.exam_title)} — Ujian Online Madrasah</title>`);
+        $$renderer4.push(`<title>${escape_html(attempt?.exam_title || "Ujian Online")} — Ujian Online Madrasah</title>`);
       });
     });
     Toast($$renderer2);
     $$renderer2.push(`<!----> <div class="min-h-screen bg-slate-50 flex flex-col select-none svelte-1huqvgl"><header class="sticky top-0 z-30 bg-white/95 backdrop-blur-xl border-b border-slate-200 px-4 py-2.5 shadow-xs svelte-1huqvgl"><div class="max-w-4xl mx-auto flex flex-col gap-2 svelte-1huqvgl"><div class="w-full overflow-hidden relative svelte-1huqvgl">`);
     {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="w-full flex items-center py-0.5 svelte-1huqvgl"><h1 class="text-sm sm:text-base font-bold text-slate-800 tracking-tight truncate svelte-1huqvgl">${escape_html(attempt.exam_title)}</h1></div>`);
+      $$renderer2.push(`<div class="w-full flex items-center py-0.5 svelte-1huqvgl"><h1 class="text-sm sm:text-base font-bold text-slate-800 tracking-tight truncate svelte-1huqvgl">${escape_html(attempt?.exam_title || "")}</h1></div>`);
     }
     $$renderer2.push(`<!--]--></div> <div class="flex items-center justify-between gap-3 svelte-1huqvgl"><div class="flex items-center gap-1.5 svelte-1huqvgl">`);
     {
@@ -123,7 +133,7 @@ function _page_($$renderer, $$props) {
     }
     $$renderer2.push(`<!--]--> `);
     Timer($$renderer2, { endTime: currentEndTime, isPaused: isPausedByProctor });
-    $$renderer2.push(`<!----></div></div> <div class="w-full svelte-1huqvgl"><div class="h-1.5 bg-slate-100 rounded-full overflow-hidden svelte-1huqvgl"><div class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-500 svelte-1huqvgl"${attr_style(`width: ${stringify(answeredCount / questions.length * 100)}%`)}></div></div></div></div></header> <main class="flex-1 max-w-4xl mx-auto w-full px-4 py-6 svelte-1huqvgl">`);
+    $$renderer2.push(`<!----></div></div> <div class="w-full svelte-1huqvgl"><div class="h-1.5 bg-slate-100 rounded-full overflow-hidden svelte-1huqvgl"><div class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-500 svelte-1huqvgl"${attr_style(`width: ${stringify(questions && questions.length > 0 ? answeredCount / questions.length * 100 : 0)}%`)}></div></div></div></div></header> <main class="flex-1 max-w-4xl mx-auto w-full px-4 py-6 svelte-1huqvgl">`);
     if (currentQuestion) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<!---->`);
@@ -151,7 +161,7 @@ function _page_($$renderer, $$props) {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]--> <div class="flex items-center gap-3 svelte-1huqvgl"><button class="btn-ghost flex-1 justify-center svelte-1huqvgl"${attr("disabled", currentIndex === 0, true)}><svg class="w-4 h-4 svelte-1huqvgl" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.chevronLeft)} class="svelte-1huqvgl"></path></svg> Sebelumnya</button> `);
-    if (currentIndex < questions.length - 1) {
+    if (questions && currentIndex < questions.length - 1) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<button class="btn-primary flex-1 justify-center svelte-1huqvgl">Selanjutnya <svg class="w-4 h-4 svelte-1huqvgl" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.chevronRight)} class="svelte-1huqvgl"></path></svg></button>`);
     } else {
