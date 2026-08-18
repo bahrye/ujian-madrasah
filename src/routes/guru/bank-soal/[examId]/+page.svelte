@@ -1191,20 +1191,50 @@
 
 <!-- Preview Modal -->
 {#if previewQuestionId}
-	{@const pq = questions.find(q => q.id === previewQuestionId)}
+	{@const pIdx = questions.findIndex(q => q.id === previewQuestionId)}
+	{@const pq = pIdx !== -1 ? questions[pIdx] : null}
 	{#if pq}
 		<div use:portal class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
 			<div class="bg-white rounded-2xl w-full max-w-3xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
 				<div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-					<h3 class="font-bold text-slate-800 text-lg">Preview Soal No. {pq.question_number}</h3>
+					<div class="flex items-center gap-2">
+						<h3 class="font-bold text-slate-800 text-lg">Preview Soal No. {pq.question_number}</h3>
+						<span class="text-xs text-slate-400 font-medium">({pIdx + 1} dari {questions.length})</span>
+					</div>
 					<button class="text-slate-400 hover:text-slate-600 p-2 rounded-lg hover:bg-slate-100 transition-colors" on:click={() => previewQuestionId = null}>
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.close} />
 						</svg>
 					</button>
 				</div>
-				<div class="p-6 overflow-y-auto">
-					<QuestionRenderer question={pq} />
+				<div class="p-6 overflow-y-auto flex-1">
+					{#key pq.id}
+						<QuestionRenderer question={pq} />
+					{/key}
+				</div>
+				<div class="px-6 py-3.5 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between gap-3">
+					<button
+						type="button"
+						class="btn-ghost btn-sm text-slate-700 flex items-center gap-1.5 border border-slate-200"
+						disabled={pIdx <= 0}
+						on:click={() => { if (pIdx > 0) previewQuestionId = questions[pIdx - 1].id; }}
+					>
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.chevronLeft} />
+						</svg>
+						Sebelumnya
+					</button>
+					<button
+						type="button"
+						class="btn-primary btn-sm flex items-center gap-1.5"
+						disabled={pIdx >= questions.length - 1}
+						on:click={() => { if (pIdx < questions.length - 1) previewQuestionId = questions[pIdx + 1].id; }}
+					>
+						Selanjutnya
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.chevronRight} />
+						</svg>
+					</button>
 				</div>
 			</div>
 		</div>

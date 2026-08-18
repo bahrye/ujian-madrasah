@@ -81,13 +81,15 @@
 
 	<main class="flex-1 max-w-4xl mx-auto w-full px-4 py-6">
 		{#if questions.length > 0 && currentQuestion}
-			<QuestionRenderer
-				question={currentQuestion}
-				answer={localAnswers[currentQuestion.id] || ''}
-				isDoubted={localDoubts[currentQuestion.id] || false}
-				on:answer={handleAnswer}
-				on:doubt={handleDoubt}
-			/>
+			{#key currentQuestion.id}
+				<QuestionRenderer
+					question={currentQuestion}
+					answer={localAnswers[currentQuestion.id] || ''}
+					isDoubted={localDoubts[currentQuestion.id] || false}
+					on:answer={handleAnswer}
+					on:doubt={handleDoubt}
+				/>
+			{/key}
 		{:else}
 			<div class="flex items-center justify-center h-64">
 				<div class="text-center bg-white p-8 rounded-2xl shadow-sm border border-slate-100 max-w-md w-full">

@@ -25,21 +25,44 @@
 
 	let options: any = [];
 	$: {
-		if (question.options_json) {
-			try {
-				options = JSON.parse(question.options_json);
-			} catch (e) {
-				console.error("Invalid options_json for question", question.id, e);
+		const raw = question?.options_json;
+		if (raw) {
+			if (typeof raw === 'object') {
+				options = raw;
+			} else if (typeof raw === 'string') {
+				try {
+					let parsed = JSON.parse(raw);
+					if (typeof parsed === 'string') {
+						try { parsed = JSON.parse(parsed); } catch {}
+					}
+					options = parsed || [];
+				} catch (e) {
+					console.error("Invalid options_json for question", question?.id, e);
+					options = [];
+				}
+			} else {
 				options = [];
 			}
+		} else if ((question as any)?.options) {
+			options = (question as any).options;
 		} else {
 			options = [];
 		}
 	}
 	
-	$: safeType = (question.type || '').trim().toLowerCase();
+	$: safeOptions = Array.isArray(options) ? options : [];
+	$: safeType = (question?.type || '').trim().toLowerCase();
 	$: matchingLeft = safeType === 'menjodohkan' && options?.left ? options.left : [];
 	$: matchingRight = safeType === 'menjodohkan' && options?.right ? options.right : [];
+
+	function getOptionHtml(opt: any): string {
+		if (opt == null) return '';
+		if (typeof opt === 'object') {
+			const str = opt.html || opt.text || opt.label || opt.content || '';
+			return String(str).replace(/^(<br\s*\/?>\s*)+/i, '');
+		}
+		return String(opt).replace(/^(<br\s*\/?>\s*)+/i, '');
+	}
 
 	// Untuk menjodohkan, answer disimpan sebagai JSON string mapping
 	let matchingAnswers: Record<string, string> = {};
@@ -194,7 +217,7 @@
 	<div class="space-y-2">
 		{#if safeType === 'pilihan_ganda' || safeType === 'pilihan_ganda_kompleks'}
 			<!-- Multiple Choice -->
-			{#each options as option, i}
+			{#each safeOptions as option, i}
 				{@const isSelected = safeType === 'pilihan_ganda_kompleks' ? complexAnswers.includes(optionLetters[i]) : answer === optionLetters[i]}
 				<div
 					role="button"
@@ -240,7 +263,7 @@
 						{optionLetters[i]}
 					</span>
 					<div class="option-content text-sm prose prose-sm max-w-none flex-1 {isSelected ? 'text-indigo-700 font-medium' : 'text-slate-700'}">
-						{@html option.replace(/^(<br\s*\/?>\s*)+/i, '')}
+						{@html getOptionHtml(option)}
 					</div>
 				</div>
 			{/each}

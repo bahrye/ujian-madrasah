@@ -57,12 +57,20 @@ function AudioPlayer($$renderer, $$props) {
 }
 function QuestionRenderer($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
-    let safeType, matchingLeft, matchingRight, benarSalahStatements, directMediaUrl;
+    let safeOptions, safeType, matchingLeft, matchingRight, benarSalahStatements, directMediaUrl;
     let question = $$props["question"];
     let answer = fallback($$props["answer"], "");
     let isDoubted = fallback($$props["isDoubted"], false);
     let displayNumber = fallback($$props["displayNumber"], void 0);
     let options = [];
+    function getOptionHtml(opt) {
+      if (opt == null) return "";
+      if (typeof opt === "object") {
+        const str = opt.html || opt.text || opt.label || opt.content || "";
+        return String(str).replace(/^(<br\s*\/?>\s*)+/i, "");
+      }
+      return String(opt).replace(/^(<br\s*\/?>\s*)+/i, "");
+    }
     let matchingAnswers = {};
     let complexAnswers = [];
     let benarSalahAnswers = {};
@@ -89,18 +97,35 @@ function QuestionRenderer($$renderer, $$props) {
       return url;
     }
     {
-      if (question.options_json) {
-        try {
-          options = JSON.parse(question.options_json);
-        } catch (e) {
-          console.error("Invalid options_json for question", question.id, e);
+      const raw = question?.options_json;
+      if (raw) {
+        if (typeof raw === "object") {
+          options = raw;
+        } else if (typeof raw === "string") {
+          try {
+            let parsed = JSON.parse(raw);
+            if (typeof parsed === "string") {
+              try {
+                parsed = JSON.parse(parsed);
+              } catch {
+              }
+            }
+            options = parsed || [];
+          } catch (e) {
+            console.error("Invalid options_json for question", question?.id, e);
+            options = [];
+          }
+        } else {
           options = [];
         }
+      } else if (question?.options) {
+        options = question.options;
       } else {
         options = [];
       }
     }
-    safeType = (question.type || "").trim().toLowerCase();
+    safeOptions = Array.isArray(options) ? options : [];
+    safeType = (question?.type || "").trim().toLowerCase();
     matchingLeft = safeType === "menjodohkan" && options?.left ? options.left : [];
     matchingRight = safeType === "menjodohkan" && options?.right ? options.right : [];
     if (safeType === "menjodohkan" && answer) {
@@ -159,7 +184,7 @@ function QuestionRenderer($$renderer, $$props) {
     if (safeType === "pilihan_ganda" || safeType === "pilihan_ganda_kompleks") {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<!--[-->`);
-      const each_array = ensure_array_like(options);
+      const each_array = ensure_array_like(safeOptions);
       for (let i = 0, $$length = each_array.length; i < $$length; i++) {
         let option = each_array[i];
         const isSelected = safeType === "pilihan_ganda_kompleks" ? complexAnswers.includes(optionLetters[i]) : answer === optionLetters[i];
@@ -177,7 +202,7 @@ function QuestionRenderer($$renderer, $$props) {
         } else {
           $$renderer2.push("<!--[-1-->");
         }
-        $$renderer2.push(`<!--]--> <span${attr_class(`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0 transition-colors ${isSelected ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white" : "bg-slate-100 text-slate-500"}`)}>${escape_html(optionLetters[i])}</span> <div${attr_class(`option-content text-sm prose prose-sm max-w-none flex-1 ${isSelected ? "text-indigo-700 font-medium" : "text-slate-700"}`, "svelte-v7h8kb")}>${html(option.replace(/^(<br\s*\/?>\s*)+/i, ""))}</div></div>`);
+        $$renderer2.push(`<!--]--> <span${attr_class(`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0 transition-colors ${isSelected ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white" : "bg-slate-100 text-slate-500"}`)}>${escape_html(optionLetters[i])}</span> <div${attr_class(`option-content text-sm prose prose-sm max-w-none flex-1 ${isSelected ? "text-indigo-700 font-medium" : "text-slate-700"}`, "svelte-v7h8kb")}>${html(getOptionHtml(option))}</div></div>`);
       }
       $$renderer2.push(`<!--]-->`);
     } else if (safeType === "benar_salah") {
