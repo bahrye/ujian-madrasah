@@ -143,6 +143,18 @@ function QuestionRenderer($$renderer, $$props) {
     let selectedLeftIdx = null;
     let selectedRightIdx = null;
     let connectionLines = [];
+    let recalcRaf = null;
+    function scheduleRecalculate() {
+      if (recalcRaf) cancelAnimationFrame(recalcRaf);
+      recalcRaf = requestAnimationFrame(() => {
+      });
+      setTimeout(() => recalculateLines(), 40);
+      setTimeout(() => recalculateLines(), 120);
+      setTimeout(() => recalculateLines(), 250);
+    }
+    function recalculateLines() {
+      return;
+    }
     const optionLetters = ["A", "B", "C", "D", "E", "F", "G", "H"];
     function getDirectUrl(url) {
       if (!url) return "";
@@ -230,6 +242,9 @@ function QuestionRenderer($$renderer, $$props) {
       }
     } else if (safeType === "benar_salah" && !answer) {
       benarSalahAnswers = {};
+    }
+    if (safeType === "menjodohkan" && (matchingAnswers || matchingLeft || matchingRight)) {
+      scheduleRecalculate();
     }
     directMediaUrl = getDirectUrl(question.media_url);
     $$renderer2.push(`<div class="space-y-5 animate-in" role="presentation"><div class="flex items-center justify-between flex-wrap gap-2"><div class="flex items-center gap-3"><span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold text-sm shadow-md shadow-indigo-500/20">${escape_html(

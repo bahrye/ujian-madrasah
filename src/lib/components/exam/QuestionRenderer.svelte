@@ -152,7 +152,7 @@
 		matchingAnswers[String(leftIdx)] = String(rightIdx);
 		matchingAnswers = { ...matchingAnswers };
 		dispatch('answer', { questionId: question.id, answer: JSON.stringify(matchingAnswers) });
-		recalculateLines();
+		scheduleRecalculate();
 	}
 
 	function removeMatchingPair(leftIdx: number, e?: Event) {
@@ -160,52 +160,77 @@
 		delete matchingAnswers[String(leftIdx)];
 		matchingAnswers = { ...matchingAnswers };
 		dispatch('answer', { questionId: question.id, answer: JSON.stringify(matchingAnswers) });
-		recalculateLines();
+		scheduleRecalculate();
+	}
+
+	let recalcRaf: number | null = null;
+	function scheduleRecalculate() {
+		if (recalcRaf) cancelAnimationFrame(recalcRaf);
+		recalcRaf = requestAnimationFrame(() => {
+			recalculateLines();
+		});
+		setTimeout(() => recalculateLines(), 40);
+		setTimeout(() => recalculateLines(), 120);
+		setTimeout(() => recalculateLines(), 250);
 	}
 
 	function recalculateLines() {
 		if (!matchingContainerEl || safeType !== 'menjodohkan') return;
-		tick().then(() => {
-			if (!matchingContainerEl) return;
-			const containerRect = matchingContainerEl.getBoundingClientRect();
-			const lines: typeof connectionLines = [];
+		const containerRect = matchingContainerEl.getBoundingClientRect();
+		if (containerRect.width === 0 || containerRect.height === 0) return;
 
-			Object.entries(matchingAnswers).forEach(([leftKey, rightVal]) => {
-				const leftI = parseInt(leftKey, 10);
-				const rightI = parseInt(String(rightVal), 10);
-				if (isNaN(leftI) || isNaN(rightI)) return;
+		const lines: typeof connectionLines = [];
 
-				const leftPort = document.getElementById(`match-port-left-${question.id}-${leftI}`);
-				const rightPort = document.getElementById(`match-port-right-${question.id}-${rightI}`);
+		Object.entries(matchingAnswers).forEach(([leftKey, rightVal]) => {
+			const leftI = parseInt(leftKey, 10);
+			const rightI = parseInt(String(rightVal), 10);
+			if (isNaN(leftI) || isNaN(rightI)) return;
 
-				if (leftPort && rightPort) {
-					const lRect = leftPort.getBoundingClientRect();
-					const rRect = rightPort.getBoundingClientRect();
-					
-					const x1 = lRect.left + lRect.width / 2 - containerRect.left;
-					const y1 = lRect.top + lRect.height / 2 - containerRect.top;
-					const x2 = rRect.left + rRect.width / 2 - containerRect.left;
-					const y2 = rRect.top + rRect.height / 2 - containerRect.top;
+			const leftPort = document.getElementById(`match-port-left-${question.id}-${leftI}`);
+			const rightPort = document.getElementById(`match-port-right-${question.id}-${rightI}`);
 
-					const color = MATCH_COLORS[leftI % MATCH_COLORS.length].stroke;
-					lines.push({ x1, y1, x2, y2, color, leftIdx: leftI, rightIdx: rightI });
-				}
-			});
+			if (leftPort && rightPort) {
+				const lRect = leftPort.getBoundingClientRect();
+				const rRect = rightPort.getBoundingClientRect();
+				
+				const x1 = lRect.left + (lRect.width / 2) - containerRect.left;
+				const y1 = lRect.top + (lRect.height / 2) - containerRect.top;
+				const x2 = rRect.left + (rRect.width / 2) - containerRect.left;
+				const y2 = rRect.top + (rRect.height / 2) - containerRect.top;
 
-			connectionLines = lines;
+				const color = MATCH_COLORS[leftI % MATCH_COLORS.length].stroke;
+				lines.push({ x1, y1, x2, y2, color, leftIdx: leftI, rightIdx: rightI });
+			}
 		});
+
+		connectionLines = lines;
 	}
 
 	$: if (safeType === 'menjodohkan' && (matchingAnswers || matchingLeft || matchingRight)) {
-		recalculateLines();
+		scheduleRecalculate();
 	}
 
 	onMount(() => {
 		if (safeType === 'menjodohkan') {
-			recalculateLines();
-			const handleResize = () => recalculateLines();
+			scheduleRecalculate();
+			const handleResize = () => scheduleRecalculate();
 			window.addEventListener('resize', handleResize);
-			return () => window.removeEventListener('resize', handleResize);
+			window.addEventListener('scroll', handleResize, true);
+
+			let resizeObserver: ResizeObserver | null = null;
+			if (typeof ResizeObserver !== 'undefined' && matchingContainerEl) {
+				resizeObserver = new ResizeObserver(() => {
+					scheduleRecalculate();
+				});
+				resizeObserver.observe(matchingContainerEl);
+			}
+
+			return () => {
+				window.removeEventListener('resize', handleResize);
+				window.removeEventListener('scroll', handleResize, true);
+				resizeObserver?.disconnect();
+				if (recalcRaf) cancelAnimationFrame(recalcRaf);
+			};
 		}
 	});
 
