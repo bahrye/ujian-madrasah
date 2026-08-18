@@ -91,19 +91,23 @@ const actions = {
     } else if (type === "menjodohkan") {
       const leftItems = [];
       const rightItems = [];
-      for (let i = 0; i < 20; i++) {
+      const mapping = {};
+      for (let i = 0; i < 50; i++) {
         const l = form.get(`left_${i}`)?.toString().trim();
-        const r = form.get(`right_${i}`)?.toString().trim();
-        if (l && r) {
+        if (l) {
+          const leftIdx = leftItems.length;
           leftItems.push(l);
+          const correctRight = form.get(`match_correct_${i}`)?.toString() || String(leftIdx);
+          mapping[String(leftIdx)] = correctRight;
+        }
+      }
+      for (let j = 0; j < 50; j++) {
+        const r = form.get(`right_${j}`)?.toString().trim();
+        if (r) {
           rightItems.push(r);
         }
       }
       optionsJson = JSON.stringify({ left: leftItems, right: rightItems });
-      const mapping = {};
-      leftItems.forEach((_, i) => {
-        mapping[String(i)] = String(i);
-      });
       correctAnswerJson = JSON.stringify(mapping);
     }
     try {
@@ -199,25 +203,24 @@ const actions = {
     } else if (type === "menjodohkan") {
       const leftItems = [];
       const rightItems = [];
-      for (let i = 0; i < 20; i++) {
+      const mapping = {};
+      for (let i = 0; i < 50; i++) {
         const l = form.get(`left_${i}`)?.toString().trim();
-        const r = form.get(`right_${i}`)?.toString().trim();
-        if (l && r) {
+        if (l) {
+          const leftIdx = leftItems.length;
           leftItems.push(l);
+          const correctRight = form.get(`match_correct_${i}`)?.toString() || String(leftIdx);
+          mapping[String(leftIdx)] = correctRight;
+        }
+      }
+      for (let j = 0; j < 50; j++) {
+        const r = form.get(`right_${j}`)?.toString().trim();
+        if (r) {
           rightItems.push(r);
         }
       }
       optionsJson = JSON.stringify({ left: leftItems, right: rightItems });
-      const prevMap = await db.prepare("SELECT correct_answer_json FROM questions WHERE id = ?").bind(parsedId).first();
-      if (prevMap && prevMap.correct_answer_json) {
-        correctAnswerJson = prevMap.correct_answer_json;
-      } else {
-        const mapping = {};
-        leftItems.forEach((_, i) => {
-          mapping[String(i)] = String(i);
-        });
-        correctAnswerJson = JSON.stringify(mapping);
-      }
+      correctAnswerJson = JSON.stringify(mapping);
     }
     try {
       const prevMedia = await db.prepare("SELECT media_url FROM questions WHERE id = ?").bind(parsedId).first();

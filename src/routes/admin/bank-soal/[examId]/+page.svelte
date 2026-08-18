@@ -469,16 +469,19 @@
 	
 	let editingQuestion: any = null;
 	let editQuestionText = '';
-	let createMenjodohkanCount = 4;
-	let editMenjodohkanCount = 4;
+	let createMenjodohkanLeftCount = 3;
+	let createMenjodohkanRightCount = 4;
+	let editMenjodohkanLeftCount = 3;
+	let editMenjodohkanRightCount = 4;
 	let createBenarSalahCount = 3;
 	let editBenarSalahCount = 3;
 	let createBenarSalahMultiMode = false;
 	let editBenarSalahMultiMode = false;
 
 	$: if (editingQuestion && editingQuestion.type === 'menjodohkan') {
-		const opts = editingQuestion.options_json ? JSON.parse(editingQuestion.options_json) : {left:[]};
-		editMenjodohkanCount = Math.max(4, opts.left?.length || 4);
+		const opts = editingQuestion.options_json ? JSON.parse(editingQuestion.options_json) : {left:[], right:[]};
+		editMenjodohkanLeftCount = Math.max(1, opts.left?.length || 3);
+		editMenjodohkanRightCount = Math.max(1, opts.right?.length || 4);
 	}
 
 	$: if (editingQuestion && editingQuestion.type === 'benar_salah') {
@@ -752,25 +755,72 @@
 						<input id="q-correct-is" name="correct_answer" type="text" class="input" placeholder="Jawaban yang benar" />
 					</div>
 				{:else if selectedType === 'menjodohkan'}
-					<div class="space-y-2">
-						<label class="label">Pasangan (Kiri → Kanan)</label>
-						{#each Array(createMenjodohkanCount) as _, i}
-							<div class="grid grid-cols-2 gap-2">
-								<div class="flex gap-1">
-									<input id="create_left_{i}" name="left_{i}" type="text" class="input w-full" placeholder="Kiri {i + 1}" />
-									<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-2 shrink-0" on:click={() => openMediaPickerForOption('create', 'menjodohkan_left', i)} title="Media">🖼️</button>
+					<div class="space-y-4">
+						<div class="p-3 bg-amber-50/70 rounded-xl border border-amber-200 text-xs text-amber-800 flex items-center gap-2">
+							<span class="text-base">💡</span>
+							<span>Anda dapat menambahkan pilihan jawaban di Kolom Kanan lebih banyak dari Kolom Kiri sebagai <b>jawaban pengecoh (distractor)</b>. Tentukan pasangan kunci jawaban untuk tiap baris kiri.</span>
+						</div>
+
+						<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+							<!-- Kolom Kiri: Pernyataan -->
+							<div class="space-y-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+								<div class="flex items-center justify-between">
+									<span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Kolom Kiri (Pernyataan)</span>
+									<span class="text-xs text-slate-500 font-medium">{createMenjodohkanLeftCount} pernyataan</span>
 								</div>
-								<div class="flex gap-1">
-									<input id="create_right_{i}" name="right_{i}" type="text" class="input w-full" placeholder="Kanan {i + 1}" />
-									<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-2 shrink-0" on:click={() => openMediaPickerForOption('create', 'menjodohkan_right', i)} title="Media">🖼️</button>
+								
+								<div class="space-y-3">
+									{#each Array(createMenjodohkanLeftCount) as _, i}
+										<div class="p-2.5 bg-white rounded-lg border border-slate-200 space-y-2">
+											<div class="flex items-center gap-2">
+												<span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+												<input id="create_left_{i}" name="left_{i}" type="text" class="input input-sm w-full text-sm" placeholder="Pernyataan {i + 1}..." />
+												<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-1.5 shrink-0 text-xs" on:click={() => openMediaPickerForOption('create', 'menjodohkan_left', i)} title="Media">🖼️</button>
+											</div>
+											<div class="flex items-center gap-2 pt-1.5 border-t border-slate-100">
+												<span class="text-xs font-medium text-slate-500">Pasangan Kunci:</span>
+												<select name="match_correct_{i}" class="select select-sm text-xs py-0.5 h-7 flex-1 bg-indigo-50/50 border-indigo-200 font-semibold text-indigo-700">
+													{#each Array(createMenjodohkanRightCount) as _, j}
+														<option value={String(j)} selected={j === i}>➔ Pilihan {String.fromCharCode(65 + j)}</option>
+													{/each}
+												</select>
+											</div>
+										</div>
+									{/each}
+								</div>
+
+								<div class="flex items-center gap-2 pt-1">
+									<button type="button" class="btn-ghost btn-sm text-indigo-600 hover:bg-indigo-50 text-xs" on:click={() => createMenjodohkanLeftCount++}>+ Tambah Pernyataan</button>
+									{#if createMenjodohkanLeftCount > 1}
+										<button type="button" class="btn-ghost btn-sm text-red-600 hover:bg-red-50 text-xs" on:click={() => createMenjodohkanLeftCount--}>- Kurangi</button>
+									{/if}
 								</div>
 							</div>
-						{/each}
-						<div class="flex items-center gap-2 mt-1">
-							<button type="button" class="btn-ghost btn-sm text-indigo-600 hover:bg-indigo-50" on:click={() => createMenjodohkanCount++}>+ Tambah Baris</button>
-							{#if createMenjodohkanCount > 1}
-								<button type="button" class="btn-ghost btn-sm text-red-600 hover:bg-red-50" on:click={() => removeEmptyMenjodohkanRow('create')}>- Kurangi Baris</button>
-							{/if}
+
+							<!-- Kolom Kanan: Pilihan Jawaban & Pengecoh -->
+							<div class="space-y-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+								<div class="flex items-center justify-between">
+									<span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Kolom Kanan (Pilihan & Pengecoh)</span>
+									<span class="text-xs text-slate-500 font-medium">{createMenjodohkanRightCount} pilihan</span>
+								</div>
+								
+								<div class="space-y-3">
+									{#each Array(createMenjodohkanRightCount) as _, j}
+										<div class="p-2.5 bg-white rounded-lg border border-slate-200 flex items-center gap-2">
+											<span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold flex items-center justify-center shrink-0">{String.fromCharCode(65 + j)}</span>
+											<input id="create_right_{j}" name="right_{j}" type="text" class="input input-sm w-full text-sm" placeholder="Pilihan {String.fromCharCode(65 + j)} (Jawaban / Pengecoh)..." />
+											<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-1.5 shrink-0 text-xs" on:click={() => openMediaPickerForOption('create', 'menjodohkan_right', j)} title="Media">🖼️</button>
+										</div>
+									{/each}
+								</div>
+
+								<div class="flex items-center gap-2 pt-1">
+									<button type="button" class="btn-ghost btn-sm text-emerald-600 hover:bg-emerald-50 text-xs" on:click={() => createMenjodohkanRightCount++}>+ Tambah Pilihan / Pengecoh</button>
+									{#if createMenjodohkanRightCount > 1}
+										<button type="button" class="btn-ghost btn-sm text-red-600 hover:bg-red-50 text-xs" on:click={() => createMenjodohkanRightCount--}>- Kurangi</button>
+									{/if}
+								</div>
+							</div>
 						</div>
 					</div>
 				{:else if selectedType === 'essay'}
@@ -871,14 +921,35 @@
 								{/each}
 							</div>
 						{:else if q.type === 'menjodohkan' && opts.left}
-							<div class="mt-2 text-xs text-slate-500">
+							{@const correctMap = q.correct_answer_json ? JSON.parse(q.correct_answer_json) : {}}
+							<div class="mt-2 text-xs space-y-1.5 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+								<div class="font-semibold text-slate-700 mb-1">Kunci Pasangan:</div>
 								{#each opts.left as l, i}
-									<div class="flex gap-2">
-										<span class="font-medium text-slate-700">{l}</span>
-										<span>→</span>
-										<span class="text-green-600">{opts.right[correct[i]]}</span>
+									{@const targetIdx = correctMap ? (correctMap[String(i)] ?? correctMap[i] ?? i) : i}
+									{@const targetLetter = String.fromCharCode(65 + Number(targetIdx))}
+									{@const targetText = opts.right?.[Number(targetIdx)] ?? '-'}
+									<div class="flex items-center gap-2 text-slate-600">
+										<span class="w-4 h-4 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+										<span class="font-medium text-slate-700 truncate max-w-[40%]">{@html l}</span>
+										<span class="text-indigo-500 font-bold">➔</span>
+										<span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold text-[10px] shrink-0">{targetLetter}</span>
+										<span class="text-slate-600 truncate flex-1">{@html targetText}</span>
 									</div>
 								{/each}
+								{#if opts.right && opts.right.length > opts.left.length}
+									{@const pairedRightIdxs = new Set(opts.left.map((_, i) => String(correctMap ? (correctMap[String(i)] ?? correctMap[i] ?? i) : i)))}
+									{@const distractors = opts.right.map((r, j) => ({ text: r, letter: String.fromCharCode(65 + j), idx: String(j) })).filter(item => !pairedRightIdxs.has(item.idx))}
+									{#if distractors.length > 0}
+										<div class="pt-1.5 mt-1.5 border-t border-slate-200/80 flex items-center gap-1.5 flex-wrap">
+											<span class="text-amber-700 font-semibold">Pilihan Pengecoh:</span>
+											{#each distractors as d}
+												<span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-medium border border-amber-200">
+													[{d.letter}] {@html d.text}
+												</span>
+											{/each}
+										</div>
+									{/if}
+								{/if}
 							</div>
 						{/if}
 					{/if}
@@ -914,7 +985,8 @@
 							}
 							if (q.type === 'menjodohkan' && q.options_json) {
 								const parsed = JSON.parse(q.options_json);
-								if (parsed.left) editMenjodohkanCount = parsed.left.length;
+								if (parsed.left) editMenjodohkanLeftCount = parsed.left.length;
+								if (parsed.right) editMenjodohkanRightCount = parsed.right.length;
 							}
 						}}>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -1164,25 +1236,75 @@
 						</div>
 					{:else if editingQuestion.type === 'menjodohkan'}
 						{@const opts = editingQuestion.options_json ? JSON.parse(editingQuestion.options_json) : {left:[], right:[]}}
-						<div class="space-y-2">
-							<label class="label">Pasangan (Kiri → Kanan)</label>
-							{#each Array(editMenjodohkanCount) as _, i}
-								<div class="grid grid-cols-2 gap-2">
-									<div class="flex gap-1">
-										<input id="edit_left_{i}" name="left_{i}" type="text" class="input w-full" value={opts.left?.[i] || ''} placeholder="Kiri {i + 1}" />
-										<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-2 shrink-0" on:click={() => openMediaPickerForOption('edit', 'menjodohkan_left', i)} title="Media">🖼️</button>
+						{@const correctMap = editingQuestion.correct_answer_json ? JSON.parse(editingQuestion.correct_answer_json) : {}}
+
+						<div class="space-y-4">
+							<div class="p-3 bg-amber-50/70 rounded-xl border border-amber-200 text-xs text-amber-800 flex items-center gap-2">
+								<span class="text-base">💡</span>
+								<span>Anda dapat menambahkan pilihan jawaban di Kolom Kanan lebih banyak dari Kolom Kiri sebagai <b>jawaban pengecoh (distractor)</b>. Tentukan pasangan kunci jawaban untuk tiap baris kiri.</span>
+							</div>
+
+							<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+								<!-- Kolom Kiri: Pernyataan -->
+								<div class="space-y-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+									<div class="flex items-center justify-between">
+										<span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Kolom Kiri (Pernyataan)</span>
+										<span class="text-xs text-slate-500 font-medium">{editMenjodohkanLeftCount} pernyataan</span>
 									</div>
-									<div class="flex gap-1">
-										<input id="edit_right_{i}" name="right_{i}" type="text" class="input w-full" value={opts.right?.[i] || ''} placeholder="Kanan {i + 1}" />
-										<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-2 shrink-0" on:click={() => openMediaPickerForOption('edit', 'menjodohkan_right', i)} title="Media">🖼️</button>
+									
+									<div class="space-y-3">
+										{#each Array(editMenjodohkanLeftCount) as _, i}
+											{@const defaultTarget = correctMap ? (correctMap[String(i)] ?? correctMap[i] ?? String(i)) : String(i)}
+											<div class="p-2.5 bg-white rounded-lg border border-slate-200 space-y-2">
+												<div class="flex items-center gap-2">
+													<span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+													<input id="edit_left_{i}" name="left_{i}" type="text" class="input input-sm w-full text-sm" placeholder="Pernyataan {i + 1}..." value={opts.left?.[i] || ''} />
+													<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-1.5 shrink-0 text-xs" on:click={() => openMediaPickerForOption('edit', 'menjodohkan_left', i)} title="Media">🖼️</button>
+												</div>
+												<div class="flex items-center gap-2 pt-1.5 border-t border-slate-100">
+													<span class="text-xs font-medium text-slate-500">Pasangan Kunci:</span>
+													<select name="match_correct_{i}" class="select select-sm text-xs py-0.5 h-7 flex-1 bg-indigo-50/50 border-indigo-200 font-semibold text-indigo-700" value={String(defaultTarget)}>
+														{#each Array(editMenjodohkanRightCount) as _, j}
+															<option value={String(j)}>➔ Pilihan {String.fromCharCode(65 + j)}</option>
+														{/each}
+													</select>
+												</div>
+											</div>
+										{/each}
+									</div>
+
+									<div class="flex items-center gap-2 pt-1">
+										<button type="button" class="btn-ghost btn-sm text-indigo-600 hover:bg-indigo-50 text-xs" on:click={() => editMenjodohkanLeftCount++}>+ Tambah Pernyataan</button>
+										{#if editMenjodohkanLeftCount > 1}
+											<button type="button" class="btn-ghost btn-sm text-red-600 hover:bg-red-50 text-xs" on:click={() => editMenjodohkanLeftCount--}>- Kurangi</button>
+										{/if}
 									</div>
 								</div>
-							{/each}
-							<div class="flex items-center gap-2 mt-1">
-								<button type="button" class="btn-ghost btn-sm text-indigo-600 hover:bg-indigo-50" on:click={() => editMenjodohkanCount++}>+ Tambah Baris</button>
-								{#if editMenjodohkanCount > 1}
-									<button type="button" class="btn-ghost btn-sm text-red-600 hover:bg-red-50" on:click={() => removeEmptyMenjodohkanRow('edit')}>- Kurangi Baris</button>
-								{/if}
+
+								<!-- Kolom Kanan: Pilihan Jawaban & Pengecoh -->
+								<div class="space-y-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+									<div class="flex items-center justify-between">
+										<span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Kolom Kanan (Pilihan & Pengecoh)</span>
+										<span class="text-xs text-slate-500 font-medium">{editMenjodohkanRightCount} pilihan</span>
+									</div>
+									
+									<div class="space-y-3">
+										{#each Array(editMenjodohkanRightCount) as _, j}
+											<div class="p-2.5 bg-white rounded-lg border border-slate-200 flex items-center gap-2">
+												<span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold flex items-center justify-center shrink-0">{String.fromCharCode(65 + j)}</span>
+												<input id="edit_right_{j}" name="right_{j}" type="text" class="input input-sm w-full text-sm" placeholder="Pilihan {String.fromCharCode(65 + j)} (Jawaban / Pengecoh)..." value={opts.right?.[j] || ''} />
+												<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-1.5 shrink-0 text-xs" on:click={() => openMediaPickerForOption('edit', 'menjodohkan_right', j)} title="Media">🖼️</button>
+											</div>
+										{/each}
+									</div>
+
+									<div class="flex items-center gap-2 pt-1">
+										<button type="button" class="btn-ghost btn-sm text-emerald-600 hover:bg-emerald-50 text-xs" on:click={() => editMenjodohkanRightCount++}>+ Tambah Pilihan / Pengecoh</button>
+										{#if editMenjodohkanRightCount > 1}
+											<button type="button" class="btn-ghost btn-sm text-red-600 hover:bg-red-50 text-xs" on:click={() => editMenjodohkanRightCount--}>- Kurangi</button>
+										{/if}
+									</div>
+								</div>
 							</div>
 						</div>
 					{:else if editingQuestion.type === 'essay'}

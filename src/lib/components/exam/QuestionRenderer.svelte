@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount, tick } from 'svelte';
 	import AudioPlayer from './AudioPlayer.svelte';
 	import { QUESTION_TYPE_LABELS } from '$lib/utils/constants';
 	import { mathRender } from '$lib/actions/mathRender';
@@ -105,6 +105,110 @@
 		benarSalahAnswers = {};
 	}
 
+	// Matching Color Palette & Interactive Line Logic
+	const MATCH_COLORS = [
+		{ border: 'border-blue-500', bg: 'bg-blue-50/90', ring: 'ring-blue-400', badge: 'bg-blue-600 text-white', stroke: '#3b82f6', hex: '#3b82f6' },
+		{ border: 'border-emerald-500', bg: 'bg-emerald-50/90', ring: 'ring-emerald-400', badge: 'bg-emerald-600 text-white', stroke: '#10b981', hex: '#10b981' },
+		{ border: 'border-purple-500', bg: 'bg-purple-50/90', ring: 'ring-purple-400', badge: 'bg-purple-600 text-white', stroke: '#8b5cf6', hex: '#8b5cf6' },
+		{ border: 'border-amber-500', bg: 'bg-amber-50/90', ring: 'ring-amber-400', badge: 'bg-amber-600 text-white', stroke: '#f59e0b', hex: '#f59e0b' },
+		{ border: 'border-rose-500', bg: 'bg-rose-50/90', ring: 'ring-rose-400', badge: 'bg-rose-600 text-white', stroke: '#f43f5e', hex: '#f43f5e' },
+		{ border: 'border-cyan-500', bg: 'bg-cyan-50/90', ring: 'ring-cyan-400', badge: 'bg-cyan-600 text-white', stroke: '#06b6d4', hex: '#06b6d4' },
+		{ border: 'border-indigo-500', bg: 'bg-indigo-50/90', ring: 'ring-indigo-400', badge: 'bg-indigo-600 text-white', stroke: '#6366f1', hex: '#6366f1' },
+		{ border: 'border-orange-500', bg: 'bg-orange-50/90', ring: 'ring-orange-400', badge: 'bg-orange-600 text-white', stroke: '#f97316', hex: '#f97316' },
+	];
+
+	let selectedLeftIdx: number | null = null;
+	let selectedRightIdx: number | null = null;
+	let matchingContainerEl: HTMLDivElement | null = null;
+	let connectionLines: Array<{ x1: number; y1: number; x2: number; y2: number; color: string; leftIdx: number; rightIdx: number }> = [];
+
+	function selectLeftItem(idx: number) {
+		if (selectedLeftIdx === idx) {
+			selectedLeftIdx = null;
+		} else {
+			selectedLeftIdx = idx;
+			if (selectedRightIdx !== null) {
+				handleMatchingConnect(idx, selectedRightIdx);
+				selectedLeftIdx = null;
+				selectedRightIdx = null;
+			}
+		}
+	}
+
+	function selectRightItem(idx: number) {
+		if (selectedRightIdx === idx) {
+			selectedRightIdx = null;
+		} else {
+			selectedRightIdx = idx;
+			if (selectedLeftIdx !== null) {
+				handleMatchingConnect(selectedLeftIdx, idx);
+				selectedLeftIdx = null;
+				selectedRightIdx = null;
+			}
+		}
+	}
+
+	function handleMatchingConnect(leftIdx: number, rightIdx: number) {
+		matchingAnswers[String(leftIdx)] = String(rightIdx);
+		matchingAnswers = { ...matchingAnswers };
+		dispatch('answer', { questionId: question.id, answer: JSON.stringify(matchingAnswers) });
+		recalculateLines();
+	}
+
+	function removeMatchingPair(leftIdx: number, e?: Event) {
+		if (e) e.stopPropagation();
+		delete matchingAnswers[String(leftIdx)];
+		matchingAnswers = { ...matchingAnswers };
+		dispatch('answer', { questionId: question.id, answer: JSON.stringify(matchingAnswers) });
+		recalculateLines();
+	}
+
+	function recalculateLines() {
+		if (!matchingContainerEl || safeType !== 'menjodohkan') return;
+		tick().then(() => {
+			if (!matchingContainerEl) return;
+			const containerRect = matchingContainerEl.getBoundingClientRect();
+			const lines: typeof connectionLines = [];
+
+			Object.entries(matchingAnswers).forEach(([leftKey, rightVal]) => {
+				const leftI = parseInt(leftKey, 10);
+				const rightI = parseInt(String(rightVal), 10);
+				if (isNaN(leftI) || isNaN(rightI)) return;
+
+				const leftPort = document.getElementById(`match-port-left-${question.id}-${leftI}`);
+				const rightPort = document.getElementById(`match-port-right-${question.id}-${rightI}`);
+
+				if (leftPort && rightPort) {
+					const lRect = leftPort.getBoundingClientRect();
+					const rRect = rightPort.getBoundingClientRect();
+					
+					const x1 = lRect.left + lRect.width / 2 - containerRect.left;
+					const y1 = lRect.top + lRect.height / 2 - containerRect.top;
+					const x2 = rRect.left + rRect.width / 2 - containerRect.left;
+					const y2 = rRect.top + rRect.height / 2 - containerRect.top;
+
+					const color = MATCH_COLORS[leftI % MATCH_COLORS.length].stroke;
+					lines.push({ x1, y1, x2, y2, color, leftIdx: leftI, rightIdx: rightI });
+				}
+			});
+
+			connectionLines = lines;
+		});
+	}
+
+	$: if (safeType === 'menjodohkan' && (matchingAnswers || matchingLeft || matchingRight)) {
+		recalculateLines();
+	}
+
+	onMount(() => {
+		if (safeType === 'menjodohkan') {
+			recalculateLines();
+			const handleResize = () => recalculateLines();
+			window.addEventListener('resize', handleResize);
+			return () => window.removeEventListener('resize', handleResize);
+		}
+	});
+
 	function handleAnswer(value: string) {
 		dispatch('answer', { questionId: question.id, answer: value });
 	}
@@ -121,8 +225,11 @@
 	}
 
 	function handleMatchingChange(leftIndex: string, rightIndex: string) {
-		matchingAnswers[leftIndex] = rightIndex;
-		dispatch('answer', { questionId: question.id, answer: JSON.stringify(matchingAnswers) });
+		if (rightIndex === '') {
+			removeMatchingPair(Number(leftIndex));
+		} else {
+			handleMatchingConnect(Number(leftIndex), Number(rightIndex));
+		}
 	}
 
 	function handleBenarSalahChange(index: number, val: 'Benar' | 'Salah') {
@@ -374,26 +481,164 @@
 			></textarea>
 
 		{:else if safeType === 'menjodohkan'}
-			<!-- Matching -->
-			<div class="space-y-3">
-				{#each matchingLeft as leftItem, leftIdx}
-					<div class="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200">
-						<span class="flex-1 text-sm font-medium text-slate-700 prose prose-sm max-w-none">{@html leftItem}</span>
-						<svg class="w-5 h-5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-						</svg>
-						<select
-							class="select max-w-[200px]"
-							value={matchingAnswers[String(leftIdx)] ?? ''}
-							on:change={(e) => handleMatchingChange(String(leftIdx), e.currentTarget.value)}
-						>
-							<option value="">-- Pilih --</option>
-							{#each matchingRight as rightItem, rightIdx}
-								<option value={String(rightIdx)}>{rightItem}</option>
-							{/each}
-						</select>
+			<!-- Interactive Matching Table with Connecting Lines -->
+			<div class="relative space-y-3" bind:this={matchingContainerEl}>
+				<!-- Guidance Banner -->
+				<div class="flex items-center justify-between p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl text-xs text-indigo-800">
+					<div class="flex items-center gap-2">
+						<span class="text-base">🔗</span>
+						<span><b>Petunjuk Menjodohkan:</b> Klik pernyataan di kiri lalu klik jawaban pasangannya di kanan untuk menghubungkan.</span>
 					</div>
-				{/each}
+					{#if Object.keys(matchingAnswers).length > 0}
+						<span class="font-semibold px-2 py-0.5 bg-indigo-200/70 rounded-full text-indigo-900 text-[11px] shrink-0">
+							{Object.keys(matchingAnswers).length} dari {matchingLeft.length} terhubung
+						</span>
+					{/if}
+				</div>
+
+				<!-- SVG Line Overlay (Desktop/Tablet) -->
+				<svg class="absolute inset-0 w-full h-full pointer-events-none z-20 hidden sm:block">
+					{#each connectionLines as line}
+						{@const dx = (line.x2 - line.x1) * 0.5}
+						<!-- Glow background path -->
+						<path
+							d="M {line.x1} {line.y1} C {line.x1 + dx} {line.y1}, {line.x2 - dx} {line.y2}, {line.x2} {line.y2}"
+							fill="none"
+							stroke={line.color}
+							stroke-width="7"
+							stroke-opacity="0.25"
+							stroke-linecap="round"
+						/>
+						<!-- Solid line -->
+						<path
+							d="M {line.x1} {line.y1} C {line.x1 + dx} {line.y1}, {line.x2 - dx} {line.y2}, {line.x2} {line.y2}"
+							fill="none"
+							stroke={line.color}
+							stroke-width="3"
+							stroke-linecap="round"
+						/>
+						<circle cx={line.x1} cy={line.y1} r="5" fill={line.color} stroke="#ffffff" stroke-width="2" />
+						<circle cx={line.x2} cy={line.y2} r="5" fill={line.color} stroke="#ffffff" stroke-width="2" />
+					{/each}
+				</svg>
+
+				<!-- Matching Columns Grid -->
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
+					<!-- Left Column: Pernyataan -->
+					<div class="space-y-3">
+						<div class="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Kolom Kiri (Pernyataan)</div>
+						{#each matchingLeft as leftItem, leftIdx}
+							{@const hasMatch = matchingAnswers[String(leftIdx)] !== undefined}
+							{@const matchedRightIdx = hasMatch ? Number(matchingAnswers[String(leftIdx)]) : null}
+							{@const pairColor = hasMatch ? MATCH_COLORS[leftIdx % MATCH_COLORS.length] : null}
+							{@const isSelected = selectedLeftIdx === leftIdx}
+							
+							<div 
+								role="button"
+								tabindex="0"
+								class="relative flex items-center justify-between gap-3 p-3.5 rounded-2xl border-2 transition-all duration-200 cursor-pointer select-none text-left
+									{hasMatch ? `${pairColor.bg} ${pairColor.border} shadow-sm` : (isSelected ? 'border-indigo-600 bg-indigo-50/70 ring-4 ring-indigo-500/20 shadow-md' : 'border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50/70')}"
+								on:click={() => selectLeftItem(leftIdx)}
+								on:keydown={(e) => e.key === 'Enter' && selectLeftItem(leftIdx)}
+							>
+								<div class="flex items-start gap-2.5 flex-1 min-w-0">
+									<span class="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 transition-colors
+										{hasMatch ? pairColor.badge : (isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600')}">
+										{leftIdx + 1}
+									</span>
+									<div class="flex-1 min-w-0">
+										<div class="text-sm font-medium {hasMatch ? 'text-slate-900 font-semibold' : 'text-slate-700'} prose prose-sm max-w-none">
+											{@html leftItem}
+										</div>
+										{#if hasMatch && matchedRightIdx !== null}
+											<div class="flex items-center gap-1.5 mt-2 flex-wrap">
+												<span class="px-2 py-0.5 rounded-md text-[11px] font-bold {pairColor.badge} shadow-xs">
+													➔ Terhubung: [{String.fromCharCode(65 + matchedRightIdx)}] {matchingRight[matchedRightIdx] || ''}
+												</span>
+												<button 
+													type="button" 
+													class="px-1.5 py-0.5 rounded text-[11px] bg-white/80 hover:bg-red-50 text-slate-500 hover:text-red-600 border border-slate-200 transition-colors"
+													on:click={(e) => removeMatchingPair(leftIdx, e)}
+													title="Hapus Sambungan"
+												>
+													✕ Lepas
+												</button>
+											</div>
+										{/if}
+									</div>
+								</div>
+
+								<!-- Connector Port Right -->
+								<div 
+									id="match-port-left-{question.id}-{leftIdx}"
+									class="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ml-1
+										{hasMatch ? `${pairColor.border} bg-white shadow-sm ring-2 ${pairColor.ring}` : (isSelected ? 'border-indigo-600 bg-indigo-600 ring-4 ring-indigo-500/30' : 'border-slate-300 bg-slate-100')}"
+								>
+									{#if hasMatch}
+										<div class="w-2.5 h-2.5 rounded-full" style="background-color: {pairColor.hex};"></div>
+									{:else if isSelected}
+										<div class="w-2.5 h-2.5 rounded-full bg-white animate-ping"></div>
+									{/if}
+								</div>
+							</div>
+						{/each}
+					</div>
+
+					<!-- Right Column: Pilihan Jawaban & Pengecoh -->
+					<div class="space-y-3">
+						<div class="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Kolom Kanan (Pilihan & Pengecoh)</div>
+						{#each matchingRight as rightItem, rightIdx}
+							{@const matchedLeftKeys = Object.keys(matchingAnswers).filter(k => matchingAnswers[k] === String(rightIdx))}
+							{@const isMatched = matchedLeftKeys.length > 0}
+							{@const primaryLeftIdx = isMatched ? Number(matchedLeftKeys[0]) : null}
+							{@const pairColor = isMatched && primaryLeftIdx !== null ? MATCH_COLORS[primaryLeftIdx % MATCH_COLORS.length] : null}
+							{@const isSelected = selectedRightIdx === rightIdx}
+							
+							<div 
+								role="button"
+								tabindex="0"
+								class="relative flex items-center justify-between gap-3 p-3.5 rounded-2xl border-2 transition-all duration-200 cursor-pointer select-none text-left
+									{isMatched ? `${pairColor.bg} ${pairColor.border} shadow-sm` : (isSelected ? 'border-indigo-600 bg-indigo-50/70 ring-4 ring-indigo-500/20 shadow-md' : 'border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50/70')}"
+								on:click={() => selectRightItem(rightIdx)}
+								on:keydown={(e) => e.key === 'Enter' && selectRightItem(rightIdx)}
+							>
+								<!-- Connector Port Left -->
+								<div 
+									id="match-port-right-{question.id}-{rightIdx}"
+									class="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all mr-1
+										{isMatched ? `${pairColor.border} bg-white shadow-sm ring-2 ${pairColor.ring}` : (isSelected ? 'border-indigo-600 bg-indigo-600 ring-4 ring-indigo-500/30' : 'border-slate-300 bg-slate-100')}"
+								>
+									{#if isMatched}
+										<div class="w-2.5 h-2.5 rounded-full" style="background-color: {pairColor.hex};"></div>
+									{:else if isSelected}
+										<div class="w-2.5 h-2.5 rounded-full bg-white animate-ping"></div>
+									{/if}
+								</div>
+
+								<div class="flex items-start gap-2.5 flex-1 min-w-0">
+									<span class="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 transition-colors
+										{isMatched ? pairColor.badge : (isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600')}">
+										{String.fromCharCode(65 + rightIdx)}
+									</span>
+									<div class="flex-1 min-w-0">
+										<div class="text-sm font-medium {isMatched ? 'text-slate-900 font-semibold' : 'text-slate-700'} prose prose-sm max-w-none">
+											{@html rightItem}
+										</div>
+										{#if isMatched}
+											<div class="flex items-center gap-1.5 mt-2 flex-wrap">
+												{#each matchedLeftKeys as lKey}
+													<span class="px-2 py-0.5 rounded-md text-[11px] font-bold {MATCH_COLORS[Number(lKey) % MATCH_COLORS.length].badge} shadow-xs">
+														Pasangan No. {Number(lKey) + 1}
+													</span>
+												{/each}
+											</div>
+										{/if}
+									</div>
+								</div>
+							</div>
+						{/each}
+					</div>
+				</div>
 			</div>
 		{/if}
 	</div>

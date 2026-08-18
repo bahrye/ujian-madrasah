@@ -56,11 +56,17 @@ function _page($$renderer, $$props) {
         $$renderer2.push("<!--[-1-->");
         if (ans.type === "menjodohkan") {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<div class="space-y-2 text-sm bg-white p-2 rounded border border-slate-200"><!--[-->`);
-          const each_array_1 = ensure_array_like(Object.entries(JSON.parse(ans.answer_given)));
+          const opts = safeParseJson(ans.options_json, { left: [], right: [] });
+          $$renderer2.push(`<div class="space-y-1.5 text-xs bg-white p-2.5 rounded-lg border border-slate-200"><!--[-->`);
+          const each_array_1 = ensure_array_like(Object.entries(safeParseJson(ans.answer_given, {})));
           for (let $$index = 0, $$length2 = each_array_1.length; $$index < $$length2; $$index++) {
             let [key, value] = each_array_1[$$index];
-            $$renderer2.push(`<div class="flex border-b border-slate-100 last:border-0 pb-1 last:pb-0"><span class="font-medium text-slate-600 w-1/2">${escape_html(key)}</span> <span class="text-slate-800 w-1/2">-> ${escape_html(value)}</span></div>`);
+            const lIdx = parseInt(key);
+            const rIdx = parseInt(String(value));
+            const lText = opts.left?.[lIdx] || `No. ${lIdx + 1}`;
+            const rLetter = !isNaN(rIdx) ? String.fromCharCode(65 + rIdx) : "-";
+            const rText = opts.right?.[rIdx] || value;
+            $$renderer2.push(`<div class="flex items-center gap-1.5 py-0.5 border-b border-slate-100 last:border-0"><span class="px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 font-bold shrink-0">${escape_html(lIdx + 1)}</span> <span class="font-medium text-slate-700 truncate max-w-[45%]">${html(lText)}</span> <span class="text-indigo-500 font-bold">➔</span> <span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold shrink-0">${escape_html(rLetter)}</span> <span class="text-slate-600 truncate flex-1">${html(rText)}</span></div>`);
           }
           $$renderer2.push(`<!--]--></div>`);
         } else if (ans.type === "pilihan_ganda") {
@@ -143,11 +149,17 @@ function _page($$renderer, $$props) {
           $$renderer2.push("<!--[0-->");
           if (ans.type === "menjodohkan") {
             $$renderer2.push("<!--[0-->");
-            $$renderer2.push(`<div class="space-y-2 text-sm bg-emerald-50 p-2 rounded border border-emerald-100"><!--[-->`);
+            const opts = safeParseJson(ans.options_json, { left: [], right: [] });
+            $$renderer2.push(`<div class="space-y-1.5 text-xs bg-emerald-50/70 p-2.5 rounded-lg border border-emerald-200"><!--[-->`);
             const each_array_4 = ensure_array_like(safeParseObjectEntries(ans.correct_answer_json));
             for (let $$index_3 = 0, $$length2 = each_array_4.length; $$index_3 < $$length2; $$index_3++) {
               let [key, value] = each_array_4[$$index_3];
-              $$renderer2.push(`<div class="flex border-b border-emerald-200/50 last:border-0 pb-1 last:pb-0"><span class="font-medium text-emerald-800 w-1/2">${escape_html(key)}</span> <span class="text-emerald-900 w-1/2">-> ${escape_html(value)}</span></div>`);
+              const lIdx = parseInt(key);
+              const rIdx = parseInt(String(value));
+              const lText = opts.left?.[lIdx] || `No. ${lIdx + 1}`;
+              const rLetter = !isNaN(rIdx) ? String.fromCharCode(65 + rIdx) : "-";
+              const rText = opts.right?.[rIdx] || value;
+              $$renderer2.push(`<div class="flex items-center gap-1.5 py-0.5 border-b border-emerald-200/50 last:border-0"><span class="px-1.5 py-0.5 rounded bg-emerald-200 text-emerald-800 font-bold shrink-0">${escape_html(lIdx + 1)}</span> <span class="font-medium text-emerald-900 truncate max-w-[45%]">${html(lText)}</span> <span class="text-emerald-600 font-bold">➔</span> <span class="px-1.5 py-0.5 rounded bg-emerald-700 text-white font-bold shrink-0">${escape_html(rLetter)}</span> <span class="text-emerald-800 truncate flex-1">${html(rText)}</span></div>`);
             }
             $$renderer2.push(`<!--]--></div>`);
           } else if (ans.type === "pilihan_ganda") {

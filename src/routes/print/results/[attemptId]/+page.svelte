@@ -228,11 +228,20 @@
 									<p class="italic text-slate-400">Tidak dijawab</p>
 								{:else}
 									{#if ans.type === 'menjodohkan'}
+										{@const opts = safeParseJson(ans.options_json, {left:[], right:[]})}
 										<div class="space-y-0.5 text-[10px]">
-											{#each Object.entries(JSON.parse(ans.answer_given)) as [key, value]}
-												<div class="flex border-b border-slate-200/50 last:border-0 pb-0.5">
-													<span class="font-medium text-slate-700 w-1/2">{key}</span>
-													<span class="text-slate-900 w-1/2">➔ {value}</span>
+											{#each Object.entries(safeParseJson(ans.answer_given, {})) as [key, value]}
+												{@const lIdx = parseInt(key)}
+												{@const rIdx = parseInt(String(value))}
+												{@const lText = opts.left?.[lIdx] || `No. ${lIdx + 1}`}
+												{@const rLetter = !isNaN(rIdx) ? String.fromCharCode(65 + rIdx) : '-'}
+												{@const rText = opts.right?.[rIdx] || value}
+												<div class="flex items-center gap-1 border-b border-slate-200/50 last:border-0 pb-0.5">
+													<span class="font-bold text-slate-800">[{lIdx + 1}]</span>
+													<span class="text-slate-700 truncate max-w-[45%]">{@html lText}</span>
+													<span class="text-indigo-600 font-bold">➔</span>
+													<span class="font-bold text-slate-900">[{rLetter}]</span>
+													<span class="text-slate-800 truncate flex-1">{@html rText}</span>
 												</div>
 											{/each}
 										</div>
@@ -295,11 +304,20 @@
 								{:else}
 									{#if ans.correct_answer_json}
 										{#if ans.type === 'menjodohkan'}
+											{@const opts = safeParseJson(ans.options_json, {left:[], right:[]})}
 											<div class="space-y-0.5 text-[10px]">
 												{#each safeParseObjectEntries(ans.correct_answer_json) as [key, value]}
-													<div class="flex border-b border-emerald-200/60 last:border-0 pb-0.5">
-														<span class="font-medium text-emerald-900 w-1/2">{key}</span>
-														<span class="text-emerald-950 font-bold w-1/2">➔ {value}</span>
+													{@const lIdx = parseInt(key)}
+													{@const rIdx = parseInt(String(value))}
+													{@const lText = opts.left?.[lIdx] || `No. ${lIdx + 1}`}
+													{@const rLetter = !isNaN(rIdx) ? String.fromCharCode(65 + rIdx) : '-'}
+													{@const rText = opts.right?.[rIdx] || value}
+													<div class="flex items-center gap-1 border-b border-emerald-200/60 last:border-0 pb-0.5">
+														<span class="font-bold text-emerald-900">[{lIdx + 1}]</span>
+														<span class="text-emerald-800 truncate max-w-[45%]">{@html lText}</span>
+														<span class="text-emerald-600 font-bold">➔</span>
+														<span class="font-bold text-emerald-950">[{rLetter}]</span>
+														<span class="text-emerald-900 truncate flex-1">{@html rText}</span>
 													</div>
 												{/each}
 											</div>

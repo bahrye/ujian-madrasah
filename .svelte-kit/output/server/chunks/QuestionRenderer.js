@@ -74,6 +74,75 @@ function QuestionRenderer($$renderer, $$props) {
     let matchingAnswers = {};
     let complexAnswers = [];
     let benarSalahAnswers = {};
+    const MATCH_COLORS = [
+      {
+        border: "border-blue-500",
+        bg: "bg-blue-50/90",
+        ring: "ring-blue-400",
+        badge: "bg-blue-600 text-white",
+        stroke: "#3b82f6",
+        hex: "#3b82f6"
+      },
+      {
+        border: "border-emerald-500",
+        bg: "bg-emerald-50/90",
+        ring: "ring-emerald-400",
+        badge: "bg-emerald-600 text-white",
+        stroke: "#10b981",
+        hex: "#10b981"
+      },
+      {
+        border: "border-purple-500",
+        bg: "bg-purple-50/90",
+        ring: "ring-purple-400",
+        badge: "bg-purple-600 text-white",
+        stroke: "#8b5cf6",
+        hex: "#8b5cf6"
+      },
+      {
+        border: "border-amber-500",
+        bg: "bg-amber-50/90",
+        ring: "ring-amber-400",
+        badge: "bg-amber-600 text-white",
+        stroke: "#f59e0b",
+        hex: "#f59e0b"
+      },
+      {
+        border: "border-rose-500",
+        bg: "bg-rose-50/90",
+        ring: "ring-rose-400",
+        badge: "bg-rose-600 text-white",
+        stroke: "#f43f5e",
+        hex: "#f43f5e"
+      },
+      {
+        border: "border-cyan-500",
+        bg: "bg-cyan-50/90",
+        ring: "ring-cyan-400",
+        badge: "bg-cyan-600 text-white",
+        stroke: "#06b6d4",
+        hex: "#06b6d4"
+      },
+      {
+        border: "border-indigo-500",
+        bg: "bg-indigo-50/90",
+        ring: "ring-indigo-400",
+        badge: "bg-indigo-600 text-white",
+        stroke: "#6366f1",
+        hex: "#6366f1"
+      },
+      {
+        border: "border-orange-500",
+        bg: "bg-orange-50/90",
+        ring: "ring-orange-400",
+        badge: "bg-orange-600 text-white",
+        stroke: "#f97316",
+        hex: "#f97316"
+      }
+    ];
+    let selectedLeftIdx = null;
+    let selectedRightIdx = null;
+    let connectionLines = [];
     const optionLetters = ["A", "B", "C", "D", "E", "F", "G", "H"];
     function getDirectUrl(url) {
       if (!url) return "";
@@ -255,34 +324,100 @@ function QuestionRenderer($$renderer, $$props) {
       $$renderer2.push(`</textarea>`);
     } else if (safeType === "menjodohkan") {
       $$renderer2.push("<!--[4-->");
-      $$renderer2.push(`<div class="space-y-3"><!--[-->`);
-      const each_array_3 = ensure_array_like(matchingLeft);
-      for (let leftIdx = 0, $$length = each_array_3.length; leftIdx < $$length; leftIdx++) {
-        let leftItem = each_array_3[leftIdx];
-        $$renderer2.push(`<div class="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200"><span class="flex-1 text-sm font-medium text-slate-700 prose prose-sm max-w-none">${html(leftItem)}</span> <svg class="w-5 h-5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg> `);
-        $$renderer2.select(
-          {
-            class: "select max-w-[200px]",
-            value: matchingAnswers[String(leftIdx)] ?? ""
-          },
-          ($$renderer3) => {
-            $$renderer3.option({ value: "" }, ($$renderer4) => {
-              $$renderer4.push(`-- Pilih --`);
-            });
-            $$renderer3.push(`<!--[-->`);
-            const each_array_4 = ensure_array_like(matchingRight);
-            for (let rightIdx = 0, $$length2 = each_array_4.length; rightIdx < $$length2; rightIdx++) {
-              let rightItem = each_array_4[rightIdx];
-              $$renderer3.option({ value: String(rightIdx) }, ($$renderer4) => {
-                $$renderer4.push(`${escape_html(rightItem)}`);
-              });
-            }
-            $$renderer3.push(`<!--]-->`);
-          }
-        );
-        $$renderer2.push(`</div>`);
+      $$renderer2.push(`<div class="relative space-y-3"><div class="flex items-center justify-between p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl text-xs text-indigo-800"><div class="flex items-center gap-2"><span class="text-base">🔗</span> <span><b>Petunjuk Menjodohkan:</b> Klik pernyataan di kiri lalu klik jawaban pasangannya di kanan untuk menghubungkan.</span></div> `);
+      if (Object.keys(matchingAnswers).length > 0) {
+        $$renderer2.push("<!--[0-->");
+        $$renderer2.push(`<span class="font-semibold px-2 py-0.5 bg-indigo-200/70 rounded-full text-indigo-900 text-[11px] shrink-0">${escape_html(Object.keys(matchingAnswers).length)} dari ${escape_html(matchingLeft.length)} terhubung</span>`);
+      } else {
+        $$renderer2.push("<!--[-1-->");
       }
-      $$renderer2.push(`<!--]--></div>`);
+      $$renderer2.push(`<!--]--></div> <svg class="absolute inset-0 w-full h-full pointer-events-none z-20 hidden sm:block"><!--[-->`);
+      const each_array_3 = ensure_array_like(connectionLines);
+      for (let $$index_3 = 0, $$length = each_array_3.length; $$index_3 < $$length; $$index_3++) {
+        let line = each_array_3[$$index_3];
+        const dx = (line.x2 - line.x1) * 0.5;
+        $$renderer2.push(`<path${attr("d", `M ${stringify(line.x1)} ${stringify(line.y1)} C ${stringify(line.x1 + dx)} ${stringify(line.y1)}, ${stringify(line.x2 - dx)} ${stringify(line.y2)}, ${stringify(line.x2)} ${stringify(line.y2)}`)} fill="none"${attr("stroke", line.color)} stroke-width="7" stroke-opacity="0.25" stroke-linecap="round"></path><path${attr("d", `M ${stringify(line.x1)} ${stringify(line.y1)} C ${stringify(line.x1 + dx)} ${stringify(line.y1)}, ${stringify(line.x2 - dx)} ${stringify(line.y2)}, ${stringify(line.x2)} ${stringify(line.y2)}`)} fill="none"${attr("stroke", line.color)} stroke-width="3" stroke-linecap="round"></path><circle${attr("cx", line.x1)}${attr("cy", line.y1)} r="5"${attr("fill", line.color)} stroke="#ffffff" stroke-width="2"></circle><circle${attr("cx", line.x2)}${attr("cy", line.y2)} r="5"${attr("fill", line.color)} stroke="#ffffff" stroke-width="2"></circle>`);
+      }
+      $$renderer2.push(`<!--]--></svg> <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10"><div class="space-y-3"><div class="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Kolom Kiri (Pernyataan)</div> <!--[-->`);
+      const each_array_4 = ensure_array_like(matchingLeft);
+      for (let leftIdx = 0, $$length = each_array_4.length; leftIdx < $$length; leftIdx++) {
+        let leftItem = each_array_4[leftIdx];
+        const hasMatch = matchingAnswers[String(leftIdx)] !== void 0;
+        const matchedRightIdx = hasMatch ? Number(matchingAnswers[String(leftIdx)]) : null;
+        const pairColor = hasMatch ? MATCH_COLORS[leftIdx % MATCH_COLORS.length] : null;
+        const isSelected = selectedLeftIdx === leftIdx;
+        $$renderer2.push(`<div role="button" tabindex="0"${attr_class(
+          `relative flex items-center justify-between gap-3 p-3.5 rounded-2xl border-2 transition-all duration-200 cursor-pointer select-none text-left ${hasMatch ? `${pairColor.bg} ${pairColor.border} shadow-sm` : isSelected ? "border-indigo-600 bg-indigo-50/70 ring-4 ring-indigo-500/20 shadow-md" : "border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50/70"}`,
+          "svelte-v7h8kb"
+        )}><div class="flex items-start gap-2.5 flex-1 min-w-0"><span${attr_class(
+          `w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 transition-colors ${stringify(hasMatch ? pairColor.badge : isSelected ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-600")}`,
+          "svelte-v7h8kb"
+        )}>${escape_html(leftIdx + 1)}</span> <div class="flex-1 min-w-0"><div${attr_class(`text-sm font-medium ${hasMatch ? "text-slate-900 font-semibold" : "text-slate-700"} prose prose-sm max-w-none`)}>${html(leftItem)}</div> `);
+        if (hasMatch && matchedRightIdx !== null) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<div class="flex items-center gap-1.5 mt-2 flex-wrap"><span${attr_class(`px-2 py-0.5 rounded-md text-[11px] font-bold ${stringify(pairColor.badge)} shadow-xs`, "svelte-v7h8kb")}>➔ Terhubung: [${escape_html(String.fromCharCode(65 + matchedRightIdx))}] ${escape_html(matchingRight[matchedRightIdx] || "")}</span> <button type="button" class="px-1.5 py-0.5 rounded text-[11px] bg-white/80 hover:bg-red-50 text-slate-500 hover:text-red-600 border border-slate-200 transition-colors" title="Hapus Sambungan">✕ Lepas</button></div>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+        }
+        $$renderer2.push(`<!--]--></div></div> <div${attr("id", `match-port-left-${stringify(question.id)}-${stringify(leftIdx)}`)}${attr_class(
+          `w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ml-1 ${hasMatch ? `${pairColor.border} bg-white shadow-sm ring-2 ${pairColor.ring}` : isSelected ? "border-indigo-600 bg-indigo-600 ring-4 ring-indigo-500/30" : "border-slate-300 bg-slate-100"}`,
+          "svelte-v7h8kb"
+        )}>`);
+        if (hasMatch) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<div class="w-2.5 h-2.5 rounded-full"${attr_style(`background-color: ${stringify(pairColor.hex)};`)}></div>`);
+        } else if (isSelected) {
+          $$renderer2.push("<!--[1-->");
+          $$renderer2.push(`<div class="w-2.5 h-2.5 rounded-full bg-white animate-ping"></div>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+        }
+        $$renderer2.push(`<!--]--></div></div>`);
+      }
+      $$renderer2.push(`<!--]--></div> <div class="space-y-3"><div class="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Kolom Kanan (Pilihan &amp; Pengecoh)</div> <!--[-->`);
+      const each_array_5 = ensure_array_like(matchingRight);
+      for (let rightIdx = 0, $$length = each_array_5.length; rightIdx < $$length; rightIdx++) {
+        let rightItem = each_array_5[rightIdx];
+        const matchedLeftKeys = Object.keys(matchingAnswers).filter((k) => matchingAnswers[k] === String(rightIdx));
+        const isMatched = matchedLeftKeys.length > 0;
+        const primaryLeftIdx = isMatched ? Number(matchedLeftKeys[0]) : null;
+        const pairColor = isMatched && primaryLeftIdx !== null ? MATCH_COLORS[primaryLeftIdx % MATCH_COLORS.length] : null;
+        const isSelected = selectedRightIdx === rightIdx;
+        $$renderer2.push(`<div role="button" tabindex="0"${attr_class(
+          `relative flex items-center justify-between gap-3 p-3.5 rounded-2xl border-2 transition-all duration-200 cursor-pointer select-none text-left ${isMatched ? `${pairColor.bg} ${pairColor.border} shadow-sm` : isSelected ? "border-indigo-600 bg-indigo-50/70 ring-4 ring-indigo-500/20 shadow-md" : "border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50/70"}`,
+          "svelte-v7h8kb"
+        )}><div${attr("id", `match-port-right-${stringify(question.id)}-${stringify(rightIdx)}`)}${attr_class(
+          `w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all mr-1 ${isMatched ? `${pairColor.border} bg-white shadow-sm ring-2 ${pairColor.ring}` : isSelected ? "border-indigo-600 bg-indigo-600 ring-4 ring-indigo-500/30" : "border-slate-300 bg-slate-100"}`,
+          "svelte-v7h8kb"
+        )}>`);
+        if (isMatched) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<div class="w-2.5 h-2.5 rounded-full"${attr_style(`background-color: ${stringify(pairColor.hex)};`)}></div>`);
+        } else if (isSelected) {
+          $$renderer2.push("<!--[1-->");
+          $$renderer2.push(`<div class="w-2.5 h-2.5 rounded-full bg-white animate-ping"></div>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+        }
+        $$renderer2.push(`<!--]--></div> <div class="flex items-start gap-2.5 flex-1 min-w-0"><span${attr_class(
+          `w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 transition-colors ${stringify(isMatched ? pairColor.badge : isSelected ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-600")}`,
+          "svelte-v7h8kb"
+        )}>${escape_html(String.fromCharCode(65 + rightIdx))}</span> <div class="flex-1 min-w-0"><div${attr_class(`text-sm font-medium ${isMatched ? "text-slate-900 font-semibold" : "text-slate-700"} prose prose-sm max-w-none`)}>${html(rightItem)}</div> `);
+        if (isMatched) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<div class="flex items-center gap-1.5 mt-2 flex-wrap"><!--[-->`);
+          const each_array_6 = ensure_array_like(matchedLeftKeys);
+          for (let $$index_5 = 0, $$length2 = each_array_6.length; $$index_5 < $$length2; $$index_5++) {
+            let lKey = each_array_6[$$index_5];
+            $$renderer2.push(`<span${attr_class(`px-2 py-0.5 rounded-md text-[11px] font-bold ${stringify(MATCH_COLORS[Number(lKey) % MATCH_COLORS.length].badge)} shadow-xs`, "svelte-v7h8kb")}>Pasangan No. ${escape_html(Number(lKey) + 1)}</span>`);
+          }
+          $$renderer2.push(`<!--]--></div>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+        }
+        $$renderer2.push(`<!--]--></div></div></div>`);
+      }
+      $$renderer2.push(`<!--]--></div></div></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }

@@ -129,20 +129,28 @@ export const actions: Actions = {
 		} else if (type === 'isian_singkat' || type === 'essay') {
 			correctAnswerJson = JSON.stringify(form.get('correct_answer')?.toString().trim() || '');
 		} else if (type === 'menjodohkan') {
-			const leftItems = [];
-			const rightItems = [];
-			for (let i = 0; i < 20; i++) {
+			const leftItems: string[] = [];
+			const rightItems: string[] = [];
+			const mapping: Record<string, string> = {};
+
+			for (let i = 0; i < 50; i++) {
 				const l = form.get(`left_${i}`)?.toString().trim();
-				const r = form.get(`right_${i}`)?.toString().trim();
-				if (l && r) {
+				if (l) {
+					const leftIdx = leftItems.length;
 					leftItems.push(l);
+					const correctRight = form.get(`match_correct_${i}`)?.toString() || String(leftIdx);
+					mapping[String(leftIdx)] = correctRight;
+				}
+			}
+
+			for (let j = 0; j < 50; j++) {
+				const r = form.get(`right_${j}`)?.toString().trim();
+				if (r) {
 					rightItems.push(r);
 				}
 			}
+
 			optionsJson = JSON.stringify({ left: leftItems, right: rightItems });
-			// Correct mapping: index i left maps to index i right
-			const mapping: Record<string, string> = {};
-			leftItems.forEach((_, i) => { mapping[String(i)] = String(i); });
 			correctAnswerJson = JSON.stringify(mapping);
 		}
 		// essay: no options or correct answer
@@ -240,26 +248,29 @@ export const actions: Actions = {
 		} else if (type === 'isian_singkat' || type === 'essay') {
 			correctAnswerJson = JSON.stringify(form.get('correct_answer')?.toString().trim() || '');
 		} else if (type === 'menjodohkan') {
-			const leftItems = [];
-			const rightItems = [];
-			for (let i = 0; i < 20; i++) {
+			const leftItems: string[] = [];
+			const rightItems: string[] = [];
+			const mapping: Record<string, string> = {};
+
+			for (let i = 0; i < 50; i++) {
 				const l = form.get(`left_${i}`)?.toString().trim();
-				const r = form.get(`right_${i}`)?.toString().trim();
-				if (l && r) {
+				if (l) {
+					const leftIdx = leftItems.length;
 					leftItems.push(l);
+					const correctRight = form.get(`match_correct_${i}`)?.toString() || String(leftIdx);
+					mapping[String(leftIdx)] = correctRight;
+				}
+			}
+
+			for (let j = 0; j < 50; j++) {
+				const r = form.get(`right_${j}`)?.toString().trim();
+				if (r) {
 					rightItems.push(r);
 				}
 			}
+
 			optionsJson = JSON.stringify({ left: leftItems, right: rightItems });
-			
-			const prevMap = await db.prepare('SELECT correct_answer_json FROM questions WHERE id = ?').bind(parsedId).first<{correct_answer_json: string}>();
-			if (prevMap && prevMap.correct_answer_json) {
-				correctAnswerJson = prevMap.correct_answer_json; 
-			} else {
-				const mapping: Record<string, string> = {};
-				leftItems.forEach((_, i) => { mapping[String(i)] = String(i); });
-				correctAnswerJson = JSON.stringify(mapping);
-			}
+			correctAnswerJson = JSON.stringify(mapping);
 		}
 
 		try {
