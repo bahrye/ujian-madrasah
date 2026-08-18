@@ -2,10 +2,33 @@
 	import { enhance } from '$app/forms';
 	import Toast from '$lib/components/ui/Toast.svelte';
 	import PasswordInput from '$lib/components/ui/PasswordInput.svelte';
+	import QrScannerModal from '$lib/components/auth/QrScannerModal.svelte';
 
 	export let form: { error?: string } | null;
 
 	let loading = false;
+	let showQrModal = false;
+	let username = '';
+	let password = '';
+	let formElement: HTMLFormElement;
+
+	function handleQrScan(event: CustomEvent<{ username: string; password: string }>) {
+		const { username: scannedUser, password: scannedPass } = event.detail;
+		username = scannedUser;
+		password = scannedPass;
+		showQrModal = false;
+
+		// Automatically submit the form with scanned credentials
+		setTimeout(() => {
+			if (formElement) {
+				if (typeof formElement.requestSubmit === 'function') {
+					formElement.requestSubmit();
+				} else {
+					formElement.submit();
+				}
+			}
+		}, 150);
+	}
 </script>
 
 <svelte:head>
@@ -13,6 +36,12 @@
 </svelte:head>
 
 <Toast />
+
+<QrScannerModal
+	show={showQrModal}
+	on:close={() => (showQrModal = false)}
+	on:scan={handleQrScan}
+/>
 
 <div class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-primary-950 via-primary-900 to-violet-900 relative overflow-hidden">
 	<!-- Background decoration -->
@@ -49,6 +78,7 @@
 			<!-- Login Form -->
 			<form
 				method="POST"
+				bind:this={formElement}
 				use:enhance={() => {
 					loading = true;
 					return async ({ update }) => {
@@ -56,7 +86,7 @@
 						await update();
 					};
 				}}
-				class="space-y-5"
+				class="space-y-4"
 			>
 				<div>
 					<label for="username" class="label">Username</label>
@@ -69,6 +99,7 @@
 							name="username"
 							type="text"
 							required
+							bind:value={username}
 							class="input pl-10"
 							placeholder="Masukkan username"
 							autocomplete="username"
@@ -83,6 +114,7 @@
 						name="password"
 						required={true}
 						iconLeft={true}
+						bind:value={password}
 						placeholder="Masukkan kata sandi"
 						autocomplete="current-password"
 					/>
@@ -91,7 +123,7 @@
 				<button
 					type="submit"
 					disabled={loading}
-					class="btn-primary w-full justify-center py-3 text-base"
+					class="btn-primary w-full justify-center py-3 text-base shadow-lg shadow-indigo-600/20"
 				>
 					{#if loading}
 						<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -103,6 +135,27 @@
 						Masuk
 					{/if}
 				</button>
+
+				<!-- Divider -->
+				<div class="relative flex items-center justify-center my-3">
+					<div class="border-t border-slate-200 w-full"></div>
+					<span class="bg-white/80 px-3 text-xs text-slate-400 font-medium uppercase tracking-wider absolute">atau</span>
+				</div>
+
+				<!-- QR Code Login Button -->
+				<button
+					type="button"
+					on:click={() => (showQrModal = true)}
+					disabled={loading}
+					class="w-full flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl border-2 border-indigo-200/80 hover:border-indigo-500 bg-indigo-50/60 hover:bg-indigo-50 text-indigo-700 font-semibold text-sm transition-all duration-200 hover:shadow-md hover:shadow-indigo-100 active:scale-[0.99] group"
+				>
+					<div class="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+						</svg>
+					</div>
+					<span>Login dengan Kode QR</span>
+				</button>
 			</form>
 		</div>
 
@@ -112,3 +165,4 @@
 		</p>
 	</div>
 </div>
+

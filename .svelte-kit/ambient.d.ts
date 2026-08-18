@@ -56,7 +56,6 @@ declare module '$env/static/private' {
 	export const COLORTERM: string;
 	export const CommonProgramFiles: string;
 	export const GIT_ASKPASS: string;
-	export const EFC_21480_3789132940: string;
 	export const PROCESSOR_IDENTIFIER: string;
 	export const npm_config_userconfig: string;
 	export const COMPUTERNAME: string;
@@ -65,14 +64,14 @@ declare module '$env/static/private' {
 	export const C_EM64T_REDIST11: string;
 	export const OneDrive: string;
 	export const LANG: string;
-	export const EFC_21480_1592913036: string;
 	export const DriverData: string;
-	export const EFC_21480_1262719628: string;
-	export const EFC_21480_2283032206: string;
-	export const npm_lifecycle_script: string;
-	export const EFC_21480_2775293581: string;
-	export const HOMEPATH: string;
-	export const EFC_21480_4126798990: string;
+	export const EFC_2384_1262719628: string;
+	export const PROCESSOR_REVISION: string;
+	export const EFC_2384_1592913036: string;
+	export const EFC_2384_2283032206: string;
+	export const EFC_2384_2775293581: string;
+	export const EFC_2384_3789132940: string;
+	export const EFC_2384_4126798990: string;
 	export const GOPATH: string;
 	export const npm_config_global_prefix: string;
 	export const VSCODE_GIT_ASKPASS_EXTRA_ARGS: string;
@@ -80,6 +79,7 @@ declare module '$env/static/private' {
 	export const ProgramFiles: string;
 	export const npm_package_version: string;
 	export const HOMEDRIVE: string;
+	export const HOMEPATH: string;
 	export const INIT_CWD: string;
 	export const Path: string;
 	export const npm_lifecycle_event: string;
@@ -96,6 +96,7 @@ declare module '$env/static/private' {
 	export const npm_config_prefix: string;
 	export const OS: string;
 	export const npm_config_user_agent: string;
+	export const npm_lifecycle_script: string;
 	export const npm_node_execpath: string;
 	export const npm_package_json: string;
 	export const npm_package_name: string;
@@ -103,7 +104,6 @@ declare module '$env/static/private' {
 	export const PATHEXT: string;
 	export const PROCESSOR_ARCHITECTURE: string;
 	export const PROCESSOR_LEVEL: string;
-	export const PROCESSOR_REVISION: string;
 	export const ProgramW6432: string;
 	export const PROMPT: string;
 	export const PSModulePath: string;
@@ -230,7 +230,6 @@ declare module '$env/dynamic/private' {
 		COLORTERM: string;
 		CommonProgramFiles: string;
 		GIT_ASKPASS: string;
-		EFC_21480_3789132940: string;
 		PROCESSOR_IDENTIFIER: string;
 		npm_config_userconfig: string;
 		COMPUTERNAME: string;
@@ -239,14 +238,14 @@ declare module '$env/dynamic/private' {
 		C_EM64T_REDIST11: string;
 		OneDrive: string;
 		LANG: string;
-		EFC_21480_1592913036: string;
 		DriverData: string;
-		EFC_21480_1262719628: string;
-		EFC_21480_2283032206: string;
-		npm_lifecycle_script: string;
-		EFC_21480_2775293581: string;
-		HOMEPATH: string;
-		EFC_21480_4126798990: string;
+		EFC_2384_1262719628: string;
+		PROCESSOR_REVISION: string;
+		EFC_2384_1592913036: string;
+		EFC_2384_2283032206: string;
+		EFC_2384_2775293581: string;
+		EFC_2384_3789132940: string;
+		EFC_2384_4126798990: string;
 		GOPATH: string;
 		npm_config_global_prefix: string;
 		VSCODE_GIT_ASKPASS_EXTRA_ARGS: string;
@@ -254,6 +253,7 @@ declare module '$env/dynamic/private' {
 		ProgramFiles: string;
 		npm_package_version: string;
 		HOMEDRIVE: string;
+		HOMEPATH: string;
 		INIT_CWD: string;
 		Path: string;
 		npm_lifecycle_event: string;
@@ -270,6 +270,7 @@ declare module '$env/dynamic/private' {
 		npm_config_prefix: string;
 		OS: string;
 		npm_config_user_agent: string;
+		npm_lifecycle_script: string;
 		npm_node_execpath: string;
 		npm_package_json: string;
 		npm_package_name: string;
@@ -277,7 +278,6 @@ declare module '$env/dynamic/private' {
 		PATHEXT: string;
 		PROCESSOR_ARCHITECTURE: string;
 		PROCESSOR_LEVEL: string;
-		PROCESSOR_REVISION: string;
 		ProgramW6432: string;
 		PROMPT: string;
 		PSModulePath: string;

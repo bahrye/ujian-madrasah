@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { generateStudentQrData, getQrCodeImageUrl } from '$lib/utils/qrLogin';
+
 	export let data;
 	$: school = data.school as any;
 	$: examType = data.examType as any;
@@ -23,17 +25,6 @@
 		if (place) return place;
 		if (date) return date;
 		return '-';
-	}
-
-	function getQrData(p: any): string {
-		let qr = `Nama: ${p.student_name}\n`;
-		qr += `TTL: ${getTtl(p)}\n`;
-		qr += `Kelas: ${p.class_name || '-'}\n`;
-		if (p.display_nomor_peserta && p.display_nomor_peserta !== '-') {
-			qr += `No. Peserta: ${p.display_nomor_peserta}\n`;
-		}
-		qr += `NISN: ${p.display_nisn}`;
-		return qr;
 	}
 </script>
 
@@ -92,8 +83,8 @@
 							<p class="text-[9px] text-slate-700 leading-tight mt-0.5">{school.address}</p>
 						{/if}
 					</div>
-					<!-- QR Code (berada di kanan atas) -->
-					<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://ujian-madrasah.pages.dev" alt="QR Code" class="w-14 h-14 object-contain mix-blend-multiply" title="Scan untuk akses" />
+					<!-- QR Code Login Siswa (berada di kanan atas) -->
+					<img src={getQrCodeImageUrl(generateStudentQrData(p.login_username || p.username, p.login_password || p.nisn))} alt="QR Login" class="w-14 h-14 object-contain mix-blend-multiply" title="Scan QR untuk Login Siswa" />
 				</div>
 
 				<!-- Body Kartu -->
@@ -184,7 +175,7 @@
 						<p class="font-bold text-xs uppercase leading-tight">{examType.name || 'UJIAN'}</p>
 						<p class="font-bold text-xs uppercase leading-tight">{school?.name || 'NAMA SEKOLAH'}</p>
 					</div>
-					<img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data={encodeURIComponent(getQrData(p))}" alt="QR" class="w-10 h-10 flex-shrink-0" />
+					<img src={getQrCodeImageUrl(generateStudentQrData(p.login_username || p.username, p.login_password || p.nisn), 80)} alt="QR Login" class="w-10 h-10 flex-shrink-0" title="Scan QR untuk Login Siswa" />
 				</div>
 
 				<!-- Body: Data full-width -->

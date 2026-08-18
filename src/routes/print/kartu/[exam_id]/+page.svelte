@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { parseProctors } from '$lib/utils/format';
+	import { generateStudentQrData, getQrCodeImageUrl } from '$lib/utils/qrLogin';
 
 	export let data;
 	$: school = data.school as any;
@@ -46,8 +47,8 @@
 							<p class="text-[9px] text-slate-700 leading-tight mt-0.5">{school.address}</p>
 						{/if}
 					</div>
-					<!-- QR Code (berada di kanan atas) -->
-					<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://ujian-madrasah.pages.dev" alt="QR Code" class="w-14 h-14 object-contain mix-blend-multiply" title="Scan untuk akses" />
+					<!-- QR Code Login Siswa (berada di kanan atas) -->
+					<img src={getQrCodeImageUrl(generateStudentQrData(p.login_username || p.username, p.login_password || p.nisn))} alt="QR Login" class="w-14 h-14 object-contain mix-blend-multiply" title="Scan QR untuk Login Siswa" />
 				</div>
 
 				<!-- Body Kartu -->
@@ -101,7 +102,7 @@
 								<div class="grid grid-cols-[80px_8px_1fr] items-baseline">
 									<span class="text-slate-600">Password</span>
 									<span>:</span>
-									<span class="font-mono bg-slate-100 px-1 border border-slate-200 rounded">{p.plain_password || '******'}</span>
+									<span class="font-mono bg-slate-100 px-1 border border-slate-200 rounded">{p.login_password || p.plain_password || p.nisn || '******'}</span>
 								</div>
 							</div>
 						</div>

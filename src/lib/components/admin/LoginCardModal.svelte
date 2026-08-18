@@ -1,5 +1,6 @@
 <script lang="ts">
   import { parseDate } from '$lib/utils/date';
+  import { generateStudentQrData, getQrCodeImageUrl } from '$lib/utils/qrLogin';
 
   export let show = false;
   export let classes: { id: number | string; name: string }[] = [];
@@ -120,6 +121,13 @@
             <div class="url-row">
               <div class="url-label">&#127758; Link Akses</div>
               <div class="url-value">${escapeHtml(loginUrl)}</div>
+            </div>
+            <div style="margin-top:8px;display:flex;align-items:center;gap:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:6px 10px;">
+              <img src="${escapeHtml(getQrCodeImageUrl(generateStudentQrData(s.username, s.nisn || s.username), 100))}" alt="QR" style="width:44px;height:44px;flex-shrink:0;border-radius:6px;" />
+              <div style="font-size:9px;line-height:1.2;color:#64748b;">
+                <strong style="color:#4f46e5;display:block;font-size:10px;margin-bottom:2px;">QR Login Ujian</strong>
+                Scan dengan kamera untuk login otomatis
+              </div>
             </div>
           </div>
           <div class="card-footer">Simpan kartu ini baik-baik &#183; Jangan bagikan ke orang lain</div>
@@ -372,6 +380,13 @@
                     <div class="bg-indigo-50 border border-indigo-100 rounded-xl px-3 py-2 text-center">
                       <p class="text-[9px] font-bold text-indigo-500 uppercase tracking-wider mb-0.5">🌐 Link Akses</p>
                       <p class="text-xs font-bold text-indigo-700 break-all">{getLoginUrl()}</p>
+                    </div>
+                    <div class="flex items-center gap-3 bg-slate-50 border border-slate-200/80 rounded-xl p-2.5">
+                      <img src={getQrCodeImageUrl(generateStudentQrData(filteredStudents[0].username, filteredStudents[0].nisn || filteredStudents[0].username), 80)} alt="QR" class="w-11 h-11 rounded-lg bg-white p-0.5 border border-slate-200 flex-shrink-0" />
+                      <div class="min-w-0">
+                        <p class="text-[10px] font-bold text-indigo-900 leading-tight">QR Login Ujian</p>
+                        <p class="text-[9px] text-slate-500 mt-0.5">Scan langsung untuk login otomatis</p>
+                      </div>
                     </div>
                   </div>
                 </div>
