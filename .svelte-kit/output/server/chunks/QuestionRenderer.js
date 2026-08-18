@@ -1,4 +1,5 @@
 import { m as fallback, k as attr, j as attr_class, a as attr_style, e as escape_html, f as bind_props, c as stringify, i as ensure_array_like } from "./index.js";
+import { o as onDestroy } from "./index-server.js";
 import { Q as QUESTION_TYPE_LABELS } from "./constants.js";
 import "katex/dist/contrib/auto-render.mjs";
 /* empty css                                               */
@@ -53,6 +54,39 @@ function AudioPlayer($$renderer, $$props) {
     }
     $$renderer2.push(`<!--]-->`);
     bind_props($$props, { src, maxPlays });
+  });
+}
+function ImageZoomModal($$renderer, $$props) {
+  $$renderer.component(($$renderer2) => {
+    let zoomPercentage;
+    let src = fallback($$props["src"], null);
+    let alt = fallback($$props["alt"], "Pratinjau Gambar");
+    let isOpen = fallback($$props["isOpen"], false);
+    let scale = 1;
+    const minScale = 1;
+    const maxScale = 4;
+    const stepScale = 0.1;
+    let translateX = 0;
+    let translateY = 0;
+    onDestroy(() => {
+    });
+    zoomPercentage = Math.round(scale * 100);
+    if (isOpen && src) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<div class="fixed inset-0 z-[999999] bg-slate-950/90 backdrop-blur-md flex flex-col justify-between select-none overflow-hidden animate-in fade-in duration-200" role="dialog" aria-modal="true" aria-label="Penampil Gambar" tabindex="-1"><div class="relative z-20 flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4 bg-gradient-to-b from-slate-950/90 via-slate-950/60 to-transparent"><div class="flex items-center gap-2.5 text-white"><div class="p-1.5 rounded-lg bg-indigo-600/30 border border-indigo-500/40 text-indigo-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg></div> <div><h3 class="text-sm sm:text-base font-semibold text-slate-100 leading-tight">Perbesar Gambar Soal</h3> <p class="text-[11px] sm:text-xs text-slate-400 hidden sm:block">Gunakan slider zoom di bawah atau geser gambar untuk melihat detail</p></div></div> <button type="button" class="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 hover:bg-rose-600/80 active:bg-rose-700 text-white/80 hover:text-white border border-white/20 hover:border-rose-400 transition-all duration-150 shadow-lg cursor-pointer" title="Tutup (Esc)" aria-label="Tutup penampil gambar"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>  <div${attr_class("relative flex-1 w-full h-full flex items-center justify-center overflow-hidden p-2 sm:p-6", void 0, {
+        "cursor-grab": scale > 1,
+        "cursor-grabbing": scale > 1,
+        "cursor-zoom-in": scale === 1
+      })}><img${attr("src", src)}${attr("alt", alt)} draggable="false" class="max-w-[92vw] max-h-[72vh] sm:max-h-[76vh] object-contain shadow-2xl rounded-lg pointer-events-none select-none transition-transform duration-75 ease-out"${attr_style(`transform: translate(${stringify(translateX)}px, ${stringify(translateY)}px) scale(${stringify(scale)}); transform-origin: center center;`)}/></div> <div class="relative z-20 pb-4 sm:pb-6 px-3 flex flex-col items-center gap-2"><div class="flex items-center gap-2 sm:gap-4 px-3 sm:px-5 py-2 sm:py-2.5 rounded-2xl bg-slate-900/90 border border-slate-700/80 shadow-2xl backdrop-blur-lg max-w-full overflow-x-auto"><button type="button" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 flex items-center justify-center transition-colors border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed shrink-0"${attr("disabled", scale <= minScale, true)} title="Perkecil (-)"><svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"></path></svg></button> <div class="flex items-center gap-2 min-w-[120px] sm:min-w-[180px] md:min-w-[220px]"><input type="range"${attr("min", minScale)}${attr("max", maxScale)}${attr("step", stepScale)}${attr("value", scale)} class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500 hover:accent-indigo-400 focus:outline-none" aria-label="Tingkat Zoom Gambar"/></div> <button type="button" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 flex items-center justify-center transition-colors border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed shrink-0"${attr("disabled", scale >= maxScale, true)} title="Perbesar (+)"><svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg></button> <div class="h-6 w-px bg-slate-700/80 shrink-0"></div> <button type="button" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs sm:text-sm font-semibold text-indigo-300 hover:text-white border border-slate-700 transition-colors flex items-center gap-1.5 shrink-0" title="Reset Zoom ke 100%"><span>${escape_html(zoomPercentage)}%</span> `);
+      {
+        $$renderer2.push("<!--[-1-->");
+      }
+      $$renderer2.push(`<!--]--></button> <div class="h-6 w-px bg-slate-700/80 shrink-0"></div> <button type="button" class="px-3 sm:px-4 py-1.5 rounded-xl bg-rose-600/20 hover:bg-rose-600 active:bg-rose-700 text-rose-300 hover:text-white text-xs sm:text-sm font-semibold border border-rose-500/30 hover:border-rose-500 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg> <span>Tutup</span></button></div> <div class="text-[11px] text-slate-400 font-medium text-center flex items-center gap-2"><span>💡 Klik ganda untuk zoom cepat</span> <span class="text-slate-600">•</span> <span>Geser gambar saat diperbesar</span></div></div></div>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]-->`);
+    bind_props($$props, { src, alt, isOpen });
   });
 }
 function QuestionRenderer($$renderer, $$props) {
@@ -177,6 +211,7 @@ function QuestionRenderer($$renderer, $$props) {
       }
       return url;
     }
+    let lightboxImage = null;
     {
       const raw = question?.options_json;
       if (raw) {
@@ -253,7 +288,7 @@ function QuestionRenderer($$renderer, $$props) {
     )}</span> <div><span class="badge-primary text-[10px]">${escape_html(QUESTION_TYPE_LABELS[question.type] || question.type)}</span> <span class="text-xs text-slate-400 ml-2">${escape_html(question.points)} poin</span></div></div> <button${attr_class(`btn-sm ${isDoubted ? "bg-amber-100 text-amber-700 border-2 border-amber-400" : "btn-ghost border border-slate-200"}`)}><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg> ${escape_html(isDoubted ? "Diragu-ragukan" : "Ragu-ragu")}</button></div> `);
     if (question.media_type === "image" && directMediaUrl) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="rounded-xl overflow-hidden border border-slate-200 bg-white"><img${attr("src", directMediaUrl)}${attr("alt", `Media soal ${stringify(question.question_number)}`)} class="max-w-full h-auto max-h-80 mx-auto object-contain" loading="lazy"/></div>`);
+      $$renderer2.push(`<div class="rounded-xl overflow-hidden border border-slate-200 bg-white hover:border-indigo-300 transition-colors shadow-xs"><img${attr("src", directMediaUrl)}${attr("alt", `Media soal ${stringify(question.question_number)}`)} class="max-w-full h-auto max-h-80 mx-auto object-contain cursor-zoom-in hover:opacity-95 transition-opacity" loading="lazy" title="Klik untuk memperbesar gambar"/></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
@@ -431,10 +466,12 @@ function QuestionRenderer($$renderer, $$props) {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]--></div></div> `);
-    {
-      $$renderer2.push("<!--[-1-->");
-    }
-    $$renderer2.push(`<!--]-->`);
+    ImageZoomModal($$renderer2, {
+      src: lightboxImage,
+      isOpen: false,
+      alt: `Gambar Soal ${stringify(displayNumber !== void 0 ? displayNumber : question.question_number)}`
+    });
+    $$renderer2.push(`<!---->`);
     bind_props($$props, { question, answer, isDoubted, displayNumber });
   });
 }

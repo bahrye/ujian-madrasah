@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher, onMount, tick } from 'svelte';
 	import AudioPlayer from './AudioPlayer.svelte';
+	import ImageZoomModal from './ImageZoomModal.svelte';
 	import { QUESTION_TYPE_LABELS } from '$lib/utils/constants';
 	import { mathRender } from '$lib/actions/mathRender';
 	import { arabicRender } from '$lib/actions/arabicRender';
@@ -327,12 +328,13 @@
 
 	<!-- Media -->
 	{#if question.media_type === 'image' && directMediaUrl}
-		<div class="rounded-xl overflow-hidden border border-slate-200 bg-white">
+		<div class="rounded-xl overflow-hidden border border-slate-200 bg-white hover:border-indigo-300 transition-colors shadow-xs">
 			<img
 				src={directMediaUrl}
 				alt="Media soal {question.question_number}"
-				class="max-w-full h-auto max-h-80 mx-auto object-contain"
+				class="max-w-full h-auto max-h-80 mx-auto object-contain cursor-zoom-in hover:opacity-95 transition-opacity"
 				loading="lazy"
+				title="Klik untuk memperbesar gambar"
 			/>
 		</div>
 	{/if}
@@ -680,27 +682,13 @@
 	</div>
 </div>
 
-<!-- Fullscreen Image Lightbox -->
-{#if lightboxImage}
-	<div 
-		class="fixed inset-0 z-[99999] bg-slate-900/95 flex items-center justify-center p-4 backdrop-blur-sm transition-all duration-300"
-		on:click={() => lightboxImage = null}
-		on:keydown={(e) => e.key === 'Escape' && (lightboxImage = null)}
-		tabindex="-1"
-		role="dialog"
-	>
-		<button type="button" class="absolute top-4 right-4 md:top-6 md:right-6 text-white/50 hover:text-white p-2 bg-white/10 hover:bg-white/20 rounded-full transition-all z-10" on:click={() => lightboxImage = null} title="Tutup">
-			<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-		</button>
-		<img 
-			src={lightboxImage} 
-			alt="Gambar Layar Penuh" 
-			class="max-w-full max-h-[95vh] object-contain cursor-move shadow-2xl rounded-lg"
-			on:click|stopPropagation
-			use:pinchZoom
-		/>
-	</div>
-{/if}
+<!-- Fullscreen Image Lightbox with Zoom Bar -->
+<ImageZoomModal
+	src={lightboxImage}
+	isOpen={!!lightboxImage}
+	alt="Gambar Soal {displayNumber !== undefined ? displayNumber : question.question_number}"
+	on:close={() => (lightboxImage = null)}
+/>
 
 <style>
 	/* Memaksa elemen media di dalam opsi untuk merentang penuh dan membuang margin tak perlu */
@@ -713,5 +701,19 @@
 	.option-content :global(img) {
 		margin-top: 0 !important;
 		margin-bottom: 0 !important;
+		cursor: zoom-in !important;
+		border-radius: 0.5rem;
+		transition: transform 0.15s ease, box-shadow 0.15s ease;
+	}
+	.option-content :global(img:hover) {
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	}
+	:global(.prose img) {
+		cursor: zoom-in !important;
+		border-radius: 0.5rem;
+		transition: transform 0.15s ease, box-shadow 0.15s ease;
+	}
+	:global(.prose img:hover) {
+		box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
 	}
 </style>
