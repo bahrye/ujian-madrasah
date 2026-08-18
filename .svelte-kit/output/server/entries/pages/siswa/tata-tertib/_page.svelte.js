@@ -129,8 +129,13 @@ function _page($$renderer) {
       ],
       sampleQuestion: {
         id: 101,
+        type: "pilihan_ganda",
+        question_number: 1,
+        points: 1,
+        media_type: null,
+        media_url: null,
+        audio_max_plays: 3,
         question_text: "<p>Ibukota negara Republik Indonesia yang baru adalah...</p>",
-        question_type: "pilihan_ganda",
         options_json: JSON.stringify(["Jakarta", "Nusantara (IKN)", "Surabaya", "Bandung"])
       }
     },
@@ -148,12 +153,17 @@ function _page($$renderer) {
       ],
       sampleQuestion: {
         id: 102,
+        type: "pilihan_ganda_kompleks",
+        question_number: 1,
+        points: 1,
+        media_type: null,
+        media_url: null,
+        audio_max_plays: 3,
         question_text: "<p>Manakah dari pernyataan berikut yang merupakan rukun Islam? <i>(Pilih semua yang benar)</i></p>",
-        question_type: "pilihan_ganda_kompleks",
         options_json: JSON.stringify([
           "Membaca Dua Kalimat Syahadat",
           "Mendirikan Shalat 5 Waktu",
-          "Menuntut Ilmu",
+          "Menuntut Ilmu ke Luar Negeri",
           "Menunaikan Zakat"
         ])
       }
@@ -172,8 +182,13 @@ function _page($$renderer) {
       ],
       sampleQuestion: {
         id: 103,
+        type: "benar_salah",
+        question_number: 1,
+        points: 1,
+        media_type: null,
+        media_url: null,
+        audio_max_plays: 3,
         question_text: "<p>Matahari terbit dari sebelah barat dan tenggelam di sebelah timur.</p>",
-        question_type: "benar_salah",
         options_json: JSON.stringify([])
       }
     },
@@ -191,8 +206,13 @@ function _page($$renderer) {
       ],
       sampleQuestion: {
         id: 104,
+        type: "benar_salah",
+        question_number: 1,
+        points: 1,
+        media_type: null,
+        media_url: null,
+        audio_max_plays: 3,
         question_text: "<p>Tentukan Benar atau Salah untuk setiap pernyataan matematika di bawah ini:</p>",
-        question_type: "benar_salah",
         options_json: JSON.stringify({
           statements: [
             "Hasil dari $5 + 3 \\times 2$ adalah $11$.",
@@ -217,8 +237,13 @@ function _page($$renderer) {
       ],
       sampleQuestion: {
         id: 105,
+        type: "menjodohkan",
+        question_number: 1,
+        points: 1,
+        media_type: null,
+        media_url: null,
+        audio_max_plays: 3,
         question_text: "<p>Jodohkan nama surah dalam Al-Qur'an dengan artinya yang tepat:</p>",
-        question_type: "menjodohkan",
         options_json: JSON.stringify({
           left: ["Al-Fatihah", "Al-Ikhlas", "Al-Falaq"],
           right: [
@@ -245,8 +270,13 @@ function _page($$renderer) {
       ],
       sampleQuestion: {
         id: 106,
+        type: "isian_singkat",
+        question_number: 1,
+        points: 1,
+        media_type: null,
+        media_url: null,
+        audio_max_plays: 3,
         question_text: "<p>Berapa jumlah rukun iman dalam ajaran agama Islam?</p>",
-        question_type: "isian_singkat",
         options_json: JSON.stringify([])
       }
     },
@@ -264,8 +294,13 @@ function _page($$renderer) {
       ],
       sampleQuestion: {
         id: 107,
+        type: "essay",
+        question_number: 1,
+        points: 1,
+        media_type: null,
+        media_url: null,
+        audio_max_plays: 3,
         question_text: "<p>Jelaskan secara singkat hikmah puasa di bulan Ramadhan bagi pembentukan karakter seorang muslim!</p>",
-        question_type: "essay",
         options_json: JSON.stringify([])
       }
     }
