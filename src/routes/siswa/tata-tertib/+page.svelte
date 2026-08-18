@@ -126,6 +126,18 @@
 		demoAnswers = { ...demoAnswers };
 	}
 
+	function nextType() {
+		const currentIdx = questionTypes.findIndex(t => t.id === activeTypeTab);
+		const nextIdx = (currentIdx + 1) % questionTypes.length;
+		activeTypeTab = questionTypes[nextIdx].id;
+	}
+
+	function prevType() {
+		const currentIdx = questionTypes.findIndex(t => t.id === activeTypeTab);
+		const prevIdx = (currentIdx - 1 + questionTypes.length) % questionTypes.length;
+		activeTypeTab = questionTypes[prevIdx].id;
+	}
+
 	const questionTypes = [
 		{
 			id: 'pilihan_ganda',
@@ -605,9 +617,9 @@
 		</div>
 	</div>
 
-	<!-- Panduan Tipe-Tipe Soal Ujian (Interactive Showcase & Simulation) -->
-	<div class="bg-white rounded-3xl p-6 md:p-10 border border-slate-200 shadow-sm relative overflow-hidden">
-		<div class="text-center max-w-2xl mx-auto mb-8 relative z-10">
+	<!-- Panduan Tipe-Tipe Soal Ujian (Wide Layout & Previous/Next Navigation) -->
+	<div class="bg-white rounded-3xl p-6 md:p-10 border border-slate-200 shadow-sm relative overflow-hidden space-y-8">
+		<div class="text-center max-w-2xl mx-auto relative z-10">
 			<span class="text-indigo-600 font-semibold tracking-wider uppercase text-sm mb-2 block">Format Soal</span>
 			<h2 class="text-3xl font-bold text-slate-800 mb-3">Mengenal Tipe-Tipe Soal Ujian</h2>
 			<p class="text-slate-500 text-sm md:text-base">
@@ -616,13 +628,13 @@
 
 			<!-- Question Type Selector Pills -->
 			<div class="flex items-center justify-center gap-2 mt-6 flex-wrap">
-				{#each questionTypes as qType}
+				{#each questionTypes as qType, idx}
 					<button
 						type="button"
 						on:click={() => activeTypeTab = qType.id}
 						class="px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold transition-all flex items-center gap-2 border
 							{activeTypeTab === qType.id 
-								? 'bg-slate-900 text-white border-slate-900 shadow-sm ring-2 ring-slate-900/10' 
+								? 'bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-600/20 ring-2 ring-indigo-500/20' 
 								: 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300'}"
 					>
 						<span>{qType.icon}</span>
@@ -632,68 +644,93 @@
 			</div>
 		</div>
 
-		{#each questionTypes as qType}
+		{#each questionTypes as qType, idx}
 			{#if activeTypeTab === qType.id}
-				<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-in fade-in duration-300">
-					<!-- Left Info & Tips (5 cols) -->
-					<div class="lg:col-span-5 space-y-4">
-						<div class="p-5 bg-gradient-to-br from-indigo-50/80 via-white to-purple-50/50 rounded-2xl border border-indigo-100 shadow-xs space-y-3">
-							<div class="flex items-center justify-between">
-								<div class="flex items-center gap-2.5">
-									<span class="text-2xl">{qType.icon}</span>
-									<h3 class="text-lg font-bold text-slate-800">{qType.name}</h3>
+				<div class="space-y-6 animate-in fade-in duration-300 max-w-4xl mx-auto">
+					<!-- Top Info & Tips Card -->
+					<div class="grid grid-cols-1 md:grid-cols-12 gap-5 p-5 md:p-6 bg-gradient-to-br from-indigo-50/70 via-white to-purple-50/40 rounded-2xl border border-indigo-100 shadow-xs items-center">
+						<div class="md:col-span-5 space-y-2">
+							<div class="flex items-center gap-2.5">
+								<span class="text-3xl">{qType.icon}</span>
+								<div>
+									<h3 class="text-lg font-bold text-slate-900">{qType.name}</h3>
+									<span class="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold border mt-0.5 {qType.badgeColor}">
+										{qType.badge}
+									</span>
 								</div>
-								<span class="px-2.5 py-1 rounded-full text-xs font-bold border {qType.badgeColor}">
-									{qType.badge}
-								</span>
 							</div>
-
-							<p class="text-slate-600 text-sm leading-relaxed">
+							<p class="text-slate-600 text-xs md:text-sm leading-relaxed pt-1">
 								{qType.desc}
 							</p>
 						</div>
 
-						<div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-3">
-							<h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+						<div class="md:col-span-7 bg-white/90 p-4 rounded-xl border border-slate-200/80 shadow-xs space-y-2">
+							<h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
 								<span>💡</span>
-								<span>Petunjuk & Tips Pengerjaan:</span>
+								<span>Petunjuk & Cara Mengerjakan:</span>
 							</h4>
-
-							<ul class="space-y-2.5">
+							<ul class="space-y-1.5">
 								{#each qType.tips as tip}
-									<li class="flex items-start gap-2.5 text-xs md:text-sm text-slate-600 leading-relaxed">
+									<li class="flex items-start gap-2 text-xs md:text-sm text-slate-600 leading-relaxed">
 										<span class="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0 mt-2"></span>
 										<span>{@html tip}</span>
 									</li>
 								{/each}
 							</ul>
 						</div>
-
-						<div class="p-4 bg-amber-50/80 rounded-2xl border border-amber-200/70 text-xs text-amber-900 flex items-start gap-3">
-							<span class="text-base shrink-0">🎯</span>
-							<div class="leading-relaxed">
-								<b>Coba Simulasi:</b> Di kolom sebelah kanan, Anda dapat langsung mencoba berinteraksi memilih, mencentang, atau menghubungkan soal simulasi.
-							</div>
-						</div>
 					</div>
 
-					<!-- Right Interactive Simulation Playground (7 cols) -->
-					<div class="lg:col-span-7 bg-slate-50/70 p-5 md:p-7 rounded-2xl border-2 border-dashed border-slate-300">
-						<div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 text-xs">
-							<div class="flex items-center gap-2 font-bold text-indigo-700">
+					<!-- Wide Interactive Simulation Box -->
+					<div class="bg-slate-50/80 p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+						<div class="flex items-center justify-between px-1">
+							<div class="flex items-center gap-2 text-xs md:text-sm font-bold text-slate-800">
 								<span>🎮</span>
-								<span>Simulasi Interaktif — {qType.name}</span>
+								<span>Simulasi Interaktif: Coba Jawab Soal di Bawah Ini</span>
 							</div>
-							<span class="text-slate-400 font-medium italic">Demo Langsung</span>
+							<span class="text-[11px] md:text-xs font-medium text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+								✓ Coba Klik & Interaksi
+							</span>
 						</div>
 
-						<div class="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-xs">
+						<!-- Full-Width Question Renderer -->
+						<div class="bg-white p-5 md:p-8 rounded-2xl border border-slate-200 shadow-xs">
 							<QuestionRenderer
 								question={qType.sampleQuestion}
 								answer={demoAnswers[qType.id] || ''}
 								on:answer={(e) => handleDemoAnswer(qType.id, e.detail.answer)}
 							/>
 						</div>
+					</div>
+
+					<!-- Navigation Buttons between Question Types -->
+					<div class="flex items-center justify-between pt-2">
+						<button
+							type="button"
+							on:click={prevType}
+							class="px-4 md:px-5 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-700 font-semibold text-xs md:text-sm transition-all flex items-center gap-2 shadow-xs"
+						>
+							<svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+							</svg>
+							<span>Tipe Sebelumnya</span>
+						</button>
+
+						<div class="flex items-center gap-1.5">
+							<span class="text-xs md:text-sm font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
+								Tipe Soal {idx + 1} dari {questionTypes.length}
+							</span>
+						</div>
+
+						<button
+							type="button"
+							on:click={nextType}
+							class="px-4 md:px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs md:text-sm transition-all flex items-center gap-2 shadow-sm shadow-indigo-600/20"
+						>
+							<span>Tipe Selanjutnya</span>
+							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+							</svg>
+						</button>
 					</div>
 				</div>
 			{/if}
