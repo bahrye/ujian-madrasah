@@ -4,7 +4,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { verifyExamTokenSignature } from '$lib/server/auth';
 
-import { formatExamTitle } from '$lib/utils/exam';
+import { formatExamTitle, matchShortAnswer } from '$lib/utils/exam';
 
 export const load = async ({ platform, locals, params, cookies }: Parameters<PageServerLoad>[0]) => {
 	if (!locals.user) throw redirect(302, '/login');
@@ -276,8 +276,33 @@ export const actions = {
 			for (const ans of answers.results as any[]) {
 				totalPoints += ans.points;
 
-				if (ans.type === 'essay' || ans.type === 'isian_singkat') {
-					// Essay dan isian singkat dinilai manual oleh guru
+				if (ans.type === 'essay') {
+					// Essay dinilai manual oleh guru
+					continue;
+				}
+
+				if (ans.type === 'isian_singkat') {
+					// Jika siswa tidak menjawab (kosong), beri nilai 0
+					if (!ans.answer_given || !String(ans.answer_given).trim()) {
+						updateStmts.push(
+							db.prepare('UPDATE student_answers SET score_given = 0, is_correct = 0 WHERE id = ?').bind(ans.id)
+						);
+						continue;
+					}
+
+					// Cek kecocokan otomatis (case-insensitive, toleran spasi dan tanda baca)
+					const isMatched = matchShortAnswer(ans.answer_given, ans.correct_answer_json);
+					if (isMatched) {
+						// Jawaban sama / cocok -> Otomatis Benar!
+						const scoreGiven = ans.points;
+						totalScore += scoreGiven;
+						updateStmts.push(
+							db.prepare('UPDATE student_answers SET score_given = ?, is_correct = 1 WHERE id = ?')
+								.bind(scoreGiven, ans.id)
+						);
+					} else {
+						// Jawaban berbeda / bervariasi -> Dibiarkan NULL agar dinilai manual oleh guru
+					}
 					continue;
 				}
 
@@ -385,8 +410,21 @@ export const actions = {
 
 			// Hitung skor persentase
 			const finalScore = totalPoints > 0 ? Math.round((totalScore / totalPoints) * 1000) / 10 : 0;
-			const hasManualQuestions = (answers.results as any[]).some((ans: any) => ans.type === 'essay' || ans.type === 'isian_singkat');
-			const isGraded = hasManualQuestions ? 0 : 1;
+			
+			// Cek apakah masih ada soal yang memerlukan penilaian manual guru:
+			// 1. Soal essay
+			// 2. Soal isian_singkat yang tidak cocok otomatis dengan kunci (jawaban berbeda)
+			const hasUnfinishedGrading = (answers.results as any[]).some((ans: any) => {
+				if (ans.type === 'essay') {
+					return true;
+				}
+				if (ans.type === 'isian_singkat') {
+					if (!ans.answer_given || !String(ans.answer_given).trim()) return false;
+					return !matchShortAnswer(ans.answer_given, ans.correct_answer_json);
+				}
+				return false;
+			});
+			const isGraded = hasUnfinishedGrading ? 0 : 1;
 
 			// Simpan status selesai ke student_attempts
 			updateStmts.push(

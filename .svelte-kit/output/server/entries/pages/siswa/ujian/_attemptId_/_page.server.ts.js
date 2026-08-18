@@ -1,7 +1,7 @@
 import { fail, redirect, isRedirect, isHttpError } from "@sveltejs/kit";
 import { g as getDB } from "../../../../../chunks/db.js";
 import { f as verifyExamTokenSignature } from "../../../../../chunks/auth.js";
-import { f as formatExamTitle } from "../../../../../chunks/exam.js";
+import { m as matchShortAnswer, f as formatExamTitle } from "../../../../../chunks/exam.js";
 const load = async ({ platform, locals, params, cookies }) => {
   if (!locals.user) throw redirect(302, "/login");
   const db = getDB(platform);
@@ -234,7 +234,25 @@ const actions = {
       const updateStmts = [];
       for (const ans of answers.results) {
         totalPoints += ans.points;
-        if (ans.type === "essay" || ans.type === "isian_singkat") {
+        if (ans.type === "essay") {
+          continue;
+        }
+        if (ans.type === "isian_singkat") {
+          if (!ans.answer_given || !String(ans.answer_given).trim()) {
+            updateStmts.push(
+              db.prepare("UPDATE student_answers SET score_given = 0, is_correct = 0 WHERE id = ?").bind(ans.id)
+            );
+            continue;
+          }
+          const isMatched = matchShortAnswer(ans.answer_given, ans.correct_answer_json);
+          if (isMatched) {
+            const scoreGiven2 = ans.points;
+            totalScore += scoreGiven2;
+            updateStmts.push(
+              db.prepare("UPDATE student_answers SET score_given = ?, is_correct = 1 WHERE id = ?").bind(scoreGiven2, ans.id)
+            );
+          } else {
+          }
           continue;
         }
         if (!ans.correct_answer_json || !ans.answer_given) {
@@ -328,8 +346,17 @@ const actions = {
         );
       }
       const finalScore = totalPoints > 0 ? Math.round(totalScore / totalPoints * 1e3) / 10 : 0;
-      const hasManualQuestions = answers.results.some((ans) => ans.type === "essay" || ans.type === "isian_singkat");
-      const isGraded = hasManualQuestions ? 0 : 1;
+      const hasUnfinishedGrading = answers.results.some((ans) => {
+        if (ans.type === "essay") {
+          return true;
+        }
+        if (ans.type === "isian_singkat") {
+          if (!ans.answer_given || !String(ans.answer_given).trim()) return false;
+          return !matchShortAnswer(ans.answer_given, ans.correct_answer_json);
+        }
+        return false;
+      });
+      const isGraded = hasUnfinishedGrading ? 0 : 1;
       updateStmts.push(
         db.prepare(`UPDATE student_attempts SET status = 'selesai', submit_time = datetime('now'),
 					score = ?, total_points = ?, violation_count = ?, violation_logs = ?, is_graded = ? WHERE id = ?`).bind(finalScore, totalPoints, warnings, warningLogs, isGraded, parsedAttemptId)
