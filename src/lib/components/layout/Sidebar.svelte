@@ -4,11 +4,14 @@
 	import { fly } from 'svelte/transition';
 	import { toasts } from '$lib/stores/toast';
 	import PasswordInput from '$lib/components/ui/PasswordInput.svelte';
+	import MyQrLoginModal from '$lib/components/auth/MyQrLoginModal.svelte';
 	import { invalidateAll } from '$app/navigation';
 
 	export let menuItems: MenuItem[] = [];
 	export let user: App.Locals['user'];
 	export let isOpen: boolean = false;
+
+	let showMyQrModal = false;
 
 	$: currentPath = $page.url.pathname;
 
@@ -343,20 +346,37 @@
 							</div>
 						</div>
 					{/if}
+				<div class="mt-2 flex flex-col gap-1">
+					<button
+						type="button"
+						class="w-full flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-primary-200 hover:text-white hover:bg-white/10 transition-colors"
+						on:click={() => (showMyQrModal = true)}
+					>
+						<svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+						</svg>
+						QR Akses Saya
+					</button>
+					<a
+						href="/api/logout"
+						class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs text-primary-300 hover:text-white hover:bg-white/10 transition-colors"
+					>
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.logout} />
+						</svg>
+						Keluar
+					</a>
 				</div>
-				<a
-					href="/api/logout"
-					class="mt-2 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-primary-300 hover:text-white hover:bg-white/10 transition-colors"
-				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.logout} />
-					</svg>
-					Keluar
-				</a>
 			</div>
 		</aside>
 	</div>
 {/if}
+
+<MyQrLoginModal
+	show={showMyQrModal}
+	user={user}
+	on:close={() => (showMyQrModal = false)}
+/>
 
 <!-- Profile Modal (Admin Only) -->
 {#if showProfileModal}

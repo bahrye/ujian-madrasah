@@ -59,6 +59,9 @@ function AdminLoginCardModal($$renderer, $$props) {
           $$renderer3.option({ value: "pengawas" }, ($$renderer4) => {
             $$renderer4.push(`Pengawas`);
           });
+          $$renderer3.option({ value: "panitia" }, ($$renderer4) => {
+            $$renderer4.push(`Panitia`);
+          });
         }
       );
       $$renderer2.push(`</div> `);

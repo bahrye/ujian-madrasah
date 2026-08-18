@@ -2,11 +2,13 @@
 	import { ICONS, ROLE_LABELS } from '$lib/utils/constants';
 	import { createEventDispatcher } from 'svelte';
 	import { parseDate } from '$lib/utils/date';
+	import MyQrLoginModal from '$lib/components/auth/MyQrLoginModal.svelte';
 
 	export let user: App.Locals['user'];
 	export let userInfo: any = null;
 
 	let showProfileMenu = false;
+	let showMyQrModal = false;
 
 	const dispatch = createEventDispatcher();
 
@@ -136,8 +138,21 @@
 					</div>
 					
 					<!-- Footer Action -->
-					<div class="p-3 border-t border-slate-100 bg-white">
-						<a href="/api/logout" class="flex items-center justify-center gap-2 w-full text-rose-600 bg-rose-50 hover:bg-rose-500 hover:text-white p-2.5 rounded-xl transition-all duration-300 font-semibold group shadow-sm">
+					<div class="p-3 border-t border-slate-100 bg-white space-y-2">
+						<button
+							type="button"
+							class="flex items-center justify-center gap-2 w-full text-indigo-600 bg-indigo-50 hover:bg-indigo-600 hover:text-white p-2.5 rounded-xl transition-all duration-200 font-semibold text-xs group shadow-sm"
+							on:click={() => {
+								showProfileMenu = false;
+								showMyQrModal = true;
+							}}
+						>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+							</svg>
+							QR Akses Login Saya
+						</button>
+						<a href="/api/logout" class="flex items-center justify-center gap-2 w-full text-rose-600 bg-rose-50 hover:bg-rose-500 hover:text-white p-2.5 rounded-xl transition-all duration-300 font-semibold text-xs group shadow-sm">
 							<svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.logout} />
 							</svg>
@@ -149,3 +164,10 @@
 		</div>
 	</div>
 </header>
+
+<MyQrLoginModal
+	show={showMyQrModal}
+	user={user}
+	schoolName={userInfo?.school_name || ''}
+	on:close={() => (showMyQrModal = false)}
+/>

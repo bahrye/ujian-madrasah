@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { generateStudentQrData, getQrCodeImageUrl } from '$lib/utils/qrLogin';
+
   export let show = false;
   export let users: { id: number | string; name: string; username: string; role: string; photo?: string | null }[] = [];
   export let schoolName: string = '';
@@ -14,6 +16,7 @@
   const roleLabels: Record<string, string> = {
     guru: 'Guru',
     pengawas: 'Pengawas',
+    panitia: 'Panitia',
     admin: 'Administrator'
   };
 
@@ -105,6 +108,13 @@
             <div class="url-row">
               <div class="url-label">&#127758; Link Akses</div>
               <div class="url-value">${escapeHtml(loginUrl)}</div>
+            </div>
+            <div style="margin-top:10px;display:flex;align-items:center;gap:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:8px 10px;">
+              <img src="${escapeHtml(getQrCodeImageUrl(generateStudentQrData(u.username, ''), 100))}" alt="QR" style="width:48px;height:48px;flex-shrink:0;border-radius:6px;" />
+              <div style="font-size:9.5px;line-height:1.2;color:#64748b;text-align:left;">
+                <strong style="color:#0f172a;display:block;font-size:10px;margin-bottom:2px;">QR Login Petugas</strong>
+                Scan di kamera login untuk masuk cepat
+              </div>
             </div>
           </div>
           <div class="card-footer">Kerahasiaan data adalah tanggung jawab Anda</div>
@@ -280,6 +290,7 @@
             <option value="">-- Pilih role --</option>
             <option value="guru">Guru</option>
             <option value="pengawas">Pengawas</option>
+            <option value="panitia">Panitia</option>
           </select>
         </div>
 
@@ -336,6 +347,13 @@
                       <div class="min-w-0">
                         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Username</p>
                         <p class="text-sm font-bold text-slate-800 truncate">{filteredUsers[0].username}</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl p-2.5">
+                      <img src={getQrCodeImageUrl(generateStudentQrData(filteredUsers[0].username, ''), 80)} alt="QR" class="w-11 h-11 rounded-lg bg-white p-0.5 border border-slate-200 flex-shrink-0" />
+                      <div class="min-w-0">
+                        <p class="text-[10px] font-bold text-slate-900 leading-tight">QR Login Petugas</p>
+                        <p class="text-[9px] text-slate-500 mt-0.5">Scan di kamera login untuk masuk cepat</p>
                       </div>
                     </div>
                   </div>

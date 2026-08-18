@@ -1,5 +1,5 @@
 import { h as head, j as attr_class, i as ensure_array_like, k as attr, e as escape_html, c as stringify, f as bind_props } from "../../../../../../chunks/index.js";
-import { g as getQrCodeImageUrl, a as generateStudentQrData } from "../../../../../../chunks/qrLogin.js";
+import { a as getQrCodeImageUrl, g as generateStudentQrData } from "../../../../../../chunks/qrLogin.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let school, examType, participants;
