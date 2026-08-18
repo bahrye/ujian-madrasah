@@ -91,7 +91,8 @@ export const nodes = [
 	() => import('./nodes/79'),
 	() => import('./nodes/80'),
 	() => import('./nodes/81'),
-	() => import('./nodes/82')
+	() => import('./nodes/82'),
+	() => import('./nodes/83')
 ];
 
 export const server_loads = [0,2,3,4,5,6,7];
@@ -158,20 +159,21 @@ export const dictionary = {
 		"/print/kehadiran/type/[typeId]": [~66,[5]],
 		"/print/kehadiran/[exam_id]": [~67,[5]],
 		"/print/results/[attemptId]": [~68,[5]],
-		"/siswa": [~69,[6]],
-		"/siswa/hasil-ujian": [~70,[6]],
-		"/siswa/jadwal": [~71,[6]],
-		"/siswa/papan-peringkat": [~72,[6]],
-		"/siswa/papan-peringkat/type/[typeId]": [~73,[6]],
-		"/siswa/papan-peringkat/type/[typeId]/exams": [~74,[6]],
-		"/siswa/papan-peringkat/[examId]": [~75,[6]],
-		"/siswa/tata-tertib": [76,[6]],
-		"/siswa/ujian": [~77,[6]],
-		"/siswa/ujian/[attemptId]": [~78],
-		"/superadmin": [~79,[7]],
-		"/superadmin/accounts": [~80,[7]],
-		"/superadmin/admins": [~81,[7]],
-		"/superadmin/schools": [~82,[7]]
+		"/print/users": [~69,[5]],
+		"/siswa": [~70,[6]],
+		"/siswa/hasil-ujian": [~71,[6]],
+		"/siswa/jadwal": [~72,[6]],
+		"/siswa/papan-peringkat": [~73,[6]],
+		"/siswa/papan-peringkat/type/[typeId]": [~74,[6]],
+		"/siswa/papan-peringkat/type/[typeId]/exams": [~75,[6]],
+		"/siswa/papan-peringkat/[examId]": [~76,[6]],
+		"/siswa/tata-tertib": [77,[6]],
+		"/siswa/ujian": [~78,[6]],
+		"/siswa/ujian/[attemptId]": [~79],
+		"/superadmin": [~80,[7]],
+		"/superadmin/accounts": [~81,[7]],
+		"/superadmin/admins": [~82,[7]],
+		"/superadmin/schools": [~83,[7]]
 	};
 
 export const hooks = {

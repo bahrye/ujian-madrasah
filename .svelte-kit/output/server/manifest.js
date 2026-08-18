@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg","kemenag.png","panduan-ui-ujian-2.jpeg","panduan-ui-ujian-3.jpeg","panduan-ui-ujian.jpeg","template_soal_ujian.docx"]),
 	mimeTypes: {".svg":"image/svg+xml",".png":"image/png",".jpeg":"image/jpeg"},
 	_: {
-		client: {start:"_app/immutable/entry/start.mwzo5L5V.js",app:"_app/immutable/entry/app.DODd890S.js",imports:["_app/immutable/entry/start.mwzo5L5V.js","_app/immutable/chunks/DfvsBpJx.js","_app/immutable/chunks/CAmwAEK5.js","_app/immutable/chunks/C1iwYQEC.js","_app/immutable/chunks/C4l_QUTv.js","_app/immutable/chunks/BPD4iswW.js","_app/immutable/entry/app.DODd890S.js","_app/immutable/chunks/C1iwYQEC.js","_app/immutable/chunks/C4l_QUTv.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CAmwAEK5.js","_app/immutable/chunks/klE4_vFh.js","_app/immutable/chunks/CsHYDYpd.js","_app/immutable/chunks/RbyIVtyM.js","_app/immutable/chunks/qu17wuJm.js","_app/immutable/chunks/BPD4iswW.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
+		client: {start:"_app/immutable/entry/start.C7VxR5GK.js",app:"_app/immutable/entry/app.JDAfOkIw.js",imports:["_app/immutable/entry/start.C7VxR5GK.js","_app/immutable/chunks/C3qtxW-h.js","_app/immutable/chunks/CAmwAEK5.js","_app/immutable/chunks/C1iwYQEC.js","_app/immutable/chunks/C4l_QUTv.js","_app/immutable/chunks/BPD4iswW.js","_app/immutable/entry/app.JDAfOkIw.js","_app/immutable/chunks/C1iwYQEC.js","_app/immutable/chunks/C4l_QUTv.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CAmwAEK5.js","_app/immutable/chunks/klE4_vFh.js","_app/immutable/chunks/CsHYDYpd.js","_app/immutable/chunks/RbyIVtyM.js","_app/immutable/chunks/qu17wuJm.js","_app/immutable/chunks/BPD4iswW.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
 		nodes: [
 			__memo(() => import('./nodes/0.js')),
 			__memo(() => import('./nodes/1.js')),
@@ -94,7 +94,8 @@ return {
 			__memo(() => import('./nodes/79.js')),
 			__memo(() => import('./nodes/80.js')),
 			__memo(() => import('./nodes/81.js')),
-			__memo(() => import('./nodes/82.js'))
+			__memo(() => import('./nodes/82.js')),
+			__memo(() => import('./nodes/83.js'))
 		],
 		remotes: {
 			
@@ -675,101 +676,108 @@ return {
 				endpoint: null
 			},
 			{
+				id: "/print/users",
+				pattern: /^\/print\/users\/?$/,
+				params: [],
+				page: { layouts: [0,5,], errors: [1,,], leaf: 69 },
+				endpoint: null
+			},
+			{
 				id: "/siswa",
 				pattern: /^\/siswa\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 69 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 70 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/hasil-ujian",
 				pattern: /^\/siswa\/hasil-ujian\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 70 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 71 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/jadwal",
 				pattern: /^\/siswa\/jadwal\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 71 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 72 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/papan-peringkat",
 				pattern: /^\/siswa\/papan-peringkat\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 72 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 73 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/papan-peringkat/type/[typeId]",
 				pattern: /^\/siswa\/papan-peringkat\/type\/([^/]+?)\/?$/,
 				params: [{"name":"typeId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 73 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 74 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/papan-peringkat/type/[typeId]/exams",
 				pattern: /^\/siswa\/papan-peringkat\/type\/([^/]+?)\/exams\/?$/,
 				params: [{"name":"typeId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 74 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 75 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/papan-peringkat/[examId]",
 				pattern: /^\/siswa\/papan-peringkat\/([^/]+?)\/?$/,
 				params: [{"name":"examId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 75 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 76 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/tata-tertib",
 				pattern: /^\/siswa\/tata-tertib\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 76 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 77 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/ujian",
 				pattern: /^\/siswa\/ujian\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 77 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 78 },
 				endpoint: null
 			},
 			{
 				id: "/siswa/ujian/[attemptId]",
 				pattern: /^\/siswa\/ujian\/([^/]+?)\/?$/,
 				params: [{"name":"attemptId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,], errors: [1,], leaf: 78 },
+				page: { layouts: [0,], errors: [1,], leaf: 79 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin",
 				pattern: /^\/superadmin\/?$/,
 				params: [],
-				page: { layouts: [0,7,], errors: [1,,], leaf: 79 },
+				page: { layouts: [0,7,], errors: [1,,], leaf: 80 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin/accounts",
 				pattern: /^\/superadmin\/accounts\/?$/,
 				params: [],
-				page: { layouts: [0,7,], errors: [1,,], leaf: 80 },
+				page: { layouts: [0,7,], errors: [1,,], leaf: 81 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin/admins",
 				pattern: /^\/superadmin\/admins\/?$/,
 				params: [],
-				page: { layouts: [0,7,], errors: [1,,], leaf: 81 },
+				page: { layouts: [0,7,], errors: [1,,], leaf: 82 },
 				endpoint: null
 			},
 			{
 				id: "/superadmin/schools",
 				pattern: /^\/superadmin\/schools\/?$/,
 				params: [],
-				page: { layouts: [0,7,], errors: [1,,], leaf: 82 },
+				page: { layouts: [0,7,], errors: [1,,], leaf: 83 },
 				endpoint: null
 			}
 		],
