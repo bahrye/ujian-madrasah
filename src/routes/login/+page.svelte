@@ -11,31 +11,43 @@
 	let loading = false;
 	let showQrModal = false;
 	let showPinModal = false;
+	let isAuthenticatingQr = false;
+	let qrStatusMessage = '';
 	let pinUserInfo = { name: '', role: '', username: '' };
+	
+	// Manual input bindings (never populated by QR scan to prevent exposure)
 	let username = '';
 	let password = '';
+
+	// Hidden QR login payload bindings
+	let qrUsername = '';
+	let qrPassword = '';
 	let qrToken = '';
 	let loginPin = '';
 	let formElement: HTMLFormElement;
 
 	async function handleQrScan(event: CustomEvent<ParsedQrLogin>) {
 		const { username: scannedUser, password: scannedPass, qrToken: scannedToken } = event.detail;
-		username = scannedUser || '';
-		password = scannedPass || '';
+		qrUsername = scannedUser || '';
+		qrPassword = scannedPass || '';
 		qrToken = scannedToken || '';
 		loginPin = '';
 		showQrModal = false;
 
+		isAuthenticatingQr = true;
+		qrStatusMessage = 'Memverifikasi kode QR...';
+
 		// Check if this user (staff) requires 5-digit PIN
 		try {
-			const res = await fetch(`/api/auth/check-pin?u=${encodeURIComponent(username)}`);
+			const res = await fetch(`/api/auth/check-pin?u=${encodeURIComponent(qrUsername)}`);
 			if (res.ok) {
 				const data = await res.json();
 				if (data.requires_pin) {
+					isAuthenticatingQr = false;
 					pinUserInfo = {
 						name: data.name || '',
 						role: data.role || '',
-						username: data.username || username
+						username: data.username || qrUsername
 					};
 					showPinModal = true;
 					return;
@@ -45,13 +57,16 @@
 			console.debug('Check pin failed:', err);
 		}
 
-		// If no PIN required (e.g. Siswa), automatically submit immediately!
+		// If no PIN required (e.g. Siswa), submit directly with smooth transition
+		qrStatusMessage = 'Autentikasi Berhasil! Mengalihkan ke Dashboard...';
 		submitLoginForm();
 	}
 
 	function handlePinSubmit(event: CustomEvent<{ pin: string }>) {
 		loginPin = event.detail.pin;
 		showPinModal = false;
+		isAuthenticatingQr = true;
+		qrStatusMessage = 'Memverifikasi Angka Rahasia & Mengalihkan...';
 		submitLoginForm();
 	}
 
@@ -86,8 +101,26 @@
 	role={pinUserInfo.role}
 	username={pinUserInfo.username}
 	on:submit={handlePinSubmit}
-	on:cancel={() => (showPinModal = false)}
+	on:cancel={() => {
+		showPinModal = false;
+		isAuthenticatingQr = false;
+	}}
 />
+
+{#if isAuthenticatingQr}
+	<div class="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in">
+		<div class="bg-white/10 border border-white/20 rounded-3xl p-8 max-w-sm w-full text-center text-white backdrop-blur-xl shadow-2xl animate-scale-up">
+			<div class="w-16 h-16 rounded-2xl bg-indigo-500/30 border border-indigo-400/40 flex items-center justify-center mx-auto mb-4">
+				<svg class="w-8 h-8 animate-spin text-cyan-300" fill="none" viewBox="0 0 24 24">
+					<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+					<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+				</svg>
+			</div>
+			<h3 class="text-lg font-bold mb-1">Masuk dengan QR</h3>
+			<p class="text-xs text-white/80">{qrStatusMessage || 'Memproses...'}</p>
+		</div>
+	</div>
+{/if}
 
 <div class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-primary-950 via-primary-900 to-violet-900 relative overflow-hidden">
 	<!-- Background decoration -->
@@ -127,14 +160,19 @@
 				bind:this={formElement}
 				use:enhance={() => {
 					loading = true;
-					return async ({ update }) => {
+					return async ({ update, result }) => {
 						loading = false;
+						if (result.type !== 'redirect') {
+							isAuthenticatingQr = false;
+						}
 						await update();
 					};
 				}}
 				class="space-y-4"
 			>
 				<input type="hidden" name="qr_token" bind:value={qrToken} />
+				<input type="hidden" name="qr_username" bind:value={qrUsername} />
+				<input type="hidden" name="qr_password" bind:value={qrPassword} />
 				<input type="hidden" name="login_pin" bind:value={loginPin} />
 
 				<div>
@@ -147,7 +185,7 @@
 							id="username"
 							name="username"
 							type="text"
-							required
+							required={!qrUsername && !qrToken}
 							bind:value={username}
 							class="input pl-10"
 							placeholder="Masukkan username"
@@ -161,7 +199,7 @@
 					<PasswordInput
 						id="password"
 						name="password"
-						required={!qrToken}
+						required={!qrPassword && !qrToken}
 						iconLeft={true}
 						bind:value={password}
 						placeholder="Masukkan kata sandi"

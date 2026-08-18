@@ -10,8 +10,10 @@ const load = async ({ locals }) => {
 const actions = {
   default: async ({ request, platform, cookies }) => {
     const formData = await request.formData();
-    const username = formData.get("username")?.toString().trim();
-    const password = formData.get("password")?.toString();
+    const qrUsername = formData.get("qr_username")?.toString().trim();
+    const qrPassword = formData.get("qr_password")?.toString();
+    const username = qrUsername || formData.get("username")?.toString().trim();
+    const password = qrPassword || formData.get("password")?.toString();
     const qrToken = formData.get("qr_token")?.toString().trim();
     const loginPin = formData.get("login_pin")?.toString().trim();
     if (!username || !password && !qrToken) {
