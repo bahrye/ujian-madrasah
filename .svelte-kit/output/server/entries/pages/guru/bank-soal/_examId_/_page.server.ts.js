@@ -81,20 +81,27 @@ const actions = {
       optionsJson = JSON.stringify(opts);
       correctAnswerJson = JSON.stringify(corrects);
     } else if (type === "benar_salah") {
-      const statements = [];
-      const correctMap = {};
-      let idx = 0;
-      for (let i = 0; i < 50; i++) {
-        const stmt = form.get(`bs_statement_${i}`)?.toString().trim();
-        if (stmt) {
-          statements.push(stmt);
-          correctMap[String(idx)] = form.get(`bs_correct_${i}`)?.toString() || "Benar";
-          idx++;
+      const bsMode = form.get("bs_mode")?.toString() || "single";
+      if (bsMode === "multi") {
+        const statements = [];
+        const correctMap = {};
+        let idx = 0;
+        for (let i = 0; i < 50; i++) {
+          const stmt = form.get(`bs_statement_${i}`)?.toString().trim();
+          if (stmt) {
+            statements.push(stmt);
+            correctMap[String(idx)] = form.get(`bs_correct_${i}`)?.toString() || "Benar";
+            idx++;
+          }
         }
-      }
-      if (statements.length > 0) {
-        optionsJson = JSON.stringify({ statements });
-        correctAnswerJson = JSON.stringify(correctMap);
+        if (statements.length > 0) {
+          optionsJson = JSON.stringify({ statements });
+          correctAnswerJson = JSON.stringify(correctMap);
+        } else {
+          const single = form.get("correct_answer")?.toString() || "Benar";
+          optionsJson = JSON.stringify(["Benar", "Salah"]);
+          correctAnswerJson = JSON.stringify(single);
+        }
       } else {
         const single = form.get("correct_answer")?.toString() || "Benar";
         optionsJson = JSON.stringify(["Benar", "Salah"]);
@@ -185,20 +192,27 @@ const actions = {
       optionsJson = JSON.stringify(opts);
       correctAnswerJson = JSON.stringify(corrects);
     } else if (type === "benar_salah") {
-      const statements = [];
-      const correctMap = {};
-      let idx = 0;
-      for (let i = 0; i < 50; i++) {
-        const stmt = form.get(`bs_statement_${i}`)?.toString().trim();
-        if (stmt) {
-          statements.push(stmt);
-          correctMap[String(idx)] = form.get(`bs_correct_${i}`)?.toString() || "Benar";
-          idx++;
+      const bsMode = form.get("bs_mode")?.toString() || "single";
+      if (bsMode === "multi") {
+        const statements = [];
+        const correctMap = {};
+        let idx = 0;
+        for (let i = 0; i < 50; i++) {
+          const stmt = form.get(`bs_statement_${i}`)?.toString().trim();
+          if (stmt) {
+            statements.push(stmt);
+            correctMap[String(idx)] = form.get(`bs_correct_${i}`)?.toString() || "Benar";
+            idx++;
+          }
         }
-      }
-      if (statements.length > 0) {
-        optionsJson = JSON.stringify({ statements });
-        correctAnswerJson = JSON.stringify(correctMap);
+        if (statements.length > 0) {
+          optionsJson = JSON.stringify({ statements });
+          correctAnswerJson = JSON.stringify(correctMap);
+        } else {
+          const single = form.get("correct_answer")?.toString() || "Benar";
+          optionsJson = JSON.stringify(["Benar", "Salah"]);
+          correctAnswerJson = JSON.stringify(single);
+        }
       } else {
         const single = form.get("correct_answer")?.toString() || "Benar";
         optionsJson = JSON.stringify(["Benar", "Salah"]);
