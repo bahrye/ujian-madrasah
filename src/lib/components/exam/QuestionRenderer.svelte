@@ -65,6 +65,23 @@
 		}
 	}
 
+	$: benarSalahStatements = (safeType === 'benar_salah' && options?.statements && Array.isArray(options.statements)) ? options.statements : [];
+	let benarSalahAnswers: Record<string, string> = {};
+	$: if (safeType === 'benar_salah' && answer) {
+		try {
+			const parsed = JSON.parse(answer);
+			if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+				benarSalahAnswers = parsed;
+			} else {
+				benarSalahAnswers = { "0": String(answer) };
+			}
+		} catch {
+			benarSalahAnswers = { "0": String(answer) };
+		}
+	} else if (safeType === 'benar_salah' && !answer) {
+		benarSalahAnswers = {};
+	}
+
 	function handleAnswer(value: string) {
 		dispatch('answer', { questionId: question.id, answer: value });
 	}
@@ -83,6 +100,11 @@
 	function handleMatchingChange(leftIndex: string, rightIndex: string) {
 		matchingAnswers[leftIndex] = rightIndex;
 		dispatch('answer', { questionId: question.id, answer: JSON.stringify(matchingAnswers) });
+	}
+
+	function handleBenarSalahChange(index: number, val: 'Benar' | 'Salah') {
+		benarSalahAnswers[String(index)] = val;
+		dispatch('answer', { questionId: question.id, answer: JSON.stringify(benarSalahAnswers) });
 	}
 
 	function toggleDoubt() {
@@ -224,20 +246,73 @@
 			{/each}
 
 		{:else if safeType === 'benar_salah'}
-			<!-- True / False -->
-			<div class="grid grid-cols-2 gap-3">
-				{#each ['Benar', 'Salah'] as opt}
-					<button
-						class="p-4 rounded-xl border-2 text-center font-semibold transition-all duration-200
-							   {answer === opt
-								? 'border-indigo-500 bg-indigo-50 text-indigo-700 shadow-md shadow-indigo-500/10'
-								: 'border-slate-200 text-slate-600 hover:border-indigo-300 hover:bg-slate-50'}"
-						on:click={() => handleAnswer(opt)}
-					>
-						{opt}
-					</button>
-				{/each}
-			</div>
+			{#if benarSalahStatements.length > 0}
+				<!-- Multi-statement True / False Table -->
+				<div class="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-xs">
+					<table class="w-full text-sm border-collapse text-left">
+						<thead>
+							<tr class="bg-slate-50 border-b border-slate-200 text-slate-700">
+								<th class="py-3 px-3 w-12 text-center font-semibold">No</th>
+								<th class="py-3 px-4 font-semibold">Pernyataan</th>
+								<th class="py-3 px-3 w-28 text-center font-semibold text-emerald-700 bg-emerald-50/50">Benar</th>
+								<th class="py-3 px-3 w-28 text-center font-semibold text-rose-700 bg-rose-50/50">Salah</th>
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-slate-100">
+							{#each benarSalahStatements as stmt, idx}
+								{@const choice = benarSalahAnswers[String(idx)]}
+								<tr class="hover:bg-slate-50/70 transition-colors">
+									<td class="py-3.5 px-3 text-center text-slate-500 font-semibold">{idx + 1}</td>
+									<td class="py-3.5 px-4 text-slate-800 prose prose-sm max-w-none">{@html stmt}</td>
+									<td class="py-3.5 px-3 text-center bg-emerald-50/20">
+										<button
+											type="button"
+											class="w-full py-1.5 px-2 rounded-lg border-2 font-medium text-xs transition-all flex items-center justify-center gap-1.5 {choice === 'Benar' ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-500/20' : 'border-slate-200 text-slate-600 hover:border-emerald-300 hover:bg-emerald-50/50'}"
+											on:click={() => handleBenarSalahChange(idx, 'Benar')}
+										>
+											<span class="w-3.5 h-3.5 rounded-full border flex items-center justify-center {choice === 'Benar' ? 'border-white bg-white' : 'border-slate-400'}">
+												{#if choice === 'Benar'}
+													<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+												{/if}
+											</span>
+											Benar
+										</button>
+									</td>
+									<td class="py-3.5 px-3 text-center bg-rose-50/20">
+										<button
+											type="button"
+											class="w-full py-1.5 px-2 rounded-lg border-2 font-medium text-xs transition-all flex items-center justify-center gap-1.5 {choice === 'Salah' ? 'bg-rose-500 border-rose-500 text-white shadow-sm shadow-rose-500/20' : 'border-slate-200 text-slate-600 hover:border-rose-300 hover:bg-rose-50/50'}"
+											on:click={() => handleBenarSalahChange(idx, 'Salah')}
+										>
+											<span class="w-3.5 h-3.5 rounded-full border flex items-center justify-center {choice === 'Salah' ? 'border-white bg-white' : 'border-slate-400'}">
+												{#if choice === 'Salah'}
+													<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+												{/if}
+											</span>
+											Salah
+										</button>
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			{:else}
+				<!-- Legacy True / False -->
+				<div class="grid grid-cols-2 gap-3">
+					{#each ['Benar', 'Salah'] as opt}
+						<button
+							class="p-4 rounded-xl border-2 text-center font-semibold transition-all duration-200
+								   {answer === opt
+									? 'border-indigo-500 bg-indigo-50 text-indigo-700 shadow-md shadow-indigo-500/10'
+									: 'border-slate-200 text-slate-600 hover:border-indigo-300 hover:bg-slate-50'}"
+							on:click={() => handleAnswer(opt)}
+						>
+							{opt}
+						</button>
+					{/each}
+				</div>
+			{/if}
 
 		{:else if safeType === 'isian_singkat'}
 			<!-- Short Answer -->

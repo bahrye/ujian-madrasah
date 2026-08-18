@@ -257,6 +257,24 @@
 										{:else}
 											<p class="font-medium text-slate-900 text-[11px]">{ans.answer_given}</p>
 										{/if}
+									{:else if ans.type === 'benar_salah'}
+										{@const opts = safeParseJson(ans.options_json, null)}
+										{@const givenMap = safeParseJson(ans.answer_given, null)}
+										{#if opts && opts.statements && Array.isArray(opts.statements)}
+											<div class="space-y-0.5 text-[10px]">
+												{#each opts.statements as stmt, idx}
+													{@const choice = typeof givenMap === 'object' && givenMap !== null ? givenMap[String(idx)] : null}
+													<div class="flex items-center justify-between border-b border-slate-200/50 last:border-0 pb-0.5 gap-1">
+														<span class="text-slate-800">{idx + 1}. {@html stmt}</span>
+														<span class="font-bold shrink-0 {choice === 'Benar' ? 'text-emerald-700' : (choice === 'Salah' ? 'text-rose-700' : 'text-slate-400')}">
+															{choice || '-'}
+														</span>
+													</div>
+												{/each}
+											</div>
+										{:else}
+											<p class="font-medium text-slate-900 text-[11px]">{ans.answer_given}</p>
+										{/if}
 									{:else}
 										<p class="font-medium text-slate-900 whitespace-pre-wrap text-[11px]">{ans.answer_given}</p>
 									{/if}
@@ -302,6 +320,24 @@
 												<div class="flex flex-wrap gap-1">
 													{#each correctArr as item}
 														<span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-900 font-bold rounded border border-emerald-300 text-[10px]">{item}</span>
+													{/each}
+												</div>
+											{:else}
+												<p class="font-bold text-emerald-900 text-[11px]">{safeParseJson(ans.correct_answer_json, '-')}</p>
+											{/if}
+										{:else if ans.type === 'benar_salah'}
+											{@const opts = safeParseJson(ans.options_json, null)}
+											{@const correctMap = safeParseJson(ans.correct_answer_json, null)}
+											{#if opts && opts.statements && Array.isArray(opts.statements)}
+												<div class="space-y-0.5 text-[10px]">
+													{#each opts.statements as stmt, idx}
+														{@const keyVal = typeof correctMap === 'object' && correctMap !== null ? (correctMap[String(idx)] || correctMap[idx]) : 'Benar'}
+														<div class="flex items-center justify-between border-b border-emerald-200/60 last:border-0 pb-0.5 gap-1">
+															<span class="text-emerald-950">{idx + 1}. {@html stmt}</span>
+															<span class="font-bold shrink-0 {keyVal === 'Benar' ? 'text-emerald-800' : 'text-rose-800'}">
+																{keyVal || 'Benar'}
+															</span>
+														</div>
 													{/each}
 												</div>
 											{:else}

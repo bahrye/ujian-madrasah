@@ -469,6 +469,8 @@
 	let editingQuestion: any = null;
 	let createMenjodohkanCount = 4;
 	let editMenjodohkanCount = 4;
+	let createBenarSalahCount = 3;
+	let editBenarSalahCount = 3;
 
 	$: if (form?.success) toasts.success(form.success);
 	$: if (form?.error) toasts.error(form.error);
@@ -477,6 +479,15 @@
 	$: if (editingQuestion && editingQuestion.type === 'menjodohkan') {
 		const opts = editingQuestion.options_json ? JSON.parse(editingQuestion.options_json) : {left:[]};
 		editMenjodohkanCount = Math.max(4, opts.left?.length || 4);
+	}
+
+	$: if (editingQuestion && editingQuestion.type === 'benar_salah') {
+		const opts = editingQuestion.options_json ? JSON.parse(editingQuestion.options_json) : null;
+		if (opts && opts.statements && Array.isArray(opts.statements)) {
+			editBenarSalahCount = Math.max(1, opts.statements.length);
+		} else {
+			editBenarSalahCount = 1;
+		}
 	}
 
 	async function removeEmptyMenjodohkanRow(mode: 'create' | 'edit') {
@@ -656,12 +667,43 @@
 						{/if}
 					</div>
 				{:else if selectedType === 'benar_salah'}
-					<div>
-						<label class="label" for="q-correct-bs">Jawaban Benar</label>
-						<select id="q-correct-bs" name="correct_answer" class="select w-40">
-							<option value="Benar">Benar</option>
-							<option value="Salah">Salah</option>
-						</select>
+					<div class="space-y-3">
+						<div class="flex items-center justify-between">
+							<label class="label mb-0">Daftar Pernyataan & Kunci Jawaban</label>
+							<span class="text-xs text-slate-500">Tentukan pernyataan dan kunci Benar / Salah untuk masing-masing baris</span>
+						</div>
+						<div class="space-y-2.5">
+							{#each Array(createBenarSalahCount) as _, i}
+								<div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-2.5 rounded-xl border border-slate-200 bg-slate-50/50">
+									<div class="flex items-center gap-2 flex-1">
+										<span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+										<input 
+											id="create_bs_statement_{i}" 
+											name="bs_statement_{i}" 
+											type="text" 
+											class="input w-full bg-white text-sm" 
+											placeholder="Tulis pernyataan {i + 1}..." 
+										/>
+									</div>
+									<div class="flex items-center gap-1.5 shrink-0 self-end sm:self-auto bg-white p-1 rounded-lg border border-slate-200">
+										<label class="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold cursor-pointer transition-colors has-[:checked]:bg-emerald-100 has-[:checked]:text-emerald-800 text-slate-600 hover:bg-slate-50">
+											<input type="radio" name="bs_correct_{i}" value="Benar" checked class="text-emerald-600 focus:ring-emerald-500 w-3.5 h-3.5" />
+											Benar
+										</label>
+										<label class="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold cursor-pointer transition-colors has-[:checked]:bg-rose-100 has-[:checked]:text-rose-800 text-slate-600 hover:bg-slate-50">
+											<input type="radio" name="bs_correct_{i}" value="Salah" class="text-rose-600 focus:ring-rose-500 w-3.5 h-3.5" />
+											Salah
+										</label>
+									</div>
+								</div>
+							{/each}
+						</div>
+						<div class="flex items-center gap-2 mt-2">
+							<button type="button" class="btn-ghost btn-sm text-indigo-600 hover:bg-indigo-50" on:click={() => createBenarSalahCount++}>+ Tambah Pernyataan</button>
+							{#if createBenarSalahCount > 1}
+								<button type="button" class="btn-ghost btn-sm text-red-600 hover:bg-red-50" on:click={() => createBenarSalahCount--}>- Kurangi Pernyataan</button>
+							{/if}
+						</div>
 					</div>
 				{:else if selectedType === 'isian_singkat'}
 					<div>
@@ -770,6 +812,19 @@
 									<span class="text-[10px] px-2 py-0.5 rounded-md {isCorrect ? 'bg-green-100 text-green-700 font-bold border border-green-200' : 'bg-slate-100 text-slate-600'} flex items-center gap-1">
 										{q.type.startsWith('pilihan_ganda') ? `${String.fromCharCode(65 + i)}.` : ''} {@html opt}
 									</span>
+								{/each}
+							</div>
+						{:else if q.type === 'benar_salah' && opts.statements}
+							<div class="mt-2 space-y-1 text-xs">
+								{#each opts.statements as stmt, i}
+									{@const ansKey = typeof correct === 'object' && correct !== null ? (correct[String(i)] || correct[i] || 'Benar') : (correct || 'Benar')}
+									<div class="flex items-center gap-2 text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
+										<span class="font-bold text-slate-700">{i + 1}.</span>
+										<span class="flex-1 truncate">{@html stmt}</span>
+										<span class="px-2 py-0.5 rounded text-[10px] font-bold {ansKey === 'Benar' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-rose-100 text-rose-700 border border-rose-200'}">
+											{ansKey}
+										</span>
+									</div>
 								{/each}
 							</div>
 						{:else if q.type === 'menjodohkan' && opts.left}
@@ -985,13 +1040,49 @@
 							{/if}
 						</div>
 					{:else if editingQuestion.type === 'benar_salah'}
-						{@const correct = editingQuestion.correct_answer_json ? JSON.parse(editingQuestion.correct_answer_json) : 'Benar'}
-						<div>
-							<label class="label" for="eq-correct-bs">Jawaban Benar</label>
-							<select id="eq-correct-bs" name="correct_answer" class="select w-32" value={correct}>
-								<option value="Benar">Benar</option>
-								<option value="Salah">Salah</option>
-							</select>
+						{@const opts = editingQuestion.options_json ? JSON.parse(editingQuestion.options_json) : null}
+						{@const stmts = (opts && opts.statements && Array.isArray(opts.statements)) ? opts.statements : (Array.isArray(opts) ? [] : [])}
+						{@const correct = editingQuestion.correct_answer_json ? JSON.parse(editingQuestion.correct_answer_json) : {}}
+						<div class="space-y-3">
+							<div class="flex items-center justify-between">
+								<label class="label mb-0">Daftar Pernyataan & Kunci Jawaban</label>
+								<span class="text-xs text-slate-500">Edit pernyataan dan kunci Benar / Salah</span>
+							</div>
+							<div class="space-y-2.5">
+								{#each Array(editBenarSalahCount) as _, i}
+									{@const existingStmt = stmts[i] || ''}
+									{@const existingCorrect = typeof correct === 'object' && correct !== null ? (correct[String(i)] || correct[i] || 'Benar') : (i === 0 && (correct === 'Benar' || correct === 'Salah') ? correct : 'Benar')}
+									<div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-2.5 rounded-xl border border-slate-200 bg-slate-50/50">
+										<div class="flex items-center gap-2 flex-1">
+											<span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+											<input 
+												id="edit_bs_statement_{i}" 
+												name="bs_statement_{i}" 
+												type="text" 
+												class="input w-full bg-white text-sm" 
+												placeholder="Tulis pernyataan {i + 1}..." 
+												value={existingStmt}
+											/>
+										</div>
+										<div class="flex items-center gap-1.5 shrink-0 self-end sm:self-auto bg-white p-1 rounded-lg border border-slate-200">
+											<label class="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold cursor-pointer transition-colors has-[:checked]:bg-emerald-100 has-[:checked]:text-emerald-800 text-slate-600 hover:bg-slate-50">
+												<input type="radio" name="bs_correct_{i}" value="Benar" checked={existingCorrect === 'Benar'} class="text-emerald-600 focus:ring-emerald-500 w-3.5 h-3.5" />
+												Benar
+											</label>
+											<label class="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold cursor-pointer transition-colors has-[:checked]:bg-rose-100 has-[:checked]:text-rose-800 text-slate-600 hover:bg-slate-50">
+												<input type="radio" name="bs_correct_{i}" value="Salah" checked={existingCorrect === 'Salah'} class="text-rose-600 focus:ring-rose-500 w-3.5 h-3.5" />
+												Salah
+											</label>
+										</div>
+									</div>
+								{/each}
+							</div>
+							<div class="flex items-center gap-2 mt-2">
+								<button type="button" class="btn-ghost btn-sm text-indigo-600 hover:bg-indigo-50" on:click={() => editBenarSalahCount++}>+ Tambah Pernyataan</button>
+								{#if editBenarSalahCount > 1}
+									<button type="button" class="btn-ghost btn-sm text-red-600 hover:bg-red-50" on:click={() => editBenarSalahCount--}>- Kurangi Pernyataan</button>
+								{/if}
+							</div>
 						</div>
 					{:else if editingQuestion.type === 'isian_singkat'}
 						{@const correct = editingQuestion.correct_answer_json ? JSON.parse(editingQuestion.correct_answer_json) : ''}

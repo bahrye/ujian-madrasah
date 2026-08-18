@@ -57,7 +57,7 @@ function AudioPlayer($$renderer, $$props) {
 }
 function QuestionRenderer($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
-    let safeType, matchingLeft, matchingRight, directMediaUrl;
+    let safeType, matchingLeft, matchingRight, benarSalahStatements, directMediaUrl;
     let question = $$props["question"];
     let answer = fallback($$props["answer"], "");
     let isDoubted = fallback($$props["isDoubted"], false);
@@ -65,6 +65,7 @@ function QuestionRenderer($$renderer, $$props) {
     let options = [];
     let matchingAnswers = {};
     let complexAnswers = [];
+    let benarSalahAnswers = {};
     const optionLetters = ["A", "B", "C", "D", "E", "F", "G", "H"];
     function getDirectUrl(url) {
       if (!url) return "";
@@ -121,6 +122,21 @@ function QuestionRenderer($$renderer, $$props) {
         complexAnswers = [];
       }
     }
+    benarSalahStatements = safeType === "benar_salah" && options?.statements && Array.isArray(options.statements) ? options.statements : [];
+    if (safeType === "benar_salah" && answer) {
+      try {
+        const parsed = JSON.parse(answer);
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+          benarSalahAnswers = parsed;
+        } else {
+          benarSalahAnswers = { "0": String(answer) };
+        }
+      } catch {
+        benarSalahAnswers = { "0": String(answer) };
+      }
+    } else if (safeType === "benar_salah" && !answer) {
+      benarSalahAnswers = {};
+    }
     directMediaUrl = getDirectUrl(question.media_url);
     $$renderer2.push(`<div class="space-y-5 animate-in" role="presentation"><div class="flex items-center justify-between flex-wrap gap-2"><div class="flex items-center gap-3"><span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold text-sm shadow-md shadow-indigo-500/20">${escape_html(
       // Image Lightbox
@@ -166,13 +182,41 @@ function QuestionRenderer($$renderer, $$props) {
       $$renderer2.push(`<!--]-->`);
     } else if (safeType === "benar_salah") {
       $$renderer2.push("<!--[1-->");
-      $$renderer2.push(`<div class="grid grid-cols-2 gap-3"><!--[-->`);
-      const each_array_1 = ensure_array_like(["Benar", "Salah"]);
-      for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
-        let opt = each_array_1[$$index_1];
-        $$renderer2.push(`<button${attr_class(`p-4 rounded-xl border-2 text-center font-semibold transition-all duration-200 ${answer === opt ? "border-indigo-500 bg-indigo-50 text-indigo-700 shadow-md shadow-indigo-500/10" : "border-slate-200 text-slate-600 hover:border-indigo-300 hover:bg-slate-50"}`)}>${escape_html(opt)}</button>`);
+      if (benarSalahStatements.length > 0) {
+        $$renderer2.push("<!--[0-->");
+        $$renderer2.push(`<div class="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-xs"><table class="w-full text-sm border-collapse text-left"><thead><tr class="bg-slate-50 border-b border-slate-200 text-slate-700"><th class="py-3 px-3 w-12 text-center font-semibold">No</th><th class="py-3 px-4 font-semibold">Pernyataan</th><th class="py-3 px-3 w-28 text-center font-semibold text-emerald-700 bg-emerald-50/50">Benar</th><th class="py-3 px-3 w-28 text-center font-semibold text-rose-700 bg-rose-50/50">Salah</th></tr></thead><tbody class="divide-y divide-slate-100"><!--[-->`);
+        const each_array_1 = ensure_array_like(benarSalahStatements);
+        for (let idx = 0, $$length = each_array_1.length; idx < $$length; idx++) {
+          let stmt = each_array_1[idx];
+          const choice = benarSalahAnswers[String(idx)];
+          $$renderer2.push(`<tr class="hover:bg-slate-50/70 transition-colors"><td class="py-3.5 px-3 text-center text-slate-500 font-semibold">${escape_html(idx + 1)}</td><td class="py-3.5 px-4 text-slate-800 prose prose-sm max-w-none">${html(stmt)}</td><td class="py-3.5 px-3 text-center bg-emerald-50/20"><button type="button"${attr_class(`w-full py-1.5 px-2 rounded-lg border-2 font-medium text-xs transition-all flex items-center justify-center gap-1.5 ${choice === "Benar" ? "bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-500/20" : "border-slate-200 text-slate-600 hover:border-emerald-300 hover:bg-emerald-50/50"}`)}><span${attr_class(`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${choice === "Benar" ? "border-white bg-white" : "border-slate-400"}`)}>`);
+          if (choice === "Benar") {
+            $$renderer2.push("<!--[0-->");
+            $$renderer2.push(`<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+          }
+          $$renderer2.push(`<!--]--></span> Benar</button></td><td class="py-3.5 px-3 text-center bg-rose-50/20"><button type="button"${attr_class(`w-full py-1.5 px-2 rounded-lg border-2 font-medium text-xs transition-all flex items-center justify-center gap-1.5 ${choice === "Salah" ? "bg-rose-500 border-rose-500 text-white shadow-sm shadow-rose-500/20" : "border-slate-200 text-slate-600 hover:border-rose-300 hover:bg-rose-50/50"}`)}><span${attr_class(`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${choice === "Salah" ? "border-white bg-white" : "border-slate-400"}`)}>`);
+          if (choice === "Salah") {
+            $$renderer2.push("<!--[0-->");
+            $$renderer2.push(`<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+          }
+          $$renderer2.push(`<!--]--></span> Salah</button></td></tr>`);
+        }
+        $$renderer2.push(`<!--]--></tbody></table></div>`);
+      } else {
+        $$renderer2.push("<!--[-1-->");
+        $$renderer2.push(`<div class="grid grid-cols-2 gap-3"><!--[-->`);
+        const each_array_2 = ensure_array_like(["Benar", "Salah"]);
+        for (let $$index_2 = 0, $$length = each_array_2.length; $$index_2 < $$length; $$index_2++) {
+          let opt = each_array_2[$$index_2];
+          $$renderer2.push(`<button${attr_class(`p-4 rounded-xl border-2 text-center font-semibold transition-all duration-200 ${answer === opt ? "border-indigo-500 bg-indigo-50 text-indigo-700 shadow-md shadow-indigo-500/10" : "border-slate-200 text-slate-600 hover:border-indigo-300 hover:bg-slate-50"}`)}>${escape_html(opt)}</button>`);
+        }
+        $$renderer2.push(`<!--]--></div>`);
       }
-      $$renderer2.push(`<!--]--></div>`);
+      $$renderer2.push(`<!--]-->`);
     } else if (safeType === "isian_singkat") {
       $$renderer2.push("<!--[2-->");
       $$renderer2.push(`<input type="search"${attr("name", `jawaban_siswa_${stringify(question.id)}_${stringify(Date.now())}`)}${attr("id", `jawaban_siswa_${stringify(question.id)}`)} data-lpignore="true" data-form-type="other" class="input text-base appearance-none" placeholder="Ketik jawaban singkat di sini..."${attr("value", answer)} autocomplete="do-not-autofill" autocorrect="off" autocapitalize="off" spellcheck="false"/>`);
@@ -187,9 +231,9 @@ function QuestionRenderer($$renderer, $$props) {
     } else if (safeType === "menjodohkan") {
       $$renderer2.push("<!--[4-->");
       $$renderer2.push(`<div class="space-y-3"><!--[-->`);
-      const each_array_2 = ensure_array_like(matchingLeft);
-      for (let leftIdx = 0, $$length = each_array_2.length; leftIdx < $$length; leftIdx++) {
-        let leftItem = each_array_2[leftIdx];
+      const each_array_3 = ensure_array_like(matchingLeft);
+      for (let leftIdx = 0, $$length = each_array_3.length; leftIdx < $$length; leftIdx++) {
+        let leftItem = each_array_3[leftIdx];
         $$renderer2.push(`<div class="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200"><span class="flex-1 text-sm font-medium text-slate-700 prose prose-sm max-w-none">${html(leftItem)}</span> <svg class="w-5 h-5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg> `);
         $$renderer2.select(
           {
@@ -201,9 +245,9 @@ function QuestionRenderer($$renderer, $$props) {
               $$renderer4.push(`-- Pilih --`);
             });
             $$renderer3.push(`<!--[-->`);
-            const each_array_3 = ensure_array_like(matchingRight);
-            for (let rightIdx = 0, $$length2 = each_array_3.length; rightIdx < $$length2; rightIdx++) {
-              let rightItem = each_array_3[rightIdx];
+            const each_array_4 = ensure_array_like(matchingRight);
+            for (let rightIdx = 0, $$length2 = each_array_4.length; rightIdx < $$length2; rightIdx++) {
+              let rightItem = each_array_4[rightIdx];
               $$renderer3.option({ value: String(rightIdx) }, ($$renderer4) => {
                 $$renderer4.push(`${escape_html(rightItem)}`);
               });

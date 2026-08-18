@@ -89,11 +89,11 @@ function _page($$renderer, $$props) {
         $$renderer3.push("<!--[-1-->");
       }
       $$renderer3.push(`<!--]--> <div class="space-y-3">`);
-      const each_array_4 = ensure_array_like(questions);
-      if (each_array_4.length !== 0) {
+      const each_array_5 = ensure_array_like(questions);
+      if (each_array_5.length !== 0) {
         $$renderer3.push("<!--[-->");
-        for (let idx = 0, $$length = each_array_4.length; idx < $$length; idx++) {
-          let q = each_array_4[idx];
+        for (let idx = 0, $$length = each_array_5.length; idx < $$length; idx++) {
+          let q = each_array_5[idx];
           $$renderer3.push(`<div${attr_class(`card p-4 flex items-start gap-4 group ${selectedQuestionIds.has(q.id) ? "ring-2 ring-indigo-500 bg-indigo-50/20" : ""}`)}>`);
           if (isBulkSelectMode) {
             $$renderer3.push("<!--[0-->");
@@ -116,19 +116,29 @@ function _page($$renderer, $$props) {
             if (Array.isArray(opts)) {
               $$renderer3.push("<!--[0-->");
               $$renderer3.push(`<div class="flex flex-wrap gap-1.5 mt-2"><!--[-->`);
-              const each_array_5 = ensure_array_like(opts);
-              for (let i = 0, $$length2 = each_array_5.length; i < $$length2; i++) {
-                let opt = each_array_5[i];
+              const each_array_6 = ensure_array_like(opts);
+              for (let i = 0, $$length2 = each_array_6.length; i < $$length2; i++) {
+                let opt = each_array_6[i];
                 const isCorrect = q.type === "pilihan_ganda" && correct === String.fromCharCode(65 + i) || q.type === "pilihan_ganda_kompleks" && Array.isArray(correct) && correct.includes(String.fromCharCode(65 + i)) || q.type === "benar_salah" && correct === opt;
                 $$renderer3.push(`<span${attr_class(`text-[10px] px-2 py-0.5 rounded-md ${isCorrect ? "bg-green-100 text-green-700 font-bold border border-green-200" : "bg-slate-100 text-slate-600"} flex items-center gap-1`)}>${escape_html(q.type.startsWith("pilihan_ganda") ? `${String.fromCharCode(65 + i)}.` : "")} ${html(opt)}</span>`);
               }
               $$renderer3.push(`<!--]--></div>`);
-            } else if (q.type === "menjodohkan" && opts.left) {
+            } else if (q.type === "benar_salah" && opts.statements) {
               $$renderer3.push("<!--[1-->");
+              $$renderer3.push(`<div class="mt-2 space-y-1 text-xs"><!--[-->`);
+              const each_array_7 = ensure_array_like(opts.statements);
+              for (let i = 0, $$length2 = each_array_7.length; i < $$length2; i++) {
+                let stmt = each_array_7[i];
+                const ansKey = typeof correct === "object" && correct !== null ? correct[String(i)] || correct[i] || "Benar" : correct || "Benar";
+                $$renderer3.push(`<div class="flex items-center gap-2 text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100"><span class="font-bold text-slate-700">${escape_html(i + 1)}.</span> <span class="flex-1 truncate">${html(stmt)}</span> <span${attr_class(`px-2 py-0.5 rounded text-[10px] font-bold ${ansKey === "Benar" ? "bg-emerald-100 text-emerald-700 border border-emerald-200" : "bg-rose-100 text-rose-700 border border-rose-200"}`)}>${escape_html(ansKey)}</span></div>`);
+              }
+              $$renderer3.push(`<!--]--></div>`);
+            } else if (q.type === "menjodohkan" && opts.left) {
+              $$renderer3.push("<!--[2-->");
               $$renderer3.push(`<div class="mt-2 text-xs text-slate-500"><!--[-->`);
-              const each_array_6 = ensure_array_like(opts.left);
-              for (let i = 0, $$length2 = each_array_6.length; i < $$length2; i++) {
-                let l = each_array_6[i];
+              const each_array_8 = ensure_array_like(opts.left);
+              for (let i = 0, $$length2 = each_array_8.length; i < $$length2; i++) {
+                let l = each_array_8[i];
                 $$renderer3.push(`<div class="flex gap-2"><span class="font-medium text-slate-700">${escape_html(l)}</span> <span>→</span> <span class="text-green-600">${escape_html(opts.right[correct[i]])}</span></div>`);
               }
               $$renderer3.push(`<!--]--></div>`);

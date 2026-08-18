@@ -128,13 +128,31 @@
             q.correct_answer_json = JSON.stringify(correctAnswer);
           }
         } else if (type === 'benar_salah') {
-          q.options_json = JSON.stringify(['Benar', 'Salah']);
-          let correctAnswer = String(row[7] || '').trim();
-          if (correctAnswer.toLowerCase() !== 'benar' && correctAnswer.toLowerCase() !== 'salah') {
-            throw new Error(`Baris ${rowNum}: Jawaban Benar untuk tipe Benar Salah harus berisi "Benar" atau "Salah".`);
+          const statements = [];
+          for (let col = 2; col <= 6; col++) {
+            const val = String(row[col] || '').trim();
+            if (val) statements.push(val);
           }
-          correctAnswer = correctAnswer.toLowerCase() === 'benar' ? 'Benar' : 'Salah';
-          q.correct_answer_json = JSON.stringify(correctAnswer);
+
+          const rawCorrect = String(row[7] || '').trim();
+          
+          if (statements.length > 0) {
+            q.options_json = JSON.stringify({ statements });
+            const answers = rawCorrect.split(/[,;\n|]+/).map(a => a.trim().toLowerCase());
+            const correctMap: Record<string, string> = {};
+            statements.forEach((_, idx) => {
+              const a = answers[idx] !== undefined ? answers[idx] : (answers[0] || 'benar');
+              correctMap[String(idx)] = (a === 'salah' || a === 's' || a === 'false' || a === '0') ? 'Salah' : 'Benar';
+            });
+            q.correct_answer_json = JSON.stringify(correctMap);
+          } else {
+            if (rawCorrect.toLowerCase() !== 'benar' && rawCorrect.toLowerCase() !== 'salah' && rawCorrect.toLowerCase() !== 'b' && rawCorrect.toLowerCase() !== 's') {
+              throw new Error(`Baris ${rowNum}: Jawaban Benar untuk tipe Benar Salah harus berisi "Benar" atau "Salah".`);
+            }
+            const correctAnswer = (rawCorrect.toLowerCase() === 'benar' || rawCorrect.toLowerCase() === 'b') ? 'Benar' : 'Salah';
+            q.options_json = JSON.stringify(['Benar', 'Salah']);
+            q.correct_answer_json = JSON.stringify(correctAnswer);
+          }
         } else if (type === 'isian_singkat' || type === 'essay') {
           q.correct_answer_json = JSON.stringify(String(row[7] || '').trim());
         }

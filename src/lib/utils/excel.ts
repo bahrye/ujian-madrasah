@@ -121,13 +121,17 @@ export async function exportExamResults(examId: string, examTitle: string) {
 				try {
 					const correct = JSON.parse(q.correct_answer_json);
 					if (q.type === 'pilihan_ganda') {
-						kunci = correct.answer;
+						kunci = typeof correct === 'object' && correct !== null && 'answer' in correct ? correct.answer : String(correct);
 					} else if (q.type === 'benar_salah') {
-						kunci = correct.answer ? 'Benar' : 'Salah';
+						if (typeof correct === 'object' && correct !== null && !Array.isArray(correct)) {
+							kunci = Object.entries(correct).map(([k, v]) => `${Number(k) + 1}: ${v}`).join(', ');
+						} else {
+							kunci = typeof correct === 'object' && correct !== null && 'answer' in correct ? (correct.answer ? 'Benar' : 'Salah') : String(correct);
+						}
 					} else if (q.type === 'pilihan_ganda_kompleks' && Array.isArray(correct)) {
 						kunci = correct.join(', ');
 					} else {
-						kunci = Array.isArray(correct) ? correct.join(', ') : JSON.stringify(correct);
+						kunci = Array.isArray(correct) ? correct.join(', ') : (typeof correct === 'object' && correct !== null ? JSON.stringify(correct) : String(correct));
 					}
 				} catch(e) {
 					kunci = q.correct_answer_json;

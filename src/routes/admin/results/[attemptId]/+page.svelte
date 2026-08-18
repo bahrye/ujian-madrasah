@@ -9,6 +9,19 @@
 	$: attempt = data.attempt as any;
 	$: answers = data.answers as any[];
 
+	function safeParseJson(str: string | null | undefined, fallback: any = null) {
+		if (!str) return fallback;
+		try {
+			const parsed = JSON.parse(str);
+			if (typeof parsed === 'string') {
+				try { return JSON.parse(parsed); } catch { return parsed; }
+			}
+			return parsed;
+		} catch {
+			return fallback;
+		}
+	}
+
 </script>
 
 <svelte:head>
@@ -156,6 +169,24 @@
 											<p class="text-slate-400 italic">Tidak dijawab</p>
 										{/if}
 									</div>
+								{:else if ans.type === 'benar_salah'}
+									{@const opts = safeParseJson(ans.options_json, null)}
+									{@const givenMap = safeParseJson(ans.answer_given, null)}
+									{#if opts && opts.statements && Array.isArray(opts.statements)}
+										<div class="space-y-1 text-sm bg-white p-2 rounded border border-slate-200">
+											{#each opts.statements as stmt, idx}
+												{@const choice = typeof givenMap === 'object' && givenMap !== null ? givenMap[String(idx)] : null}
+												<div class="flex items-center justify-between text-xs py-1 border-b border-slate-100 last:border-0 gap-2">
+													<span class="text-slate-700">{idx + 1}. {@html stmt}</span>
+													<span class="px-2 py-0.5 rounded font-bold shrink-0 {choice === 'Benar' ? 'bg-emerald-100 text-emerald-700' : (choice === 'Salah' ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-500')}">
+														{choice || '-'}
+													</span>
+												</div>
+											{/each}
+										</div>
+									{:else}
+										<p class="text-sm text-slate-800 bg-white p-2 rounded border border-slate-200">{ans.answer_given}</p>
+									{/if}
 								{:else}
 									<p class="text-sm text-slate-800 bg-white p-2 rounded border border-slate-200 whitespace-pre-wrap">{ans.answer_given}</p>
 								{/if}
@@ -208,8 +239,26 @@
 												<p class="text-emerald-800">{JSON.parse(ans.correct_answer_json)}</p>
 											{/if}
 										</div>
+									{:else if ans.type === 'benar_salah'}
+										{@const opts = safeParseJson(ans.options_json, null)}
+										{@const correctMap = safeParseJson(ans.correct_answer_json, null)}
+										{#if opts && opts.statements && Array.isArray(opts.statements)}
+											<div class="space-y-1 text-sm bg-emerald-50 p-2 rounded border border-emerald-100">
+												{#each opts.statements as stmt, idx}
+													{@const keyVal = typeof correctMap === 'object' && correctMap !== null ? (correctMap[String(idx)] || correctMap[idx]) : 'Benar'}
+													<div class="flex items-center justify-between text-xs py-1 border-b border-emerald-200/40 last:border-0 gap-2">
+														<span class="text-emerald-900">{idx + 1}. {@html stmt}</span>
+														<span class="px-2 py-0.5 rounded font-bold shrink-0 {keyVal === 'Benar' ? 'bg-emerald-200 text-emerald-800' : 'bg-rose-200 text-rose-800'}">
+															{keyVal || 'Benar'}
+														</span>
+													</div>
+												{/each}
+											</div>
+										{:else}
+											<p class="text-sm text-emerald-800 bg-emerald-50 p-2 rounded border border-emerald-100">{safeParseJson(ans.correct_answer_json, 'Tidak ada')}</p>
+										{/if}
 									{:else}
-										<p class="text-sm text-emerald-800 bg-emerald-50 p-2 rounded border border-emerald-100">{JSON.parse(ans.correct_answer_json)}</p>
+										<p class="text-sm text-emerald-800 bg-emerald-50 p-2 rounded border border-emerald-100">{safeParseJson(ans.correct_answer_json, 'Tidak ada')}</p>
 									{/if}
 								{:else}
 									<p class="text-sm italic text-slate-400">Tidak ada kunci jawaban</p>

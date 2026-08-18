@@ -75,8 +75,25 @@ export const actions: Actions = {
 			optionsJson = JSON.stringify(opts);
 			correctAnswerJson = JSON.stringify(corrects);
 		} else if (type === 'benar_salah') {
-			optionsJson = JSON.stringify(['Benar', 'Salah']);
-			correctAnswerJson = JSON.stringify(form.get('correct_answer')?.toString() || 'Benar');
+			const statements: string[] = [];
+			const correctMap: Record<string, string> = {};
+			let idx = 0;
+			for (let i = 0; i < 50; i++) {
+				const stmt = form.get(`bs_statement_${i}`)?.toString().trim();
+				if (stmt) {
+					statements.push(stmt);
+					correctMap[String(idx)] = form.get(`bs_correct_${i}`)?.toString() || 'Benar';
+					idx++;
+				}
+			}
+			if (statements.length > 0) {
+				optionsJson = JSON.stringify({ statements });
+				correctAnswerJson = JSON.stringify(correctMap);
+			} else {
+				const single = form.get('correct_answer')?.toString() || 'Benar';
+				optionsJson = JSON.stringify(['Benar', 'Salah']);
+				correctAnswerJson = JSON.stringify(single);
+			}
 		} else if (type === 'isian_singkat' || type === 'essay') {
 			correctAnswerJson = JSON.stringify(form.get('correct_answer')?.toString().trim() || '');
 		} else if (type === 'menjodohkan') {
@@ -159,8 +176,25 @@ export const actions: Actions = {
 			optionsJson = JSON.stringify(opts);
 			correctAnswerJson = JSON.stringify(corrects);
 		} else if (type === 'benar_salah') {
-			optionsJson = JSON.stringify(['Benar', 'Salah']);
-			correctAnswerJson = JSON.stringify(form.get('correct_answer')?.toString() || 'Benar');
+			const statements: string[] = [];
+			const correctMap: Record<string, string> = {};
+			let idx = 0;
+			for (let i = 0; i < 50; i++) {
+				const stmt = form.get(`bs_statement_${i}`)?.toString().trim();
+				if (stmt) {
+					statements.push(stmt);
+					correctMap[String(idx)] = form.get(`bs_correct_${i}`)?.toString() || 'Benar';
+					idx++;
+				}
+			}
+			if (statements.length > 0) {
+				optionsJson = JSON.stringify({ statements });
+				correctAnswerJson = JSON.stringify(correctMap);
+			} else {
+				const single = form.get('correct_answer')?.toString() || 'Benar';
+				optionsJson = JSON.stringify(['Benar', 'Salah']);
+				correctAnswerJson = JSON.stringify(single);
+			}
 		} else if (type === 'isian_singkat' || type === 'essay') {
 			correctAnswerJson = JSON.stringify(form.get('correct_answer')?.toString().trim() || '');
 		} else if (type === 'menjodohkan') {

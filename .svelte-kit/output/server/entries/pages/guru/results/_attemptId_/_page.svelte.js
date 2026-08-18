@@ -101,6 +101,25 @@ function _page($$renderer, $$props) {
             $$renderer2.push(`<p class="text-slate-400 italic">Tidak dijawab</p>`);
           }
           $$renderer2.push(`<!--]--></div>`);
+        } else if (ans.type === "benar_salah") {
+          $$renderer2.push("<!--[3-->");
+          const opts = safeParseJson(ans.options_json, null);
+          const givenMap = safeParseJson(ans.answer_given, null);
+          if (opts && opts.statements && Array.isArray(opts.statements)) {
+            $$renderer2.push("<!--[0-->");
+            $$renderer2.push(`<div class="space-y-1 text-sm bg-white p-2 rounded border border-slate-200"><!--[-->`);
+            const each_array_3 = ensure_array_like(opts.statements);
+            for (let idx = 0, $$length2 = each_array_3.length; idx < $$length2; idx++) {
+              let stmt = each_array_3[idx];
+              const choice = typeof givenMap === "object" && givenMap !== null ? givenMap[String(idx)] : null;
+              $$renderer2.push(`<div class="flex items-center justify-between text-xs py-1 border-b border-slate-100 last:border-0 gap-2"><span class="text-slate-700">${escape_html(idx + 1)}. ${html(stmt)}</span> <span${attr_class(`px-2 py-0.5 rounded font-bold shrink-0 ${choice === "Benar" ? "bg-emerald-100 text-emerald-700" : choice === "Salah" ? "bg-rose-100 text-rose-700" : "bg-slate-100 text-slate-500"}`)}>${escape_html(choice || "-")}</span></div>`);
+            }
+            $$renderer2.push(`<!--]--></div>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+            $$renderer2.push(`<p class="text-sm text-slate-800 bg-white p-2 rounded border border-slate-200">${escape_html(ans.answer_given)}</p>`);
+          }
+          $$renderer2.push(`<!--]-->`);
         } else {
           $$renderer2.push("<!--[-1-->");
           $$renderer2.push(`<p class="text-sm text-slate-800 bg-white p-2 rounded border border-slate-200 whitespace-pre-wrap">${escape_html(ans.answer_given)}</p>`);
@@ -125,9 +144,9 @@ function _page($$renderer, $$props) {
           if (ans.type === "menjodohkan") {
             $$renderer2.push("<!--[0-->");
             $$renderer2.push(`<div class="space-y-2 text-sm bg-emerald-50 p-2 rounded border border-emerald-100"><!--[-->`);
-            const each_array_3 = ensure_array_like(safeParseObjectEntries(ans.correct_answer_json));
-            for (let $$index_2 = 0, $$length2 = each_array_3.length; $$index_2 < $$length2; $$index_2++) {
-              let [key, value] = each_array_3[$$index_2];
+            const each_array_4 = ensure_array_like(safeParseObjectEntries(ans.correct_answer_json));
+            for (let $$index_3 = 0, $$length2 = each_array_4.length; $$index_3 < $$length2; $$index_3++) {
+              let [key, value] = each_array_4[$$index_3];
               $$renderer2.push(`<div class="flex border-b border-emerald-200/50 last:border-0 pb-1 last:pb-0"><span class="font-medium text-emerald-800 w-1/2">${escape_html(key)}</span> <span class="text-emerald-900 w-1/2">-> ${escape_html(value)}</span></div>`);
             }
             $$renderer2.push(`<!--]--></div>`);
@@ -152,9 +171,9 @@ function _page($$renderer, $$props) {
             if (Array.isArray(correctArr)) {
               $$renderer2.push("<!--[0-->");
               $$renderer2.push(`<div class="flex flex-wrap gap-1.5"><!--[-->`);
-              const each_array_4 = ensure_array_like(correctArr);
-              for (let $$index_3 = 0, $$length2 = each_array_4.length; $$index_3 < $$length2; $$index_3++) {
-                let item = each_array_4[$$index_3];
+              const each_array_5 = ensure_array_like(correctArr);
+              for (let $$index_4 = 0, $$length2 = each_array_5.length; $$index_4 < $$length2; $$index_4++) {
+                let item = each_array_5[$$index_4];
                 $$renderer2.push(`<span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 font-medium rounded border border-emerald-200">${escape_html(item)}</span>`);
               }
               $$renderer2.push(`<!--]--></div>`);
@@ -163,6 +182,25 @@ function _page($$renderer, $$props) {
               $$renderer2.push(`<p class="text-emerald-800">${escape_html(safeParseJson(ans.correct_answer_json, "Tidak ada"))}</p>`);
             }
             $$renderer2.push(`<!--]--></div>`);
+          } else if (ans.type === "benar_salah") {
+            $$renderer2.push("<!--[3-->");
+            const opts = safeParseJson(ans.options_json, null);
+            const correctMap = safeParseJson(ans.correct_answer_json, null);
+            if (opts && opts.statements && Array.isArray(opts.statements)) {
+              $$renderer2.push("<!--[0-->");
+              $$renderer2.push(`<div class="space-y-1 text-sm bg-emerald-50 p-2 rounded border border-emerald-100"><!--[-->`);
+              const each_array_6 = ensure_array_like(opts.statements);
+              for (let idx = 0, $$length2 = each_array_6.length; idx < $$length2; idx++) {
+                let stmt = each_array_6[idx];
+                const keyVal = typeof correctMap === "object" && correctMap !== null ? correctMap[String(idx)] || correctMap[idx] : "Benar";
+                $$renderer2.push(`<div class="flex items-center justify-between text-xs py-1 border-b border-emerald-200/40 last:border-0 gap-2"><span class="text-emerald-900">${escape_html(idx + 1)}. ${html(stmt)}</span> <span${attr_class(`px-2 py-0.5 rounded font-bold shrink-0 ${keyVal === "Benar" ? "bg-emerald-200 text-emerald-800" : "bg-rose-200 text-rose-800"}`)}>${escape_html(keyVal || "Benar")}</span></div>`);
+              }
+              $$renderer2.push(`<!--]--></div>`);
+            } else {
+              $$renderer2.push("<!--[-1-->");
+              $$renderer2.push(`<p class="text-sm text-emerald-800 bg-emerald-50 p-2 rounded border border-emerald-100">${escape_html(safeParseJson(ans.correct_answer_json, "Tidak ada"))}</p>`);
+            }
+            $$renderer2.push(`<!--]-->`);
           } else {
             $$renderer2.push("<!--[-1-->");
             $$renderer2.push(`<p class="text-sm text-emerald-800 bg-emerald-50 p-2 rounded border border-emerald-100">${escape_html(safeParseJson(ans.correct_answer_json, "Tidak ada"))}</p>`);

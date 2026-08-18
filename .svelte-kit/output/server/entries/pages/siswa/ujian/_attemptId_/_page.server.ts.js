@@ -276,8 +276,30 @@ const actions = {
         }
         let isCorrect = false;
         let partialScore = null;
-        if (ans.type === "pilihan_ganda" || ans.type === "benar_salah") {
+        if (ans.type === "pilihan_ganda") {
           isCorrect = String(ans.answer_given).trim() === String(correctAnswer).trim();
+        } else if (ans.type === "benar_salah") {
+          if (typeof correctAnswer === "object" && correctAnswer !== null && !Array.isArray(correctAnswer)) {
+            try {
+              const givenMap = typeof ans.answer_given === "string" ? JSON.parse(ans.answer_given) : ans.answer_given;
+              const keys = Object.keys(correctAnswer);
+              const totalStatements = keys.length;
+              if (totalStatements > 0) {
+                let correctCount = 0;
+                for (const key of keys) {
+                  if (givenMap && String(givenMap[key] || "").trim().toLowerCase() === String(correctAnswer[key] || "").trim().toLowerCase()) {
+                    correctCount++;
+                  }
+                }
+                isCorrect = correctCount === totalStatements;
+                partialScore = Math.round(correctCount / totalStatements * ans.points * 100) / 100;
+              }
+            } catch {
+              isCorrect = false;
+            }
+          } else {
+            isCorrect = String(ans.answer_given).trim().toLowerCase() === String(correctAnswer).trim().toLowerCase();
+          }
         } else if (ans.type === "pilihan_ganda_kompleks") {
           try {
             const givenRaw = typeof ans.answer_given === "string" ? JSON.parse(ans.answer_given) : ans.answer_given;

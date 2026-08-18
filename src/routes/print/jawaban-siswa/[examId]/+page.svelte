@@ -75,6 +75,9 @@
 		}
 
 		if (typeof parsed === 'object' && parsed !== null) {
+			if (type === 'benar_salah') {
+				return Object.entries(parsed).map(([k, v]) => `${Number(k) + 1}:${String(v).toLowerCase().startsWith('b') || String(v).toLowerCase() === 'true' ? 'B' : 'S'}`).join(' ');
+			}
 			return Object.entries(parsed).map(([k, v]) => `${k}:${v}`).join(',');
 		}
 
