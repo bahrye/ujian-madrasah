@@ -395,7 +395,7 @@
 					>
 						{optionLetters[i]}
 					</span>
-					<div class="option-content text-sm prose prose-sm max-w-none flex-1 {isSelected ? 'text-indigo-700 font-medium' : 'text-slate-700'}">
+					<div class="option-content text-sm prose prose-sm max-w-none flex-1 {isSelected ? 'text-indigo-700 font-medium' : 'text-slate-700'}" use:mathRender={option} use:arabicRender={option}>
 						{@html getOptionHtml(option)}
 					</div>
 				</div>
@@ -425,7 +425,7 @@
 								{@const choice = benarSalahAnswers[String(idx)]}
 								<tr class="hover:bg-slate-50/70 transition-colors">
 									<td class="py-2.5 sm:py-3.5 px-1.5 sm:px-3 text-center text-slate-500 font-semibold">{idx + 1}</td>
-									<td class="py-2.5 sm:py-3.5 px-2 sm:px-4 text-slate-800 prose prose-sm max-w-none break-words">{@html stmt}</td>
+									<td class="py-2.5 sm:py-3.5 px-2 sm:px-4 text-slate-800 prose prose-sm max-w-none break-words" use:mathRender={stmt} use:arabicRender={stmt}>{@html stmt}</td>
 									<td class="py-2.5 sm:py-3.5 px-1 sm:px-2 text-center bg-emerald-50/20">
 										<button
 											type="button"
@@ -585,7 +585,7 @@
 											{hasMatch ? pairColor.badge : (isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600')}">
 											{leftIdx + 1}
 										</span>
-										<div class="flex-1 min-w-0">
+										<div class="flex-1 min-w-0" use:mathRender={leftItem} use:arabicRender={leftItem}>
 											<div class="text-xs sm:text-sm font-medium {hasMatch ? 'text-slate-900 font-semibold' : 'text-slate-700'} prose prose-sm max-w-none break-words">
 												{@html leftItem}
 											</div>
@@ -655,7 +655,7 @@
 											{isMatched ? pairColor.badge : (isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600')}">
 											{String.fromCharCode(65 + rightIdx)}
 										</span>
-										<div class="flex-1 min-w-0">
+										<div class="flex-1 min-w-0" use:mathRender={rightItem} use:arabicRender={rightItem}>
 											<div class="text-xs sm:text-sm font-medium {isMatched ? 'text-slate-900 font-semibold' : 'text-slate-700'} prose prose-sm max-w-none break-words">
 												{@html rightItem}
 											</div>
