@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ params, platform, locals }) => {
 	const school = await db.prepare('SELECT * FROM schools WHERE id = ?').bind(locals.user!.school_id).first();
 
 	const attempt = await db.prepare(`
-		SELECT sa.*, u.name as student_name, u.username as nisn, u.nomor_peserta, c.name as class_name, 
+		SELECT sa.*, u.name as student_name, COALESCE(u.nisn, u.username) as nisn, u.nomor_peserta, u.username, c.name as class_name, 
 		       e.title, s.name as subject_name, et.code as exam_type_code, ec.name as exam_class_name, e.duration_minutes
 		FROM student_attempts sa
 		JOIN users u ON sa.student_id = u.id

@@ -141,7 +141,8 @@
 				<!-- Kolom 1: Siswa -->
 				<div class="space-y-0.5">
 					<div><span class="text-slate-500">Nama Siswa:</span> <strong class="text-slate-900 block font-bold text-xs">{attempt.student_name}</strong></div>
-					<div><span class="text-slate-500">NISN / No. Peserta:</span> <span class="font-semibold text-slate-800">{attempt.nomor_peserta || attempt.nisn}</span></div>
+					<div><span class="text-slate-500">NISN:</span> <span class="font-semibold text-slate-800">{attempt.nisn || '-'}</span></div>
+					<div><span class="text-slate-500">No. Peserta:</span> <span class="font-semibold text-slate-800">{attempt.nomor_peserta || '-'}</span></div>
 					<div><span class="text-slate-500">Kelas:</span> <span class="font-semibold text-slate-800">{attempt.class_name || '-'}</span></div>
 				</div>
 
