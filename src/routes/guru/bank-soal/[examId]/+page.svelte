@@ -467,6 +467,7 @@
 	}
 	
 	let editingQuestion: any = null;
+	let editQuestionText = '';
 	let createMenjodohkanCount = 4;
 	let editMenjodohkanCount = 4;
 	let createBenarSalahCount = 3;
@@ -887,12 +888,13 @@
 					<div class="flex flex-col gap-2">
 						<button type="button" class="p-2 rounded-xl text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-700 transition-colors" title="Edit soal" on:click={() => {
 							editingQuestion = { ...q };
+							editQuestionText = q.question_text || '';
 							// Migrate old media to rich text
 							if (editingQuestion.media_url && editingQuestion.media_type !== 'none') {
 								const mediaHtml = editingQuestion.media_type === 'audio' 
 									? `<br><audio controls src="${editingQuestion.media_url}" class="w-full mt-2 mb-2"></audio>`
 									: `<br><img src="${editingQuestion.media_url}" class="max-h-64 object-contain rounded-lg border border-slate-200 mt-2 mb-2">`;
-								editingQuestion.question_text += mediaHtml;
+								editQuestionText += mediaHtml;
 								editingQuestion.media_url = null;
 								editingQuestion.media_type = 'none';
 							}
@@ -987,7 +989,7 @@
 			</div>
 			
 			<div class="p-6 overflow-y-auto">
-				<form method="POST" action="?/edit" use:enhance={() => { return async ({ update }) => { editingQuestion = null; await update(); }; }} class="space-y-4">
+				<form method="POST" action="?/edit" use:enhance={() => { return async ({ update }) => { await update(); editingQuestion = null; editQuestionText = ''; }; }} class="space-y-4">
 					<input type="hidden" name="id" value={editingQuestion.id} />
 					<input type="hidden" name="type" value={editingQuestion.type} />
 					
@@ -1008,7 +1010,7 @@
 							id="eq-text" 
 							name="question_text" 
 							placeholder="Tuliskan soal di sini... (Bisa langsung Paste / Ctrl+V gambar ke kotak ini)" 
-							bind:value={editingQuestion.question_text}
+							bind:value={editQuestionText}
 							bind:this={eqEditorComponent}
 							on:paste={(e) => handlePaste(e, eqEditorComponent)}
 						>
@@ -1043,7 +1045,7 @@
 								<div class="flex items-center gap-2">
 									<span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500">{String.fromCharCode(65 + i)}</span>
 									<div class="flex-1">
-										<RichTextEditor id="edit_option_{i}" name="option_{i}" placeholder="Opsi {String.fromCharCode(65 + i)}" bind:value={opts[i]} compact={true} />
+										<RichTextEditor id="edit_option_{i}" name="option_{i}" placeholder="Opsi {String.fromCharCode(65 + i)}" value={opts[i] || ''} compact={true} />
 									</div>
 									<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 shrink-0" on:click={() => openMediaPickerForOption('edit', editingQuestion.type, i)} title="Tambahkan Media">
 										🖼️
