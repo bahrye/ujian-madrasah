@@ -1,6 +1,107 @@
-import { h as head, i as ensure_array_like, e as escape_html, k as attr, j as attr_class, c as stringify } from "../../../../chunks/index.js";
+import { h as head, i as ensure_array_like, e as escape_html, k as attr, j as attr_class, c as stringify, a as attr_style } from "../../../../chunks/index.js";
 function _page($$renderer) {
   let activeBadge = 0;
+  let currentSlide = 0;
+  const slides = [
+    {
+      id: 1,
+      title: "Tampilan Utama Soal (No. 1 - 10)",
+      subtitle: "Penjelasan antarmuka navigasi, soal, dan timer saat mengerjakan.",
+      image: "/panduan-ui-ujian.jpeg",
+      badges: [
+        { no: 1, top: "3%", left: "3%" },
+        { no: 2, top: "3%", left: "52%" },
+        { no: 3, top: "3%", left: "90%" },
+        { no: 4, top: "15%", left: "90%" },
+        { no: 5, top: "30%", left: "3%" },
+        { no: 6, top: "55%", left: "3%" },
+        { no: 7, top: "85%", left: "3%" },
+        { no: 8, top: "85%", left: "40%" },
+        { no: 9, top: "85%", left: "88%" },
+        { no: 10, top: "96%", left: "88%" }
+      ],
+      items: [
+        {
+          no: 1,
+          title: "Judul Ujian",
+          desc: "Menampilkan nama mata pelajaran ujian yang sedang dikerjakan."
+        },
+        {
+          no: 2,
+          title: "Indikator Pelanggaran",
+          desc: "Menampilkan jumlah peringatan jika Anda terdeteksi keluar dari layar penuh/membuka aplikasi lain."
+        },
+        {
+          no: 3,
+          title: "Sisa Waktu",
+          desc: "Menunjukkan batas waktu pengerjaan. Ujian otomatis berakhir jika waktu habis."
+        },
+        {
+          no: 4,
+          title: "Tombol Ragu-ragu",
+          desc: "Tandai soal dengan ini jika Anda belum yakin dengan jawaban yang dipilih."
+        },
+        {
+          no: 5,
+          title: "Teks Soal",
+          desc: "Area utama yang menampilkan pertanyaan ujian yang harus dijawab."
+        },
+        {
+          no: 6,
+          title: "Pilihan Jawaban",
+          desc: "Pilih jawaban yang paling tepat. Jawaban akan langsung tersimpan ke sistem."
+        },
+        {
+          no: 7,
+          title: "Navigasi Soal",
+          desc: "Membuka panel berisi daftar seluruh nomor soal untuk memudahkan berpindah nomor."
+        },
+        {
+          no: 8,
+          title: "Tombol Muat Ulang",
+          desc: "Gunakan tombol ini untuk memuat ulang halaman tanpa keluar dari ujian jika terjadi kendala/error jaringan."
+        },
+        {
+          no: 9,
+          title: "Informasi Progres",
+          desc: "Melihat ringkasan berapa soal yang sudah dijawab dan yang masih kosong."
+        },
+        {
+          no: 10,
+          title: "Tombol Navigasi (Sebelumnya/Selanjutnya)",
+          desc: "Digunakan untuk beralih ke soal sebelum atau soal sesudahnya."
+        }
+      ]
+    },
+    {
+      id: 2,
+      title: "Tombol Selesai & Kumpulkan (No. 11)",
+      subtitle: "Tampilan di nomor soal terakhir untuk menyelesaikan ujian.",
+      image: "/panduan-ui-ujian-2.jpeg",
+      badges: [{ no: 11, top: "94%", left: "72%" }],
+      items: [
+        {
+          no: 11,
+          title: "Tombol Selesai & Kumpulkan",
+          desc: 'Tombol berwarna hijau ini akan muncul menggantikan tombol "Selanjutnya" saat Anda berada pada nomor soal terakhir. Klik tombol ini jika sudah selesai mengerjakan seluruh soal.'
+        }
+      ]
+    },
+    {
+      id: 3,
+      title: "Konfirmasi Pengumpulan Jawaban (No. 12)",
+      subtitle: "Kotak dialog verifikasi sebelum lembar jawaban dikirim secara permanen.",
+      image: "/panduan-ui-ujian-3.jpeg",
+      badges: [{ no: 12, top: "69%", left: "72%" }],
+      items: [
+        {
+          no: 12,
+          title: "Konfirmasi Pengumpulan Jawaban",
+          desc: 'Kotak dialog ini merangkum total soal yang sudah terjawab, ragu-ragu, dan belum dijawab. Klik "Ya, Kumpulkan" untuk menyelesaikan ujian, atau klik "Kembali" jika masih ingin memeriksa jawaban.'
+        }
+      ]
+    }
+  ];
   head("17ilvk", $$renderer, ($$renderer2) => {
     $$renderer2.title(($$renderer3) => {
       $$renderer3.push(`<title>Tata Tertib Ujian — Ujian Online Madrasah</title>`);
@@ -88,62 +189,23 @@ function _page($$renderer) {
     let step = each_array_2[i];
     $$renderer.push(`<div class="relative flex flex-col items-center text-center group bg-white pt-2"><div${attr_class(`w-20 h-20 rounded-2xl ${stringify(step.bg)} ${stringify(step.color)} flex items-center justify-center mb-5 shadow-sm border border-white ring-4 ring-slate-50 group-hover:scale-110 transition-transform duration-300 relative z-10`)}><svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", step.icon)}></path></svg> <div class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center text-sm font-bold shadow-lg">${escape_html(i + 1)}</div></div> <h3 class="font-bold text-slate-800 text-lg mb-2">${escape_html(step.title)}</h3> <p class="text-sm text-slate-500 px-4 leading-relaxed">${escape_html(step.desc)}</p></div>`);
   }
-  $$renderer.push(`<!--]--></div></div></div> <div class="bg-white rounded-3xl p-6 md:p-10 border border-slate-200 shadow-sm relative overflow-hidden"><div class="text-center max-w-2xl mx-auto mb-12 relative z-10"><span class="text-indigo-600 font-semibold tracking-wider uppercase text-sm mb-2 block">Panduan Antarmuka</span> <h2 class="text-3xl font-bold text-slate-800 mb-4">Mengenal Halaman Ujian</h2> <p class="text-slate-500">Berikut adalah penjelasan mengenai fungsi-fungsi tombol dan informasi yang ada pada halaman pengerjaan ujian.</p></div> <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center"><div class="relative mx-auto w-full max-w-sm rounded-2xl overflow-hidden border-4 border-slate-100 shadow-xl bg-slate-50"><img src="/panduan-ui-ujian.jpeg" alt="Antarmuka Ujian" class="w-full h-auto block object-cover"/> <button type="button"${attr_class(`absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all ${"bg-indigo-600/95 cursor-pointer"}`)} style="top: 3%; left: 3%;">1</button> <button type="button"${attr_class(`absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all ${"bg-indigo-600/95 cursor-pointer"}`)} style="top: 3%; left: 52%;">2</button> <button type="button"${attr_class(`absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all ${"bg-indigo-600/95 cursor-pointer"}`)} style="top: 3%; left: 90%;">3</button> <button type="button"${attr_class(`absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all ${"bg-indigo-600/95 cursor-pointer"}`)} style="top: 15%; left: 90%;">4</button> <button type="button"${attr_class(`absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all ${"bg-indigo-600/95 cursor-pointer"}`)} style="top: 30%; left: 3%;">5</button> <button type="button"${attr_class(`absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all ${"bg-indigo-600/95 cursor-pointer"}`)} style="top: 55%; left: 3%;">6</button> <button type="button"${attr_class(`absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all ${"bg-indigo-600/95 cursor-pointer"}`)} style="top: 85%; left: 3%;">7</button> <button type="button"${attr_class(`absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all ${"bg-indigo-600/95 cursor-pointer"}`)} style="top: 85%; left: 40%;">8</button> <button type="button"${attr_class(`absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all ${"bg-indigo-600/95 cursor-pointer"}`)} style="top: 85%; left: 88%;">9</button> <button type="button"${attr_class(`absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all ${"bg-indigo-600/95 cursor-pointer"}`)} style="top: 96%; left: 88%;">10</button></div> <div class="space-y-2"><!--[-->`);
-  const each_array_3 = ensure_array_like([
-    {
-      no: 1,
-      title: "Judul Ujian",
-      desc: "Menampilkan nama mata pelajaran ujian yang sedang dikerjakan."
-    },
-    {
-      no: 2,
-      title: "Indikator Pelanggaran",
-      desc: "Menampilkan jumlah peringatan jika Anda terdeteksi keluar dari layar penuh/membuka aplikasi lain."
-    },
-    {
-      no: 3,
-      title: "Sisa Waktu",
-      desc: "Menunjukkan batas waktu pengerjaan. Ujian otomatis berakhir jika waktu habis."
-    },
-    {
-      no: 4,
-      title: "Tombol Ragu-ragu",
-      desc: "Tandai soal dengan ini jika Anda belum yakin dengan jawaban yang dipilih."
-    },
-    {
-      no: 5,
-      title: "Teks Soal",
-      desc: "Area utama yang menampilkan pertanyaan ujian yang harus dijawab."
-    },
-    {
-      no: 6,
-      title: "Pilihan Jawaban",
-      desc: "Pilih jawaban yang paling tepat. Jawaban akan langsung tersimpan ke sistem."
-    },
-    {
-      no: 7,
-      title: "Navigasi Soal",
-      desc: "Membuka panel berisi daftar seluruh nomor soal untuk memudahkan berpindah nomor."
-    },
-    {
-      no: 8,
-      title: "Tombol Muat Ulang",
-      desc: "Gunakan tombol ini untuk memuat ulang halaman tanpa keluar dari ujian jika terjadi kendala/error jaringan."
-    },
-    {
-      no: 9,
-      title: "Informasi Progres",
-      desc: "Melihat ringkasan berapa soal yang sudah dijawab dan yang masih kosong."
-    },
-    {
-      no: 10,
-      title: "Tombol Navigasi (Sebelumnya/Selanjutnya)",
-      desc: "Digunakan untuk beralih ke soal sebelum atau soal sesudahnya."
-    }
-  ]);
-  for (let $$index_3 = 0, $$length = each_array_3.length; $$index_3 < $$length; $$index_3++) {
-    let item = each_array_3[$$index_3];
-    $$renderer.push(`<div${attr("id", `badge-desc-${stringify(item.no)}`)}${attr_class(`flex items-start gap-4 p-3 rounded-xl transition-all border cursor-pointer ${activeBadge === item.no ? "bg-indigo-50 border-indigo-200 shadow-sm ring-1 ring-indigo-200" : "hover:bg-slate-50 border-transparent hover:border-slate-100"}`)}><div${attr_class(`shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${activeBadge === item.no ? "bg-indigo-600 text-white" : "bg-indigo-100 text-indigo-700"}`)}>${escape_html(item.no)}</div> <div><h4${attr_class(`font-bold text-slate-800 text-sm transition-colors ${activeBadge === item.no ? "text-indigo-700" : ""}`)}>${escape_html(item.title)}</h4> <p class="text-slate-500 text-xs mt-1 leading-relaxed">${escape_html(item.desc)}</p></div></div>`);
+  $$renderer.push(`<!--]--></div></div></div> <div class="bg-white rounded-3xl p-6 md:p-10 border border-slate-200 shadow-sm relative overflow-hidden"><div class="text-center max-w-2xl mx-auto mb-8 relative z-10"><span class="text-indigo-600 font-semibold tracking-wider uppercase text-sm mb-2 block">Panduan Antarmuka</span> <h2 class="text-3xl font-bold text-slate-800 mb-3">Mengenal Halaman Ujian</h2> <p class="text-slate-500 text-sm md:text-base">Geser gambar atau pilih tab di bawah untuk mempelajari setiap bagian antarmuka pengerjaan hingga proses pengumpulan ujian.</p> <div class="flex items-center justify-center gap-2 mt-6 flex-wrap"><!--[-->`);
+  const each_array_3 = ensure_array_like(slides);
+  for (let idx = 0, $$length = each_array_3.length; idx < $$length; idx++) {
+    let slide = each_array_3[idx];
+    $$renderer.push(`<button type="button"${attr_class(`px-4 py-2 rounded-xl text-xs md:text-sm font-semibold transition-all flex items-center gap-2 border ${currentSlide === idx ? "bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-600/20 ring-2 ring-indigo-500/20" : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"}`)}><span${attr_class(`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${currentSlide === idx ? "bg-white/20 text-white" : "bg-slate-200 text-slate-700"}`)}>${escape_html(idx + 1)}</span> <span>${escape_html(slide.title)}</span></button>`);
+  }
+  $$renderer.push(`<!--]--></div></div> <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-start"><div class="flex flex-col items-center space-y-4"><div class="relative mx-auto w-full max-w-sm rounded-2xl overflow-hidden border-4 border-slate-100 shadow-xl bg-slate-900 select-none touch-pan-y"><img${attr("src", slides[currentSlide].image)}${attr("alt", slides[currentSlide].title)} class="w-full h-auto block object-cover transition-opacity duration-300"/> <!--[-->`);
+  const each_array_4 = ensure_array_like(slides[currentSlide].badges);
+  for (let $$index_4 = 0, $$length = each_array_4.length; $$index_4 < $$length; $$index_4++) {
+    let badge = each_array_4[$$index_4];
+    $$renderer.push(`<button type="button"${attr_class(`absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all ${activeBadge === badge.no ? "bg-rose-500 scale-125 z-10 animate-bounce" : "bg-indigo-600/95 cursor-pointer"}`)}${attr_style(`top: ${stringify(badge.top)}; left: ${stringify(badge.left)};`)}${attr("title", `Klik untuk melihat penjelasan nomor ${stringify(badge.no)}`)}>${escape_html(badge.no)}</button>`);
+  }
+  $$renderer.push(`<!--]--> <button type="button" class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-slate-900/60 hover:bg-slate-900/90 text-white backdrop-blur-xs flex items-center justify-center transition-all shadow-md" title="Gambar Sebelumnya">‹</button> <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-slate-900/60 hover:bg-slate-900/90 text-white backdrop-blur-xs flex items-center justify-center transition-all shadow-md" title="Gambar Selanjutnya">›</button> <div class="absolute bottom-2 right-2 px-2.5 py-1 rounded-full bg-slate-900/70 text-white text-[11px] font-semibold backdrop-blur-xs">${escape_html(currentSlide + 1)} / ${escape_html(slides.length)}</div></div> <div class="text-xs text-slate-400 flex items-center gap-1.5"><span>👆 Geser atau tekan tombol panah untuk berganti gambar</span></div></div> <div class="space-y-2"><div class="p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl mb-3"><h3 class="font-bold text-indigo-900 text-sm">${escape_html(slides[currentSlide].title)}</h3> <p class="text-indigo-700 text-xs mt-0.5">${escape_html(slides[currentSlide].subtitle)}</p></div> <!--[-->`);
+  const each_array_5 = ensure_array_like(slides[currentSlide].items);
+  for (let $$index_5 = 0, $$length = each_array_5.length; $$index_5 < $$length; $$index_5++) {
+    let item = each_array_5[$$index_5];
+    $$renderer.push(`<div${attr("id", `badge-desc-${stringify(item.no)}`)}${attr_class(`flex items-start gap-3.5 p-3 rounded-xl transition-all border cursor-pointer ${activeBadge === item.no ? "bg-indigo-50 border-indigo-200 shadow-sm ring-1 ring-indigo-200" : "hover:bg-slate-50 border-slate-100 bg-white"}`)}><div${attr_class(`shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center font-bold text-xs md:text-sm transition-colors ${activeBadge === item.no ? "bg-indigo-600 text-white" : "bg-indigo-100 text-indigo-700"}`)}>${escape_html(item.no)}</div> <div class="flex-1 min-w-0"><h4${attr_class(`font-bold text-slate-800 text-sm transition-colors ${activeBadge === item.no ? "text-indigo-700" : ""}`)}>${escape_html(item.title)}</h4> <p class="text-slate-500 text-xs mt-1 leading-relaxed">${escape_html(item.desc)}</p></div></div>`);
   }
   $$renderer.push(`<!--]--></div></div></div> <div class="rounded-3xl overflow-hidden shadow-md relative h-48 md:h-64 mt-8 group"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&amp;auto=format&amp;fit=crop&amp;w=1200&amp;q=80" alt="Sukses Ujian" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/> <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent flex flex-col items-center justify-end pb-8 text-center px-4"><h3 class="text-2xl md:text-3xl font-bold text-white mb-2 drop-shadow-md">Semoga Berhasil!</h3> <p class="text-slate-200 md:text-lg drop-shadow">Kejujuran adalah kunci kesuksesan yang sesungguhnya.</p></div></div></div>`);
 }

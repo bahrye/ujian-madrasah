@@ -7,10 +7,10 @@ function __memo(fn) {
 return {
 	appDir: "_app",
 	appPath: "_app",
-	assets: new Set(["favicon.svg","kemenag.png","panduan-ui-ujian.jpeg","template_soal_ujian.docx"]),
+	assets: new Set(["favicon.svg","kemenag.png","panduan-ui-ujian-2.jpeg","panduan-ui-ujian-3.jpeg","panduan-ui-ujian.jpeg","template_soal_ujian.docx"]),
 	mimeTypes: {".svg":"image/svg+xml",".png":"image/png",".jpeg":"image/jpeg"},
 	_: {
-		client: {start:"_app/immutable/entry/start.DSZ4KzYa.js",app:"_app/immutable/entry/app.BfUU_XL3.js",imports:["_app/immutable/entry/start.DSZ4KzYa.js","_app/immutable/chunks/BqDvx4DK.js","_app/immutable/chunks/BqssnHz9.js","_app/immutable/chunks/77oVT6gL.js","_app/immutable/chunks/CBVzxlgg.js","_app/immutable/chunks/CKhHHlMD.js","_app/immutable/entry/app.BfUU_XL3.js","_app/immutable/chunks/77oVT6gL.js","_app/immutable/chunks/CBVzxlgg.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/BqssnHz9.js","_app/immutable/chunks/9rnmF-J1.js","_app/immutable/chunks/CzCA0sYk.js","_app/immutable/chunks/BBfBhjn1.js","_app/immutable/chunks/D5OSDHHL.js","_app/immutable/chunks/CKhHHlMD.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
+		client: {start:"_app/immutable/entry/start.p415k9qi.js",app:"_app/immutable/entry/app.DC4_kekB.js",imports:["_app/immutable/entry/start.p415k9qi.js","_app/immutable/chunks/BRuYs4lu.js","_app/immutable/chunks/BqssnHz9.js","_app/immutable/chunks/77oVT6gL.js","_app/immutable/chunks/CBVzxlgg.js","_app/immutable/chunks/CKhHHlMD.js","_app/immutable/entry/app.DC4_kekB.js","_app/immutable/chunks/77oVT6gL.js","_app/immutable/chunks/CBVzxlgg.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/BqssnHz9.js","_app/immutable/chunks/9rnmF-J1.js","_app/immutable/chunks/CzCA0sYk.js","_app/immutable/chunks/BBfBhjn1.js","_app/immutable/chunks/D5OSDHHL.js","_app/immutable/chunks/CKhHHlMD.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
 		nodes: [
 			__memo(() => import('./nodes/0.js')),
 			__memo(() => import('./nodes/1.js')),

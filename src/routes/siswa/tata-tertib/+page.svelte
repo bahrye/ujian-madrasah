@@ -2,11 +2,109 @@
 	import { ICONS } from '$lib/utils/constants';
 	
 	let activeBadge = 0;
+	let currentSlide = 0;
+
+	const slides = [
+		{
+			id: 1,
+			title: 'Tampilan Utama Soal (No. 1 - 10)',
+			subtitle: 'Penjelasan antarmuka navigasi, soal, dan timer saat mengerjakan.',
+			image: '/panduan-ui-ujian.jpeg',
+			badges: [
+				{ no: 1, top: '3%', left: '3%' },
+				{ no: 2, top: '3%', left: '52%' },
+				{ no: 3, top: '3%', left: '90%' },
+				{ no: 4, top: '15%', left: '90%' },
+				{ no: 5, top: '30%', left: '3%' },
+				{ no: 6, top: '55%', left: '3%' },
+				{ no: 7, top: '85%', left: '3%' },
+				{ no: 8, top: '85%', left: '40%' },
+				{ no: 9, top: '85%', left: '88%' },
+				{ no: 10, top: '96%', left: '88%' }
+			],
+			items: [
+				{ no: 1, title: 'Judul Ujian', desc: 'Menampilkan nama mata pelajaran ujian yang sedang dikerjakan.' },
+				{ no: 2, title: 'Indikator Pelanggaran', desc: 'Menampilkan jumlah peringatan jika Anda terdeteksi keluar dari layar penuh/membuka aplikasi lain.' },
+				{ no: 3, title: 'Sisa Waktu', desc: 'Menunjukkan batas waktu pengerjaan. Ujian otomatis berakhir jika waktu habis.' },
+				{ no: 4, title: 'Tombol Ragu-ragu', desc: 'Tandai soal dengan ini jika Anda belum yakin dengan jawaban yang dipilih.' },
+				{ no: 5, title: 'Teks Soal', desc: 'Area utama yang menampilkan pertanyaan ujian yang harus dijawab.' },
+				{ no: 6, title: 'Pilihan Jawaban', desc: 'Pilih jawaban yang paling tepat. Jawaban akan langsung tersimpan ke sistem.' },
+				{ no: 7, title: 'Navigasi Soal', desc: 'Membuka panel berisi daftar seluruh nomor soal untuk memudahkan berpindah nomor.' },
+				{ no: 8, title: 'Tombol Muat Ulang', desc: 'Gunakan tombol ini untuk memuat ulang halaman tanpa keluar dari ujian jika terjadi kendala/error jaringan.' },
+				{ no: 9, title: 'Informasi Progres', desc: 'Melihat ringkasan berapa soal yang sudah dijawab dan yang masih kosong.' },
+				{ no: 10, title: 'Tombol Navigasi (Sebelumnya/Selanjutnya)', desc: 'Digunakan untuk beralih ke soal sebelum atau soal sesudahnya.' }
+			]
+		},
+		{
+			id: 2,
+			title: 'Tombol Selesai & Kumpulkan (No. 11)',
+			subtitle: 'Tampilan di nomor soal terakhir untuk menyelesaikan ujian.',
+			image: '/panduan-ui-ujian-2.jpeg',
+			badges: [
+				{ no: 11, top: '94%', left: '72%' }
+			],
+			items: [
+				{ 
+					no: 11, 
+					title: 'Tombol Selesai & Kumpulkan', 
+					desc: 'Tombol berwarna hijau ini akan muncul menggantikan tombol "Selanjutnya" saat Anda berada pada nomor soal terakhir. Klik tombol ini jika sudah selesai mengerjakan seluruh soal.' 
+				}
+			]
+		},
+		{
+			id: 3,
+			title: 'Konfirmasi Pengumpulan Jawaban (No. 12)',
+			subtitle: 'Kotak dialog verifikasi sebelum lembar jawaban dikirim secara permanen.',
+			image: '/panduan-ui-ujian-3.jpeg',
+			badges: [
+				{ no: 12, top: '69%', left: '72%' }
+			],
+			items: [
+				{ 
+					no: 12, 
+					title: 'Konfirmasi Pengumpulan Jawaban', 
+					desc: 'Kotak dialog ini merangkum total soal yang sudah terjawab, ragu-ragu, dan belum dijawab. Klik "Ya, Kumpulkan" untuk menyelesaikan ujian, atau klik "Kembali" jika masih ingin memeriksa jawaban.' 
+				}
+			]
+		}
+	];
+
 	function highlightBadge(no: number) {
 		activeBadge = no;
 		const el = document.getElementById(`badge-desc-${no}`);
 		if (el) {
 			el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		}
+	}
+
+	function nextSlide() {
+		currentSlide = (currentSlide + 1) % slides.length;
+		activeBadge = 0;
+	}
+
+	function prevSlide() {
+		currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+		activeBadge = 0;
+	}
+
+	function setSlide(idx: number) {
+		currentSlide = idx;
+		activeBadge = 0;
+	}
+
+	let touchStartX = 0;
+	let touchEndX = 0;
+
+	function handleTouchStart(e: TouchEvent) {
+		touchStartX = e.changedTouches[0].screenX;
+	}
+
+	function handleTouchEnd(e: TouchEvent) {
+		touchEndX = e.changedTouches[0].screenX;
+		if (touchStartX - touchEndX > 50) {
+			nextSlide();
+		} else if (touchEndX - touchStartX > 50) {
+			prevSlide();
 		}
 	}
 </script>
@@ -180,60 +278,114 @@
 		</div>
 	</div>
 
-	<!-- Panduan Antarmuka Ujian -->
+	<!-- Panduan Antarmuka Ujian (3-Slide Interactive Slider) -->
 	<div class="bg-white rounded-3xl p-6 md:p-10 border border-slate-200 shadow-sm relative overflow-hidden">
-		<div class="text-center max-w-2xl mx-auto mb-12 relative z-10">
+		<div class="text-center max-w-2xl mx-auto mb-8 relative z-10">
 			<span class="text-indigo-600 font-semibold tracking-wider uppercase text-sm mb-2 block">Panduan Antarmuka</span>
-			<h2 class="text-3xl font-bold text-slate-800 mb-4">Mengenal Halaman Ujian</h2>
-			<p class="text-slate-500">
-				Berikut adalah penjelasan mengenai fungsi-fungsi tombol dan informasi yang ada pada halaman pengerjaan ujian.
+			<h2 class="text-3xl font-bold text-slate-800 mb-3">Mengenal Halaman Ujian</h2>
+			<p class="text-slate-500 text-sm md:text-base">
+				Geser gambar atau pilih tab di bawah untuk mempelajari setiap bagian antarmuka pengerjaan hingga proses pengumpulan ujian.
 			</p>
+
+			<!-- Slide Navigation Tabs / Pills -->
+			<div class="flex items-center justify-center gap-2 mt-6 flex-wrap">
+				{#each slides as slide, idx}
+					<button
+						type="button"
+						on:click={() => setSlide(idx)}
+						class="px-4 py-2 rounded-xl text-xs md:text-sm font-semibold transition-all flex items-center gap-2 border
+							{currentSlide === idx 
+								? 'bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-600/20 ring-2 ring-indigo-500/20' 
+								: 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}"
+					>
+						<span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold {currentSlide === idx ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'}">
+							{idx + 1}
+						</span>
+						<span>{slide.title}</span>
+					</button>
+				{/each}
+			</div>
 		</div>
 
-		<div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-			<!-- Image with Badges -->
-			<div class="relative mx-auto w-full max-w-sm rounded-2xl overflow-hidden border-4 border-slate-100 shadow-xl bg-slate-50">
-				<!-- Gambar UI Ujian -->
-				<img src="/panduan-ui-ujian.jpeg" alt="Antarmuka Ujian" class="w-full h-auto block object-cover" />
-				
-				<!-- Badges Overlay (Diperkecil & digeser ke tepi agar tidak menutupi gambar) -->
-				<button type="button" on:click={() => highlightBadge(1)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 1 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 3%; left: 3%;">1</button>
-				<button type="button" on:click={() => highlightBadge(2)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 2 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 3%; left: 52%;">2</button>
-				<button type="button" on:click={() => highlightBadge(3)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 3 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 3%; left: 90%;">3</button>
-				<button type="button" on:click={() => highlightBadge(4)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 4 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 15%; left: 90%;">4</button>
-				<button type="button" on:click={() => highlightBadge(5)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 5 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 30%; left: 3%;">5</button>
-				<button type="button" on:click={() => highlightBadge(6)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 6 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 55%; left: 3%;">6</button>
-				<button type="button" on:click={() => highlightBadge(7)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 7 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 85%; left: 3%;">7</button>
-				<button type="button" on:click={() => highlightBadge(8)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 8 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 85%; left: 40%;">8</button>
-				<button type="button" on:click={() => highlightBadge(9)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 9 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 85%; left: 88%;">9</button>
-				<button type="button" on:click={() => highlightBadge(10)} class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === 10 ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" style="top: 96%; left: 88%;">10</button>
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-start">
+			<!-- Image Container with Slide Controls & Badges -->
+			<div class="flex flex-col items-center space-y-4">
+				<!-- svelte-ignore a11y-no-static-element-interactions -->
+				<div 
+					class="relative mx-auto w-full max-w-sm rounded-2xl overflow-hidden border-4 border-slate-100 shadow-xl bg-slate-900 select-none touch-pan-y"
+					on:touchstart={handleTouchStart}
+					on:touchend={handleTouchEnd}
+				>
+					<!-- Active Slide Image -->
+					<img 
+						src={slides[currentSlide].image} 
+						alt={slides[currentSlide].title} 
+						class="w-full h-auto block object-cover transition-opacity duration-300" 
+					/>
+					
+					<!-- Badges Overlay for Current Slide -->
+					{#each slides[currentSlide].badges as badge}
+						<button 
+							type="button" 
+							on:click={() => highlightBadge(badge.no)} 
+							class="absolute w-5 h-5 md:w-6 md:h-6 rounded-full ring-2 ring-white text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md hover:scale-125 transition-all {activeBadge === badge.no ? 'bg-rose-500 scale-125 z-10 animate-bounce' : 'bg-indigo-600/95 cursor-pointer'}" 
+							style="top: {badge.top}; left: {badge.left};"
+							title="Klik untuk melihat penjelasan nomor {badge.no}"
+						>
+							{badge.no}
+						</button>
+					{/each}
+
+					<!-- Previous Button -->
+					<button
+						type="button"
+						on:click={prevSlide}
+						class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-slate-900/60 hover:bg-slate-900/90 text-white backdrop-blur-xs flex items-center justify-center transition-all shadow-md"
+						title="Gambar Sebelumnya"
+					>
+						‹
+					</button>
+
+					<!-- Next Button -->
+					<button
+						type="button"
+						on:click={nextSlide}
+						class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-slate-900/60 hover:bg-slate-900/90 text-white backdrop-blur-xs flex items-center justify-center transition-all shadow-md"
+						title="Gambar Selanjutnya"
+					>
+						›
+					</button>
+
+					<!-- Slide Counter Overlay -->
+					<div class="absolute bottom-2 right-2 px-2.5 py-1 rounded-full bg-slate-900/70 text-white text-[11px] font-semibold backdrop-blur-xs">
+						{currentSlide + 1} / {slides.length}
+					</div>
+				</div>
+
+				<div class="text-xs text-slate-400 flex items-center gap-1.5">
+					<span>👆 Geser atau tekan tombol panah untuk berganti gambar</span>
+				</div>
 			</div>
 
-			<!-- Explanations -->
+			<!-- Explanations Column -->
 			<div class="space-y-2">
-				{#each [
-					{ no: 1, title: 'Judul Ujian', desc: 'Menampilkan nama mata pelajaran ujian yang sedang dikerjakan.' },
-					{ no: 2, title: 'Indikator Pelanggaran', desc: 'Menampilkan jumlah peringatan jika Anda terdeteksi keluar dari layar penuh/membuka aplikasi lain.' },
-					{ no: 3, title: 'Sisa Waktu', desc: 'Menunjukkan batas waktu pengerjaan. Ujian otomatis berakhir jika waktu habis.' },
-					{ no: 4, title: 'Tombol Ragu-ragu', desc: 'Tandai soal dengan ini jika Anda belum yakin dengan jawaban yang dipilih.' },
-					{ no: 5, title: 'Teks Soal', desc: 'Area utama yang menampilkan pertanyaan ujian yang harus dijawab.' },
-					{ no: 6, title: 'Pilihan Jawaban', desc: 'Pilih jawaban yang paling tepat. Jawaban akan langsung tersimpan ke sistem.' },
-					{ no: 7, title: 'Navigasi Soal', desc: 'Membuka panel berisi daftar seluruh nomor soal untuk memudahkan berpindah nomor.' },
-					{ no: 8, title: 'Tombol Muat Ulang', desc: 'Gunakan tombol ini untuk memuat ulang halaman tanpa keluar dari ujian jika terjadi kendala/error jaringan.' },
-					{ no: 9, title: 'Informasi Progres', desc: 'Melihat ringkasan berapa soal yang sudah dijawab dan yang masih kosong.' },
-					{ no: 10, title: 'Tombol Navigasi (Sebelumnya/Selanjutnya)', desc: 'Digunakan untuk beralih ke soal sebelum atau soal sesudahnya.' }
-				] as item}
+				<div class="p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl mb-3">
+					<h3 class="font-bold text-indigo-900 text-sm">{slides[currentSlide].title}</h3>
+					<p class="text-indigo-700 text-xs mt-0.5">{slides[currentSlide].subtitle}</p>
+				</div>
+
+				{#each slides[currentSlide].items as item}
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<!-- svelte-ignore a11y-no-static-element-interactions -->
 					<div 
 						id="badge-desc-{item.no}" 
 						on:click={() => activeBadge = item.no}
-						class="flex items-start gap-4 p-3 rounded-xl transition-all border cursor-pointer {activeBadge === item.no ? 'bg-indigo-50 border-indigo-200 shadow-sm ring-1 ring-indigo-200' : 'hover:bg-slate-50 border-transparent hover:border-slate-100'}"
+						class="flex items-start gap-3.5 p-3 rounded-xl transition-all border cursor-pointer {activeBadge === item.no ? 'bg-indigo-50 border-indigo-200 shadow-sm ring-1 ring-indigo-200' : 'hover:bg-slate-50 border-slate-100 bg-white'}"
 					>
-						<div class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors {activeBadge === item.no ? 'bg-indigo-600 text-white' : 'bg-indigo-100 text-indigo-700'}">
+						<div class="shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center font-bold text-xs md:text-sm transition-colors {activeBadge === item.no ? 'bg-indigo-600 text-white' : 'bg-indigo-100 text-indigo-700'}">
 							{item.no}
 						</div>
-						<div>
+						<div class="flex-1 min-w-0">
 							<h4 class="font-bold text-slate-800 text-sm transition-colors {activeBadge === item.no ? 'text-indigo-700' : ''}">{item.title}</h4>
 							<p class="text-slate-500 text-xs mt-1 leading-relaxed">{item.desc}</p>
 						</div>
