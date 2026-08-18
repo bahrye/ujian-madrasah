@@ -281,9 +281,9 @@
 		{:else}
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 				{#each filteredActiveExams as exam (exam.id)}
-					{@const inProgressAttempt = (activeAttempt && activeAttempt.exam_id === exam.id) ? activeAttempt : myAttempts.find(a => a.exam_id === exam.id && a.status === 'mengerjakan')}
+					{@const inProgressAttempt = (activeAttempt && activeAttempt.exam_id === exam.id) ? activeAttempt : (data.myAttempts || []).find((a) => a.exam_id === exam.id && a.status === 'mengerjakan')}
 					{@const isInProgress = !!inProgressAttempt}
-					{@const isFinished = myAttempts.some(a => a.exam_id === exam.id && ['selesai', 'waktu_habis', 'remedial'].includes(a.status))}
+					{@const isFinished = (data.myAttempts || []).some((a) => a.exam_id === exam.id && ['selesai', 'waktu_habis', 'remedial'].includes(a.status))}
 
 					<div class="p-5 flex flex-col h-full rounded-2xl transition-all duration-200 {isInProgress ? 'bg-gradient-to-br from-amber-50/90 via-orange-50/40 to-white border-2 border-amber-400 shadow-md shadow-amber-500/10 ring-2 ring-amber-400/20' : 'card-hover'}">
 						<div class="flex items-start justify-between mb-3">

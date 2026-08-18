@@ -177,9 +177,9 @@ function _page($$renderer, $$props) {
       const each_array = ensure_array_like(filteredActiveExams);
       for (let $$index_1 = 0, $$length = each_array.length; $$index_1 < $$length; $$index_1++) {
         let exam = each_array[$$index_1];
-        const inProgressAttempt = activeAttempt && activeAttempt.exam_id === exam.id ? activeAttempt : myAttempts.find((a) => a.exam_id === exam.id && a.status === "mengerjakan");
+        const inProgressAttempt = activeAttempt && activeAttempt.exam_id === exam.id ? activeAttempt : (data.myAttempts || []).find((a) => a.exam_id === exam.id && a.status === "mengerjakan");
         const isInProgress = !!inProgressAttempt;
-        const isFinished = myAttempts.some((a) => a.exam_id === exam.id && ["selesai", "waktu_habis", "remedial"].includes(a.status));
+        const isFinished = (data.myAttempts || []).some((a) => a.exam_id === exam.id && ["selesai", "waktu_habis", "remedial"].includes(a.status));
         $$renderer2.push(`<div${attr_class(`p-5 flex flex-col h-full rounded-2xl transition-all duration-200 ${isInProgress ? "bg-gradient-to-br from-amber-50/90 via-orange-50/40 to-white border-2 border-amber-400 shadow-md shadow-amber-500/10 ring-2 ring-amber-400/20" : "card-hover"}`)}><div class="flex items-start justify-between mb-3"><div${attr_class(`w-10 h-10 rounded-xl ${isInProgress ? "bg-gradient-to-br from-amber-400 to-orange-500 shadow-md shadow-orange-500/20 animate-pulse" : "bg-gradient-to-br from-indigo-500 to-violet-500"} flex items-center justify-center`)}><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">`);
         if (isInProgress) {
           $$renderer2.push("<!--[0-->");
