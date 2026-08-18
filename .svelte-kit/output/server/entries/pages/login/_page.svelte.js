@@ -23,6 +23,7 @@ function QrScannerModal($$renderer, $$props) {
     let isProcessing = false;
     let hasTorch = false;
     let isStarting = false;
+    let isAnalyzingFile = false;
     function playSuccessBeep() {
       try {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -56,7 +57,7 @@ function QrScannerModal($$renderer, $$props) {
       }
     }
     async function startScanner() {
-      if (isScanning || isStarting) return;
+      if (isScanning || isStarting || isAnalyzingFile) return;
       isStarting = true;
       errorMessage = "";
       try {
@@ -135,7 +136,9 @@ function QrScannerModal($$renderer, $$props) {
     if (show) {
       setTimeout(
         () => {
-          startScanner();
+          {
+            startScanner();
+          }
         },
         100
       );
@@ -153,10 +156,10 @@ function QrScannerModal($$renderer, $$props) {
       }
       $$renderer2.push(`<!--]--></div></div> `);
       if (isStarting) {
-        $$renderer2.push("<!--[0-->");
+        $$renderer2.push("<!--[1-->");
         $$renderer2.push(`<div class="absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center gap-3 text-slate-300 svelte-6d2txn"><svg class="w-8 h-8 animate-spin text-indigo-400 svelte-6d2txn" fill="none" viewBox="0 0 24 24"><circle class="opacity-25 svelte-6d2txn" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75 svelte-6d2txn" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <p class="text-xs font-medium tracking-wide svelte-6d2txn">Menyiapkan kamera...</p></div>`);
       } else if (isProcessing) {
-        $$renderer2.push("<!--[1-->");
+        $$renderer2.push("<!--[2-->");
         $$renderer2.push(`<div class="absolute inset-0 bg-indigo-950/90 flex flex-col items-center justify-center gap-3 text-white svelte-6d2txn"><div class="w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center svelte-6d2txn"><svg class="w-6 h-6 text-emerald-400 animate-bounce svelte-6d2txn" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" class="svelte-6d2txn"></path></svg></div> <p class="text-sm font-bold text-emerald-300 svelte-6d2txn">QR Terdeteksi! Memproses login...</p></div>`);
       } else {
         $$renderer2.push("<!--[-1-->");
@@ -175,7 +178,8 @@ function QrScannerModal($$renderer, $$props) {
         $$renderer2.select(
           {
             class: "w-full bg-slate-800 text-slate-200 border border-slate-700 rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none",
-            value: selectedCameraId
+            value: selectedCameraId,
+            disabled: isProcessing
           },
           ($$renderer3) => {
             $$renderer3.push(`<!--[-->`);
@@ -204,11 +208,16 @@ function QrScannerModal($$renderer, $$props) {
         $$renderer2.push(`<button type="button"${attr_class(
           `p-2 rounded-xl border transition-colors ${"bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700"}`,
           "svelte-6d2txn"
-        )} title="Senter"><svg class="w-4 h-4 svelte-6d2txn" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" class="svelte-6d2txn"></path></svg></button>`);
+        )} title="Senter"${attr("disabled", !isScanning, true)}><svg class="w-4 h-4 svelte-6d2txn" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" class="svelte-6d2txn"></path></svg></button>`);
       } else {
         $$renderer2.push("<!--[-1-->");
       }
-      $$renderer2.push(`<!--]--> <input type="file" accept="image/*" class="hidden svelte-6d2txn"/> <button type="button" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-colors svelte-6d2txn"><svg class="w-4 h-4 text-indigo-400 svelte-6d2txn" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" class="svelte-6d2txn"></path></svg> Unggah Foto QR</button></div></div> <div class="px-6 py-3 border-t border-slate-800 bg-slate-900/60 flex items-center justify-between text-[11px] text-slate-400 svelte-6d2txn"><div class="flex items-center gap-1.5 svelte-6d2txn"><span${attr_class(`w-2 h-2 rounded-full ${isScanning ? "bg-emerald-500 animate-pulse" : "bg-slate-500"}`, "svelte-6d2txn")}></span> <span class="svelte-6d2txn">${escape_html(isScanning ? "Kamera aktif" : "Kamera nonaktif")}</span></div> <button type="button" class="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium transition-colors svelte-6d2txn">Batal</button></div></div></div>`);
+      $$renderer2.push(`<!--]--> <input type="file" accept="image/*" class="hidden svelte-6d2txn"/> <button type="button" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-colors disabled:opacity-50 svelte-6d2txn"${attr("disabled", isProcessing, true)}>`);
+      {
+        $$renderer2.push("<!--[-1-->");
+        $$renderer2.push(`<svg class="w-4 h-4 text-indigo-400 svelte-6d2txn" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" class="svelte-6d2txn"></path></svg> <span class="svelte-6d2txn">Unggah Foto QR</span>`);
+      }
+      $$renderer2.push(`<!--]--></button></div></div> <div class="px-6 py-3 border-t border-slate-800 bg-slate-900/60 flex items-center justify-between text-[11px] text-slate-400 svelte-6d2txn"><div class="flex items-center gap-1.5 svelte-6d2txn"><span${attr_class(`w-2 h-2 rounded-full ${isScanning ? "bg-emerald-500 animate-pulse" : "bg-slate-500"}`, "svelte-6d2txn")}></span> <span class="svelte-6d2txn">${escape_html(isScanning ? "Kamera aktif" : "Kamera nonaktif")}</span></div> <button type="button" class="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium transition-colors svelte-6d2txn">Batal</button></div></div></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }

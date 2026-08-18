@@ -146,16 +146,26 @@ export function parseQrLoginData(rawText: string): ParsedQrLogin | null {
 		}
 	}
 
-	// 6. Try single pipe "username|password"
-	if (trimmed.includes('|')) {
-		const parts = trimmed.split('|');
-		if (parts.length === 2 && parts[0].trim()) {
-			const sec = parts[1].trim();
+	// 6. Try single pipe "username|password" or colon "username:password" or comma/semicolon
+	if (trimmed.includes('|') || trimmed.includes(':') || trimmed.includes(';') || trimmed.includes(',')) {
+		const delimiter = trimmed.includes('|') ? '|' : (trimmed.includes(':') ? ':' : (trimmed.includes(';') ? ';' : ','));
+		const parts = trimmed.split(delimiter);
+		if (parts.length >= 2 && parts[0].trim()) {
+			const u = parts[0].trim();
+			const sec = parts.slice(1).join(delimiter).trim();
 			if (sec.startsWith('QRL_')) {
-				return { username: parts[0].trim(), qrToken: sec };
+				return { username: u, qrToken: sec };
 			}
-			return { username: parts[0].trim(), password: sec };
+			return { username: u, password: sec };
 		}
+	}
+
+	// 7. Single token / single username fallback (no spaces, length >= 3)
+	if (!trimmed.includes(' ') && trimmed.length >= 3) {
+		return {
+			username: trimmed,
+			password: trimmed
+		};
 	}
 
 	return null;
