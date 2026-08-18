@@ -17,6 +17,7 @@
 
 	let currentTime = new Date();
 	let timer: any;
+	let previewSignature: { name: string; url: string } | null = null;
 
 	onMount(() => {
 		timer = setInterval(() => {
@@ -126,9 +127,10 @@
 					<thead>
 						<tr>
 							<th>Siswa</th>
+							<th class="whitespace-nowrap">No. Peserta / NISN</th>
+							<th class="w-20 text-center">TTD</th>
 							<th>Ujian</th>
 							<th>Nilai</th>
-							<th>Status Ujian</th>
 							<th class="whitespace-nowrap text-xs">Status Nilai</th>
 							<th>Waktu Selesai</th>
 							<th class="w-28 text-center">Aksi</th>
@@ -141,13 +143,33 @@
 							{@const released = isAttemptScoreReleased(r, currentTime)}
 							<tr>
 								<td class="font-semibold text-slate-800">{r.student_name}</td>
+								<td class="text-xs">
+									<div class="font-mono font-semibold text-slate-800">{r.nomor_peserta || '-'}</div>
+									<div class="font-mono text-[11px] text-slate-400">{r.nisn || (r.username !== r.nomor_peserta ? `@${r.username}` : '') || '-'}</div>
+								</td>
+								<td class="text-center">
+									{#if r.signature}
+										<button
+											type="button"
+											class="group relative inline-flex items-center justify-center p-1 rounded-xl border border-slate-200 bg-white hover:border-indigo-400 hover:shadow-md transition-all cursor-pointer"
+											on:click={() => previewSignature = { name: r.student_name, url: r.signature }}
+											title="Klik untuk memperbesar tanda tangan"
+										>
+											<img src={r.signature} alt="TTD {r.student_name}" class="h-7 max-w-[55px] object-contain" />
+											<span class="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-indigo-600 text-[8px] text-white opacity-0 group-hover:opacity-100 transition-opacity">
+												🔍
+											</span>
+										</button>
+									{:else}
+										<span class="text-slate-300 text-xs">-</span>
+									{/if}
+								</td>
 								<td>{r.exam_title}</td>
 								<td>
 									<span class="text-lg font-bold {(r.score ?? 0) >= 70 ? 'text-emerald-600' : 'text-rose-600'}">
 										{r.score != null ? r.score.toFixed(1) : '-'}
 									</span>
 								</td>
-								<td><span class={ATTEMPT_STATUS_COLORS[r.status] || 'badge-info'}>{ATTEMPT_STATUS_LABELS[r.status]}</span></td>
 								<td class="whitespace-nowrap text-xs">
 									{#if released}
 										<span class="badge-success text-[11px] whitespace-nowrap px-2 py-0.5 font-medium">🟢 Terkirim</span>
@@ -226,3 +248,53 @@
 		{/if}
 	</div>
 </div>
+
+<!-- Signature Preview Modal -->
+{#if previewSignature}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in"
+		on:click={() => (previewSignature = null)}
+	>
+		<div
+			class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center relative animate-scale-up border border-slate-100"
+			on:click|stopPropagation
+		>
+			<button
+				type="button"
+				class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
+				on:click={() => (previewSignature = null)}
+			>
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+				</svg>
+			</button>
+
+			<div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-3">
+				<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+				</svg>
+			</div>
+
+			<h3 class="text-base font-bold text-slate-800">Tanda Tangan Siswa</h3>
+			<p class="text-xs text-slate-500 mt-0.5 mb-4">{previewSignature.name}</p>
+
+			<div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-4 flex items-center justify-center min-h-[160px]">
+				<img
+					src={previewSignature.url}
+					alt="Tanda Tangan {previewSignature.name}"
+					class="max-h-40 max-w-full object-contain mix-blend-multiply"
+				/>
+			</div>
+
+			<button
+				type="button"
+				class="btn btn-secondary w-full text-xs mt-5 py-2.5"
+				on:click={() => (previewSignature = null)}
+			>
+				Tutup
+			</button>
+		</div>
+	</div>
+{/if}

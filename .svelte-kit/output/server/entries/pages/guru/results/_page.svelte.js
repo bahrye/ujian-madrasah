@@ -1,4 +1,4 @@
-import { h as head, i as ensure_array_like, e as escape_html, k as attr, j as attr_class, l as clsx, c as stringify, f as bind_props } from "../../../../chunks/index.js";
+import { h as head, i as ensure_array_like, e as escape_html, k as attr, c as stringify, j as attr_class, f as bind_props } from "../../../../chunks/index.js";
 import { p as parseDate } from "../../../../chunks/date.js";
 import { o as onDestroy } from "../../../../chunks/index-server.js";
 import "@sveltejs/kit/internal";
@@ -7,7 +7,6 @@ import "../../../../chunks/utils2.js";
 import "@sveltejs/kit/internal/server";
 import "../../../../chunks/root.js";
 import "../../../../chunks/state.svelte.js";
-import { A as ATTEMPT_STATUS_COLORS, a as ATTEMPT_STATUS_LABELS } from "../../../../chunks/constants.js";
 import { t as toasts } from "../../../../chunks/toast.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
@@ -91,14 +90,22 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<div class="p-12 text-center text-slate-400">Belum ada hasil ujian.</div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Siswa</th><th>Ujian</th><th>Nilai</th><th>Status Ujian</th><th class="whitespace-nowrap text-xs">Status Nilai</th><th>Waktu Selesai</th><th class="w-24 text-center">Aksi</th></tr></thead><tbody><!--[-->`);
+      $$renderer2.push(`<div class="table-container border-0 rounded-none"><table class="table"><thead><tr><th>Siswa</th><th class="whitespace-nowrap">No. Peserta / NISN</th><th class="w-20 text-center">TTD</th><th>Ujian</th><th>Nilai</th><th class="whitespace-nowrap text-xs">Status Nilai</th><th>Waktu Selesai</th><th class="w-24 text-center">Aksi</th></tr></thead><tbody><!--[-->`);
       const each_array_1 = ensure_array_like(results);
       for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
         let r = each_array_1[$$index_1];
         const isComplete = r.is_graded === 1 || r.ungraded_count === 0;
         const isManual = r.show_score_type === "manual";
         const released = isAttemptScoreReleased(r, currentTime);
-        $$renderer2.push(`<tr><td class="font-semibold text-slate-800">${escape_html(r.student_name)}</td><td>${escape_html(r.exam_title)}</td><td><span${attr_class(`text-lg font-bold ${(r.score ?? 0) >= 70 ? "text-emerald-600" : "text-rose-600"}`)}>${escape_html(r.score != null ? r.score.toFixed(1) : "-")}</span></td><td><span${attr_class(clsx(ATTEMPT_STATUS_COLORS[r.status] || "badge-info"))}>${escape_html(ATTEMPT_STATUS_LABELS[r.status])}</span></td><td class="whitespace-nowrap text-xs">`);
+        $$renderer2.push(`<tr><td class="font-semibold text-slate-800">${escape_html(r.student_name)}</td><td class="text-xs"><div class="font-mono font-semibold text-slate-800">${escape_html(r.nomor_peserta || "-")}</div> <div class="font-mono text-[11px] text-slate-400">${escape_html(r.nisn || (r.username !== r.nomor_peserta ? `@${r.username}` : "") || "-")}</div></td><td class="text-center">`);
+        if (r.signature) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<button type="button" class="group relative inline-flex items-center justify-center p-1 rounded-xl border border-slate-200 bg-white hover:border-indigo-400 hover:shadow-md transition-all cursor-pointer" title="Klik untuk memperbesar tanda tangan"><img${attr("src", r.signature)}${attr("alt", `TTD ${stringify(r.student_name)}`)} class="h-7 max-w-[55px] object-contain"/> <span class="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-indigo-600 text-[8px] text-white opacity-0 group-hover:opacity-100 transition-opacity">🔍</span></button>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`<span class="text-slate-300 text-xs">-</span>`);
+        }
+        $$renderer2.push(`<!--]--></td><td>${escape_html(r.exam_title)}</td><td><span${attr_class(`text-lg font-bold ${(r.score ?? 0) >= 70 ? "text-emerald-600" : "text-rose-600"}`)}>${escape_html(r.score != null ? r.score.toFixed(1) : "-")}</span></td><td class="whitespace-nowrap text-xs">`);
         if (released) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<span class="badge-success text-[11px] whitespace-nowrap px-2 py-0.5 font-medium">🟢 Terkirim</span>`);
@@ -128,7 +135,11 @@ function _page($$renderer, $$props) {
       }
       $$renderer2.push(`<!--]--></tbody></table></div>`);
     }
-    $$renderer2.push(`<!--]--></div></div>`);
+    $$renderer2.push(`<!--]--></div></div> `);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]-->`);
     bind_props($$props, { data, form });
   });
 }
