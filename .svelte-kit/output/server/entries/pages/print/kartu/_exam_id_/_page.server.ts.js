@@ -1,5 +1,6 @@
 import { g as getDB } from "../../../../../chunks/db.js";
 import { error } from "@sveltejs/kit";
+import { a as createQrLoginToken } from "../../../../../chunks/auth.js";
 import { f as formatExamTitle } from "../../../../../chunks/exam.js";
 const load = async ({ platform, params, locals }) => {
   const db = getDB(platform);
@@ -34,7 +35,7 @@ const load = async ({ platform, params, locals }) => {
     className: exam.class_name
   });
   const participants = await db.prepare(`
-		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name, u.session_number, r.name as room_name
+		SELECT p.id as participant_id, u.id as user_id, u.name as student_name, u.username, u.password_hash, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name, u.session_number, r.name as room_name
 		FROM exam_participants p
 		JOIN users u ON p.student_id = u.id
 		LEFT JOIN classes c ON u.class_id = c.id
@@ -46,20 +47,27 @@ const load = async ({ platform, params, locals }) => {
 			ELSE 99 END ASC, c.name ASC, u.name ASC
 	`).bind(examId).all();
   const sessions = await db.prepare("SELECT * FROM exam_sessions WHERE exam_id = ?").bind(examId).all();
-  const formattedParticipants = participants.results.map((p) => {
-    const isNomorPesertaMode = p.username === p.nomor_peserta;
-    const sessionRecord = sessions.results.find((s) => s.session_number === p.session_number);
-    return {
-      ...p,
-      login_username: p.username,
-      login_password: p.nisn,
-      // Password is always NISN in this system
-      login_mode_label: isNomorPesertaMode ? "No. Peserta" : "NISN",
-      display_nisn: p.nisn,
-      display_nomor_peserta: p.nomor_peserta || "-",
-      session_time: sessionRecord ? `${sessionRecord.start_time?.slice(11, 16) || "?"} - ${sessionRecord.end_time?.slice(11, 16) || "?"}` : null
-    };
-  });
+  const formattedParticipants = await Promise.all(
+    participants.results.map(async (p) => {
+      const isNomorPesertaMode = p.username === p.nomor_peserta;
+      const sessionRecord = sessions.results.find((s) => s.session_number === p.session_number);
+      let qrToken = "";
+      if (p.user_id && p.username && p.password_hash) {
+        qrToken = await createQrLoginToken(p.user_id, p.username, p.password_hash);
+      }
+      return {
+        ...p,
+        login_username: p.username,
+        login_password: p.nisn,
+        // Password is always NISN in this system
+        qr_token: qrToken,
+        login_mode_label: isNomorPesertaMode ? "No. Peserta" : "NISN",
+        display_nisn: p.nisn,
+        display_nomor_peserta: p.nomor_peserta || "-",
+        session_time: sessionRecord ? `${sessionRecord.start_time?.slice(11, 16) || "?"} - ${sessionRecord.end_time?.slice(11, 16) || "?"}` : null
+      };
+    })
+  );
   const roomsCount = await db.prepare("SELECT COUNT(*) as count FROM exam_rooms WHERE exam_id = ?").bind(examId).first();
   const hasRooms = (roomsCount?.count || 0) > 0;
   let committeeName = null;

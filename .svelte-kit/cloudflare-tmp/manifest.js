@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg","kemenag.png","panduan-ui-ujian-2.jpeg","panduan-ui-ujian-3.jpeg","panduan-ui-ujian.jpeg","template_soal_ujian.docx"]),
 	mimeTypes: {".svg":"image/svg+xml",".png":"image/png",".jpeg":"image/jpeg"},
 	_: {
-		client: {start:"_app/immutable/entry/start.DTFA6aLq.js",app:"_app/immutable/entry/app.39udDLC7.js",imports:["_app/immutable/entry/start.DTFA6aLq.js","_app/immutable/chunks/DFCHkf6l.js","_app/immutable/chunks/CAmwAEK5.js","_app/immutable/chunks/C1iwYQEC.js","_app/immutable/chunks/C4l_QUTv.js","_app/immutable/chunks/BPD4iswW.js","_app/immutable/entry/app.39udDLC7.js","_app/immutable/chunks/C1iwYQEC.js","_app/immutable/chunks/C4l_QUTv.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CAmwAEK5.js","_app/immutable/chunks/klE4_vFh.js","_app/immutable/chunks/CJQ_5s9f.js","_app/immutable/chunks/RbyIVtyM.js","_app/immutable/chunks/qu17wuJm.js","_app/immutable/chunks/BPD4iswW.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
+		client: {start:"_app/immutable/entry/start._Adh1Ia8.js",app:"_app/immutable/entry/app.DVGA2q4W.js",imports:["_app/immutable/entry/start._Adh1Ia8.js","_app/immutable/chunks/D9aDCxCX.js","_app/immutable/chunks/CAmwAEK5.js","_app/immutable/chunks/C1iwYQEC.js","_app/immutable/chunks/C4l_QUTv.js","_app/immutable/chunks/BPD4iswW.js","_app/immutable/entry/app.DVGA2q4W.js","_app/immutable/chunks/C1iwYQEC.js","_app/immutable/chunks/C4l_QUTv.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CAmwAEK5.js","_app/immutable/chunks/klE4_vFh.js","_app/immutable/chunks/CJQ_5s9f.js","_app/immutable/chunks/RbyIVtyM.js","_app/immutable/chunks/qu17wuJm.js","_app/immutable/chunks/BPD4iswW.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
 		nodes: [
 			__memo(() => import('../output/server/nodes/0.js')),
 			__memo(() => import('../output/server/nodes/1.js')),
@@ -393,6 +393,13 @@ return {
 				params: [],
 				page: null,
 				endpoint: __memo(() => import('../output/server/entries/endpoints/api/profile/_server.ts.js'))
+			},
+			{
+				id: "/api/profile/qr-token",
+				pattern: /^\/api\/profile\/qr-token\/?$/,
+				params: [],
+				page: null,
+				endpoint: __memo(() => import('../output/server/entries/endpoints/api/profile/qr-token/_server.ts.js'))
 			},
 			{
 				id: "/api/proxy-media",

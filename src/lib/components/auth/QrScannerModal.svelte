@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 	import { Html5Qrcode } from 'html5-qrcode';
-	import { parseQrLoginData } from '$lib/utils/qrLogin';
+	import { parseQrLoginData, type ParsedQrLogin } from '$lib/utils/qrLogin';
 
 	export let show = false;
 
 	const dispatch = createEventDispatcher<{
-		scan: { username: string; password: string };
+		scan: ParsedQrLogin;
 		close: void;
 	}>();
 

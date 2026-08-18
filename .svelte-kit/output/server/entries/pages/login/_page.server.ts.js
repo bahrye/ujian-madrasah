@@ -1,6 +1,6 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB } from "../../../chunks/db.js";
-import { a as verifyPassword, c as createToken, C as COOKIE_NAME } from "../../../chunks/auth.js";
+import { b as verifyQrLoginToken, d as verifyPassword, c as createToken, C as COOKIE_NAME } from "../../../chunks/auth.js";
 const load = async ({ locals }) => {
   if (locals.user) {
     const redirectRoute = locals.user.role === "panitia" ? "/admin" : `/${locals.user.role}`;
@@ -12,7 +12,8 @@ const actions = {
     const formData = await request.formData();
     const username = formData.get("username")?.toString().trim();
     const password = formData.get("password")?.toString();
-    if (!username || !password) {
+    const qrToken = formData.get("qr_token")?.toString().trim();
+    if (!username || !password && !qrToken) {
       return fail(400, { error: "Username dan kata sandi wajib diisi." });
     }
     try {
@@ -21,9 +22,17 @@ const actions = {
       if (!user) {
         return fail(401, { error: "Username atau kata sandi salah." });
       }
-      const valid = await verifyPassword(password, user.password_hash);
-      if (!valid) {
-        return fail(401, { error: "Username atau kata sandi salah." });
+      let valid = false;
+      if (qrToken) {
+        valid = await verifyQrLoginToken(user.id, user.username, user.password_hash, qrToken);
+        if (!valid) {
+          return fail(401, { error: "Kode QR login tidak valid atau sudah kadaluarsa." });
+        }
+      } else if (password) {
+        valid = await verifyPassword(password, user.password_hash);
+        if (!valid) {
+          return fail(401, { error: "Username atau kata sandi salah." });
+        }
       }
       let sessionToken = null;
       if (user.role === "siswa") {

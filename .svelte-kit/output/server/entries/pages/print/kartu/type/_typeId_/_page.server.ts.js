@@ -1,5 +1,6 @@
 import { g as getDB } from "../../../../../../chunks/db.js";
 import { error } from "@sveltejs/kit";
+import { a as createQrLoginToken } from "../../../../../../chunks/auth.js";
 const load = async ({ platform, params, locals, url }) => {
   const db = getDB(platform);
   const typeIdStr = params.typeId;
@@ -11,7 +12,7 @@ const load = async ({ platform, params, locals, url }) => {
   const classIdStr = url.searchParams.get("class_id");
   const classId = parseInt(classIdStr || "", 10);
   let query = `
-		SELECT u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name, u.session_number
+		SELECT u.id as user_id, u.name as student_name, u.username, u.password_hash, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name, u.session_number
 		FROM users u
 		JOIN classes c ON u.class_id = c.id
 		JOIN exam_type_classes etc ON etc.class_id = u.class_id
@@ -27,18 +28,25 @@ const load = async ({ platform, params, locals, url }) => {
 		WHEN '1' THEN 1 WHEN '2' THEN 2 WHEN '3' THEN 3 WHEN '4' THEN 4 WHEN '5' THEN 5 WHEN '6' THEN 6 WHEN '7' THEN 7 WHEN '8' THEN 8 WHEN '9' THEN 9 WHEN '10' THEN 10 WHEN '11' THEN 11 WHEN '12' THEN 12
 		ELSE 99 END ASC, c.name ASC, u.name ASC`;
   const participants = await db.prepare(query).bind(...paramsArr).all();
-  const formattedParticipants = participants.results.map((p) => {
-    const isNomorPesertaMode = p.username === p.nomor_peserta;
-    return {
-      ...p,
-      login_username: p.username,
-      login_password: p.nisn,
-      // Password is always NISN in this system
-      login_mode_label: isNomorPesertaMode ? "No. Peserta" : "NISN",
-      display_nisn: p.nisn,
-      display_nomor_peserta: p.nomor_peserta || "-"
-    };
-  });
+  const formattedParticipants = await Promise.all(
+    participants.results.map(async (p) => {
+      const isNomorPesertaMode = p.username === p.nomor_peserta;
+      let qrToken = "";
+      if (p.user_id && p.username && p.password_hash) {
+        qrToken = await createQrLoginToken(p.user_id, p.username, p.password_hash);
+      }
+      return {
+        ...p,
+        login_username: p.username,
+        login_password: p.nisn,
+        // Password is always NISN in this system
+        qr_token: qrToken,
+        login_mode_label: isNomorPesertaMode ? "No. Peserta" : "NISN",
+        display_nisn: p.nisn,
+        display_nomor_peserta: p.nomor_peserta || "-"
+      };
+    })
+  );
   const committee = await db.prepare(`
 		SELECT u.name, u.nip
 		FROM exam_type_proctors etp

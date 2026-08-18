@@ -346,6 +346,7 @@
 							</div>
 						</div>
 					{/if}
+				</div>
 				<div class="mt-2 flex flex-col gap-1">
 					<button
 						type="button"

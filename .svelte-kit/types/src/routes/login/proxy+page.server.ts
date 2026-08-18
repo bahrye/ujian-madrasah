@@ -2,7 +2,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
-import { verifyPassword, createToken, COOKIE_NAME } from '$lib/server/auth';
+import { verifyPassword, verifyQrLoginToken, createToken, COOKIE_NAME } from '$lib/server/auth';
 
 export const load = async ({ locals }: Parameters<PageServerLoad>[0]) => {
 	if (locals.user) {
@@ -16,8 +16,9 @@ export const actions = {
 		const formData = await request.formData();
 		const username = formData.get('username')?.toString().trim();
 		const password = formData.get('password')?.toString();
+		const qrToken = formData.get('qr_token')?.toString().trim();
 
-		if (!username || !password) {
+		if (!username || (!password && !qrToken)) {
 			return fail(400, { error: 'Username dan kata sandi wajib diisi.' });
 		}
 
@@ -44,9 +45,17 @@ export const actions = {
 				return fail(401, { error: 'Username atau kata sandi salah.' });
 			}
 
-			const valid = await verifyPassword(password, user.password_hash);
-			if (!valid) {
-				return fail(401, { error: 'Username atau kata sandi salah.' });
+			let valid = false;
+			if (qrToken) {
+				valid = await verifyQrLoginToken(user.id, user.username, user.password_hash, qrToken);
+				if (!valid) {
+					return fail(401, { error: 'Kode QR login tidak valid atau sudah kadaluarsa.' });
+				}
+			} else if (password) {
+				valid = await verifyPassword(password, user.password_hash);
+				if (!valid) {
+					return fail(401, { error: 'Username atau kata sandi salah.' });
+				}
 			}
 
 			let sessionToken: string | null = null;

@@ -2,14 +2,14 @@
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
-import { hashPassword, createToken, COOKIE_NAME } from '$lib/server/auth';
+import { hashPassword, createToken, COOKIE_NAME, createQrLoginToken } from '$lib/server/auth';
 
 export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>[0]) => {
 	const db = getDB(platform);
 	const search = url.searchParams.get('search') || '';
 	const roleFilter = url.searchParams.get('role') || '';
 
-	let query = 'SELECT id, username, name, nip, role, is_active, created_at, photo FROM users WHERE school_id = ? AND role != "siswa" AND role != "superadmin" AND role != "admin"';
+	let query = 'SELECT id, username, password_hash, name, nip, role, is_active, created_at, photo FROM users WHERE school_id = ? AND role != "siswa" AND role != "superadmin" AND role != "admin"';
 	const params: unknown[] = [locals.user!.school_id];
 
 	if (search) {
@@ -28,8 +28,28 @@ export const load = async ({ platform, url, locals }: Parameters<PageServerLoad>
 		db.prepare('SELECT name, logo_url FROM schools WHERE id = ?').bind(locals.user!.school_id).first()
 	]);
 
+	const usersWithTokens = await Promise.all(
+		(usersResult.results || []).map(async (u: any) => {
+			let qrToken = '';
+			if (u.id && u.username && u.password_hash) {
+				qrToken = await createQrLoginToken(u.id, u.username, u.password_hash);
+			}
+			return {
+				id: u.id,
+				username: u.username,
+				name: u.name,
+				nip: u.nip,
+				role: u.role,
+				is_active: u.is_active,
+				created_at: u.created_at,
+				photo: u.photo,
+				qr_token: qrToken
+			};
+		})
+	);
+
 	return { 
-		users: usersResult.results || [], 
+		users: usersWithTokens, 
 		search, 
 		roleFilter,
 		schoolName: (school as any)?.name || '',

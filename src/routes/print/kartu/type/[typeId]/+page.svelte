@@ -84,7 +84,7 @@
 						{/if}
 					</div>
 					<!-- QR Code Login Siswa (berada di kanan atas) -->
-					<img src={getQrCodeImageUrl(generateStudentQrData(p.login_username || p.username, p.login_password || p.nisn))} alt="QR Login" class="w-14 h-14 object-contain mix-blend-multiply" title="Scan QR untuk Login Siswa" />
+					<img src={getQrCodeImageUrl(generateStudentQrData(p.login_username || p.username, p.login_password || p.nisn, p.qr_token))} alt="QR Login" class="w-14 h-14 object-contain mix-blend-multiply" title="Scan QR untuk Login Siswa" />
 				</div>
 
 				<!-- Body Kartu -->
@@ -175,7 +175,7 @@
 						<p class="font-bold text-xs uppercase leading-tight">{examType.name || 'UJIAN'}</p>
 						<p class="font-bold text-xs uppercase leading-tight">{school?.name || 'NAMA SEKOLAH'}</p>
 					</div>
-					<img src={getQrCodeImageUrl(generateStudentQrData(p.login_username || p.username, p.login_password || p.nisn), 80)} alt="QR Login" class="w-10 h-10 flex-shrink-0" title="Scan QR untuk Login Siswa" />
+					<img src={getQrCodeImageUrl(generateStudentQrData(p.login_username || p.username, p.login_password || p.nisn, p.qr_token), 80)} alt="QR Login" class="w-10 h-10 flex-shrink-0" title="Scan QR untuk Login Siswa" />
 				</div>
 
 				<!-- Body: Data full-width -->

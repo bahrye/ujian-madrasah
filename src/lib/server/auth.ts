@@ -153,3 +153,25 @@ export function generateTokenCode(length: number = 6): string {
 	}
 	return result;
 }
+
+/**
+ * Buat QR Login Secret Token berbasis HMAC SHA-256 yang aman.
+ * Token ini hanya bisa digunakan untuk login via Scan QR dan otomatis ditolak jika diketik di kotak kata sandi biasa.
+ */
+export async function createQrLoginToken(userId: number, username: string, passwordHash: string): Promise<string> {
+	const data = new TextEncoder().encode(`qr_login_user_${userId}_${username}_${passwordHash}`);
+	const key = await crypto.subtle.importKey('raw', getJwtSecret(), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+	const signature = await crypto.subtle.sign('HMAC', key, data);
+	const sigHex = Array.from(new Uint8Array(signature)).map((b) => b.toString(16).padStart(2, '0')).join('');
+	return `QRL_${userId}_${sigHex.slice(0, 32)}`;
+}
+
+/**
+ * Verifikasi QR Login Token
+ */
+export async function verifyQrLoginToken(userId: number, username: string, passwordHash: string, qrToken: string): Promise<boolean> {
+	if (!qrToken || typeof qrToken !== 'string' || !qrToken.startsWith('QRL_')) return false;
+	const expected = await createQrLoginToken(userId, username, passwordHash);
+	return qrToken === expected;
+}
+

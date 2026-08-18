@@ -110,10 +110,10 @@
               <div class="url-value">${escapeHtml(loginUrl)}</div>
             </div>
             <div style="margin-top:10px;display:flex;align-items:center;gap:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:8px 10px;">
-              <img src="${escapeHtml(getQrCodeImageUrl(generateStudentQrData(u.username, ''), 100))}" alt="QR" style="width:48px;height:48px;flex-shrink:0;border-radius:6px;" />
+              <img src="${escapeHtml(getQrCodeImageUrl(generateStudentQrData(u.username, null, (u as any).qr_token), 100))}" alt="QR" style="width:48px;height:48px;flex-shrink:0;border-radius:6px;" />
               <div style="font-size:9.5px;line-height:1.2;color:#64748b;text-align:left;">
-                <strong style="color:#0f172a;display:block;font-size:10px;margin-bottom:2px;">QR Login Petugas</strong>
-                Scan di kamera login untuk masuk cepat
+                <strong style="color:#0f172a;display:block;font-size:10px;margin-bottom:2px;">QR Login Petugas (Aman)</strong>
+                Scan di kamera login untuk masuk otomatis
               </div>
             </div>
           </div>
@@ -350,10 +350,10 @@
                       </div>
                     </div>
                     <div class="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl p-2.5">
-                      <img src={getQrCodeImageUrl(generateStudentQrData(filteredUsers[0].username, ''), 80)} alt="QR" class="w-11 h-11 rounded-lg bg-white p-0.5 border border-slate-200 flex-shrink-0" />
+                      <img src={getQrCodeImageUrl(generateStudentQrData(filteredUsers[0].username, null, (filteredUsers[0] as any).qr_token), 80)} alt="QR" class="w-11 h-11 rounded-lg bg-white p-0.5 border border-slate-200 flex-shrink-0" />
                       <div class="min-w-0">
-                        <p class="text-[10px] font-bold text-slate-900 leading-tight">QR Login Petugas</p>
-                        <p class="text-[9px] text-slate-500 mt-0.5">Scan di kamera login untuk masuk cepat</p>
+                        <p class="text-[10px] font-bold text-slate-900 leading-tight">QR Login Petugas (Aman)</p>
+                        <p class="text-[9px] text-slate-500 mt-0.5">Scan di kamera login untuk masuk otomatis</p>
                       </div>
                     </div>
                   </div>

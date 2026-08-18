@@ -3,6 +3,7 @@
 	import Toast from '$lib/components/ui/Toast.svelte';
 	import PasswordInput from '$lib/components/ui/PasswordInput.svelte';
 	import QrScannerModal from '$lib/components/auth/QrScannerModal.svelte';
+	import type { ParsedQrLogin } from '$lib/utils/qrLogin';
 
 	export let form: { error?: string } | null;
 
@@ -10,15 +11,17 @@
 	let showQrModal = false;
 	let username = '';
 	let password = '';
+	let qrToken = '';
 	let formElement: HTMLFormElement;
 
-	function handleQrScan(event: CustomEvent<{ username: string; password: string }>) {
-		const { username: scannedUser, password: scannedPass } = event.detail;
-		username = scannedUser;
-		password = scannedPass;
+	function handleQrScan(event: CustomEvent<ParsedQrLogin>) {
+		const { username: scannedUser, password: scannedPass, qrToken: scannedToken } = event.detail;
+		username = scannedUser || '';
+		password = scannedPass || '';
+		qrToken = scannedToken || '';
 		showQrModal = false;
 
-		// Automatically submit the form with scanned credentials
+		// Automatically submit the form with scanned credentials / token
 		setTimeout(() => {
 			if (formElement) {
 				if (typeof formElement.requestSubmit === 'function') {
@@ -88,6 +91,8 @@
 				}}
 				class="space-y-4"
 			>
+				<input type="hidden" name="qr_token" bind:value={qrToken} />
+
 				<div>
 					<label for="username" class="label">Username</label>
 					<div class="relative">
@@ -112,7 +117,7 @@
 					<PasswordInput
 						id="password"
 						name="password"
-						required={true}
+						required={!qrToken}
 						iconLeft={true}
 						bind:value={password}
 						placeholder="Masukkan kata sandi"

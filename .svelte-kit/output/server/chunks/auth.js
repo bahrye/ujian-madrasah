@@ -95,11 +95,25 @@ function generateTokenCode(length = 6) {
   }
   return result;
 }
+async function createQrLoginToken(userId, username, passwordHash) {
+  const data = new TextEncoder().encode(`qr_login_user_${userId}_${username}_${passwordHash}`);
+  const key = await crypto.subtle.importKey("raw", getJwtSecret(), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const signature = await crypto.subtle.sign("HMAC", key, data);
+  const sigHex = Array.from(new Uint8Array(signature)).map((b) => b.toString(16).padStart(2, "0")).join("");
+  return `QRL_${userId}_${sigHex.slice(0, 32)}`;
+}
+async function verifyQrLoginToken(userId, username, passwordHash, qrToken) {
+  if (!qrToken || typeof qrToken !== "string" || !qrToken.startsWith("QRL_")) return false;
+  const expected = await createQrLoginToken(userId, username, passwordHash);
+  return qrToken === expected;
+}
 export {
   COOKIE_NAME as C,
-  verifyPassword as a,
-  verifyExamTokenSignature as b,
+  createQrLoginToken as a,
+  verifyQrLoginToken as b,
   createToken as c,
+  verifyPassword as d,
+  verifyExamTokenSignature as e,
   generateTokenCode as g,
   hashPassword as h,
   signExamToken as s,

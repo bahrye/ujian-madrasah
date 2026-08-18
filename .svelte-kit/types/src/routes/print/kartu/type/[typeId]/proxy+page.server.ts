@@ -2,6 +2,7 @@
 import type { PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { error } from '@sveltejs/kit';
+import { createQrLoginToken } from '$lib/server/auth';
 
 export const load = async ({ platform, params, locals, url }: Parameters<PageServerLoad>[0]) => {
 	const db = getDB(platform);
@@ -23,7 +24,7 @@ export const load = async ({ platform, params, locals, url }: Parameters<PageSer
 	const classIdStr = url.searchParams.get('class_id');
 	const classId = parseInt(classIdStr || '', 10);
 	let query = `
-		SELECT u.id as user_id, u.name as student_name, u.username, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name, u.session_number
+		SELECT u.id as user_id, u.name as student_name, u.username, u.password_hash, u.nisn, u.nomor_peserta, u.photo, u.place_of_birth, u.date_of_birth, c.name as class_name, u.session_number
 		FROM users u
 		JOIN classes c ON u.class_id = c.id
 		JOIN exam_type_classes etc ON etc.class_id = u.class_id
@@ -44,18 +45,25 @@ export const load = async ({ platform, params, locals, url }: Parameters<PageSer
 	const participants = await db.prepare(query).bind(...paramsArr).all();
 
 	// Calculate login info for each participant based on what's available
-	const formattedParticipants = participants.results.map((p: any) => {
-		const isNomorPesertaMode = p.username === p.nomor_peserta;
-		
-		return {
-			...p,
-			login_username: p.username,
-			login_password: p.nisn, // Password is always NISN in this system
-			login_mode_label: isNomorPesertaMode ? 'No. Peserta' : 'NISN',
-			display_nisn: p.nisn,
-			display_nomor_peserta: p.nomor_peserta || '-'
-		};
-	});
+	const formattedParticipants = await Promise.all(
+		participants.results.map(async (p: any) => {
+			const isNomorPesertaMode = p.username === p.nomor_peserta;
+			let qrToken = '';
+			if (p.user_id && p.username && p.password_hash) {
+				qrToken = await createQrLoginToken(p.user_id, p.username, p.password_hash);
+			}
+
+			return {
+				...p,
+				login_username: p.username,
+				login_password: p.nisn, // Password is always NISN in this system
+				qr_token: qrToken,
+				login_mode_label: isNomorPesertaMode ? 'No. Peserta' : 'NISN',
+				display_nisn: p.nisn,
+				display_nomor_peserta: p.nomor_peserta || '-'
+			};
+		})
+	);
 
 	// Fetch Panitia (committee) assigned to this Exam Type (proctor_role = 'cm')
 	const committee = await db.prepare(`

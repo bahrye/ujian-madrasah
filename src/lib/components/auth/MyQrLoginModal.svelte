@@ -9,20 +9,39 @@
 
 	const dispatch = createEventDispatcher<{ close: void }>();
 
-	let customPassword = '';
-	let includePassword = false;
+	let fetchedQrToken = '';
+	let loadingToken = false;
+
+	async function loadSecureToken() {
+		if (!user) return;
+		loadingToken = true;
+		try {
+			const res = await fetch('/api/profile/qr-token');
+			if (res.ok) {
+				const data = await res.json();
+				fetchedQrToken = data.qr_token || '';
+			}
+		} catch (e) {
+			console.warn('Failed to load secure QR token:', e);
+		} finally {
+			loadingToken = false;
+		}
+	}
+
+	$: if (show && user) {
+		loadSecureToken();
+	}
 
 	$: qrPayload = generateStudentQrData(
 		user?.username || '',
-		includePassword && customPassword ? customPassword : ''
+		null,
+		fetchedQrToken
 	);
 
 	$: qrImageUrl = getQrCodeImageUrl(qrPayload, 250);
 
 	function close() {
 		show = false;
-		customPassword = '';
-		includePassword = false;
 		dispatch('close');
 	}
 
@@ -70,7 +89,7 @@
 		<img src="${qrUrl}" alt="QR" class="qr-img" />
 		<div class="name">${name}</div>
 		<div class="user">Username: ${u}</div>
-		<div class="note">Arahkan QR ke kamera komputer ujian untuk login otomatis</div>
+		<div class="note">Arahkan QR ke kamera komputer ujian untuk login otomatis (Kata sandi terenkripsi aman)</div>
 	</div>
 </div>
 <script>window.onload = function() { window.print(); }<\/script>
@@ -138,8 +157,18 @@
 			<!-- Body -->
 			<div class="p-6 flex flex-col items-center text-center space-y-4">
 				<!-- QR Code Container -->
-				<div class="p-3 bg-slate-50 border-2 border-dashed border-indigo-200 rounded-2xl shadow-inner relative group">
-					<img src={qrImageUrl} alt="QR Code Login" class="w-48 h-48 rounded-xl object-contain bg-white" />
+				<div class="p-3 bg-slate-50 border-2 border-dashed border-indigo-200 rounded-2xl shadow-inner relative group flex items-center justify-center min-h-[190px]">
+					{#if loadingToken}
+						<div class="flex flex-col items-center gap-2 text-slate-400 py-10">
+							<svg class="w-6 h-6 animate-spin text-indigo-600" fill="none" viewBox="0 0 24 24">
+								<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+								<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+							</svg>
+							<span class="text-xs font-medium">Membuat kode akses aman...</span>
+						</div>
+					{:else}
+						<img src={qrImageUrl} alt="QR Code Login" class="w-44 h-44 rounded-xl object-contain bg-white" />
+					{/if}
 				</div>
 
 				<div class="w-full">
@@ -147,29 +176,18 @@
 					<p class="text-xs font-mono font-semibold text-slate-500 mt-1">Username: {user.username}</p>
 				</div>
 
-				<!-- Optional: Include direct password in QR for quick 1-click login -->
-				<div class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3.5 text-left text-xs">
-					<label class="flex items-center gap-2 cursor-pointer font-medium text-slate-700 select-none">
-						<input type="checkbox" bind:checked={includePassword} class="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4" />
-						<span>Sertakan kata sandi di QR (Login Langsung)</span>
-					</label>
-
-					{#if includePassword}
-						<div class="mt-2.5 space-y-1 animate-in fade-in duration-150">
-							<input
-								type="password"
-								bind:value={customPassword}
-								placeholder="Masukkan kata sandi akun Anda"
-								class="input text-xs py-1.5 px-3 bg-white"
-							/>
-							<p class="text-[10px] text-slate-400">QR akan langsung login tanpa perlu mengetik kata sandi lagi.</p>
-						</div>
-					{/if}
+				<!-- Security Badge Explanation -->
+				<div class="w-full bg-emerald-50 border border-emerald-200 rounded-2xl p-3 text-left flex items-start gap-2.5">
+					<div class="w-6 h-6 rounded-lg bg-emerald-500 text-white flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm text-xs">
+						🔒
+					</div>
+					<div class="text-[11px] leading-snug">
+						<p class="font-bold text-emerald-900">Aman & Terenkripsi</p>
+						<p class="text-emerald-700 mt-0.5">
+							Kata sandi Anda <strong>tidak ditampilkan</strong>. Kode ini hanya valid saat dipindai lewat kamera login dan tidak dapat diketik sebagai kata sandi biasa.
+						</p>
+					</div>
 				</div>
-
-				<p class="text-[11px] text-slate-500 leading-snug">
-					Tunjukkan QR ini ke kamera komputer madrasah di halaman login untuk masuk secara otomatis.
-				</p>
 			</div>
 
 			<!-- Footer -->
@@ -189,7 +207,7 @@
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
 					</svg>
-					Cetak / Unduh Badge
+					Cetak Badge
 				</button>
 			</div>
 		</div>

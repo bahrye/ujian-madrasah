@@ -222,6 +222,7 @@ function _page($$renderer, $$props) {
     let showQrModal = false;
     let username = "";
     let password = "";
+    let qrToken = "";
     let $$settled = true;
     let $$inner_renderer;
     function $$render_inner($$renderer3) {
@@ -240,11 +241,11 @@ function _page($$renderer, $$props) {
       } else {
         $$renderer3.push("<!--[-1-->");
       }
-      $$renderer3.push(`<!--]--> <form method="POST" class="space-y-4"><div><label for="username" class="label">Username</label> <div class="relative"><svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg> <input id="username" name="username" type="text" required=""${attr("value", username)} class="input pl-10" placeholder="Masukkan username" autocomplete="username"/></div></div> <div><label for="password" class="label">Kata Sandi</label> `);
+      $$renderer3.push(`<!--]--> <form method="POST" class="space-y-4"><input type="hidden" name="qr_token"${attr("value", qrToken)}/> <div><label for="username" class="label">Username</label> <div class="relative"><svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg> <input id="username" name="username" type="text" required=""${attr("value", username)} class="input pl-10" placeholder="Masukkan username" autocomplete="username"/></div></div> <div><label for="password" class="label">Kata Sandi</label> `);
       PasswordInput($$renderer3, {
         id: "password",
         name: "password",
-        required: true,
+        required: !qrToken,
         iconLeft: true,
         placeholder: "Masukkan kata sandi",
         autocomplete: "current-password",

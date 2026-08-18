@@ -178,6 +178,9 @@
 	"/api/profile": [
 		"src/routes/api/profile/+server.ts"
 	],
+	"/api/profile/qr-token": [
+		"src/routes/api/profile/qr-token/+server.ts"
+	],
 	"/api/proxy-media": [
 		"src/routes/api/proxy-media/+server.ts"
 	],

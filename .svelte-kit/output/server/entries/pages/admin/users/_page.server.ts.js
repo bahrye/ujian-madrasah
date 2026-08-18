@@ -1,11 +1,11 @@
 import { fail } from "@sveltejs/kit";
 import { g as getDB } from "../../../../chunks/db.js";
-import { h as hashPassword, c as createToken, C as COOKIE_NAME } from "../../../../chunks/auth.js";
+import { h as hashPassword, c as createToken, C as COOKIE_NAME, a as createQrLoginToken } from "../../../../chunks/auth.js";
 const load = async ({ platform, url, locals }) => {
   const db = getDB(platform);
   const search = url.searchParams.get("search") || "";
   const roleFilter = url.searchParams.get("role") || "";
-  let query = 'SELECT id, username, name, nip, role, is_active, created_at, photo FROM users WHERE school_id = ? AND role != "siswa" AND role != "superadmin" AND role != "admin"';
+  let query = 'SELECT id, username, password_hash, name, nip, role, is_active, created_at, photo FROM users WHERE school_id = ? AND role != "siswa" AND role != "superadmin" AND role != "admin"';
   const params = [locals.user.school_id];
   if (search) {
     query += " AND (username LIKE ? OR name LIKE ?)";
@@ -20,8 +20,27 @@ const load = async ({ platform, url, locals }) => {
     db.prepare(query).bind(...params).all(),
     db.prepare("SELECT name, logo_url FROM schools WHERE id = ?").bind(locals.user.school_id).first()
   ]);
+  const usersWithTokens = await Promise.all(
+    (usersResult.results || []).map(async (u) => {
+      let qrToken = "";
+      if (u.id && u.username && u.password_hash) {
+        qrToken = await createQrLoginToken(u.id, u.username, u.password_hash);
+      }
+      return {
+        id: u.id,
+        username: u.username,
+        name: u.name,
+        nip: u.nip,
+        role: u.role,
+        is_active: u.is_active,
+        created_at: u.created_at,
+        photo: u.photo,
+        qr_token: qrToken
+      };
+    })
+  );
   return {
-    users: usersResult.results || [],
+    users: usersWithTokens,
     search,
     roleFilter,
     schoolName: school?.name || "",
