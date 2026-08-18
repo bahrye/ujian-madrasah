@@ -471,8 +471,8 @@
 	let editMenjodohkanCount = 4;
 	let createBenarSalahCount = 3;
 	let editBenarSalahCount = 3;
-	let createBenarSalahMultiMode = true;
-	let editBenarSalahMultiMode = true;
+	let createBenarSalahMultiMode = false;
+	let editBenarSalahMultiMode = false;
 
 	$: if (form?.success) toasts.success(form.success);
 	$: if (form?.error) toasts.error(form.error);
@@ -776,6 +776,8 @@
 						options = ['', '', '', ''];
 						optionCount = 4;
 						createMenjodohkanCount = 4;
+						createBenarSalahCount = 3;
+						createBenarSalahMultiMode = false;
 					}}>Batal</button>
 					<button type="submit" class="btn-primary flex-1">Simpan Soal</button>
 				</div>
