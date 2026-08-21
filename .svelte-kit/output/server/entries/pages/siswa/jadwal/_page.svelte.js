@@ -52,12 +52,15 @@ function _page($$renderer, $$props) {
       todayClone.setHours(0, 0, 0, 0);
       const diffTime = date.getTime() - todayClone.getTime();
       const diffDays = Math.round(diffTime / (1e3 * 60 * 60 * 24));
-      if (diffDays === 0) return "Hari Ini";
-      if (diffDays === 1) return "Besok";
-      if (diffDays === 2) return "Lusa";
-      if (diffDays > 2) return `${diffDays} hari lagi`;
-      if (diffDays === -1) return "Kemarin";
-      if (diffDays < -1) return `${Math.abs(diffDays)} hari lalu`;
+      if (diffDays === 0) return { text: "Hari Ini", class: "badge-primary" };
+      if (diffDays === 1) return { text: "Besok", class: "badge-primary" };
+      if (diffDays === 2) return { text: "Lusa", class: "badge-primary" };
+      if (diffDays > 2) return { text: `${diffDays} hari lagi`, class: "badge-primary" };
+      if (diffDays === -1) return { text: "Kemarin", class: "badge-secondary" };
+      if (diffDays < -1) return {
+        text: `${Math.abs(diffDays)} hari lalu`,
+        class: "badge-secondary"
+      };
       return null;
     }
     function formatTimeRange(startStr, endStr) {
@@ -83,6 +86,106 @@ function _page($$renderer, $$props) {
         return "upcoming";
       }
       return "active";
+    }
+    function getExamDisplayStatus(exam) {
+      const isDone = exam.attempt_status && ["selesai", "waktu_habis", "remedial"].includes(exam.attempt_status);
+      if (isDone) {
+        return {
+          type: "done",
+          label: "Selesai",
+          bgClass: "bg-emerald-50 hover:bg-emerald-100/70",
+          textClass: "text-emerald-700",
+          dotClass: "bg-emerald-500",
+          borderClass: "border-emerald-200",
+          badgeClass: "badge-success"
+        };
+      }
+      if (exam.attempt_status === "mengerjakan") {
+        return {
+          type: "active",
+          label: "Sedang Mengerjakan",
+          bgClass: "bg-amber-50 hover:bg-amber-100/70",
+          textClass: "text-amber-800 font-bold",
+          dotClass: "bg-amber-500 animate-pulse",
+          borderClass: "border-amber-300",
+          badgeClass: "badge-warning"
+        };
+      }
+      const timing = getExamStatus(exam);
+      if (timing === "active") {
+        return {
+          type: "active",
+          label: "Sedang Berlangsung",
+          bgClass: "bg-amber-50 hover:bg-amber-100/70",
+          textClass: "text-amber-800 font-bold",
+          dotClass: "bg-amber-500 animate-pulse",
+          borderClass: "border-amber-300",
+          badgeClass: "badge-warning"
+        };
+      }
+      if (timing === "ended") {
+        return {
+          type: "ended",
+          label: "Berakhir",
+          bgClass: "bg-rose-50 hover:bg-rose-100/70",
+          textClass: "text-rose-700",
+          dotClass: "bg-rose-500",
+          borderClass: "border-rose-200",
+          badgeClass: "badge-danger"
+        };
+      }
+      return {
+        type: "upcoming",
+        label: "Akan Datang",
+        bgClass: "bg-indigo-50 hover:bg-indigo-100/70",
+        textClass: "text-indigo-700",
+        dotClass: "bg-indigo-500",
+        borderClass: "border-indigo-200",
+        badgeClass: "badge-primary"
+      };
+    }
+    function getCellDominantStatus(exams) {
+      if (!exams || exams.length === 0) return null;
+      const hasActive = exams.some((e) => {
+        if (e.attempt_status === "mengerjakan") return true;
+        const isDone = e.attempt_status && ["selesai", "waktu_habis", "remedial"].includes(e.attempt_status);
+        return !isDone && getExamStatus(e) === "active";
+      });
+      if (hasActive) {
+        return {
+          type: "active",
+          dotClass: "bg-amber-500 ring-2 ring-amber-200 animate-pulse",
+          badgeClass: "bg-amber-500 text-white",
+          cellBorder: "border-amber-300 bg-amber-50/30"
+        };
+      }
+      const hasUpcoming = exams.some((e) => {
+        const isDone = e.attempt_status && ["selesai", "waktu_habis", "remedial"].includes(e.attempt_status);
+        return !isDone && getExamStatus(e) === "upcoming";
+      });
+      if (hasUpcoming) {
+        return {
+          type: "upcoming",
+          dotClass: "bg-indigo-500 ring-2 ring-indigo-200",
+          badgeClass: "bg-indigo-600 text-white",
+          cellBorder: "border-indigo-200 bg-indigo-50/20"
+        };
+      }
+      const allDone = exams.every((e) => e.attempt_status && ["selesai", "waktu_habis", "remedial"].includes(e.attempt_status));
+      if (allDone) {
+        return {
+          type: "done",
+          dotClass: "bg-emerald-500 ring-2 ring-emerald-200",
+          badgeClass: "bg-emerald-600 text-white",
+          cellBorder: "border-emerald-200 bg-emerald-50/20"
+        };
+      }
+      return {
+        type: "ended",
+        dotClass: "bg-rose-500 ring-2 ring-rose-200",
+        badgeClass: "bg-rose-500 text-white",
+        cellBorder: "border-rose-200 bg-rose-50/20"
+      };
     }
     function buildCalendarGrid(year, month, selectedKey, examsMap) {
       const todayKey = toDateKey(/* @__PURE__ */ new Date());
@@ -192,26 +295,34 @@ function _page($$renderer, $$props) {
       for (let $$index_2 = 0, $$length = each_array_1.length; $$index_2 < $$length; $$index_2++) {
         let cell = each_array_1[$$index_2];
         const hasExams = cell.exams.length > 0;
-        $$renderer2.push(`<button type="button"${attr_class(`text-left rounded-xl p-1.5 sm:p-2 transition-all flex flex-col justify-between min-h-[64px] sm:min-h-[88px] border relative group focus:outline-none ${cell.isSelected ? "ring-2 ring-indigo-600 bg-indigo-50/70 border-indigo-300 shadow-sm" : cell.isToday ? "ring-2 ring-indigo-400/80 bg-indigo-50/30 border-indigo-200" : hasExams ? "bg-white hover:bg-indigo-50/40 border-indigo-200 hover:border-indigo-300 shadow-xs" : cell.isCurrentMonth ? "bg-white hover:bg-slate-50 border-slate-200/80 text-slate-700" : "bg-slate-50/50 border-slate-100 text-slate-300 opacity-60"}`)}><div class="flex items-center justify-between w-full"><span${attr_class(`text-xs sm:text-sm font-bold ${cell.isSelected ? "text-indigo-900 font-black" : cell.isToday ? "text-indigo-600 font-extrabold" : cell.isCurrentMonth ? "text-slate-800" : "text-slate-400"}`)}>${escape_html(cell.dayNumber)}</span> `);
+        const dominant = getCellDominantStatus(cell.exams);
+        $$renderer2.push(`<button type="button"${attr_class(`text-left rounded-xl p-1.5 sm:p-2 transition-all flex flex-col justify-between min-h-[64px] sm:min-h-[88px] border relative group focus:outline-none cursor-pointer ${cell.isSelected ? "ring-2 ring-indigo-600 bg-indigo-50/80 border-indigo-300 shadow-sm z-10" : cell.isToday ? "ring-2 ring-indigo-400/80 bg-indigo-50/30 border-indigo-200" : hasExams && dominant ? `${dominant.cellBorder} hover:shadow-sm` : cell.isCurrentMonth ? "bg-white hover:bg-slate-50 border-slate-200/80 text-slate-700" : "bg-slate-50/50 border-slate-100 text-slate-300 opacity-60"}`)}><div class="flex items-center justify-between w-full"><span${attr_class(`text-xs sm:text-sm font-bold ${cell.isSelected ? "text-indigo-900 font-black" : cell.isToday ? "text-indigo-600 font-extrabold" : cell.isCurrentMonth ? "text-slate-800" : "text-slate-400"}`)}>${escape_html(cell.dayNumber)}</span> `);
         if (cell.isToday) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<span class="hidden sm:inline-block text-[10px] font-bold px-1.5 py-0.2 bg-indigo-600 text-white rounded-md uppercase tracking-tight">Hari ini</span> <span class="sm:hidden w-2 h-2 rounded-full bg-indigo-600"></span>`);
-        } else if (hasExams) {
+          $$renderer2.push(`<span class="hidden sm:inline-block text-[10px] font-bold px-1.5 py-0.2 bg-indigo-600 text-white rounded-md uppercase tracking-tight">Hari ini</span> `);
+          if (dominant) {
+            $$renderer2.push("<!--[0-->");
+            $$renderer2.push(`<span${attr_class(`sm:hidden w-2 h-2 rounded-full ${stringify(dominant.dotClass)}`)}></span>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+            $$renderer2.push(`<span class="sm:hidden w-2 h-2 rounded-full bg-indigo-600"></span>`);
+          }
+          $$renderer2.push(`<!--]-->`);
+        } else if (hasExams && dominant) {
           $$renderer2.push("<!--[1-->");
-          $$renderer2.push(`<span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-indigo-500 ring-2 ring-indigo-200"></span>`);
+          $$renderer2.push(`<span${attr_class(`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ${stringify(dominant.dotClass)}`)}></span>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
         $$renderer2.push(`<!--]--></div> <div class="w-full mt-1 space-y-1">`);
-        if (hasExams) {
+        if (hasExams && dominant) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<div class="sm:hidden flex items-center justify-center"><span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-indigo-600 text-white leading-none">${escape_html(cell.exams.length)}</span></div> <div class="hidden sm:block space-y-1"><!--[-->`);
+          $$renderer2.push(`<div class="sm:hidden flex items-center justify-center"><span${attr_class(`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${stringify(dominant.badgeClass)} leading-none shadow-xs`)}>${escape_html(cell.exams.length)}</span></div> <div class="hidden sm:block space-y-1"><!--[-->`);
           const each_array_2 = ensure_array_like(cell.exams.slice(0, 2));
           for (let $$index_1 = 0, $$length2 = each_array_2.length; $$index_1 < $$length2; $$index_1++) {
             let exam = each_array_2[$$index_1];
-            const status = getExamStatus(exam);
-            const isDone = exam.attempt_status && ["selesai", "waktu_habis", "remedial"].includes(exam.attempt_status);
-            $$renderer2.push(`<div${attr_class(`text-[10px] font-semibold truncate px-1.5 py-0.5 rounded flex items-center gap-1 border ${isDone ? "bg-emerald-50 text-emerald-700 border-emerald-200" : status === "active" ? "bg-amber-50 text-amber-700 border-amber-200 font-bold" : status === "ended" ? "bg-rose-50 text-rose-700 border-rose-200" : "bg-indigo-50 text-indigo-700 border-indigo-200"}`)}${attr("title", `${stringify(exam.title)} (${stringify(exam.subject || "Umum")})`)}><span${attr_class(`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isDone ? "bg-emerald-500" : status === "active" ? "bg-amber-500 animate-pulse" : status === "ended" ? "bg-rose-500" : "bg-indigo-500"}`)}></span> <span class="truncate">${escape_html(exam.subject || exam.title)}</span></div>`);
+            const display = getExamDisplayStatus(exam);
+            $$renderer2.push(`<div${attr_class(`text-[10px] font-semibold truncate px-1.5 py-0.5 rounded flex items-center gap-1 border ${stringify(display.bgClass)} ${stringify(display.textClass)} ${stringify(display.borderClass)}`)}${attr("title", `${stringify(exam.title)} (${stringify(display.label)})`)}><span${attr_class(`w-1.5 h-1.5 rounded-full flex-shrink-0 ${stringify(display.dotClass)}`)}></span> <span class="truncate">${escape_html(exam.subject || exam.title)}</span></div>`);
           }
           $$renderer2.push(`<!--]--> `);
           if (cell.exams.length > 2) {
@@ -226,10 +337,11 @@ function _page($$renderer, $$props) {
         }
         $$renderer2.push(`<!--]--></div></button>`);
       }
-      $$renderer2.push(`<!--]--></div> <div class="mt-5 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500"><div class="flex items-center gap-4 flex-wrap"><div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span> <span>Akan Datang</span></div> <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> <span>Sedang Berlangsung</span></div> <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> <span>Selesai Dikerjakan</span></div> <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> <span>Berakhir</span></div></div> <button type="button" class="text-indigo-600 hover:text-indigo-800 font-semibold underline text-xs">Lompat ke Ujian Terdekat</button></div></div> <div class="lg:col-span-5 xl:col-span-4 space-y-4"><div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sticky top-6"><div class="flex items-start justify-between gap-2 mb-4 pb-4 border-b border-slate-100"><div><div class="flex items-center gap-1.5 text-indigo-600 font-semibold text-xs uppercase tracking-wider mb-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.calendar)}></path></svg> <span>Informasi Jadwal Ujian</span></div> <h3 class="font-black text-slate-800 text-lg sm:text-xl leading-tight">${escape_html(formatFullDate(selectedDateKey))}</h3></div> `);
+      $$renderer2.push(`<!--]--></div> <div class="mt-5 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500"><div class="flex items-center gap-4 flex-wrap"><div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span> <span class="text-slate-600 font-medium">Akan Datang</span></div> <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> <span class="text-slate-600 font-medium">Sedang Berlangsung</span></div> <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> <span class="text-slate-600 font-medium">Selesai</span></div> <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> <span class="text-slate-600 font-medium">Telah Berakhir</span></div></div> <button type="button" class="text-indigo-600 hover:text-indigo-800 font-semibold underline text-xs transition-colors">Lompat ke Ujian Terdekat</button></div></div> <div id="selected-date-details-section" class="lg:col-span-5 xl:col-span-4 space-y-4 scroll-mt-20"><div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sticky top-6"><div class="flex items-start justify-between gap-2 mb-4 pb-4 border-b border-slate-100"><div><div class="flex items-center gap-1.5 text-indigo-600 font-semibold text-xs uppercase tracking-wider mb-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.calendar)}></path></svg> <span>Informasi Jadwal Ujian</span></div> <h3 class="font-black text-slate-800 text-lg sm:text-xl leading-tight">${escape_html(formatFullDate(selectedDateKey))}</h3></div> `);
       if (getDateRelativeLabel(selectedDateKey)) {
         $$renderer2.push("<!--[0-->");
-        $$renderer2.push(`<span class="badge-primary font-bold text-xs px-2.5 py-1 rounded-lg flex-shrink-0">${escape_html(getDateRelativeLabel(selectedDateKey))}</span>`);
+        const rel = getDateRelativeLabel(selectedDateKey);
+        $$renderer2.push(`<span${attr_class(`${stringify(rel.class)} font-bold text-xs px-2.5 py-1 rounded-lg flex-shrink-0`)}>${escape_html(rel.text)}</span>`);
       } else {
         $$renderer2.push("<!--[-1-->");
       }
@@ -241,22 +353,9 @@ function _page($$renderer, $$props) {
         for (let $$index_4 = 0, $$length = each_array_3.length; $$index_4 < $$length; $$index_4++) {
           let exam = each_array_3[$$index_4];
           const status = getExamStatus(exam);
+          const display = getExamDisplayStatus(exam);
           const isCompleted = exam.attempt_status && ["selesai", "waktu_habis", "remedial"].includes(exam.attempt_status);
-          $$renderer2.push(`<div class="rounded-xl border border-slate-200 bg-slate-50/50 p-4 transition-all hover:bg-white hover:shadow-md hover:border-indigo-200 space-y-3"><div class="flex items-start justify-between gap-2"><div><span class="text-xs font-bold text-indigo-600 uppercase tracking-wide">${escape_html(exam.subject || "Mata Pelajaran Umum")}</span> <h4 class="font-bold text-slate-800 text-base leading-snug mt-0.5">${escape_html(exam.title)}</h4></div> `);
-          if (isCompleted) {
-            $$renderer2.push("<!--[0-->");
-            $$renderer2.push(`<span class="badge-success text-xs font-semibold px-2 py-0.5 rounded-md flex-shrink-0">Selesai</span>`);
-          } else if (status === "active") {
-            $$renderer2.push("<!--[1-->");
-            $$renderer2.push(`<span class="badge-warning text-xs font-semibold px-2 py-0.5 rounded-md flex-shrink-0 animate-pulse">Sedang Berlangsung</span>`);
-          } else if (status === "upcoming") {
-            $$renderer2.push("<!--[2-->");
-            $$renderer2.push(`<span class="badge-primary text-xs font-semibold px-2 py-0.5 rounded-md flex-shrink-0">Akan Datang</span>`);
-          } else {
-            $$renderer2.push("<!--[-1-->");
-            $$renderer2.push(`<span class="badge-danger text-xs font-semibold px-2 py-0.5 rounded-md flex-shrink-0">Berakhir</span>`);
-          }
-          $$renderer2.push(`<!--]--></div> `);
+          $$renderer2.push(`<div class="rounded-xl border border-slate-200 bg-slate-50/50 p-4 transition-all hover:bg-white hover:shadow-md hover:border-indigo-200 space-y-3"><div class="flex items-start justify-between gap-2"><div><span class="text-xs font-bold text-indigo-600 uppercase tracking-wide">${escape_html(exam.subject || "Mata Pelajaran Umum")}</span> <h4 class="font-bold text-slate-800 text-base leading-snug mt-0.5">${escape_html(exam.title)}</h4></div> <span${attr_class(`${stringify(display.badgeClass)} text-xs font-semibold px-2.5 py-0.5 rounded-md flex-shrink-0 ${display.type === "active" ? "animate-pulse" : ""}`)}>${escape_html(display.label)}</span></div> `);
           if (exam.room_name || exam.session_number) {
             $$renderer2.push("<!--[0-->");
             $$renderer2.push(`<div class="flex items-center gap-2 flex-wrap">`);
@@ -300,19 +399,19 @@ function _page($$renderer, $$props) {
           $$renderer2.push(`<!--]--></div> <div class="pt-1">`);
           if (isCompleted) {
             $$renderer2.push("<!--[0-->");
-            $$renderer2.push(`<button disabled="" class="btn w-full justify-center bg-emerald-50 text-emerald-600 border border-emerald-200 cursor-not-allowed shadow-none text-xs sm:text-sm py-2"><svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.check)}></path></svg> Ujian Selesai Dikerjakan</button>`);
+            $$renderer2.push(`<button disabled="" class="btn w-full justify-center bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-not-allowed shadow-none text-xs sm:text-sm py-2.5 font-bold"><svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.check)}></path></svg> Ujian Selesai Dikerjakan</button>`);
           } else if (status === "ended") {
             $$renderer2.push("<!--[1-->");
-            $$renderer2.push(`<div class="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs font-bold cursor-not-allowed"><svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.warning)}></path></svg> <span>Ujian Telah Berakhir</span></div>`);
+            $$renderer2.push(`<div class="flex items-center justify-center gap-2 w-full px-3 py-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm font-bold cursor-not-allowed"><svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"${attr("d", ICONS.warning)}></path></svg> <span>Ujian Telah Berakhir</span></div>`);
           } else if (status === "upcoming") {
             $$renderer2.push("<!--[2-->");
-            $$renderer2.push(`<button disabled="" class="btn w-full justify-center bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed text-xs sm:text-sm py-2">Belum Dimulai</button>`);
+            $$renderer2.push(`<button disabled="" class="btn w-full justify-center bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed text-xs sm:text-sm py-2.5">Belum Dimulai</button>`);
           } else if (exam.attempt_status === "mengerjakan") {
             $$renderer2.push("<!--[3-->");
-            $$renderer2.push(`<a${attr("href", `/siswa/ujian?exam_id=${stringify(exam.id)}`)} class="btn btn-warning w-full justify-center text-xs sm:text-sm py-2 shadow-md">Lanjutkan Ujian</a>`);
+            $$renderer2.push(`<a${attr("href", `/siswa/ujian?exam_id=${stringify(exam.id)}`)} class="btn btn-warning w-full justify-center text-xs sm:text-sm py-2.5 shadow-md">Lanjutkan Ujian</a>`);
           } else {
             $$renderer2.push("<!--[-1-->");
-            $$renderer2.push(`<a${attr("href", `/siswa/ujian?exam_id=${stringify(exam.id)}`)} class="btn btn-primary w-full justify-center text-xs sm:text-sm py-2 shadow-md">Buka Halaman Ujian</a>`);
+            $$renderer2.push(`<a${attr("href", `/siswa/ujian?exam_id=${stringify(exam.id)}`)} class="btn btn-primary w-full justify-center text-xs sm:text-sm py-2.5 shadow-md">Buka Halaman Ujian</a>`);
           }
           $$renderer2.push(`<!--]--></div></div>`);
         }

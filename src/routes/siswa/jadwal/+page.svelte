@@ -80,12 +80,12 @@
 		const diffTime = date.getTime() - todayClone.getTime();
 		const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
-		if (diffDays === 0) return 'Hari Ini';
-		if (diffDays === 1) return 'Besok';
-		if (diffDays === 2) return 'Lusa';
-		if (diffDays > 2) return `${diffDays} hari lagi`;
-		if (diffDays === -1) return 'Kemarin';
-		if (diffDays < -1) return `${Math.abs(diffDays)} hari lalu`;
+		if (diffDays === 0) return { text: 'Hari Ini', class: 'badge-primary' };
+		if (diffDays === 1) return { text: 'Besok', class: 'badge-primary' };
+		if (diffDays === 2) return { text: 'Lusa', class: 'badge-primary' };
+		if (diffDays > 2) return { text: `${diffDays} hari lagi`, class: 'badge-primary' };
+		if (diffDays === -1) return { text: 'Kemarin', class: 'badge-secondary' };
+		if (diffDays < -1) return { text: `${Math.abs(diffDays)} hari lalu`, class: 'badge-secondary' };
 		return null;
 	}
 
@@ -119,7 +119,7 @@
 		return `${startDateFormatted} ${startFormatted} - ${endDateFormatted} ${endFormatted}`;
 	}
 
-	function getExamStatus(exam: any) {
+	function getExamStatus(exam: any): 'active' | 'upcoming' | 'ended' {
 		const now = new Date();
 		if (exam.end_time && now > parseDate(exam.end_time)) {
 			return 'ended';
@@ -128,6 +128,120 @@
 			return 'upcoming';
 		}
 		return 'active';
+	}
+
+	function getExamDisplayStatus(exam: any) {
+		const isDone = exam.attempt_status && ['selesai', 'waktu_habis', 'remedial'].includes(exam.attempt_status);
+		if (isDone) {
+			return {
+				type: 'done',
+				label: 'Selesai',
+				bgClass: 'bg-emerald-50 hover:bg-emerald-100/70',
+				textClass: 'text-emerald-700',
+				dotClass: 'bg-emerald-500',
+				borderClass: 'border-emerald-200',
+				badgeClass: 'badge-success'
+			};
+		}
+
+		if (exam.attempt_status === 'mengerjakan') {
+			return {
+				type: 'active',
+				label: 'Sedang Mengerjakan',
+				bgClass: 'bg-amber-50 hover:bg-amber-100/70',
+				textClass: 'text-amber-800 font-bold',
+				dotClass: 'bg-amber-500 animate-pulse',
+				borderClass: 'border-amber-300',
+				badgeClass: 'badge-warning'
+			};
+		}
+
+		const timing = getExamStatus(exam);
+		if (timing === 'active') {
+			return {
+				type: 'active',
+				label: 'Sedang Berlangsung',
+				bgClass: 'bg-amber-50 hover:bg-amber-100/70',
+				textClass: 'text-amber-800 font-bold',
+				dotClass: 'bg-amber-500 animate-pulse',
+				borderClass: 'border-amber-300',
+				badgeClass: 'badge-warning'
+			};
+		}
+
+		if (timing === 'ended') {
+			return {
+				type: 'ended',
+				label: 'Berakhir',
+				bgClass: 'bg-rose-50 hover:bg-rose-100/70',
+				textClass: 'text-rose-700',
+				dotClass: 'bg-rose-500',
+				borderClass: 'border-rose-200',
+				badgeClass: 'badge-danger'
+			};
+		}
+
+		return {
+			type: 'upcoming',
+			label: 'Akan Datang',
+			bgClass: 'bg-indigo-50 hover:bg-indigo-100/70',
+			textClass: 'text-indigo-700',
+			dotClass: 'bg-indigo-500',
+			borderClass: 'border-indigo-200',
+			badgeClass: 'badge-primary'
+		};
+	}
+
+	function getCellDominantStatus(exams: any[]) {
+		if (!exams || exams.length === 0) return null;
+		
+		// 1. Any active / ongoing exam
+		const hasActive = exams.some(e => {
+			if (e.attempt_status === 'mengerjakan') return true;
+			const isDone = e.attempt_status && ['selesai', 'waktu_habis', 'remedial'].includes(e.attempt_status);
+			return !isDone && getExamStatus(e) === 'active';
+		});
+		if (hasActive) {
+			return {
+				type: 'active',
+				dotClass: 'bg-amber-500 ring-2 ring-amber-200 animate-pulse',
+				badgeClass: 'bg-amber-500 text-white',
+				cellBorder: 'border-amber-300 bg-amber-50/30'
+			};
+		}
+
+		// 2. Any upcoming exam
+		const hasUpcoming = exams.some(e => {
+			const isDone = e.attempt_status && ['selesai', 'waktu_habis', 'remedial'].includes(e.attempt_status);
+			return !isDone && getExamStatus(e) === 'upcoming';
+		});
+		if (hasUpcoming) {
+			return {
+				type: 'upcoming',
+				dotClass: 'bg-indigo-500 ring-2 ring-indigo-200',
+				badgeClass: 'bg-indigo-600 text-white',
+				cellBorder: 'border-indigo-200 bg-indigo-50/20'
+			};
+		}
+
+		// 3. All completed
+		const allDone = exams.every(e => e.attempt_status && ['selesai', 'waktu_habis', 'remedial'].includes(e.attempt_status));
+		if (allDone) {
+			return {
+				type: 'done',
+				dotClass: 'bg-emerald-500 ring-2 ring-emerald-200',
+				badgeClass: 'bg-emerald-600 text-white',
+				cellBorder: 'border-emerald-200 bg-emerald-50/20'
+			};
+		}
+
+		// 4. All ended
+		return {
+			type: 'ended',
+			dotClass: 'bg-rose-500 ring-2 ring-rose-200',
+			badgeClass: 'bg-rose-500 text-white',
+			cellBorder: 'border-rose-200 bg-rose-50/20'
+		};
 	}
 
 	$: filteredSchedules = (data.schedules || []).filter((exam: any) => {
@@ -262,11 +376,21 @@
 		selectedDateKey = toDateKey(now);
 	}
 
-	function handleSelectDay(cell: CalendarCell) {
+	function handleSelectDay(cell: CalendarCell, shouldScroll = true) {
 		selectedDateKey = cell.dateKey;
 		if (!cell.isCurrentMonth) {
 			currentMonth = cell.date.getMonth();
 			currentYear = cell.date.getFullYear();
+		}
+
+		// Focus and smoothly scroll to the exam details section on mobile screens (< 1024px)
+		if (shouldScroll && typeof window !== 'undefined' && window.innerWidth < 1024) {
+			setTimeout(() => {
+				const targetEl = document.getElementById('selected-date-details-section');
+				if (targetEl) {
+					targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				}
+			}, 60);
 		}
 	}
 
@@ -444,16 +568,18 @@
 				<div class="grid grid-cols-7 gap-1 sm:gap-2">
 					{#each calendarGrid as cell}
 						{@const hasExams = cell.exams.length > 0}
+						{@const dominant = getCellDominantStatus(cell.exams)}
+						
 						<button
 							type="button"
-							on:click={() => handleSelectDay(cell)}
-							class="text-left rounded-xl p-1.5 sm:p-2 transition-all flex flex-col justify-between min-h-[64px] sm:min-h-[88px] border relative group focus:outline-none
+							on:click={() => handleSelectDay(cell, true)}
+							class="text-left rounded-xl p-1.5 sm:p-2 transition-all flex flex-col justify-between min-h-[64px] sm:min-h-[88px] border relative group focus:outline-none cursor-pointer
 								{cell.isSelected 
-									? 'ring-2 ring-indigo-600 bg-indigo-50/70 border-indigo-300 shadow-sm' 
+									? 'ring-2 ring-indigo-600 bg-indigo-50/80 border-indigo-300 shadow-sm z-10' 
 									: cell.isToday 
 										? 'ring-2 ring-indigo-400/80 bg-indigo-50/30 border-indigo-200' 
-										: hasExams 
-											? 'bg-white hover:bg-indigo-50/40 border-indigo-200 hover:border-indigo-300 shadow-xs' 
+										: hasExams && dominant
+											? `${dominant.cellBorder} hover:shadow-sm`
 											: cell.isCurrentMonth 
 												? 'bg-white hover:bg-slate-50 border-slate-200/80 text-slate-700' 
 												: 'bg-slate-50/50 border-slate-100 text-slate-300 opacity-60'}"
@@ -468,18 +594,22 @@
 									<span class="hidden sm:inline-block text-[10px] font-bold px-1.5 py-0.2 bg-indigo-600 text-white rounded-md uppercase tracking-tight">
 										Hari ini
 									</span>
-									<span class="sm:hidden w-2 h-2 rounded-full bg-indigo-600"></span>
-								{:else if hasExams}
-									<span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-indigo-500 ring-2 ring-indigo-200"></span>
+									{#if dominant}
+										<span class="sm:hidden w-2 h-2 rounded-full {dominant.dotClass}"></span>
+									{:else}
+										<span class="sm:hidden w-2 h-2 rounded-full bg-indigo-600"></span>
+									{/if}
+								{:else if hasExams && dominant}
+									<span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full {dominant.dotClass}"></span>
 								{/if}
 							</div>
 
 							<!-- Cell Exam List / Badges -->
 							<div class="w-full mt-1 space-y-1">
-								{#if hasExams}
-									<!-- Mobile View: simple count badge -->
+								{#if hasExams && dominant}
+									<!-- Mobile View: status-colored count badge -->
 									<div class="sm:hidden flex items-center justify-center">
-										<span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-indigo-600 text-white leading-none">
+										<span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md {dominant.badgeClass} leading-none shadow-xs">
 											{cell.exams.length}
 										</span>
 									</div>
@@ -487,21 +617,12 @@
 									<!-- Desktop View: item badges -->
 									<div class="hidden sm:block space-y-1">
 										{#each cell.exams.slice(0, 2) as exam}
-											{@const status = getExamStatus(exam)}
-											{@const isDone = exam.attempt_status && ['selesai', 'waktu_habis', 'remedial'].includes(exam.attempt_status)}
+											{@const display = getExamDisplayStatus(exam)}
 											<div 
-												class="text-[10px] font-semibold truncate px-1.5 py-0.5 rounded flex items-center gap-1 border
-													{isDone 
-														? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-														: status === 'active' 
-															? 'bg-amber-50 text-amber-700 border-amber-200 font-bold' 
-															: status === 'ended' 
-																? 'bg-rose-50 text-rose-700 border-rose-200' 
-																: 'bg-indigo-50 text-indigo-700 border-indigo-200'}"
-												title="{exam.title} ({exam.subject || 'Umum'})"
+												class="text-[10px] font-semibold truncate px-1.5 py-0.5 rounded flex items-center gap-1 border {display.bgClass} {display.textClass} {display.borderClass}"
+												title="{exam.title} ({display.label})"
 											>
-												<span class="w-1.5 h-1.5 rounded-full flex-shrink-0
-													{isDone ? 'bg-emerald-500' : status === 'active' ? 'bg-amber-500 animate-pulse' : status === 'ended' ? 'bg-rose-500' : 'bg-indigo-500'}"></span>
+												<span class="w-1.5 h-1.5 rounded-full flex-shrink-0 {display.dotClass}"></span>
 												<span class="truncate">{exam.subject || exam.title}</span>
 											</div>
 										{/each}
@@ -523,25 +644,25 @@
 					<div class="flex items-center gap-4 flex-wrap">
 						<div class="flex items-center gap-1.5">
 							<span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-							<span>Akan Datang</span>
+							<span class="text-slate-600 font-medium">Akan Datang</span>
 						</div>
 						<div class="flex items-center gap-1.5">
 							<span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-							<span>Sedang Berlangsung</span>
+							<span class="text-slate-600 font-medium">Sedang Berlangsung</span>
 						</div>
 						<div class="flex items-center gap-1.5">
 							<span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-							<span>Selesai Dikerjakan</span>
+							<span class="text-slate-600 font-medium">Selesai</span>
 						</div>
 						<div class="flex items-center gap-1.5">
 							<span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-							<span>Berakhir</span>
+							<span class="text-slate-600 font-medium">Telah Berakhir</span>
 						</div>
 					</div>
 
 					<button 
 						type="button" 
-						class="text-indigo-600 hover:text-indigo-800 font-semibold underline text-xs"
+						class="text-indigo-600 hover:text-indigo-800 font-semibold underline text-xs transition-colors"
 						on:click={goToNearestExam}
 					>
 						Lompat ke Ujian Terdekat
@@ -550,7 +671,7 @@
 			</div>
 
 			<!-- Selected Date Details Panel (5 cols on lg, 4 cols on xl) -->
-			<div class="lg:col-span-5 xl:col-span-4 space-y-4">
+			<div id="selected-date-details-section" class="lg:col-span-5 xl:col-span-4 space-y-4 scroll-mt-20">
 				<div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sticky top-6">
 					<!-- Panel Header -->
 					<div class="flex items-start justify-between gap-2 mb-4 pb-4 border-b border-slate-100">
@@ -566,8 +687,9 @@
 							</h3>
 						</div>
 						{#if getDateRelativeLabel(selectedDateKey)}
-							<span class="badge-primary font-bold text-xs px-2.5 py-1 rounded-lg flex-shrink-0">
-								{getDateRelativeLabel(selectedDateKey)}
+							{@const rel = getDateRelativeLabel(selectedDateKey)}
+							<span class="{rel.class} font-bold text-xs px-2.5 py-1 rounded-lg flex-shrink-0">
+								{rel.text}
 							</span>
 						{/if}
 					</div>
@@ -577,6 +699,7 @@
 						<div class="space-y-4 max-h-[calc(100vh-280px)] overflow-y-auto pr-1">
 							{#each selectedDateExams as exam}
 								{@const status = getExamStatus(exam)}
+								{@const display = getExamDisplayStatus(exam)}
 								{@const isCompleted = exam.attempt_status && ['selesai', 'waktu_habis', 'remedial'].includes(exam.attempt_status)}
 								
 								<div class="rounded-xl border border-slate-200 bg-slate-50/50 p-4 transition-all hover:bg-white hover:shadow-md hover:border-indigo-200 space-y-3">
@@ -590,23 +713,9 @@
 											</h4>
 										</div>
 
-										{#if isCompleted}
-											<span class="badge-success text-xs font-semibold px-2 py-0.5 rounded-md flex-shrink-0">
-												Selesai
-											</span>
-										{:else if status === 'active'}
-											<span class="badge-warning text-xs font-semibold px-2 py-0.5 rounded-md flex-shrink-0 animate-pulse">
-												Sedang Berlangsung
-											</span>
-										{:else if status === 'upcoming'}
-											<span class="badge-primary text-xs font-semibold px-2 py-0.5 rounded-md flex-shrink-0">
-												Akan Datang
-											</span>
-										{:else}
-											<span class="badge-danger text-xs font-semibold px-2 py-0.5 rounded-md flex-shrink-0">
-												Berakhir
-											</span>
-										{/if}
+										<span class="{display.badgeClass} text-xs font-semibold px-2.5 py-0.5 rounded-md flex-shrink-0 {display.type === 'active' ? 'animate-pulse' : ''}">
+											{display.label}
+										</span>
 									</div>
 
 									<!-- Badges for Room & Session -->
@@ -671,29 +780,29 @@
 									<!-- Action Button -->
 									<div class="pt-1">
 										{#if isCompleted}
-											<button disabled class="btn w-full justify-center bg-emerald-50 text-emerald-600 border border-emerald-200 cursor-not-allowed shadow-none text-xs sm:text-sm py-2">
+											<button disabled class="btn w-full justify-center bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-not-allowed shadow-none text-xs sm:text-sm py-2.5 font-bold">
 												<svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 													<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.check} />
 												</svg>
 												Ujian Selesai Dikerjakan
 											</button>
 										{:else if status === 'ended'}
-											<div class="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs font-bold cursor-not-allowed">
+											<div class="flex items-center justify-center gap-2 w-full px-3 py-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm font-bold cursor-not-allowed">
 												<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 													<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.warning} />
 												</svg>
 												<span>Ujian Telah Berakhir</span>
 											</div>
 										{:else if status === 'upcoming'}
-											<button disabled class="btn w-full justify-center bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed text-xs sm:text-sm py-2">
+											<button disabled class="btn w-full justify-center bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed text-xs sm:text-sm py-2.5">
 												Belum Dimulai
 											</button>
 										{:else if exam.attempt_status === 'mengerjakan'}
-											<a href="/siswa/ujian?exam_id={exam.id}" class="btn btn-warning w-full justify-center text-xs sm:text-sm py-2 shadow-md">
+											<a href="/siswa/ujian?exam_id={exam.id}" class="btn btn-warning w-full justify-center text-xs sm:text-sm py-2.5 shadow-md">
 												Lanjutkan Ujian
 											</a>
 										{:else}
-											<a href="/siswa/ujian?exam_id={exam.id}" class="btn btn-primary w-full justify-center text-xs sm:text-sm py-2 shadow-md">
+											<a href="/siswa/ujian?exam_id={exam.id}" class="btn btn-primary w-full justify-center text-xs sm:text-sm py-2.5 shadow-md">
 												Buka Halaman Ujian
 											</a>
 										{/if}
@@ -754,6 +863,7 @@
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 			{#each filteredSchedules as exam}
 				{@const status = getExamStatus(exam)}
+				{@const display = getExamDisplayStatus(exam)}
 				{@const isCompleted = exam.attempt_status && ['selesai', 'waktu_habis', 'remedial'].includes(exam.attempt_status)}
 
 				<div class="card-hover p-5 bg-white border border-slate-200 flex flex-col justify-between h-full">
@@ -764,9 +874,11 @@
 									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.calendar} />
 								</svg>
 							</div>
-							<span class="badge-primary text-xs font-semibold px-2.5 py-1 rounded-md">
-								{formatScheduleDate(exam.start_time)}
-							</span>
+							<div class="flex items-center gap-1.5">
+								<span class="{display.badgeClass} text-xs font-semibold px-2.5 py-1 rounded-md {display.type === 'active' ? 'animate-pulse' : ''}">
+									{display.label}
+								</span>
+							</div>
 						</div>
 						<h3 class="font-bold text-slate-800 text-lg mb-1 leading-snug break-words">{exam.title}</h3>
 						<p class="text-sm text-slate-500 mb-2">{exam.subject || 'Umum'}</p>
@@ -787,6 +899,12 @@
 						{/if}
 						
 						<div class="space-y-2 mb-4">
+							<div class="flex items-center text-sm text-slate-600">
+								<svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.calendar} />
+								</svg>
+								<span>Tanggal: {formatScheduleDate(exam.start_time)}</span>
+							</div>
 							<div class="flex items-center text-sm text-slate-600">
 								<svg class="w-4 h-4 mr-2 text-slate-400 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} />
@@ -831,14 +949,14 @@
 					
 					<div class="pt-4 border-t border-slate-100 mt-auto">
 						{#if isCompleted}
-							<button disabled class="btn w-full justify-center bg-emerald-50 text-emerald-600 border border-emerald-200 cursor-not-allowed shadow-none">
+							<button disabled class="btn w-full justify-center bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-not-allowed shadow-none">
 								<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.check} />
 								</svg>
 								Selesai
 							</button>
 						{:else if status === 'ended'}
-							<div class="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 cursor-not-allowed">
+							<div class="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 cursor-not-allowed">
 								<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
 									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.warning} />
 								</svg>
