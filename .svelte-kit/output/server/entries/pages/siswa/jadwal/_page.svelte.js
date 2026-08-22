@@ -243,9 +243,10 @@ function _page($$renderer, $$props) {
       const q = searchQuery.toLowerCase().trim();
       const titleMatch = (exam.title || "").toLowerCase().includes(q);
       const subjectMatch = (exam.subject || "").toLowerCase().includes(q);
+      const subjectCodeMatch = (exam.subject_code || "").toLowerCase().includes(q);
       const roomMatch = (exam.room_name || "").toLowerCase().includes(q);
       const proctorsStr = (exam.proctors || "").toString().toLowerCase();
-      return titleMatch || subjectMatch || roomMatch || proctorsStr.includes(q);
+      return titleMatch || subjectMatch || subjectCodeMatch || roomMatch || proctorsStr.includes(q);
     });
     examsByDate = (() => {
       const map = /* @__PURE__ */ new Map();
@@ -322,7 +323,7 @@ function _page($$renderer, $$props) {
           for (let $$index_1 = 0, $$length2 = each_array_2.length; $$index_1 < $$length2; $$index_1++) {
             let exam = each_array_2[$$index_1];
             const display = getExamDisplayStatus(exam);
-            $$renderer2.push(`<div${attr_class(`text-[10px] font-semibold truncate px-1.5 py-0.5 rounded flex items-center gap-1 border ${stringify(display.bgClass)} ${stringify(display.textClass)} ${stringify(display.borderClass)}`)}${attr("title", `${stringify(exam.title)} (${stringify(display.label)})`)}><span${attr_class(`w-1.5 h-1.5 rounded-full flex-shrink-0 ${stringify(display.dotClass)}`)}></span> <span class="truncate">${escape_html(exam.subject || exam.title)}</span></div>`);
+            $$renderer2.push(`<div${attr_class(`text-[10px] font-semibold truncate px-1.5 py-0.5 rounded flex items-center gap-1 border ${stringify(display.bgClass)} ${stringify(display.textClass)} ${stringify(display.borderClass)}`)}${attr("title", `${stringify(exam.title)} (${stringify(display.label)})`)}><span${attr_class(`w-1.5 h-1.5 rounded-full flex-shrink-0 ${stringify(display.dotClass)}`)}></span> <span class="truncate">${escape_html(exam.subject_code || exam.subject || exam.title)}</span></div>`);
           }
           $$renderer2.push(`<!--]--> `);
           if (cell.exams.length > 2) {
@@ -355,7 +356,7 @@ function _page($$renderer, $$props) {
           const status = getExamStatus(exam);
           const display = getExamDisplayStatus(exam);
           const isCompleted = exam.attempt_status && ["selesai", "waktu_habis", "remedial"].includes(exam.attempt_status);
-          $$renderer2.push(`<div class="rounded-xl border border-slate-200 bg-slate-50/50 p-4 transition-all hover:bg-white hover:shadow-md hover:border-indigo-200 space-y-3"><div class="flex items-start justify-between gap-2"><div><span class="text-xs font-bold text-indigo-600 uppercase tracking-wide">${escape_html(exam.subject || "Mata Pelajaran Umum")}</span> <h4 class="font-bold text-slate-800 text-base leading-snug mt-0.5">${escape_html(exam.title)}</h4></div> <span${attr_class(`${stringify(display.badgeClass)} text-xs font-semibold px-2.5 py-0.5 rounded-md flex-shrink-0 ${display.type === "active" ? "animate-pulse" : ""}`)}>${escape_html(display.label)}</span></div> `);
+          $$renderer2.push(`<div class="rounded-xl border border-slate-200 bg-slate-50/50 p-4 transition-all hover:bg-white hover:shadow-md hover:border-indigo-200 space-y-3"><div class="flex items-center justify-between gap-2"><span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-black bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase tracking-wide">${escape_html(exam.subject_code || exam.subject || "UMUM")}</span> <span${attr_class(`${stringify(display.badgeClass)} text-xs font-semibold px-2.5 py-0.5 rounded-md flex-shrink-0 ${display.type === "active" ? "animate-pulse" : ""}`)}>${escape_html(display.label)}</span></div> <h4 class="font-bold text-slate-800 text-sm sm:text-base leading-snug break-words">${escape_html(exam.title)}</h4> `);
           if (exam.room_name || exam.session_number) {
             $$renderer2.push("<!--[0-->");
             $$renderer2.push(`<div class="flex items-center gap-2 flex-wrap">`);
@@ -427,7 +428,7 @@ function _page($$renderer, $$props) {
         const each_array_5 = ensure_array_like(unscheduledExams);
         for (let $$index_5 = 0, $$length = each_array_5.length; $$index_5 < $$length; $$index_5++) {
           let exam = each_array_5[$$index_5];
-          $$renderer2.push(`<div class="bg-white p-2.5 rounded-lg border border-amber-100 text-xs flex items-center justify-between gap-2"><div><p class="font-bold text-slate-800">${escape_html(exam.title)}</p> <p class="text-slate-500">${escape_html(exam.subject || "Umum")}</p></div> <span class="badge-secondary text-[10px]">Menunggu Jadwal</span></div>`);
+          $$renderer2.push(`<div class="bg-white p-2.5 rounded-lg border border-amber-100 text-xs flex items-center justify-between gap-2"><div><p class="font-bold text-slate-800">${escape_html(exam.title)}</p> <p class="text-slate-500">${escape_html(exam.subject_code || exam.subject || "Umum")}</p></div> <span class="badge-secondary text-[10px]">Menunggu Jadwal</span></div>`);
         }
         $$renderer2.push(`<!--]--></div></div>`);
       } else {

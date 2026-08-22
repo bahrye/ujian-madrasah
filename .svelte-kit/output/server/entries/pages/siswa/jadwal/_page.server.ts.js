@@ -8,6 +8,7 @@ const load = async ({ platform, locals }) => {
 		SELECT 
 			e.*, 
 			s.name as subject,
+			s.code as subject_code,
 			et.code as exam_type_code,
 			c.name as class_name,
 			c.level as class_level,

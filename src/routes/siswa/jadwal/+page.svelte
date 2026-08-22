@@ -249,9 +249,10 @@
 		const q = searchQuery.toLowerCase().trim();
 		const titleMatch = (exam.title || '').toLowerCase().includes(q);
 		const subjectMatch = (exam.subject || '').toLowerCase().includes(q);
+		const subjectCodeMatch = (exam.subject_code || '').toLowerCase().includes(q);
 		const roomMatch = (exam.room_name || '').toLowerCase().includes(q);
 		const proctorsStr = (exam.proctors || '').toString().toLowerCase();
-		return titleMatch || subjectMatch || roomMatch || proctorsStr.includes(q);
+		return titleMatch || subjectMatch || subjectCodeMatch || roomMatch || proctorsStr.includes(q);
 	});
 
 	// Map of exams keyed by 'YYYY-MM-DD'
@@ -623,7 +624,7 @@
 												title="{exam.title} ({display.label})"
 											>
 												<span class="w-1.5 h-1.5 rounded-full flex-shrink-0 {display.dotClass}"></span>
-												<span class="truncate">{exam.subject || exam.title}</span>
+												<span class="truncate">{exam.subject_code || exam.subject || exam.title}</span>
 											</div>
 										{/each}
 
@@ -703,20 +704,21 @@
 								{@const isCompleted = exam.attempt_status && ['selesai', 'waktu_habis', 'remedial'].includes(exam.attempt_status)}
 								
 								<div class="rounded-xl border border-slate-200 bg-slate-50/50 p-4 transition-all hover:bg-white hover:shadow-md hover:border-indigo-200 space-y-3">
-									<div class="flex items-start justify-between gap-2">
-										<div>
-											<span class="text-xs font-bold text-indigo-600 uppercase tracking-wide">
-												{exam.subject || 'Mata Pelajaran Umum'}
-											</span>
-											<h4 class="font-bold text-slate-800 text-base leading-snug mt-0.5">
-												{exam.title}
-											</h4>
-										</div>
+									<!-- Top Row: Subject Code Badge & Status Badge -->
+									<div class="flex items-center justify-between gap-2">
+										<span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-black bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase tracking-wide">
+											{exam.subject_code || exam.subject || 'UMUM'}
+										</span>
 
 										<span class="{display.badgeClass} text-xs font-semibold px-2.5 py-0.5 rounded-md flex-shrink-0 {display.type === 'active' ? 'animate-pulse' : ''}">
 											{display.label}
 										</span>
 									</div>
+
+									<!-- Exam Full Title (Now on full width line) -->
+									<h4 class="font-bold text-slate-800 text-sm sm:text-base leading-snug break-words">
+										{exam.title}
+									</h4>
 
 									<!-- Badges for Room & Session -->
 									{#if exam.room_name || exam.session_number}
@@ -847,7 +849,7 @@
 								<div class="bg-white p-2.5 rounded-lg border border-amber-100 text-xs flex items-center justify-between gap-2">
 									<div>
 										<p class="font-bold text-slate-800">{exam.title}</p>
-										<p class="text-slate-500">{exam.subject || 'Umum'}</p>
+										<p class="text-slate-500">{exam.subject_code || exam.subject || 'Umum'}</p>
 									</div>
 									<span class="badge-secondary text-[10px]">Menunggu Jadwal</span>
 								</div>
@@ -868,13 +870,20 @@
 
 				<div class="card-hover p-5 bg-white border border-slate-200 flex flex-col justify-between h-full">
 					<div>
-						<div class="flex items-start justify-between mb-3">
-							<div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
-								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.calendar} />
-								</svg>
+						<div class="flex items-start justify-between mb-3 gap-2">
+							<div class="flex items-center gap-2">
+								<div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 flex-shrink-0">
+									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+										<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.calendar} />
+									</svg>
+								</div>
+								{#if exam.subject_code}
+									<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase tracking-wider">
+										{exam.subject_code}
+									</span>
+								{/if}
 							</div>
-							<div class="flex items-center gap-1.5">
+							<div class="flex items-center gap-1.5 flex-shrink-0">
 								<span class="{display.badgeClass} text-xs font-semibold px-2.5 py-1 rounded-md {display.type === 'active' ? 'animate-pulse' : ''}">
 									{display.label}
 								</span>

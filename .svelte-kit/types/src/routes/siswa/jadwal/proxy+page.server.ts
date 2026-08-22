@@ -13,6 +13,7 @@ export interface StudentScheduleItem {
 	end_time: string | null;
 	is_active: number;
 	subject: string | null;
+	subject_code?: string | null;
 	exam_type_code?: string | null;
 	class_name?: string | null;
 	class_level?: string | number | null;
@@ -38,6 +39,7 @@ export const load = async ({ platform, locals }: Parameters<PageServerLoad>[0]) 
 		SELECT 
 			e.*, 
 			s.name as subject,
+			s.code as subject_code,
 			et.code as exam_type_code,
 			c.name as class_name,
 			c.level as class_level,
