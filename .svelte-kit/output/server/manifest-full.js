@@ -10,7 +10,7 @@ return {
 	assets: new Set(["favicon.svg","kemenag.png","panduan-ui-ujian-2.jpeg","panduan-ui-ujian-3.jpeg","panduan-ui-ujian.jpeg","template_soal_ujian.docx"]),
 	mimeTypes: {".svg":"image/svg+xml",".png":"image/png",".jpeg":"image/jpeg"},
 	_: {
-		client: {start:"_app/immutable/entry/start.CXfotlw7.js",app:"_app/immutable/entry/app.DPjmHZ88.js",imports:["_app/immutable/entry/start.CXfotlw7.js","_app/immutable/chunks/CDnaxQlf.js","_app/immutable/chunks/CWu7Ay1j.js","_app/immutable/chunks/C1iwYQEC.js","_app/immutable/chunks/CpNQxTAW.js","_app/immutable/chunks/BPD4iswW.js","_app/immutable/entry/app.DPjmHZ88.js","_app/immutable/chunks/C1iwYQEC.js","_app/immutable/chunks/CpNQxTAW.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CWu7Ay1j.js","_app/immutable/chunks/klE4_vFh.js","_app/immutable/chunks/CJQ_5s9f.js","_app/immutable/chunks/RbyIVtyM.js","_app/immutable/chunks/qu17wuJm.js","_app/immutable/chunks/BPD4iswW.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
+		client: {start:"_app/immutable/entry/start.S_phK2Pp.js",app:"_app/immutable/entry/app.B1_N39jP.js",imports:["_app/immutable/entry/start.S_phK2Pp.js","_app/immutable/chunks/Rwib56fE.js","_app/immutable/chunks/CWu7Ay1j.js","_app/immutable/chunks/C1iwYQEC.js","_app/immutable/chunks/CpNQxTAW.js","_app/immutable/chunks/BPD4iswW.js","_app/immutable/entry/app.B1_N39jP.js","_app/immutable/chunks/C1iwYQEC.js","_app/immutable/chunks/CpNQxTAW.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/CWu7Ay1j.js","_app/immutable/chunks/klE4_vFh.js","_app/immutable/chunks/CJQ_5s9f.js","_app/immutable/chunks/RbyIVtyM.js","_app/immutable/chunks/qu17wuJm.js","_app/immutable/chunks/BPD4iswW.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
 		nodes: [
 			__memo(() => import('./nodes/0.js')),
 			__memo(() => import('./nodes/1.js')),
@@ -422,6 +422,20 @@ return {
 				params: [],
 				page: null,
 				endpoint: __memo(() => import('./entries/endpoints/api/setup/_server.ts.js'))
+			},
+			{
+				id: "/api/student/log-violation",
+				pattern: /^\/api\/student\/log-violation\/?$/,
+				params: [],
+				page: null,
+				endpoint: __memo(() => import('./entries/endpoints/api/student/log-violation/_server.ts.js'))
+			},
+			{
+				id: "/api/student/save-single",
+				pattern: /^\/api\/student\/save-single\/?$/,
+				params: [],
+				page: null,
+				endpoint: __memo(() => import('./entries/endpoints/api/student/save-single/_server.ts.js'))
 			},
 			{
 				id: "/api/track-media",

@@ -342,7 +342,13 @@ function _page($$renderer, $$props) {
       if (getDateRelativeLabel(selectedDateKey)) {
         $$renderer2.push("<!--[0-->");
         const rel = getDateRelativeLabel(selectedDateKey);
-        $$renderer2.push(`<span${attr_class(`${stringify(rel.class)} font-bold text-xs px-2.5 py-1 rounded-lg flex-shrink-0`)}>${escape_html(rel.text)}</span>`);
+        if (rel) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<span${attr_class(`${stringify(rel.class)} font-bold text-xs px-2.5 py-1 rounded-lg flex-shrink-0`)}>${escape_html(rel.text)}</span>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+        }
+        $$renderer2.push(`<!--]-->`);
       } else {
         $$renderer2.push("<!--[-1-->");
       }

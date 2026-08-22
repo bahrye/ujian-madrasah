@@ -358,6 +358,33 @@
 
 	let isDisqualifying = false;
 
+	function sendViolationBeacon(type: string) {
+		if (!attempt?.id) return;
+		const payload = JSON.stringify({
+			attempt_id: attempt.id,
+			violation_type: type
+		});
+
+		let sent = false;
+		if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+			try {
+				const blob = new Blob([payload], { type: 'application/json' });
+				sent = navigator.sendBeacon('/api/student/log-violation', blob);
+			} catch (e) {
+				sent = false;
+			}
+		}
+
+		if (!sent && typeof fetch !== 'undefined') {
+			fetch('/api/student/log-violation', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: payload,
+				keepalive: true
+			}).catch(() => {});
+		}
+	}
+
 	function triggerViolation(type: string) {
 		localStorage.removeItem(`cheat_deadline_${attempt.id}`);
 		localStorage.removeItem(`cheat_type_${attempt.id}`);
@@ -370,6 +397,8 @@
 		localStorage.setItem(`warnings_${attempt.id}`, warnings.toString());
 		localStorage.setItem(`warningLogs_${attempt.id}`, JSON.stringify(warningLogs));
 		
+		// Kirim instan tanpa terkena throttle / freeze browser
+		sendViolationBeacon(type);
 		saveCurrentAnswer(true);
 		isExamBlurred = false;
 
@@ -558,16 +587,38 @@
 		}, 1000);
 	}
 
+	async function saveSingleAnswer(questionId: number, answer: string, doubted: boolean) {
+		if (isPausedByProctor || !attempt?.id) return;
+		try {
+			await fetch('/api/student/save-single', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					attempt_id: attempt.id,
+					question_id: questionId,
+					answer_given: answer,
+					is_doubted: doubted ? 1 : 0
+				}),
+				keepalive: true
+			});
+		} catch (err) {
+			console.warn('Delta save fallback:', err);
+			triggerAutoSave();
+		}
+	}
+
 	function handleAnswer(e: CustomEvent<{ questionId: number; answer: string }>) {
 		localAnswers[e.detail.questionId] = e.detail.answer;
 		localAnswers = localAnswers; // trigger reactivity
-		triggerAutoSave();
+		const isDoubted = !!localDoubts[e.detail.questionId];
+		saveSingleAnswer(e.detail.questionId, e.detail.answer, isDoubted);
 	}
 
 	function handleDoubt(e: CustomEvent<{ questionId: number; doubted: boolean }>) {
 		localDoubts[e.detail.questionId] = e.detail.doubted;
 		localDoubts = localDoubts;
-		triggerAutoSave();
+		const currentAns = localAnswers[e.detail.questionId] || '';
+		saveSingleAnswer(e.detail.questionId, currentAns, e.detail.doubted);
 	}
 
 	async function saveCurrentAnswer(force = false) {

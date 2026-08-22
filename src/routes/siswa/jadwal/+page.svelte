@@ -739,9 +739,11 @@
 						</div>
 						{#if getDateRelativeLabel(selectedDateKey)}
 							{@const rel = getDateRelativeLabel(selectedDateKey)}
-							<span class="{rel.class} font-bold text-xs px-2.5 py-1 rounded-lg flex-shrink-0">
-								{rel.text}
-							</span>
+							{#if rel}
+								<span class="{rel.class} font-bold text-xs px-2.5 py-1 rounded-lg flex-shrink-0">
+									{rel.text}
+								</span>
+							{/if}
 						{/if}
 					</div>
 
@@ -877,7 +879,7 @@
 							<button 
 								type="button" 
 								class="btn btn-outline btn-sm text-xs"
-								on:click={goToNearestExam}
+								on:click={() => goToNearestExam(true)}
 							>
 								Lihat Jadwal Terdekat
 							</button>

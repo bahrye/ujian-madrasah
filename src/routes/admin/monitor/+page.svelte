@@ -102,15 +102,33 @@
 		}
 	}
 
+	let monitorVersion = '';
+	let isPolling = false;
+	$: if (data.examFilter || data.sessionFilter) {
+		monitorVersion = '';
+	}
+
 	async function pollLiveStatus() {
-		if (!data.examFilter) return;
+		if (!data.examFilter || isPolling) return;
+		isPolling = true;
 		try {
 			const queryParams = new URLSearchParams({ exam_id: data.examFilter });
 			if (data.sessionFilter) queryParams.set('session_number', data.sessionFilter);
+			if (monitorVersion) queryParams.set('since', monitorVersion);
 			
 			const res = await fetch(`/api/monitor-live?${queryParams.toString()}`);
 			if (!res.ok) return;
 			const result = (await res.json()) as any;
+
+			if (result.version) {
+				monitorVersion = result.version;
+			}
+
+			// Jika data tidak berubah sama sekali, hemat proses render & komputasi
+			if (result.changed === false) {
+				return;
+			}
+
 			if (result.attempts && Array.isArray(result.attempts)) {
 				result.attempts.forEach((newA: any) => {
 					const key = newA.attempt_id || newA.student_id;
@@ -139,6 +157,8 @@
 			}
 		} catch (e) {
 			console.warn('Live monitoring poll error:', e);
+		} finally {
+			isPolling = false;
 		}
 	}
 
@@ -172,7 +192,7 @@
 					interval = setInterval(() => {
 						currentTime = Date.now();
 						pollLiveStatus();
-					}, 3000);
+					}, 1500);
 				}
 			}
 		};
@@ -184,7 +204,7 @@
 				currentTime = Date.now();
 				pollLiveStatus();
 			}
-		}, 3000);
+		}, 1500);
 
 		return () => {
 			document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -227,7 +247,7 @@
 	<div class="card p-4">
 		<form method="GET" class="flex flex-wrap gap-3 mb-4" bind:this={formElement}>
 			<select name="exam_id" class="select flex-1 min-w-[200px]" required on:change={() => {
-				const sessionEl = formElement?.querySelector('select[name="session_number"]') as HTMLSelectElement;
+				const sessionEl = formElement?.querySelector('select[name="session_number"]') as unknown as HTMLSelectElement;
 				if (sessionEl) sessionEl.value = '';
 				formElement?.submit();
 			}}>

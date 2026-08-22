@@ -1,6 +1,6 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { g as getDB } from "../../../chunks/db.js";
-import { d as verifyQrLoginToken, e as verifyPassword, c as createToken, C as COOKIE_NAME } from "../../../chunks/auth.js";
+import { e as verifyQrLoginToken, f as verifyPassword, c as createToken, C as COOKIE_NAME } from "../../../chunks/auth.js";
 const load = async ({ locals }) => {
   if (locals.user) {
     const redirectRoute = locals.user.role === "panitia" ? "/admin" : `/${locals.user.role}`;

@@ -190,6 +190,12 @@
 	"/api/setup": [
 		"src/routes/api/setup/+server.ts"
 	],
+	"/api/student/log-violation": [
+		"src/routes/api/student/log-violation/+server.ts"
+	],
+	"/api/student/save-single": [
+		"src/routes/api/student/save-single/+server.ts"
+	],
 	"/api/track-media": [
 		"src/routes/api/track-media/+server.ts"
 	],

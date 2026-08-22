@@ -1,6 +1,6 @@
 import { fail, redirect, isRedirect, isHttpError } from "@sveltejs/kit";
 import { g as getDB } from "../../../../../chunks/db.js";
-import { f as verifyExamTokenSignature } from "../../../../../chunks/auth.js";
+import { d as verifyExamTokenSignature } from "../../../../../chunks/auth.js";
 import { m as matchShortAnswer, f as formatExamTitle } from "../../../../../chunks/exam.js";
 const load = async ({ platform, locals, params, cookies }) => {
   if (!locals.user) throw redirect(302, "/login");
@@ -142,7 +142,7 @@ const actions = {
         syncStmts.push(
           db.prepare(`
 						UPDATE student_attempts 
-						SET violation_count = ?, violation_logs = ?
+						SET violation_count = ?, violation_logs = ?, updated_at = datetime('now')
 						WHERE id = ? AND student_id = ?
 					`).bind(warnings, warningLogs, parsedAttemptId, locals.user.id)
         );

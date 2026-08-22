@@ -170,7 +170,7 @@ export const actions: Actions = {
 				syncStmts.push(
 					db.prepare(`
 						UPDATE student_attempts 
-						SET violation_count = ?, violation_logs = ?
+						SET violation_count = ?, violation_logs = ?, updated_at = datetime('now')
 						WHERE id = ? AND student_id = ?
 					`).bind(warnings, warningLogs, parsedAttemptId, locals.user.id)
 				);

@@ -22,6 +22,7 @@ function _page($$renderer, $$props) {
     if (data.loadError) toasts.error("Terjadi kesalahan data: " + data.loadError);
     attempts = data.attempts;
     filteredAttempts = attempts;
+    if (data.examFilter || data.sessionFilter) ;
     head("1o95ep9", $$renderer2, ($$renderer3) => {
       $$renderer3.title(($$renderer4) => {
         $$renderer4.push(`<title>Monitoring Ujian — Ujian Online Madrasah</title>`);

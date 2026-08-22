@@ -192,7 +192,8 @@ CREATE TABLE IF NOT EXISTS student_attempts (
     signature TEXT,
     is_graded INTEGER NOT NULL DEFAULT 0,
     is_score_released INTEGER NOT NULL DEFAULT 0,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_attempts_student ON student_attempts(student_id);
 CREATE INDEX IF NOT EXISTS idx_attempts_exam ON student_attempts(exam_id);

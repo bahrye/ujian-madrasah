@@ -1420,6 +1420,25 @@
       "_auth.js"
     ]
   },
+  "src/routes/api/student/log-violation/+server.ts": {
+    "file": "entries/endpoints/api/student/log-violation/_server.ts.js",
+    "name": "entries/endpoints/api/student/log-violation/_server.ts",
+    "src": "src/routes/api/student/log-violation/+server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "src/routes/api/student/save-single/+server.ts": {
+    "file": "entries/endpoints/api/student/save-single/_server.ts.js",
+    "name": "entries/endpoints/api/student/save-single/_server.ts",
+    "src": "src/routes/api/student/save-single/+server.ts",
+    "isEntry": true,
+    "imports": [
+      "_db.js",
+      "_auth.js"
+    ]
+  },
   "src/routes/api/track-media/+server.ts": {
     "file": "entries/endpoints/api/track-media/_server.ts.js",
     "name": "entries/endpoints/api/track-media/_server.ts",

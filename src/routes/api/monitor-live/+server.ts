@@ -10,10 +10,36 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 	const examId = parseInt(examIdStr, 10);
 	const sessionFilterStr = url.searchParams.get('session_number') || '';
 	const sessionFilter = parseInt(sessionFilterStr, 10);
+	const clientVersion = url.searchParams.get('since') || '';
 
 	if (isNaN(examId)) return json({ error: 'ID Ujian tidak valid' }, { status: 400 });
 
 	try {
+		// Smart Check: Baca 1 baris agregat timestamp & violations untuk cek apakah ada perubahan
+		if (clientVersion) {
+			try {
+				const checkRes = await db.prepare(`
+					SELECT 
+						MAX(COALESCE(sa.updated_at, sa.start_time, sa.created_at, '')) as max_updated,
+						COUNT(sa.id) as attempt_count,
+						COALESCE(SUM(sa.violation_count), 0) as total_violations,
+						COALESCE(SUM(sa.is_paused), 0) as total_paused
+					FROM student_attempts sa
+					WHERE sa.exam_id = ?
+				`).bind(examId).first<any>();
+
+				const currentVersion = `${checkRes?.max_updated || ''}_${checkRes?.attempt_count || 0}_${checkRes?.total_violations || 0}_${checkRes?.total_paused || 0}`;
+
+				if (clientVersion === currentVersion) {
+					// Tidak ada perubahan sama sekali, return respon 1 baris super hemat kuota D1
+					return json({ changed: false, version: currentVersion });
+				}
+			} catch (checkErr) {
+				// Fallback ke full query jika kolom updated_at belum ada di DB lokal
+				console.warn('Smart polling check fallback:', checkErr);
+			}
+		}
+
 		let query = `
 			SELECT 
 				epart.student_id,
@@ -34,7 +60,8 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 				sa.violation_logs,
 				sa.is_paused,
 				sa.paused_at,
-				sa.signature
+				sa.signature,
+				COALESCE(sa.updated_at, sa.start_time, sa.created_at, '') as updated_at
 			FROM exam_participants epart
 			JOIN users u ON epart.student_id = u.id
 			JOIN exams e ON epart.exam_id = e.id
@@ -83,11 +110,21 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 			});
 		}
 
+		let maxUpdated = '';
+		let totalViolations = 0;
+		let totalPaused = 0;
+
 		const attemptsWithProgress = attempts.map((a: any) => {
 			let answeredCount = 0;
 			let warnings = a.violation_count || 0;
 			let warningLogs: any[] = [];
 			const status = a.status || 'belum_mengerjakan';
+
+			totalViolations += warnings;
+			if (a.is_paused) totalPaused += 1;
+			if (a.updated_at && a.updated_at > maxUpdated) {
+				maxUpdated = a.updated_at;
+			}
 
 			if (a.attempt_id) {
 				answeredCount = answeredCountsMap[a.attempt_id] || 0;
@@ -110,7 +147,13 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 			};
 		});
 
-		return json({ attempts: attemptsWithProgress });
+		const currentVersion = `${maxUpdated}_${attempts.length}_${totalViolations}_${totalPaused}`;
+
+		return json({
+			changed: true,
+			version: currentVersion,
+			attempts: attemptsWithProgress
+		});
 	} catch (e: any) {
 		return json({ error: e.message || String(e) }, { status: 500 });
 	}
