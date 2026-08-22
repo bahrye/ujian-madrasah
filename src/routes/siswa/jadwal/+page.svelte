@@ -384,8 +384,9 @@
 			currentYear = cell.date.getFullYear();
 		}
 
-		// Focus and smoothly scroll to the exam details section on mobile screens (< 1024px)
-		if (shouldScroll && typeof window !== 'undefined' && window.innerWidth < 1024) {
+		// Focus and smoothly scroll to the exam details section on mobile screens (< 1024px) ONLY when the selected date has exams
+		const hasExams = cell.exams && cell.exams.length > 0;
+		if (shouldScroll && hasExams && typeof window !== 'undefined' && window.innerWidth < 1024) {
 			setTimeout(() => {
 				const targetEl = document.getElementById('selected-date-details-section');
 				if (targetEl) {
@@ -395,7 +396,7 @@
 		}
 	}
 
-	function goToNearestExam() {
+	function goToNearestExam(shouldScroll = true) {
 		const allExams = [...(data.schedules || [])].filter((e: any) => e.start_time);
 		if (allExams.length === 0) return;
 
@@ -420,13 +421,22 @@
 		currentMonth = targetDate.getMonth();
 		currentYear = targetDate.getFullYear();
 		selectedDateKey = toDateKey(targetDate);
+
+		if (shouldScroll && typeof window !== 'undefined' && window.innerWidth < 1024) {
+			setTimeout(() => {
+				const targetEl = document.getElementById('selected-date-details-section');
+				if (targetEl) {
+					targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				}
+			}, 60);
+		}
 	}
 
 	onMount(() => {
-		// If today doesn't have any exams, auto select nearest exam date if available
+		// If today doesn't have any exams, auto select nearest exam date if available without scrolling
 		const todayKey = toDateKey(new Date());
 		if (!examsByDate.has(todayKey) && (data.schedules || []).some((e: any) => e.start_time)) {
-			goToNearestExam();
+			goToNearestExam(false);
 		}
 	});
 </script>
