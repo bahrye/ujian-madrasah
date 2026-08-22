@@ -352,6 +352,34 @@
 		.filter(c => c.isCurrentMonth)
 		.reduce((sum, c) => sum + c.exams.length, 0);
 
+	// Swipe gestures for touch screens
+	let touchStartX = 0;
+	let touchStartY = 0;
+	let touchStartTime = 0;
+
+	function handleTouchStart(e: TouchEvent) {
+		if (e.touches.length !== 1) return;
+		touchStartX = e.touches[0].clientX;
+		touchStartY = e.touches[0].clientY;
+		touchStartTime = Date.now();
+	}
+
+	function handleTouchEnd(e: TouchEvent) {
+		if (e.changedTouches.length !== 1) return;
+		const deltaX = e.changedTouches[0].clientX - touchStartX;
+		const deltaY = e.changedTouches[0].clientY - touchStartY;
+		const deltaTime = Date.now() - touchStartTime;
+
+		// Must be within 500ms, minimum horizontal swipe of 40px, and horizontal dominance
+		if (deltaTime < 500 && Math.abs(deltaX) >= 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.25) {
+			if (deltaX < 0) {
+				nextMonth();
+			} else {
+				prevMonth();
+			}
+		}
+	}
+
 	function prevMonth() {
 		if (currentMonth === 0) {
 			currentMonth = 11;
@@ -518,7 +546,11 @@
 	{#if viewMode === 'calendar'}
 		<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 			<!-- Calendar Grid Column (7 cols on lg, 8 cols on xl) -->
-			<div class="lg:col-span-7 xl:col-span-8 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-4 sm:p-6">
+			<div 
+				class="lg:col-span-7 xl:col-span-8 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-4 sm:p-6 select-none touch-pan-y"
+				on:touchstart={handleTouchStart}
+				on:touchend={handleTouchEnd}
+			>
 				<!-- Calendar Navigation Header -->
 				<div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-5 pb-4 border-b border-slate-100">
 					<div class="flex items-center gap-2">
@@ -651,7 +683,7 @@
 				</div>
 
 				<!-- Calendar Legend -->
-				<div class="mt-5 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+				<div class="mt-5 pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-500">
 					<div class="flex items-center gap-4 flex-wrap">
 						<div class="flex items-center gap-1.5">
 							<span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
@@ -671,13 +703,21 @@
 						</div>
 					</div>
 
-					<button 
-						type="button" 
-						class="text-indigo-600 hover:text-indigo-800 font-semibold underline text-xs transition-colors"
-						on:click={goToNearestExam}
-					>
-						Lompat ke Ujian Terdekat
-					</button>
+					<div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+						<span class="sm:hidden text-[11px] text-slate-400 font-medium flex items-center gap-1">
+							<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+							</svg>
+							Geser ↔ ganti bulan
+						</span>
+						<button 
+							type="button" 
+							class="text-indigo-600 hover:text-indigo-800 font-semibold underline text-xs transition-colors"
+							on:click={() => goToNearestExam(true)}
+						>
+							Lompat ke Ujian Terdekat
+						</button>
+					</div>
 				</div>
 			</div>
 
