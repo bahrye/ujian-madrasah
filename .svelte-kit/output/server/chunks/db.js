@@ -30,10 +30,7 @@ function transformQuery(sql) {
     }
   }
   result = result.replace(/datetime\s*\(\s*['"]now['"]\s*\)/gi, "to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS')");
-  result = result.replace(/(=|!=|<>|LIKE|NOT LIKE)\s*"([^"]+)"/gi, "$1 '$2'");
-  result = result.replace(/\bIN\s*\(\s*"([^"]+)"(?:\s*,\s*"([^"]+)")*\s*\)/gi, (match) => {
-    return match.replace(/"/g, "'");
-  });
+  result = result.replace(/"([^"]*)"/g, "'$1'");
   result = result.replace(
     /\bGROUP_CONCAT\s*\(\s*DISTINCT\s+([^,\)]+)\s*(?:,\s*('[^']*'|"[^"]*"))?\s*\)/gi,
     (_, col, sep) => `STRING_AGG(DISTINCT (${col})::text, ${sep ? sep.replace(/"/g, "'") : "', '"})`

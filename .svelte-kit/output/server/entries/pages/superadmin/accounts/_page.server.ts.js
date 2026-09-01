@@ -40,9 +40,9 @@ const actions = {
           return fail(400, { error: "Kata sandi minimal 6 karakter." });
         }
         const passwordHash = await hashPassword(password);
-        await db.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, updated_at = datetime("now") WHERE id = ? AND role = "superadmin"').bind(name, username, passwordHash, locals.user.id).run();
+        await db.prepare(`UPDATE users SET name = ?, username = ?, password_hash = ?, updated_at = datetime('now') WHERE id = ? AND role = 'superadmin'`).bind(name, username, passwordHash, locals.user.id).run();
       } else {
-        await db.prepare('UPDATE users SET name = ?, username = ?, updated_at = datetime("now") WHERE id = ? AND role = "superadmin"').bind(name, username, locals.user.id).run();
+        await db.prepare(`UPDATE users SET name = ?, username = ?, updated_at = datetime('now') WHERE id = ? AND role = 'superadmin'`).bind(name, username, locals.user.id).run();
       }
       const updatedUser = {
         ...locals.user,
@@ -84,7 +84,7 @@ const actions = {
     }
     try {
       const passwordHash = await hashPassword(password);
-      await db.prepare('INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (NULL, NULL, ?, ?, ?, "superadmin")').bind(username, passwordHash, name).run();
+      await db.prepare(`INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (NULL, NULL, ?, ?, ?, 'superadmin')`).bind(username, passwordHash, name).run();
       return { success: "Akun Superadmin baru berhasil dibuat." };
     } catch (err) {
       console.error("Create superadmin error:", err);
@@ -103,7 +103,7 @@ const actions = {
     if (parsedId === locals.user.id) {
       return fail(400, { error: "Anda tidak dapat menghapus akun Anda sendiri yang sedang aktif." });
     }
-    const countRes = await db.prepare('SELECT COUNT(*) as c FROM users WHERE role = "superadmin"').first();
+    const countRes = await db.prepare(`SELECT COUNT(*) as c FROM users WHERE role = 'superadmin'`).first();
     if (countRes && countRes.c <= 1) {
       return fail(400, { error: "Tidak dapat menghapus. Harus tersisa minimal 1 akun Superadmin di sistem." });
     }
@@ -112,7 +112,7 @@ const actions = {
         db.prepare("UPDATE exams SET created_by = NULL WHERE created_by = ?").bind(parsedId),
         db.prepare("UPDATE tokens SET created_by = NULL WHERE created_by = ?").bind(parsedId),
         db.prepare("UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?").bind(parsedId),
-        db.prepare('DELETE FROM users WHERE id = ? AND role = "superadmin"').bind(parsedId)
+        db.prepare(`DELETE FROM users WHERE id = ? AND role = 'superadmin'`).bind(parsedId)
       ]);
       return { success: "Akun Superadmin berhasil dihapus." };
     } catch (err) {

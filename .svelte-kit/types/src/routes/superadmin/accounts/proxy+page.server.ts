@@ -63,11 +63,11 @@ export const actions = {
 					return fail(400, { error: 'Kata sandi minimal 6 karakter.' });
 				}
 				const passwordHash = await hashPassword(password);
-				await db.prepare('UPDATE users SET name = ?, username = ?, password_hash = ?, updated_at = datetime("now") WHERE id = ? AND role = "superadmin"')
+				await db.prepare(`UPDATE users SET name = ?, username = ?, password_hash = ?, updated_at = datetime('now') WHERE id = ? AND role = 'superadmin'`)
 					.bind(name, username, passwordHash, locals.user.id)
 					.run();
 			} else {
-				await db.prepare('UPDATE users SET name = ?, username = ?, updated_at = datetime("now") WHERE id = ? AND role = "superadmin"')
+				await db.prepare(`UPDATE users SET name = ?, username = ?, updated_at = datetime('now') WHERE id = ? AND role = 'superadmin'`)
 					.bind(name, username, locals.user.id)
 					.run();
 			}
@@ -121,7 +121,7 @@ export const actions = {
 
 		try {
 			const passwordHash = await hashPassword(password);
-			await db.prepare('INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (NULL, NULL, ?, ?, ?, "superadmin")')
+			await db.prepare(`INSERT INTO users (school_id, class_id, username, password_hash, name, role) VALUES (NULL, NULL, ?, ?, ?, 'superadmin')`)
 				.bind(username, passwordHash, name)
 				.run();
 
@@ -149,7 +149,7 @@ export const actions = {
 		}
 
 		// Hitung jumlah superadmin yang ada
-		const countRes = await db.prepare('SELECT COUNT(*) as c FROM users WHERE role = "superadmin"').first<{ c: number }>();
+		const countRes = await db.prepare(`SELECT COUNT(*) as c FROM users WHERE role = 'superadmin'`).first<{ c: number }>();
 		if (countRes && countRes.c <= 1) {
 			return fail(400, { error: 'Tidak dapat menghapus. Harus tersisa minimal 1 akun Superadmin di sistem.' });
 		}
@@ -159,7 +159,7 @@ export const actions = {
 				db.prepare('UPDATE exams SET created_by = NULL WHERE created_by = ?').bind(parsedId),
 				db.prepare('UPDATE tokens SET created_by = NULL WHERE created_by = ?').bind(parsedId),
 				db.prepare('UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?').bind(parsedId),
-				db.prepare('DELETE FROM users WHERE id = ? AND role = "superadmin"').bind(parsedId)
+				db.prepare(`DELETE FROM users WHERE id = ? AND role = 'superadmin'`).bind(parsedId)
 			]);
 			return { success: 'Akun Superadmin berhasil dihapus.' };
 		} catch (err: any) {

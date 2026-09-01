@@ -85,7 +85,7 @@ export const actions = {
 		const newStatus = currentStatus === '1' ? 0 : 1;
 
 		try {
-			await db.prepare('UPDATE users SET is_active = ?, updated_at = datetime("now") WHERE id = ? AND role = "admin"')
+			await db.prepare(`UPDATE users SET is_active = ?, updated_at = datetime('now') WHERE id = ? AND role = 'admin'`)
 				.bind(newStatus, parsedId)
 				.run();
 			
@@ -104,7 +104,7 @@ export const actions = {
 
 		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid' });
 
-		const userToDelete = await db.prepare('SELECT id, is_active FROM users WHERE id = ? AND role = "admin"')
+		const userToDelete = await db.prepare(`SELECT id, is_active FROM users WHERE id = ? AND role = 'admin'`)
 			.bind(parsedId)
 			.first<{ id: number; is_active: number }>();
 
@@ -121,7 +121,7 @@ export const actions = {
 				db.prepare('UPDATE exams SET created_by = NULL WHERE created_by = ?').bind(parsedId),
 				db.prepare('UPDATE tokens SET created_by = NULL WHERE created_by = ?').bind(parsedId),
 				db.prepare('UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?').bind(parsedId),
-				db.prepare('DELETE FROM users WHERE id = ? AND role = "admin"').bind(parsedId)
+				db.prepare(`DELETE FROM users WHERE id = ? AND role = 'admin'`).bind(parsedId)
 			]);
 			return { success: true };
 		} catch (e: any) {

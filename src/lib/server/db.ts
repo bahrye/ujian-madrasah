@@ -53,11 +53,8 @@ function transformQuery(sql: string): {
 	// SQLite datetime('now') / datetime("now") compatibility
 	result = result.replace(/datetime\s*\(\s*['"]now['"]\s*\)/gi, "to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS')");
 
-	// Convert SQLite double-quoted string literals in comparisons (e.g. role != "siswa" -> role != 'siswa')
-	result = result.replace(/(=|!=|<>|LIKE|NOT LIKE)\s*"([^"]+)"/gi, "$1 '$2'");
-	result = result.replace(/\bIN\s*\(\s*"([^"]+)"(?:\s*,\s*"([^"]+)")*\s*\)/gi, (match) => {
-		return match.replace(/"/g, "'");
-	});
+	// Convert all SQLite double-quoted string literals ("value" -> 'value')
+	result = result.replace(/"([^"]*)"/g, "'$1'");
 
 	// SQLite GROUP_CONCAT -> PostgreSQL STRING_AGG
 	result = result.replace(

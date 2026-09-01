@@ -19,7 +19,7 @@ export const load = async ({ params, platform, locals }: Parameters<PageServerLo
 	if (!exam) throw error(404, 'Ujian tidak ditemukan atau Anda tidak memiliki akses.');
 
 	const questionsReq = db.prepare('SELECT id, question_number, type, question_text FROM questions WHERE exam_id = ? ORDER BY question_number').bind(examId).all();
-	const attemptsReq = db.prepare('SELECT id, student_id, score FROM student_attempts WHERE exam_id = ? AND status IN ("selesai", "waktu_habis") ORDER BY score DESC, id ASC').bind(examId).all();
+	const attemptsReq = db.prepare(`SELECT id, student_id, score FROM student_attempts WHERE exam_id = ? AND status IN ('selesai', 'waktu_habis') ORDER BY score DESC, id ASC`).bind(examId).all();
 	const answersReq = db.prepare('SELECT sa.attempt_id, sa.question_id, sa.is_correct, sa.answer_given FROM student_answers sa JOIN student_attempts a ON sa.attempt_id = a.id WHERE a.exam_id = ?').bind(examId).all();
 
 	const [questionsRes, attemptsRes, answersRes] = await Promise.all([questionsReq, attemptsReq, answersReq]);

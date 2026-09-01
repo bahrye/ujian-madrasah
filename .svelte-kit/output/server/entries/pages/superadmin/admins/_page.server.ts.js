@@ -50,7 +50,7 @@ const actions = {
     if (isNaN(parsedId) || !currentStatus) return fail(400, { error: "Data tidak valid" });
     const newStatus = currentStatus === "1" ? 0 : 1;
     try {
-      await db.prepare('UPDATE users SET is_active = ?, updated_at = datetime("now") WHERE id = ? AND role = "admin"').bind(newStatus, parsedId).run();
+      await db.prepare(`UPDATE users SET is_active = ?, updated_at = datetime('now') WHERE id = ? AND role = 'admin'`).bind(newStatus, parsedId).run();
       return { success: true };
     } catch (e) {
       console.error(e);
@@ -64,7 +64,7 @@ const actions = {
     const idStr = data.get("id")?.toString();
     const parsedId = parseInt(idStr || "", 10);
     if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid" });
-    const userToDelete = await db.prepare('SELECT id, is_active FROM users WHERE id = ? AND role = "admin"').bind(parsedId).first();
+    const userToDelete = await db.prepare(`SELECT id, is_active FROM users WHERE id = ? AND role = 'admin'`).bind(parsedId).first();
     if (!userToDelete) {
       return fail(404, { error: "Admin tidak ditemukan" });
     }
@@ -76,7 +76,7 @@ const actions = {
         db.prepare("UPDATE exams SET created_by = NULL WHERE created_by = ?").bind(parsedId),
         db.prepare("UPDATE tokens SET created_by = NULL WHERE created_by = ?").bind(parsedId),
         db.prepare("UPDATE uploaded_media SET uploaded_by = NULL WHERE uploaded_by = ?").bind(parsedId),
-        db.prepare('DELETE FROM users WHERE id = ? AND role = "admin"').bind(parsedId)
+        db.prepare(`DELETE FROM users WHERE id = ? AND role = 'admin'`).bind(parsedId)
       ]);
       return { success: true };
     } catch (e) {
