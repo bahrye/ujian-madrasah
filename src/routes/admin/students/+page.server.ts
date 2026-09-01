@@ -166,7 +166,7 @@ export const actions: Actions = {
 				db.prepare('DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)').bind(parsedId),
 				db.prepare('DELETE FROM student_attempts WHERE student_id = ?').bind(parsedId),
 				db.prepare('DELETE FROM exam_participants WHERE student_id = ?').bind(parsedId),
-				db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(parsedId, locals.user.school_id)
+				db.prepare(`DELETE FROM users WHERE id = ? AND school_id = ? AND role = 'siswa'`).bind(parsedId, locals.user.school_id)
 			]);
 			return { success: true, message: 'Berhasil menghapus data siswa.' };
 		} catch (e: any) {
@@ -194,7 +194,7 @@ export const actions: Actions = {
 					db.prepare('DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)').bind(id),
 					db.prepare('DELETE FROM student_attempts WHERE student_id = ?').bind(id),
 					db.prepare('DELETE FROM exam_participants WHERE student_id = ?').bind(id),
-					db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(id, locals.user.school_id)
+					db.prepare(`DELETE FROM users WHERE id = ? AND school_id = ? AND role = 'siswa'`).bind(id, locals.user.school_id)
 				);
 			}
 
@@ -296,7 +296,7 @@ export const actions: Actions = {
 		const newStatus = currentStatus === '1' ? 0 : 1;
 
 		try {
-			await db.prepare('UPDATE users SET is_active = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ? AND role = "siswa"')
+			await db.prepare(`UPDATE users SET is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ? AND role = 'siswa'`)
 				.bind(newStatus, parsedId, locals.user.school_id)
 				.run();
 			
@@ -318,7 +318,7 @@ export const actions: Actions = {
 
 		try {
 			// Cek apakah siswa sudah punya foto lama
-			const oldUser = await db.prepare('SELECT photo FROM users WHERE id = ? AND school_id = ? AND role = "siswa"')
+			const oldUser = await db.prepare(`SELECT photo FROM users WHERE id = ? AND school_id = ? AND role = 'siswa'`)
 				.bind(parsedId, locals.user.school_id)
 				.first();
 
@@ -337,7 +337,7 @@ export const actions: Actions = {
 				}
 			}
 
-			await db.prepare('UPDATE users SET photo = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ? AND role = "siswa"')
+			await db.prepare(`UPDATE users SET photo = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ? AND role = 'siswa'`)
 				.bind(photo, parsedId, locals.user.school_id)
 				.run();
 			

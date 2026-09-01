@@ -110,7 +110,7 @@ export const actions: Actions = {
 
 		// Verifikasi siswa terdaftar di sekolah yang sama
 		const placeholders = parsedStudentIds.map(() => '?').join(',');
-		const validStudents = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "siswa"`)
+		const validStudents = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = 'siswa'`)
 			.bind(...parsedStudentIds, locals.user!.school_id).all<{ id: number }>();
 
 		if (validStudents.results.length === 0) {

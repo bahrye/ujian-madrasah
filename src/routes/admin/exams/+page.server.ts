@@ -23,11 +23,11 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		.bind(locals.user!.school_id).all<{ id: number; name: string }>();
 
 	const students = await db.prepare(
-		'SELECT id, name, username, class_id FROM users WHERE school_id = ? AND role = "siswa" ORDER BY name ASC'
+		`SELECT id, name, username, class_id FROM users WHERE school_id = ? AND role = 'siswa' ORDER BY name ASC`
 	).bind(locals.user!.school_id).all<{ id: number; name: string; username: string; class_id: number | null }>();
 
 	const teachers = await db.prepare(
-		'SELECT id, name, nip, role FROM users WHERE school_id = ? AND role IN ("guru", "pengawas", "admin") AND is_active = 1 ORDER BY name ASC'
+		`SELECT id, name, nip, role FROM users WHERE school_id = ? AND role IN ('guru', 'pengawas', 'admin') AND is_active = 1 ORDER BY name ASC`
 	).bind(locals.user!.school_id).all<{ id: number; name: string; nip: string | null; role: string }>();
 
 	return {

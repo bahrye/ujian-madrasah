@@ -13,7 +13,7 @@ export const load: PageServerLoad = async ({ platform, locals, url }) => {
 
 	const roleFilter = url.searchParams.get('role') || '';
 
-	let query = 'SELECT id, username, name, nip, role, is_active, login_pin, created_at FROM users WHERE school_id = ? AND role != "siswa" AND role != "superadmin" AND role != "admin"';
+	let query = `SELECT id, username, name, nip, role, is_active, login_pin, created_at FROM users WHERE school_id = ? AND role != 'siswa' AND role != 'superadmin' AND role != 'admin'`;
 	const params: unknown[] = [locals.user.school_id];
 
 	if (roleFilter) {

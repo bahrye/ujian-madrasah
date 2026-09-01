@@ -3,10 +3,10 @@ import { g as getDB, e as ensureUserLoginPinColumn } from "../../../../chunks/db
 import { h as hashPassword, c as createToken, C as COOKIE_NAME, a as createQrLoginToken, b as generate5DigitPin } from "../../../../chunks/auth.js";
 const load = async ({ platform, url, locals }) => {
   const db = getDB(platform);
-  await ensureUserLoginPinColumn(db);
+  await ensureUserLoginPinColumn();
   const search = url.searchParams.get("search") || "";
   const roleFilter = url.searchParams.get("role") || "";
-  let query = 'SELECT id, username, password_hash, name, nip, role, is_active, created_at, photo, login_pin FROM users WHERE school_id = ? AND role != "siswa" AND role != "superadmin" AND role != "admin"';
+  let query = `SELECT id, username, password_hash, name, nip, role, is_active, created_at, photo, login_pin FROM users WHERE school_id = ? AND role != 'siswa' AND role != 'superadmin' AND role != 'admin'`;
   const params = [locals.user.school_id];
   if (search) {
     query += " AND (username LIKE ? OR name LIKE ?)";
@@ -52,7 +52,7 @@ const load = async ({ platform, url, locals }) => {
 const actions = {
   generatePin: async ({ request, platform, locals }) => {
     const db = getDB(platform);
-    await ensureUserLoginPinColumn(db);
+    await ensureUserLoginPinColumn();
     const form = await request.formData();
     const userId = form.get("id");
     if (!userId) return fail(400, { error: "ID pengguna tidak valid" });
@@ -62,7 +62,7 @@ const actions = {
   },
   clearPin: async ({ request, platform, locals }) => {
     const db = getDB(platform);
-    await ensureUserLoginPinColumn(db);
+    await ensureUserLoginPinColumn();
     const form = await request.formData();
     const userId = form.get("id");
     if (!userId) return fail(400, { error: "ID pengguna tidak valid" });
@@ -71,8 +71,8 @@ const actions = {
   },
   generateAllPins: async ({ platform, locals }) => {
     const db = getDB(platform);
-    await ensureUserLoginPinColumn(db);
-    const users = await db.prepare('SELECT id FROM users WHERE school_id = ? AND role != "siswa"').bind(locals.user.school_id).all();
+    await ensureUserLoginPinColumn();
+    const users = await db.prepare(`SELECT id FROM users WHERE school_id = ? AND role != 'siswa'`).bind(locals.user.school_id).all();
     for (const u of users.results || []) {
       const pin = generate5DigitPin();
       await db.prepare("UPDATE users SET login_pin = ? WHERE id = ?").bind(pin, u.id).run();

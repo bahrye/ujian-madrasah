@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 	const search = url.searchParams.get('search') || '';
 	const roleFilter = url.searchParams.get('role') || '';
 
-	let query = 'SELECT id, username, password_hash, name, nip, role, is_active, created_at, photo, login_pin FROM users WHERE school_id = ? AND role != "siswa" AND role != "superadmin" AND role != "admin"';
+	let query = `SELECT id, username, password_hash, name, nip, role, is_active, created_at, photo, login_pin FROM users WHERE school_id = ? AND role != 'siswa' AND role != 'superadmin' AND role != 'admin'`;
 	const params: unknown[] = [locals.user!.school_id];
 
 	if (search) {
@@ -91,7 +91,7 @@ export const actions: Actions = {
 	generateAllPins: async ({ platform, locals }) => {
 		const db = getDB(platform);
 		await ensureUserLoginPinColumn(db);
-		const users = await db.prepare('SELECT id FROM users WHERE school_id = ? AND role != "siswa"')
+		const users = await db.prepare(`SELECT id FROM users WHERE school_id = ? AND role != 'siswa'`)
 			.bind(locals.user!.school_id)
 			.all();
 

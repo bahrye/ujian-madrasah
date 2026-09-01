@@ -17,10 +17,10 @@ const load = async ({ platform, locals }) => {
 	`).bind(locals.user.school_id).all();
   const classes = await db.prepare("SELECT id, name FROM classes WHERE school_id = ? ORDER BY name ASC").bind(locals.user.school_id).all();
   const students = await db.prepare(
-    'SELECT id, name, username, class_id FROM users WHERE school_id = ? AND role = "siswa" ORDER BY name ASC'
+    `SELECT id, name, username, class_id FROM users WHERE school_id = ? AND role = 'siswa' ORDER BY name ASC`
   ).bind(locals.user.school_id).all();
   const teachers = await db.prepare(
-    'SELECT id, name, nip, role FROM users WHERE school_id = ? AND role IN ("guru", "pengawas", "admin") AND is_active = 1 ORDER BY name ASC'
+    `SELECT id, name, nip, role FROM users WHERE school_id = ? AND role IN ('guru', 'pengawas', 'admin') AND is_active = 1 ORDER BY name ASC`
   ).bind(locals.user.school_id).all();
   return {
     examTypes: examTypes.results,

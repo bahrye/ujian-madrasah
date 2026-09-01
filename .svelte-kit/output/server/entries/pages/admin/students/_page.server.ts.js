@@ -138,7 +138,7 @@ const actions = {
         db.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)").bind(parsedId),
         db.prepare("DELETE FROM student_attempts WHERE student_id = ?").bind(parsedId),
         db.prepare("DELETE FROM exam_participants WHERE student_id = ?").bind(parsedId),
-        db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(parsedId, locals.user.school_id)
+        db.prepare(`DELETE FROM users WHERE id = ? AND school_id = ? AND role = 'siswa'`).bind(parsedId, locals.user.school_id)
       ]);
       return { success: true, message: "Berhasil menghapus data siswa." };
     } catch (e) {
@@ -163,7 +163,7 @@ const actions = {
           db.prepare("DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)").bind(id),
           db.prepare("DELETE FROM student_attempts WHERE student_id = ?").bind(id),
           db.prepare("DELETE FROM exam_participants WHERE student_id = ?").bind(id),
-          db.prepare('DELETE FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(id, locals.user.school_id)
+          db.prepare(`DELETE FROM users WHERE id = ? AND school_id = ? AND role = 'siswa'`).bind(id, locals.user.school_id)
         );
       }
       if (stmts.length > 0) {
@@ -241,7 +241,7 @@ const actions = {
     if (isNaN(parsedId) || !currentStatus) return fail(400, { error: "Data tidak valid" });
     const newStatus = currentStatus === "1" ? 0 : 1;
     try {
-      await db.prepare('UPDATE users SET is_active = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ? AND role = "siswa"').bind(newStatus, parsedId, locals.user.school_id).run();
+      await db.prepare(`UPDATE users SET is_active = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ? AND role = 'siswa'`).bind(newStatus, parsedId, locals.user.school_id).run();
       return { success: true };
     } catch (e) {
       console.error(e);
@@ -257,7 +257,7 @@ const actions = {
     const parsedId = parseInt(idStr || "", 10);
     if (isNaN(parsedId)) return fail(400, { error: "ID tidak valid" });
     try {
-      const oldUser = await db.prepare('SELECT photo FROM users WHERE id = ? AND school_id = ? AND role = "siswa"').bind(parsedId, locals.user.school_id).first();
+      const oldUser = await db.prepare(`SELECT photo FROM users WHERE id = ? AND school_id = ? AND role = 'siswa'`).bind(parsedId, locals.user.school_id).first();
       const oldPhoto = oldUser?.photo;
       if (oldPhoto && oldPhoto.includes("res.cloudinary.com") && oldPhoto !== photo) {
         try {
@@ -267,7 +267,7 @@ const actions = {
           console.error("Failed to delete old photo from Cloudinary:", err);
         }
       }
-      await db.prepare('UPDATE users SET photo = ?, updated_at = datetime("now") WHERE id = ? AND school_id = ? AND role = "siswa"').bind(photo, parsedId, locals.user.school_id).run();
+      await db.prepare(`UPDATE users SET photo = ?, updated_at = datetime('now') WHERE id = ? AND school_id = ? AND role = 'siswa'`).bind(photo, parsedId, locals.user.school_id).run();
       if (photo && photo.includes("res.cloudinary.com")) {
         try {
           await db.prepare(`

@@ -9,8 +9,9 @@ declare global {
 	namespace App {
 		interface Platform {
 			env: {
-				DB: D1Database;
-				EXAM_ANSWERS: KVNamespace;
+				DATABASE_URL?: string;
+				DB?: D1Database;
+				EXAM_ANSWERS?: KVNamespace;
 			};
 			context: {
 				waitUntil(promise: Promise<unknown>): void;

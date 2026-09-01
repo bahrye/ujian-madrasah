@@ -90,7 +90,7 @@ const actions = {
     const exam = await db.prepare("SELECT id FROM exams WHERE id = ? AND created_by = ? AND school_id = ?").bind(parsedExamId, locals.user.id, locals.user.school_id).first();
     if (!exam) return fail(403, { error: "Akses ditolak." });
     const placeholders = parsedStudentIds.map(() => "?").join(",");
-    const validStudents = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "siswa"`).bind(...parsedStudentIds, locals.user.school_id).all();
+    const validStudents = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = 'siswa'`).bind(...parsedStudentIds, locals.user.school_id).all();
     if (validStudents.results.length === 0) {
       return fail(400, { error: "Siswa yang dipilih tidak valid." });
     }

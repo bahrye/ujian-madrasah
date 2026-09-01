@@ -123,7 +123,7 @@ export const actions = {
 			if (!isAllowed) return fail(403, { error: 'Kelas ini tidak termasuk dalam kelas yang diizinkan untuk tipe ujian ini.' });
 		}
 
-		const students = await db.prepare('SELECT id FROM users WHERE class_id = ? AND school_id = ? AND role = "siswa"')
+		const students = await db.prepare(`SELECT id FROM users WHERE class_id = ? AND school_id = ? AND role = 'siswa'`)
 			.bind(parsedClassId, locals.user.school_id).all<{ id: number }>();
 		
 		if (students.results.length === 0) {
@@ -158,7 +158,7 @@ export const actions = {
 		}
 
 		const placeholders = parsedStudentIds.map(() => '?').join(',');
-		const validStudents = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "siswa" ${classFilterSql}`)
+		const validStudents = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = 'siswa' ${classFilterSql}`)
 			.bind(...parsedStudentIds, locals.user.school_id).all<{ id: number }>();
 
 		if (validStudents.results.length === 0) {

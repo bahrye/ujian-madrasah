@@ -100,7 +100,7 @@ const actions = {
       const isAllowed = await db.prepare("SELECT 1 FROM exam_type_classes WHERE exam_type_id = ? AND class_id = ?").bind(exam.exam_type_id, parsedClassId).first();
       if (!isAllowed) return fail(403, { error: "Kelas ini tidak termasuk dalam kelas yang diizinkan untuk tipe ujian ini." });
     }
-    const students = await db.prepare('SELECT id FROM users WHERE class_id = ? AND school_id = ? AND role = "siswa"').bind(parsedClassId, locals.user.school_id).all();
+    const students = await db.prepare(`SELECT id FROM users WHERE class_id = ? AND school_id = ? AND role = 'siswa'`).bind(parsedClassId, locals.user.school_id).all();
     if (students.results.length === 0) {
       return { success: "Tidak ada siswa di kelas ini." };
     }
@@ -125,7 +125,7 @@ const actions = {
       classFilterSql = ` AND class_id IN (SELECT class_id FROM exam_type_classes WHERE exam_type_id = ${exam.exam_type_id})`;
     }
     const placeholders = parsedStudentIds.map(() => "?").join(",");
-    const validStudents = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = "siswa" ${classFilterSql}`).bind(...parsedStudentIds, locals.user.school_id).all();
+    const validStudents = await db.prepare(`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = 'siswa' ${classFilterSql}`).bind(...parsedStudentIds, locals.user.school_id).all();
     if (validStudents.results.length === 0) {
       return fail(400, { error: "Siswa tidak valid." });
     }
