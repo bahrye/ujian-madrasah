@@ -31,6 +31,19 @@ function transformQuery(sql) {
   }
   result = result.replace(/datetime\s*\(\s*['"]now['"]\s*\)/gi, "to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS')");
   result = result.replace(/(=|!=|<>|LIKE|NOT LIKE)\s*"([^"]+)"/gi, "$1 '$2'");
+  result = result.replace(/\bIN\s*\(\s*"([^"]+)"(?:\s*,\s*"([^"]+)")*\s*\)/gi, (match) => {
+    return match.replace(/"/g, "'");
+  });
+  result = result.replace(
+    /\bGROUP_CONCAT\s*\(\s*DISTINCT\s+([^,\)]+)\s*(?:,\s*('[^']*'|"[^"]*"))?\s*\)/gi,
+    (_, col, sep) => `STRING_AGG(DISTINCT (${col})::text, ${sep ? sep.replace(/"/g, "'") : "', '"})`
+  );
+  result = result.replace(
+    /\bGROUP_CONCAT\s*\(\s*([^,\)]+)\s*(?:,\s*('[^']*'|"[^"]*"))?\s*\)/gi,
+    (_, col, sep) => `STRING_AGG((${col})::text, ${sep ? sep.replace(/"/g, "'") : "', '"})`
+  );
+  result = result.replace(/\bjson_group_array\s*\(/gi, "json_agg(");
+  result = result.replace(/\bjson_object\s*\(/gi, "json_build_object(");
   if (/^\s*INSERT\s+OR\s+IGNORE\s+INTO/i.test(result)) {
     result = result.replace(/^\s*INSERT\s+OR\s+IGNORE\s+INTO/i, "INSERT INTO");
     if (!/ON\s+CONFLICT/i.test(result)) {
@@ -129,11 +142,15 @@ function createNeonD1Adapter(connectionString) {
           results: []
         };
       },
-      async raw() {
+      async raw(options) {
         const { pgSql } = transformQuery(query);
         const rows = await executeQuery(pgSql, boundParams);
-        if (!rows) return [];
-        return rows.map((r) => Object.values(r));
+        if (!rows || rows.length === 0) return [];
+        const values = rows.map((r) => Object.values(r));
+        if (options?.columnNames && rows[0]) {
+          return [Object.keys(rows[0]), ...values];
+        }
+        return values;
       }
     };
     return stmtObj;
@@ -159,6 +176,9 @@ function createNeonD1Adapter(connectionString) {
         count: statements.length,
         duration: 0
       };
+    },
+    withSession(_token) {
+      return adapter;
     },
     dump() {
       throw new Error("dump() is not supported on Neon PostgreSQL adapter.");

@@ -55,6 +55,23 @@ function transformQuery(sql: string): {
 
 	// Convert SQLite double-quoted string literals in comparisons (e.g. role != "siswa" -> role != 'siswa')
 	result = result.replace(/(=|!=|<>|LIKE|NOT LIKE)\s*"([^"]+)"/gi, "$1 '$2'");
+	result = result.replace(/\bIN\s*\(\s*"([^"]+)"(?:\s*,\s*"([^"]+)")*\s*\)/gi, (match) => {
+		return match.replace(/"/g, "'");
+	});
+
+	// SQLite GROUP_CONCAT -> PostgreSQL STRING_AGG
+	result = result.replace(
+		/\bGROUP_CONCAT\s*\(\s*DISTINCT\s+([^,\)]+)\s*(?:,\s*('[^']*'|"[^"]*"))?\s*\)/gi,
+		(_, col, sep) => `STRING_AGG(DISTINCT (${col})::text, ${sep ? sep.replace(/"/g, "'") : "', '"})`
+	);
+	result = result.replace(
+		/\bGROUP_CONCAT\s*\(\s*([^,\)]+)\s*(?:,\s*('[^']*'|"[^"]*"))?\s*\)/gi,
+		(_, col, sep) => `STRING_AGG((${col})::text, ${sep ? sep.replace(/"/g, "'") : "', '"})`
+	);
+
+	// SQLite JSON functions -> PostgreSQL JSON functions
+	result = result.replace(/\bjson_group_array\s*\(/gi, 'json_agg(');
+	result = result.replace(/\bjson_object\s*\(/gi, 'json_build_object(');
 
 	// SQLite INSERT OR IGNORE -> ON CONFLICT DO NOTHING
 	if (/^\s*INSERT\s+OR\s+IGNORE\s+INTO/i.test(result)) {
@@ -172,15 +189,19 @@ export function createNeonD1Adapter(connectionString: string): D1Database {
 				};
 			},
 
-			async raw<T = unknown[]>() {
+			async raw<T = unknown[]>(options?: { columnNames?: boolean }): Promise<any> {
 				const { pgSql } = transformQuery(query);
 				const rows = (await executeQuery(pgSql, boundParams)) as unknown as Record<string, unknown>[];
-				if (!rows) return [];
-				return rows.map((r) => Object.values(r)) as T[];
+				if (!rows || rows.length === 0) return [];
+				const values = rows.map((r) => Object.values(r));
+				if (options?.columnNames && rows[0]) {
+					return [Object.keys(rows[0]), ...values];
+				}
+				return values as T[];
 			}
 		};
 
-		return stmtObj;
+		return stmtObj as unknown as D1PreparedStatement;
 	}
 
 	const adapter: D1Database = {
@@ -212,10 +233,14 @@ export function createNeonD1Adapter(connectionString: string): D1Database {
 			};
 		},
 
+		withSession(_token?: string): any {
+			return adapter;
+		},
+
 		dump(): Promise<ArrayBuffer> {
 			throw new Error('dump() is not supported on Neon PostgreSQL adapter.');
 		}
-	};
+	} as unknown as D1Database;
 
 	return adapter;
 }
