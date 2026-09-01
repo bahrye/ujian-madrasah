@@ -98,6 +98,54 @@ function transformQuery(sql: string): {
 	};
 }
 
+function sanitizeRow<T = Record<string, unknown>>(row: T): T {
+	if (!row || typeof row !== 'object' || Array.isArray(row)) return row;
+	const res: Record<string, unknown> = {};
+	const stringOnlyColumns = [
+		'password_hash',
+		'token_code',
+		'phone',
+		'nisn',
+		'nomor_peserta',
+		'login_pin',
+		'code',
+		'session_token',
+		'nip',
+		'options_json',
+		'correct_answer_json',
+		'violation_logs',
+		'signature',
+		'answer_given',
+		'start_time',
+		'end_time',
+		'created_at',
+		'updated_at',
+		'paused_at',
+		'released_at',
+		'expires_at',
+		'answered_at',
+		'last_active_at',
+		'date_of_birth'
+	];
+
+	for (const [key, val] of Object.entries(row as Record<string, unknown>)) {
+		if (
+			typeof val === 'string' &&
+			/^-?\d+$/.test(val) &&
+			val.length < 16 &&
+			!stringOnlyColumns.includes(key.toLowerCase())
+		) {
+			const num = Number(val);
+			if (Number.isSafeInteger(num)) {
+				res[key] = num;
+				continue;
+			}
+		}
+		res[key] = val;
+	}
+	return res as T;
+}
+
 /**
  * Creates a D1-compatible Database instance wrapping Neon PostgreSQL
  */
@@ -126,7 +174,8 @@ export function createNeonD1Adapter(connectionString: string): D1Database {
 
 			async all<T = Record<string, unknown>>() {
 				const { pgSql } = transformQuery(query);
-				const rows = (await executeQuery(pgSql, boundParams)) as unknown as T[];
+				const rawRows = (await executeQuery(pgSql, boundParams)) as unknown as T[];
+				const rows = Array.isArray(rawRows) ? rawRows.map((r) => sanitizeRow(r)) : [];
 				return {
 					results: rows || [],
 					success: true,
@@ -142,9 +191,9 @@ export function createNeonD1Adapter(connectionString: string): D1Database {
 
 			async first<T = Record<string, unknown>>(colName?: string) {
 				const { pgSql } = transformQuery(query);
-				const rows = (await executeQuery(pgSql, boundParams)) as unknown as Record<string, unknown>[];
-				if (!rows || rows.length === 0) return null;
-				const firstRow = rows[0];
+				const rawRows = (await executeQuery(pgSql, boundParams)) as unknown as Record<string, unknown>[];
+				if (!rawRows || rawRows.length === 0) return null;
+				const firstRow = sanitizeRow(rawRows[0]);
 				if (colName) {
 					return (firstRow[colName] as T) ?? null;
 				}

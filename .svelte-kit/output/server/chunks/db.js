@@ -64,6 +64,47 @@ function transformQuery(sql) {
     hasReturning
   };
 }
+function sanitizeRow(row) {
+  if (!row || typeof row !== "object" || Array.isArray(row)) return row;
+  const res = {};
+  const stringOnlyColumns = [
+    "password_hash",
+    "token_code",
+    "phone",
+    "nisn",
+    "nomor_peserta",
+    "login_pin",
+    "code",
+    "session_token",
+    "nip",
+    "options_json",
+    "correct_answer_json",
+    "violation_logs",
+    "signature",
+    "answer_given",
+    "start_time",
+    "end_time",
+    "created_at",
+    "updated_at",
+    "paused_at",
+    "released_at",
+    "expires_at",
+    "answered_at",
+    "last_active_at",
+    "date_of_birth"
+  ];
+  for (const [key, val] of Object.entries(row)) {
+    if (typeof val === "string" && /^-?\d+$/.test(val) && val.length < 16 && !stringOnlyColumns.includes(key.toLowerCase())) {
+      const num = Number(val);
+      if (Number.isSafeInteger(num)) {
+        res[key] = num;
+        continue;
+      }
+    }
+    res[key] = val;
+  }
+  return res;
+}
 function createNeonD1Adapter(connectionString) {
   const sql = getNeonClient(connectionString);
   const executeQuery = async (queryText, params = [], withFullResult = false) => {
@@ -86,7 +127,8 @@ function createNeonD1Adapter(connectionString) {
       },
       async all() {
         const { pgSql } = transformQuery(query);
-        const rows = await executeQuery(pgSql, boundParams);
+        const rawRows = await executeQuery(pgSql, boundParams);
+        const rows = Array.isArray(rawRows) ? rawRows.map((r) => sanitizeRow(r)) : [];
         return {
           results: rows || [],
           success: true,
@@ -101,9 +143,9 @@ function createNeonD1Adapter(connectionString) {
       },
       async first(colName) {
         const { pgSql } = transformQuery(query);
-        const rows = await executeQuery(pgSql, boundParams);
-        if (!rows || rows.length === 0) return null;
-        const firstRow = rows[0];
+        const rawRows = await executeQuery(pgSql, boundParams);
+        if (!rawRows || rawRows.length === 0) return null;
+        const firstRow = sanitizeRow(rawRows[0]);
         if (colName) {
           return firstRow[colName] ?? null;
         }

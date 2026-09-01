@@ -24,17 +24,17 @@ const load = async ({ platform, locals }) => {
   ]);
   const roleCounts = {};
   for (const r of userCounts.results) {
-    roleCounts[r.role] = r.count;
+    roleCounts[r.role] = Number(r.count || 0);
   }
   return {
     stats: {
-      totalUsers: Object.values(roleCounts).reduce((a, b) => a + b, 0),
+      totalUsers: Object.values(roleCounts).reduce((a, b) => a + Number(b), 0),
       roleCounts,
-      totalExams: examStats?.total ?? 0,
-      activeExams: examStats?.active ?? 0,
-      totalAttempts: attemptStats?.total ?? 0,
-      sedangMengerjakan: attemptStats?.sedang_mengerjakan ?? 0,
-      selesai: attemptStats?.selesai ?? 0
+      totalExams: Number(examStats?.total ?? 0),
+      activeExams: Number(examStats?.active ?? 0),
+      totalAttempts: Number(attemptStats?.total ?? 0),
+      sedangMengerjakan: Number(attemptStats?.sedang_mengerjakan ?? 0),
+      selesai: Number(attemptStats?.selesai ?? 0)
     },
     recentAttempts: recentAttempts.results
   };
