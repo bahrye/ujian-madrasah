@@ -65,10 +65,12 @@ export function arabicRender(node: HTMLElement, trigger?: any) {
 					}
 				}
 			});
-		}, 30);
+		}, 100);
 	}
 
-	render();
+	if (typeof window !== 'undefined') {
+		render();
+	}
 
 	return {
 		update(newTrigger?: any) {

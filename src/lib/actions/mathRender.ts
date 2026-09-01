@@ -4,7 +4,7 @@ export function mathRender(node: HTMLElement, trigger?: any) {
 	let timer: any = null;
 
 	function render() {
-		if (!node || !node.isConnected) return;
+		if (typeof window === 'undefined' || !node || !node.isConnected) return;
 		try {
 			renderMathInElement(node, {
 				delimiters: [
@@ -21,14 +21,14 @@ export function mathRender(node: HTMLElement, trigger?: any) {
 		}
 	}
 
-	render();
+	if (typeof window !== 'undefined') {
+		timer = setTimeout(render, 50);
+	}
 
 	return {
 		update(trigger: any) {
 			if (timer) clearTimeout(timer);
-			timer = setTimeout(() => {
-				render();
-			}, 10);
+			timer = setTimeout(render, 50);
 		},
 		destroy() {
 			if (timer) clearTimeout(timer);
