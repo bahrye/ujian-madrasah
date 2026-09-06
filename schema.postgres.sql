@@ -86,6 +86,10 @@ CREATE INDEX IF NOT EXISTS idx_users_school ON users(school_id);
 CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 CREATE INDEX IF NOT EXISTS idx_users_username_active ON users(username, is_active);
+CREATE INDEX IF NOT EXISTS idx_users_class ON users(class_id);
+CREATE INDEX IF NOT EXISTS idx_users_school_class ON users(school_id, class_id);
+CREATE INDEX IF NOT EXISTS idx_users_nisn ON users(nisn);
+CREATE INDEX IF NOT EXISTS idx_users_nomor_peserta ON users(nomor_peserta);
 
 -- 5. Tabel Tipe Ujian
 CREATE TABLE IF NOT EXISTS exam_types (
@@ -137,6 +141,10 @@ CREATE TABLE IF NOT EXISTS exams (
 );
 CREATE INDEX IF NOT EXISTS idx_exams_school ON exams(school_id);
 CREATE INDEX IF NOT EXISTS idx_exams_active ON exams(is_active);
+CREATE INDEX IF NOT EXISTS idx_exams_type ON exams(exam_type_id);
+CREATE INDEX IF NOT EXISTS idx_exams_type_school ON exams(exam_type_id, school_id);
+CREATE INDEX IF NOT EXISTS idx_exams_class ON exams(class_id);
+CREATE INDEX IF NOT EXISTS idx_exams_subject ON exams(subject_id);
 
 -- 8. Tabel Jadwal Sesi Ujian
 CREATE TABLE IF NOT EXISTS exam_sessions (
@@ -222,6 +230,7 @@ CREATE INDEX IF NOT EXISTS idx_attempts_exam ON student_attempts(exam_id);
 CREATE INDEX IF NOT EXISTS idx_attempts_exam_student ON student_attempts(exam_id, student_id);
 CREATE INDEX IF NOT EXISTS idx_attempts_status ON student_attempts(status);
 CREATE INDEX IF NOT EXISTS idx_attempts_student_status ON student_attempts(student_id, status);
+CREATE INDEX IF NOT EXISTS idx_attempts_token ON student_attempts(token_id);
 
 -- 13. Tabel Jawaban Siswa
 CREATE TABLE IF NOT EXISTS student_answers (

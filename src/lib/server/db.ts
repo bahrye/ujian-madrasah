@@ -173,7 +173,9 @@ export function createNeonD1Adapter(connectionString: string): D1Database {
 	};
 
 	function createPreparedStatement(query: string, boundParams: unknown[] = []): D1PreparedStatement {
-		const stmtObj: D1PreparedStatement = {
+		const stmtObj: any = {
+			_query: query,
+			_boundParams: boundParams,
 			bind(...values: unknown[]) {
 				const flatValues = values.length === 1 && Array.isArray(values[0]) ? values[0] : values;
 				return createPreparedStatement(query, flatValues);
@@ -266,6 +268,49 @@ export function createNeonD1Adapter(connectionString: string): D1Database {
 		},
 
 		async batch<T = unknown>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]> {
+			if (!statements || statements.length === 0) return [];
+
+			// Use Neon's single HTTP roundtrip transaction when available for massive speedup
+			if (typeof sql.transaction === 'function' && typeof sql.query === 'function') {
+				try {
+					const queries = statements.map((stmt: any) => {
+						const query = stmt._query || '';
+						const boundParams = stmt._boundParams || [];
+						const { pgSql, pgSqlWithReturning, isInsert, hasReturning } = transformQuery(query);
+						const queryToRun = isInsert && !hasReturning ? pgSqlWithReturning : pgSql;
+						const cleanParams = boundParams.map((p: any) => (p === undefined ? null : p));
+						return sql.query(queryToRun, cleanParams, { fullResults: true });
+					});
+
+					const txResults = (await (sql as any).transaction(queries as any)) as any[];
+					return txResults.map((res: any) => {
+						let lastRowId: number | null = null;
+						let rowCount = 0;
+						if (Array.isArray(res)) {
+							rowCount = res.length;
+						} else if (res && typeof res === 'object') {
+							rowCount = res.rowCount ?? (res.rows ? res.rows.length : 0);
+							if (res.rows && res.rows.length > 0 && res.rows[0]?.id !== undefined) {
+								lastRowId = Number(res.rows[0].id);
+							}
+						}
+						return {
+							success: true,
+							meta: {
+								changes: rowCount,
+								last_row_id: lastRowId,
+								duration: 0,
+								rows_read: 0,
+								rows_written: rowCount
+							} as any,
+							results: []
+						};
+					});
+				} catch (err) {
+					console.warn('Batch transaction failed, falling back to sequential execution:', err);
+				}
+			}
+
 			const results: D1Result<T>[] = [];
 			for (const stmt of statements) {
 				const res = await stmt.run<T>();
