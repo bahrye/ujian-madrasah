@@ -313,8 +313,11 @@ export const actions = {
 		if (isNaN(examTypeId) || isNaN(proctorId)) return fail(400, { error: 'Data petugas tidak valid.' });
 
 		try {
-			await db.prepare('INSERT OR REPLACE INTO exam_type_proctors (exam_type_id, proctor_id, proctor_role) VALUES (?, ?, ?)')
-				.bind(examTypeId, proctorId, proctorRole).run();
+			await db.prepare(`
+				INSERT INTO exam_type_proctors (exam_type_id, proctor_id, proctor_role) 
+				VALUES (?, ?, ?)
+				ON CONFLICT (exam_type_id, proctor_id) DO UPDATE SET proctor_role = EXCLUDED.proctor_role
+			`).bind(examTypeId, proctorId, proctorRole).run();
 
 			// Auto-sync to all exams belonging to this exam_type_id
 			await db.prepare(`

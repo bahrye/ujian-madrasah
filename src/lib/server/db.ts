@@ -69,6 +69,10 @@ function transformQuery(sql: string): {
 	// SQLite JSON functions -> PostgreSQL JSON functions
 	result = result.replace(/\bjson_group_array\s*\(/gi, 'json_agg(');
 	result = result.replace(/\bjson_object\s*\(/gi, 'json_build_object(');
+	result = result.replace(
+		/\bSELECT\s+value\s+FROM\s+json_each\s*\(\s*([^)]+)\s*\)/gi,
+		"SELECT json_array_elements_text(($1)::json)::int"
+	);
 
 	// SQLite julianday -> PostgreSQL epoch
 	result = result.replace(

@@ -230,7 +230,11 @@ const actions = {
     const proctorId = parseInt(proctorIdStr || "", 10);
     if (isNaN(examTypeId) || isNaN(proctorId)) return fail(400, { error: "Data petugas tidak valid." });
     try {
-      await db.prepare("INSERT OR REPLACE INTO exam_type_proctors (exam_type_id, proctor_id, proctor_role) VALUES (?, ?, ?)").bind(examTypeId, proctorId, proctorRole).run();
+      await db.prepare(`
+				INSERT INTO exam_type_proctors (exam_type_id, proctor_id, proctor_role) 
+				VALUES (?, ?, ?)
+				ON CONFLICT (exam_type_id, proctor_id) DO UPDATE SET proctor_role = EXCLUDED.proctor_role
+			`).bind(examTypeId, proctorId, proctorRole).run();
       await db.prepare(`
 				INSERT OR IGNORE INTO exam_proctors (exam_id, proctor_id, proctor_role)
 				SELECT id, ?, ? FROM exams WHERE exam_type_id = ? AND school_id = ?
