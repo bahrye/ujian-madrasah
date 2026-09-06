@@ -311,3 +311,9 @@ CREATE TABLE IF NOT EXISTS uploaded_media (
 CREATE INDEX IF NOT EXISTS idx_uploaded_media_url ON uploaded_media(url);
 CREATE INDEX IF NOT EXISTS idx_uploaded_media_school ON uploaded_media(school_id);
 CREATE INDEX IF NOT EXISTS idx_uploaded_media_school_public ON uploaded_media(school_id, is_public);
+
+-- 20. SQLite Compatibility Functions
+CREATE OR REPLACE FUNCTION julianday(ts text) RETURNS double precision AS 'SELECT CASE WHEN ts IS NULL OR ts = '''' THEN NULL ELSE EXTRACT(EPOCH FROM ts::timestamp) / 86400.0 + 2440587.5 END' LANGUAGE SQL IMMUTABLE;
+CREATE OR REPLACE FUNCTION julianday(ts timestamp) RETURNS double precision AS 'SELECT CASE WHEN ts IS NULL THEN NULL ELSE EXTRACT(EPOCH FROM ts) / 86400.0 + 2440587.5 END' LANGUAGE SQL IMMUTABLE;
+CREATE OR REPLACE FUNCTION julianday(ts timestamptz) RETURNS double precision AS 'SELECT CASE WHEN ts IS NULL THEN NULL ELSE EXTRACT(EPOCH FROM ts) / 86400.0 + 2440587.5 END' LANGUAGE SQL IMMUTABLE;
+

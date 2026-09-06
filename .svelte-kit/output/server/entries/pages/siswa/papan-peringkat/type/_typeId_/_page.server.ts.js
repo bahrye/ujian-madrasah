@@ -28,7 +28,7 @@ const load = async ({ platform, locals, params }) => {
 			SUM(julianday(best_sa.submit_time) - julianday(best_sa.start_time)) as total_time,
 			COUNT(best_sa.exam_id) as exams_completed
 		FROM (
-			SELECT student_id, exam_id, MAX(score) as score, start_time, submit_time
+			SELECT student_id, exam_id, MAX(score) as score, MIN(start_time) as start_time, MAX(submit_time) as submit_time
 			FROM student_attempts 
 			WHERE status = 'selesai'
 			GROUP BY student_id, exam_id
@@ -36,7 +36,7 @@ const load = async ({ platform, locals, params }) => {
 		JOIN users u ON best_sa.student_id = u.id
 		JOIN exams e ON best_sa.exam_id = e.id
 		WHERE e.exam_type_id = ? AND u.class_id = ?
-		GROUP BY u.id
+		GROUP BY u.id, u.name, u.photo
 		ORDER BY total_score DESC, avg_score DESC, total_time ASC
 	`).bind(typeId, classId).all();
   return {

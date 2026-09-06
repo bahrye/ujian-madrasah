@@ -920,7 +920,8 @@
       "_db.js",
       "_cloudinary.js",
       "_shared-server.js",
-      "_exam.js"
+      "_exam.js",
+      "_date.js"
     ]
   },
   "src/routes/admin/monitor/+page.svelte": {
@@ -1960,7 +1961,8 @@
       "_db.js",
       "_cloudinary.js",
       "_shared-server.js",
-      "_exam.js"
+      "_exam.js",
+      "_date.js"
     ]
   },
   "src/routes/pengawas/monitor/+page.svelte": {

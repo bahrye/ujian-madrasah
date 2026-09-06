@@ -3,6 +3,7 @@ import { g as getDB } from "../../../../chunks/db.js";
 import { d as deleteFromCloudinary } from "../../../../chunks/cloudinary.js";
 import { b as private_env } from "../../../../chunks/shared-server.js";
 import { f as formatExamTitle } from "../../../../chunks/exam.js";
+import { p as parseDate } from "../../../../chunks/date.js";
 const load = async ({ platform, url, locals }) => {
   if (!locals.user) throw redirect(302, "/login");
   try {
@@ -220,14 +221,19 @@ const actions = {
         return { success: "Ujian berhasil ditahan." };
       } else if (action === "resume") {
         if (attemptData.paused_at && attemptData.end_time) {
+          const pausedAtMs = parseDate(attemptData.paused_at).getTime();
+          const nowMs = Date.now();
+          const diffSeconds = Math.max(0, Math.round((nowMs - pausedAtMs) / 1e3));
+          const newEndTime = new Date(parseDate(attemptData.end_time).getTime() + diffSeconds * 1e3);
+          const formattedEndTime = newEndTime.toISOString().replace("T", " ").replace(/\..+/, "");
           await db.prepare(`
 						UPDATE student_attempts 
 						SET 
 							is_paused = 0, 
 							paused_at = NULL,
-							end_time = datetime(end_time, '+' || cast(round((julianday('now') - julianday(paused_at)) * 86400) as int) || ' seconds')
+							end_time = ?
 						WHERE id = ?
-					`).bind(parsedAttemptId).run();
+					`).bind(formattedEndTime, parsedAttemptId).run();
         } else {
           await db.prepare(`UPDATE student_attempts SET is_paused = 0, paused_at = NULL WHERE id = ?`).bind(parsedAttemptId).run();
         }

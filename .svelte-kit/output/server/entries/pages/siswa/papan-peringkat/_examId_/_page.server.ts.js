@@ -35,11 +35,15 @@ const load = async ({ platform, locals, params }) => {
 			u.photo,
 			sa.start_time,
 			sa.submit_time
-		FROM student_attempts sa
+		FROM (
+			SELECT sa_inner.*,
+				ROW_NUMBER() OVER (PARTITION BY sa_inner.student_id ORDER BY sa_inner.score DESC, sa_inner.id DESC) as rn
+			FROM student_attempts sa_inner
+			WHERE sa_inner.exam_id = ? AND sa_inner.status = 'selesai'
+		) sa
 		JOIN users u ON sa.student_id = u.id
-		WHERE sa.exam_id = ? AND sa.status = 'selesai' AND u.class_id = ?
-		GROUP BY u.id
-		ORDER BY MAX(sa.score) DESC, (julianday(sa.submit_time) - julianday(sa.start_time)) ASC
+		WHERE sa.rn = 1 AND u.class_id = ?
+		ORDER BY sa.score DESC, (julianday(sa.submit_time) - julianday(sa.start_time)) ASC
 	`).bind(examId, classId).all();
   return {
     exam: {

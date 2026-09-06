@@ -54,7 +54,7 @@ const load = async ({ platform, locals, params, url }) => {
     leaderboardSQL += " AND u.class_id = ?";
     leaderboardParams.push(classFilter);
   }
-  leaderboardSQL += " GROUP BY u.id ORDER BY total_score DESC, avg_score DESC";
+  leaderboardSQL += " GROUP BY u.id, u.name, u.photo, c.name ORDER BY total_score DESC, avg_score DESC";
   const leaderboardQuery = await db.prepare(leaderboardSQL).bind(...leaderboardParams).all();
   let detailSQL = `
 		SELECT 

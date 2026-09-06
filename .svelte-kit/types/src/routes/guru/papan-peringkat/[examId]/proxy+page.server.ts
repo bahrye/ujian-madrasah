@@ -40,16 +40,20 @@ export const load = async ({ platform, locals, params }: Parameters<PageServerLo
 			u.name as student_name,
 			u.photo,
 			c.name as class_name,
-			MAX(sa.score) as score,
+			sa.score,
 			sa.total_points,
 			sa.submit_time,
 			sa.start_time
-		FROM student_attempts sa
+		FROM (
+			SELECT sa_inner.*,
+				ROW_NUMBER() OVER (PARTITION BY sa_inner.student_id ORDER BY sa_inner.score DESC, sa_inner.id DESC) as rn
+			FROM student_attempts sa_inner
+			WHERE sa_inner.exam_id = ? AND sa_inner.status = 'selesai'
+		) sa
 		JOIN users u ON sa.student_id = u.id
 		LEFT JOIN classes c ON u.class_id = c.id
-		WHERE sa.exam_id = ? AND sa.status = 'selesai'
-		GROUP BY u.id
-		ORDER BY score DESC, (julianday(sa.submit_time) - julianday(sa.start_time)) ASC
+		WHERE sa.rn = 1
+		ORDER BY sa.score DESC, (julianday(sa.submit_time) - julianday(sa.start_time)) ASC
 	`).bind(examId).all<{ student_name: string; photo: string | null; class_name: string | null; score: number; total_points: number; submit_time: string; start_time: string }>();
 
 	return {

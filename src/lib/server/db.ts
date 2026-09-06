@@ -70,6 +70,12 @@ function transformQuery(sql: string): {
 	result = result.replace(/\bjson_group_array\s*\(/gi, 'json_agg(');
 	result = result.replace(/\bjson_object\s*\(/gi, 'json_build_object(');
 
+	// SQLite julianday -> PostgreSQL epoch
+	result = result.replace(
+		/\bjulianday\s*\(\s*([^)]+)\s*\)/gi,
+		"(EXTRACT(EPOCH FROM (NULLIF(($1)::text, '')::timestamp)) / 86400.0 + 2440587.5)"
+	);
+
 	// SQLite INSERT OR IGNORE -> ON CONFLICT DO NOTHING
 	if (/^\s*INSERT\s+OR\s+IGNORE\s+INTO/i.test(result)) {
 		result = result.replace(/^\s*INSERT\s+OR\s+IGNORE\s+INTO/i, 'INSERT INTO');
