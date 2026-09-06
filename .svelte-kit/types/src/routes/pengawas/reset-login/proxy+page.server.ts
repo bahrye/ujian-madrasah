@@ -66,7 +66,7 @@ export const load = async ({ platform, locals, url }: Parameters<PageServerLoad>
 		} else {
 			// For pengawas / guru role: fetch exams assigned to this proctor in exam_proctors
 			const proctorExamsRes = await db.prepare(`
-				SELECT DISTINCT e.id, e.title, s.name as subject_name, et.code as exam_type_code, c.name as class_name 
+				SELECT DISTINCT e.id, e.title, e.is_active, s.name as subject_name, et.code as exam_type_code, c.name as class_name 
 				FROM exams e 
 				JOIN exam_proctors ep ON e.id = ep.exam_id 
 				LEFT JOIN subjects s ON e.subject_id = s.id

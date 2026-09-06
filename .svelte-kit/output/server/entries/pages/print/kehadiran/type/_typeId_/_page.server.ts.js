@@ -65,7 +65,7 @@ const load = async ({ platform, params, locals, url }) => {
       }
     }
     const assignedProctorsRes = await db.prepare(`
-			SELECT DISTINCT u.id, u.name, u.nip, u.role, COALESCE(ep.proctor_role, 'p1') as proctor_role
+			SELECT u.id, u.name, u.nip, u.role, COALESCE(ep.proctor_role, 'p1') as proctor_role
 			FROM exam_proctors ep
 			JOIN users u ON ep.proctor_id = u.id
 			WHERE ep.exam_id = ?

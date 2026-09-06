@@ -253,6 +253,7 @@ CREATE TABLE IF NOT EXISTS exam_participants (
     exam_id INTEGER NOT NULL REFERENCES exams(id) ON DELETE CASCADE,
     student_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     room_id INTEGER REFERENCES exam_rooms(id) ON DELETE SET NULL,
+    session_number INTEGER DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(exam_id, student_id)
 );

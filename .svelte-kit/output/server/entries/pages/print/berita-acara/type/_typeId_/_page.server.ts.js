@@ -29,7 +29,7 @@ const load = async ({ platform, params, locals, url }) => {
   const sample = await db.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(locals.user.school_id).first();
   const isNomorPesertaMode = sample && sample.username === sample.nomor_peserta;
   const typeProctorsRes = await db.prepare(`
-		SELECT DISTINCT u.id, u.name, u.nip, u.role, COALESCE(etp.proctor_role, 'pt') as proctor_role
+		SELECT u.id, u.name, u.nip, u.role, COALESCE(etp.proctor_role, 'pt') as proctor_role
 		FROM exam_type_proctors etp
 		JOIN users u ON etp.proctor_id = u.id
 		WHERE etp.exam_type_id = ?
@@ -80,7 +80,7 @@ const load = async ({ platform, params, locals, url }) => {
       }
     }
     const assignedProctorsRes = await db.prepare(`
-			SELECT DISTINCT u.id, u.name, u.nip, u.role, COALESCE(ep.proctor_role, 'p1') as proctor_role
+			SELECT u.id, u.name, u.nip, u.role, COALESCE(ep.proctor_role, 'p1') as proctor_role
 			FROM exam_proctors ep
 			JOIN users u ON ep.proctor_id = u.id
 			WHERE ep.exam_id = ?
