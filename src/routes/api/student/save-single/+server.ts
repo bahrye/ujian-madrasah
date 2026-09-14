@@ -54,7 +54,7 @@ export const POST: RequestHandler = async ({ request, platform, locals, cookies 
 	try {
 		// Validasi status attempt
 		const attempt = await db.prepare(`
-			SELECT id, is_paused, status 
+			SELECT id, is_paused, status, end_time 
 			FROM student_attempts 
 			WHERE id = ? AND student_id = ?
 		`).bind(attemptId, locals.user.id).first<any>();
@@ -87,7 +87,13 @@ export const POST: RequestHandler = async ({ request, platform, locals, cookies 
 
 		await db.batch(batchStmts);
 
-		return json({ success: true, saved_at: Date.now() });
+		return json({ 
+			success: true, 
+			saved_at: Date.now(),
+			is_paused: attempt.is_paused === 1,
+			status: attempt.status,
+			end_time: attempt.end_time
+		});
 	} catch (e: any) {
 		console.error('Error saving single answer:', e);
 		return json({ error: 'Gagal menyimpan jawaban: ' + (e?.message || '') }, { status: 500 });

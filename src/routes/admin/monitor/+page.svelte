@@ -192,7 +192,7 @@
 					interval = setInterval(() => {
 						currentTime = Date.now();
 						pollLiveStatus();
-					}, 1500);
+					}, 8000);
 				}
 			}
 		};
@@ -204,7 +204,7 @@
 				currentTime = Date.now();
 				pollLiveStatus();
 			}
-		}, 1500);
+		}, 8000);
 
 		return () => {
 			document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -224,7 +224,23 @@
 			<h1 class="text-2xl font-bold text-slate-800">Monitoring Ujian</h1>
 			<p class="text-sm text-slate-500 mt-1">Pantau seluruh siswa yang terdaftar dalam ujian</p>
 		</div>
-		<div>
+		<div class="flex items-center gap-2">
+			<button 
+				type="button" 
+				class="btn-sm btn-ghost border border-slate-200 bg-white hover:bg-slate-50 flex items-center gap-1.5 text-xs text-slate-700 font-medium shadow-sm transition-colors"
+				disabled={isPolling}
+				on:click={() => { 
+					monitorVersion = '';
+					pollLiveStatus();
+					toasts.info('Memperbarui data monitoring...');
+				}}
+				title="Segarkan data monitoring sekarang"
+			>
+				<svg class="w-3.5 h-3.5 text-slate-600 {isPolling ? 'animate-spin' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+				</svg>
+				<span>{isPolling ? 'Menyegarkan...' : 'Segarkan Data'}</span>
+			</button>
 			<button 
 				type="button" 
 				class="btn-sm btn-ghost border border-slate-200 bg-white hover:bg-slate-50 flex items-center gap-1.5 text-xs text-slate-700 font-medium shadow-sm transition-colors"

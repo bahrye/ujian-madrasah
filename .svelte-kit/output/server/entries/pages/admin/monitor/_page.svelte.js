@@ -1,4 +1,4 @@
-import { h as head, i as ensure_array_like, e as escape_html, j as attr_class, k as attr, l as clsx, c as stringify, a as attr_style, f as bind_props } from "../../../../chunks/index.js";
+import { h as head, k as attr, j as attr_class, e as escape_html, i as ensure_array_like, l as clsx, c as stringify, a as attr_style, f as bind_props } from "../../../../chunks/index.js";
 import { p as parseDate } from "../../../../chunks/date.js";
 import { o as onDestroy } from "../../../../chunks/index-server.js";
 import "@sveltejs/kit/internal";
@@ -15,6 +15,7 @@ function _page($$renderer, $$props) {
     let data = $$props["data"];
     let form = $$props["form"];
     let currentTime = Date.now();
+    let isPolling = false;
     onDestroy(() => {
     });
     if (form?.success) toasts.success(form.success);
@@ -28,7 +29,7 @@ function _page($$renderer, $$props) {
         $$renderer4.push(`<title>Monitoring Ujian — Ujian Online Madrasah</title>`);
       });
     });
-    $$renderer2.push(`<div class="space-y-6 animate-in"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div><h1 class="text-2xl font-bold text-slate-800">Monitoring Ujian</h1> <p class="text-sm text-slate-500 mt-1">Pantau seluruh siswa yang terdaftar dalam ujian</p></div> <div><button type="button" class="btn-sm btn-ghost border border-slate-200 bg-white hover:bg-slate-50 flex items-center gap-1.5 text-xs text-slate-700 font-medium shadow-sm transition-colors"><svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg> Tes Suara &amp; Panggilan Nama</button></div></div> <div class="card p-4"><form method="GET" class="flex flex-wrap gap-3 mb-4"><select name="exam_id" class="select flex-1 min-w-[200px]" required="">`);
+    $$renderer2.push(`<div class="space-y-6 animate-in"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div><h1 class="text-2xl font-bold text-slate-800">Monitoring Ujian</h1> <p class="text-sm text-slate-500 mt-1">Pantau seluruh siswa yang terdaftar dalam ujian</p></div> <div class="flex items-center gap-2"><button type="button" class="btn-sm btn-ghost border border-slate-200 bg-white hover:bg-slate-50 flex items-center gap-1.5 text-xs text-slate-700 font-medium shadow-sm transition-colors"${attr("disabled", isPolling, true)} title="Segarkan data monitoring sekarang"><svg${attr_class(`w-3.5 h-3.5 text-slate-600 ${""}`)} fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> <span>${escape_html("Segarkan Data")}</span></button> <button type="button" class="btn-sm btn-ghost border border-slate-200 bg-white hover:bg-slate-50 flex items-center gap-1.5 text-xs text-slate-700 font-medium shadow-sm transition-colors"><svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg> Tes Suara &amp; Panggilan Nama</button></div></div> <div class="card p-4"><form method="GET" class="flex flex-wrap gap-3 mb-4"><select name="exam_id" class="select flex-1 min-w-[200px]" required="">`);
     $$renderer2.option({ value: "" }, ($$renderer3) => {
       $$renderer3.push(`-- Pilih Ujian --`);
     });

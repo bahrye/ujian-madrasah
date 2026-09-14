@@ -1,6 +1,7 @@
 import "@sveltejs/kit";
 import { C as COOKIE_NAME, v as verifyToken } from "../chunks/auth.js";
 import { g as getDB } from "../chunks/db.js";
+const lastActiveMap = /* @__PURE__ */ new Map();
 const handle = async ({ event, resolve }) => {
   const token = event.cookies.get(COOKIE_NAME);
   if (token) {
@@ -15,10 +16,20 @@ const handle = async ({ event, resolve }) => {
             event.locals.user = null;
             return resolve(event);
           }
-          const updatePromise = db.prepare(`UPDATE users SET last_active_at = datetime('now') WHERE id = ?`).bind(user.id).run().catch(() => {
-          });
-          if (event.platform?.context?.waitUntil) {
-            event.platform.context.waitUntil(updatePromise);
+          const now = Date.now();
+          const lastActive = lastActiveMap.get(user.id) || 0;
+          if (now - lastActive > 6e4) {
+            lastActiveMap.set(user.id, now);
+            if (lastActiveMap.size > 2e3) {
+              for (const [uid, time] of lastActiveMap) {
+                if (now - time > 3e5) lastActiveMap.delete(uid);
+              }
+            }
+            const updatePromise = db.prepare(`UPDATE users SET last_active_at = datetime('now') WHERE id = ?`).bind(user.id).run().catch(() => {
+            });
+            if (event.platform?.context?.waitUntil) {
+              event.platform.context.waitUntil(updatePromise);
+            }
           }
         } catch (e) {
         }

@@ -188,7 +188,7 @@
 					}
 				}
 			} catch (e) {}
-		}, 10000);
+		}, 30000);
 	});
 
 	let isOfficialReload = false;
@@ -399,7 +399,7 @@
 		
 		// Kirim instan tanpa terkena throttle / freeze browser
 		sendViolationBeacon(type);
-		saveCurrentAnswer(true);
+		saveCurrentAnswer(false);
 		isExamBlurred = false;
 
 		if (warnings > MAX_WARNINGS) {
@@ -590,7 +590,7 @@
 	async function saveSingleAnswer(questionId: number, answer: string, doubted: boolean) {
 		if (isPausedByProctor || !attempt?.id) return;
 		try {
-			await fetch('/api/student/save-single', {
+			const res = await fetch('/api/student/save-single', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -601,6 +601,29 @@
 				}),
 				keepalive: true
 			});
+
+			if (res.ok) {
+				const data = (await res.json()) as any;
+				if (data) {
+					if (data.end_time && data.end_time !== currentEndTime) {
+						currentEndTime = data.end_time;
+					}
+					if (typeof data.is_paused !== 'undefined') {
+						isPausedByProctor = data.is_paused;
+					}
+					if (data.status && data.status !== 'mengerjakan' && data.status !== attempt.status) {
+						sessionStorage.setItem(officialReloadKey, 'true');
+						window.location.reload();
+					}
+				}
+				// Sinkronkan lastSavedPayload agar navigasi soal (Next/Prev/Nomor) tidak memicu request ?/saveAnswer duplikat
+				lastSavedPayload = JSON.stringify({
+					answers: localAnswers,
+					doubts: localDoubts,
+					warnings: warnings,
+					warningLogs: warningLogs
+				});
+			}
 		} catch (err) {
 			console.warn('Delta save fallback:', err);
 			triggerAutoSave();

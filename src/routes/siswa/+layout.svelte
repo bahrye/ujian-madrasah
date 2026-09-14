@@ -5,10 +5,13 @@
 	export let data;
 
 	onMount(() => {
-		// Send heartbeat every 45s to maintain active status while tab is open
+		// Send heartbeat every 120s to maintain active status while tab is open
+		// Skip if tab is in background or if student is actively taking an exam
 		const interval = setInterval(() => {
+			if (typeof document !== 'undefined' && document.hidden) return;
+			if (typeof window !== 'undefined' && window.location.pathname.startsWith('/siswa/ujian')) return;
 			fetch('/api/heartbeat').catch(() => {});
-		}, 45000);
+		}, 120000);
 
 		return () => clearInterval(interval);
 	});

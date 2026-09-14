@@ -28,17 +28,17 @@
 			 s.nisn.includes(searchTerm) ||
 			 (s.class_name && s.class_name.toLowerCase().includes(searchTerm.toLowerCase())))
 	);
-
-	onMount(() => {
+	onMount(() => {
 		// Update timer for token expiration
 		timerInterval = setInterval(() => {
 			currentTime = Date.now();
 		}, 1000);
 
-		// Auto-refresh data for live monitoring every 10 seconds
+		// Auto-refresh data for live monitoring every 30 seconds (skip if tab is in background)
 		const refreshInterval = setInterval(() => {
+			if (typeof document !== 'undefined' && document.hidden) return;
 			invalidateAll();
-		}, 10000);
+		}, 30000);
 
 		return () => {
 			clearInterval(timerInterval);
