@@ -1,6 +1,7 @@
 import type { PageServerLoad, Actions } from './$types';
 import { getDB } from '$lib/server/db';
 import { error, fail } from '@sveltejs/kit';
+import { ensureRoomsTable } from '$lib/server/rooms';
 
 import { formatExamTitle } from '$lib/utils/exam';
 
@@ -20,6 +21,10 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 		subjectName: exam.subject_name,
 		className: exam.class_name
 	});
+
+	await ensureRoomsTable(db);
+	const masterRoomsRes = await db.prepare('SELECT * FROM rooms WHERE school_id = ? AND is_active = 1 ORDER BY name ASC').bind(locals.user!.school_id).all();
+	const masterRooms = masterRoomsRes.results || [];
 
 	const questions = await db.prepare('SELECT * FROM questions WHERE exam_id = ? ORDER BY question_number').bind(examId).all();
 	const attempts = await db.prepare(`
@@ -95,7 +100,8 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 		hasSessions,
 		sessionsCount: examSessions.results?.length || 0,
 		examSessions: examSessions.results || [],
-		examRooms: examRooms.results
+		examRooms: examRooms.results,
+		masterRooms
 	};
 };
 
@@ -215,10 +221,15 @@ export const actions: Actions = {
 		const name = form.get('name')?.toString().trim();
 		const examId = parseInt(params.id, 10);
 
-		if (!name || isNaN(examId)) return fail(400, { error: 'Nama ruang tidak valid' });
+		if (!name || isNaN(examId)) return fail(400, { error: 'Pilih ruang ujian terlebih dahulu.' });
+
+		const existing = await db.prepare('SELECT id FROM exam_rooms WHERE exam_id = ? AND LOWER(name) = LOWER(?)').bind(examId, name).first();
+		if (existing) {
+			return fail(400, { error: `Ruang "${name}" sudah ditambahkan pada ujian ini.` });
+		}
 
 		await db.prepare('INSERT INTO exam_rooms (exam_id, name) VALUES (?, ?)').bind(examId, name).run();
-		return { success: 'Ruang ujian berhasil ditambahkan.' };
+		return { success: `Ruang "${name}" berhasil ditambahkan ke ujian.` };
 	},
 
 	deleteRoom: async ({ request, platform, params, locals }) => {

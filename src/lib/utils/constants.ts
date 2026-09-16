@@ -77,6 +77,7 @@ export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
 		{ label: 'Pengguna', href: '/admin/users', icon: 'users' },
 		{ label: 'Siswa', href: '/admin/students', icon: 'users' },
 		{ label: 'Kelas', href: '/admin/classes', icon: 'school' },
+		{ label: 'Ruang Ujian', href: '/admin/rooms', icon: 'room' },
 		{ label: 'Mata Pelajaran', href: '/admin/subjects', icon: 'exam' },
 		{ label: 'Bank Soal', href: '/admin/bank-soal', icon: 'questions' },
 		{ label: 'Bank Media', href: '/admin/media-bank', icon: 'folder' },
@@ -170,5 +171,6 @@ export const ICONS: Record<string, string> = {
 	profile: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
 	rules: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4',
 	print: 'M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z',
-	history: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
+	history: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+	room: 'M3 21h18M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16M9 10a1 1 0 100 2 1 1 0 000-2z'
 };

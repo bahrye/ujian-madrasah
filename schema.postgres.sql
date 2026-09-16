@@ -342,4 +342,18 @@ CREATE TABLE IF NOT EXISTS activity_logs (
 CREATE INDEX IF NOT EXISTS idx_activity_logs_school ON activity_logs(school_id);
 CREATE INDEX IF NOT EXISTS idx_activity_logs_created ON activity_logs(created_at DESC);
 
+-- 22. Tabel Master Ruang Ujian
+CREATE TABLE IF NOT EXISTS rooms (
+    id SERIAL PRIMARY KEY,
+    school_id INTEGER NOT NULL REFERENCES schools(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    location TEXT,
+    capacity INTEGER DEFAULT 30,
+    is_active INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT (to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS')),
+    updated_at TEXT NOT NULL DEFAULT (to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS'))
+);
+CREATE INDEX IF NOT EXISTS idx_rooms_school ON rooms(school_id);
+
+
 

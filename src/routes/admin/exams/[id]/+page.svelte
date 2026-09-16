@@ -197,10 +197,29 @@
 				<h2 class="text-lg font-bold text-slate-800">Manajemen Ruang</h2>
 				<p class="text-xs text-slate-500 mt-0.5">Bagi peserta dan pengawas ke dalam beberapa ruang (opsional).</p>
 			</div>
-			<form method="POST" action="?/addRoom" use:enhance class="flex items-center gap-2">
-				<input type="text" name="name" class="input py-1.5 text-sm w-48" placeholder="Nama Ruang (cth: LAB 1)" required />
-				<button type="submit" class="btn-sm btn-primary shrink-0">Tambah Ruang</button>
-			</form>
+			{#if data.masterRooms && data.masterRooms.length > 0}
+				<form method="POST" action="?/addRoom" use:enhance class="flex items-center gap-2">
+					<select name="name" class="input py-1.5 text-sm min-w-[220px]" required>
+						<option value="">-- Pilih Ruang Ujian --</option>
+						{#each data.masterRooms as mRoom}
+							<option value={mRoom.name}>
+								{mRoom.name}{mRoom.location ? ` (${mRoom.location})` : ''}
+							</option>
+						{/each}
+					</select>
+					<button type="submit" class="btn-sm btn-primary shrink-0">Tambah Ruang</button>
+				</form>
+			{:else}
+				<div class="flex items-center gap-2">
+					<span class="text-xs text-slate-500">Belum ada ruang di master.</span>
+					<a href="/admin/rooms" class="btn-sm btn-secondary text-xs shrink-0 flex items-center gap-1.5">
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
+						</svg>
+						<span>Tambah di Ruang Ujian</span>
+					</a>
+				</div>
+			{/if}
 		</div>
 		{#if data.examRooms.length === 0}
 			<div class="p-6 text-center text-slate-400 text-sm">Tidak ada pembagian ruang. Semua peserta berada dalam 1 ruang default.</div>
