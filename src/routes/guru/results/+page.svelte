@@ -100,6 +100,17 @@
 						</button>
 					</form>
 				{/if}
+				<a
+					href="/print/daftar-nilai/{data.examFilter}"
+					target="_blank"
+					class="btn bg-slate-800 hover:bg-slate-900 text-white md:w-auto w-full flex items-center justify-center gap-2 shadow-sm"
+					title="Buka / Cetak Daftar Nilai Ujian (PDF)"
+				>
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+					</svg>
+					Daftar Nilai Ujian
+				</a>
 				<button type="button" class="btn-primary md:w-auto w-full flex items-center justify-center gap-2" on:click={handleExport} disabled={isExporting}>
 					{#if isExporting}
 						<span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
