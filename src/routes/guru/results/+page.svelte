@@ -52,6 +52,14 @@
 	$: if (form?.releaseAll) toasts.success('Nilai seluruh siswa yang sudah lengkap berhasil dikirim!');
 
 	let showExportDropdown = false;
+	let exportDropdownContainer: HTMLElement | undefined;
+
+	function handleWindowClick(e: MouseEvent) {
+		if (showExportDropdown && exportDropdownContainer && !exportDropdownContainer.contains(e.target as Node)) {
+			showExportDropdown = false;
+		}
+	}
+
 	let isExporting = false;
 	async function handleExport() {
 		if (!data.examFilter) {
@@ -68,6 +76,8 @@
 	}
 </script>
 
+<svelte:window on:click={handleWindowClick} />
+
 <svelte:head>
 	<title>Hasil Ujian — Ujian Online Madrasah</title>
 </svelte:head>
@@ -79,7 +89,7 @@
 	</div>
 
 	<!-- Filter -->
-	<div class="card p-4 flex flex-col md:flex-row gap-3 items-center">
+	<div class="card p-4 flex flex-col md:flex-row gap-3 items-center relative z-30 !overflow-visible" style="overflow: visible !important;">
 		<form method="GET" class="flex flex-col md:flex-row gap-3 flex-1 w-full">
 			<select name="exam_id" class="select flex-1" on:change={(e) => e.currentTarget.form?.submit()}>
 				<option value="">Semua Ujian</option>
@@ -104,10 +114,10 @@
 				{/if}
 
 				<!-- Dropdown Cetak & Eksport -->
-				<div class="relative w-full md:w-auto">
+				<div class="relative w-full md:w-auto" bind:this={exportDropdownContainer}>
 					<button
 						type="button"
-						on:click={() => (showExportDropdown = !showExportDropdown)}
+						on:click|stopPropagation={() => (showExportDropdown = !showExportDropdown)}
 						class="btn bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white md:w-auto w-full flex items-center justify-between gap-2.5 shadow-md shadow-indigo-600/20 border border-indigo-400/30 transition-all active:scale-[0.98] cursor-pointer"
 						aria-haspopup="true"
 						aria-expanded={showExportDropdown}
@@ -130,15 +140,8 @@
 					</button>
 
 					{#if showExportDropdown}
-						<!-- Click backdrop to close -->
 						<div
-							class="fixed inset-0 z-40"
-							on:click={() => (showExportDropdown = false)}
-							role="presentation"
-						></div>
-
-						<div
-							class="absolute right-0 top-full mt-2 w-72 md:w-80 bg-white rounded-2xl shadow-2xl border border-slate-200/90 ring-1 ring-black/5 z-50 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-150"
+							class="absolute right-0 top-full mt-2 w-72 md:w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 ring-1 ring-black/10 z-[100] p-2 space-y-1 animate-in fade-in zoom-in-95 duration-150"
 						>
 							<div class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">
 								Pilihan Dokumen & Format
