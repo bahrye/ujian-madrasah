@@ -1,6 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { error, redirect } from '@sveltejs/kit';
+import { finalizeExpiredAttempts } from '$lib/server/exam-finalize';
 
 export const load: PageServerLoad = async ({ platform, params, locals, url }) => {
 	if (!locals.user || !['superadmin', 'admin', 'guru', 'panitia'].includes(locals.user.role)) {
@@ -39,6 +40,9 @@ export const load: PageServerLoad = async ({ platform, params, locals, url }) =>
 	if (!exam) throw error(404, 'Ujian tidak ditemukan atau Anda tidak memiliki akses.');
 
 	const effectiveSchoolId = locals.user.school_id || exam.school_id || 1;
+
+	// Auto-finalize sesi ujian yang waktu pengerjaannya sudah habis
+	await finalizeExpiredAttempts(db, { schoolId: effectiveSchoolId, examId });
 
 	// 2. Fetch School info
 	const school = await db.prepare('SELECT * FROM schools WHERE id = ?').bind(effectiveSchoolId).first<any>();

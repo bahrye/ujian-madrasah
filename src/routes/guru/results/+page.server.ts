@@ -2,11 +2,19 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { getDB } from '$lib/server/db';
 import { formatExamTitle } from '$lib/utils/exam';
+import { finalizeExpiredAttempts } from '$lib/server/exam-finalize';
 
 export const load: PageServerLoad = async ({ platform, url, locals }) => {
 	if (!locals.user) throw redirect(302, '/login');
 	const db = getDB(platform);
 	const examFilter = url.searchParams.get('exam_id') || '';
+	const parsedExamId = parseInt(examFilter, 10);
+
+	// Auto-finalize sesi ujian yang waktu pengerjaannya sudah habis
+	await finalizeExpiredAttempts(db, {
+		schoolId: locals.user?.school_id,
+		examId: !isNaN(parsedExamId) ? parsedExamId : undefined
+	});
 
 	const examsRes = await db.prepare(`
 		SELECT e.id, e.title, e.show_score_type, s.name as subject_name, et.code as exam_type_code, c.name as class_name

@@ -4,12 +4,19 @@ import { getDB } from '$lib/server/db';
 import { deleteFromCloudinary } from '$lib/server/cloudinary';
 import { env } from '$env/dynamic/private';
 import { formatExamTitle } from '$lib/utils/exam';
+import { finalizeExpiredAttempts } from '$lib/server/exam-finalize';
 
 export const load: PageServerLoad = async ({ platform, url, locals }) => {
 	if (!locals.user) throw redirect(302, '/login');
 	const db = getDB(platform);
 	const examFilterStr = url.searchParams.get('exam_id') || '';
 	const examFilter = parseInt(examFilterStr, 10);
+
+	// Auto-finalize sesi ujian yang waktu pengerjaannya sudah habis
+	await finalizeExpiredAttempts(db, {
+		schoolId: locals.user.school_id,
+		examId: !isNaN(examFilter) ? examFilter : undefined
+	});
 
 	const examsRes = await db.prepare(`
 		SELECT e.id, e.title, e.show_score_type, s.name as subject_name, et.code as exam_type_code, c.name as class_name

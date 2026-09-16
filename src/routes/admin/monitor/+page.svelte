@@ -465,6 +465,24 @@
 													</button>
 												{/if}
 											</form>
+											<form method="POST" action="?/forceSubmit" use:enhance>
+												<input type="hidden" name="attempt_id" value={a.attempt_id} />
+												<button 
+													type="submit" 
+													class="btn-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs" 
+													title="Selesaikan dan kumpulkan ujian siswa secara resmi (jawaban tersimpan langsung dinilai)"
+													on:click={(e) => {
+														if (!confirm(`Selesaikan dan kumpulkan ujian siswa "${a.student_name}"? Semua jawaban yang sudah tersimpan akan langsung dinilai secara resmi.`)) {
+															e.preventDefault();
+														}
+													}}
+												>
+													<svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+														<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+													</svg>
+													Selesaikan
+												</button>
+											</form>
 											<button
 												class="btn-sm btn-danger"
 												on:click={() => (resetConfirm = a.attempt_id)}

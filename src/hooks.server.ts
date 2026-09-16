@@ -1,12 +1,27 @@
 import { type Handle } from '@sveltejs/kit';
 import { verifyToken, COOKIE_NAME } from '$lib/server/auth';
 import { getDB } from '$lib/server/db';
+import { finalizeExpiredAttempts } from '$lib/server/exam-finalize';
 
 // Cache timestamp aktivitas terakhir siswa untuk throttling write DB
 const lastActiveMap = new Map<number, number>();
+let lastExpiredSweep = 0;
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const token = event.cookies.get(COOKIE_NAME);
+
+	// Auto-finalize sweep maksimal 1x per 60 detik di background saat ada request masuk
+	const nowTime = Date.now();
+	if (nowTime - lastExpiredSweep > 60000) {
+		lastExpiredSweep = nowTime;
+		try {
+			const db = getDB(event.platform);
+			const sweepPromise = finalizeExpiredAttempts(db).catch(() => {});
+			if (event.platform?.context?.waitUntil) {
+				event.platform.context.waitUntil(sweepPromise);
+			}
+		} catch {}
+	}
 
 	if (token) {
 		const user = await verifyToken(token);

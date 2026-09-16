@@ -5,6 +5,7 @@ import { deleteFromCloudinary } from '$lib/server/cloudinary';
 import { env } from '$env/dynamic/private';
 import { formatExamTitle } from '$lib/utils/exam';
 import { parseDate } from '$lib/utils/date';
+import { finalizeExpiredAttempts, finalizeAttempt } from '$lib/server/exam-finalize';
 
 export interface ExamFilterOption {
 	id: number;
@@ -19,6 +20,12 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 		const examFilter = parseInt(examFilterStr, 10);
 		const sessionFilterStr = url.searchParams.get('session_number') || '';
 		const sessionFilter = parseInt(sessionFilterStr, 10);
+
+		// Auto-finalize sesi ujian yang waktu pengerjaannya sudah habis
+		await finalizeExpiredAttempts(db, {
+			schoolId: locals.user.school_id,
+			examId: !isNaN(examFilter) ? examFilter : undefined
+		});
 
 		const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
 		const isAdmin = locals.user.role === 'admin';
@@ -336,6 +343,25 @@ export const actions: Actions = {
 		} catch (e: any) {
 			console.error(e);
 			return fail(500, { error: e.message || 'Gagal mereset login perangkat siswa.' });
+		}
+	},
+	forceSubmit: async ({ request, platform, locals }) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
+		const db = getDB(platform);
+		const form = await request.formData();
+		const attemptIdStr = form.get('attempt_id')?.toString();
+		const parsedAttemptId = parseInt(attemptIdStr || '', 10);
+		if (isNaN(parsedAttemptId)) return fail(400, { error: 'ID tidak valid.' });
+
+		try {
+			const res = await finalizeAttempt(db, parsedAttemptId, 'waktu_habis');
+			if (!res) {
+				return fail(400, { error: 'Sesi ujian tidak dapat diselesaikan atau sudah selesai.' });
+			}
+			return { success: 'Ujian siswa berhasil dikumpulkan dan dinilai secara otomatis.' };
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal mengumpulkan ujian siswa.' });
 		}
 	}
 };

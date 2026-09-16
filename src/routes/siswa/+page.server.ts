@@ -2,6 +2,7 @@ import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { formatExamTitle } from '$lib/utils/exam';
+import { finalizeExpiredAttempts } from '$lib/server/exam-finalize';
 
 export const load: PageServerLoad = async ({ platform, locals }) => {
 	if (!locals.user) throw redirect(302, '/login');
@@ -10,6 +11,9 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		const db = getDB(platform);
 		const userId = locals.user.id;
 		const schoolId = locals.user.school_id || 0;
+
+		// Auto-finalize attempt yang sudah habis waktunya
+		await finalizeExpiredAttempts(db, { schoolId });
 
 		// Ujian aktif yang tokennya sudah dirilis
 		const activeExamsRes = await db.prepare(`
