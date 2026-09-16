@@ -213,6 +213,13 @@
 	}
 
 	onMount(() => {
+		if (typeof window !== 'undefined') {
+			window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+			if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+			if (document.documentElement) document.documentElement.scrollTop = 0;
+			if (document.body) document.body.scrollTop = 0;
+		}
+
 		if (safeType === 'menjodohkan') {
 			scheduleRecalculate();
 			const handleResize = () => scheduleRecalculate();

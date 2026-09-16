@@ -7,7 +7,7 @@
 	import { ICONS } from '$lib/utils/constants';
 	import Toast from '$lib/components/ui/Toast.svelte';
 	import { toasts } from '$lib/stores/toast';
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount, onDestroy, tick } from 'svelte';
 	import { browser } from '$app/environment';
 
 	export let data;
@@ -85,6 +85,10 @@
 
 	onMount(() => {
 		if (!attempt?.id) return;
+		if (browser && 'scrollRestoration' in history) {
+			history.scrollRestoration = 'manual';
+		}
+		scrollToTop();
 		requestWakeLock();
 		
 		if (browser) {
@@ -620,13 +624,35 @@
 	$: doubtedCount = (questions || []).filter((q: any) => localDoubts && localDoubts[q.id]).length;
 	$: unansweredCount = (questions?.length || 0) - answeredCount;
 
-	function goToQuestion(index: number) {
+	function scrollToTop() {
+		if (typeof window !== 'undefined') {
+			window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+			if (document.scrollingElement) {
+				document.scrollingElement.scrollTop = 0;
+			}
+			if (document.documentElement) {
+				document.documentElement.scrollTop = 0;
+			}
+			if (document.body) {
+				document.body.scrollTop = 0;
+			}
+		}
+	}
+
+	async function goToQuestion(index: number) {
 		flushPendingSingleAnswer();
 		// Save current only if there are changes before navigating
 		saveCurrentAnswer();
 		currentIndex = index;
 		localStorage.setItem(`currentIndex_${attempt.id}`, currentIndex.toString());
 		showNav = false;
+
+		scrollToTop();
+		await tick();
+		scrollToTop();
+		requestAnimationFrame(() => {
+			scrollToTop();
+		});
 	}
 
 	function prev() {
