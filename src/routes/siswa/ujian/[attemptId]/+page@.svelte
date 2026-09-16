@@ -33,9 +33,12 @@
 	// Anti-cheat state
 	let currentEndTime = data?.attempt?.end_time;
 	let isPausedByProctor = data?.attempt?.is_paused === 1;
+	const checkedMilestones = new Set<number>();
+
 	$: if (data?.attempt) {
 		if (data.attempt.end_time && data.attempt.end_time !== currentEndTime) {
 			currentEndTime = data.attempt.end_time;
+			checkedMilestones.clear();
 		}
 		isPausedByProctor = data.attempt.is_paused === 1;
 	}
@@ -172,14 +175,25 @@
 			}
 		}, 3000);
 
-		statusPollingInterval = setInterval(async () => {
-			if (isUnloading || submitting || showSubmitConfirm || typeof document !== 'undefined' && document.hidden) return;
+		function getRemainingSeconds(): number {
+			if (!currentEndTime) return 999999;
+			let validEndTime = currentEndTime;
+			if (validEndTime && !validEndTime.endsWith('Z') && !validEndTime.includes('+')) {
+				validEndTime = validEndTime.replace(' ', 'T') + 'Z';
+			}
+			const end = new Date(validEndTime).getTime();
+			return Math.max(0, Math.floor((end - Date.now()) / 1000));
+		}
+
+		async function fetchAttemptStatus() {
+			if (isUnloading || submitting || showSubmitConfirm || (typeof document !== 'undefined' && document.hidden)) return;
 			try {
 				const res = await fetch(`/api/attempt-status/${attempt.id}`);
 				if (res.ok) {
-					const data = await res.json() as any;
+					const data = (await res.json()) as any;
 					if (data.end_time && data.end_time !== currentEndTime) {
 						currentEndTime = data.end_time;
+						checkedMilestones.clear();
 					}
 					isPausedByProctor = data.is_paused;
 					if (data.status !== 'mengerjakan' && data.status !== attempt.status) {
@@ -188,7 +202,36 @@
 					}
 				}
 			} catch (e) {}
-		}, 30000);
+		}
+
+		// Smart Milestone Polling: Sangat hemat kuota Cloudflare/Vercel.
+		// Siswa aktif sudah otomatis sinkron saat klik jawaban (delta save).
+		// Polling network hanya jalan 1-2x ketika waktu hampir habis atau saat ditahan.
+		statusPollingInterval = setInterval(async () => {
+			if (isUnloading || submitting || showSubmitConfirm) return;
+
+			// 1. Jika sedang ditahan oleh pengawas, periksa status agar segera lanjut saat dibuka
+			if (isPausedByProctor) {
+				await fetchAttemptStatus();
+				return;
+			}
+
+			const remaining = getRemainingSeconds();
+
+			// 2. Milestone 1: Sisa 2 menit (<= 120s) -> sinkronisasi waktu akhir 1x
+			if (remaining <= 120 && remaining > 65 && !checkedMilestones.has(120)) {
+				checkedMilestones.add(120);
+				await fetchAttemptStatus();
+				return;
+			}
+
+			// 3. Milestone 2: Sisa 1 menit (<= 60s) -> sinkronisasi waktu akhir 1x
+			if (remaining <= 60 && remaining > 10 && !checkedMilestones.has(60)) {
+				checkedMilestones.add(60);
+				await fetchAttemptStatus();
+				return;
+			}
+		}, 10000);
 	});
 
 	let isOfficialReload = false;
@@ -625,6 +668,7 @@
 				if (data) {
 					if (data.end_time && data.end_time !== currentEndTime) {
 						currentEndTime = data.end_time;
+						checkedMilestones.clear();
 					}
 					if (typeof data.is_paused !== 'undefined') {
 						isPausedByProctor = data.is_paused;

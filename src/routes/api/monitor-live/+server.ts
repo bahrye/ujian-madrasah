@@ -1,7 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getDB } from '$lib/server/db';
-import { finalizeExpiredAttempts } from '$lib/server/exam-finalize';
 
 export const GET: RequestHandler = async ({ url, platform, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -16,8 +15,6 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 	if (isNaN(examId)) return json({ error: 'ID Ujian tidak valid' }, { status: 400 });
 
 	try {
-		// Auto-finalize sesi yang waktu pengerjaannya telah habis
-		await finalizeExpiredAttempts(db, { schoolId: locals.user.school_id, examId });
 		// Smart Check: Baca 1 baris agregat timestamp & violations untuk cek apakah ada perubahan
 		if (clientVersion) {
 			try {
