@@ -33,6 +33,7 @@ async function fixAllColumns() {
 		// exam_rooms
 		'ALTER TABLE exam_rooms ADD COLUMN IF NOT EXISTS exam_id INTEGER REFERENCES exams(id) ON DELETE CASCADE',
 		'ALTER TABLE exam_rooms ADD COLUMN IF NOT EXISTS school_id INTEGER REFERENCES schools(id) ON DELETE CASCADE',
+		'ALTER TABLE exam_rooms ALTER COLUMN school_id DROP NOT NULL',
 		'ALTER TABLE exam_rooms ADD COLUMN IF NOT EXISTS capacity INTEGER DEFAULT 30',
 
 		// exam_teachers

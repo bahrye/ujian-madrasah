@@ -1,7 +1,7 @@
 import type { PageServerLoad, Actions } from './$types';
 import { getDB } from '$lib/server/db';
 import { error, fail } from '@sveltejs/kit';
-import { ensureRoomsTable } from '$lib/server/rooms';
+import { ensureRoomsTable, ensureExamRoomsTable } from '$lib/server/rooms';
 
 import { formatExamTitle } from '$lib/utils/exam';
 
@@ -23,6 +23,7 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 	});
 
 	await ensureRoomsTable(db);
+	await ensureExamRoomsTable(db);
 	const masterRoomsRes = await db.prepare('SELECT * FROM rooms WHERE school_id = ? AND is_active = 1 ORDER BY name ASC').bind(locals.user!.school_id).all();
 	const masterRooms = masterRoomsRes.results || [];
 
@@ -223,13 +224,31 @@ export const actions: Actions = {
 
 		if (!name || isNaN(examId)) return fail(400, { error: 'Pilih ruang ujian terlebih dahulu.' });
 
-		const existing = await db.prepare('SELECT id FROM exam_rooms WHERE exam_id = ? AND LOWER(name) = LOWER(?)').bind(examId, name).first();
-		if (existing) {
-			return fail(400, { error: `Ruang "${name}" sudah ditambahkan pada ujian ini.` });
-		}
+		try {
+			await ensureExamRoomsTable(db);
 
-		await db.prepare('INSERT INTO exam_rooms (exam_id, name) VALUES (?, ?)').bind(examId, name).run();
-		return { success: `Ruang "${name}" berhasil ditambahkan ke ujian.` };
+			const exam = await db.prepare('SELECT id, school_id FROM exams WHERE id = ?').bind(examId).first<{ id: number; school_id: number }>();
+			if (!exam) return fail(404, { error: 'Ujian tidak ditemukan.' });
+
+			const schoolId = exam.school_id || locals.user.school_id;
+
+			const existing = await db.prepare('SELECT id FROM exam_rooms WHERE exam_id = ? AND LOWER(name) = LOWER(?)').bind(examId, name).first();
+			if (existing) {
+				return fail(400, { error: `Ruang "${name}" sudah ditambahkan pada ujian ini.` });
+			}
+
+			// Try inserting with school_id first, fallback without school_id if column absent in older SQLite schema
+			try {
+				await db.prepare('INSERT INTO exam_rooms (exam_id, school_id, name) VALUES (?, ?, ?)').bind(examId, schoolId, name).run();
+			} catch {
+				await db.prepare('INSERT INTO exam_rooms (exam_id, name) VALUES (?, ?)').bind(examId, name).run();
+			}
+
+			return { success: `Ruang "${name}" berhasil ditambahkan ke ujian.` };
+		} catch (err: any) {
+			console.error('Error in addRoom:', err);
+			return fail(500, { error: err?.message || 'Gagal menambahkan ruang ujian.' });
+		}
 	},
 
 	deleteRoom: async ({ request, platform, params, locals }) => {
@@ -241,8 +260,13 @@ export const actions: Actions = {
 
 		if (isNaN(roomId) || isNaN(examId)) return fail(400, { error: 'ID ruang tidak valid' });
 
-		await db.prepare('DELETE FROM exam_rooms WHERE id = ? AND exam_id = ?').bind(roomId, examId).run();
-		return { success: 'Ruang ujian berhasil dihapus.' };
+		try {
+			await db.prepare('DELETE FROM exam_rooms WHERE id = ? AND exam_id = ?').bind(roomId, examId).run();
+			return { success: 'Ruang ujian berhasil dihapus.' };
+		} catch (err: any) {
+			console.error('Error in deleteRoom:', err);
+			return fail(500, { error: 'Gagal menghapus ruang ujian.' });
+		}
 	},
 
 	updateParticipantRoom: async ({ request, platform, params, locals }) => {
@@ -254,9 +278,14 @@ export const actions: Actions = {
 
 		if (isNaN(participantId)) return fail(400, { error: 'Data tidak valid' });
 
-		await db.prepare('UPDATE exam_participants SET room_id = ? WHERE id = ? AND exam_id = ?')
-			.bind(roomId, participantId, parseInt(params.id, 10)).run();
-		return { success: 'Ruang peserta berhasil diperbarui.' };
+		try {
+			await db.prepare('UPDATE exam_participants SET room_id = ? WHERE id = ? AND exam_id = ?')
+				.bind(roomId, participantId, parseInt(params.id, 10)).run();
+			return { success: 'Ruang peserta berhasil diperbarui.' };
+		} catch (err: any) {
+			console.error('Error in updateParticipantRoom:', err);
+			return fail(500, { error: 'Gagal memperbarui ruang peserta.' });
+		}
 	},
 
 

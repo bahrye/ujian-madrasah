@@ -10,6 +10,7 @@ export interface RoomItem {
 }
 
 let isRoomsTableChecked = false;
+let isExamRoomsTableChecked = false;
 
 /**
  * Ensures the master rooms table exists in the database.
@@ -56,5 +57,33 @@ export async function ensureRoomsTable(db: any): Promise<void> {
 		} catch (innerErr) {
 			console.warn('ensureRoomsTable fallback error:', innerErr);
 		}
+	}
+}
+
+/**
+ * Ensures exam_rooms table has proper columns across SQLite and PostgreSQL.
+ */
+export async function ensureExamRoomsTable(db: any): Promise<void> {
+	if (isExamRoomsTableChecked || !db) return;
+
+	try {
+		// PostgreSQL DROP NOT NULL on school_id if present
+		try {
+			await db.prepare('ALTER TABLE exam_rooms ALTER COLUMN school_id DROP NOT NULL').run();
+		} catch {}
+
+		// Ensure exam_id exists
+		try {
+			await db.prepare('ALTER TABLE exam_rooms ADD COLUMN IF NOT EXISTS exam_id INTEGER REFERENCES exams(id) ON DELETE CASCADE').run();
+		} catch {}
+
+		// Ensure school_id exists
+		try {
+			await db.prepare('ALTER TABLE exam_rooms ADD COLUMN IF NOT EXISTS school_id INTEGER REFERENCES schools(id) ON DELETE CASCADE').run();
+		} catch {}
+
+		isExamRoomsTableChecked = true;
+	} catch (e) {
+		console.warn('ensureExamRoomsTable error:', e);
 	}
 }
