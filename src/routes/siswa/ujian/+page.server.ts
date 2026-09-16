@@ -5,6 +5,7 @@ import { getDB } from '$lib/server/db';
 import { signExamToken } from '$lib/server/auth';
 import { uploadToCloudinary } from '$lib/server/cloudinary';
 import { env } from '$env/dynamic/private';
+import { saveMonitoringPhoto } from '$lib/server/monitoring';
 
 import { formatExamTitle } from '$lib/utils/exam';
 
@@ -274,6 +275,23 @@ export const actions: Actions = {
 				.bind(locals.user!.id, token.exam_id, token.id, endTime, signatureStr).run();
 
 			const attemptId = result.meta.last_row_id;
+
+			let facePhotoStr = form.get('face_photo')?.toString() || '';
+			if (facePhotoStr && facePhotoStr.startsWith('data:image/')) {
+				try {
+					await saveMonitoringPhoto(db, {
+						schoolId: locals.user!.school_id,
+						examId: token.exam_id,
+						attemptId: Number(attemptId),
+						studentId: locals.user!.id,
+						photoType: 'start',
+						photoUrl: facePhotoStr,
+						caption: 'Foto Absensi Kehadiran'
+					});
+				} catch (photoErr) {
+					console.warn('Failed to save start face photo:', photoErr);
+				}
+			}
 
 			// Background task to upload signature to Cloudinary
 			if (signatureStr.startsWith('data:image/')) {

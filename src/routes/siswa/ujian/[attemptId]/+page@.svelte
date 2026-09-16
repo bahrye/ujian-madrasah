@@ -9,6 +9,7 @@
 	import { toasts } from '$lib/stores/toast';
 	import { onMount, onDestroy, tick } from 'svelte';
 	import { browser } from '$app/environment';
+	import { captureMicroSnapshot } from '$lib/utils/camera';
 
 	export let data;
 
@@ -23,6 +24,12 @@
 	let finishConfirmationInput = '';
 	$: isFinishConfirmed = finishConfirmationInput.trim().toUpperCase() === 'SELESAI';
 	let submitting = false;
+	let finishPhoto = '';
+	$: if (showSubmitConfirm && !finishPhoto) {
+		captureMicroSnapshot({ timeoutMs: 2000 }).then((photo) => {
+			if (photo) finishPhoto = photo;
+		}).catch(() => {});
+	}
 
 	// Anti-cheat v2 state
 	let isExamBlurred = false;
@@ -411,11 +418,12 @@
 
 	let isDisqualifying = false;
 
-	function sendViolationBeacon(type: string) {
+	function sendViolationBeacon(type: string, photo?: string | null) {
 		if (!attempt?.id) return;
 		const payload = JSON.stringify({
 			attempt_id: attempt.id,
-			violation_type: type
+			violation_type: type,
+			photo: photo || undefined
 		});
 
 		let sent = false;
@@ -450,8 +458,13 @@
 		localStorage.setItem(`warnings_${attempt.id}`, warnings.toString());
 		localStorage.setItem(`warningLogs_${attempt.id}`, JSON.stringify(warningLogs));
 		
-		// Kirim instan tanpa terkena throttle / freeze browser
-		sendViolationBeacon(type);
+		// Tangkap bukti foto pelanggaran otomatis hemat daya (<400ms)
+		captureMicroSnapshot({ timeoutMs: 1500 }).then((photo) => {
+			sendViolationBeacon(type, photo);
+		}).catch(() => {
+			sendViolationBeacon(type, null);
+		});
+
 		saveCurrentAnswer(false);
 		isExamBlurred = false;
 
@@ -815,6 +828,9 @@
 		form.set('doubts', JSON.stringify(localDoubts));
 		form.set('warnings', warnings.toString());
 		form.set('warningLogs', JSON.stringify(warningLogs));
+		if (finishPhoto) {
+			form.set('finish_photo', finishPhoto);
+		}
 
 		try {
 			await fetch('?/submit', { 
@@ -1127,6 +1143,9 @@
 					formData.set('doubts', JSON.stringify(localDoubts));
 					formData.set('warnings', warnings.toString());
 					formData.set('warningLogs', JSON.stringify(warningLogs));
+					if (finishPhoto) {
+						formData.set('finish_photo', finishPhoto);
+					}
 					return async ({ result, update }) => {
 						if (result.type !== 'redirect') {
 							submitting = false; 

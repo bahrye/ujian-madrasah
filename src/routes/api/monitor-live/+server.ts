@@ -110,6 +110,27 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 			});
 		}
 
+		// Fetch monitoring photos stats for this exam
+		let photoCountsMap: Record<number, number> = {};
+		let latestPhotosMap: Record<number, string> = {};
+		let totalPhotos = 0;
+		try {
+			const photoStats = await db.prepare(`
+				SELECT student_id, COUNT(*) as c, MAX(photo_url) as latest_photo
+				FROM exam_monitoring_photos
+				WHERE exam_id = ?
+				GROUP BY student_id
+			`).bind(examId).all<any>();
+
+			(photoStats.results || []).forEach((p: any) => {
+				photoCountsMap[p.student_id] = p.c;
+				totalPhotos += p.c;
+				if (p.latest_photo) {
+					latestPhotosMap[p.student_id] = p.latest_photo;
+				}
+			});
+		} catch {}
+
 		let maxUpdated = '';
 		let totalViolations = 0;
 		let totalPaused = 0;
@@ -142,12 +163,14 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 				answeredCount,
 				warnings,
 				warningLogs,
+				photoCount: photoCountsMap[a.student_id] || 0,
+				latestPhoto: latestPhotosMap[a.student_id] || null,
 				is_paused: a.is_paused,
 				paused_at: a.paused_at
 			};
 		});
 
-		const currentVersion = `${maxUpdated}_${attempts.length}_${totalViolations}_${totalPaused}`;
+		const currentVersion = `${maxUpdated}_${attempts.length}_${totalViolations}_${totalPaused}_${totalPhotos}`;
 
 		return json({
 			changed: true,

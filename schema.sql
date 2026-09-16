@@ -317,5 +317,18 @@ CREATE TABLE IF NOT EXISTS rooms (
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_rooms_school ON rooms(school_id);
-
-
+-- 20. Tabel Foto Pengawasan Ujian (Event-Driven Micro-Snapshot)
+CREATE TABLE IF NOT EXISTS exam_monitoring_photos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    school_id INTEGER REFERENCES schools(id) ON DELETE CASCADE,
+    exam_id INTEGER NOT NULL REFERENCES exams(id) ON DELETE CASCADE,
+    attempt_id INTEGER REFERENCES student_attempts(id) ON DELETE CASCADE,
+    student_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    photo_type TEXT NOT NULL CHECK(photo_type IN ('start', 'violation', 'finish', 'inspect')),
+    photo_url TEXT NOT NULL,
+    caption TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_mon_photos_attempt ON exam_monitoring_photos(attempt_id);
+CREATE INDEX IF NOT EXISTS idx_mon_photos_exam_student ON exam_monitoring_photos(exam_id, student_id);
+CREATE INDEX IF NOT EXISTS idx_mon_photos_created ON exam_monitoring_photos(created_at DESC);

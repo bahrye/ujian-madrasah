@@ -4,6 +4,7 @@ import { getDB } from '$lib/server/db';
 import { verifyExamTokenSignature } from '$lib/server/auth';
 
 import { formatExamTitle, matchShortAnswer } from '$lib/utils/exam';
+import { saveMonitoringPhoto } from '$lib/server/monitoring';
 
 export const load: PageServerLoad = async ({ platform, locals, params, cookies }) => {
 	if (!locals.user) throw redirect(302, '/login');
@@ -436,6 +437,24 @@ export const actions: Actions = {
 				const chunkSize = 50;
 				for (let i = 0; i < updateStmts.length; i += chunkSize) {
 					await db.batch(updateStmts.slice(i, i + chunkSize));
+				}
+			}
+
+			// Simpan foto verifikasi selesai ujian jika dikirimkan
+			const finishPhotoStr = form?.get('finish_photo')?.toString();
+			if (finishPhotoStr && finishPhotoStr.startsWith('data:image/')) {
+				try {
+					await saveMonitoringPhoto(db, {
+						schoolId: locals.user.school_id,
+						examId: attempt.exam_id,
+						attemptId: parsedAttemptId,
+						studentId: locals.user.id,
+						photoType: 'finish',
+						photoUrl: finishPhotoStr,
+						caption: 'Foto Pengumpulan Selesai'
+					});
+				} catch (photoErr) {
+					console.warn('Failed to save finish photo:', photoErr);
 				}
 			}
 

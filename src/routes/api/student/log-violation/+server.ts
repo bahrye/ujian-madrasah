@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getDB } from '$lib/server/db';
+import { saveMonitoringPhoto } from '$lib/server/monitoring';
 
 export const POST: RequestHandler = async ({ request, platform, locals }) => {
 	if (!locals.user) {
@@ -11,6 +12,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 
 	let attemptId: number | null = null;
 	let violationType = 'Melakukan pelanggaran ujian';
+	let photoUrl: string | null = null;
 
 	const contentType = request.headers.get('content-type') || '';
 	try {
@@ -18,11 +20,14 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 			const body = (await request.json()) as any;
 			attemptId = parseInt(body.attempt_id, 10);
 			if (body.violation_type) violationType = String(body.violation_type);
+			if (body.photo) photoUrl = String(body.photo);
 		} else if (contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {
 			const formData = await request.formData();
 			attemptId = parseInt(formData.get('attempt_id')?.toString() || '', 10);
 			const typeVal = formData.get('violation_type')?.toString();
 			if (typeVal) violationType = typeVal;
+			const photoVal = formData.get('photo')?.toString();
+			if (photoVal) photoUrl = photoVal;
 		} else {
 			// Fallback text / blob parser (common for navigator.sendBeacon)
 			const text = await request.text();
@@ -30,11 +35,14 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 				const body = JSON.parse(text);
 				attemptId = parseInt(body.attempt_id, 10);
 				if (body.violation_type) violationType = String(body.violation_type);
+				if (body.photo) photoUrl = String(body.photo);
 			} catch {
 				const params = new URLSearchParams(text);
 				attemptId = parseInt(params.get('attempt_id') || '', 10);
 				const typeVal = params.get('violation_type');
 				if (typeVal) violationType = typeVal;
+				const photoVal = params.get('photo');
+				if (photoVal) photoUrl = photoVal;
 			}
 		}
 	} catch (e: any) {
@@ -48,7 +56,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 	try {
 		// Verifikasi attempt milik siswa
 		const attempt = await db.prepare(`
-			SELECT id, status, violation_count, violation_logs 
+			SELECT id, exam_id, status, violation_count, violation_logs 
 			FROM student_attempts 
 			WHERE id = ? AND student_id = ?
 		`).bind(attemptId, locals.user.id).first<any>();
@@ -83,6 +91,23 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 			    updated_at = datetime('now')
 			WHERE id = ? AND student_id = ?
 		`).bind(newViolationCount, updatedLogsStr, attemptId, locals.user.id).run();
+
+		// Save violation snapshot photo if provided
+		if (photoUrl && photoUrl.startsWith('data:image/')) {
+			try {
+				await saveMonitoringPhoto(db, {
+					schoolId: locals.user.school_id,
+					examId: attempt.exam_id,
+					attemptId,
+					studentId: locals.user.id,
+					photoType: 'violation',
+					photoUrl,
+					caption: `Pelanggaran: ${violationType}`
+				});
+			} catch (photoErr) {
+				console.warn('Failed to save violation photo:', photoErr);
+			}
+		}
 
 		return json({
 			success: true,

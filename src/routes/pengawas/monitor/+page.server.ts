@@ -6,6 +6,7 @@ import { env } from '$env/dynamic/private';
 import { formatExamTitle } from '$lib/utils/exam';
 import { parseDate } from '$lib/utils/date';
 import { finalizeExpiredAttempts, finalizeAttempt } from '$lib/server/exam-finalize';
+import { ensureMonitoringPhotosTable } from '$lib/server/monitoring';
 
 export interface ExamFilterOption {
 	id: number;
@@ -194,30 +195,54 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 				GROUP BY sa.attempt_id
 			`).bind(examFilter).all();
 			
-			countsResult.results.forEach((r: any) => {
-				answeredCountsMap[r.attempt_id] = r.c;
+				countsResult.results.forEach((r: any) => {
+					answeredCountsMap[r.attempt_id] = r.c;
+				});
+			}
+
+			// Fetch monitoring photos stats for this exam
+			let photoCountsMap: Record<number, number> = {};
+			let latestPhotosMap: Record<number, string> = {};
+			try {
+				await ensureMonitoringPhotosTable(db);
+				const photoStats = await db.prepare(`
+					SELECT student_id, COUNT(*) as c, MAX(photo_url) as latest_photo
+					FROM exam_monitoring_photos
+					WHERE exam_id = ?
+					GROUP BY student_id
+				`).bind(examFilter).all<any>();
+
+				(photoStats.results || []).forEach((p: any) => {
+					photoCountsMap[p.student_id] = p.c;
+					if (p.latest_photo) {
+						latestPhotosMap[p.student_id] = p.latest_photo;
+					}
+				});
+			} catch (photoErr) {
+				console.warn('Photo stats query warning:', photoErr);
+			}
+
+			const attemptsWithProgress = attempts.map((a) => {
+				let status = a.status || 'belum_mengerjakan';
+				let answeredCount = a.attempt_id ? (answeredCountsMap[a.attempt_id] || 0) : 0;
+				let warnings = a.violation_count || 0;
+				let warningLogs: any[] = [];
+				try { warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : []; } catch(e) {}
+
+				return {
+					...a,
+					id: a.attempt_id || `no_attempt_${a.student_id}`,
+					attempt_id: a.attempt_id,
+					status,
+					answeredCount,
+					warnings,
+					warningLogs,
+					photoCount: photoCountsMap[a.student_id] || 0,
+					latestPhoto: latestPhotosMap[a.student_id] || null,
+					is_paused: a.is_paused,
+					paused_at: a.paused_at
+				};
 			});
-		}
-
-		const attemptsWithProgress = attempts.map((a) => {
-			let status = a.status || 'belum_mengerjakan';
-			let answeredCount = a.attempt_id ? (answeredCountsMap[a.attempt_id] || 0) : 0;
-			let warnings = a.violation_count || 0;
-			let warningLogs: any[] = [];
-			try { warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : []; } catch(e) {}
-
-			return {
-				...a,
-				id: a.attempt_id || `no_attempt_${a.student_id}`,
-				attempt_id: a.attempt_id,
-				status,
-				answeredCount,
-				warnings,
-				warningLogs,
-				is_paused: a.is_paused,
-				paused_at: a.paused_at
-			};
-		});
 
 		return {
 			exams,

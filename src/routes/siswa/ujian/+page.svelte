@@ -2,6 +2,8 @@
 	import { enhance } from '$app/forms';
 	import { ICONS } from '$lib/utils/constants';
 	import { parseProctors } from '$lib/utils/format';
+	import { startCameraPreview, stopCameraStream, snapshotFromVideo } from '$lib/utils/camera';
+	import { onDestroy } from 'svelte';
 
 	export let data;
 	export let form: { error?: string, success?: boolean, tokenCode?: string } | null;
@@ -14,6 +16,47 @@
 	let tokenError = '';
 	let modalError = '';
 
+	// Camera Face Verification Logic
+	let videoElement: HTMLVideoElement;
+	let cameraStream: MediaStream | null = null;
+	let cameraLoading = false;
+	let cameraActive = false;
+	let facePhotoData = '';
+	let cameraError = '';
+
+	async function handleStartCamera() {
+		cameraLoading = true;
+		cameraError = '';
+		cameraStream = await startCameraPreview(videoElement);
+		cameraLoading = false;
+		if (cameraStream) {
+			cameraActive = true;
+		} else {
+			cameraError = 'Kamera tidak dapat diakses atau izin belum diberikan. Anda tetap dapat melanjutkan ujian.';
+		}
+	}
+
+	function handleTakeSnapshot() {
+		if (videoElement && cameraStream) {
+			facePhotoData = snapshotFromVideo(videoElement);
+			stopCameraStream(cameraStream);
+			cameraStream = null;
+			cameraActive = false;
+		}
+	}
+
+	function handleRetakePhoto() {
+		facePhotoData = '';
+		handleStartCamera();
+	}
+
+	onDestroy(() => {
+		if (cameraStream) {
+			stopCameraStream(cameraStream);
+			cameraStream = null;
+		}
+	});
+
 	$: if (form?.error) {
 		if (showModal) {
 			modalError = form.error;
@@ -25,6 +68,11 @@
 	function closeModal() {
 		showModal = false;
 		modalError = '';
+		if (cameraStream) {
+			stopCameraStream(cameraStream);
+			cameraStream = null;
+			cameraActive = false;
+		}
 		if (form) form = null;
 	}
 
@@ -247,6 +295,101 @@
 				</div>
 			{/if}
 
+			<!-- Face Photo Verification Section -->
+			<div class="mb-6 p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+				<div class="flex items-center justify-between mb-2">
+					<div class="flex items-center gap-2">
+						<span class="p-1 rounded-lg bg-indigo-50 text-indigo-600">
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+								<path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+							</svg>
+						</span>
+						<p class="text-sm font-bold text-slate-800">Verifikasi Wajah / Absensi Kamera</p>
+					</div>
+					{#if facePhotoData}
+						<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+							✓ Foto Siap
+						</span>
+					{:else}
+						<span class="text-[11px] font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+							Wajib / Disarankan
+						</span>
+					{/if}
+				</div>
+				<p class="text-xs text-slate-500 mb-3">
+					Ambil 1 foto wajah sebagai bukti kehadiran. Kamera hanya aktif sejenak untuk memotret dan langsung mati otomatis.
+				</p>
+
+				<div class="relative overflow-hidden rounded-xl bg-slate-900 border border-slate-200 flex items-center justify-center min-h-[160px] max-h-[200px]">
+					<video 
+						bind:this={videoElement} 
+						class="w-full h-[180px] object-cover -scale-x-100 {cameraActive ? 'block' : 'hidden'}" 
+						playsinline 
+						muted
+					></video>
+
+					{#if facePhotoData && !cameraActive}
+						<!-- Photo Captured Preview -->
+						<div class="relative w-full h-[180px] bg-slate-100 flex items-center justify-center">
+							<img src={facePhotoData} alt="Foto Absensi Wajah" class="h-full w-full object-contain -scale-x-100" />
+							<div class="absolute bottom-2 right-2 flex gap-2">
+								<button 
+									type="button" 
+									class="px-2.5 py-1 bg-slate-900/80 hover:bg-slate-900 text-white rounded-lg text-xs font-medium backdrop-blur-sm shadow transition-colors flex items-center gap-1" 
+									on:click={handleRetakePhoto}
+								>
+									🔄 Foto Ulang
+								</button>
+							</div>
+						</div>
+					{:else if !cameraActive}
+						<!-- Placeholder Before Camera Started -->
+						<div class="py-6 px-4 text-center">
+							<div class="w-10 h-10 mx-auto rounded-full bg-slate-800 text-slate-300 flex items-center justify-center mb-3">
+								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+									<path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+								</svg>
+							</div>
+							<button 
+								type="button" 
+								class="btn-primary py-2 px-4 text-xs font-semibold shadow-sm justify-center" 
+								on:click={handleStartCamera}
+								disabled={cameraLoading}
+							>
+								{#if cameraLoading}
+									<svg class="w-4 h-4 animate-spin mr-1.5" fill="none" viewBox="0 0 24 24">
+										<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+										<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+									</svg>
+									Membuka Kamera...
+								{:else}
+									📸 Buka Kamera & Ambil Foto
+								{/if}
+							</button>
+						</div>
+					{:else}
+						<!-- Camera Active Viewfinder -->
+						<div class="absolute bottom-2 inset-x-0 flex justify-center z-10">
+							<button 
+								type="button" 
+								class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-xs font-bold shadow-lg transition-transform active:scale-95 flex items-center gap-1.5"
+								on:click={handleTakeSnapshot}
+							>
+								⚪ Ambil Foto Sekarang
+							</button>
+						</div>
+					{/if}
+				</div>
+
+				{#if cameraError}
+					<p class="text-[11px] text-amber-600 mt-2 flex items-center gap-1">
+						<span>ℹ️</span> {cameraError}
+					</p>
+				{/if}
+			</div>
+
 			<!-- Signature Pad -->
 			<div class="mb-6">
 				<p class="text-sm font-bold text-slate-700 mb-2">Tanda Tangan (Wajib)</p>
@@ -290,6 +433,7 @@
 				<input type="hidden" name="exam_id" value={data.exam.id} />
 				<input type="hidden" name="tz_offset" value={new Date().getTimezoneOffset()} />
 				<input type="hidden" name="signature" value={signatureData} />
+				<input type="hidden" name="face_photo" value={facePhotoData} />
 				
 				<div class="flex gap-3">
 					<button type="button" class="btn-ghost flex-1 justify-center" on:click={closeModal} disabled={starting}>Batal</button>
