@@ -8,11 +8,13 @@ import "../../../chunks/state.svelte.js";
 import { T as Toast } from "../../../chunks/Toast2.js";
 import { P as PasswordInput } from "../../../chunks/PasswordInput.js";
 import { o as onDestroy } from "../../../chunks/index-server.js";
-import { Html5Qrcode } from "html5-qrcode";
 import { p as parseQrLoginData } from "../../../chunks/qrLogin.js";
 import { R as ROLE_LABELS } from "../../../chunks/constants.js";
 function QrScannerModal($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
+    async function getHtml5QrcodeClass() {
+      return null;
+    }
     let show = fallback($$props["show"], false);
     let scannerContainerId = "qr-reader-" + Math.random().toString(36).substring(2, 9);
     let html5QrCode = null;
@@ -46,6 +48,7 @@ function QrScannerModal($$renderer, $$props) {
     }
     async function getCameras() {
       try {
+        const Html5Qrcode = await getHtml5QrcodeClass();
         const devices = await Html5Qrcode.getCameras();
         if (devices && devices.length) {
           cameras = devices;
@@ -61,6 +64,7 @@ function QrScannerModal($$renderer, $$props) {
       isStarting = true;
       errorMessage = "";
       try {
+        const Html5Qrcode = await getHtml5QrcodeClass();
         if (!html5QrCode) {
           html5QrCode = new Html5Qrcode(scannerContainerId);
         }

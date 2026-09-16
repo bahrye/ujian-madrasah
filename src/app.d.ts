@@ -8,15 +8,15 @@ declare module 'katex/dist/contrib/auto-render.mjs' {
 declare global {
 	namespace App {
 		interface Platform {
-			env: {
+			env?: {
 				DATABASE_URL?: string;
 				DB?: D1Database;
 				EXAM_ANSWERS?: KVNamespace;
 			};
-			context: {
+			context?: {
 				waitUntil(promise: Promise<unknown>): void;
 			};
-			caches: CacheStorage & { default: Cache };
+			caches?: CacheStorage & { default: Cache };
 		}
 
 		interface Locals {

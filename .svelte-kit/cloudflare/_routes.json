@@ -6,6 +6,7 @@
 	],
 	"exclude": [
 		"/_app/*",
+		"/.assetsignore",
 		"/favicon.svg",
 		"/kemenag.png",
 		"/panduan-ui-ujian-2.jpeg",

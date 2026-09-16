@@ -1,6 +1,7 @@
 # SvelteKit and Vite build directories
 .svelte-kit/
 .wrangler/
+.vercel/
 dist/
 build/
 

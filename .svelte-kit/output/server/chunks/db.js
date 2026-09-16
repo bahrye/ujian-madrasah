@@ -1,4 +1,5 @@
 import { neon } from "@neondatabase/serverless";
+import { b as private_env } from "./shared-server.js";
 const DEFAULT_DATABASE_URL = "postgresql://neondb_owner:npg_cH3eDR5VhETs@ep-soft-wildflower-az092xod-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
 const clientCache = /* @__PURE__ */ new Map();
 function getNeonClient(connectionString) {
@@ -275,7 +276,7 @@ function createNeonD1Adapter(connectionString) {
   return adapter;
 }
 function getDB(platform) {
-  const dbUrl = platform?.env?.DATABASE_URL || (typeof process !== "undefined" ? process.env?.DATABASE_URL : void 0) || DEFAULT_DATABASE_URL;
+  const dbUrl = platform?.env?.DATABASE_URL || private_env?.DATABASE_URL || (typeof process !== "undefined" ? process.env?.DATABASE_URL : void 0) || DEFAULT_DATABASE_URL;
   {
     return createNeonD1Adapter(dbUrl);
   }

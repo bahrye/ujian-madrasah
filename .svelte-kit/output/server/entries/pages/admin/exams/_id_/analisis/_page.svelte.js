@@ -1,6 +1,5 @@
 import { h as head, k as attr, e as escape_html, i as ensure_array_like, j as attr_class, c as stringify, f as bind_props } from "../../../../../../chunks/index.js";
 import { Q as QUESTION_TYPE_LABELS, I as ICONS } from "../../../../../../chunks/constants.js";
-import "katex/dist/contrib/auto-render.mjs";
 import { h as html } from "../../../../../../chunks/html.js";
 function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {

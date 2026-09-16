@@ -75,10 +75,33 @@ Buka `http://localhost:5173`.
 ### 5. Inisialisasi Data Dummy
 Kunjungi `/api/setup` di browser untuk membuat data awal (hanya bisa dijalankan sekali).
 
-### 6. Deploy ke Cloudflare Pages
-```bash
-npm run deploy
-```
+### 6. Multi-Hosting Deployment
+
+Aplikasi ini mendukung **Dual/Multi-Hosting** secara simultan di **Cloudflare Pages** dan **Vercel** (`.vercel.app`) tanpa konflik:
+
+#### A. Deploy ke Cloudflare Pages
+1. Build & deploy langsung via CLI:
+   ```bash
+   npm run deploy
+   ```
+2. Atau jika dihubungkan dengan Git di Cloudflare Pages Dashboard:
+   - **Framework Preset**: SvelteKit
+   - **Build command**: `npm run build`
+   - **Build output directory**: `.svelte-kit/cloudflare`
+   - **Environment Variables**: Masukkan `DATABASE_URL` (Neon PostgreSQL) dan variabel lainnya.
+
+#### B. Deploy ke Vercel (vercel.app)
+1. Hubungkan repository Git ke **Vercel Dashboard** (atau gunakan `vercel` CLI).
+2. Vercel akan otomatis mengenali framework SvelteKit.
+3. **Environment Variables**: Masukkan variabel berikut di menu **Settings -> Environment Variables** di Vercel:
+   - `DATABASE_URL` — String koneksi Neon PostgreSQL Serverless Anda.
+   - `JWT_SECRET` — Kunci enkripsi sesi (opsional).
+   - `PUBLIC_CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` — Kredensial media Cloudinary (opsional).
+4. Klik **Deploy**. SvelteKit secara otomatis mendeteksi runtime Vercel dan menggunakan `@sveltejs/adapter-vercel` dengan region serverless Singapura (`sin1`).
+
+#### Skrip Build Manual (Lokal)
+- Uji build untuk Cloudflare: `npm run build:cf` (atau default `npm run build`)
+- Uji build untuk Vercel: `npm run build:vercel`
 
 ## 🔐 Kredensial Default
 

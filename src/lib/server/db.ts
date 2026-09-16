@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless';
+import { env as privateEnv } from '$env/dynamic/private';
 
 // Default fallback connection string from configuration
 const DEFAULT_DATABASE_URL =
@@ -350,9 +351,10 @@ export function createNeonD1Adapter(connectionString: string): D1Database {
  * Helper untuk mendapatkan D1 Database instance (powered by Neon PostgreSQL)
  */
 export function getDB(platform?: App.Platform): D1Database {
-	// 1. Cek DATABASE_URL dari Cloudflare Platform env atau process.env
+	// 1. Cek DATABASE_URL dari Cloudflare Platform env, SvelteKit dynamic private env, atau process.env
 	const dbUrl =
 		platform?.env?.DATABASE_URL ||
+		privateEnv?.DATABASE_URL ||
 		(typeof process !== 'undefined' ? process.env?.DATABASE_URL : undefined) ||
 		DEFAULT_DATABASE_URL;
 

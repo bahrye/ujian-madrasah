@@ -15,6 +15,7 @@
 	$: attempt = (data?.attempt || {}) as any;
 	$: questions = (data?.questions || []) as any[];
 	$: answerMap = (data?.answerMap || {}) as Record<number, any>;
+	$: officialReloadKey = `allowed_official_reload_${attempt?.id || ''}`;
 
 	let currentIndex = 0;
 	let showNav = false;
@@ -123,7 +124,6 @@
 		}
 
 		// Cek apakah reload ini dipicu resmi dari tombol muat ulang website
-		const officialReloadKey = `allowed_official_reload_${attempt.id}`;
 		if (sessionStorage.getItem(officialReloadKey) === 'true') {
 			isOfficialReload = true;
 			sessionStorage.removeItem(officialReloadKey);

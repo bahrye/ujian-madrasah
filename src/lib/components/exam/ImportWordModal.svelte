@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import * as mammoth from 'mammoth';
-	import JSZip from 'jszip';
 	import { parseWordHtmlToQuestions } from '$lib/utils/wordParser';
 	import { env } from '$env/dynamic/public';
 	import { toasts } from '$lib/stores/toast';
@@ -118,6 +116,13 @@
 		parsedData = [];
 
 		try {
+			const [mammothModule, jszipModule] = await Promise.all([
+				import('mammoth'),
+				import('jszip')
+			]);
+			const mammoth: any = (mammothModule as any).default || mammothModule;
+			const JSZip: any = (jszipModule as any).default || jszipModule;
+
 			const arrayBuffer = await selectedFile.arrayBuffer();
 
 			// --- PREPROCESS DOCX FOR OMML (Math Equations) ---

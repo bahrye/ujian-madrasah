@@ -8,7 +8,6 @@ import "../../../../../chunks/root.js";
 import "../../../../../chunks/state.svelte.js";
 import { C as ConfirmForm } from "../../../../../chunks/ConfirmForm.js";
 import { Q as QUESTION_TYPE_LABELS, A as ATTEMPT_STATUS_COLORS, a as ATTEMPT_STATUS_LABELS, I as ICONS } from "../../../../../chunks/constants.js";
-import "katex/dist/contrib/auto-render.mjs";
 import { t as toasts } from "../../../../../chunks/toast.js";
 import { h as html } from "../../../../../chunks/html.js";
 function _page($$renderer, $$props) {

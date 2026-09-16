@@ -69,6 +69,7 @@ function _page_($$renderer, $$props) {
     attempt = data?.attempt || {};
     questions = data?.questions || [];
     answerMap = data?.answerMap || {};
+    `allowed_official_reload_${attempt?.id || ""}`;
     if (data?.attempt) {
       if (data.attempt.end_time && data.attempt.end_time !== currentEndTime) {
         currentEndTime = data.attempt.end_time;

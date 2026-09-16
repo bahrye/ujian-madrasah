@@ -1,13 +1,13 @@
 export async function deleteFromCloudinary(url: string | null, env: Record<string, string | undefined> | any): Promise<{success: boolean, error?: string}> {
 	if (!url || !url.includes('res.cloudinary.com')) return { success: false, error: 'Bukan URL Cloudinary valid' };
 
-	const cloudName = (env.PUBLIC_CLOUDINARY_CLOUD_NAME || env.CLOUDINARY_CLOUD_NAME || 'dfhtjgwcz').trim();
-	const apiKey = env.CLOUDINARY_API_KEY?.trim();
-	const apiSecret = env.CLOUDINARY_API_SECRET?.trim();
+	const cloudName = (env?.PUBLIC_CLOUDINARY_CLOUD_NAME || env?.CLOUDINARY_CLOUD_NAME || process?.env?.PUBLIC_CLOUDINARY_CLOUD_NAME || process?.env?.CLOUDINARY_CLOUD_NAME || 'dfhtjgwcz').trim();
+	const apiKey = (env?.CLOUDINARY_API_KEY || process?.env?.CLOUDINARY_API_KEY)?.trim();
+	const apiSecret = (env?.CLOUDINARY_API_SECRET || process?.env?.CLOUDINARY_API_SECRET)?.trim();
 
 	if (!apiKey || !apiSecret) {
 		console.warn('Cloudinary API credentials missing. Skipping automatic deletion.');
-		return { success: false, error: 'API Key atau Secret Cloudinary belum diatur di Cloudflare Pages (Environment Variables)' };
+		return { success: false, error: 'API Key atau Secret Cloudinary belum diatur di Environment Variables (Cloudflare Pages / Vercel)' };
 	}
 
 	try {
@@ -64,9 +64,9 @@ export async function deleteFromCloudinary(url: string | null, env: Record<strin
 }
 
 export async function uploadToCloudinary(base64Image: string, env: Record<string, string | undefined> | any): Promise<{success: boolean, url?: string, error?: string}> {
-	const cloudName = (env.PUBLIC_CLOUDINARY_CLOUD_NAME || env.CLOUDINARY_CLOUD_NAME || 'dfhtjgwcz').trim();
-	const apiKey = env.CLOUDINARY_API_KEY?.trim();
-	const apiSecret = env.CLOUDINARY_API_SECRET?.trim();
+	const cloudName = (env?.PUBLIC_CLOUDINARY_CLOUD_NAME || env?.CLOUDINARY_CLOUD_NAME || process?.env?.PUBLIC_CLOUDINARY_CLOUD_NAME || process?.env?.CLOUDINARY_CLOUD_NAME || 'dfhtjgwcz').trim();
+	const apiKey = (env?.CLOUDINARY_API_KEY || process?.env?.CLOUDINARY_API_KEY)?.trim();
+	const apiSecret = (env?.CLOUDINARY_API_SECRET || process?.env?.CLOUDINARY_API_SECRET)?.trim();
 
 	if (!cloudName || !apiKey || !apiSecret) {
 		const missing = [];

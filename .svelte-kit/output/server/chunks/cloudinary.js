@@ -1,11 +1,11 @@
 async function deleteFromCloudinary(url, env) {
   if (!url || !url.includes("res.cloudinary.com")) return { success: false, error: "Bukan URL Cloudinary valid" };
-  const cloudName = (env.PUBLIC_CLOUDINARY_CLOUD_NAME || env.CLOUDINARY_CLOUD_NAME || "dfhtjgwcz").trim();
-  const apiKey = env.CLOUDINARY_API_KEY?.trim();
-  const apiSecret = env.CLOUDINARY_API_SECRET?.trim();
+  const cloudName = (env?.PUBLIC_CLOUDINARY_CLOUD_NAME || env?.CLOUDINARY_CLOUD_NAME || process?.env?.PUBLIC_CLOUDINARY_CLOUD_NAME || process?.env?.CLOUDINARY_CLOUD_NAME || "dfhtjgwcz").trim();
+  const apiKey = (env?.CLOUDINARY_API_KEY || process?.env?.CLOUDINARY_API_KEY)?.trim();
+  const apiSecret = (env?.CLOUDINARY_API_SECRET || process?.env?.CLOUDINARY_API_SECRET)?.trim();
   if (!apiKey || !apiSecret) {
     console.warn("Cloudinary API credentials missing. Skipping automatic deletion.");
-    return { success: false, error: "API Key atau Secret Cloudinary belum diatur di Cloudflare Pages (Environment Variables)" };
+    return { success: false, error: "API Key atau Secret Cloudinary belum diatur di Environment Variables (Cloudflare Pages / Vercel)" };
   }
   try {
     const uploadSplit = url.split("/upload/");
@@ -46,9 +46,9 @@ async function deleteFromCloudinary(url, env) {
   }
 }
 async function uploadToCloudinary(base64Image, env) {
-  const cloudName = (env.PUBLIC_CLOUDINARY_CLOUD_NAME || env.CLOUDINARY_CLOUD_NAME || "dfhtjgwcz").trim();
-  const apiKey = env.CLOUDINARY_API_KEY?.trim();
-  const apiSecret = env.CLOUDINARY_API_SECRET?.trim();
+  const cloudName = (env?.PUBLIC_CLOUDINARY_CLOUD_NAME || env?.CLOUDINARY_CLOUD_NAME || process?.env?.PUBLIC_CLOUDINARY_CLOUD_NAME || process?.env?.CLOUDINARY_CLOUD_NAME || "dfhtjgwcz").trim();
+  const apiKey = (env?.CLOUDINARY_API_KEY || process?.env?.CLOUDINARY_API_KEY)?.trim();
+  const apiSecret = (env?.CLOUDINARY_API_SECRET || process?.env?.CLOUDINARY_API_SECRET)?.trim();
   if (!cloudName || !apiKey || !apiSecret) {
     const missing = [];
     if (!cloudName) missing.push("CLOUD_NAME");

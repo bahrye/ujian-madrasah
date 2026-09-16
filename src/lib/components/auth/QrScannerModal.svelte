@@ -1,7 +1,17 @@
 <script lang="ts">
 	import { onMount, onDestroy, createEventDispatcher } from 'svelte';
-	import { Html5Qrcode } from 'html5-qrcode';
+	import { browser } from '$app/environment';
 	import { parseQrLoginData, type ParsedQrLogin } from '$lib/utils/qrLogin';
+
+	let Html5QrcodeClass: any = null;
+	async function getHtml5QrcodeClass() {
+		if (!browser) return null;
+		if (!Html5QrcodeClass) {
+			const mod = await import('html5-qrcode');
+			Html5QrcodeClass = mod.Html5Qrcode;
+		}
+		return Html5QrcodeClass;
+	}
 
 	export let show = false;
 
@@ -11,7 +21,7 @@
 	}>();
 
 	let scannerContainerId = 'qr-reader-' + Math.random().toString(36).substring(2, 9);
-	let html5QrCode: Html5Qrcode | null = null;
+	let html5QrCode: any = null;
 	let isScanning = false;
 	let cameras: Array<{ id: string; label: string }> = [];
 	let selectedCameraId: string = '';
@@ -52,6 +62,7 @@
 
 	async function getCameras() {
 		try {
+			const Html5Qrcode = await getHtml5QrcodeClass();
 			const devices = await Html5Qrcode.getCameras();
 			if (devices && devices.length) {
 				cameras = devices;
@@ -70,6 +81,7 @@
 		errorMessage = '';
 
 		try {
+			const Html5Qrcode = await getHtml5QrcodeClass();
 			if (!html5QrCode) {
 				html5QrCode = new Html5Qrcode(scannerContainerId);
 			}
@@ -216,8 +228,9 @@
 		tempDiv.style.visibility = 'hidden';
 		document.body.appendChild(tempDiv);
 
-		let tempScanner: Html5Qrcode | null = null;
+		let tempScanner: any = null;
 		try {
+			const Html5Qrcode = await getHtml5QrcodeClass();
 			tempScanner = new Html5Qrcode(tempContainerId);
 			const decodedText = await tempScanner.scanFile(file, false);
 			if (decodedText) {

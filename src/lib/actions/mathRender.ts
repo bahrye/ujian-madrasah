@@ -1,12 +1,16 @@
-import renderMathInElement from 'katex/dist/contrib/auto-render.mjs';
+let renderMathInElementFn: any = null;
 
 export function mathRender(node: HTMLElement, trigger?: any) {
 	let timer: any = null;
 
-	function render() {
+	async function render() {
 		if (typeof window === 'undefined' || !node || !node.isConnected) return;
 		try {
-			renderMathInElement(node, {
+			if (!renderMathInElementFn) {
+				const mod = await import('katex/dist/contrib/auto-render.mjs');
+				renderMathInElementFn = (mod as any).default || mod;
+			}
+			renderMathInElementFn(node, {
 				delimiters: [
 					{ left: '$$', right: '$$', display: true },
 					{ left: '\\[', right: '\\]', display: true },
