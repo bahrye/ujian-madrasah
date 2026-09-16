@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { fade, scale } from 'svelte/transition';
-	import type { SubmitFunction } from '$app/forms';
+	import type { SubmitFunction } from '@sveltejs/kit';
 
 	export let action: string;
 	export let confirmMessage: string;

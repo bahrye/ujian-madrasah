@@ -283,7 +283,8 @@
 
 					// Try Html5Qrcode on downscaled canvas blob
 					const blob = await new Promise<Blob | null>(res => canvas.toBlob(res, 'image/jpeg', 0.92));
-					if (blob) {
+					const QrClass = await getHtml5QrcodeClass();
+					if (blob && QrClass) {
 						const resizedFile = new File([blob], 'resized-qr.jpg', { type: 'image/jpeg' });
 						const fallbackContainerId = 'qr-fallback-file-' + Math.random().toString(36).substring(2, 9);
 						const fallbackDiv = document.createElement('div');
@@ -291,7 +292,7 @@
 						fallbackDiv.style.position = 'fixed';
 						fallbackDiv.style.left = '-9999px';
 						document.body.appendChild(fallbackDiv);
-						const fallbackScanner = new Html5Qrcode(fallbackContainerId);
+						const fallbackScanner = new QrClass(fallbackContainerId);
 						try {
 							const res = await fallbackScanner.scanFile(resizedFile, false);
 							if (res) return res;

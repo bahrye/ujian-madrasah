@@ -200,6 +200,10 @@
 			wakeLock.release();
 			wakeLock = null;
 		}
+		if (singleAnswerDebounceTimer) {
+			clearTimeout(singleAnswerDebounceTimer);
+			singleAnswerDebounceTimer = null;
+		}
 		if (statusPollingInterval) clearInterval(statusPollingInterval);
 		if (typeof document !== 'undefined' && document.fullscreenElement) {
 			document.exitFullscreen().catch(() => {});
@@ -525,10 +529,20 @@
 	$: if (attempt?.id && attempt.id !== initializedAttemptId && Array.isArray(questions) && questions.length > 0) {
 		const newAnswers: Record<number, string> = {};
 		const newDoubts: Record<number, boolean> = {};
+
+		let cachedAnswers: Record<number, string> = {};
+		let cachedDoubts: Record<number, boolean> = {};
+		try {
+			const ca = localStorage.getItem(`local_answers_${attempt.id}`);
+			if (ca) cachedAnswers = JSON.parse(ca);
+			const cd = localStorage.getItem(`local_doubts_${attempt.id}`);
+			if (cd) cachedDoubts = JSON.parse(cd);
+		} catch {}
+
 		for (const q of questions) {
 			const ans = answerMap?.[q.id];
-			newAnswers[q.id] = ans?.answer_given || '';
-			newDoubts[q.id] = ans?.is_doubted === 1;
+			newAnswers[q.id] = ans?.answer_given || cachedAnswers[q.id] || '';
+			newDoubts[q.id] = typeof ans?.is_doubted !== 'undefined' ? (ans.is_doubted === 1) : !!cachedDoubts[q.id];
 		}
 		localAnswers = newAnswers;
 		localDoubts = newDoubts;
@@ -562,6 +576,7 @@
 	$: unansweredCount = (questions?.length || 0) - answeredCount;
 
 	function goToQuestion(index: number) {
+		flushPendingSingleAnswer();
 		// Save current only if there are changes before navigating
 		saveCurrentAnswer();
 		currentIndex = index;
@@ -587,7 +602,10 @@
 		}, 1000);
 	}
 
-	async function saveSingleAnswer(questionId: number, answer: string, doubted: boolean) {
+	let singleAnswerDebounceTimer: any = null;
+	let pendingAnswerSave: { questionId: number; answer: string; doubted: boolean } | null = null;
+
+	async function executeSaveSingleAnswer(questionId: number, answer: string, doubted: boolean) {
 		if (isPausedByProctor || !attempt?.id) return;
 		try {
 			const res = await fetch('/api/student/save-single', {
@@ -630,9 +648,32 @@
 		}
 	}
 
+	async function flushPendingSingleAnswer() {
+		if (singleAnswerDebounceTimer) {
+			clearTimeout(singleAnswerDebounceTimer);
+			singleAnswerDebounceTimer = null;
+		}
+		if (pendingAnswerSave) {
+			const toSave = pendingAnswerSave;
+			pendingAnswerSave = null;
+			await executeSaveSingleAnswer(toSave.questionId, toSave.answer, toSave.doubted);
+		}
+	}
+
+	function saveSingleAnswer(questionId: number, answer: string, doubted: boolean) {
+		pendingAnswerSave = { questionId, answer, doubted };
+		if (singleAnswerDebounceTimer) clearTimeout(singleAnswerDebounceTimer);
+		singleAnswerDebounceTimer = setTimeout(() => {
+			flushPendingSingleAnswer();
+		}, 300);
+	}
+
 	function handleAnswer(e: CustomEvent<{ questionId: number; answer: string }>) {
 		localAnswers[e.detail.questionId] = e.detail.answer;
 		localAnswers = localAnswers; // trigger reactivity
+		try {
+			localStorage.setItem(`local_answers_${attempt.id}`, JSON.stringify(localAnswers));
+		} catch {}
 		const isDoubted = !!localDoubts[e.detail.questionId];
 		saveSingleAnswer(e.detail.questionId, e.detail.answer, isDoubted);
 	}
@@ -640,6 +681,9 @@
 	function handleDoubt(e: CustomEvent<{ questionId: number; doubted: boolean }>) {
 		localDoubts[e.detail.questionId] = e.detail.doubted;
 		localDoubts = localDoubts;
+		try {
+			localStorage.setItem(`local_doubts_${attempt.id}`, JSON.stringify(localDoubts));
+		} catch {}
 		const currentAns = localAnswers[e.detail.questionId] || '';
 		saveSingleAnswer(e.detail.questionId, currentAns, e.detail.doubted);
 	}
@@ -948,13 +992,17 @@
 
 			<div class="flex gap-3 mt-8">
 				<button type="button" class="btn-ghost flex-1" on:click={() => (showSubmitConfirm = false)}>Kembali</button>
-				<form id="submit-form" method="POST" action="?/submit" use:enhance={({ cancel }) => {
+				<form id="submit-form" method="POST" action="?/submit" use:enhance={({ cancel, formData }) => {
 					if (isPausedByProctor) {
 						cancel();
 						return;
 					}
+					flushPendingSingleAnswer();
 					submitting = true;
-					saveCurrentAnswer();
+					formData.set('answers', JSON.stringify(localAnswers));
+					formData.set('doubts', JSON.stringify(localDoubts));
+					formData.set('warnings', warnings.toString());
+					formData.set('warningLogs', JSON.stringify(warningLogs));
 					return async ({ result, update }) => {
 						if (result.type !== 'redirect') {
 							submitting = false; 

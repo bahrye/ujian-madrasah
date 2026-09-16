@@ -51,7 +51,7 @@ export const actions: Actions = {
 		}
 
 		if (password.length < 6) {
-			return fail(400, { error: 'Password minimal 6 karakter', school_id, username, name });
+			return fail(400, { error: 'Password minimal 6 karakter', school_id: schoolIdStr, username, name });
 		}
 
 		// Cek username unik

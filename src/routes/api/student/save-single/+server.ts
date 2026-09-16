@@ -18,7 +18,7 @@ export const POST: RequestHandler = async ({ request, platform, locals, cookies 
 	const contentType = request.headers.get('content-type') || '';
 	try {
 		if (contentType.includes('application/json')) {
-			const body = await request.json();
+			const body = (await request.json()) as any;
 			attemptId = parseInt(body.attempt_id, 10);
 			questionId = parseInt(body.question_id, 10);
 			if (body.answer_given !== undefined && body.answer_given !== null) {

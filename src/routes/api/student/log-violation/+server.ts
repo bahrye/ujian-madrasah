@@ -15,7 +15,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 	const contentType = request.headers.get('content-type') || '';
 	try {
 		if (contentType.includes('application/json')) {
-			const body = await request.json();
+			const body = (await request.json()) as any;
 			attemptId = parseInt(body.attempt_id, 10);
 			if (body.violation_type) violationType = String(body.violation_type);
 		} else if (contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {

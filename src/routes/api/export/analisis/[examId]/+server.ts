@@ -340,9 +340,9 @@ export const GET: RequestHandler = async ({ params, platform, locals }) => {
 	});
 
 	// Baris Ringkasan di Bawah Matriks
-	const totalCorrectRow = ['', '', 'TOTAL SISWA MENJAWAB BENAR', '', ''];
-	const difficultyRow = ['', '', 'TINGKAT KESUKARAN (P)', '', ''];
-	const discriminationRow = ['', '', 'DAYA PEMBEDA (D)', '', ''];
+	const totalCorrectRow: (string | number)[] = ['', '', 'TOTAL SISWA MENJAWAB BENAR', '', ''];
+	const difficultyRow: (string | number)[] = ['', '', 'TINGKAT KESUKARAN (P)', '', ''];
+	const discriminationRow: (string | number)[] = ['', '', 'DAYA PEMBEDA (D)', '', ''];
 
 	questions.forEach((q) => {
 		const qAnal = questionAnalysis.find(item => item.id === q.id);

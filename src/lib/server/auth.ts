@@ -129,8 +129,8 @@ export async function verifyToken(token: string): Promise<UserPayload | null> {
  */
 export async function signExamToken(attemptId: number | string, studentId: number): Promise<string> {
 	const data = new TextEncoder().encode(`exam_attempt_${attemptId}_student_${studentId}`);
-	const key = await crypto.subtle.importKey('raw', getJwtSecret(), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-	const signature = await crypto.subtle.sign('HMAC', key, data);
+	const key = await crypto.subtle.importKey('raw', getJwtSecret() as any, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+	const signature = await crypto.subtle.sign('HMAC', key, data as any);
 	const sigHex = Array.from(new Uint8Array(signature)).map(b => b.toString(16).padStart(2, '0')).join('');
 	return `${attemptId}:${sigHex}`;
 }
@@ -160,8 +160,8 @@ export function generateTokenCode(length: number = 6): string {
  */
 export async function createQrLoginToken(userId: number, username: string, passwordHash: string): Promise<string> {
 	const data = new TextEncoder().encode(`qr_login_user_${userId}_${username}_${passwordHash}`);
-	const key = await crypto.subtle.importKey('raw', getJwtSecret(), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-	const signature = await crypto.subtle.sign('HMAC', key, data);
+	const key = await crypto.subtle.importKey('raw', getJwtSecret() as any, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+	const signature = await crypto.subtle.sign('HMAC', key, data as any);
 	const sigHex = Array.from(new Uint8Array(signature)).map((b) => b.toString(16).padStart(2, '0')).join('');
 	return `QRL_${userId}_${sigHex.slice(0, 32)}`;
 }

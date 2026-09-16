@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount, tick } from 'svelte';
+	import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte';
 	import AudioPlayer from './AudioPlayer.svelte';
 	import ImageZoomModal from './ImageZoomModal.svelte';
 	import { QUESTION_TYPE_LABELS } from '$lib/utils/constants';
@@ -236,6 +236,44 @@
 		}
 	});
 
+	let textDebounceTimer: any = null;
+	let currentTextValue = '';
+	let previousQuestionId: number | null = null;
+
+	$: if (question?.id && previousQuestionId !== null && question.id !== previousQuestionId) {
+		if (textDebounceTimer) {
+			clearTimeout(textDebounceTimer);
+			textDebounceTimer = null;
+			dispatch('answer', { questionId: previousQuestionId, answer: currentTextValue });
+		}
+		previousQuestionId = question.id;
+	} else if (question?.id && previousQuestionId === null) {
+		previousQuestionId = question.id;
+	}
+
+	function handleTextInput(value: string) {
+		currentTextValue = value;
+		if (textDebounceTimer) clearTimeout(textDebounceTimer);
+		textDebounceTimer = setTimeout(() => {
+			dispatch('answer', { questionId: question.id, answer: value });
+		}, 750);
+	}
+
+	function handleTextBlur(value: string) {
+		if (textDebounceTimer) {
+			clearTimeout(textDebounceTimer);
+			textDebounceTimer = null;
+		}
+		dispatch('answer', { questionId: question.id, answer: value });
+	}
+
+	onDestroy(() => {
+		if (textDebounceTimer) {
+			clearTimeout(textDebounceTimer);
+			textDebounceTimer = null;
+		}
+	});
+
 	function handleAnswer(value: string) {
 		dispatch('answer', { questionId: question.id, answer: value });
 	}
@@ -362,7 +400,8 @@
 							? 'border-indigo-500 bg-indigo-50 shadow-md shadow-indigo-500/10'
 							: 'border-slate-200 hover:border-indigo-300 hover:bg-slate-50'}"
 					on:click={(e) => {
-						const target = e.target;
+						const target = e.target as HTMLElement | null;
+						if (!target) return;
 						if (target.tagName === 'AUDIO' || target.closest('audio')) return;
 						if (target.tagName === 'IMG') return; // let the lightbox handle it
 						if (safeType === 'pilihan_ganda_kompleks') {
@@ -485,7 +524,7 @@
 		{:else if safeType === 'isian_singkat'}
 			<!-- Short Answer -->
 			<input
-				type="search"
+				type="text"
 				name="jawaban_siswa_{question.id}_{Date.now()}"
 				id="jawaban_siswa_{question.id}"
 				data-lpignore="true"
@@ -493,8 +532,9 @@
 				class="input text-base appearance-none"
 				placeholder="Ketik jawaban singkat di sini..."
 				value={answer}
-				on:input={(e) => handleAnswer(e.currentTarget.value)}
-				autocomplete="do-not-autofill"
+				on:input={(e) => handleTextInput(e.currentTarget.value)}
+				on:blur={(e) => handleTextBlur(e.currentTarget.value)}
+				autocomplete="off"
 				autocorrect="off"
 				autocapitalize="off"
 				spellcheck="false"
@@ -510,9 +550,10 @@
 				class="input text-base min-h-[200px] resize-y appearance-none"
 				placeholder="Tulis jawaban uraian di sini..."
 				value={answer}
-				on:input={(e) => handleAnswer(e.currentTarget.value)}
+				on:input={(e) => handleTextInput(e.currentTarget.value)}
+				on:blur={(e) => handleTextBlur(e.currentTarget.value)}
 				rows="8"
-				autocomplete="do-not-autofill"
+				autocomplete="off"
 				autocorrect="off"
 				autocapitalize="off"
 				spellcheck="false"
@@ -571,7 +612,7 @@
 							{#each matchingLeft as leftItem, leftIdx}
 								{@const hasMatch = matchingAnswers[String(leftIdx)] !== undefined}
 								{@const matchedRightIdx = hasMatch ? Number(matchingAnswers[String(leftIdx)]) : null}
-								{@const pairColor = hasMatch ? MATCH_COLORS[leftIdx % MATCH_COLORS.length] : null}
+								{@const pairColor = MATCH_COLORS[leftIdx % MATCH_COLORS.length]}
 								{@const isSelected = selectedLeftIdx === leftIdx}
 								
 								<div 
@@ -630,7 +671,7 @@
 								{@const matchedLeftKeys = Object.keys(matchingAnswers).filter(k => matchingAnswers[k] === String(rightIdx))}
 								{@const isMatched = matchedLeftKeys.length > 0}
 								{@const primaryLeftIdx = isMatched ? Number(matchedLeftKeys[0]) : null}
-								{@const pairColor = isMatched && primaryLeftIdx !== null ? MATCH_COLORS[primaryLeftIdx % MATCH_COLORS.length] : null}
+								{@const pairColor = primaryLeftIdx !== null ? MATCH_COLORS[primaryLeftIdx % MATCH_COLORS.length] : MATCH_COLORS[rightIdx % MATCH_COLORS.length]}
 								{@const isSelected = selectedRightIdx === rightIdx}
 								
 								<div 

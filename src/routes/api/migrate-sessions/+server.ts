@@ -3,8 +3,8 @@ import { getDB, dbRun } from '$lib/server/db';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ platform }) => {
+    const db = getDB(platform);
     try {
-        const db = getDB(platform);
         
         await dbRun(db, 'ALTER TABLE users ADD COLUMN session_number INTEGER DEFAULT 1');
         
