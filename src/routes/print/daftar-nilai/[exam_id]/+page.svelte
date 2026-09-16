@@ -386,7 +386,7 @@
 				<tr>
 					<th class="w-10">No</th>
 					<th>Nama peserta</th>
-					<th class="w-24">NIS</th>
+					<th class="w-24">NISN</th>
 					<th class="w-24">Kelas</th>
 					<th class="w-20">Ruang</th>
 					<th class="w-16">Benar</th>
@@ -407,7 +407,7 @@
 						<tr>
 							<td class="text-center font-bold">{s.no}</td>
 							<td class="font-semibold">{s.studentName}</td>
-							<td class="text-center font-mono text-xs">{s.nis}</td>
+							<td class="text-center font-mono text-xs">{s.nisn}</td>
 							<td class="text-center">{s.className}</td>
 							<td class="text-center">{s.roomName}</td>
 							<td class="text-center font-bold">{s.correctCount}</td>

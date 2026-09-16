@@ -116,7 +116,8 @@ export const load: PageServerLoad = async ({ platform, params, locals, url }) =>
 		return {
 			no: idx + 1,
 			studentName: att.student_name,
-			nis: att.nisn || att.nomor_peserta || att.username || '-',
+			nisn: att.nisn || '-',
+			nis: att.nisn || '-',
 			className: att.class_name || '-',
 			roomName: att.room_name || '-',
 			correctCount,
