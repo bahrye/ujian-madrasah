@@ -327,3 +327,19 @@ CREATE OR REPLACE FUNCTION julianday(ts text) RETURNS double precision AS 'SELEC
 CREATE OR REPLACE FUNCTION julianday(ts timestamp) RETURNS double precision AS 'SELECT CASE WHEN ts IS NULL THEN NULL ELSE EXTRACT(EPOCH FROM ts) / 86400.0 + 2440587.5 END' LANGUAGE SQL IMMUTABLE;
 CREATE OR REPLACE FUNCTION julianday(ts timestamptz) RETURNS double precision AS 'SELECT CASE WHEN ts IS NULL THEN NULL ELSE EXTRACT(EPOCH FROM ts) / 86400.0 + 2440587.5 END' LANGUAGE SQL IMMUTABLE;
 
+-- 21. Tabel Log Aktivitas Sistem
+CREATE TABLE IF NOT EXISTS activity_logs (
+    id SERIAL PRIMARY KEY,
+    school_id INTEGER REFERENCES schools(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    user_name TEXT,
+    user_role TEXT,
+    action TEXT NOT NULL,
+    detail TEXT,
+    ip_address TEXT,
+    created_at TEXT NOT NULL DEFAULT (to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS'))
+);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_school ON activity_logs(school_id);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_created ON activity_logs(created_at DESC);
+
+

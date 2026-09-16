@@ -288,3 +288,19 @@ CREATE INDEX IF NOT EXISTS idx_uploaded_media_school_public ON uploaded_media(sc
 -- Additional High Performance Indexes
 CREATE INDEX IF NOT EXISTS idx_questions_exam_number ON questions(exam_id, question_number);
 CREATE INDEX IF NOT EXISTS idx_users_username_active ON users(username, is_active);
+
+-- 18. Tabel Log Aktivitas Sistem
+CREATE TABLE IF NOT EXISTS activity_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    school_id INTEGER REFERENCES schools(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    user_name TEXT,
+    user_role TEXT,
+    action TEXT NOT NULL,
+    detail TEXT,
+    ip_address TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_school ON activity_logs(school_id);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_created ON activity_logs(created_at DESC);
+

@@ -2,6 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { formatExamTitle } from '$lib/utils/exam';
+import { recordActivityLog, getClientIp } from '$lib/server/activity-log';
 
 export interface StudentLoginItem {
 	id: number;
@@ -193,7 +194,7 @@ export const load: PageServerLoad = async ({ platform, locals, url }) => {
 };
 
 export const actions: Actions = {
-	resetLogin: async ({ request, platform, locals }) => {
+	resetLogin: async ({ request, platform, locals, getClientAddress }) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const formData = await request.formData();
@@ -205,9 +206,9 @@ export const actions: Actions = {
 		}
 
 		try {
-			const student = await db.prepare('SELECT name FROM users WHERE id = ? AND role = \'siswa\'')
+			const student = await db.prepare('SELECT name, username FROM users WHERE id = ? AND role = \'siswa\'')
 				.bind(studentId)
-				.first<{ name: string }>();
+				.first<{ name: string; username: string }>();
 
 			if (!student) {
 				return fail(404, { error: 'Data siswa tidak ditemukan.' });
@@ -219,6 +220,17 @@ export const actions: Actions = {
 				WHERE id = ?
 			`).bind(studentId).run();
 
+			const ip = getClientIp(request, getClientAddress);
+			await recordActivityLog(db, {
+				schoolId: locals.user.school_id,
+				userId: locals.user.id,
+				userName: locals.user.name,
+				userRole: locals.user.role,
+				action: 'reset login',
+				detail: `Reset login siswa: ${student.name} (${student.username})`,
+				ipAddress: ip
+			});
+
 			return { success: `Login siswa "${student.name}" berhasil di-reset. Siswa sekarang dapat login kembali.` };
 		} catch (e: any) {
 			console.error('Reset login error:', e);
@@ -226,7 +238,7 @@ export const actions: Actions = {
 		}
 	},
 
-	resetAllActive: async ({ request, platform, locals }) => {
+	resetAllActive: async ({ request, platform, locals, getClientAddress }) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 
@@ -245,6 +257,17 @@ export const actions: Actions = {
 			}
 
 			const result = await db.prepare(query).bind(...params).run();
+
+			const ip = getClientIp(request, getClientAddress);
+			await recordActivityLog(db, {
+				schoolId: locals.user.school_id,
+				userId: locals.user.id,
+				userName: locals.user.name,
+				userRole: locals.user.role,
+				action: 'reset login',
+				detail: `Reset seluruh login siswa aktif (${result.meta.changes || 0} siswa)`,
+				ipAddress: ip
+			});
 
 			return { success: `Berhasil me-reset seluruh login siswa yang sedang aktif (${result.meta.changes || 0} siswa).` };
 		} catch (e: any) {

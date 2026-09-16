@@ -2,6 +2,8 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { verifyPassword, verifyQrLoginToken, createToken, COOKIE_NAME } from '$lib/server/auth';
+import { recordActivityLog, getClientIp } from '$lib/server/activity-log';
+import { ROLE_LABELS } from '$lib/utils/constants';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user) {
@@ -11,7 +13,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, platform, cookies }) => {
+	default: async ({ request, platform, cookies, getClientAddress }) => {
 		const formData = await request.formData();
 		const qrUsername = formData.get('qr_username')?.toString().trim();
 		const qrPassword = formData.get('qr_password')?.toString();
@@ -125,6 +127,18 @@ export const actions: Actions = {
 				secure: true,
 				sameSite: 'lax',
 				maxAge: 60 * 60 * 8 // 8 jam
+			});
+
+			const ip = getClientIp(request, getClientAddress);
+			const roleLabel = ROLE_LABELS[user.role] || user.role;
+			await recordActivityLog(db, {
+				schoolId: user.school_id,
+				userId: user.id,
+				userName: user.name,
+				userRole: user.role,
+				action: 'login',
+				detail: `Masuk aplikasi sebagai ${roleLabel}`,
+				ipAddress: ip
 			});
 
 			const redirectRoute = user.role === 'panitia' ? '/admin' : `/${user.role}`;

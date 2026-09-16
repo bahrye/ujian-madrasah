@@ -4,6 +4,7 @@ import { getDB } from '$lib/server/db';
 import { generateTokenCode } from '$lib/server/auth';
 import { checkSessionTimeWindow } from '$lib/utils/date';
 import { formatExamTitle } from '$lib/utils/exam';
+import { recordActivityLog, getClientIp } from '$lib/server/activity-log';
 
 export interface ExamSessionItem {
 	session_number: number;
@@ -122,7 +123,7 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 };
 
 export const actions: Actions = {
-	generate: async ({ request, platform, locals }) => {
+	generate: async ({ request, platform, locals, getClientAddress }) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 
@@ -135,7 +136,7 @@ export const actions: Actions = {
 		if (isNaN(parsedExamId)) return fail(400, { error: 'Pilih ujian terlebih dahulu.' });
 		if (isNaN(parsedSessionNumber) || parsedSessionNumber < 1) return fail(400, { error: 'Pilih sesi ujian terlebih dahulu.' });
 
-		const exam = await db.prepare('SELECT id, start_time, end_time FROM exams WHERE id = ? AND school_id = ?').bind(parsedExamId, locals.user.school_id).first() as any;
+		const exam = await db.prepare('SELECT id, title, start_time, end_time FROM exams WHERE id = ? AND school_id = ?').bind(parsedExamId, locals.user.school_id).first() as any;
 		if (!exam) return fail(400, { error: 'Ujian tidak ditemukan.' });
 
 		// Ambil waktu sesi dari exam_sessions jika ada
@@ -171,7 +172,7 @@ export const actions: Actions = {
 			return fail(400, { error: `Gagal: Masih ada token aktif untuk Sesi ${parsedSessionNumber} ujian ini (${activeToken.token_code}). Harap hapus token tersebut dahulu jika ingin membuat yang baru.` });
 		}
 
-		const tokenCode = generateTokenCode(6);
+		const tokenCode = generateTokenCode();
 		const expiresAt = new Date(Date.now() + durationHours * 60 * 60 * 1000).toISOString();
 
 		try {
@@ -185,6 +186,17 @@ export const actions: Actions = {
 			await db.prepare('INSERT INTO tokens (school_id, exam_id, session_number, token_code, is_released, released_at, created_by, expires_at) VALUES (?, ?, ?, ?, 1, datetime(\'now\'), ?, ?)')
 				.bind(locals.user.school_id, parsedExamId, parsedSessionNumber, tokenCode, locals.user.id, expiresAt).run();
 
+			const ip = getClientIp(request, getClientAddress);
+			await recordActivityLog(db, {
+				schoolId: locals.user.school_id,
+				userId: locals.user.id,
+				userName: locals.user.name,
+				userRole: locals.user.role,
+				action: 'generate token',
+				detail: `Membuat token Sesi ${parsedSessionNumber}: ${tokenCode} (${exam.title || 'Ujian'})`,
+				ipAddress: ip
+			});
+
 			return { success: `Token Sesi ${parsedSessionNumber} berhasil dibuat: ${tokenCode}` };
 		} catch (e: any) {
 			console.error(e);
@@ -192,7 +204,7 @@ export const actions: Actions = {
 		}
 	},
 
-	release: async ({ request, platform, locals }) => {
+	release: async ({ request, platform, locals, getClientAddress }) => {
 		if (!locals.user) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const form = await request.formData();
@@ -202,6 +214,18 @@ export const actions: Actions = {
 
 		try {
 			await db.prepare('UPDATE tokens SET is_released = 1, released_at = datetime("now") WHERE id = ? AND school_id = ?').bind(parsedId, locals.user.school_id).run();
+
+			const ip = getClientIp(request, getClientAddress);
+			await recordActivityLog(db, {
+				schoolId: locals.user.school_id,
+				userId: locals.user.id,
+				userName: locals.user.name,
+				userRole: locals.user.role,
+				action: 'rilis token',
+				detail: `Merilis token ujian (ID: ${parsedId}) ke siswa`,
+				ipAddress: ip
+			});
+
 			return { success: 'Token berhasil dirilis ke siswa. Token akan ditarik otomatis dalam 15 menit.' };
 		} catch (e: any) {
 			console.error(e);
