@@ -58,6 +58,7 @@
 					{ role: 'admin', label: 'Administrator', color: 'bg-rose-500', bg: 'bg-rose-100' },
 					{ role: 'guru', label: 'Guru', color: 'bg-indigo-500', bg: 'bg-indigo-100' },
 					{ role: 'pengawas', label: 'Pengawas', color: 'bg-amber-500', bg: 'bg-amber-100' },
+					{ role: 'panitia', label: 'Panitia', color: 'bg-emerald-500', bg: 'bg-emerald-100' },
 					{ role: 'siswa', label: 'Siswa', color: 'bg-cyan-500', bg: 'bg-cyan-100' }
 				] as item}
 					<div class="flex items-center gap-3">
