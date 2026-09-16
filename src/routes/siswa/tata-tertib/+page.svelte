@@ -64,7 +64,7 @@
 				{ 
 					no: 12, 
 					title: 'Konfirmasi Pengumpulan Jawaban', 
-					desc: 'Kotak dialog ini merangkum total soal yang sudah terjawab, ragu-ragu, dan belum dijawab. Klik "Ya, Kumpulkan" untuk menyelesaikan ujian, atau klik "Kembali" jika masih ingin memeriksa jawaban.' 
+					desc: 'Kotak dialog ini merangkum total soal yang sudah terjawab, ragu-ragu, dan belum dijawab. Anda harus mengetikkan kata "SELESAI" untuk mengonfirmasi dan mengaktifkan tombol "Ya, Kumpulkan", atau klik "Kembali" jika masih ingin memeriksa jawaban.' 
 				}
 			]
 		}

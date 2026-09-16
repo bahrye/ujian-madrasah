@@ -20,6 +20,8 @@
 	let currentIndex = 0;
 	let showNav = false;
 	let showSubmitConfirm = false;
+	let finishConfirmationInput = '';
+	$: isFinishConfirmed = finishConfirmationInput.trim().toUpperCase() === 'SELESAI';
 	let submitting = false;
 
 	// Anti-cheat v2 state
@@ -998,7 +1000,7 @@
 				{:else}
 					<button
 						class="btn-success flex-1 justify-center"
-						on:click={() => { saveCurrentAnswer(); showSubmitConfirm = true; }}
+						on:click={() => { saveCurrentAnswer(); finishConfirmationInput = ''; showSubmitConfirm = true; }}
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.check} />
@@ -1015,7 +1017,7 @@
 {#if showSubmitConfirm}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => (showSubmitConfirm = false)}>
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" on:click={() => { showSubmitConfirm = false; finishConfirmationInput = ''; }}>
 		<div class="max-h-[90vh] overflow-y-auto card p-6 w-full max-w-sm animate-bounce-in text-center" on:click|stopPropagation>
 			<div class="w-16 h-16 mx-auto rounded-full bg-emerald-100 flex items-center justify-center mb-4">
 				<svg class="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -1034,10 +1036,57 @@
 				<p class="text-sm text-amber-600 mb-4 font-medium">⚠ Masih ada {unansweredCount} soal yang belum dijawab!</p>
 			{/if}
 
-			<div class="flex gap-3 mt-8">
-				<button type="button" class="btn-ghost flex-1" on:click={() => (showSubmitConfirm = false)}>Kembali</button>
+			<!-- Konfirmasi Kata SELESAI -->
+			<div class="bg-amber-50/70 border border-amber-200/80 rounded-xl p-3.5 mb-5 text-left">
+				<div class="flex items-start gap-2 mb-2">
+					<svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+					</svg>
+					<p class="text-xs text-slate-700 leading-relaxed">
+						Untuk mengonfirmasi pengumpulan ujian, ketik kata <span class="font-bold text-slate-900 bg-amber-100/90 px-1.5 py-0.5 rounded border border-amber-300 font-mono">SELESAI</span> pada kolom di bawah:
+					</p>
+				</div>
+				<div class="relative mt-2">
+					<!-- svelte-ignore a11y_autofocus -->
+					<input
+						id="finish-confirm-input"
+						type="text"
+						bind:value={finishConfirmationInput}
+						placeholder='Ketik kata "SELESAI"'
+						autocomplete="off"
+						spellcheck="false"
+						autofocus
+						on:keydown={(e) => {
+							if (e.key === 'Enter' && isFinishConfirmed && !submitting && !isPausedByProctor) {
+								e.preventDefault();
+								const form = document.getElementById('submit-form') as HTMLFormElement;
+								form?.requestSubmit();
+							}
+						}}
+						class="input w-full text-center font-bold tracking-widest text-sm py-2.5 transition-all bg-white uppercase {isFinishConfirmed ? 'border-emerald-500 ring-2 ring-emerald-500/20 text-emerald-700' : 'border-slate-300 focus:border-indigo-500'}"
+					/>
+					{#if isFinishConfirmed}
+						<div class="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600 animate-in zoom-in">
+							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+						</div>
+					{/if}
+				</div>
+				{#if !isFinishConfirmed && finishConfirmationInput.trim().length > 0}
+					<p class="text-[11px] text-rose-600 mt-1.5 font-medium flex items-center gap-1">
+						<svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+						</svg>
+						Tuliskan kata "SELESAI" untuk mengaktifkan tombol.
+					</p>
+				{/if}
+			</div>
+
+			<div class="flex gap-3">
+				<button type="button" class="btn-ghost flex-1" on:click={() => { showSubmitConfirm = false; finishConfirmationInput = ''; }}>Kembali</button>
 				<form id="submit-form" method="POST" action="?/submit" use:enhance={({ cancel, formData }) => {
-					if (isPausedByProctor) {
+					if (!isFinishConfirmed || isPausedByProctor) {
 						cancel();
 						return;
 					}
@@ -1054,7 +1103,7 @@
 						await update();
 					};
 				}} class="flex-1">
-					<button type="submit" disabled={submitting || isPausedByProctor} class="btn-success w-full justify-center">
+					<button type="submit" disabled={submitting || isPausedByProctor || !isFinishConfirmed} class="btn-success w-full justify-center disabled:opacity-40 disabled:cursor-not-allowed">
 						{#if submitting}
 							Mengirim...
 						{:else}
