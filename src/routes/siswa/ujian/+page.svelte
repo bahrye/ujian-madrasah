@@ -11,6 +11,22 @@
 	let showModal = false;
 	let tokenCode = '';
 	let agreed = false;
+	let tokenError = '';
+	let modalError = '';
+
+	$: if (form?.error) {
+		if (showModal) {
+			modalError = form.error;
+		} else {
+			tokenError = form.error;
+		}
+	}
+
+	function closeModal() {
+		showModal = false;
+		modalError = '';
+		if (form) form = null;
+	}
 
 	// Signature Pad Logic
 	let canvas: HTMLCanvasElement;
@@ -100,12 +116,12 @@
 		</div>
 		<p class="text-sm text-slate-500 mb-6">Dapatkan token dari pengawas ujian Anda untuk memulai</p>
 
-		{#if form?.error}
-			<div class="mb-6 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-medium text-left flex items-center gap-2">
+		{#if tokenError}
+			<div class="mb-6 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-medium text-left flex items-center gap-2 animate-in fade-in">
 				<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.warning} />
 				</svg>
-				{form.error}
+				{tokenError}
 			</div>
 		{/if}
 
@@ -114,12 +130,20 @@
 			action="?/validateToken"
 			use:enhance={() => {
 				loading = true;
+				tokenError = '';
+				modalError = '';
 				return async ({ result, update }) => { 
 					loading = false;
 					if (result.type === 'success' && result.data?.success) {
 						tokenCode = String(result.data.tokenCode);
+						form = null;
+						tokenError = '';
+						modalError = '';
 						showModal = true;
 					} else {
+						if (result.type === 'failure') {
+							tokenError = String((result.data as any)?.error || 'Token tidak valid.');
+						}
 						await update();
 					}
 				};
@@ -134,6 +158,7 @@
 				placeholder="_ _ _ _ _ _"
 				maxlength="10"
 				autocomplete="off"
+				on:input={() => { tokenError = ''; if (form) form = null; }}
 			/>
 			<input type="hidden" name="exam_id" value={data.exam.id} />
 			<input type="hidden" name="tz_offset" value={new Date().getTimezoneOffset()} />
@@ -159,7 +184,7 @@
 {#if showModal}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" on:click={() => (showModal = false)}>
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" on:click={closeModal}>
 		<div class="max-h-[90vh] overflow-y-auto card p-6 w-full max-w-lg animate-in fade-in zoom-in duration-200" on:click|stopPropagation>
 			<div class="w-14 h-14 mx-auto rounded-full bg-indigo-100 flex items-center justify-center mb-4">
 				<svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -213,12 +238,12 @@
 				</span>
 			</label>
 
-			{#if form?.error}
+			{#if modalError}
 				<div class="mb-6 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-medium text-left flex items-center gap-2 animate-in fade-in">
 					<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.warning} />
 					</svg>
-					{form.error}
+					{modalError}
 				</div>
 			{/if}
 
@@ -252,8 +277,12 @@
 
 			<form method="POST" action="?/startExam" use:enhance={() => { 
 				starting = true; 
-				return async ({ update }) => { 
+				modalError = '';
+				return async ({ result, update }) => { 
 					starting = false; 
+					if (result.type === 'failure') {
+						modalError = String((result.data as any)?.error || 'Gagal memulai ujian.');
+					}
 					await update(); 
 				}; 
 			}}>
@@ -263,7 +292,7 @@
 				<input type="hidden" name="signature" value={signatureData} />
 				
 				<div class="flex gap-3">
-					<button type="button" class="btn-ghost flex-1 justify-center" on:click={() => (showModal = false)} disabled={starting}>Batal</button>
+					<button type="button" class="btn-ghost flex-1 justify-center" on:click={closeModal} disabled={starting}>Batal</button>
 					<button type="submit" class="btn-primary flex-1 justify-center" disabled={!agreed || starting || signatureEmpty}>
 						{#if starting}
 							Memulai...
