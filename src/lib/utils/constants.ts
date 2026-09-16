@@ -91,6 +91,7 @@ export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
 			]
 		},
 		{ label: 'Hasil Ujian', href: '/admin/results', icon: 'results' },
+		{ label: 'Laporan & Analisis', href: '/admin/laporan-analisis', icon: 'analytics' },
 		{ label: 'Papan Peringkat', href: '/admin/papan-peringkat', icon: 'results' }
 	],
 	guru: [
@@ -100,6 +101,7 @@ export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
 		{ label: 'Bank Media', href: '/guru/media-bank', icon: 'folder' },
 		{ label: 'Penilaian', href: '/guru/penilaian', icon: 'grading' },
 		{ label: 'Hasil Ujian', href: '/guru/results', icon: 'results' },
+		{ label: 'Laporan & Analisis', href: '/guru/laporan-analisis', icon: 'analytics' },
 		{ label: 'Papan Peringkat', href: '/guru/papan-peringkat', icon: 'results' }
 	],
 	pengawas: [
@@ -137,6 +139,8 @@ export const ICONS: Record<string, string> = {
 	exam: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01',
 	results:
 		'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
+	analytics:
+		'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z',
 	questions:
 		'M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
 	grading:
