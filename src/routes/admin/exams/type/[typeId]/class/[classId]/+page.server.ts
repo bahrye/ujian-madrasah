@@ -111,14 +111,30 @@ export const actions: Actions = {
 		const showScoreType = form.get('show_score_type')?.toString() || 'after_submit';
 		const isActive = form.get('is_active')?.toString() === '1' ? 1 : 0;
 
-		if (startTime && examType.start_time) {
-			if (new Date(startTime) < new Date(examType.start_time)) {
-				return fail(400, { error: 'Waktu mulai tidak boleh mendahului rentang waktu Tipe Ujian.' });
+		const typeStartDate = examType.start_time ? new Date(`${examType.start_time.slice(0, 10)}T00:00:00`) : null;
+		const typeEndDate = examType.end_time ? new Date(`${examType.end_time.slice(0, 10)}T23:59:59.999`) : null;
+
+		if (startTime && typeStartDate) {
+			if (new Date(startTime) < typeStartDate) {
+				return fail(400, { error: 'Waktu mulai tidak boleh mendahului tanggal mulai Tipe Ujian.' });
 			}
 		}
-		if (endTime && examType.end_time) {
-			if (new Date(endTime) > new Date(examType.end_time)) {
-				return fail(400, { error: 'Waktu selesai tidak boleh melebihi rentang waktu Tipe Ujian.' });
+		if (endTime && typeEndDate) {
+			if (new Date(endTime) > typeEndDate) {
+				return fail(400, { error: 'Waktu selesai tidak boleh melebihi tanggal selesai Tipe Ujian.' });
+			}
+		}
+
+		if (form.get('use_sessions')) {
+			for (let i = 1; i <= 4; i++) {
+				const sStart = form.get(`session_${i}_start`)?.toString() || null;
+				const sEnd = form.get(`session_${i}_end`)?.toString() || null;
+				if (sStart && typeStartDate && new Date(sStart) < typeStartDate) {
+					return fail(400, { error: `Waktu mulai Sesi ${i} tidak boleh mendahului tanggal mulai Tipe Ujian.` });
+				}
+				if (sEnd && typeEndDate && new Date(sEnd) > typeEndDate) {
+					return fail(400, { error: `Waktu selesai Sesi ${i} tidak boleh melebihi tanggal selesai Tipe Ujian.` });
+				}
 			}
 		}
 
@@ -206,14 +222,30 @@ export const actions: Actions = {
 		const shuffleQuestions = parseInt(form.get('shuffle_questions')?.toString() || '0');
 		const showScoreType = form.get('show_score_type')?.toString() || 'after_submit';
 
-		if (startTime && examType.start_time) {
-			if (new Date(startTime) < new Date(examType.start_time)) {
-				return fail(400, { error: 'Waktu mulai tidak boleh mendahului rentang waktu Tipe Ujian.' });
+		const typeStartDate = examType.start_time ? new Date(`${examType.start_time.slice(0, 10)}T00:00:00`) : null;
+		const typeEndDate = examType.end_time ? new Date(`${examType.end_time.slice(0, 10)}T23:59:59.999`) : null;
+
+		if (startTime && typeStartDate) {
+			if (new Date(startTime) < typeStartDate) {
+				return fail(400, { error: 'Waktu mulai tidak boleh mendahului tanggal mulai Tipe Ujian.' });
 			}
 		}
-		if (endTime && examType.end_time) {
-			if (new Date(endTime) > new Date(examType.end_time)) {
-				return fail(400, { error: 'Waktu selesai tidak boleh melebihi rentang waktu Tipe Ujian.' });
+		if (endTime && typeEndDate) {
+			if (new Date(endTime) > typeEndDate) {
+				return fail(400, { error: 'Waktu selesai tidak boleh melebihi tanggal selesai Tipe Ujian.' });
+			}
+		}
+
+		if (form.get('use_sessions')) {
+			for (let i = 1; i <= 4; i++) {
+				const sStart = form.get(`session_${i}_start`)?.toString() || null;
+				const sEnd = form.get(`session_${i}_end`)?.toString() || null;
+				if (sStart && typeStartDate && new Date(sStart) < typeStartDate) {
+					return fail(400, { error: `Waktu mulai Sesi ${i} tidak boleh mendahului tanggal mulai Tipe Ujian.` });
+				}
+				if (sEnd && typeEndDate && new Date(sEnd) > typeEndDate) {
+					return fail(400, { error: `Waktu selesai Sesi ${i} tidak boleh melebihi tanggal selesai Tipe Ujian.` });
+				}
 			}
 		}
 

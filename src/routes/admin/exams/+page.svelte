@@ -150,10 +150,12 @@
 							<path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
 						</svg>
 						<div class="flex flex-col gap-0.5 min-w-0">
-							<span class="text-slate-400 font-medium">Mulai:</span>
-							<span class="truncate font-medium">{type.start_time ? parseDate(type.start_time).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : 'Belum diatur'}</span>
-							<span class="text-slate-400 font-medium mt-1">Berakhir:</span>
-							<span class="truncate font-medium">{type.end_time ? parseDate(type.end_time).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : 'Belum diatur'}</span>
+							<span class="text-slate-400 font-medium">Rentang Pelaksanaan:</span>
+							<span class="truncate font-medium text-slate-700">
+								{type.start_time && type.end_time 
+									? `${parseDate(type.start_time).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })} s.d. ${parseDate(type.end_time).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}`
+									: type.start_time ? parseDate(type.start_time).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Belum diatur'}
+							</span>
 						</div>
 					</div>
 					<div class="flex items-center gap-3 mt-1">
@@ -381,15 +383,15 @@
 				<div class="grid grid-cols-2 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
 					<div class="col-span-full">
 						<p class="text-sm font-semibold text-slate-700">Rentang Waktu Pelaksanaan</p>
-						<p class="text-xs text-slate-500 mb-2">Semua ujian di dalam tipe ini tidak boleh berada di luar rentang waktu berikut.</p>
+						<p class="text-xs text-slate-500 mb-2">Pilih tanggal mulai dan selesai pelaksanaan. Jadwal ujian di dalamnya bebas diatur pada jam berapa saja selama tidak melebihi tanggal selesai.</p>
 					</div>
 					<div>
-						<label class="label" for="c-start">Waktu Mulai</label>
-						<input id="c-start" name="start_time" type="datetime-local" class="input" required />
+						<label class="label" for="c-start">Tanggal Mulai</label>
+						<input id="c-start" name="start_time" type="date" class="input bg-white" required />
 					</div>
 					<div>
-						<label class="label" for="c-end">Waktu Selesai</label>
-						<input id="c-end" name="end_time" type="datetime-local" class="input" required />
+						<label class="label" for="c-end">Tanggal Selesai</label>
+						<input id="c-end" name="end_time" type="date" class="input bg-white" required />
 					</div>
 				</div>
 
@@ -430,14 +432,15 @@
 				<div class="grid grid-cols-2 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
 					<div class="col-span-full">
 						<p class="text-sm font-semibold text-slate-700">Rentang Waktu Pelaksanaan</p>
+						<p class="text-xs text-slate-500 mb-2">Pilih tanggal mulai dan selesai pelaksanaan. Jadwal ujian di dalamnya bebas diatur pada jam berapa saja selama tidak melebihi tanggal selesai.</p>
 					</div>
 					<div>
-						<label class="label" for="e-start">Waktu Mulai</label>
-						<input id="e-start" name="start_time" type="datetime-local" class="input" required value={editingType.start_time?.slice(0, 16) || ''} />
+						<label class="label" for="e-start">Tanggal Mulai</label>
+						<input id="e-start" name="start_time" type="date" class="input bg-white" required value={editingType.start_time?.slice(0, 10) || ''} />
 					</div>
 					<div>
-						<label class="label" for="e-end">Waktu Selesai</label>
-						<input id="e-end" name="end_time" type="datetime-local" class="input" required value={editingType.end_time?.slice(0, 16) || ''} />
+						<label class="label" for="e-end">Tanggal Selesai</label>
+						<input id="e-end" name="end_time" type="date" class="input bg-white" required value={editingType.end_time?.slice(0, 10) || ''} />
 					</div>
 				</div>
 

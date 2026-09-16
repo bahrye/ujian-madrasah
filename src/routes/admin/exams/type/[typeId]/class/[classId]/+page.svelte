@@ -30,6 +30,9 @@
 	let useSessionsEdit = false;
 	let searchQuery = '';
 
+	$: typeMinDateTime = data.examType.start_time ? `${data.examType.start_time.slice(0, 10)}T00:00` : '';
+	$: typeMaxDateTime = data.examType.end_time ? `${data.examType.end_time.slice(0, 10)}T23:59` : '';
+
 	$: filteredExams = data.exams.filter((exam: any) => {
 		if (!searchQuery.trim()) return true;
 		const q = searchQuery.toLowerCase().trim();
@@ -60,7 +63,18 @@
 					<span class="text-xs font-mono font-bold tracking-wider text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded">{data.examType.code}</span>
 					<h1 class="text-2xl font-bold text-slate-800">{data.examType.name} - {data.classData.name}</h1>
 				</div>
-				<p class="text-sm text-slate-500 mt-1">Kelola ujian khusus untuk kelas ini</p>
+				<div class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mt-1">
+					<span>Kelola ujian khusus untuk kelas ini</span>
+					{#if data.examType.start_time && data.examType.end_time}
+						<span class="text-slate-300">•</span>
+						<span class="inline-flex items-center gap-1 text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
+							<svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+							</svg>
+							{parseDate(data.examType.start_time).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })} s.d. {parseDate(data.examType.end_time).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+						</span>
+					{/if}
+				</div>
 			</div>
 		</div>
 		<div class="w-full md:w-auto flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
@@ -103,7 +117,7 @@
 	<!-- Exam Cards -->
 	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 		{#each filteredExams as exam (exam.id)}
-			{@const isOutOfBounds = (exam.start_time && exam.start_time < data.examType.start_time) || (exam.end_time && exam.end_time > data.examType.end_time)}
+			{@const isOutOfBounds = (exam.start_time && typeMinDateTime && exam.start_time.slice(0, 16) < typeMinDateTime) || (exam.end_time && typeMaxDateTime && exam.end_time.slice(0, 16) > typeMaxDateTime)}
 			<div class="card-hover p-5 flex flex-col">
 				<div class="flex items-start justify-between mb-3">
 					<div class="flex-1 min-w-0">
@@ -294,16 +308,19 @@
 					{/if}
 					<div>
 						<label class="label" for="c-start">Waktu Mulai</label>
-						<input id="c-start" name="start_time" type="datetime-local" class="input" disabled={useSessionsCreate} value={data.examType.start_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
+						<input id="c-start" name="start_time" type="datetime-local" class="input" disabled={useSessionsCreate} value={data.examType.start_time ? `${data.examType.start_time.slice(0, 10)}T07:30` : ''} min={typeMinDateTime} max={typeMaxDateTime} />
 					</div>
 					<div>
 						<label class="label" for="c-end">Waktu Selesai</label>
-						<input id="c-end" name="end_time" type="datetime-local" class="input" disabled={useSessionsCreate} value={data.examType.end_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
+						<input id="c-end" name="end_time" type="datetime-local" class="input" disabled={useSessionsCreate} value={data.examType.start_time ? `${data.examType.start_time.slice(0, 10)}T09:30` : (data.examType.end_time ? `${data.examType.end_time.slice(0, 10)}T23:59` : '')} min={typeMinDateTime} max={typeMaxDateTime} />
 					</div>
 					<div class="col-span-2 text-xs text-slate-500 mt-1 mb-2">
-						Pastikan waktu berada di dalam rentang: <br/> 
-						{data.examType.start_time ? parseDate(data.examType.start_time).toLocaleString('id-ID') : '-'} s.d. 
-						{data.examType.end_time ? parseDate(data.examType.end_time).toLocaleString('id-ID') : '-'}
+						Rentang tanggal pelaksanaan tipe ujian: <br/> 
+						<strong class="text-slate-700 font-semibold">
+							{data.examType.start_time ? parseDate(data.examType.start_time).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'} s.d. 
+							{data.examType.end_time ? parseDate(data.examType.end_time).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}
+						</strong>
+						<span class="block text-slate-400 mt-0.5">Waktu/jam pelaksanaan ujian bebas diatur di antara rentang tanggal tersebut.</span>
 					</div>
 				</div>
 				
@@ -318,11 +335,11 @@
 								<div class="col-span-2 text-sm font-medium text-slate-700">Sesi {sessionNum}</div>
 								<div>
 									<label class="text-xs text-slate-500 block mb-1">Mulai</label>
-									<input name={`session_${sessionNum}_start`} type="datetime-local" class="input text-sm py-1" min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
+									<input name={`session_${sessionNum}_start`} type="datetime-local" class="input text-sm py-1" min={typeMinDateTime} max={typeMaxDateTime} />
 								</div>
 								<div>
 									<label class="text-xs text-slate-500 block mb-1">Selesai</label>
-									<input name={`session_${sessionNum}_end`} type="datetime-local" class="input text-sm py-1" min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
+									<input name={`session_${sessionNum}_end`} type="datetime-local" class="input text-sm py-1" min={typeMinDateTime} max={typeMaxDateTime} />
 								</div>
 							</div>
 						{/each}
@@ -405,11 +422,19 @@
 					{/if}
 					<div>
 						<label class="label" for="e-start">Waktu Mulai</label>
-						<input id="e-start" name="start_time" type="datetime-local" class="input" disabled={useSessionsEdit} value={editingExam.start_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
+						<input id="e-start" name="start_time" type="datetime-local" class="input" disabled={useSessionsEdit} value={editingExam.start_time?.slice(0, 16) || ''} min={typeMinDateTime} max={typeMaxDateTime} />
 					</div>
 					<div>
 						<label class="label" for="e-end">Waktu Selesai</label>
-						<input id="e-end" name="end_time" type="datetime-local" class="input" disabled={useSessionsEdit} value={editingExam.end_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
+						<input id="e-end" name="end_time" type="datetime-local" class="input" disabled={useSessionsEdit} value={editingExam.end_time?.slice(0, 16) || ''} min={typeMinDateTime} max={typeMaxDateTime} />
+					</div>
+					<div class="col-span-2 text-xs text-slate-500 mt-1 mb-2">
+						Rentang tanggal pelaksanaan tipe ujian: <br/> 
+						<strong class="text-slate-700 font-semibold">
+							{data.examType.start_time ? parseDate(data.examType.start_time).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'} s.d. 
+							{data.examType.end_time ? parseDate(data.examType.end_time).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}
+						</strong>
+						<span class="block text-slate-400 mt-0.5">Waktu/jam pelaksanaan ujian bebas diatur di antara rentang tanggal tersebut.</span>
 					</div>
 				</div>
 				<div class="border border-slate-200 rounded-lg p-3">
@@ -424,11 +449,11 @@
 								<div class="col-span-2 text-sm font-medium text-slate-700">Sesi {sessionNum}</div>
 								<div>
 									<label class="text-xs text-slate-500 block mb-1">Mulai</label>
-									<input name={`session_${sessionNum}_start`} type="datetime-local" class="input text-sm py-1" value={session.start_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
+									<input name={`session_${sessionNum}_start`} type="datetime-local" class="input text-sm py-1" value={session.start_time?.slice(0, 16) || ''} min={typeMinDateTime} max={typeMaxDateTime} />
 								</div>
 								<div>
 									<label class="text-xs text-slate-500 block mb-1">Selesai</label>
-									<input name={`session_${sessionNum}_end`} type="datetime-local" class="input text-sm py-1" value={session.end_time?.slice(0, 16) || ''} min={data.examType.start_time?.slice(0, 16) || ''} max={data.examType.end_time?.slice(0, 16) || ''} />
+									<input name={`session_${sessionNum}_end`} type="datetime-local" class="input text-sm py-1" value={session.end_time?.slice(0, 16) || ''} min={typeMinDateTime} max={typeMaxDateTime} />
 								</div>
 							</div>
 						{/each}

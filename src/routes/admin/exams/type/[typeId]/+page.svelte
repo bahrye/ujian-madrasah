@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { parseDate } from '$lib/utils/date';
 	import { ICONS } from '$lib/utils/constants';
 
 	export let data;
@@ -21,7 +22,18 @@
 					<span class="text-xs font-mono font-bold tracking-wider text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded">{data.examType.code}</span>
 					<h1 class="text-2xl font-bold text-slate-800">{data.examType.name}</h1>
 				</div>
-				<p class="text-sm text-slate-500 mt-1">Daftar kelas yang terdaftar pada tipe ujian ini</p>
+				<div class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mt-1">
+					<span>Daftar kelas yang terdaftar pada tipe ujian ini</span>
+					{#if data.examType.start_time && data.examType.end_time}
+						<span class="text-slate-300">•</span>
+						<span class="inline-flex items-center gap-1 text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
+							<svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+							</svg>
+							{parseDate(data.examType.start_time).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })} s.d. {parseDate(data.examType.end_time).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+						</span>
+					{/if}
+				</div>
 			</div>
 		</div>
 		<a href="/print/jadwal-rekap/type/{data.examType.id}" target="_blank" class="btn-outline text-indigo-600 border-indigo-200 hover:bg-indigo-50 flex items-center justify-center gap-2">

@@ -45,9 +45,15 @@ export const actions: Actions = {
 
 		const code = form.get('code')?.toString().trim();
 		const name = form.get('name')?.toString().trim();
-		const description = form.get('description')?.toString().trim() || '';
-		const startTime = form.get('start_time')?.toString() || null;
-		const endTime = form.get('end_time')?.toString() || null;
+		let startTime = form.get('start_time')?.toString().trim() || null;
+		let endTime = form.get('end_time')?.toString().trim() || null;
+
+		if (startTime && /^\d{4}-\d{2}-\d{2}$/.test(startTime)) {
+			startTime = `${startTime}T00:00:00`;
+		}
+		if (endTime && /^\d{4}-\d{2}-\d{2}$/.test(endTime)) {
+			endTime = `${endTime}T23:59:59`;
+		}
 		const isActive = 1; // Tipe ujian selalu aktif
 
 		if (!code || !name) return fail(400, { error: 'Kode dan Nama Tipe Ujian wajib diisi.' });
@@ -71,9 +77,15 @@ export const actions: Actions = {
 		const idStr = form.get('id')?.toString();
 		const code = form.get('code')?.toString().trim();
 		const name = form.get('name')?.toString().trim();
-		const description = form.get('description')?.toString().trim() || '';
-		const startTime = form.get('start_time')?.toString() || null;
-		const endTime = form.get('end_time')?.toString() || null;
+		let startTime = form.get('start_time')?.toString().trim() || null;
+		let endTime = form.get('end_time')?.toString().trim() || null;
+
+		if (startTime && /^\d{4}-\d{2}-\d{2}$/.test(startTime)) {
+			startTime = `${startTime}T00:00:00`;
+		}
+		if (endTime && /^\d{4}-\d{2}-\d{2}$/.test(endTime)) {
+			endTime = `${endTime}T23:59:59`;
+		}
 		const isActive = 1; // Tipe ujian selalu aktif
 		const parsedId = parseInt(idStr || '', 10);
 
