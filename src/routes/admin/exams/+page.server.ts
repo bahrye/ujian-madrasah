@@ -45,6 +45,7 @@ export const actions: Actions = {
 
 		const code = form.get('code')?.toString().trim();
 		const name = form.get('name')?.toString().trim();
+		const description = form.get('description')?.toString().trim() || '';
 		let startTime = form.get('start_time')?.toString().trim() || null;
 		let endTime = form.get('end_time')?.toString().trim() || null;
 
@@ -77,6 +78,7 @@ export const actions: Actions = {
 		const idStr = form.get('id')?.toString();
 		const code = form.get('code')?.toString().trim();
 		const name = form.get('name')?.toString().trim();
+		const description = form.get('description')?.toString().trim() || '';
 		let startTime = form.get('start_time')?.toString().trim() || null;
 		let endTime = form.get('end_time')?.toString().trim() || null;
 
