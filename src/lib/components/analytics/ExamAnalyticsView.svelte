@@ -128,95 +128,98 @@
 				</p>
 			</div>
 
-			<!-- Select Exam & KKM Controls -->
-			<div class="flex flex-wrap items-center gap-2 sm:gap-3">
-				<!-- Exam Selector -->
-				<div class="min-w-[240px] sm:min-w-[280px]">
-					<select
-						class="select w-full font-medium text-xs sm:text-sm border-slate-300 shadow-xs focus:ring-indigo-500"
-						value={selectedExamId || ''}
-						on:change={(e) => handleExamSelect(Number(e.currentTarget.value))}
-					>
-						<option value="" disabled>-- Pilih Ujian untuk Dianalisis --</option>
-						{#each exams as ex}
-							<option value={ex.id}>
-								{ex.title} {ex.class_name ? `(${ex.class_name})` : ''}
-							</option>
-						{/each}
-					</select>
-				</div>
-
-				<!-- KKM Control -->
-				{#if analytics}
-					<div class="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-xl shadow-xs">
-						<span class="text-xs font-bold text-slate-600">KKM:</span>
-						<input
-							type="number"
-							min="0"
-							max="100"
-							class="w-14 text-center font-bold text-xs sm:text-sm py-1 px-1 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500"
-							bind:value={kkmInputValue}
-							on:blur={handleKkmChange}
-							on:keydown={(e) => e.key === 'Enter' && handleKkmChange()}
-							title="Tekan Enter untuk menerapkan KKM baru"
-						/>
+			<!-- Select Exam & KKM Controls & Actions -->
+			<div class="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3 w-full lg:w-auto">
+				<!-- Exam Selector & KKM Row -->
+				<div class="flex items-center gap-2 w-full sm:w-auto">
+					<!-- Exam Selector -->
+					<div class="flex-1 sm:w-[280px] sm:flex-initial min-w-0">
+						<select
+							class="select w-full font-medium text-xs sm:text-sm border-slate-300 shadow-xs focus:ring-indigo-500"
+							value={selectedExamId || ''}
+							on:change={(e) => handleExamSelect(Number(e.currentTarget.value))}
+						>
+							<option value="" disabled>-- Pilih Ujian untuk Dianalisis --</option>
+							{#each exams as ex}
+								<option value={ex.id}>
+									{ex.title} {ex.class_name ? `(${ex.class_name})` : ''}
+								</option>
+							{/each}
+						</select>
 					</div>
-				{/if}
+
+					<!-- KKM Control -->
+					{#if analytics}
+						<div class="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-xl shadow-xs shrink-0">
+							<span class="text-xs font-bold text-slate-600">KKM:</span>
+							<input
+								type="number"
+								min="0"
+								max="100"
+								class="w-12 sm:w-14 text-center font-bold text-xs sm:text-sm py-1 px-1 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500"
+								bind:value={kkmInputValue}
+								on:blur={handleKkmChange}
+								on:keydown={(e) => e.key === 'Enter' && handleKkmChange()}
+								title="Tekan Enter untuk menerapkan KKM baru"
+							/>
+						</div>
+					{/if}
+				</div>
 
 				<!-- Export & Print Actions -->
 				{#if selectedExamId && analytics}
-					<div class="flex items-center gap-2">
+					<div class="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center gap-2 w-full sm:w-auto">
 						<button
 							type="button"
-							class="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs flex items-center gap-1.5"
+							class="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs flex items-center justify-center gap-1.5 px-2.5 py-2 sm:py-1.5 text-xs font-semibold rounded-xl"
 							on:click={handleExportExcel}
 							disabled={isExporting}
 							title="Unduh rekap nilai & analisis butir soal dalam format Excel"
 						>
 							{#if isExporting}
-								<span class="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin"></span>
+								<span class="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin shrink-0"></span>
 							{:else}
-								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
 								</svg>
 							{/if}
-							<span>Ekspor Excel</span>
+							<span class="truncate">Ekspor Excel</span>
 						</button>
 
 						<a
 							href="/print/daftar-nilai/{selectedExamId}?kkm={kkm}"
 							target="_blank"
-							class="btn btn-sm bg-slate-800 hover:bg-slate-900 text-white flex items-center gap-1.5 shadow-xs"
+							class="btn btn-sm bg-slate-800 hover:bg-slate-900 text-white flex items-center justify-center gap-1.5 px-2.5 py-2 sm:py-1.5 text-xs font-semibold rounded-xl shadow-xs"
 							title="Buka / Cetak Daftar Nilai Ujian resmi (PDF)"
 						>
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
 							</svg>
-							<span>Daftar Nilai</span>
+							<span class="truncate">Daftar Nilai</span>
 						</a>
 
 						<a
 							href="/print/hasil-peserta/{selectedExamId}?kkm={kkm}"
 							target="_blank"
-							class="btn btn-sm bg-indigo-700 hover:bg-indigo-800 text-white flex items-center gap-1.5 shadow-xs"
+							class="btn btn-sm bg-indigo-700 hover:bg-indigo-800 text-white flex items-center justify-center gap-1.5 px-2.5 py-2 sm:py-1.5 text-xs font-semibold rounded-xl shadow-xs"
 							title="Buka / Cetak Laporan Hasil Ujian per Peserta (1 Siswa 1 Halaman)"
 						>
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
 							</svg>
-							<span>Laporan Peserta</span>
+							<span class="truncate">Laporan Peserta</span>
 						</a>
 
 						<a
 							href="/print/analisis/{selectedExamId}"
 							target="_blank"
-							class="btn btn-sm btn-secondary flex items-center gap-1.5"
+							class="btn btn-sm bg-sky-600 hover:bg-sky-700 text-white flex items-center justify-center gap-1.5 px-2.5 py-2 sm:py-1.5 text-xs font-semibold rounded-xl shadow-xs"
 							title="Buka lembar cetak analisis butir soal resmi"
 						>
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
 							</svg>
-							<span>Cetak Butir Soal</span>
+							<span class="truncate">Cetak Butir Soal</span>
 						</a>
 					</div>
 				{/if}
