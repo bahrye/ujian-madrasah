@@ -54,6 +54,7 @@
 	$: if (form?.releaseAll) toasts.success('Nilai seluruh siswa yang sudah lengkap berhasil dikirim!');
 	$: if (form?.success && !form?.released && !form?.releaseAll) toasts.success('Hasil ujian berhasil dihapus!');
 
+	let showExportDropdown = false;
 	let isExporting = false;
 	async function handleExport() {
 		if (!data.examFilter) {
@@ -66,6 +67,7 @@
 		if (res.error) toasts.error(res.error);
 		else toasts.success('Excel berhasil diunduh!');
 		isExporting = false;
+		showExportDropdown = false;
 	}
 </script>
 
@@ -91,11 +93,11 @@
 			<button type="submit" class="btn-secondary md:w-auto w-full">Tampilkan</button>
 		</form>
 		{#if data.examFilter}
-			<div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+			<div class="flex flex-col md:flex-row items-stretch md:items-center gap-2.5 w-full md:w-auto">
 				{#if isManualExamSelected}
 					<form method="POST" action="?/releaseAll" use:enhance class="w-full md:w-auto">
 						<input type="hidden" name="exam_id" value={data.examFilter} />
-						<button type="submit" class="btn bg-indigo-600 hover:bg-indigo-700 text-white md:w-auto w-full flex items-center justify-center gap-2 shadow-sm">
+						<button type="submit" class="btn bg-emerald-600 hover:bg-emerald-700 text-white md:w-auto w-full flex items-center justify-center gap-2 shadow-sm">
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
 							</svg>
@@ -103,28 +105,125 @@
 						</button>
 					</form>
 				{/if}
-				<a
-					href="/print/daftar-nilai/{data.examFilter}"
-					target="_blank"
-					class="btn bg-slate-800 hover:bg-slate-900 text-white md:w-auto w-full flex items-center justify-center gap-2 shadow-sm"
-					title="Buka / Cetak Daftar Nilai Ujian (PDF)"
-				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-					</svg>
-					Daftar Nilai Ujian
-				</a>
-				<button type="button" class="btn-primary md:w-auto w-full flex items-center justify-center gap-2" on:click={handleExport} disabled={isExporting}>
-					{#if isExporting}
-						<span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-						Mengekspor...
-					{:else}
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+
+				<!-- Dropdown Cetak & Eksport -->
+				<div class="relative w-full md:w-auto">
+					<button
+						type="button"
+						on:click={() => (showExportDropdown = !showExportDropdown)}
+						class="btn bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white md:w-auto w-full flex items-center justify-between gap-2.5 shadow-md shadow-indigo-600/20 border border-indigo-400/30 transition-all active:scale-[0.98] cursor-pointer"
+						aria-haspopup="true"
+						aria-expanded={showExportDropdown}
+					>
+						<div class="flex items-center gap-2">
+							<svg class="w-4 h-4 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+							</svg>
+							<span class="font-semibold text-sm">Cetak & Eksport</span>
+						</div>
+						<svg
+							class="w-4 h-4 text-indigo-200 transition-transform duration-200 {showExportDropdown ? 'rotate-180' : ''}"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+							stroke-width="2"
+						>
+							<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
 						</svg>
-						Eksport Excel
+					</button>
+
+					{#if showExportDropdown}
+						<!-- Click backdrop to close -->
+						<div
+							class="fixed inset-0 z-40"
+							on:click={() => (showExportDropdown = false)}
+							role="presentation"
+						></div>
+
+						<div
+							class="absolute right-0 top-full mt-2 w-72 md:w-80 bg-white rounded-2xl shadow-2xl border border-slate-200/90 ring-1 ring-black/5 z-50 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-150"
+						>
+							<div class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+								Pilihan Dokumen & Format
+							</div>
+
+							<!-- Opsi 1: Daftar Nilai Ujian -->
+							<a
+								href="/print/daftar-nilai/{data.examFilter}"
+								target="_blank"
+								on:click={() => (showExportDropdown = false)}
+								class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-all group cursor-pointer"
+							>
+								<div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 group-hover:bg-slate-800 group-hover:text-white transition-colors">
+									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+									</svg>
+								</div>
+								<div class="flex-1 min-w-0">
+									<div class="text-xs font-bold text-slate-800 flex items-center justify-between">
+										<span>Daftar Nilai Ujian</span>
+										<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">PDF</span>
+									</div>
+									<div class="text-[11px] text-slate-500 truncate">
+										Rekap daftar nilai ujian & tanda tangan
+									</div>
+								</div>
+							</a>
+
+							<!-- Opsi 2: Laporan Hasil Ujian Peserta -->
+							<a
+								href="/print/hasil-peserta/{data.examFilter}"
+								target="_blank"
+								on:click={() => (showExportDropdown = false)}
+								class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-indigo-50/70 transition-all group cursor-pointer"
+							>
+								<div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+									</svg>
+								</div>
+								<div class="flex-1 min-w-0">
+									<div class="text-xs font-bold text-slate-800 flex items-center justify-between">
+										<span>Laporan Hasil Ujian Peserta</span>
+										<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">PDF</span>
+									</div>
+									<div class="text-[11px] text-slate-500 truncate">
+										1 lembar per siswa & rincian pengawasan
+									</div>
+								</div>
+							</a>
+
+							<div class="border-t border-slate-100 my-1"></div>
+
+							<!-- Opsi 3: Eksport Excel -->
+							<button
+								type="button"
+								on:click={handleExport}
+								disabled={isExporting}
+								class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-emerald-50/70 transition-all group text-left cursor-pointer disabled:opacity-50"
+							>
+								<div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+									{#if isExporting}
+										<span class="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></span>
+									{:else}
+										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+										</svg>
+									{/if}
+								</div>
+								<div class="flex-1 min-w-0">
+									<div class="text-xs font-bold text-slate-800 flex items-center justify-between">
+										<span>{isExporting ? 'Mengekspor Excel...' : 'Eksport Excel'}</span>
+										<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">XLSX</span>
+									</div>
+									<div class="text-[11px] text-slate-500 truncate">
+										Unduh spreadsheet nilai lengkap (.xlsx)
+									</div>
+								</div>
+							</button>
+						</div>
 					{/if}
-				</button>
+				</div>
 			</div>
 		{/if}
 	</div>

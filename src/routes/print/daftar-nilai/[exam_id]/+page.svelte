@@ -107,6 +107,13 @@
 		return 'Semua Kelas Peserta';
 	})();
 
+	// Location string exactly matching berita-acara
+	$: locationStr = [
+		school?.district ? `Kecamatan ${school.district}` : '',
+		school?.city ? (school.city.toLowerCase().startsWith('kab') || school.city.toLowerCase().startsWith('kota') ? school.city : `Kabupaten ${school.city}`) : '',
+		school?.province ? school.province : ''
+	].filter(Boolean).join(', ');
+
 	// Location City for Signature
 	$: locationCity = school?.city
 		? school.city.replace(/^(kab\.|kabupaten|kota)\s+/i, '')
@@ -255,8 +262,28 @@
 <!-- Print Document Page Container (F4 / Folio) -->
 <div class="p-4 md:p-8 print:p-0 print:m-0 max-w-[215.9mm] mx-auto bg-white text-slate-900" style="font-family: 'Times New Roman', Times, Arial, serif; font-variant-numeric: lining-nums tabular-nums;">
 	
-	<!-- 1. KOP SURAT (SESUAI STANDAR MADRASAH / SEKOLAH) -->
+	<!-- KOP SURAT (SAMA PERSIS DENGAN KOP SURAT BERITA ACARA DI DAFTAR UJIAN) -->
 	<div class="flex items-center justify-between gap-4 pb-2 relative">
+		<img 
+			src="/kemenag.png" 
+			alt="Logo Kemenag" 
+			class="w-20 h-20 object-contain shrink-0" 
+			on:error={(e) => { (e.currentTarget as HTMLElement).style.visibility = 'hidden'; }}
+		/>
+		<div class="flex-1 text-center font-serif px-2">
+			<h4 class="font-semibold text-sm uppercase tracking-wider text-black m-0 leading-tight">
+				KEMENTERIAN AGAMA REPUBLIK INDONESIA
+			</h4>
+			<h3 class="font-bold text-xl uppercase tracking-wide text-black m-0 my-0.5">
+				{school?.name || 'NAMA MADRASAH'}
+			</h3>
+			{#if school?.address}
+				<p class="text-xs italic text-black m-0 leading-tight">{school.address}</p>
+			{/if}
+			{#if locationStr}
+				<p class="text-xs italic text-black m-0 leading-tight mt-0.5">{locationStr}</p>
+			{/if}
+		</div>
 		{#if school?.logo_url}
 			<img 
 				src={school.logo_url} 
@@ -264,49 +291,14 @@
 				class="w-20 h-20 object-contain shrink-0" 
 			/>
 		{:else}
-			<img 
-				src="/kemenag.png" 
-				alt="Logo Kemenag" 
-				class="w-20 h-20 object-contain shrink-0" 
-				on:error={(e) => { (e.currentTarget as HTMLElement).style.visibility = 'hidden'; }}
-			/>
-		{/if}
-
-		<div class="flex-1 text-center px-2">
-			<h4 class="font-semibold text-xs sm:text-sm uppercase tracking-wider text-black m-0 leading-tight">
-				{school?.level ? `SATUAN PENDIDIKAN ${school.level.toUpperCase()}` : 'KEMENTERIAN AGAMA REPUBLIK INDONESIA'}
-			</h4>
-			<h3 class="font-extrabold text-lg sm:text-xl uppercase tracking-wide text-black m-0 my-0.5">
-				{school?.name || 'SMA NEGERI 1 NUSANTARA'}
-			</h3>
-			<p class="text-xs text-black m-0 leading-tight">
-				{[
-					school?.address || 'Jl. Pendidikan No. 1',
-					school?.phone ? `Telp. ${school.phone}` : '',
-					school?.email ? school.email : ''
-				].filter(Boolean).join(' · ')}
-			</p>
-			{#if school?.npsn}
-				<p class="text-xs text-black m-0 leading-tight mt-0.5 font-medium">NPSN {school.npsn}</p>
-			{/if}
-		</div>
-
-		{#if school?.logo_url}
-			<img 
-				src="/kemenag.png" 
-				alt="Logo Kemenag" 
-				class="w-20 h-20 object-contain shrink-0" 
-				on:error={(e) => { (e.currentTarget as HTMLElement).style.visibility = 'hidden'; }}
-			/>
-		{:else}
 			<div class="w-20 h-20 shrink-0"></div>
 		{/if}
 	</div>
 
-	<!-- Garis Kop Surat Ganda (Garis tebal atas & tipis bawah persis standar dinas) -->
-	<div class="mt-1 mb-4">
-		<div style="border-bottom: 2.5px solid #000;"></div>
-		<div style="border-bottom: 1px solid #000; margin-top: 2px;"></div>
+	<!-- Garis Kop Surat (Tipis atas, Agak tebal bawah persis berita acara) -->
+	<div class="mt-2 mb-3">
+		<div class="border-b-2 border-black w-full"></div>
+		<div class="border-b border-black w-full mt-0.5"></div>
 	</div>
 
 	<!-- 2. JUDUL DOKUMEN -->

@@ -196,6 +196,18 @@
 						</a>
 
 						<a
+							href="/print/hasil-peserta/{selectedExamId}?kkm={kkm}"
+							target="_blank"
+							class="btn btn-sm bg-indigo-700 hover:bg-indigo-800 text-white flex items-center gap-1.5 shadow-xs"
+							title="Buka / Cetak Laporan Hasil Ujian per Peserta (1 Siswa 1 Halaman)"
+						>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+							</svg>
+							<span>Laporan Peserta</span>
+						</a>
+
+						<a
 							href="/print/analisis/{selectedExamId}"
 							target="_blank"
 							class="btn btn-sm btn-secondary flex items-center gap-1.5"
