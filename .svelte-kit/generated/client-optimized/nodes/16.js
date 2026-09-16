@@ -1,1 +1,0 @@
-export { default as component } from "../../../../src/routes/admin/exams/type/[typeId]/class/[classId]/+page.svelte";

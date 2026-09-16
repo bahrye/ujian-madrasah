@@ -1,1 +1,0 @@
-export { default as component } from "../../../../src/routes/admin/papan-peringkat/type/[typeId]/exams/+page.svelte";

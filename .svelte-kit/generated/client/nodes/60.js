@@ -1,1 +1,0 @@
-export { default as component } from "../../../../src/routes/print/berita-acara/[exam_id]/+page.svelte";

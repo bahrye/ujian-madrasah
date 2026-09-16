@@ -1,1 +1,0 @@
-export { default as component } from "../../../../src/routes/print/kehadiran/type/[typeId]/+page.svelte";

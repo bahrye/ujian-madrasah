@@ -1,1 +1,0 @@
-export { default as component } from "../../../../src/routes/print/kartu/[exam_id]/+page.svelte";

@@ -1,1 +1,0 @@
-export { default as component } from "../../../../src/routes/guru/bank-soal/[examId]/jawaban-siswa/+page.svelte";

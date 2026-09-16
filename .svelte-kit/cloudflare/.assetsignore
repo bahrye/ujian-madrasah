@@ -1,7 +1,0 @@
-*.map
-_worker.js.map
-
-_worker.js
-_routes.json
-_headers
-_redirects

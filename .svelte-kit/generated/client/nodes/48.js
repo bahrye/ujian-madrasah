@@ -1,1 +1,0 @@
-export { default as component } from "../../../../src/routes/guru/results/+page.svelte";

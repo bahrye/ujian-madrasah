@@ -1,1 +1,0 @@
-export { default as component } from "../../../../src/routes/print/jadwal-rekap/type/[typeId]/+page.svelte";
