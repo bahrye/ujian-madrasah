@@ -162,18 +162,30 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Polling PIN keluar ujian langsung dari server setiap 15 detik.
-     * Ini memastikan `currentExamExitPin` selalu tersinkron dengan `exams.exit_pin` di database,
-     * bahkan jika koneksi web sempat gagal saat inject PIN via ExambroBridge.
+     * Fetch PIN keluar ujian dari server dengan strategi retry hemat kuota.
+     * APK hanya akan mencoba mengambil PIN jika `currentExamExitPin` masih null/kosong,
+     * maksimal 3 kali percobaan dengan jeda 30 detik per percobaan.
+     *
+     * Efisiensi: maks 3 request/siswa per ujian (vs 360 request jika polling konstan 15 detik).
+     * PIN di database hampir tidak pernah berubah setelah ujian dimulai, sehingga
+     * retry-only jauh lebih tepat daripada polling terus-menerus.
      */
     private fun startPinPolling(attemptId: String) {
         stopPinPolling()
         currentAttemptId = attemptId
+        // Jika PIN sudah ada (dari web injection), tidak perlu fetch ke server sama sekali
+        if (!currentExamExitPin.isNullOrEmpty()) return
         pinPollThread = Thread {
-            while (!Thread.currentThread().isInterrupted && isExamActive) {
+            var retryCount = 0
+            val maxRetries = 3
+            val retryDelayMs = 30_000L // 30 detik per percobaan
+            while (!Thread.currentThread().isInterrupted && isExamActive && retryCount < maxRetries) {
                 try {
-                    Thread.sleep(15000)
+                    Thread.sleep(retryDelayMs)
                     if (!isExamActive) break
+                    // Jika PIN sudah tersinkron via web (ExambroBridge), berhenti
+                    if (!currentExamExitPin.isNullOrEmpty()) break
+                    retryCount++
                     val serverUrl = prefs.getString(KEY_EXAM_URL, DEFAULT_URL) ?: DEFAULT_URL
                     val url = java.net.URL("$serverUrl/api/attempt-status/$attemptId")
                     val conn = url.openConnection() as java.net.HttpURLConnection
@@ -188,6 +200,7 @@ class MainActivity : AppCompatActivity() {
                         val pin = json.optString("exam_exit_pin", "")
                         if (pin.isNotEmpty() && pin != "null") {
                             currentExamExitPin = pin.trim()
+                            break // PIN berhasil didapat, tidak perlu retry lagi
                         }
                     }
                     conn.disconnect()
