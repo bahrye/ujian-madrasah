@@ -23,29 +23,61 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 	if (!locals.user) throw redirect(302, '/login');
 	const db = getDB(platform);
 
-	const tokensRaw = await db.prepare(`
-		SELECT t.*, e.title as exam_title, s.name as subject_name, et.code as exam_type_code, c.name as class_name,
-		COALESCE((
-			SELECT json_group_array(
-				json_object(
-					'id', u.id, 
-					'name', u.name, 
-					'username', u.username, 
-					'start_time', sa.start_time
+	const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
+	const isAdmin = locals.user.role === 'admin';
+
+	let tokensRaw: any;
+	if (isSuperAdmin || isAdmin) {
+		tokensRaw = await db.prepare(`
+			SELECT t.*, e.title as exam_title, s.name as subject_name, et.code as exam_type_code, c.name as class_name,
+			COALESCE((
+				SELECT json_group_array(
+					json_object(
+						'id', u.id, 
+						'name', u.name, 
+						'username', u.username, 
+						'start_time', sa.start_time
+					)
 				)
-			)
-			FROM student_attempts sa
-			JOIN users u ON sa.student_id = u.id
-			WHERE sa.token_id = t.id AND sa.status = 'mengerjakan'
-		), '[]') as active_students_json
-		FROM tokens t 
-		JOIN exams e ON t.exam_id = e.id
-		LEFT JOIN subjects s ON e.subject_id = s.id
-		LEFT JOIN exam_types et ON e.exam_type_id = et.id
-		LEFT JOIN classes c ON e.class_id = c.id
-		WHERE e.school_id = ?
-		ORDER BY t.created_at DESC
-	`).bind(locals.user.school_id).all<any>();
+				FROM student_attempts sa
+				JOIN users u ON sa.student_id = u.id
+				WHERE sa.token_id = t.id AND sa.status = 'mengerjakan'
+			), '[]') as active_students_json
+			FROM tokens t 
+			JOIN exams e ON t.exam_id = e.id
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			LEFT JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN classes c ON e.class_id = c.id
+			WHERE e.school_id = ?
+			ORDER BY t.created_at DESC
+		`).bind(locals.user.school_id).all<any>();
+	} else {
+		tokensRaw = await db.prepare(`
+			SELECT DISTINCT t.*, e.title as exam_title, s.name as subject_name, et.code as exam_type_code, c.name as class_name,
+			COALESCE((
+				SELECT json_group_array(
+					json_object(
+						'id', u.id, 
+						'name', u.name, 
+						'username', u.username, 
+						'start_time', sa.start_time
+					)
+				)
+				FROM student_attempts sa
+				JOIN users u ON sa.student_id = u.id
+				WHERE sa.token_id = t.id AND sa.status = 'mengerjakan'
+			), '[]') as active_students_json
+			FROM tokens t 
+			JOIN exams e ON t.exam_id = e.id
+			LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
+			LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			LEFT JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN classes c ON e.class_id = c.id
+			WHERE e.school_id = ? AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
+			ORDER BY t.created_at DESC
+		`).bind(locals.user.id, locals.user.id, locals.user.school_id).all<any>();
+	}
 
 	const tokens = (tokensRaw.results || []).map((t: any) => ({
 		...t,
@@ -58,8 +90,6 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		used_by_students: [] // Placeholder to maintain structure compatibility
 	}));
 
-	const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
-	const isAdmin = locals.user.role === 'admin';
 	let rawExamsList: any[] = [];
 
 	if (isSuperAdmin || isAdmin) {
@@ -75,30 +105,19 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		rawExamsList = examsRes.results || [];
 	} else {
 		const proctorExamsRes = await db.prepare(`
-			SELECT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name, ep.sessions as proctor_sessions
+			SELECT DISTINCT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name, ep.sessions as proctor_sessions
 			FROM exams e
-			JOIN exam_proctors ep ON e.id = ep.exam_id
+			LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
+			LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
 			LEFT JOIN subjects s ON e.subject_id = s.id
 			JOIN exam_types et ON e.exam_type_id = et.id
 			LEFT JOIN classes c ON e.class_id = c.id
-			WHERE e.is_active = 1 AND et.is_active = 1 AND e.school_id = ? AND ep.proctor_id = ?
+			WHERE e.is_active = 1 AND et.is_active = 1 AND e.school_id = ? 
+			  AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
 			ORDER BY e.title
-		`).bind(locals.user.school_id, locals.user.id).all<any>();
+		`).bind(locals.user.id, locals.user.id, locals.user.school_id).all<any>();
 
 		rawExamsList = proctorExamsRes.results || [];
-
-		if (rawExamsList.length === 0) {
-			const schoolExamsRes = await db.prepare(`
-				SELECT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name, NULL as proctor_sessions
-				FROM exams e
-				LEFT JOIN subjects s ON e.subject_id = s.id
-				JOIN exam_types et ON e.exam_type_id = et.id
-				LEFT JOIN classes c ON e.class_id = c.id
-				WHERE e.is_active = 1 AND et.is_active = 1 AND e.school_id = ?
-				ORDER BY e.title
-			`).bind(locals.user.school_id).all<any>();
-			rawExamsList = schoolExamsRes.results || [];
-		}
 	}
 
 	const examIds = rawExamsList.map((e: any) => e.id);
@@ -193,13 +212,26 @@ export const actions: Actions = {
 		if (isNaN(parsedExamId)) return fail(400, { error: 'Pilih ujian terlebih dahulu.' });
 		if (isNaN(parsedSessionNumber) || parsedSessionNumber < 1) return fail(400, { error: 'Pilih sesi ujian terlebih dahulu.' });
 
+		const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
+		const isAdmin = locals.user.role === 'admin';
+
 		// Verifikasi penugasan pengawas pada ujian ini
-		const proctorAssignment = await db.prepare(`
-			SELECT ep.sessions, e.start_time as exam_start_time, e.end_time as exam_end_time
-			FROM exams e
-			JOIN exam_proctors ep ON e.id = ep.exam_id
-			WHERE e.id = ? AND e.school_id = ? AND ep.proctor_id = ?
-		`).bind(parsedExamId, locals.user.school_id, locals.user.id).first<any>();
+		let proctorAssignment: any = null;
+		if (isSuperAdmin || isAdmin) {
+			proctorAssignment = await db.prepare(`
+				SELECT NULL as sessions, e.start_time as exam_start_time, e.end_time as exam_end_time
+				FROM exams e
+				WHERE e.id = ? AND (e.school_id = ? OR ? IS NULL)
+			`).bind(parsedExamId, locals.user.school_id, locals.user.school_id).first<any>();
+		} else {
+			proctorAssignment = await db.prepare(`
+				SELECT ep.sessions, e.start_time as exam_start_time, e.end_time as exam_end_time
+				FROM exams e
+				LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
+				LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+				WHERE e.id = ? AND e.school_id = ? AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
+			`).bind(locals.user.id, locals.user.id, parsedExamId, locals.user.school_id).first<any>();
+		}
 
 		if (!proctorAssignment) return fail(403, { error: 'Anda bukan pengawas yang ditugaskan untuk ujian ini.' });
 
@@ -299,13 +331,25 @@ export const actions: Actions = {
 		const parsedId = parseInt(idStr || '', 10);
 		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid.' });
 
+		const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
+		const isAdmin = locals.user.role === 'admin';
+
 		try {
-			// Pastikan token terhubung ke ujian yang ditugaskan ke pengawas
-			const tokenCheck = await db.prepare(`
-				SELECT t.id FROM tokens t
-				JOIN exam_proctors ep ON t.exam_id = ep.exam_id
-				WHERE t.id = ? AND t.school_id = ? AND ep.proctor_id = ?
-			`).bind(parsedId, locals.user.school_id, locals.user.id).first();
+			let tokenCheck: any = null;
+			if (isSuperAdmin || isAdmin) {
+				tokenCheck = await db.prepare(`
+					SELECT t.id FROM tokens t
+					WHERE t.id = ? AND (t.school_id = ? OR ? IS NULL)
+				`).bind(parsedId, locals.user.school_id, locals.user.school_id).first();
+			} else {
+				tokenCheck = await db.prepare(`
+					SELECT t.id FROM tokens t
+					JOIN exams e ON t.exam_id = e.id
+					LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
+					LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+					WHERE t.id = ? AND t.school_id = ? AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
+				`).bind(locals.user.id, locals.user.id, parsedId, locals.user.school_id).first();
+			}
 
 			if (!tokenCheck) return fail(403, { error: 'Anda tidak memiliki hak untuk merilis token ini.' });
 
@@ -325,12 +369,25 @@ export const actions: Actions = {
 		const parsedId = parseInt(idStr || '', 10);
 		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid.' });
 
+		const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
+		const isAdmin = locals.user.role === 'admin';
+
 		try {
-			const tokenCheck = await db.prepare(`
-				SELECT t.id FROM tokens t
-				JOIN exam_proctors ep ON t.exam_id = ep.exam_id
-				WHERE t.id = ? AND t.school_id = ? AND ep.proctor_id = ?
-			`).bind(parsedId, locals.user.school_id, locals.user.id).first();
+			let tokenCheck: any = null;
+			if (isSuperAdmin || isAdmin) {
+				tokenCheck = await db.prepare(`
+					SELECT t.id FROM tokens t
+					WHERE t.id = ? AND (t.school_id = ? OR ? IS NULL)
+				`).bind(parsedId, locals.user.school_id, locals.user.school_id).first();
+			} else {
+				tokenCheck = await db.prepare(`
+					SELECT t.id FROM tokens t
+					JOIN exams e ON t.exam_id = e.id
+					LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
+					LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+					WHERE t.id = ? AND t.school_id = ? AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
+				`).bind(locals.user.id, locals.user.id, parsedId, locals.user.school_id).first();
+			}
 
 			if (!tokenCheck) return fail(403, { error: 'Anda tidak memiliki hak untuk menarik token ini.' });
 
@@ -350,12 +407,25 @@ export const actions: Actions = {
 		const parsedId = parseInt(idStr || '', 10);
 		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid.' });
 
+		const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
+		const isAdmin = locals.user.role === 'admin';
+
 		try {
-			const tokenCheck = await db.prepare(`
-				SELECT t.id FROM tokens t
-				JOIN exam_proctors ep ON t.exam_id = ep.exam_id
-				WHERE t.id = ? AND t.school_id = ? AND ep.proctor_id = ?
-			`).bind(parsedId, locals.user.school_id, locals.user.id).first();
+			let tokenCheck: any = null;
+			if (isSuperAdmin || isAdmin) {
+				tokenCheck = await db.prepare(`
+					SELECT t.id FROM tokens t
+					WHERE t.id = ? AND (t.school_id = ? OR ? IS NULL)
+				`).bind(parsedId, locals.user.school_id, locals.user.school_id).first();
+			} else {
+				tokenCheck = await db.prepare(`
+					SELECT t.id FROM tokens t
+					JOIN exams e ON t.exam_id = e.id
+					LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
+					LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+					WHERE t.id = ? AND t.school_id = ? AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
+				`).bind(locals.user.id, locals.user.id, parsedId, locals.user.school_id).first();
+			}
 
 			if (!tokenCheck) return fail(403, { error: 'Anda tidak memiliki hak untuk menghapus token ini.' });
 

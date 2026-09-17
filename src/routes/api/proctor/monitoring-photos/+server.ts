@@ -21,6 +21,37 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 		return json({ error: 'Parameter tidak lengkap' }, { status: 400 });
 	}
 
+	const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
+	const isAdmin = locals.user.role === 'admin';
+
+	if (!isSuperAdmin) {
+		if (isAdmin) {
+			if (examId) {
+				const check = await db.prepare(`SELECT 1 FROM exams WHERE id = ? AND school_id = ?`).bind(examId, locals.user.school_id).first();
+				if (!check) return json({ error: 'Forbidden' }, { status: 403 });
+			}
+		} else {
+			if (examId) {
+				const proctorCheck = await db.prepare(`
+					SELECT 1 FROM exams e
+					LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
+					LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+					WHERE e.id = ? AND e.school_id = ? AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
+				`).bind(locals.user.id, locals.user.id, examId, locals.user.school_id).first();
+				if (!proctorCheck) return json({ error: 'Forbidden: Anda tidak ditugaskan untuk ujian ini.' }, { status: 403 });
+			} else if (attemptId) {
+				const proctorCheck = await db.prepare(`
+					SELECT 1 FROM student_attempts sa
+					JOIN exams e ON sa.exam_id = e.id
+					LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
+					LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+					WHERE sa.id = ? AND e.school_id = ? AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
+				`).bind(locals.user.id, locals.user.id, attemptId, locals.user.school_id).first();
+				if (!proctorCheck) return json({ error: 'Forbidden: Anda tidak ditugaskan untuk ujian ini.' }, { status: 403 });
+			}
+		}
+	}
+
 	try {
 		const photos = await getMonitoringPhotos(db, {
 			examId: isNaN(examId as any) ? undefined : examId,

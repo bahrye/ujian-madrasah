@@ -14,6 +14,29 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 
 	if (isNaN(examId)) return json({ error: 'ID Ujian tidak valid' }, { status: 400 });
 
+	const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
+	const isAdmin = locals.user.role === 'admin';
+
+	if (!isSuperAdmin) {
+		if (isAdmin) {
+			const examCheck = await db.prepare(`SELECT 1 FROM exams WHERE id = ? AND school_id = ?`).bind(examId, locals.user.school_id).first();
+			if (!examCheck) {
+				return json({ error: 'Forbidden' }, { status: 403 });
+			}
+		} else {
+			const proctorCheck = await db.prepare(`
+				SELECT 1 FROM exams e
+				LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
+				LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+				WHERE e.id = ? AND e.school_id = ? AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
+			`).bind(locals.user.id, locals.user.id, examId, locals.user.school_id).first();
+
+			if (!proctorCheck) {
+				return json({ error: 'Forbidden: Anda tidak ditugaskan untuk mengawasi ujian ini.' }, { status: 403 });
+			}
+		}
+	}
+
 	try {
 		// Smart Check: Baca 1 baris agregat timestamp & violations untuk cek apakah ada perubahan
 		if (clientVersion) {

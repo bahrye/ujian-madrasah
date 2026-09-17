@@ -44,31 +44,22 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 			`).bind(locals.user.school_id).all<any>();
 			rawExamsList = examsRes.results || [];
 		} else {
+			// Hanya ujian yang ditugaskan ke pengawas ini (via exam_proctors ataupun exam_type_proctors)
 			const proctorExamsRes = await db.prepare(`
 				SELECT DISTINCT e.id, e.title, s.name as subject_name, et.code as exam_type_code, c.name as class_name
 				FROM exams e 
-				JOIN exam_proctors ep ON e.id = ep.exam_id
+				LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
+				LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
 				LEFT JOIN subjects s ON e.subject_id = s.id
 				LEFT JOIN exam_types et ON e.exam_type_id = et.id
 				LEFT JOIN classes c ON e.class_id = c.id
-				WHERE e.is_active = 1 AND (et.is_active IS NULL OR et.is_active = 1) AND e.school_id = ? AND ep.proctor_id = ?
+				WHERE e.is_active = 1 AND (et.is_active IS NULL OR et.is_active = 1) 
+				  AND e.school_id = ? 
+				  AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
 				ORDER BY e.title
-			`).bind(locals.user.school_id, locals.user.id).all<any>();
+			`).bind(locals.user.id, locals.user.id, locals.user.school_id).all<any>();
 
 			rawExamsList = proctorExamsRes.results || [];
-
-			if (rawExamsList.length === 0) {
-				const schoolExamsRes = await db.prepare(`
-					SELECT e.id, e.title, s.name as subject_name, et.code as exam_type_code, c.name as class_name
-					FROM exams e 
-					LEFT JOIN subjects s ON e.subject_id = s.id
-					LEFT JOIN exam_types et ON e.exam_type_id = et.id
-					LEFT JOIN classes c ON e.class_id = c.id
-					WHERE e.is_active = 1 AND (et.is_active IS NULL OR et.is_active = 1) AND e.school_id = ?
-					ORDER BY e.title
-				`).bind(locals.user.school_id).all<any>();
-				rawExamsList = schoolExamsRes.results || [];
-			}
 		}
 
 		const exams: ExamFilterOption[] = rawExamsList.map((e: any) => ({
@@ -81,14 +72,20 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 			})
 		}));
 
+		const allowedExamIds = rawExamsList.map((e: any) => e.id);
+		let validExamFilter: number | null = null;
+		if (!isNaN(examFilter) && (isSuperAdmin || isAdmin || allowedExamIds.includes(examFilter))) {
+			validExamFilter = examFilter;
+		}
+
 		let availableSessions: number[] = [];
 		let allowedProctorSessions: number[] | null = null;
 
-		if (!isNaN(examFilter)) {
+		if (validExamFilter !== null) {
 			// Check proctor assignment for this exam
 			const proctorAssignment = await db.prepare(`
 				SELECT sessions FROM exam_proctors WHERE exam_id = ? AND proctor_id = ?
-			`).bind(examFilter, locals.user.id).first<{ sessions: string | null }>();
+			`).bind(validExamFilter, locals.user.id).first<{ sessions: string | null }>();
 
 			if (proctorAssignment?.sessions) {
 				try {
@@ -102,7 +99,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 			// Get sessions defined in exam_sessions table
 			const dbSessions = await db.prepare(`
 				SELECT session_number FROM exam_sessions WHERE exam_id = ? ORDER BY session_number
-			`).bind(examFilter).all<{ session_number: number }>();
+			`).bind(validExamFilter).all<{ session_number: number }>();
 
 			if (dbSessions.results.length > 0) {
 				availableSessions = dbSessions.results.map(s => s.session_number);
@@ -128,7 +125,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 		}
 
 		let attempts: any[] = [];
-		if (!isNaN(examFilter)) {
+		if (validExamFilter !== null) {
 			let query = `
 				SELECT 
 					epart.student_id,
@@ -154,13 +151,27 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 				FROM exam_participants epart
 				JOIN users u ON epart.student_id = u.id
 				JOIN exams e ON epart.exam_id = e.id
-				JOIN exam_proctors ep ON e.id = ep.exam_id
-				LEFT JOIN student_attempts sa ON sa.student_id = epart.student_id AND sa.exam_id = epart.exam_id
-				WHERE epart.exam_id = ? AND e.school_id = ? AND ep.proctor_id = ?
-				  AND (ep.room_id IS NULL OR ep.room_id = epart.room_id)
 			`;
 
-			const bindings: any[] = [examFilter, locals.user.school_id, locals.user.id];
+			const bindings: any[] = [];
+
+			if (isSuperAdmin || isAdmin) {
+				query += `
+					LEFT JOIN student_attempts sa ON sa.student_id = epart.student_id AND sa.exam_id = epart.exam_id
+					WHERE epart.exam_id = ? AND e.school_id = ?
+				`;
+				bindings.push(validExamFilter, locals.user.school_id);
+			} else {
+				query += `
+					LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
+					LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+					LEFT JOIN student_attempts sa ON sa.student_id = epart.student_id AND sa.exam_id = epart.exam_id
+					WHERE epart.exam_id = ? AND e.school_id = ?
+					  AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
+					  AND (ep.room_id IS NULL OR ep.room_id = epart.room_id)
+				`;
+				bindings.push(locals.user.id, locals.user.id, validExamFilter, locals.user.school_id);
+			}
 
 			if (activeSessionFilter !== null) {
 				query += ` AND COALESCE(u.session_number, 1) = ?`;
@@ -186,23 +197,24 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 		// Fetch all answers count from DB to avoid N+1 queries
 		let answeredCountsMap: Record<number, number> = {};
 		const attemptIds = attempts.map(a => a.attempt_id).filter(id => id);
-		if (attemptIds.length > 0) {
+		if (attemptIds.length > 0 && validExamFilter !== null) {
 			const countsResult = await db.prepare(`
 				SELECT sa.attempt_id, COUNT(*) as c
 				FROM student_answers sa
 				JOIN student_attempts st ON sa.attempt_id = st.id
 				WHERE st.exam_id = ? AND sa.answer_given IS NOT NULL AND sa.answer_given != '' AND sa.answer_given != '[]' AND sa.answer_given != '{}'
 				GROUP BY sa.attempt_id
-			`).bind(examFilter).all();
+			`).bind(validExamFilter).all();
 			
-				countsResult.results.forEach((r: any) => {
-					answeredCountsMap[r.attempt_id] = r.c;
-				});
-			}
+			countsResult.results.forEach((r: any) => {
+				answeredCountsMap[r.attempt_id] = r.c;
+			});
+		}
 
-			// Fetch monitoring photos stats for this exam
-			let photoCountsMap: Record<number, number> = {};
-			let latestPhotosMap: Record<number, string> = {};
+		// Fetch monitoring photos stats for this exam
+		let photoCountsMap: Record<number, number> = {};
+		let latestPhotosMap: Record<number, string> = {};
+		if (validExamFilter !== null) {
 			try {
 				await ensureMonitoringPhotosTable(db);
 				const photoStats = await db.prepare(`
@@ -210,7 +222,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 					FROM exam_monitoring_photos
 					WHERE exam_id = ?
 					GROUP BY student_id
-				`).bind(examFilter).all<any>();
+				`).bind(validExamFilter).all<any>();
 
 				(photoStats.results || []).forEach((p: any) => {
 					photoCountsMap[p.student_id] = p.c;
@@ -221,34 +233,35 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 			} catch (photoErr) {
 				console.warn('Photo stats query warning:', photoErr);
 			}
+		}
 
-			const attemptsWithProgress = attempts.map((a) => {
-				let status = a.status || 'belum_mengerjakan';
-				let answeredCount = a.attempt_id ? (answeredCountsMap[a.attempt_id] || 0) : 0;
-				let warnings = a.violation_count || 0;
-				let warningLogs: any[] = [];
-				try { warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : []; } catch(e) {}
+		const attemptsWithProgress = attempts.map((a) => {
+			let status = a.status || 'belum_mengerjakan';
+			let answeredCount = a.attempt_id ? (answeredCountsMap[a.attempt_id] || 0) : 0;
+			let warnings = a.violation_count || 0;
+			let warningLogs: any[] = [];
+			try { warningLogs = a.violation_logs ? JSON.parse(a.violation_logs) : []; } catch(e) {}
 
-				return {
-					...a,
-					id: a.attempt_id || `no_attempt_${a.student_id}`,
-					attempt_id: a.attempt_id,
-					status,
-					answeredCount,
-					warnings,
-					warningLogs,
-					photoCount: photoCountsMap[a.student_id] || 0,
-					latestPhoto: latestPhotosMap[a.student_id] || null,
-					is_paused: a.is_paused,
-					paused_at: a.paused_at
-				};
-			});
+			return {
+				...a,
+				id: a.attempt_id || `no_attempt_${a.student_id}`,
+				attempt_id: a.attempt_id,
+				status,
+				answeredCount,
+				warnings,
+				warningLogs,
+				photoCount: photoCountsMap[a.student_id] || 0,
+				latestPhoto: latestPhotosMap[a.student_id] || null,
+				is_paused: a.is_paused,
+				paused_at: a.paused_at
+			};
+		});
 
 		return {
 			exams,
-			attempts: attemptsWithProgress,
-			examFilter: isNaN(examFilter) ? '' : String(examFilter),
 			availableSessions,
+			attempts: attemptsWithProgress,
+			examFilter: validExamFilter ? String(validExamFilter) : '',
 			sessionFilter: activeSessionFilter !== null ? String(activeSessionFilter) : ''
 		};
 	} catch (err: any) {
@@ -268,16 +281,34 @@ export const actions: Actions = {
 		
 		if (isNaN(parsedAttemptId) || !action) return fail(400, { error: 'Data tidak valid.' });
 
-		const attemptData = await db.prepare(`
-			SELECT sa.id, sa.is_paused, sa.paused_at, sa.end_time FROM student_attempts sa
-			JOIN exams e ON sa.exam_id = e.id
-			JOIN exam_participants ep_part ON sa.student_id = ep_part.student_id AND sa.exam_id = ep_part.exam_id
-			JOIN users u ON ep_part.student_id = u.id
-			JOIN exam_proctors ep ON e.id = ep.exam_id
-			WHERE sa.id = ? AND e.school_id = ? AND ep.proctor_id = ?
-			  AND (ep.room_id IS NULL OR ep.room_id = ep_part.room_id)
-			  AND (ep.sessions IS NULL OR ep.sessions = '[]' OR u.session_number IN (SELECT value FROM json_each(ep.sessions)))
-		`).bind(parsedAttemptId, locals.user.school_id, locals.user.id).first() as any;
+		const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
+		const isAdmin = locals.user.role === 'admin';
+
+		let attemptData: any = null;
+		if (isSuperAdmin) {
+			attemptData = await db.prepare(`
+				SELECT sa.id, sa.is_paused, sa.paused_at, sa.end_time FROM student_attempts sa WHERE sa.id = ?
+			`).bind(parsedAttemptId).first();
+		} else if (isAdmin) {
+			attemptData = await db.prepare(`
+				SELECT sa.id, sa.is_paused, sa.paused_at, sa.end_time FROM student_attempts sa
+				JOIN exams e ON sa.exam_id = e.id
+				WHERE sa.id = ? AND e.school_id = ?
+			`).bind(parsedAttemptId, locals.user.school_id).first();
+		} else {
+			attemptData = await db.prepare(`
+				SELECT sa.id, sa.is_paused, sa.paused_at, sa.end_time FROM student_attempts sa
+				JOIN exams e ON sa.exam_id = e.id
+				JOIN exam_participants ep_part ON sa.student_id = ep_part.student_id AND sa.exam_id = ep_part.exam_id
+				JOIN users u ON ep_part.student_id = u.id
+				LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
+				LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+				WHERE sa.id = ? AND e.school_id = ?
+				  AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
+				  AND (ep.room_id IS NULL OR ep.room_id = ep_part.room_id)
+				  AND (ep.sessions IS NULL OR ep.sessions = '[]' OR u.session_number IN (SELECT value FROM json_each(ep.sessions)))
+			`).bind(locals.user.id, locals.user.id, parsedAttemptId, locals.user.school_id).first() as any;
+		}
 
 		if (!attemptData) return fail(403, { error: 'Sesi ujian tidak ditemukan atau bukan milik sekolah Anda.' });
 
@@ -319,16 +350,34 @@ export const actions: Actions = {
 		const parsedAttemptId = parseInt(attemptIdStr || '', 10);
 		if (isNaN(parsedAttemptId)) return fail(400, { error: 'ID tidak valid.' });
 
-		const attemptCheck = await db.prepare(`
-			SELECT sa.id, sa.signature FROM student_attempts sa
-			JOIN exams e ON sa.exam_id = e.id
-			JOIN exam_participants ep_part ON sa.student_id = ep_part.student_id AND sa.exam_id = ep_part.exam_id
-			JOIN users u ON ep_part.student_id = u.id
-			JOIN exam_proctors ep ON e.id = ep.exam_id
-			WHERE sa.id = ? AND e.school_id = ? AND ep.proctor_id = ?
-			  AND (ep.room_id IS NULL OR ep.room_id = ep_part.room_id)
-			  AND (ep.sessions IS NULL OR ep.sessions = '[]' OR u.session_number IN (SELECT value FROM json_each(ep.sessions)))
-		`).bind(parsedAttemptId, locals.user.school_id, locals.user.id).first<{id: number, signature: string | null}>();
+		const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
+		const isAdmin = locals.user.role === 'admin';
+
+		let attemptCheck: { id: number; signature: string | null } | null = null;
+		if (isSuperAdmin) {
+			attemptCheck = await db.prepare(`
+				SELECT sa.id, sa.signature FROM student_attempts sa WHERE sa.id = ?
+			`).bind(parsedAttemptId).first<{id: number, signature: string | null}>();
+		} else if (isAdmin) {
+			attemptCheck = await db.prepare(`
+				SELECT sa.id, sa.signature FROM student_attempts sa
+				JOIN exams e ON sa.exam_id = e.id
+				WHERE sa.id = ? AND e.school_id = ?
+			`).bind(parsedAttemptId, locals.user.school_id).first<{id: number, signature: string | null}>();
+		} else {
+			attemptCheck = await db.prepare(`
+				SELECT sa.id, sa.signature FROM student_attempts sa
+				JOIN exams e ON sa.exam_id = e.id
+				JOIN exam_participants ep_part ON sa.student_id = ep_part.student_id AND sa.exam_id = ep_part.exam_id
+				JOIN users u ON ep_part.student_id = u.id
+				LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
+				LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+				WHERE sa.id = ? AND e.school_id = ?
+				  AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
+				  AND (ep.room_id IS NULL OR ep.room_id = ep_part.room_id)
+				  AND (ep.sessions IS NULL OR ep.sessions = '[]' OR u.session_number IN (SELECT value FROM json_each(ep.sessions)))
+			`).bind(locals.user.id, locals.user.id, parsedAttemptId, locals.user.school_id).first<{id: number, signature: string | null}>();
+		}
 
 		if (!attemptCheck) {
 			return fail(403, { error: 'Sesi ujian tidak ditemukan atau bukan milik sekolah Anda.' });
@@ -377,6 +426,34 @@ export const actions: Actions = {
 		const attemptIdStr = form.get('attempt_id')?.toString();
 		const parsedAttemptId = parseInt(attemptIdStr || '', 10);
 		if (isNaN(parsedAttemptId)) return fail(400, { error: 'ID tidak valid.' });
+
+		const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
+		const isAdmin = locals.user.role === 'admin';
+
+		if (!isSuperAdmin) {
+			if (isAdmin) {
+				const ok = await db.prepare(`
+					SELECT sa.id FROM student_attempts sa
+					JOIN exams e ON sa.exam_id = e.id
+					WHERE sa.id = ? AND e.school_id = ?
+				`).bind(parsedAttemptId, locals.user.school_id).first();
+				if (!ok) return fail(403, { error: 'Sesi ujian tidak ditemukan atau bukan milik sekolah Anda.' });
+			} else {
+				const ok = await db.prepare(`
+					SELECT sa.id FROM student_attempts sa
+					JOIN exams e ON sa.exam_id = e.id
+					JOIN exam_participants ep_part ON sa.student_id = ep_part.student_id AND sa.exam_id = ep_part.exam_id
+					JOIN users u ON ep_part.student_id = u.id
+					LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
+					LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+					WHERE sa.id = ? AND e.school_id = ?
+					  AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
+					  AND (ep.room_id IS NULL OR ep.room_id = ep_part.room_id)
+					  AND (ep.sessions IS NULL OR ep.sessions = '[]' OR u.session_number IN (SELECT value FROM json_each(ep.sessions)))
+				`).bind(locals.user.id, locals.user.id, parsedAttemptId, locals.user.school_id).first();
+				if (!ok) return fail(403, { error: 'Anda tidak memiliki hak untuk menyelesaikan sesi ujian ini.' });
+			}
+		}
 
 		try {
 			const res = await finalizeAttempt(db, parsedAttemptId, 'waktu_habis');

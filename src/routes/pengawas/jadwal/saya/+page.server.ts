@@ -25,15 +25,16 @@ export const load: ServerLoad = async ({ locals, platform }) => {
 
 	// Ambil jadwal mengawas pribadi (ujian yang ditugaskan kepada pengawas/guru ini)
 	const { results: rawSchedules } = await db.prepare(`
-		SELECT e.*, s.name as subject_name, et.code as exam_type_code, et.name as exam_type_name, c.name as class_name
+		SELECT DISTINCT e.*, s.name as subject_name, et.code as exam_type_code, et.name as exam_type_name, c.name as class_name
 		FROM exams e
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		LEFT JOIN exam_types et ON e.exam_type_id = et.id
 		LEFT JOIN classes c ON e.class_id = c.id
-		JOIN exam_proctors ep ON e.id = ep.exam_id
-		WHERE ep.proctor_id = ? AND e.school_id = ? AND e.is_active = 1
+		LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
+		LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+		WHERE (ep.id IS NOT NULL OR etp.id IS NOT NULL) AND e.school_id = ? AND e.is_active = 1
 		ORDER BY e.start_time ASC
-	`).bind(locals.user.id, locals.user.school_id).all<any>();
+	`).bind(locals.user.id, locals.user.id, locals.user.school_id).all<any>();
 
 	const schedules = (rawSchedules || []).map((s: any) => ({
 		...s,

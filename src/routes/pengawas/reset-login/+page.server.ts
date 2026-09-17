@@ -63,33 +63,20 @@ export const load: PageServerLoad = async ({ platform, locals, url }) => {
 			const examsRes = await db.prepare(examsQuery).bind(...examsParams).all<any>();
 			rawExams = examsRes.results || [];
 		} else {
-			// For pengawas / guru role: fetch exams assigned to this proctor in exam_proctors
+			// For pengawas / guru / panitia role: fetch exams assigned to this proctor
 			const proctorExamsRes = await db.prepare(`
 				SELECT DISTINCT e.id, e.title, e.is_active, s.name as subject_name, et.code as exam_type_code, c.name as class_name 
 				FROM exams e 
-				JOIN exam_proctors ep ON e.id = ep.exam_id 
+				LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
+				LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
 				LEFT JOIN subjects s ON e.subject_id = s.id
 				LEFT JOIN exam_types et ON e.exam_type_id = et.id
 				LEFT JOIN classes c ON e.class_id = c.id
-				WHERE ep.proctor_id = ? 
+				WHERE (ep.id IS NOT NULL OR etp.id IS NOT NULL) AND e.school_id = ?
 				ORDER BY e.is_active DESC, e.title ASC
-			`).bind(userId).all<any>();
+			`).bind(userId, userId, userSchoolId).all<any>();
 
 			rawExams = proctorExamsRes.results || [];
-
-			// Fallback to school exams if no specific exam_proctor assignment
-			if (rawExams.length === 0 && userSchoolId !== null) {
-				const schoolExamsRes = await db.prepare(`
-					SELECT e.id, e.title, s.name as subject_name, et.code as exam_type_code, c.name as class_name 
-					FROM exams e 
-					LEFT JOIN subjects s ON e.subject_id = s.id
-					LEFT JOIN exam_types et ON e.exam_type_id = et.id
-					LEFT JOIN classes c ON e.class_id = c.id
-					WHERE e.school_id = ? 
-					ORDER BY e.is_active DESC, e.title ASC
-				`).bind(userSchoolId).all<any>();
-				rawExams = schoolExamsRes.results || [];
-			}
 		}
 
 		let exams: { id: number; title: string }[] = rawExams.map((e: any) => ({
@@ -102,9 +89,11 @@ export const load: PageServerLoad = async ({ platform, locals, url }) => {
 			})
 		}));
 
+		const allowedExamIds = rawExams.map((e: any) => e.id);
+
 		// REQUIRE EXAM SELECTION FIRST
-		// If no exam selected, return empty students list with prompt
-		if (isNaN(examFilter)) {
+		// If no exam selected or not authorized, return empty students list with prompt
+		if (isNaN(examFilter) || (!isSuperAdmin && locals.user.role !== 'admin' && !allowedExamIds.includes(examFilter))) {
 			return {
 				students: [],
 				exams,

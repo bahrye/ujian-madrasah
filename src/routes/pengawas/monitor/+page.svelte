@@ -359,7 +359,12 @@
 				<svg class="w-16 h-16 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
 					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.exam} />
 				</svg>
-				<p class="text-lg font-medium">Silakan pilih ujian terlebih dahulu</p>
+				{#if data.exams.length === 0}
+					<p class="text-lg font-bold text-slate-700 mb-1">Tidak Ada Ujian yang Ditugaskan</p>
+					<p class="text-sm text-slate-500 max-w-md mx-auto">Anda belum ditugaskan sebagai pengawas pada ujian aktif mana pun. Hubungi admin atau panitia untuk pembagian jadwal pengawasan ujian.</p>
+				{:else}
+					<p class="text-lg font-medium">Silakan pilih ujian terlebih dahulu</p>
+				{/if}
 			</div>
 		{:else if filteredAttempts.length === 0}
 			<div class="p-12 text-center text-slate-400">
@@ -918,7 +923,8 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
-		class="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-fade-in"
+		class="fixed inset-0 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-fade-in"
+		style="z-index: 9999;"
 		on:click={() => (previewEnlargedPhoto = null)}
 	>
 		<div
