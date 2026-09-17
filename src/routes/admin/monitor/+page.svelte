@@ -25,6 +25,43 @@
 	let currentTime = Date.now();
 	let interval: any;
 
+	// Monitoring Camera Photos State
+	let showCameraGridModal = false;
+	let cameraGridFilter = 'semua';
+	$: cameraGridList = filteredAttempts.filter(a => {
+		if (cameraGridFilter === 'foto') return (a.photoCount || 0) > 0;
+		if (cameraGridFilter === 'pelanggaran') return (a.warnings || 0) > 0;
+		return true;
+	});
+	let selectedStudentForPhotos: any = null;
+	let selectedStudentPhotos: any[] = [];
+	let loadingStudentPhotos = false;
+	let previewEnlargedPhoto: { url: string; caption?: string; title?: string; time?: string } | null = null;
+
+	async function openStudentPhotos(student: any) {
+		selectedStudentForPhotos = student;
+		selectedStudentPhotos = [];
+		loadingStudentPhotos = true;
+		try {
+			const query = new URLSearchParams({
+				exam_id: String(data.examFilter || ''),
+				student_id: String(student.student_id)
+			});
+			const res = await fetch(`/api/proctor/monitoring-photos?${query.toString()}`);
+			if (res.ok) {
+				const json = await res.json();
+				selectedStudentPhotos = json.photos || [];
+			} else {
+				toasts.error('Gagal memuat foto pengawasan.');
+			}
+		} catch (e) {
+			console.error(e);
+			toasts.error('Terjadi kesalahan saat memuat foto.');
+		} finally {
+			loadingStudentPhotos = false;
+		}
+	}
+
 	let attemptsMap = new Map<string | number, number>();
 
 	let audioCtx: AudioContext | null = null;
@@ -288,11 +325,29 @@
 		</form>
 		
 		{#if data.examFilter}
-			<div class="flex gap-2 overflow-x-auto p-1.5 -m-1.5 mb-1 mt-2">
-				<button class="btn-sm {statusFilter === 'semua' ? 'btn-primary' : 'btn-ghost border border-slate-200'}" on:click={() => statusFilter = 'semua'}>Semua</button>
-				<button class="btn-sm {statusFilter === 'mengerjakan' ? 'btn-warning' : 'btn-ghost border border-slate-200 text-slate-600'}" on:click={() => statusFilter = 'mengerjakan'}>Sedang Mengerjakan</button>
-				<button class="btn-sm {statusFilter === 'selesai' ? 'btn-success' : 'btn-ghost border border-slate-200 text-slate-600'}" on:click={() => statusFilter = 'selesai'}>Selesai</button>
-				<button class="btn-sm {statusFilter === 'belum_mengerjakan' ? 'bg-slate-500 text-white' : 'btn-ghost border border-slate-200 text-slate-600'}" on:click={() => statusFilter = 'belum_mengerjakan'}>Belum Mengerjakan</button>
+			<div class="flex flex-wrap items-center justify-between gap-2 p-1.5 -m-1.5 mb-1 mt-2">
+				<div class="flex gap-2 overflow-x-auto">
+					<button class="btn-sm {statusFilter === 'semua' ? 'btn-primary' : 'btn-ghost border border-slate-200'}" on:click={() => statusFilter = 'semua'}>Semua</button>
+					<button class="btn-sm {statusFilter === 'mengerjakan' ? 'btn-warning' : 'btn-ghost border border-slate-200 text-slate-600'}" on:click={() => statusFilter = 'mengerjakan'}>Sedang Mengerjakan</button>
+					<button class="btn-sm {statusFilter === 'selesai' ? 'btn-success' : 'btn-ghost border border-slate-200 text-slate-600'}" on:click={() => statusFilter = 'selesai'}>Selesai</button>
+					<button class="btn-sm {statusFilter === 'belum_mengerjakan' ? 'bg-slate-500 text-white' : 'btn-ghost border border-slate-200 text-slate-600'}" on:click={() => statusFilter = 'belum_mengerjakan'}>Belum Mengerjakan</button>
+				</div>
+				<button 
+					type="button" 
+					class="btn-secondary btn-sm flex items-center gap-1.5 shadow-sm text-indigo-700 bg-indigo-50 border-indigo-200 hover:bg-indigo-100" 
+					on:click={() => showCameraGridModal = true}
+				>
+					<svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+						<path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+					</svg>
+					<span>Galeri Kamera Wajah</span>
+					{#if filteredAttempts.filter(a => (a.photoCount || 0) > 0).length > 0}
+						<span class="px-1.5 py-0.2 bg-indigo-600 text-white rounded-full text-[10px] font-bold">
+							{filteredAttempts.filter(a => (a.photoCount || 0) > 0).length}
+						</span>
+					{/if}
+				</button>
 			</div>
 		{/if}
 	</div>
@@ -322,6 +377,7 @@
 							<th>Username</th>
 							<th>Status</th>
 							<th class="w-20 text-center">TTD</th>
+							<th class="w-24 text-center">Foto Wajah</th>
 							<th class="w-24 text-center">Pelanggaran</th>
 							<th class="w-32">Progress</th>
 							<th>Sisa Waktu</th>
@@ -361,6 +417,25 @@
 											<span class="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-indigo-600 text-[8px] text-white opacity-0 group-hover:opacity-100 transition-opacity">
 												🔍
 											</span>
+										</button>
+									{:else}
+										<span class="text-slate-300 text-xs">-</span>
+									{/if}
+								</td>
+								<td class="text-center">
+									{#if (a.photoCount || 0) > 0}
+										<button
+											type="button"
+											class="group relative inline-flex items-center gap-1.5 px-2 py-1 rounded-xl border border-indigo-200 bg-indigo-50/70 hover:bg-indigo-100 hover:border-indigo-400 transition-all cursor-pointer shadow-xs"
+											on:click={() => openStudentPhotos(a)}
+											title="Lihat riwayat {a.photoCount} foto pengawasan"
+										>
+											{#if a.latestPhoto}
+												<img src={a.latestPhoto} alt="Foto {a.student_name}" class="h-6 w-6 rounded-full object-cover border border-indigo-200" />
+											{:else}
+												<span class="text-xs">📷</span>
+											{/if}
+											<span class="text-[11px] font-bold text-indigo-700">{a.photoCount}</span>
 										</button>
 									{:else}
 										<span class="text-slate-300 text-xs">-</span>
@@ -609,6 +684,259 @@
 				class="btn btn-secondary w-full text-xs mt-5 py-2.5"
 				on:click={() => (previewSignature = null)}
 			>
+				Tutup
+			</button>
+		</div>
+	</div>
+{/if}
+
+<!-- Student Photo Timeline Modal -->
+{#if selectedStudentForPhotos}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in"
+		on:click={() => (selectedStudentForPhotos = null)}
+	>
+		<div
+			class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl relative animate-scale-up border border-slate-100 max-h-[90vh] flex flex-col"
+			on:click|stopPropagation
+		>
+			<div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+				<div class="flex items-center gap-3">
+					<div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+							<path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+						</svg>
+					</div>
+					<div>
+						<h3 class="text-base font-bold text-slate-800 leading-tight">{selectedStudentForPhotos.student_name}</h3>
+						<p class="text-xs text-slate-500">@{selectedStudentForPhotos.username} • Sesi {selectedStudentForPhotos.student_session_number || 1}</p>
+					</div>
+				</div>
+				<button
+					type="button"
+					class="text-slate-400 hover:text-slate-600 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
+					on:click={() => (selectedStudentForPhotos = null)}
+				>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+
+			<div class="overflow-y-auto flex-1 pr-1 space-y-4">
+				{#if loadingStudentPhotos}
+					<div class="py-12 text-center text-slate-400">
+						<svg class="w-8 h-8 animate-spin mx-auto mb-2 text-indigo-600" fill="none" viewBox="0 0 24 24">
+							<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+							<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+						</svg>
+						<p class="text-sm font-medium">Memuat riwayat foto...</p>
+					</div>
+				{:else if selectedStudentPhotos.length === 0}
+					<div class="py-12 text-center text-slate-400">
+						<svg class="w-12 h-12 mx-auto mb-2 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+						</svg>
+						<p class="text-sm font-medium">Belum ada rekaman foto pengawasan untuk siswa ini.</p>
+					</div>
+				{:else}
+					<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+						{#each selectedStudentPhotos as photo}
+							{@const isStart = photo.photo_type === 'start'}
+							{@const isViolation = photo.photo_type === 'violation'}
+							{@const isFinish = photo.photo_type === 'finish'}
+							<div class="p-3 rounded-2xl border {isViolation ? 'border-rose-200 bg-rose-50/40' : isStart ? 'border-emerald-200 bg-emerald-50/40' : 'border-indigo-200 bg-indigo-50/40'} flex flex-col justify-between">
+								<div class="flex items-center justify-between mb-2">
+									<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider {isViolation ? 'bg-rose-100 text-rose-700' : isStart ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700'}">
+										{#if isStart}🟢 Absensi Awal{:else if isViolation}⚠️ Pelanggaran{:else if isFinish}🔵 Selesai Ujian{:else}📸 Inspeksi{/if}
+									</span>
+									<span class="text-[10px] text-slate-400 font-mono">
+										{photo.created_at ? parseDate(photo.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : ''}
+									</span>
+								</div>
+
+								<!-- Photo Thumbnail with Zoom Click -->
+								<button
+									type="button"
+									class="relative rounded-xl overflow-hidden bg-slate-900 aspect-4/3 flex items-center justify-center group cursor-pointer border border-slate-200/80 mb-2"
+									on:click={() => previewEnlargedPhoto = { url: photo.photo_url, caption: photo.caption, title: selectedStudentForPhotos.student_name, time: photo.created_at }}
+									title="Klik untuk memperbesar foto"
+								>
+									<img src={photo.photo_url} alt={photo.caption || 'Foto'} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
+									<div class="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1">
+										<span>🔍 Perbesar</span>
+									</div>
+								</button>
+
+								{#if photo.caption}
+									<p class="text-[11px] {isViolation ? 'text-rose-700 font-semibold' : 'text-slate-600'} line-clamp-2 leading-tight">
+										{photo.caption}
+									</p>
+								{/if}
+							</div>
+						{/each}
+					</div>
+				{/if}
+			</div>
+
+			<div class="pt-4 border-t border-slate-100 mt-4">
+				<button type="button" class="btn btn-secondary w-full text-xs py-2.5" on:click={() => (selectedStudentForPhotos = null)}>
+					Tutup
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Live Camera Grid Modal for All Students -->
+{#if showCameraGridModal}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in"
+		on:click={() => (showCameraGridModal = false)}
+	>
+		<div
+			class="bg-white rounded-3xl p-6 w-full max-w-4xl shadow-2xl relative animate-scale-up border border-slate-100 max-h-[90vh] flex flex-col"
+			on:click|stopPropagation
+		>
+			<div class="flex flex-wrap items-center justify-between pb-4 border-b border-slate-100 mb-4 gap-2">
+				<div class="flex items-center gap-3">
+					<div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+							<path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+						</svg>
+					</div>
+					<div>
+						<h3 class="text-base font-bold text-slate-800 leading-tight">Galeri Pengawasan Kamera Wajah</h3>
+						<p class="text-xs text-slate-500">Monitoring snapshot wajah seluruh peserta ujian di ruangan</p>
+					</div>
+				</div>
+
+				<div class="flex items-center gap-2">
+					<div class="flex gap-1 bg-slate-100 p-1 rounded-xl text-xs">
+						<button class="px-2.5 py-1 rounded-lg font-medium {cameraGridFilter === 'semua' ? 'bg-white shadow-xs text-indigo-600 font-bold' : 'text-slate-600'}" on:click={() => cameraGridFilter = 'semua'}>Semua</button>
+						<button class="px-2.5 py-1 rounded-lg font-medium {cameraGridFilter === 'foto' ? 'bg-white shadow-xs text-indigo-600 font-bold' : 'text-slate-600'}" on:click={() => cameraGridFilter = 'foto'}>Punya Foto</button>
+						<button class="px-2.5 py-1 rounded-lg font-medium {cameraGridFilter === 'pelanggaran' ? 'bg-white shadow-xs text-rose-600 font-bold' : 'text-slate-600'}" on:click={() => cameraGridFilter = 'pelanggaran'}>Pelanggaran</button>
+					</div>
+					<button
+						type="button"
+						class="text-slate-400 hover:text-slate-600 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
+						on:click={() => (showCameraGridModal = false)}
+					>
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+						</svg>
+					</button>
+				</div>
+			</div>
+
+			<div class="overflow-y-auto flex-1 pr-1">
+				{#if cameraGridList.length === 0}
+					<div class="py-16 text-center text-slate-400">
+						<svg class="w-12 h-12 mx-auto mb-2 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+						</svg>
+						<p class="text-sm font-medium">Tidak ada siswa yang sesuai filter saat ini.</p>
+					</div>
+				{:else}
+					<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+						{#each cameraGridList as a}
+							<div class="card p-3 flex flex-col justify-between border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all group">
+								<div class="relative rounded-xl overflow-hidden bg-slate-900 aspect-4/3 flex items-center justify-center mb-2.5">
+									{#if a.latestPhoto}
+										<img src={a.latestPhoto} alt={a.student_name} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
+										<span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-full bg-slate-950/70 text-white text-[10px] font-semibold backdrop-blur-xs">
+											📷 {a.photoCount || 1}
+										</span>
+									{:else}
+										<div class="text-center p-3 text-slate-400">
+											<span class="text-2xl block mb-1">👤</span>
+											<span class="text-[10px]">Belum Ada Foto</span>
+										</div>
+									{/if}
+
+									{#if (a.warnings || 0) > 0}
+										<span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-bold shadow-xs">
+											⚠️ {a.warnings}x
+										</span>
+									{/if}
+								</div>
+
+								<div>
+									<h4 class="text-xs font-bold text-slate-800 truncate" title={a.student_name}>{a.student_name}</h4>
+									<p class="text-[10px] text-slate-500 mb-2">@{a.username} • Sesi {a.student_session_number || 1}</p>
+								</div>
+
+								<div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-1">
+									<span class="text-[10px] font-semibold {a.status === 'mengerjakan' ? 'text-amber-600' : a.status === 'selesai' ? 'text-emerald-600' : 'text-slate-400'}">
+										{ATTEMPT_STATUS_LABELS[a.status] || 'Belum'}
+									</span>
+									{#if (a.photoCount || 0) > 0}
+										<button
+											type="button"
+											class="text-[10px] text-indigo-600 font-bold hover:text-indigo-800 hover:underline cursor-pointer"
+											on:click={() => openStudentPhotos(a)}
+										>
+											Detail Foto →
+										</button>
+									{/if}
+								</div>
+							</div>
+						{/each}
+					</div>
+				{/if}
+			</div>
+
+			<div class="pt-4 border-t border-slate-100 mt-4 flex justify-end">
+				<button type="button" class="btn btn-secondary text-xs px-6 py-2.5" on:click={() => (showCameraGridModal = false)}>
+					Tutup
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Lightbox Modal for Enlarged Photo -->
+{#if previewEnlargedPhoto}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div
+		class="fixed inset-0 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-fade-in"
+		style="z-index: 9999;"
+		on:click={() => (previewEnlargedPhoto = null)}
+	>
+		<div
+			class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl relative animate-scale-up border border-slate-100 text-center"
+			on:click|stopPropagation
+		>
+			<button
+				type="button"
+				class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
+				on:click={() => (previewEnlargedPhoto = null)}
+			>
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+				</svg>
+			</button>
+
+			<h3 class="text-base font-bold text-slate-800">{previewEnlargedPhoto.title || 'Foto Pengawasan'}</h3>
+			{#if previewEnlargedPhoto.caption}
+				<p class="text-xs text-rose-600 font-semibold mt-0.5">{previewEnlargedPhoto.caption}</p>
+			{/if}
+			{#if previewEnlargedPhoto.time}
+				<p class="text-[11px] text-slate-400 mt-0.5 mb-3">{parseDate(previewEnlargedPhoto.time).toLocaleString('id-ID')}</p>
+			{/if}
+
+			<div class="rounded-2xl overflow-hidden bg-slate-900 flex items-center justify-center border border-slate-200">
+				<img src={previewEnlargedPhoto.url} alt="Foto Zoom" class="max-h-[65vh] w-auto object-contain" />
+			</div>
+
+			<button type="button" class="btn btn-secondary w-full text-xs mt-4 py-2.5" on:click={() => (previewEnlargedPhoto = null)}>
 				Tutup
 			</button>
 		</div>
