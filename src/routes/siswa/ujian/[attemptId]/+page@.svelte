@@ -497,6 +497,48 @@
 	}
 
 	let isDisqualifying = false;
+	let pendingViolationPhotoType: string | null = null;
+	let isCapturingViolationPhoto = false;
+
+	async function sendViolationPhotoOnly(type: string, photo: string) {
+		if (!attempt?.id || submitting || isSubmitted) return;
+		try {
+			await fetch('/api/student/log-violation', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					attempt_id: attempt.id,
+					violation_type: type,
+					photo: photo,
+					photo_only: true
+				}),
+				keepalive: true
+			});
+		} catch (e) {
+			console.warn('Failed to send deferred violation photo:', e);
+		}
+	}
+
+	async function checkAndCapturePendingViolationPhoto() {
+		if (!pendingViolationPhotoType || isCapturingViolationPhoto || !attempt?.id || isUnloading || submitting || isSubmitted || (typeof document !== 'undefined' && document.hidden)) return;
+		const vType = pendingViolationPhotoType;
+		pendingViolationPhotoType = null;
+		isCapturingViolationPhoto = true;
+
+		try {
+			const photo = await captureMicroSnapshot({ timeoutMs: 3000 });
+			if (photo) {
+				await sendViolationPhotoOnly(vType, photo);
+			} else {
+				// Coba sekali lagi jika kamera belum siap
+				pendingViolationPhotoType = vType;
+			}
+		} catch (e) {
+			console.warn('Error capturing pending violation photo:', e);
+		} finally {
+			isCapturingViolationPhoto = false;
+		}
+	}
 
 	function sendViolationBeacon(type: string, photo?: string | null) {
 		if (!attempt?.id || submitting || isSubmitted || isUnloading || isDisqualifying || attempt?.status !== 'mengerjakan') return;
@@ -670,7 +712,11 @@
 			requestWakeLock();
 		}
 		// Tangkap bukti foto pelanggaran yang tertunda saat siswa kembali ke ujian
-		checkAndCapturePendingViolationPhoto();
+		try {
+			checkAndCapturePendingViolationPhoto();
+		} catch (e) {
+			console.warn('Error checking pending violation photo:', e);
+		}
 	}
 
 	function unlockAudioAndVibration() {
@@ -691,8 +737,12 @@
 	}
 
 	async function enterFullscreen() {
-		unlockAudioAndVibration();
-		handleReturnToExam();
+		try {
+			unlockAudioAndVibration();
+		} catch (e) {}
+		try {
+			handleReturnToExam();
+		} catch (e) {}
 		hasEnteredFullscreenOnce = true;
 		if (browser) {
 			localStorage.setItem(`hasEnteredFullscreen_${attempt.id}`, 'true');
@@ -703,14 +753,20 @@
 			}
 		}
 		try {
-			if (document.documentElement.requestFullscreen) {
-				await document.documentElement.requestFullscreen();
-				isFullscreen = true;
-			} else {
-				isFullscreen = true;
+			const docEl = document.documentElement as any;
+			if (docEl.requestFullscreen) {
+				await docEl.requestFullscreen();
+			} else if (docEl.webkitRequestFullscreen) {
+				await docEl.webkitRequestFullscreen();
+			} else if (docEl.mozRequestFullScreen) {
+				await docEl.mozRequestFullScreen();
+			} else if (docEl.msRequestFullscreen) {
+				await docEl.msRequestFullscreen();
 			}
 		} catch (err) {
-			// Fallback jika API requestFullscreen ditolak/tidak didukung WebView
+			console.warn('requestFullscreen fallback:', err);
+		} finally {
+			// Pastikan isFullscreen selalu aktif sehingga overlay langsung tertutup di browser
 			isFullscreen = true;
 		}
 	}
