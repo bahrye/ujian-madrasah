@@ -78,7 +78,7 @@ export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
 		{ label: 'Siswa', href: '/admin/students', icon: 'users' },
 		{ label: 'Kelas', href: '/admin/classes', icon: 'school' },
 		{ label: 'Ruang Ujian', href: '/admin/rooms', icon: 'room' },
-		{ label: 'Mata Pelajaran', href: '/admin/subjects', icon: 'exam' },
+		{ label: 'Mata Pelajaran', href: '/admin/subjects', icon: 'subject' },
 		{ label: 'Bank Soal', href: '/admin/bank-soal', icon: 'questions' },
 		{ label: 'Bank Media', href: '/admin/media-bank', icon: 'folder' },
 		{ 
@@ -93,7 +93,7 @@ export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
 		},
 		{ label: 'Hasil Ujian', href: '/admin/results', icon: 'results' },
 		{ label: 'Laporan & Analisis', href: '/admin/laporan-analisis', icon: 'analytics' },
-		{ label: 'Papan Peringkat', href: '/admin/papan-peringkat', icon: 'results' },
+		{ label: 'Papan Peringkat', href: '/admin/papan-peringkat', icon: 'trophy' },
 		{ label: 'Log Aktivitas', href: '/admin/activity-logs', icon: 'history' }
 	],
 	guru: [
@@ -104,7 +104,7 @@ export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
 		{ label: 'Penilaian', href: '/guru/penilaian', icon: 'grading' },
 		{ label: 'Hasil Ujian', href: '/guru/results', icon: 'results' },
 		{ label: 'Laporan & Analisis', href: '/guru/laporan-analisis', icon: 'analytics' },
-		{ label: 'Papan Peringkat', href: '/guru/papan-peringkat', icon: 'results' }
+		{ label: 'Papan Peringkat', href: '/guru/papan-peringkat', icon: 'trophy' }
 	],
 	pengawas: [
 		{ label: 'Dashboard', href: '/pengawas', icon: 'dashboard' },
@@ -126,7 +126,7 @@ export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
 		{ label: 'Tata Tertib Ujian', href: '/siswa/tata-tertib', icon: 'rules' },
 		{ label: 'Jadwal Ujian', href: '/siswa/jadwal', icon: 'calendar' },
 		{ label: 'Hasil Ujian', href: '/siswa/hasil-ujian', icon: 'results' },
-		{ label: 'Papan Peringkat', href: '/siswa/papan-peringkat', icon: 'results' }
+		{ label: 'Papan Peringkat', href: '/siswa/papan-peringkat', icon: 'trophy' }
 	]
 };
 
@@ -139,6 +139,7 @@ export const ICONS: Record<string, string> = {
 	school:
 		'M12 14l9-5-9-5-9 5 9 5z M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222',
 	exam: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01',
+	subject: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253',
 	results:
 		'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
 	analytics:
@@ -172,5 +173,6 @@ export const ICONS: Record<string, string> = {
 	rules: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4',
 	print: 'M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z',
 	history: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
-	room: 'M3 21h18M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16M9 10a1 1 0 100 2 1 1 0 000-2z'
+	room: 'M3 21h18M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16M9 10a1 1 0 100 2 1 1 0 000-2z',
+	trophy: 'M6.22 12.17A8 8 0 0112 3a8 8 0 015.78 9.17M15 21H9m3-3v3M5 7H3a2 2 0 00-2 2v1c0 1.1.9 2 2 2h2m14-5h2a2 2 0 012 2v1a2 2 0 01-2 2h-2M5 7v5a7 7 0 007 7 7 7 0 007-7V7H5z'
 };
