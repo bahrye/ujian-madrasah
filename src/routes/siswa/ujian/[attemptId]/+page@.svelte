@@ -289,6 +289,15 @@
 						checkedMilestones.clear();
 					}
 					isPausedByProctor = data.is_paused;
+					// Sinkron PIN keluar ke APK setiap polling agar selalu cocok dengan yang di server
+					if (data.exam_exit_pin) {
+						(window as any).exambroExitPin = String(data.exam_exit_pin);
+						try {
+							if ((window as any).ExambroBridge?.setExamExitPin) {
+								(window as any).ExambroBridge.setExamExitPin(String(data.exam_exit_pin));
+							}
+						} catch (e) {}
+					}
 					if (data.status !== 'mengerjakan' && data.status !== attempt.status) {
 						sessionStorage.setItem(officialReloadKey, 'true');
 						window.location.reload();

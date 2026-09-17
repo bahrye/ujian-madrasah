@@ -78,6 +78,8 @@ class MainActivity : AppCompatActivity() {
     private var isExamPaused: Boolean = false
     private var isExamActive: Boolean = false
     private var touchStartedInTopZone: Boolean = false
+    private var currentAttemptId: String? = null
+    private var pinPollThread: Thread? = null
 
     companion object {
         private const val PREFS_NAME = "exambro_prefs"
@@ -159,11 +161,54 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {}
     }
 
+    /**
+     * Polling PIN keluar ujian langsung dari server setiap 15 detik.
+     * Ini memastikan `currentExamExitPin` selalu tersinkron dengan `exams.exit_pin` di database,
+     * bahkan jika koneksi web sempat gagal saat inject PIN via ExambroBridge.
+     */
+    private fun startPinPolling(attemptId: String) {
+        stopPinPolling()
+        currentAttemptId = attemptId
+        pinPollThread = Thread {
+            while (!Thread.currentThread().isInterrupted && isExamActive) {
+                try {
+                    Thread.sleep(15000)
+                    if (!isExamActive) break
+                    val serverUrl = prefs.getString(KEY_EXAM_URL, DEFAULT_URL) ?: DEFAULT_URL
+                    val url = java.net.URL("$serverUrl/api/attempt-status/$attemptId")
+                    val conn = url.openConnection() as java.net.HttpURLConnection
+                    conn.connectTimeout = 5000
+                    conn.readTimeout = 5000
+                    conn.requestMethod = "GET"
+                    if (conn.responseCode == 200) {
+                        val reader = java.io.BufferedReader(java.io.InputStreamReader(conn.inputStream))
+                        val response = reader.readText()
+                        reader.close()
+                        val json = org.json.JSONObject(response)
+                        val pin = json.optString("exam_exit_pin", "")
+                        if (pin.isNotEmpty() && pin != "null") {
+                            currentExamExitPin = pin.trim()
+                        }
+                    }
+                    conn.disconnect()
+                } catch (e: InterruptedException) {
+                    break
+                } catch (e: Exception) {}
+            }
+        }.also { it.isDaemon = true; it.start() }
+    }
+
+    private fun stopPinPolling() {
+        pinPollThread?.interrupt()
+        pinPollThread = null
+    }
+
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (!::webView.isInitialized) return
         if (hasFocus) {
             applyImmersiveMode()
+            // Pastikan LockTask hanya diaktifkan jika ujian aktif DAN tidak dalam status ditahan
             if (isExamInProgress() && !isExamPaused) {
                 startLockTaskMode()
             }
@@ -364,10 +409,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showLandingScreen() {
+        stopPinPolling()
         stopLockTaskMode()
         isExamActive = false
         currentExamExitPin = null
         isExamPaused = false
+        currentAttemptId = null
         if (::layoutLanding.isInitialized) layoutLanding.visibility = View.VISIBLE
         if (::webView.isInitialized) webView.visibility = View.GONE
         if (::layoutError.isInitialized) layoutError.visibility = View.GONE
@@ -518,6 +565,12 @@ class MainActivity : AppCompatActivity() {
                         val cleanActive = active?.replace("\"", "")?.trim()
                         if (cleanActive == "1" || cleanActive == "true") {
                             isExamActive = true
+                            // Ekstrak attemptId dari URL dan mulai polling PIN mandiri
+                            val attemptIdMatch = Regex(".*/siswa/ujian/(\\d+).*").find(currentUrl)
+                            val extractedId = attemptIdMatch?.groupValues?.getOrNull(1)
+                            if (!extractedId.isNullOrEmpty() && (currentAttemptId != extractedId)) {
+                                startPinPolling(extractedId)
+                            }
                             runOnUiThread {
                                 startLockTaskMode()
                                 applyImmersiveMode()
@@ -525,6 +578,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 } else {
+                    stopPinPolling()
                     stopLockTaskMode()
                     isExamActive = false
                     currentExamExitPin = null
@@ -565,14 +619,24 @@ class MainActivity : AppCompatActivity() {
     inner class ExambroWebAppInterface {
         @android.webkit.JavascriptInterface
         fun setExamActive(active: Boolean, exitPin: String?) {
+            // exitPin: PIN dari exams.exit_pin yang dikirim web saat halaman soal dimuat
+            if (!exitPin.isNullOrEmpty() && exitPin != "null") {
+                currentExamExitPin = exitPin.trim()
+            }
+            // Ekstrak attemptId dari URL untuk polling PIN mandiri
+            val urlStr = webView.url ?: currentUrl
+            val attemptIdMatch = Regex(".*/siswa/ujian/(\\d+).*").find(urlStr)
+            val extractedAttemptId = attemptIdMatch?.groupValues?.getOrNull(1)
+
             runOnUiThread {
                 isExamActive = active
-                if (!exitPin.isNullOrEmpty() && exitPin != "null") {
-                    currentExamExitPin = exitPin.trim()
-                }
                 if (active) {
+                    if (!extractedAttemptId.isNullOrEmpty()) {
+                        startPinPolling(extractedAttemptId)
+                    }
                     startLockTaskMode()
                 } else {
+                    stopPinPolling()
                     stopLockTaskMode()
                 }
                 applyImmersiveMode()
@@ -589,12 +653,19 @@ class MainActivity : AppCompatActivity() {
             isExamPaused = paused
             runOnUiThread {
                 if (paused) {
-                    // Ketika ujian dijeda oleh pengawas, hentikan LockTask sementara dan izinkan akses bilah atas untuk menyalakan data/WiFi
+                    // Saat ujian ditahan pengawas:
+                    // 1. Hentikan LockTask agar bilah status & navigasi bisa diakses
+                    // 2. Izinkan gestur swipe untuk menyalakan/mematikan data/WiFi
                     stopLockTaskMode()
-                    val controller = WindowInsetsControllerCompat(window, window.decorView)
-                    controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                    Toast.makeText(this@MainActivity, "Ujian dijeda pengawas. Pengaturan data/WiFi dibuka.", Toast.LENGTH_SHORT).show()
+                    try {
+                        WindowCompat.setDecorFitsSystemWindows(window, false)
+                        val controller = WindowInsetsControllerCompat(window, window.decorView)
+                        controller.show(WindowInsetsCompat.Type.systemBars())
+                        controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                    } catch (e: Exception) {}
+                    Toast.makeText(this@MainActivity, "Ujian dijeda pengawas. Bilah status dibuka untuk mengatur WiFi/Data.", Toast.LENGTH_LONG).show()
                 } else {
+                    // Saat ujian dilanjutkan kembali: kunci penuh
                     if (isExamInProgress()) {
                         startLockTaskMode()
                     }
@@ -798,21 +869,36 @@ class MainActivity : AppCompatActivity() {
             .setCancelable(false)
             .setPositiveButton(getString(R.string.dialog_btn_exit)) { _, _ ->
                 val enteredPin = input.text.toString().trim()
+                // Validasi: cek PIN dari server (exam_exit_pin) ATAU master PIN pengawas (SharedPreferences)
+                val serverPin = currentExamExitPin?.trim()
                 val masterPin = prefs.getString(KEY_PROCTOR_PIN, DEFAULT_PIN) ?: DEFAULT_PIN
-                val isValid = (currentExamExitPin != null && enteredPin == currentExamExitPin) || (enteredPin == masterPin)
-                if (isValid) {
+                val isValidServerPin = !serverPin.isNullOrEmpty() && enteredPin == serverPin
+                val isValidMasterPin = enteredPin == masterPin
+                if (isValidServerPin || isValidMasterPin) {
+                    stopPinPolling()
                     stopLockTaskMode()
                     isExamActive = false
+                    isExamPaused = false
                     showLandingScreen()
                     Toast.makeText(this, "Berhasil keluar dari ujian", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(this, "PIN Keluar Ujian salah! Silakan minta PIN kepada Pengawas Ruang.", Toast.LENGTH_SHORT).show()
-                    applyImmersiveMode()
+                    // PIN salah: tampilkan pesan saja.
+                    // JANGAN panggil applyImmersiveMode() saat isExamPaused=true agar LockTask tidak diaktifkan lagi.
+                    val msg = if (serverPin.isNullOrEmpty())
+                        "PIN Keluar Ujian salah! (PIN belum tersinkron — coba tunggu beberapa detik, atau gunakan PIN dari layar Monitoring Pengawas)"
+                    else
+                        "PIN Keluar Ujian salah! Silakan minta PIN kepada Pengawas Ruang."
+                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+                    if (!isExamPaused) {
+                        applyImmersiveMode()
+                    }
                 }
             }
             .setNegativeButton(getString(R.string.dialog_btn_cancel)) { dialog, _ ->
                 dialog.dismiss()
-                applyImmersiveMode()
+                if (!isExamPaused) {
+                    applyImmersiveMode()
+                }
             }
             .show()
     }
