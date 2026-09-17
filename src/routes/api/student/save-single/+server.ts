@@ -64,7 +64,12 @@ export const POST: RequestHandler = async ({ request, platform, locals, cookies 
 		}
 
 		if (attempt.is_paused === 1) {
-			return json({ error: 'Ujian sedang dijeda oleh pengawas' }, { status: 403 });
+			return json({ 
+				error: 'Ujian sedang dijeda oleh pengawas',
+				is_paused: true,
+				status: attempt.status,
+				end_time: attempt.end_time
+			}, { status: 403 });
 		}
 
 		// Simpan jawaban tunggal dan perbarui updated_at attempt

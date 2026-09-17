@@ -147,9 +147,12 @@ export const actions: Actions = {
 		const isVerified = await verifyExamTokenSignature(cookieVal, parsedAttemptId, locals.user.id);
 		if (!isVerified) return fail(401, { error: 'Sesi token tidak valid.' });
 
-		const attemptCheck = await db.prepare('SELECT status FROM student_attempts WHERE id = ? AND student_id = ?').bind(parsedAttemptId, locals.user.id).first<any>();
+		const attemptCheck = await db.prepare('SELECT status, is_paused FROM student_attempts WHERE id = ? AND student_id = ?').bind(parsedAttemptId, locals.user.id).first<any>();
 		if (!attemptCheck || attemptCheck.status !== 'mengerjakan') {
 			return fail(400, { error: 'Sesi ujian sudah tidak aktif.' });
+		}
+		if (attemptCheck.is_paused === 1) {
+			return fail(403, { error: 'Ujian sedang ditahan oleh pengawas.', is_paused: true });
 		}
 
 		const form = await request.formData();
@@ -222,6 +225,10 @@ export const actions: Actions = {
 
 			if (!attempt || attempt.status !== 'mengerjakan') {
 				return fail(400, { error: 'Sesi ujian tidak valid atau sudah selesai.' });
+			}
+
+			if (attempt.is_paused === 1) {
+				return fail(403, { error: 'Ujian sedang ditahan oleh pengawas. Anda tidak dapat menyelesaikan ujian saat ditahan.', is_paused: true });
 			}
 
 			const form = await request.formData().catch(() => null);

@@ -53,6 +53,8 @@
 		isPausedByProctor = data.attempt.is_paused === 1;
 	}
 	let statusPollingInterval: any;
+	let lastStatusFetchTime = Date.now();
+	let fetchAttemptStatus: () => Promise<void> = async () => {};
 
 	$: isExambroApp = browser && (
 		navigator.userAgent.includes('ExambroMadrasah') || 
@@ -305,9 +307,10 @@
 			return Math.max(0, Math.floor((end - Date.now()) / 1000));
 		}
 
-		async function fetchAttemptStatus() {
+		fetchAttemptStatus = async () => {
 			if (isUnloading || submitting || showSubmitConfirm || (typeof document !== 'undefined' && document.hidden)) return;
 			try {
+				lastStatusFetchTime = Date.now();
 				const res = await fetch(`/api/attempt-status/${attempt.id}`);
 				if (res.ok) {
 					const data = (await res.json()) as any;
@@ -315,7 +318,7 @@
 						currentEndTime = data.end_time;
 						checkedMilestones.clear();
 					}
-					isPausedByProctor = data.is_paused;
+					isPausedByProctor = data.is_paused === true || data.is_paused === 1;
 					// Sinkron PIN keluar per-ujian ke APK
 					if (data.exam_exit_pin) {
 						(window as any).exambroExitPin = String(data.exam_exit_pin);
@@ -339,36 +342,48 @@
 					}
 				}
 			} catch (e) {}
-		}
+		};
 
-		// Smart Milestone Polling: Sangat hemat kuota Cloudflare/Vercel.
-		// Siswa aktif sudah otomatis sinkron saat klik jawaban (delta save).
-		// Polling network hanya jalan 1-2x ketika waktu hampir habis atau saat ditahan.
+		// Smart Adaptive Polling (Sangat hemat kuota Cloudflare/Vercel):
+		// 1. Saat siswa aktif menjawab soal, /api/student/save-single sudah otomatis menyinkronkan status (0 request ekstra).
+		// 2. Saat siswa diam/membaca soal, polling berjalan santai setiap 15 detik jika tidak ada aktivitas sync (~4 req/menit per siswa).
+		// 3. Saat ujian sedang DITAHAN, polling dilakukan tiap 5 detik agar segera aktif saat pengawas klik "Lanjutkan".
+		// 4. Saat tab hidden/blur: tidak ada request sama sekali (0 request).
 		statusPollingInterval = setInterval(async () => {
-			if (isUnloading || submitting || showSubmitConfirm) return;
+			if (isUnloading || submitting || showSubmitConfirm || (typeof document !== 'undefined' && document.hidden)) return;
 
-			// 1. Jika sedang ditahan oleh pengawas, periksa status agar segera lanjut saat dibuka
+			const now = Date.now();
+
+			// 1. Jika sedang ditahan oleh pengawas, periksa tiap 5 detik agar segera lanjut saat dibuka
 			if (isPausedByProctor) {
+				if (now - lastStatusFetchTime >= 5000) {
+					await fetchAttemptStatus();
+				}
+				return;
+			}
+
+			// 2. Jika normal berjalan, cek berkala setiap 15 detik jika belum ada aktivitas sync
+			if (now - lastStatusFetchTime >= 15000) {
 				await fetchAttemptStatus();
 				return;
 			}
 
 			const remaining = getRemainingSeconds();
 
-			// 2. Milestone 1: Sisa 2 menit (<= 120s) -> sinkronisasi waktu akhir 1x
+			// 3. Milestone 1: Sisa 2 menit (<= 120s) -> sinkronisasi waktu akhir 1x
 			if (remaining <= 120 && remaining > 65 && !checkedMilestones.has(120)) {
 				checkedMilestones.add(120);
 				await fetchAttemptStatus();
 				return;
 			}
 
-			// 3. Milestone 2: Sisa 1 menit (<= 60s) -> sinkronisasi waktu akhir 1x
+			// 4. Milestone 2: Sisa 1 menit (<= 60s) -> sinkronisasi waktu akhir 1x
 			if (remaining <= 60 && remaining > 10 && !checkedMilestones.has(60)) {
 				checkedMilestones.add(60);
 				await fetchAttemptStatus();
 				return;
 			}
-		}, 10000);
+		}, 3000);
 	});
 
 	let isOfficialReload = false;
@@ -538,6 +553,13 @@
 				window.speechSynthesis.cancel();
 			}
 		} catch (e) {}
+	}
+
+	$: if (isPausedByProctor) {
+		stopWarningSoundLoop();
+		if (cheatWarningTimeout) clearTimeout(cheatWarningTimeout);
+		if (cheatCountdownInterval) clearInterval(cheatCountdownInterval);
+		isExamBlurred = false;
 	}
 
 	let isDisqualifying = false;
@@ -865,6 +887,7 @@
 				setTimeout(() => {
 					checkAndCapturePendingViolationPhoto();
 				}, 300);
+				fetchAttemptStatus?.();
 			}
 		}
 	}
@@ -1000,9 +1023,9 @@
 	}
 
 	let singleAnswerDebounceTimer: any = null;
-	let pendingAnswerSave: { questionId: number; answer: string; doubted: boolean } | null = null;
+	let pendingAnswerSave: { questionId: number; answer: string; doubted: boolean; previousAnswer?: string } | null = null;
 
-	async function executeSaveSingleAnswer(questionId: number, answer: string, doubted: boolean) {
+	async function executeSaveSingleAnswer(questionId: number, answer: string, doubted: boolean, previousAnswer?: string) {
 		if (isPausedByProctor || !attempt?.id) return;
 		try {
 			const res = await fetch('/api/student/save-single', {
@@ -1017,20 +1040,20 @@
 				keepalive: true
 			});
 
-			if (res.ok) {
-				const data = (await res.json()) as any;
-				if (data) {
-					if (data.end_time && data.end_time !== currentEndTime) {
-						currentEndTime = data.end_time;
-						checkedMilestones.clear();
-					}
-					if (typeof data.is_paused !== 'undefined') {
-						isPausedByProctor = data.is_paused;
-					}
-					if (data.status && data.status !== 'mengerjakan' && data.status !== attempt.status) {
-						sessionStorage.setItem(officialReloadKey, 'true');
-						window.location.reload();
-					}
+			lastStatusFetchTime = Date.now();
+			const data = (await res.json().catch(() => null)) as any;
+
+			if (res.ok && data) {
+				if (data.end_time && data.end_time !== currentEndTime) {
+					currentEndTime = data.end_time;
+					checkedMilestones.clear();
+				}
+				if (typeof data.is_paused !== 'undefined') {
+					isPausedByProctor = data.is_paused === true || data.is_paused === 1;
+				}
+				if (data.status && data.status !== 'mengerjakan' && data.status !== attempt.status) {
+					sessionStorage.setItem(officialReloadKey, 'true');
+					window.location.reload();
 				}
 				// Sinkronkan lastSavedPayload agar navigasi soal (Next/Prev/Nomor) tidak memicu request ?/saveAnswer duplikat
 				lastSavedPayload = JSON.stringify({
@@ -1039,6 +1062,22 @@
 					warnings: warnings,
 					warningLogs: warningLogs
 				});
+			} else if (res.status === 403 || data?.is_paused) {
+				// UJIAN DITAHAN! Segera aktifkan status ditahan dan batalkan pilihan jawaban lokal
+				isPausedByProctor = true;
+				if (data?.end_time) {
+					currentEndTime = data.end_time;
+				}
+				if (previousAnswer !== undefined) {
+					localAnswers[questionId] = previousAnswer;
+				} else {
+					delete localAnswers[questionId];
+				}
+				localAnswers = localAnswers;
+				try {
+					localStorage.setItem(`local_answers_${attempt.id}`, JSON.stringify(localAnswers));
+				} catch {}
+				toasts.warning('Ujian Anda sedang ditahan oleh pengawas.');
 			}
 		} catch (err) {
 			console.warn('Delta save fallback:', err);
@@ -1054,12 +1093,12 @@
 		if (pendingAnswerSave) {
 			const toSave = pendingAnswerSave;
 			pendingAnswerSave = null;
-			await executeSaveSingleAnswer(toSave.questionId, toSave.answer, toSave.doubted);
+			await executeSaveSingleAnswer(toSave.questionId, toSave.answer, toSave.doubted, toSave.previousAnswer);
 		}
 	}
 
-	function saveSingleAnswer(questionId: number, answer: string, doubted: boolean) {
-		pendingAnswerSave = { questionId, answer, doubted };
+	function saveSingleAnswer(questionId: number, answer: string, doubted: boolean, previousAnswer?: string) {
+		pendingAnswerSave = { questionId, answer, doubted, previousAnswer };
 		if (singleAnswerDebounceTimer) clearTimeout(singleAnswerDebounceTimer);
 		singleAnswerDebounceTimer = setTimeout(() => {
 			flushPendingSingleAnswer();
@@ -1067,16 +1106,19 @@
 	}
 
 	function handleAnswer(e: CustomEvent<{ questionId: number; answer: string }>) {
+		if (isPausedByProctor) return;
+		const previousAnswer = localAnswers[e.detail.questionId];
 		localAnswers[e.detail.questionId] = e.detail.answer;
 		localAnswers = localAnswers; // trigger reactivity
 		try {
 			localStorage.setItem(`local_answers_${attempt.id}`, JSON.stringify(localAnswers));
 		} catch {}
 		const isDoubted = !!localDoubts[e.detail.questionId];
-		saveSingleAnswer(e.detail.questionId, e.detail.answer, isDoubted);
+		saveSingleAnswer(e.detail.questionId, e.detail.answer, isDoubted, previousAnswer);
 	}
 
 	function handleDoubt(e: CustomEvent<{ questionId: number; doubted: boolean }>) {
+		if (isPausedByProctor) return;
 		localDoubts[e.detail.questionId] = e.detail.doubted;
 		localDoubts = localDoubts;
 		try {
@@ -1117,6 +1159,8 @@
 			});
 			if (res.ok) {
 				lastSavedPayload = currentPayload;
+			} else if (res.status === 403) {
+				isPausedByProctor = true;
 			}
 		} catch (err) {
 			console.error('Save error:', err);
