@@ -53,4 +53,13 @@
         android:text="Reset Pelanggaran ke 0"
         android:textColor="@color/primary" />
 
+    <Button
+        android:id="@+id/btnCheckUpdate"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Periksa Pembaruan Aplikasi"
+        android:textColor="@color/primary" />
+
 </LinearLayout>

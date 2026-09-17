@@ -32,6 +32,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import android.content.Intent
+import android.net.Uri
+import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
@@ -93,6 +100,11 @@ class MainActivity : AppCompatActivity() {
         window.decorView.postDelayed({
             isAppStarted = true
         }, 3000)
+
+        // Periksa pembaruan di latar belakang setelah 6 detik
+        window.decorView.postDelayed({
+            checkAppUpdate(false)
+        }, 6000)
     }
 
     private fun applyImmersiveMode() {
@@ -436,6 +448,11 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Riwayat pelanggaran berhasil di-reset ke 0", Toast.LENGTH_SHORT).show()
         }
 
+        val btnCheckUpdate = view.findViewById<Button>(R.id.btnCheckUpdate)
+        btnCheckUpdate.setOnClickListener {
+            checkAppUpdate(true)
+        }
+
         AlertDialog.Builder(this)
             .setView(view)
             .setPositiveButton("Simpan & Muat Ulang") { _, _ ->
@@ -455,5 +472,68 @@ class MainActivity : AppCompatActivity() {
                 applyImmersiveMode()
             }
             .show()
+    }
+
+    private fun checkAppUpdate(isManual: Boolean) {
+        val currentServerUrl = prefs.getString(KEY_EXAM_URL, DEFAULT_URL) ?: DEFAULT_URL
+        val endpoint = if (currentServerUrl.endsWith("/")) "${currentServerUrl}api/app-version" else "$currentServerUrl/api/app-version"
+
+        Thread {
+            try {
+                val url = URL(endpoint)
+                val conn = url.openConnection() as HttpURLConnection
+                conn.connectTimeout = 5000
+                conn.readTimeout = 5000
+                conn.requestMethod = "GET"
+
+                if (conn.responseCode == 200) {
+                    val reader = BufferedReader(InputStreamReader(conn.inputStream))
+                    val response = reader.readText()
+                    reader.close()
+
+                    val json = JSONObject(response)
+                    val remoteVersionCode = json.optInt("versionCode", 0)
+                    val remoteVersionName = json.optString("versionName", "")
+                    val downloadUrl = json.optString("downloadUrl", "")
+                    val changelog = json.optString("changelog", "Pembaruan performa dan keamanan.")
+
+                    runOnUiThread {
+                        if (remoteVersionCode > BuildConfig.VERSION_CODE) {
+                            AlertDialog.Builder(this)
+                                .setTitle("Pembaruan Tersedia (v$remoteVersionName)")
+                                .setMessage("Versi baru aplikasi telah dirilis.\n\nCatatan:\n$changelog\n\nVersi Anda: v${BuildConfig.VERSION_NAME}\nVersi Baru: v$remoteVersionName\n\nApakah Anda ingin mengunduh pembaruan?")
+                                .setCancelable(false)
+                                .setPositiveButton("Unduh Pembaruan") { _, _ ->
+                                    if (downloadUrl.isNotEmpty()) {
+                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(downloadUrl))
+                                        startActivity(intent)
+                                    }
+                                }
+                                .setNegativeButton("Nanti Saja") { dialog, _ ->
+                                    dialog.dismiss()
+                                    applyImmersiveMode()
+                                }
+                                .show()
+                        } else if (isManual) {
+                            Toast.makeText(
+                                this,
+                                "Aplikasi sudah versi terbaru (v${BuildConfig.VERSION_NAME})",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                } else if (isManual) {
+                    runOnUiThread {
+                        Toast.makeText(this, "Tidak dapat memeriksa pembaruan (Status: ${conn.responseCode})", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                if (isManual) {
+                    runOnUiThread {
+                        Toast.makeText(this, "Gagal terhubung ke server pembaruan", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }.start()
     }
 }

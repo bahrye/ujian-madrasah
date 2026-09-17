@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 	const isAdmin = locals.user.role === 'admin';
 
 	let tokensRaw: any;
-	if (isSuperAdmin || isAdmin) {
+	if (isSuperAdmin && !locals.user.school_id) {
 		tokensRaw = await db.prepare(`
 			SELECT t.*, e.title as exam_title, s.name as subject_name, et.code as exam_type_code, c.name as class_name,
 			COALESCE((
@@ -50,9 +50,34 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 			LEFT JOIN subjects s ON e.subject_id = s.id
 			LEFT JOIN exam_types et ON e.exam_type_id = et.id
 			LEFT JOIN classes c ON e.class_id = c.id
-			WHERE (? IS NULL OR e.school_id = ?)
 			ORDER BY t.created_at DESC
-		`).bind(locals.user.school_id, locals.user.school_id).all<any>();
+		`).all<any>();
+	} else if (isSuperAdmin || isAdmin) {
+		tokensRaw = await db.prepare(`
+			SELECT t.*, e.title as exam_title, s.name as subject_name, et.code as exam_type_code, c.name as class_name,
+			COALESCE((
+				SELECT json_group_array(
+					json_object(
+						'id', u.id, 
+						'name', u.name, 
+						'username', u.username, 
+						'start_time', sa.start_time,
+						'status', sa.status
+					)
+				)
+				FROM student_attempts sa
+				JOIN users u ON sa.student_id = u.id
+				WHERE sa.token_id = t.id 
+				   OR (sa.token_id IS NULL AND sa.exam_id = t.exam_id AND (t.session_number IS NULL OR t.session_number = COALESCE(u.session_number, 1)))
+			), '[]') as used_by_students_json
+			FROM tokens t 
+			JOIN exams e ON t.exam_id = e.id
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			LEFT JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN classes c ON e.class_id = c.id
+			WHERE e.school_id = ?
+			ORDER BY t.created_at DESC
+		`).bind(locals.user.school_id).all<any>();
 	} else {
 		tokensRaw = await db.prepare(`
 			SELECT DISTINCT t.*, e.title as exam_title, s.name as subject_name, et.code as exam_type_code, c.name as class_name,
@@ -109,7 +134,18 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 
 	let rawExamsList: any[] = [];
 
-	if (isSuperAdmin || isAdmin) {
+	if (isSuperAdmin && !locals.user.school_id) {
+		const examsRes = await db.prepare(`
+			SELECT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name, NULL as proctor_sessions
+			FROM exams e
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN classes c ON e.class_id = c.id
+			WHERE e.is_active = 1 AND et.is_active = 1
+			ORDER BY e.title
+		`).all<any>();
+		rawExamsList = examsRes.results || [];
+	} else if (isSuperAdmin || isAdmin) {
 		const examsRes = await db.prepare(`
 			SELECT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name, NULL as proctor_sessions
 			FROM exams e
@@ -135,14 +171,14 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		rawExamsList = proctorExamsRes.results || [];
 	}
 
-	const examIds = rawExamsList.map((e: any) => e.id);
+	const examIds = (rawExamsList || []).map((e: any) => e.id);
 	let dbSessions: any[] = [];
 	if (examIds.length > 0) {
 		const placeholders = examIds.map(() => '?').join(',');
 		const sessionsResult = await db.prepare(
 			`SELECT exam_id, session_number, start_time, end_time FROM exam_sessions WHERE exam_id IN (${placeholders}) ORDER BY session_number`
 		).bind(...examIds).all();
-		dbSessions = sessionsResult.results;
+		dbSessions = sessionsResult.results || [];
 	}
 
 	const processedExams: ExamSelectItem[] = rawExamsList.map((exam: any) => {
@@ -232,15 +268,21 @@ export const actions: Actions = {
 
 		// Verifikasi penugasan pengawas pada ujian ini
 		let proctorAssignment: any = null;
-		if (isSuperAdmin || isAdmin) {
+		if (isSuperAdmin && !locals.user.school_id) {
 			proctorAssignment = await db.prepare(`
-				SELECT NULL as sessions, e.start_time as exam_start_time, e.end_time as exam_end_time
+				SELECT e.school_id, NULL as sessions, e.start_time as exam_start_time, e.end_time as exam_end_time
 				FROM exams e
-				WHERE e.id = ? AND (e.school_id = ? OR ? IS NULL)
-			`).bind(parsedExamId, locals.user.school_id, locals.user.school_id).first<any>();
+				WHERE e.id = ?
+			`).bind(parsedExamId).first<any>();
+		} else if (isSuperAdmin || isAdmin) {
+			proctorAssignment = await db.prepare(`
+				SELECT e.school_id, NULL as sessions, e.start_time as exam_start_time, e.end_time as exam_end_time
+				FROM exams e
+				WHERE e.id = ? AND e.school_id = ?
+			`).bind(parsedExamId, locals.user.school_id).first<any>();
 		} else {
 			proctorAssignment = await db.prepare(`
-				SELECT ep.sessions, e.start_time as exam_start_time, e.end_time as exam_end_time
+				SELECT e.school_id, ep.sessions, e.start_time as exam_start_time, e.end_time as exam_end_time
 				FROM exams e
 				JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
 				WHERE e.id = ? AND e.school_id = ?
@@ -285,12 +327,21 @@ export const actions: Actions = {
 		}
 
 		const nowIso = new Date().toISOString();
+		const targetSchoolId = locals.user.school_id ?? proctorAssignment.school_id;
 
 		// Check for active token per exam AND session_number
-		const activeToken = await db.prepare(`
-			SELECT token_code FROM tokens 
-			WHERE exam_id = ? AND (session_number = ? OR session_number IS NULL) AND school_id = ? AND expires_at > ?
-		`).bind(parsedExamId, parsedSessionNumber, locals.user.school_id, nowIso).first() as { token_code: string } | null;
+		let activeToken: { token_code: string } | null = null;
+		if (targetSchoolId) {
+			activeToken = await db.prepare(`
+				SELECT token_code FROM tokens 
+				WHERE exam_id = ? AND (session_number = ? OR session_number IS NULL) AND school_id = ? AND expires_at > ?
+			`).bind(parsedExamId, parsedSessionNumber, targetSchoolId, nowIso).first() as { token_code: string } | null;
+		} else {
+			activeToken = await db.prepare(`
+				SELECT token_code FROM tokens 
+				WHERE exam_id = ? AND (session_number = ? OR session_number IS NULL) AND expires_at > ?
+			`).bind(parsedExamId, parsedSessionNumber, nowIso).first() as { token_code: string } | null;
+		}
 
 		if (activeToken) {
 			return fail(400, { error: `Gagal: Masih ada token aktif untuk Sesi ${parsedSessionNumber} ujian ini (${activeToken.token_code}). Harap hapus token tersebut dahulu jika ingin membuat yang baru.` });
@@ -300,11 +351,19 @@ export const actions: Actions = {
 
 		try {
 			// Hapus token lama yang kadaluwarsa dan tidak pernah digunakan oleh siswa untuk sesi ini
-			await db.prepare(`
-				DELETE FROM tokens 
-				WHERE exam_id = ? AND (session_number = ? OR session_number IS NULL) AND school_id = ? 
-				  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
-			`).bind(parsedExamId, parsedSessionNumber, locals.user.school_id, parsedExamId).run();
+			if (targetSchoolId) {
+				await db.prepare(`
+					DELETE FROM tokens 
+					WHERE exam_id = ? AND (session_number = ? OR session_number IS NULL) AND school_id = ? 
+					  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
+				`).bind(parsedExamId, parsedSessionNumber, targetSchoolId, parsedExamId).run();
+			} else {
+				await db.prepare(`
+					DELETE FROM tokens 
+					WHERE exam_id = ? AND (session_number = ? OR session_number IS NULL) 
+					  AND id NOT IN (SELECT DISTINCT token_id FROM student_attempts WHERE exam_id = ? AND token_id IS NOT NULL)
+				`).bind(parsedExamId, parsedSessionNumber, parsedExamId).run();
+			}
 
 			// Generate dengan mekanisme retry jika terjadi collision
 			let tokenCode = '';
@@ -316,7 +375,7 @@ export const actions: Actions = {
 				tokenCode = generateTokenCode(6);
 				try {
 					await db.prepare('INSERT INTO tokens (school_id, exam_id, session_number, token_code, is_released, released_at, created_by, expires_at) VALUES (?, ?, ?, ?, 1, datetime(\'now\'), ?, ?)')
-						.bind(locals.user.school_id, parsedExamId, parsedSessionNumber, tokenCode, locals.user.id, expiresAt).run();
+						.bind(targetSchoolId, parsedExamId, parsedSessionNumber, tokenCode, locals.user.id, expiresAt).run();
 					inserted = true;
 				} catch (err: any) {
 					if (err.message && err.message.includes('UNIQUE')) {
@@ -350,11 +409,16 @@ export const actions: Actions = {
 
 		try {
 			let tokenCheck: any = null;
-			if (isSuperAdmin || isAdmin) {
+			if (isSuperAdmin && !locals.user.school_id) {
 				tokenCheck = await db.prepare(`
 					SELECT t.id FROM tokens t
-					WHERE t.id = ? AND (t.school_id = ? OR ? IS NULL)
-				`).bind(parsedId, locals.user.school_id, locals.user.school_id).first();
+					WHERE t.id = ?
+				`).bind(parsedId).first();
+			} else if (isSuperAdmin || isAdmin) {
+				tokenCheck = await db.prepare(`
+					SELECT t.id FROM tokens t
+					WHERE t.id = ? AND t.school_id = ?
+				`).bind(parsedId, locals.user.school_id).first();
 			} else {
 				tokenCheck = await db.prepare(`
 					SELECT t.id FROM tokens t
@@ -366,7 +430,7 @@ export const actions: Actions = {
 
 			if (!tokenCheck) return fail(403, { error: 'Anda tidak memiliki hak untuk merilis token ini.' });
 
-			await db.prepare('UPDATE tokens SET is_released = 1, released_at = datetime("now") WHERE id = ? AND school_id = ?').bind(parsedId, locals.user.school_id).run();
+			await db.prepare('UPDATE tokens SET is_released = 1, released_at = datetime("now") WHERE id = ?').bind(parsedId).run();
 			return { success: 'Token berhasil dirilis ke siswa.' };
 		} catch (e: any) {
 			console.error(e);
@@ -387,11 +451,16 @@ export const actions: Actions = {
 
 		try {
 			let tokenCheck: any = null;
-			if (isSuperAdmin || isAdmin) {
+			if (isSuperAdmin && !locals.user.school_id) {
 				tokenCheck = await db.prepare(`
 					SELECT t.id FROM tokens t
-					WHERE t.id = ? AND (t.school_id = ? OR ? IS NULL)
-				`).bind(parsedId, locals.user.school_id, locals.user.school_id).first();
+					WHERE t.id = ?
+				`).bind(parsedId).first();
+			} else if (isSuperAdmin || isAdmin) {
+				tokenCheck = await db.prepare(`
+					SELECT t.id FROM tokens t
+					WHERE t.id = ? AND t.school_id = ?
+				`).bind(parsedId, locals.user.school_id).first();
 			} else {
 				tokenCheck = await db.prepare(`
 					SELECT t.id FROM tokens t
@@ -403,7 +472,7 @@ export const actions: Actions = {
 
 			if (!tokenCheck) return fail(403, { error: 'Anda tidak memiliki hak untuk menarik token ini.' });
 
-			await db.prepare('UPDATE tokens SET is_released = 0 WHERE id = ? AND school_id = ?').bind(parsedId, locals.user.school_id).run();
+			await db.prepare('UPDATE tokens SET is_released = 0 WHERE id = ?').bind(parsedId).run();
 			return { success: 'Token berhasil ditarik.' };
 		} catch (e: any) {
 			console.error(e);
@@ -424,11 +493,16 @@ export const actions: Actions = {
 
 		try {
 			let tokenCheck: any = null;
-			if (isSuperAdmin || isAdmin) {
+			if (isSuperAdmin && !locals.user.school_id) {
 				tokenCheck = await db.prepare(`
 					SELECT t.id FROM tokens t
-					WHERE t.id = ? AND (t.school_id = ? OR ? IS NULL)
-				`).bind(parsedId, locals.user.school_id, locals.user.school_id).first();
+					WHERE t.id = ?
+				`).bind(parsedId).first();
+			} else if (isSuperAdmin || isAdmin) {
+				tokenCheck = await db.prepare(`
+					SELECT t.id FROM tokens t
+					WHERE t.id = ? AND t.school_id = ?
+				`).bind(parsedId, locals.user.school_id).first();
 			} else {
 				tokenCheck = await db.prepare(`
 					SELECT t.id FROM tokens t
@@ -445,7 +519,7 @@ export const actions: Actions = {
 				return fail(400, { error: 'Gagal dihapus: Token ini telah digunakan oleh peserta ujian.' });
 			}
 			
-			await db.prepare('DELETE FROM tokens WHERE id = ? AND school_id = ?').bind(parsedId, locals.user.school_id).run();
+			await db.prepare('DELETE FROM tokens WHERE id = ?').bind(parsedId).run();
 			return { success: 'Token berhasil dihapus.' };
 		} catch (err: any) {
 			console.error('Delete token error:', err);

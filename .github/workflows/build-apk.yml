@@ -10,32 +10,64 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+
       - name: Accept Android SDK Licenses
         run: yes | sdkmanager --licenses || true
+
+      - name: Ensure Permanent Release Keystore Exists
+        run: |
+          if [ ! -f android-exambro/release.jks ]; then
+            echo "Generating permanent release keystore..."
+            keytool -genkeypair -v \
+              -keystore android-exambro/release.jks \
+              -alias exambro \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -storepass exambro123 \
+              -keypass exambro123 \
+              -dname "CN=Ujian Madrasah, OU=Pendidikan Madrasah, O=Kemenag, L=Jakarta, ST=Jakarta, C=ID"
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add android-exambro/release.jks
+            git commit -m "chore: buat permanent release keystore resmi" || true
+            git push || true
+          fi
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.6'
 
-      - name: Build Debug APK
+      - name: Build Signed Release and Debug APK
         run: |
           cd android-exambro
-          gradle assembleDebug --stacktrace
+          gradle assembleRelease assembleDebug --stacktrace
 
-      - name: Upload APK Artifact
+      - name: Upload Release APK
         uses: actions/upload-artifact@v4
         with:
-          name: Exambro-Madrasah-APK
+          name: Exambro-Madrasah-Release-APK
+          path: android-exambro/app/build/outputs/apk/release/*.apk
+          retention-days: 30
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Exambro-Madrasah-Debug-APK
           path: android-exambro/app/build/outputs/apk/debug/*.apk
           retention-days: 30
