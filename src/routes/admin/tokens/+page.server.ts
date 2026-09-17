@@ -25,41 +25,81 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 	const db = getDB(platform);
 	const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
 
-	const tokensRaw = await db.prepare(`
-		SELECT t.*, e.title as exam_title, s.name as subject_name, et.code as exam_type_code, c.name as class_name,
-		COALESCE((
-			SELECT json_group_array(
-				json_object(
-					'id', u.id, 
-					'name', u.name, 
-					'username', u.username, 
-					'start_time', sa.start_time,
-					'status', sa.status
-				)
-			)
-			FROM student_attempts sa
-			JOIN users u ON sa.student_id = u.id
-			WHERE sa.token_id = t.id
-			   OR (sa.token_id IS NULL AND sa.exam_id = t.exam_id AND (t.session_number IS NULL OR t.session_number = COALESCE(u.session_number, 1)))
-		), '[]') as used_by_students_json
-		FROM tokens t 
-		JOIN exams e ON t.exam_id = e.id
-		LEFT JOIN subjects s ON e.subject_id = s.id
-		LEFT JOIN exam_types et ON e.exam_type_id = et.id
-		LEFT JOIN classes c ON e.class_id = c.id
-		WHERE (? IS NULL OR t.school_id = ?)
-		ORDER BY t.created_at DESC
-	`).bind(locals.user.school_id, locals.user.school_id).all<any>();
+	let tokensRaw: any;
+	let examsRaw: any;
 
-	const examsRaw = await db.prepare(`
-		SELECT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name
-		FROM exams e
-		LEFT JOIN subjects s ON e.subject_id = s.id
-		JOIN exam_types et ON e.exam_type_id = et.id
-		LEFT JOIN classes c ON e.class_id = c.id
-		WHERE e.is_active = 1 AND et.is_active = 1 AND (? IS NULL OR e.school_id = ?)
-		ORDER BY e.title
-	`).bind(locals.user.school_id, locals.user.school_id).all<any>();
+	if (isSuperAdmin && !locals.user.school_id) {
+		tokensRaw = await db.prepare(`
+			SELECT t.*, e.title as exam_title, s.name as subject_name, et.code as exam_type_code, c.name as class_name,
+			COALESCE((
+				SELECT json_group_array(
+					json_object(
+						'id', u.id, 
+						'name', u.name, 
+						'username', u.username, 
+						'start_time', sa.start_time,
+						'status', sa.status
+					)
+				)
+				FROM student_attempts sa
+				JOIN users u ON sa.student_id = u.id
+				WHERE sa.token_id = t.id
+				   OR (sa.token_id IS NULL AND sa.exam_id = t.exam_id AND (t.session_number IS NULL OR t.session_number = COALESCE(u.session_number, 1)))
+			), '[]') as used_by_students_json
+			FROM tokens t 
+			JOIN exams e ON t.exam_id = e.id
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			LEFT JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN classes c ON e.class_id = c.id
+			ORDER BY t.created_at DESC
+		`).all<any>();
+
+		examsRaw = await db.prepare(`
+			SELECT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name
+			FROM exams e
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN classes c ON e.class_id = c.id
+			WHERE e.is_active = 1 AND et.is_active = 1
+			ORDER BY e.title
+		`).all<any>();
+	} else {
+		tokensRaw = await db.prepare(`
+			SELECT t.*, e.title as exam_title, s.name as subject_name, et.code as exam_type_code, c.name as class_name,
+			COALESCE((
+				SELECT json_group_array(
+					json_object(
+						'id', u.id, 
+						'name', u.name, 
+						'username', u.username, 
+						'start_time', sa.start_time,
+						'status', sa.status
+					)
+				)
+				FROM student_attempts sa
+				JOIN users u ON sa.student_id = u.id
+				WHERE sa.token_id = t.id
+				   OR (sa.token_id IS NULL AND sa.exam_id = t.exam_id AND (t.session_number IS NULL OR t.session_number = COALESCE(u.session_number, 1)))
+			), '[]') as used_by_students_json
+			FROM tokens t 
+			JOIN exams e ON t.exam_id = e.id
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			LEFT JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN classes c ON e.class_id = c.id
+			WHERE t.school_id = ?
+			ORDER BY t.created_at DESC
+		`).bind(locals.user.school_id).all<any>();
+
+		examsRaw = await db.prepare(`
+			SELECT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name
+			FROM exams e
+			LEFT JOIN subjects s ON e.subject_id = s.id
+			JOIN exam_types et ON e.exam_type_id = et.id
+			LEFT JOIN classes c ON e.class_id = c.id
+			WHERE e.is_active = 1 AND et.is_active = 1 AND e.school_id = ?
+			ORDER BY e.title
+		`).bind(locals.user.school_id).all<any>();
+	}
 
 	const examIds = (examsRaw.results || []).map((e: any) => e.id);
 	let dbSessions: any[] = [];
