@@ -168,11 +168,16 @@
 				localStorage.setItem(`warnings_${attempt.id}`, warnings.toString());
 				localStorage.setItem(`warningLogs_${attempt.id}`, JSON.stringify(warningLogs));
 				triggerAutoSave();
+				pendingViolationPhotoType = savedCheatType;
+				sendViolationBeacon(savedCheatType, null);
 				if (warnings > MAX_WARNINGS) {
 					triggerDisqualification();
 				} else {
 					showWarningModal = true;
 				}
+				setTimeout(() => {
+					checkAndCapturePendingViolationPhoto();
+				}, 1200);
 			} else {
 				// Lanjutkan sisa waktu jeda toleransi tanpa mereset ke 10 detik penuh!
 				handleCheatWarning(savedCheatType, remainingMs);
@@ -418,6 +423,48 @@
 	}
 
 	let isDisqualifying = false;
+	let pendingViolationPhotoType: string | null = null;
+	let isCapturingViolationPhoto = false;
+
+	async function sendViolationPhotoOnly(type: string, photo: string) {
+		if (!attempt?.id || submitting || isSubmitted) return;
+		try {
+			await fetch('/api/student/log-violation', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					attempt_id: attempt.id,
+					violation_type: type,
+					photo: photo,
+					photo_only: true
+				}),
+				keepalive: true
+			});
+		} catch (e) {
+			console.warn('Failed to send deferred violation photo:', e);
+		}
+	}
+
+	async function checkAndCapturePendingViolationPhoto() {
+		if (!pendingViolationPhotoType || isCapturingViolationPhoto || !attempt?.id || isUnloading || submitting || isSubmitted || (typeof document !== 'undefined' && document.hidden)) return;
+		const vType = pendingViolationPhotoType;
+		pendingViolationPhotoType = null;
+		isCapturingViolationPhoto = true;
+
+		try {
+			const photo = await captureMicroSnapshot({ timeoutMs: 3000 });
+			if (photo) {
+				await sendViolationPhotoOnly(vType, photo);
+			} else {
+				// Coba sekali lagi jika kamera belum siap
+				pendingViolationPhotoType = vType;
+			}
+		} catch (e) {
+			console.warn('Error capturing pending violation photo:', e);
+		} finally {
+			isCapturingViolationPhoto = false;
+		}
+	}
 
 	function sendViolationBeacon(type: string, photo?: string | null) {
 		if (!attempt?.id || submitting || isSubmitted || isUnloading || isDisqualifying || attempt?.status !== 'mengerjakan') return;
@@ -426,6 +473,24 @@
 			violation_type: type,
 			photo: photo || undefined
 		});
+
+		// Jika membawa payload foto Base64, prioritaskan fetch POST keepalive agar tidak terpotong batasan 64KB navigator.sendBeacon
+		if (photo && typeof fetch !== 'undefined') {
+			fetch('/api/student/log-violation', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: payload,
+				keepalive: true
+			}).catch(() => {
+				if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+					try {
+						const blob = new Blob([payload], { type: 'application/json' });
+						navigator.sendBeacon('/api/student/log-violation', blob);
+					} catch (e) {}
+				}
+			});
+			return;
+		}
 
 		let sent = false;
 		if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
@@ -472,12 +537,28 @@
 		localStorage.setItem(`warnings_${attempt.id}`, warnings.toString());
 		localStorage.setItem(`warningLogs_${attempt.id}`, JSON.stringify(warningLogs));
 		
-		// Tangkap bukti foto pelanggaran otomatis hemat daya (<400ms)
-		captureMicroSnapshot({ timeoutMs: 1500 }).then((photo) => {
-			sendViolationBeacon(type, photo);
-		}).catch(() => {
+		const isTabVisible = typeof document !== 'undefined' && !document.hidden;
+
+		if (isTabVisible) {
+			// Tab aktif di layar: langsung ambil foto snapshot pelanggaran
+			captureMicroSnapshot({ timeoutMs: 3000 }).then((photo) => {
+				if (photo) {
+					sendViolationBeacon(type, photo);
+				} else {
+					pendingViolationPhotoType = type;
+					sendViolationBeacon(type, null);
+				}
+			}).catch(() => {
+				pendingViolationPhotoType = type;
+				sendViolationBeacon(type, null);
+			});
+		} else {
+			// Tab tersembunyi (siswa berpindah layar/aplikasi):
+			// Browser melarang akses kamera saat tab hidden. Catat pelanggaran seketika,
+			// dan antrikan pengambilan foto begitu siswa kembali ke layar ujian.
+			pendingViolationPhotoType = type;
 			sendViolationBeacon(type, null);
-		});
+		}
 
 		saveCurrentAnswer(false);
 		isExamBlurred = false;
@@ -552,6 +633,8 @@
 		} else if (wakeLock === null) {
 			requestWakeLock();
 		}
+		// Tangkap bukti foto pelanggaran yang tertunda saat siswa kembali ke ujian
+		checkAndCapturePendingViolationPhoto();
 	}
 
 	function unlockAudioAndVibration() {
@@ -620,11 +703,23 @@
 			!showSubmitConfirm &&
 			!showTimeUpModal &&
 			!showDisqualifiedModal &&
-			attempt?.status === 'mengerjakan' &&
-			document.visibilityState === 'hidden'
+			attempt?.status === 'mengerjakan'
 		) {
-			triggerViolation('Keluar dari aplikasi ujian (Berpindah Tab/Layar)');
+			if (document.visibilityState === 'hidden') {
+				triggerViolation('Keluar dari aplikasi ujian (Berpindah Tab/Layar)');
+			} else if (document.visibilityState === 'visible') {
+				// Siswa kembali ke layar ujian: tangkap foto wajah pelanggaran seketika
+				setTimeout(() => {
+					checkAndCapturePendingViolationPhoto();
+				}, 300);
+			}
 		}
+	}
+
+	$: if (showWarningModal && pendingViolationPhotoType) {
+		setTimeout(() => {
+			checkAndCapturePendingViolationPhoto();
+		}, 300);
 	}
 
 	function handleBlur() {

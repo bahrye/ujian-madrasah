@@ -15,6 +15,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 	let attemptId: number | null = null;
 	let violationType = 'Melakukan pelanggaran ujian';
 	let photoUrl: string | null = null;
+	let photoOnly = false;
 
 	const contentType = request.headers.get('content-type') || '';
 	try {
@@ -23,6 +24,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 			attemptId = parseInt(body.attempt_id, 10);
 			if (body.violation_type) violationType = String(body.violation_type);
 			if (body.photo) photoUrl = String(body.photo);
+			if (body.photo_only || body.photoOnly) photoOnly = true;
 		} else if (contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {
 			const formData = await request.formData();
 			attemptId = parseInt(formData.get('attempt_id')?.toString() || '', 10);
@@ -30,6 +32,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 			if (typeVal) violationType = typeVal;
 			const photoVal = formData.get('photo')?.toString();
 			if (photoVal) photoUrl = photoVal;
+			if (formData.get('photo_only') === 'true' || formData.get('photoOnly') === 'true') photoOnly = true;
 		} else {
 			// Fallback text / blob parser (common for navigator.sendBeacon)
 			const text = await request.text();
@@ -38,6 +41,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 				attemptId = parseInt(body.attempt_id, 10);
 				if (body.violation_type) violationType = String(body.violation_type);
 				if (body.photo) photoUrl = String(body.photo);
+				if (body.photo_only || body.photoOnly) photoOnly = true;
 			} catch {
 				const params = new URLSearchParams(text);
 				attemptId = parseInt(params.get('attempt_id') || '', 10);
@@ -45,6 +49,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 				if (typeVal) violationType = typeVal;
 				const photoVal = params.get('photo');
 				if (photoVal) photoUrl = photoVal;
+				if (params.get('photo_only') === 'true' || params.get('photoOnly') === 'true') photoOnly = true;
 			}
 		}
 	} catch (e: any) {
@@ -69,6 +74,30 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 
 		if (attempt.status !== 'mengerjakan') {
 			return json({ error: 'Ujian sudah tidak aktif' }, { status: 400 });
+		}
+
+		// Jika permintaan hanya untuk melampirkan foto bukti pelanggaran (deferred snapshot)
+		if (photoOnly) {
+			if (photoUrl && photoUrl.startsWith('data:image/')) {
+				try {
+					await saveMonitoringPhoto(db, {
+						schoolId: locals.user.school_id,
+						examId: attempt.exam_id,
+						attemptId,
+						studentId: locals.user.id,
+						photoType: 'violation',
+						photoUrl,
+						caption: `Pelanggaran: ${violationType}`
+					}, mergedEnv);
+				} catch (photoErr) {
+					console.warn('Failed to save deferred violation photo:', photoErr);
+				}
+			}
+			return json({
+				success: true,
+				photo_saved: true,
+				violation_count: attempt.violation_count || 0
+			});
 		}
 
 		let logs: any[] = [];
