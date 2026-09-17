@@ -37,6 +37,7 @@ export const actions: Actions = {
 		const data = await request.formData();
 
 		const name = data.get('name')?.toString().trim();
+		const jenjang = data.get('jenjang')?.toString().trim() || null;
 		const principal_name = data.get('principal_name')?.toString().trim() || null;
 		const principal_nip = data.get('principal_nip')?.toString().trim() || null;
 		const npsn = data.get('npsn')?.toString().trim() || null;
@@ -60,7 +61,7 @@ export const actions: Actions = {
 			await db
 				.prepare(
 					`UPDATE schools SET
-						name = ?, principal_name = ?, principal_nip = ?, npsn = ?, phone = ?, email = ?,
+						name = ?, jenjang = ?, level = ?, principal_name = ?, principal_nip = ?, npsn = ?, phone = ?, email = ?,
 						address = ?, province = ?, city = ?, district = ?, village = ?, postal_code = ?,
 						accreditation = ?, website = ?, logo_url = ?,
 						updated_at = datetime('now')
@@ -68,6 +69,8 @@ export const actions: Actions = {
 				)
 				.bind(
 					name,
+					jenjang,
+					jenjang,
 					principal_name,
 					principal_nip,
 					npsn,

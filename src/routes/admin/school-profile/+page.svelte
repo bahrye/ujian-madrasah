@@ -140,11 +140,18 @@
 				{#if school?.npsn}
 					<p class="text-indigo-200 text-sm mt-1">NPSN: {school.npsn}</p>
 				{/if}
-				{#if school?.accreditation}
-					<span class="inline-flex items-center mt-2 px-3 py-1 rounded-full text-xs font-bold bg-white/20 text-white border border-white/30">
-						Akreditasi {school.accreditation}
-					</span>
-				{/if}
+				<div class="flex flex-wrap items-center gap-2 mt-2">
+					{#if school?.jenjang || school?.level}
+						<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-400/20 text-amber-200 border border-amber-300/30">
+							Jenjang {school?.jenjang || school?.level}
+						</span>
+					{/if}
+					{#if school?.accreditation}
+						<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-white/20 text-white border border-white/30">
+							Akreditasi {school.accreditation}
+						</span>
+					{/if}
+				</div>
 			</div>
 		</div>
 	</div>
@@ -257,6 +264,17 @@
 						/>
 					</div>
 					<div>
+						<label for="jenjang" class="block text-sm font-semibold text-slate-700 mb-1.5">
+							Jenjang Sekolah <span class="text-rose-500">*</span>
+						</label>
+						<select id="jenjang" name="jenjang" class="input" required>
+							<option value="">-- Pilih Jenjang --</option>
+							<option value="MI" selected={school?.jenjang === 'MI' || school?.level === 'MI'}>MI (Madrasah Ibtidaiyah)</option>
+							<option value="MTS" selected={school?.jenjang === 'MTS' || school?.level === 'MTS'}>MTS (Madrasah Tsanawiyah)</option>
+							<option value="MA" selected={school?.jenjang === 'MA' || school?.level === 'MA'}>MA (Madrasah Aliyah)</option>
+						</select>
+					</div>
+					<div>
 						<label for="npsn" class="block text-sm font-semibold text-slate-700 mb-1.5">NPSN</label>
 						<input
 							type="text"
@@ -267,7 +285,7 @@
 							value={school?.npsn || ''}
 						/>
 					</div>
-					<div>
+					<div class="sm:col-span-2">
 						<label for="accreditation" class="block text-sm font-semibold text-slate-700 mb-1.5">Akreditasi</label>
 						<select id="accreditation" name="accreditation" class="input">
 							<option value="">-- Pilih Akreditasi --</option>
