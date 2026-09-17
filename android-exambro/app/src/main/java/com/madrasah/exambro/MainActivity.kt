@@ -103,9 +103,7 @@ class MainActivity : AppCompatActivity() {
         // 2. Cegah layar mati selama ujian
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        // 3. Masuk ke mode fullscreen immersive
-        applyImmersiveMode()
-
+        // 3. Set content view terlebih dahulu sebelum inisialisasi tampilan
         setContentView(R.layout.activity_main)
 
         prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -114,6 +112,7 @@ class MainActivity : AppCompatActivity() {
 
         initViews()
         setupWebView()
+        applyImmersiveMode()
         requestCameraPermissionIfNeeded()
 
         // Tampilkan Beranda Landing Screen saat aplikasi pertama kali dibuka
@@ -131,35 +130,38 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun applyImmersiveMode() {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        val controller = WindowInsetsControllerCompat(window, window.decorView)
-        controller.hide(WindowInsetsCompat.Type.systemBars())
+        try {
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+            val controller = WindowInsetsControllerCompat(window, window.decorView)
+            controller.hide(WindowInsetsCompat.Type.systemBars())
 
-        if (isExamInProgress() && !isExamPaused) {
-            // Saat ujian aktif: sembunyikan bilah status permanen dan cegah muncul saat swipe
-            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
-            @Suppress("DEPRECATION")
-            window.decorView.systemUiVisibility = (
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_FULLSCREEN
-            )
-        } else {
-            controller.systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        }
+            if (isExamInProgress() && !isExamPaused) {
+                // Saat ujian aktif: sembunyikan bilah status permanen dan cegah muncul saat swipe
+                controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+                @Suppress("DEPRECATION")
+                window.decorView.systemUiVisibility = (
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_FULLSCREEN
+                )
+            } else {
+                controller.systemBarsBehavior =
+                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            window.attributes.layoutInDisplayCutoutMode =
-                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-        }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                window.attributes.layoutInDisplayCutoutMode =
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            }
+        } catch (e: Exception) {}
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
+        if (!::webView.isInitialized) return
         if (hasFocus) {
             applyImmersiveMode()
             if (isExamInProgress() && !isExamPaused) {
@@ -256,6 +258,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (!::webView.isInitialized) return super.dispatchTouchEvent(ev)
         if (ev != null && isExamInProgress() && !isExamPaused) {
             val statusBarHeight = getStatusBarHeight()
             // Intercept zone diperluas agar mencakup notch dan threshold tarikan gesture bilah atas Android
@@ -365,14 +368,15 @@ class MainActivity : AppCompatActivity() {
         isExamActive = false
         currentExamExitPin = null
         isExamPaused = false
-        layoutLanding.visibility = View.VISIBLE
-        webView.visibility = View.GONE
-        layoutError.visibility = View.GONE
+        if (::layoutLanding.isInitialized) layoutLanding.visibility = View.VISIBLE
+        if (::webView.isInitialized) webView.visibility = View.GONE
+        if (::layoutError.isInitialized) layoutError.visibility = View.GONE
         updateLandingInfo()
         applyImmersiveMode()
     }
 
     private fun updateLandingInfo() {
+        if (!::prefs.isInitialized || !::tvLandingServerStatus.isInitialized || !::tvLandingVersion.isInitialized) return
         val currentStoredUrl = prefs.getString(KEY_EXAM_URL, DEFAULT_URL) ?: DEFAULT_URL
         try {
             val uri = Uri.parse(currentStoredUrl)
@@ -641,7 +645,9 @@ class MainActivity : AppCompatActivity() {
      */
     private fun isExamInProgress(): Boolean {
         if (isExamActive) return true
+        if (!::webView.isInitialized) return false
         val activeUrl = webView.url ?: currentUrl
+        if (activeUrl.isEmpty()) return false
         val questionPageRegex = Regex(".*/siswa/ujian/\\d+.*")
         return questionPageRegex.matches(activeUrl)
     }
@@ -654,6 +660,9 @@ class MainActivity : AppCompatActivity() {
         // 1. Sedang memunculkan dialog izin kamera sistem
         // 2. Aplikasi baru saja dibuka (< 3 detik)
         // 3. Masih di Beranda awal atau belum masuk ke halaman pengerjaan soal ujian
+        if (!::layoutLanding.isInitialized || !::prefs.isInitialized || !::webView.isInitialized) {
+            return
+        }
         if (isRequestingPermission || !isAppStarted || !isExamInProgress() || layoutLanding.visibility == View.VISIBLE) {
             return
         }
@@ -666,6 +675,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+        if (!::webView.isInitialized) return
         if (isExamInProgress() && !isExamPaused && !isRequestingPermission) {
             collapseNotificationShade()
             bringAppToFront()
@@ -674,6 +684,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
+        if (!::webView.isInitialized) return
         if (isExamInProgress() && !isExamPaused && !isRequestingPermission) {
             bringAppToFront()
         }
@@ -681,6 +692,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (!::webView.isInitialized || !::prefs.isInitialized) return
         applyImmersiveMode()
         if (isExamInProgress() && !isExamPaused) {
             startLockTaskMode()
@@ -712,8 +724,13 @@ class MainActivity : AppCompatActivity() {
     // PENANGANAN TOMBOL KEMBALI
     @Suppress("DEPRECATION")
     override fun onBackPressed() {
+        if (!::layoutLanding.isInitialized || !::webView.isInitialized || !::prefs.isInitialized) {
+            super.onBackPressed()
+            return
+        }
         val activeUrl = webView.url ?: currentUrl
-        val isLoginPage = activeUrl.contains("/login") || activeUrl.endsWith("/login") || activeUrl == prefs.getString(KEY_EXAM_URL, DEFAULT_URL)
+        val defaultUrl = prefs.getString(KEY_EXAM_URL, DEFAULT_URL) ?: DEFAULT_URL
+        val isLoginPage = activeUrl.contains("/login") || activeUrl.endsWith("/login") || activeUrl == defaultUrl
 
         if (layoutLanding.visibility == View.VISIBLE) {
             // Saat di Beranda Utama: Konfirmasi keluar dari aplikasi
@@ -913,6 +930,7 @@ class MainActivity : AppCompatActivity() {
                     val changelog = json.optString("changelog", "Pembaruan performa dan keamanan.")
 
                     runOnUiThread {
+                        if (isFinishing || isDestroyed) return@runOnUiThread
                         if (remoteVersionCode > BuildConfig.VERSION_CODE) {
                             AlertDialog.Builder(this)
                                 .setTitle("Pembaruan Tersedia (v$remoteVersionName)")
