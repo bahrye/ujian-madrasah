@@ -332,11 +332,10 @@ export const actions: Actions = {
 				ON CONFLICT (exam_type_id, proctor_id) DO UPDATE SET proctor_role = EXCLUDED.proctor_role
 			`).bind(examTypeId, proctorId, proctorRole).run();
 
-			// Auto-sync to all exams belonging to this exam_type_id
-			await db.prepare(`
-				INSERT OR IGNORE INTO exam_proctors (exam_id, proctor_id, proctor_role)
-				SELECT id, ?, ? FROM exams WHERE exam_type_id = ? AND school_id = ?
-			`).bind(proctorId, proctorRole, examTypeId, locals.user!.school_id).run();
+			// Clean up any accidentally synced pt/cm from exam_proctors
+			try {
+				await db.prepare(`DELETE FROM exam_proctors WHERE proctor_role IN ('pt', 'cm')`).run();
+			} catch {}
 
 			return { success: 'Petugas default berhasil ditambahkan.' };
 		} catch (e: any) {
@@ -353,6 +352,9 @@ export const actions: Actions = {
 		if (isNaN(id)) return fail(400, { error: 'ID tidak valid.' });
 
 		await db.prepare('DELETE FROM exam_type_proctors WHERE id = ?').bind(id).run();
+		try {
+			await db.prepare(`DELETE FROM exam_proctors WHERE proctor_role IN ('pt', 'cm')`).run();
+		} catch {}
 		return { success: 'Petugas default berhasil dihapus.' };
 	}
 };

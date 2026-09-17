@@ -34,19 +34,17 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 			if (examId) {
 				const proctorCheck = await db.prepare(`
 					SELECT 1 FROM exams e
-					LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
-					LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
-					WHERE e.id = ? AND e.school_id = ? AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
-				`).bind(locals.user.id, locals.user.id, examId, locals.user.school_id).first();
+					JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
+					WHERE e.id = ? AND e.school_id = ?
+				`).bind(locals.user.id, examId, locals.user.school_id).first();
 				if (!proctorCheck) return json({ error: 'Forbidden: Anda tidak ditugaskan untuk ujian ini.' }, { status: 403 });
 			} else if (attemptId) {
 				const proctorCheck = await db.prepare(`
 					SELECT 1 FROM student_attempts sa
 					JOIN exams e ON sa.exam_id = e.id
-					LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
-					LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
-					WHERE sa.id = ? AND e.school_id = ? AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
-				`).bind(locals.user.id, locals.user.id, attemptId, locals.user.school_id).first();
+					JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
+					WHERE sa.id = ? AND e.school_id = ?
+				`).bind(locals.user.id, attemptId, locals.user.school_id).first();
 				if (!proctorCheck) return json({ error: 'Forbidden: Anda tidak ditugaskan untuk ujian ini.' }, { status: 403 });
 			}
 		}

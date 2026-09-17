@@ -43,7 +43,7 @@ export const load: ServerLoad = async ({ locals, platform }) => {
 				SELECT GROUP_CONCAT(u2.name, ', ')
 				FROM exam_proctors ep2
 				JOIN users u2 ON ep2.proctor_id = u2.id
-				WHERE ep2.exam_id = e.id
+				WHERE ep2.exam_id = e.id AND COALESCE(ep2.proctor_role, 'p1') NOT IN ('pt', 'cm')
 			) as proctor_names,
 			(
 				SELECT COUNT(*)

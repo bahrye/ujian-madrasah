@@ -65,7 +65,7 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
 		SELECT u.id, u.name, u.nip, u.role, COALESCE(ep.proctor_role, 'p1') as proctor_role
 		FROM exam_proctors ep
 		JOIN users u ON ep.proctor_id = u.id
-		WHERE ep.exam_id = ?
+		WHERE ep.exam_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
 		ORDER BY ep.id ASC
 	`).bind(examId).all();
 

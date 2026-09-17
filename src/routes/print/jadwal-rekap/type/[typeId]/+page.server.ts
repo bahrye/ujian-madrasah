@@ -15,7 +15,7 @@ async function fetchSchedulesForClass(db: any, typeId: number, schoolId: number,
 				SELECT GROUP_CONCAT(u2.name, '||')
 				FROM exam_proctors epr
 				JOIN users u2 ON epr.proctor_id = u2.id
-				WHERE epr.exam_id = e.id
+				WHERE epr.exam_id = e.id AND COALESCE(epr.proctor_role, 'p1') NOT IN ('pt', 'cm')
 			) as proctor_names
 		FROM exams e
 		JOIN exam_types et ON e.exam_type_id = et.id

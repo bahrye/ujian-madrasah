@@ -69,14 +69,13 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 			), '[]') as active_students_json
 			FROM tokens t 
 			JOIN exams e ON t.exam_id = e.id
-			LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
-			LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+			JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
 			LEFT JOIN subjects s ON e.subject_id = s.id
 			LEFT JOIN exam_types et ON e.exam_type_id = et.id
 			LEFT JOIN classes c ON e.class_id = c.id
-			WHERE e.school_id = ? AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
+			WHERE e.school_id = ?
 			ORDER BY t.created_at DESC
-		`).bind(locals.user.id, locals.user.id, locals.user.school_id).all<any>();
+		`).bind(locals.user.id, locals.user.school_id).all<any>();
 	}
 
 	const tokens = (tokensRaw.results || []).map((t: any) => ({
@@ -107,15 +106,13 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		const proctorExamsRes = await db.prepare(`
 			SELECT DISTINCT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name, ep.sessions as proctor_sessions
 			FROM exams e
-			LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
-			LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+			JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
 			LEFT JOIN subjects s ON e.subject_id = s.id
 			JOIN exam_types et ON e.exam_type_id = et.id
 			LEFT JOIN classes c ON e.class_id = c.id
 			WHERE e.is_active = 1 AND et.is_active = 1 AND e.school_id = ? 
-			  AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
 			ORDER BY e.title
-		`).bind(locals.user.id, locals.user.id, locals.user.school_id).all<any>();
+		`).bind(locals.user.id, locals.user.school_id).all<any>();
 
 		rawExamsList = proctorExamsRes.results || [];
 	}
@@ -227,10 +224,9 @@ export const actions: Actions = {
 			proctorAssignment = await db.prepare(`
 				SELECT ep.sessions, e.start_time as exam_start_time, e.end_time as exam_end_time
 				FROM exams e
-				LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
-				LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
-				WHERE e.id = ? AND e.school_id = ? AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
-			`).bind(locals.user.id, locals.user.id, parsedExamId, locals.user.school_id).first<any>();
+				JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
+				WHERE e.id = ? AND e.school_id = ?
+			`).bind(locals.user.id, parsedExamId, locals.user.school_id).first<any>();
 		}
 
 		if (!proctorAssignment) return fail(403, { error: 'Anda bukan pengawas yang ditugaskan untuk ujian ini.' });
@@ -345,10 +341,9 @@ export const actions: Actions = {
 				tokenCheck = await db.prepare(`
 					SELECT t.id FROM tokens t
 					JOIN exams e ON t.exam_id = e.id
-					LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
-					LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
-					WHERE t.id = ? AND t.school_id = ? AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
-				`).bind(locals.user.id, locals.user.id, parsedId, locals.user.school_id).first();
+					JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
+					WHERE t.id = ? AND t.school_id = ?
+				`).bind(locals.user.id, parsedId, locals.user.school_id).first();
 			}
 
 			if (!tokenCheck) return fail(403, { error: 'Anda tidak memiliki hak untuk merilis token ini.' });
@@ -383,10 +378,9 @@ export const actions: Actions = {
 				tokenCheck = await db.prepare(`
 					SELECT t.id FROM tokens t
 					JOIN exams e ON t.exam_id = e.id
-					LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
-					LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
-					WHERE t.id = ? AND t.school_id = ? AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
-				`).bind(locals.user.id, locals.user.id, parsedId, locals.user.school_id).first();
+					JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
+					WHERE t.id = ? AND t.school_id = ?
+				`).bind(locals.user.id, parsedId, locals.user.school_id).first();
 			}
 
 			if (!tokenCheck) return fail(403, { error: 'Anda tidak memiliki hak untuk menarik token ini.' });
@@ -421,10 +415,9 @@ export const actions: Actions = {
 				tokenCheck = await db.prepare(`
 					SELECT t.id FROM tokens t
 					JOIN exams e ON t.exam_id = e.id
-					LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
-					LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
-					WHERE t.id = ? AND t.school_id = ? AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
-				`).bind(locals.user.id, locals.user.id, parsedId, locals.user.school_id).first();
+					JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
+					WHERE t.id = ? AND t.school_id = ?
+				`).bind(locals.user.id, parsedId, locals.user.school_id).first();
 			}
 
 			if (!tokenCheck) return fail(403, { error: 'Anda tidak memiliki hak untuk menghapus token ini.' });

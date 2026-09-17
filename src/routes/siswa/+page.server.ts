@@ -29,7 +29,7 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 						SELECT GROUP_CONCAT(u.name, '||')
 						FROM exam_proctors epr
 						JOIN users u ON epr.proctor_id = u.id
-						WHERE epr.exam_id = e.id
+						WHERE epr.exam_id = e.id AND COALESCE(epr.proctor_role, 'p1') NOT IN ('pt', 'cm')
 					),
 					(
 						SELECT u.name FROM users u WHERE u.id = e.created_by AND u.role = 'guru'
@@ -165,7 +165,7 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 						SELECT GROUP_CONCAT(u2.name, '||')
 						FROM exam_proctors epr
 						JOIN users u2 ON epr.proctor_id = u2.id
-						WHERE epr.exam_id = e.id
+						WHERE epr.exam_id = e.id AND COALESCE(epr.proctor_role, 'p1') NOT IN ('pt', 'cm')
 					) as proctor_names
 				FROM exams e
 				JOIN exam_participants ep ON ep.exam_id = e.id

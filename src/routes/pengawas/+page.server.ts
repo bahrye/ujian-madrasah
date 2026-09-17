@@ -13,14 +13,15 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 			SELECT DISTINCT e.id as exam_id, e.title, e.start_time, e.end_time, e.duration_minutes, s.name as subject_name, et.code as exam_type_code, c.name as class_name, e.is_active,
 			(SELECT token_code FROM tokens WHERE exam_id = e.id AND expires_at > datetime('now') LIMIT 1) as token_code
 			FROM exams e
-			LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
-			LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+			JOIN exam_proctors ep ON e.id = ep.exam_id
 			LEFT JOIN subjects s ON e.subject_id = s.id
 			JOIN exam_types et ON e.exam_type_id = et.id
 			LEFT JOIN classes c ON e.class_id = c.id
-			WHERE (ep.id IS NOT NULL OR etp.id IS NOT NULL) AND e.school_id = ? AND et.is_active = 1 AND e.is_active = 1
+			WHERE ep.proctor_id = ? 
+			  AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
+			  AND e.school_id = ? AND et.is_active = 1 AND e.is_active = 1
 			ORDER BY e.start_time ASC
-		`).bind(locals.user!.id, locals.user!.id, locals.user!.school_id).all<any>()
+		`).bind(locals.user!.id, locals.user!.school_id).all<any>()
 	]);
 
 	const participantsDb = await db.prepare(`
@@ -29,13 +30,13 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		JOIN users u ON epart.student_id = u.id
 		LEFT JOIN classes c ON u.class_id = c.id
 		JOIN exams e ON epart.exam_id = e.id
-		LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
-		LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
-		WHERE (ep.id IS NOT NULL OR etp.id IS NOT NULL)
+		JOIN exam_proctors ep ON e.id = ep.exam_id
+		WHERE ep.proctor_id = ?
+		  AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
 		  AND (ep.room_id IS NULL OR ep.room_id = epart.room_id)
 		  AND (ep.sessions IS NULL OR ep.sessions = '[]' OR u.session_number IN (SELECT value FROM json_each(ep.sessions)))
 		ORDER BY c.name, u.name
-	`).bind(locals.user!.id, locals.user!.id).all();
+	`).bind(locals.user!.id).all();
 
 	const participants = participantsDb.results as any[];
 

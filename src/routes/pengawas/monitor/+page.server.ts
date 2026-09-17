@@ -44,20 +44,20 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 			`).bind(locals.user.school_id).all<any>();
 			rawExamsList = examsRes.results || [];
 		} else {
-			// Hanya ujian yang ditugaskan ke pengawas ini (via exam_proctors ataupun exam_type_proctors)
+			// Hanya ujian yang ditugaskan ke pengawas ini (via exam_proctors dengan role pengawas p1/p2, bukan proktor/panitia tipe ujian)
 			const proctorExamsRes = await db.prepare(`
 				SELECT DISTINCT e.id, e.title, s.name as subject_name, et.code as exam_type_code, c.name as class_name
 				FROM exams e 
-				LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
-				LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+				JOIN exam_proctors ep ON e.id = ep.exam_id
 				LEFT JOIN subjects s ON e.subject_id = s.id
 				LEFT JOIN exam_types et ON e.exam_type_id = et.id
 				LEFT JOIN classes c ON e.class_id = c.id
 				WHERE e.is_active = 1 AND (et.is_active IS NULL OR et.is_active = 1) 
 				  AND e.school_id = ? 
-				  AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
+				  AND ep.proctor_id = ?
+				  AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
 				ORDER BY e.title
-			`).bind(locals.user.id, locals.user.id, locals.user.school_id).all<any>();
+			`).bind(locals.user.school_id, locals.user.id).all<any>();
 
 			rawExamsList = proctorExamsRes.results || [];
 		}
@@ -84,7 +84,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 		if (validExamFilter !== null) {
 			// Check proctor assignment for this exam
 			const proctorAssignment = await db.prepare(`
-				SELECT sessions FROM exam_proctors WHERE exam_id = ? AND proctor_id = ?
+				SELECT sessions FROM exam_proctors WHERE exam_id = ? AND proctor_id = ? AND COALESCE(proctor_role, 'p1') NOT IN ('pt', 'cm')
 			`).bind(validExamFilter, locals.user.id).first<{ sessions: string | null }>();
 
 			if (proctorAssignment?.sessions) {
@@ -163,14 +163,12 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 				bindings.push(validExamFilter, locals.user.school_id);
 			} else {
 				query += `
-					LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
-					LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+					JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
 					LEFT JOIN student_attempts sa ON sa.student_id = epart.student_id AND sa.exam_id = epart.exam_id
 					WHERE epart.exam_id = ? AND e.school_id = ?
-					  AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
 					  AND (ep.room_id IS NULL OR ep.room_id = epart.room_id)
 				`;
-				bindings.push(locals.user.id, locals.user.id, validExamFilter, locals.user.school_id);
+				bindings.push(locals.user.id, validExamFilter, locals.user.school_id);
 			}
 
 			if (activeSessionFilter !== null) {
@@ -301,13 +299,11 @@ export const actions: Actions = {
 				JOIN exams e ON sa.exam_id = e.id
 				JOIN exam_participants ep_part ON sa.student_id = ep_part.student_id AND sa.exam_id = ep_part.exam_id
 				JOIN users u ON ep_part.student_id = u.id
-				LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
-				LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+				JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
 				WHERE sa.id = ? AND e.school_id = ?
-				  AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
 				  AND (ep.room_id IS NULL OR ep.room_id = ep_part.room_id)
 				  AND (ep.sessions IS NULL OR ep.sessions = '[]' OR u.session_number IN (SELECT value FROM json_each(ep.sessions)))
-			`).bind(locals.user.id, locals.user.id, parsedAttemptId, locals.user.school_id).first() as any;
+			`).bind(locals.user.id, parsedAttemptId, locals.user.school_id).first() as any;
 		}
 
 		if (!attemptData) return fail(403, { error: 'Sesi ujian tidak ditemukan atau bukan milik sekolah Anda.' });
@@ -370,13 +366,11 @@ export const actions: Actions = {
 				JOIN exams e ON sa.exam_id = e.id
 				JOIN exam_participants ep_part ON sa.student_id = ep_part.student_id AND sa.exam_id = ep_part.exam_id
 				JOIN users u ON ep_part.student_id = u.id
-				LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
-				LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+				JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
 				WHERE sa.id = ? AND e.school_id = ?
-				  AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
 				  AND (ep.room_id IS NULL OR ep.room_id = ep_part.room_id)
 				  AND (ep.sessions IS NULL OR ep.sessions = '[]' OR u.session_number IN (SELECT value FROM json_each(ep.sessions)))
-			`).bind(locals.user.id, locals.user.id, parsedAttemptId, locals.user.school_id).first<{id: number, signature: string | null}>();
+			`).bind(locals.user.id, parsedAttemptId, locals.user.school_id).first<{id: number, signature: string | null}>();
 		}
 
 		if (!attemptCheck) {
@@ -444,13 +438,11 @@ export const actions: Actions = {
 					JOIN exams e ON sa.exam_id = e.id
 					JOIN exam_participants ep_part ON sa.student_id = ep_part.student_id AND sa.exam_id = ep_part.exam_id
 					JOIN users u ON ep_part.student_id = u.id
-					LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
-					LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+					JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
 					WHERE sa.id = ? AND e.school_id = ?
-					  AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
 					  AND (ep.room_id IS NULL OR ep.room_id = ep_part.room_id)
 					  AND (ep.sessions IS NULL OR ep.sessions = '[]' OR u.session_number IN (SELECT value FROM json_each(ep.sessions)))
-				`).bind(locals.user.id, locals.user.id, parsedAttemptId, locals.user.school_id).first();
+				`).bind(locals.user.id, parsedAttemptId, locals.user.school_id).first();
 				if (!ok) return fail(403, { error: 'Anda tidak memiliki hak untuk menyelesaikan sesi ujian ini.' });
 			}
 		}

@@ -67,14 +67,13 @@ export const load: PageServerLoad = async ({ platform, locals, url }) => {
 			const proctorExamsRes = await db.prepare(`
 				SELECT DISTINCT e.id, e.title, e.is_active, s.name as subject_name, et.code as exam_type_code, c.name as class_name 
 				FROM exams e 
-				LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
-				LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
+				JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
 				LEFT JOIN subjects s ON e.subject_id = s.id
 				LEFT JOIN exam_types et ON e.exam_type_id = et.id
 				LEFT JOIN classes c ON e.class_id = c.id
-				WHERE (ep.id IS NOT NULL OR etp.id IS NOT NULL) AND e.school_id = ?
+				WHERE e.school_id = ?
 				ORDER BY e.is_active DESC, e.title ASC
-			`).bind(userId, userId, userSchoolId).all<any>();
+			`).bind(userId, userSchoolId).all<any>();
 
 			rawExams = proctorExamsRes.results || [];
 		}
@@ -134,7 +133,7 @@ export const load: PageServerLoad = async ({ platform, locals, url }) => {
 		// Restrict sessions if proctor has specific session assignment
 		if (!isSuperAdmin && ['pengawas', 'guru'].includes(locals.user.role)) {
 			const proctorAssignment = await db.prepare(`
-				SELECT sessions FROM exam_proctors WHERE exam_id = ? AND proctor_id = ?
+				SELECT sessions FROM exam_proctors WHERE exam_id = ? AND proctor_id = ? AND COALESCE(proctor_role, 'p1') NOT IN ('pt', 'cm')
 			`).bind(examFilter, userId).first<{ sessions: string | null }>();
 
 			if (proctorAssignment?.sessions) {

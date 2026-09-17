@@ -26,13 +26,13 @@ export const load: PageServerLoad = async ({ params, platform, locals }) => {
 			(SELECT COUNT(*) FROM questions WHERE exam_id = e.id) as question_count,
 			(SELECT COUNT(*) FROM exam_participants WHERE exam_id = e.id) as participant_count,
 			(SELECT COUNT(*) FROM exam_teachers WHERE exam_id = e.id) as teacher_count,
-			(SELECT COUNT(*) FROM exam_proctors WHERE exam_id = e.id) as proctor_count,
+			(SELECT COUNT(*) FROM exam_proctors WHERE exam_id = e.id AND COALESCE(proctor_role, 'p1') NOT IN ('pt', 'cm')) as proctor_count,
 			COALESCE(
 				(
 					SELECT GROUP_CONCAT(u2.name, '||')
 					FROM exam_proctors epr
 					JOIN users u2 ON epr.proctor_id = u2.id
-					WHERE epr.exam_id = e.id
+					WHERE epr.exam_id = e.id AND COALESCE(epr.proctor_role, 'p1') NOT IN ('pt', 'cm')
 				),
 				(
 					SELECT u3.name FROM users u3 WHERE u3.id = e.created_by AND u3.role = 'guru'

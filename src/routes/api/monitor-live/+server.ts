@@ -17,6 +17,9 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 	const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
 	const isAdmin = locals.user.role === 'admin';
 
+	let proctorRoomId: number | null = null;
+	let allowedProctorSessions: number[] | null = null;
+
 	if (!isSuperAdmin) {
 		if (isAdmin) {
 			const examCheck = await db.prepare(`SELECT 1 FROM exams WHERE id = ? AND school_id = ?`).bind(examId, locals.user.school_id).first();
@@ -25,14 +28,23 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 			}
 		} else {
 			const proctorCheck = await db.prepare(`
-				SELECT 1 FROM exams e
-				LEFT JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ?
-				LEFT JOIN exam_type_proctors etp ON e.exam_type_id = etp.exam_type_id AND etp.proctor_id = ?
-				WHERE e.id = ? AND e.school_id = ? AND (ep.id IS NOT NULL OR etp.id IS NOT NULL)
-			`).bind(locals.user.id, locals.user.id, examId, locals.user.school_id).first();
+				SELECT ep.room_id, ep.sessions FROM exams e
+				JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
+				WHERE e.id = ? AND e.school_id = ?
+			`).bind(locals.user.id, examId, locals.user.school_id).first<{ room_id: number | null; sessions: string | null }>();
 
 			if (!proctorCheck) {
 				return json({ error: 'Forbidden: Anda tidak ditugaskan untuk mengawasi ujian ini.' }, { status: 403 });
+			}
+
+			proctorRoomId = proctorCheck.room_id;
+			if (proctorCheck.sessions) {
+				try {
+					const parsed = JSON.parse(proctorCheck.sessions);
+					if (Array.isArray(parsed) && parsed.length > 0) {
+						allowedProctorSessions = parsed.map((s: any) => parseInt(s, 10));
+					}
+				} catch (e) {}
 			}
 		}
 	}
@@ -94,15 +106,27 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 
 		const bindings: any[] = [examId, locals.user.school_id];
 
+		if (proctorRoomId !== null) {
+			query += ` AND epart.room_id = ?`;
+			bindings.push(proctorRoomId);
+		}
+
 		const dbSessions = await db.prepare(`
 			SELECT session_number FROM exam_sessions WHERE exam_id = ?
 		`).bind(examId).all<{ session_number: number }>();
 
-		const availableSessions = (dbSessions.results || []).map(s => s.session_number);
+		let availableSessions = (dbSessions.results || []).map(s => s.session_number);
+		if (allowedProctorSessions && allowedProctorSessions.length > 0) {
+			availableSessions = availableSessions.filter(sn => allowedProctorSessions!.includes(sn));
+		}
 
 		if (availableSessions.length > 0 && !isNaN(sessionFilter) && availableSessions.includes(sessionFilter)) {
 			query += ` AND COALESCE(u.session_number, 1) = ?`;
 			bindings.push(sessionFilter);
+		} else if (allowedProctorSessions && allowedProctorSessions.length > 0) {
+			const placeholders = allowedProctorSessions.map(() => '?').join(',');
+			query += ` AND COALESCE(u.session_number, 1) IN (${placeholders})`;
+			bindings.push(...allowedProctorSessions);
 		}
 
 		query += `
