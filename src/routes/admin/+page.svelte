@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { parseDate } from '$lib/utils/date';
-
 	import StatCard from '$lib/components/dashboard/StatCard.svelte';
+	import SchoolBanner from '$lib/components/dashboard/SchoolBanner.svelte';
 	import { ICONS, ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS } from '$lib/utils/constants';
 
 	export let data;
@@ -15,10 +15,16 @@
 </svelte:head>
 
 <div class="space-y-6 animate-in">
+	<!-- School Banner -->
+	<SchoolBanner
+		schoolName={data.userInfo?.school_name || ''}
+		userName={data.user.name}
+		role={data.user.role}
+	/>
 	<!-- Page Header -->
 	<div>
-		<h1 class="text-2xl font-bold text-slate-800">Dashboard Admin</h1>
-		<p class="text-sm text-slate-500 mt-1">Selamat datang, {data.user.name}. Berikut ringkasan sistem.</p>
+		<h1 class="text-2xl font-bold text-slate-800">{data.user.role === 'panitia' ? 'Dashboard Panitia' : 'Dashboard Admin'}</h1>
+		<p class="text-sm text-slate-500 mt-1">Berikut ringkasan sistem ujian.</p>
 	</div>
 
 	<!-- Stat Cards -->

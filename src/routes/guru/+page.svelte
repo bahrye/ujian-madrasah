@@ -1,5 +1,6 @@
 <script lang="ts">
 	import StatCard from '$lib/components/dashboard/StatCard.svelte';
+	import SchoolBanner from '$lib/components/dashboard/SchoolBanner.svelte';
 	import { ICONS } from '$lib/utils/constants';
 	export let data;
 </script>
@@ -7,9 +8,14 @@
 <svelte:head><title>Dashboard Guru — Ujian Online Madrasah</title></svelte:head>
 
 <div class="space-y-6 animate-in">
+	<SchoolBanner
+		schoolName={data.userInfo?.school_name || ''}
+		userName={data.user.name}
+		role="guru"
+	/>
 	<div>
 		<h1 class="text-2xl font-bold text-slate-800">Dashboard Guru</h1>
-		<p class="text-sm text-slate-500 mt-1">Selamat datang, {data.user.name}.</p>
+		<p class="text-sm text-slate-500 mt-1">Berikut ringkasan aktivitas Anda.</p>
 	</div>
 
 	<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">

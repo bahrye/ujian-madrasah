@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { parseDate } from '$lib/utils/date';
-
 	import { onMount, onDestroy } from 'svelte';
 	import StatCard from '$lib/components/dashboard/StatCard.svelte';
+	import SchoolBanner from '$lib/components/dashboard/SchoolBanner.svelte';
 	import { ICONS } from '$lib/utils/constants';
 	export let data;
 
@@ -139,9 +139,14 @@
 <svelte:head><title>Dashboard Pengawas — Ujian Online Madrasah</title></svelte:head>
 
 <div class="space-y-6 animate-in">
+	<SchoolBanner
+		schoolName={data.userInfo?.school_name || ''}
+		userName={data.user.name}
+		role="pengawas"
+	/>
 	<div>
 		<h1 class="text-2xl font-bold text-slate-800">Dashboard Pengawas</h1>
-		<p class="text-sm text-slate-500 mt-1">Selamat datang, {data.user.name}.</p>
+		<p class="text-sm text-slate-500 mt-1">Berikut ringkasan tugas pengawasan Anda.</p>
 	</div>
 
 	<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">

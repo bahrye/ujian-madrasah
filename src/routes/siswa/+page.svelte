@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { ICONS, ATTEMPT_STATUS_LABELS, ATTEMPT_STATUS_COLORS } from '$lib/utils/constants';
+	import SchoolBanner from '$lib/components/dashboard/SchoolBanner.svelte';
 	import { parseDate } from '$lib/utils/date';
 	import { parseProctors, formatProctorsText } from '$lib/utils/format';
 	import { onMount, onDestroy } from 'svelte';
@@ -231,9 +232,14 @@
 <svelte:head><title>Dashboard Siswa — Ujian Online Madrasah</title></svelte:head>
 
 <div class="space-y-6 animate-in">
+	<SchoolBanner
+		schoolName={data.userInfo?.school_name || ''}
+		userName={data.user.name}
+		role="siswa"
+	/>
 	<div>
 		<h1 class="text-2xl font-bold text-slate-800">Dashboard Siswa</h1>
-		<p class="text-sm text-slate-500 mt-1">Selamat datang, {data.user.name}.</p>
+		<p class="text-sm text-slate-500 mt-1">Berikut jadwal dan ujian Anda hari ini.</p>
 	</div>
 
 	<!-- Active Attempt Banner -->
