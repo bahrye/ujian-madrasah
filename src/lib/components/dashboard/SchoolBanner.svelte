@@ -43,19 +43,21 @@
 </script>
 
 <div class="school-banner relative overflow-hidden rounded-2xl bg-gradient-to-r {config.gradient} p-5 sm:p-6 text-white shadow-xl">
-	<!-- Decorative circles -->
-	<div class="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-white/5"></div>
-	<div class="absolute -bottom-8 -left-8 w-40 h-40 rounded-full bg-white/5"></div>
-	<div class="absolute top-4 right-28 w-20 h-20 rounded-full bg-white/10"></div>
-	<div class="absolute bottom-2 right-8 w-14 h-14 rounded-full bg-white/10"></div>
+	<!-- Animated decorative circles (100% Pure CSS / GPU-accelerated / 0 Network Request / 0 Polling) -->
+	<div class="orb orb-1 absolute -top-12 -right-12 w-56 h-56 rounded-full bg-white/10 pointer-events-none"></div>
+	<div class="orb orb-2 absolute -bottom-10 -left-10 w-48 h-48 rounded-full bg-white/10 pointer-events-none"></div>
+	<div class="orb orb-3 absolute top-2 right-28 w-24 h-24 rounded-full bg-white/15 pointer-events-none"></div>
+	<div class="orb orb-4 absolute bottom-2 right-8 w-16 h-16 rounded-full bg-white/15 pointer-events-none"></div>
+	<div class="orb orb-5 absolute top-6 left-1/3 w-14 h-14 rounded-full bg-white/10 pointer-events-none"></div>
+
 	<!-- Dot pattern overlay -->
-	<div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 20px 20px;"></div>
+	<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 20px 20px;"></div>
 	<!-- Shine overlay -->
 	<div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
 
 	<div class="relative z-10 flex flex-col sm:flex-row sm:items-center gap-4">
 		<!-- Role icon badge -->
-		<div class="flex-shrink-0 w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center shadow-lg">
+		<div class="flex-shrink-0 w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-105">
 			<svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
 				<path stroke-linecap="round" stroke-linejoin="round" d={config.icon} />
 			</svg>
@@ -79,7 +81,7 @@
 
 		<!-- Right badge -->
 		<div class="hidden sm:flex flex-col items-center justify-center flex-shrink-0">
-			<div class="px-4 py-2 rounded-xl bg-white/15 border border-white/20 backdrop-blur-sm text-center">
+			<div class="px-4 py-2 rounded-xl bg-white/15 border border-white/20 backdrop-blur-sm text-center shadow-inner">
 				<p class="text-xs font-extrabold text-white uppercase tracking-wider">Sistem Ujian</p>
 				<p class="text-[10px] text-white/60 tracking-wide">Online Madrasah</p>
 			</div>
@@ -94,5 +96,99 @@
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 		text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+	}
+
+	/* Animasi Bulatan Bergerak (100% Pure CSS Keyframes / GPU Accelerated) */
+	.orb {
+		will-change: transform;
+	}
+
+	.orb-1 {
+		animation: float-1 16s ease-in-out infinite alternate;
+	}
+
+	.orb-2 {
+		animation: float-2 20s ease-in-out infinite alternate;
+	}
+
+	.orb-3 {
+		animation: float-3 12s ease-in-out infinite;
+	}
+
+	.orb-4 {
+		animation: float-4 9s ease-in-out infinite alternate;
+	}
+
+	.orb-5 {
+		animation: float-5 14s ease-in-out infinite alternate;
+	}
+
+	@keyframes float-1 {
+		0% {
+			transform: translate3d(0, 0, 0) scale(1);
+		}
+		50% {
+			transform: translate3d(-24px, 18px, 0) scale(1.08);
+		}
+		100% {
+			transform: translate3d(18px, -12px, 0) scale(0.94);
+		}
+	}
+
+	@keyframes float-2 {
+		0% {
+			transform: translate3d(0, 0, 0) scale(1);
+		}
+		50% {
+			transform: translate3d(28px, -22px, 0) scale(1.12);
+		}
+		100% {
+			transform: translate3d(-16px, 14px, 0) scale(0.92);
+		}
+	}
+
+	@keyframes float-3 {
+		0% {
+			transform: translate3d(0, 0, 0) scale(1);
+		}
+		33% {
+			transform: translate3d(-20px, -14px, 0) scale(1.15);
+		}
+		66% {
+			transform: translate3d(14px, 18px, 0) scale(0.88);
+		}
+		100% {
+			transform: translate3d(0, 0, 0) scale(1);
+		}
+	}
+
+	@keyframes float-4 {
+		0% {
+			transform: translate3d(0, 0, 0) scale(0.92);
+		}
+		50% {
+			transform: translate3d(-16px, -22px, 0) scale(1.2);
+		}
+		100% {
+			transform: translate3d(12px, 10px, 0) scale(0.96);
+		}
+	}
+
+	@keyframes float-5 {
+		0% {
+			transform: translate3d(0, 0, 0) scale(1);
+		}
+		50% {
+			transform: translate3d(20px, -16px, 0) scale(1.12);
+		}
+		100% {
+			transform: translate3d(-14px, 10px, 0) scale(0.9);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.orb {
+			animation: none !important;
+		}
 	}
 </style>
