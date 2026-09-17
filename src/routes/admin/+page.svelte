@@ -17,7 +17,7 @@
 <div class="space-y-6 animate-in">
 	<!-- School Banner -->
 	<SchoolBanner
-		schoolName={data.userInfo?.school_name || ''}
+		schoolName={data.schoolName || data.userInfo?.school_name || ''}
 		userName={data.user.name}
 		role={data.user.role}
 	/>

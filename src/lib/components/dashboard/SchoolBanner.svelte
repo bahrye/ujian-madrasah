@@ -63,17 +63,15 @@
 
 		<!-- Text content -->
 		<div class="flex-1 min-w-0">
-			{#if schoolName}
-				<p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60 mb-0.5">Madrasah</p>
-				<h2 class="text-lg sm:text-2xl font-extrabold leading-tight tracking-tight drop-shadow school-name-text">
-					{schoolName}
-				</h2>
-			{/if}
-			<p class="text-sm text-white/80 mt-1.5 font-medium flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+			<p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70 mb-0.5">Madrasah</p>
+			<h2 class="text-lg sm:text-2xl font-extrabold leading-tight tracking-tight drop-shadow school-name-text">
+				{schoolName || 'Madrasah'}
+			</h2>
+			<p class="text-sm text-white/85 mt-1.5 font-medium flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
 				<span>{getGreeting()},</span>
 				<span class="text-white font-bold">{userName}</span>
 				<span class="text-white/40">·</span>
-				<span class="inline-flex items-center gap-1 bg-white/15 rounded-full px-2 py-0.5 text-xs font-semibold border border-white/20">
+				<span class="inline-flex items-center gap-1 bg-white/20 rounded-full px-2 py-0.5 text-xs font-semibold border border-white/20">
 					{config.label}
 				</span>
 			</p>
