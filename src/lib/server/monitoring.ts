@@ -1,4 +1,5 @@
 import type { D1Database } from '@cloudflare/workers-types';
+import { uploadToCloudinary, deleteFromCloudinary } from '$lib/server/cloudinary';
 
 let isTableChecked = false;
 
@@ -81,11 +82,28 @@ export interface MonitoringPhotoInput {
 
 export async function saveMonitoringPhoto(
 	db: any,
-	input: MonitoringPhotoInput
+	input: MonitoringPhotoInput,
+	env?: any
 ): Promise<boolean> {
 	if (!db || !input.examId || !input.studentId || !input.photoUrl) return false;
 
 	await ensureMonitoringPhotosTable(db);
+
+	let finalPhotoUrl = input.photoUrl;
+
+	// Simpan foto ke Cloudinary secara langsung jika berupa base64
+	if (input.photoUrl.startsWith('data:image/')) {
+		try {
+			const uploadRes = await uploadToCloudinary(input.photoUrl, env, 'ujian_monitoring_photos');
+			if (uploadRes.success && uploadRes.url) {
+				finalPhotoUrl = uploadRes.url;
+			} else {
+				console.warn('Upload monitoring photo to Cloudinary skipped or failed:', uploadRes.error);
+			}
+		} catch (uploadErr) {
+			console.warn('Failed to upload monitoring photo to Cloudinary:', uploadErr);
+		}
+	}
 
 	try {
 		await db.prepare(`
@@ -97,7 +115,7 @@ export async function saveMonitoringPhoto(
 			input.attemptId || null,
 			input.studentId,
 			input.photoType,
-			input.photoUrl,
+			finalPhotoUrl,
 			input.caption || null
 		).run();
 
@@ -105,6 +123,74 @@ export async function saveMonitoringPhoto(
 	} catch (err) {
 		console.error('saveMonitoringPhoto error:', err);
 		return false;
+	}
+}
+
+/**
+ * Deletes monitoring photos from both Cloudinary and database.
+ * Used when student attempt or exam results are reset/deleted.
+ */
+export async function deleteMonitoringPhotos(
+	db: any,
+	env: any,
+	filter: { attemptId?: number; examId?: number; studentId?: number }
+): Promise<number> {
+	if (!db) return 0;
+	try {
+		await ensureMonitoringPhotosTable(db);
+		let query = 'SELECT id, photo_url FROM exam_monitoring_photos WHERE 1=1';
+		const bindings: any[] = [];
+		if (filter.attemptId) {
+			query += ' AND attempt_id = ?';
+			bindings.push(filter.attemptId);
+		}
+		if (filter.examId) {
+			query += ' AND exam_id = ?';
+			bindings.push(filter.examId);
+		}
+		if (filter.studentId) {
+			query += ' AND student_id = ?';
+			bindings.push(filter.studentId);
+		}
+
+		if (bindings.length === 0) return 0;
+
+		const photosRes = await db.prepare(query).bind(...bindings).all<{ id: number; photo_url: string }>();
+		const photos = photosRes.results || [];
+		if (photos.length === 0) return 0;
+
+		// Hapus dari Cloudinary jika berupa URL Cloudinary
+		for (const p of photos) {
+			if (p.photo_url && p.photo_url.includes('res.cloudinary.com')) {
+				try {
+					await deleteFromCloudinary(p.photo_url, env);
+				} catch (delErr) {
+					console.warn('Failed to delete photo from Cloudinary:', p.photo_url, delErr);
+				}
+			}
+		}
+
+		// Hapus baris dari tabel database
+		let delQuery = 'DELETE FROM exam_monitoring_photos WHERE 1=1';
+		const delBindings: any[] = [];
+		if (filter.attemptId) {
+			delQuery += ' AND attempt_id = ?';
+			delBindings.push(filter.attemptId);
+		}
+		if (filter.examId) {
+			delQuery += ' AND exam_id = ?';
+			delBindings.push(filter.examId);
+		}
+		if (filter.studentId) {
+			delQuery += ' AND student_id = ?';
+			delBindings.push(filter.studentId);
+		}
+
+		await db.prepare(delQuery).bind(...delBindings).run();
+		return photos.length;
+	} catch (e) {
+		console.error('deleteMonitoringPhotos error:', e);
+		return 0;
 	}
 }
 

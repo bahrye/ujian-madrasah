@@ -6,7 +6,7 @@ import { env } from '$env/dynamic/private';
 import { formatExamTitle } from '$lib/utils/exam';
 import { parseDate } from '$lib/utils/date';
 import { finalizeExpiredAttempts, finalizeAttempt } from '$lib/server/exam-finalize';
-import { ensureMonitoringPhotosTable } from '$lib/server/monitoring';
+import { ensureMonitoringPhotosTable, deleteMonitoringPhotos } from '$lib/server/monitoring';
 
 export interface ExamFilterOption {
 	id: number;
@@ -378,10 +378,13 @@ export const actions: Actions = {
 		}
 
 		try {
+			const mergedEnv = platform?.env || env;
 			if (attemptCheck.signature && attemptCheck.signature.includes('res.cloudinary.com')) {
-				const mergedEnv = platform?.env || env;
 				await deleteFromCloudinary(attemptCheck.signature, mergedEnv);
 			}
+
+			// Hapus foto monitoring dari Cloudinary dan database
+			await deleteMonitoringPhotos(db, mergedEnv, { attemptId: parsedAttemptId });
 
 			await db.batch([
 				db.prepare('DELETE FROM student_answers WHERE attempt_id = ?').bind(parsedAttemptId),

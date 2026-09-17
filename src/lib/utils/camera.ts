@@ -6,13 +6,13 @@
 export interface CameraSnapshotOptions {
 	maxWidth?: number;
 	maxHeight?: number;
-	quality?: number; // 0.1 - 1.0 (default 0.5 for ~10-15KB file)
+	quality?: number; // 0.1 - 1.0 (default 0.65 for sharp ~20-30KB file)
 	timeoutMs?: number;
 }
 
 /**
  * Captures a single lightweight micro-snapshot from the front webcam/camera,
- * compresses it to 320x240 WebP (or JPEG fallback), and immediately shuts off
+ * compresses it to 480x360 WebP (or JPEG fallback), and immediately shuts off
  * the camera hardware to prevent battery drain and overheating.
  */
 export async function captureMicroSnapshot(options: CameraSnapshotOptions = {}): Promise<string | null> {
@@ -20,9 +20,9 @@ export async function captureMicroSnapshot(options: CameraSnapshotOptions = {}):
 		return null;
 	}
 
-	const width = options.maxWidth || 320;
-	const height = options.maxHeight || 240;
-	const quality = options.quality || 0.5;
+	const width = options.maxWidth || 480;
+	const height = options.maxHeight || 360;
+	const quality = options.quality || 0.65;
 	const timeoutMs = options.timeoutMs || 2500;
 
 	let stream: MediaStream | null = null;
@@ -97,8 +97,8 @@ export async function captureMicroSnapshot(options: CameraSnapshotOptions = {}):
  */
 export async function startCameraPreview(
 	videoElement: HTMLVideoElement,
-	width = 320,
-	height = 240
+	width = 480,
+	height = 360
 ): Promise<MediaStream | null> {
 	if (typeof window === 'undefined' || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
 		return null;
@@ -144,9 +144,9 @@ export function stopCameraStream(stream: MediaStream | null) {
  */
 export function snapshotFromVideo(
 	video: HTMLVideoElement,
-	width = 320,
-	height = 240,
-	quality = 0.5
+	width = 480,
+	height = 360,
+	quality = 0.65
 ): string {
 	const canvas = document.createElement('canvas');
 	canvas.width = width;

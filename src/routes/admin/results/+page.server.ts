@@ -5,6 +5,7 @@ import { deleteFromCloudinary } from '$lib/server/cloudinary';
 import { env } from '$env/dynamic/private';
 import { formatExamTitle } from '$lib/utils/exam';
 import { finalizeExpiredAttempts } from '$lib/server/exam-finalize';
+import { deleteMonitoringPhotos } from '$lib/server/monitoring';
 
 export const load: PageServerLoad = async ({ platform, url, locals }) => {
 	if (!locals.user) throw redirect(302, '/login');
@@ -166,11 +167,15 @@ export const actions: Actions = {
 				return fail(403, { error: 'Data hasil ujian tidak ditemukan atau bukan milik sekolah Anda.' });
 			}
 
+			const mergedEnv = platform?.env || env;
+
 			// Delete signature from Cloudinary if exists
 			if (attemptCheck.signature && attemptCheck.signature.includes('res.cloudinary.com')) {
-				const mergedEnv = platform?.env || env;
 				await deleteFromCloudinary(attemptCheck.signature, mergedEnv);
 			}
+
+			// Delete monitoring photos from Cloudinary and database
+			await deleteMonitoringPhotos(db, mergedEnv, { attemptId: parsedId });
 
 			// Hapus data answers dan attempt dalam batch
 			await db.batch([

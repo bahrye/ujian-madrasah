@@ -3,6 +3,8 @@ import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 
 import { formatExamTitle } from '$lib/utils/exam';
+import { deleteMonitoringPhotos } from '$lib/server/monitoring';
+import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async ({ params, platform, locals }) => {
 	const db = getDB(platform);
@@ -294,6 +296,9 @@ export const actions: Actions = {
 		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid.' });
 
 		try {
+			const mergedEnv = platform?.env || env;
+			await deleteMonitoringPhotos(db, mergedEnv, { examId: parsedId });
+
 			const attempts = await db.prepare('SELECT id FROM student_attempts WHERE exam_id = ?').bind(parsedId).all<{ id: number }>();
 			const attemptIds = attempts.results.map((a: any) => a.id);
 			

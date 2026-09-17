@@ -3,6 +3,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 import { hashPassword } from '$lib/server/auth';
 import { deleteFromCloudinary } from '$lib/server/cloudinary';
+import { deleteMonitoringPhotos } from '$lib/server/monitoring';
 import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async ({ locals, url, platform }) => {
@@ -162,6 +163,9 @@ export const actions: Actions = {
 		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid' });
 
 		try {
+			const mergedEnv = platform?.env || env;
+			await deleteMonitoringPhotos(db, mergedEnv, { studentId: parsedId });
+
 			await db.batch([
 				db.prepare('DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE student_id = ?)').bind(parsedId),
 				db.prepare('DELETE FROM student_attempts WHERE student_id = ?').bind(parsedId),
@@ -186,6 +190,11 @@ export const actions: Actions = {
 			const ids = JSON.parse(idsJson) as number[];
 			if (!Array.isArray(ids) || ids.length === 0) {
 				return fail(400, { error: 'Pilih minimal satu siswa.' });
+			}
+
+			const mergedEnv = platform?.env || env;
+			for (const id of ids) {
+				await deleteMonitoringPhotos(db, mergedEnv, { studentId: id });
 			}
 
 			const stmts = [];

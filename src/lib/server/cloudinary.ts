@@ -63,7 +63,11 @@ export async function deleteFromCloudinary(url: string | null, env: Record<strin
 	}
 }
 
-export async function uploadToCloudinary(base64Image: string, env: Record<string, string | undefined> | any): Promise<{success: boolean, url?: string, error?: string}> {
+export async function uploadToCloudinary(
+	base64Image: string, 
+	env: Record<string, string | undefined> | any,
+	folder: string = 'ujian_signatures'
+): Promise<{success: boolean, url?: string, error?: string}> {
 	const cloudName = (env?.PUBLIC_CLOUDINARY_CLOUD_NAME || env?.CLOUDINARY_CLOUD_NAME || process?.env?.PUBLIC_CLOUDINARY_CLOUD_NAME || process?.env?.CLOUDINARY_CLOUD_NAME || 'dfhtjgwcz').trim();
 	const apiKey = (env?.CLOUDINARY_API_KEY || process?.env?.CLOUDINARY_API_KEY)?.trim();
 	const apiSecret = (env?.CLOUDINARY_API_SECRET || process?.env?.CLOUDINARY_API_SECRET)?.trim();
@@ -78,9 +82,9 @@ export async function uploadToCloudinary(base64Image: string, env: Record<string
 
 	try {
 		const timestamp = Math.round(new Date().getTime() / 1000).toString();
-		const folder = 'ujian_signatures';
+		const targetFolder = folder || 'ujian_signatures';
 		
-		const strToSign = `folder=${folder}&timestamp=${timestamp}${apiSecret}`;
+		const strToSign = `folder=${targetFolder}&timestamp=${timestamp}${apiSecret}`;
 		const encoder = new TextEncoder();
 		const data = encoder.encode(strToSign);
 		const hashBuffer = await crypto.subtle.digest('SHA-1', data);
@@ -92,7 +96,7 @@ export async function uploadToCloudinary(base64Image: string, env: Record<string
 		formData.append('api_key', apiKey);
 		formData.append('timestamp', timestamp);
 		formData.append('signature', signature);
-		formData.append('folder', folder);
+		formData.append('folder', targetFolder);
 
 		const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
 			method: 'POST',

@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getDB } from '$lib/server/db';
 import { saveMonitoringPhoto } from '$lib/server/monitoring';
+import { env } from '$env/dynamic/private';
 
 export const POST: RequestHandler = async ({ request, platform, locals }) => {
 	if (!locals.user) {
@@ -9,6 +10,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 	}
 
 	const db = getDB(platform);
+	const mergedEnv = platform?.env || env;
 
 	let attemptId: number | null = null;
 	let violationType = 'Melakukan pelanggaran ujian';
@@ -103,7 +105,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 					photoType: 'violation',
 					photoUrl,
 					caption: `Pelanggaran: ${violationType}`
-				});
+				}, mergedEnv);
 			} catch (photoErr) {
 				console.warn('Failed to save violation photo:', photoErr);
 			}

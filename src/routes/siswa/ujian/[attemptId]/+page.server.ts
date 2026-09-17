@@ -5,6 +5,7 @@ import { verifyExamTokenSignature } from '$lib/server/auth';
 
 import { formatExamTitle, matchShortAnswer } from '$lib/utils/exam';
 import { saveMonitoringPhoto } from '$lib/server/monitoring';
+import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async ({ platform, locals, params, cookies }) => {
 	if (!locals.user) throw redirect(302, '/login');
@@ -444,6 +445,7 @@ export const actions: Actions = {
 			const finishPhotoStr = form?.get('finish_photo')?.toString();
 			if (finishPhotoStr && finishPhotoStr.startsWith('data:image/')) {
 				try {
+					const mergedEnv = platform?.env || env;
 					await saveMonitoringPhoto(db, {
 						schoolId: locals.user.school_id,
 						examId: attempt.exam_id,
@@ -452,7 +454,7 @@ export const actions: Actions = {
 						photoType: 'finish',
 						photoUrl: finishPhotoStr,
 						caption: 'Foto Pengumpulan Selesai'
-					});
+					}, mergedEnv);
 				} catch (photoErr) {
 					console.warn('Failed to save finish photo:', photoErr);
 				}

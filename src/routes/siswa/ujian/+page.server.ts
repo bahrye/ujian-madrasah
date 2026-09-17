@@ -276,6 +276,8 @@ export const actions: Actions = {
 
 			const attemptId = result.meta.last_row_id;
 
+			const mergedEnv = platform?.env || env;
+
 			let facePhotoStr = form.get('face_photo')?.toString() || '';
 			if (facePhotoStr && facePhotoStr.startsWith('data:image/')) {
 				try {
@@ -287,7 +289,7 @@ export const actions: Actions = {
 						photoType: 'start',
 						photoUrl: facePhotoStr,
 						caption: 'Foto Absensi Kehadiran'
-					});
+					}, mergedEnv);
 				} catch (photoErr) {
 					console.warn('Failed to save start face photo:', photoErr);
 				}
@@ -295,8 +297,6 @@ export const actions: Actions = {
 
 			// Background task to upload signature to Cloudinary
 			if (signatureStr.startsWith('data:image/')) {
-				const mergedEnv = platform?.env || env;
-				
 				const backgroundUpload = async () => {
 					try {
 						const uploadResult = await uploadToCloudinary(signatureStr, mergedEnv);
