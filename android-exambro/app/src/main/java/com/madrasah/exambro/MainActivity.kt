@@ -169,13 +169,14 @@ class MainActivity : AppCompatActivity() {
             // Beri izin akses kamera ke webview (untuk scan QR token)
             override fun onPermissionRequest(request: PermissionRequest?) {
                 if (request == null) return
-                for (resource in request.resources) {
+                val resList = request.resources ?: return
+                for (resource in resList) {
                     if (resource == PermissionRequest.RESOURCE_VIDEO_CAPTURE) {
                         request.grant(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
                         return
                     }
                 }
-                request.grant(request.resources)
+                request.grant(resList)
             }
         }
 
