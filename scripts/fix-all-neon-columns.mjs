@@ -1,14 +1,20 @@
-import { getDB } from '../src/lib/server/db.ts';
+import { neon } from '@neondatabase/serverless';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
+const databaseUrl = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_cH3eDR5VhETs@ep-soft-wildflower-az092xod-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require';
+
 async function fixAllColumns() {
-	const db = getDB();
+	console.log('Connecting to Neon PostgreSQL...');
+	const sql = neon(databaseUrl);
+
 	console.log('Ensuring all tables and columns exist in Neon PostgreSQL...');
 
 	const statements = [
 		// schools
+		'ALTER TABLE schools ADD COLUMN IF NOT EXISTS require_exambro INTEGER NOT NULL DEFAULT 0',
+		'ALTER TABLE schools ADD COLUMN IF NOT EXISTS master_exit_pin TEXT',
 		'ALTER TABLE schools ADD COLUMN IF NOT EXISTS principal_nip TEXT',
 		'ALTER TABLE schools ADD COLUMN IF NOT EXISTS province TEXT',
 		'ALTER TABLE schools ADD COLUMN IF NOT EXISTS city TEXT',
@@ -26,6 +32,7 @@ async function fixAllColumns() {
 		'ALTER TABLE users ADD COLUMN IF NOT EXISTS is_logged_in INTEGER DEFAULT 0',
 
 		// exams
+		'ALTER TABLE exams ADD COLUMN IF NOT EXISTS exit_pin TEXT',
 		'ALTER TABLE exams ADD COLUMN IF NOT EXISTS class_id INTEGER REFERENCES classes(id) ON DELETE SET NULL',
 		'ALTER TABLE exams ADD COLUMN IF NOT EXISTS exam_type_id INTEGER REFERENCES exam_types(id) ON DELETE SET NULL',
 		'ALTER TABLE exams ADD COLUMN IF NOT EXISTS max_attempts INTEGER DEFAULT 1',
@@ -74,15 +81,29 @@ async function fixAllColumns() {
 		)`
 	];
 
+	let count = 0;
 	for (const stmt of statements) {
 		try {
-			await db.prepare(stmt).run();
+			if (sql.query) {
+				await sql.query(stmt);
+			} else {
+				await sql(stmt);
+			}
+			count++;
 		} catch (err) {
 			console.warn(`Statement warning [${stmt}]:`, err.message);
 		}
 	}
 
-	console.log('✓ All table columns verified and synced successfully in Neon DB!');
+	console.log(`✓ ${count}/${statements.length} table columns verified and synced successfully in Neon DB!`);
+
+	// Verify master_exit_pin column specifically
+	try {
+		const verifyRes = await (sql.query ? sql.query("SELECT column_name FROM information_schema.columns WHERE table_name = 'schools' AND column_name = 'master_exit_pin'") : sql("SELECT column_name FROM information_schema.columns WHERE table_name = 'schools' AND column_name = 'master_exit_pin'"));
+		console.log('Verification check for schools.master_exit_pin:', verifyRes);
+	} catch (vErr) {
+		console.error('Verification error:', vErr);
+	}
 }
 
 fixAllColumns();

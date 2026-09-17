@@ -9,6 +9,16 @@ export const load: PageServerLoad = async ({ locals, platform, url }) => {
 	}
 
 	const db = getDB(platform);
+
+	// Pastikan kolom master_exit_pin tersedia di database (PostgreSQL Neon & SQLite D1)
+	try {
+		await db.prepare('ALTER TABLE schools ADD COLUMN IF NOT EXISTS master_exit_pin TEXT').run();
+	} catch (_) {
+		try {
+			await db.prepare('ALTER TABLE schools ADD COLUMN master_exit_pin TEXT').run();
+		} catch (_) {}
+	}
+
 	let schoolId = locals.user.school_id;
 	if (!schoolId) {
 		const u = await db.prepare('SELECT school_id FROM users WHERE id = ?')
@@ -21,8 +31,13 @@ export const load: PageServerLoad = async ({ locals, platform, url }) => {
 	let allSchools: { id: number; name: string; npsn: string | null; require_exambro: number; master_exit_pin: string | null }[] = [];
 
 	if (isSuperAdmin) {
-		const schoolsRes = await db.prepare('SELECT id, name, npsn, require_exambro, master_exit_pin FROM schools ORDER BY id ASC').all<any>();
-		allSchools = schoolsRes.results || [];
+		try {
+			const schoolsRes = await db.prepare('SELECT id, name, npsn, require_exambro, master_exit_pin FROM schools ORDER BY id ASC').all<any>();
+			allSchools = schoolsRes.results || [];
+		} catch (_) {
+			const schoolsRes = await db.prepare('SELECT id, name, npsn, require_exambro FROM schools ORDER BY id ASC').all<any>();
+			allSchools = (schoolsRes.results || []).map((s: any) => ({ ...s, master_exit_pin: null }));
+		}
 		
 		const requestedSchoolId = url.searchParams.get('school_id');
 		if (requestedSchoolId) {
@@ -39,15 +54,29 @@ export const load: PageServerLoad = async ({ locals, platform, url }) => {
 
 	let school = null;
 	if (schoolId) {
-		school = await db
-			.prepare('SELECT id, name, npsn, require_exambro, master_exit_pin FROM schools WHERE id = ?')
-			.bind(schoolId)
-			.first<{ id: number; name: string; npsn: string; require_exambro: number; master_exit_pin: string | null }>();
+		try {
+			school = await db
+				.prepare('SELECT id, name, npsn, require_exambro, master_exit_pin FROM schools WHERE id = ?')
+				.bind(schoolId)
+				.first<{ id: number; name: string; npsn: string; require_exambro: number; master_exit_pin: string | null }>();
+		} catch (_) {
+			school = await db
+				.prepare('SELECT id, name, npsn, require_exambro FROM schools WHERE id = ?')
+				.bind(schoolId)
+				.first<any>();
+			if (school) school.master_exit_pin = null;
+		}
 	}
 
 	if (!school) {
-		const firstSchool = await db.prepare('SELECT id, name, npsn, require_exambro, master_exit_pin FROM schools ORDER BY id ASC LIMIT 1').first<any>();
-		school = firstSchool;
+		try {
+			const firstSchool = await db.prepare('SELECT id, name, npsn, require_exambro, master_exit_pin FROM schools ORDER BY id ASC LIMIT 1').first<any>();
+			school = firstSchool;
+		} catch (_) {
+			const firstSchool = await db.prepare('SELECT id, name, npsn, require_exambro FROM schools ORDER BY id ASC LIMIT 1').first<any>();
+			school = firstSchool;
+			if (school) school.master_exit_pin = null;
+		}
 	}
 
 	return {

@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS schools (
     village TEXT,
     postal_code TEXT,
     require_exambro INTEGER NOT NULL DEFAULT 0,
+    master_exit_pin TEXT,
     is_active INTEGER NOT NULL DEFAULT 1,
     created_at TEXT NOT NULL DEFAULT (to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS')),
     updated_at TEXT NOT NULL DEFAULT (to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS'))

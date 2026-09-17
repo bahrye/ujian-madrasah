@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS schools (
     accreditation TEXT,
     website TEXT,
     require_exambro INTEGER NOT NULL DEFAULT 0,
+    master_exit_pin TEXT,
     is_active INTEGER NOT NULL DEFAULT 1,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
