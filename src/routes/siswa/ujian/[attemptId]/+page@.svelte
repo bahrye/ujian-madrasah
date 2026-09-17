@@ -53,6 +53,22 @@
 		isPausedByProctor = data.attempt.is_paused === 1;
 	}
 	let statusPollingInterval: any;
+
+	$: isExambroApp = browser && (
+		navigator.userAgent.includes('ExambroMadrasah') || 
+		typeof (window as any).ExambroBridge !== 'undefined'
+	);
+
+	$: if (browser && isExambroApp) {
+		isFullscreen = true;
+		hasEnteredFullscreenOnce = true;
+	}
+
+	$: if (browser && typeof (window as any).ExambroBridge?.setExamPaused === 'function') {
+		try {
+			(window as any).ExambroBridge.setExamPaused(isPausedByProctor);
+		} catch (e) {}
+	}
 	
 	let warnings = 0;
 	let showWarningModal = false;
@@ -100,7 +116,13 @@
 		requestWakeLock();
 		
 		if (browser) {
-			isFullscreen = !!document.fullscreenElement;
+			const isExambro = navigator.userAgent.includes('ExambroMadrasah') || typeof (window as any).ExambroBridge !== 'undefined';
+			if (isExambro) {
+				isFullscreen = true;
+				hasEnteredFullscreenOnce = true;
+			} else {
+				isFullscreen = !!document.fullscreenElement;
+			}
 			if (attempt?.exam_exit_pin) {
 				(window as any).exambroExitPin = String(attempt.exam_exit_pin);
 				if ((window as any).ExambroBridge?.setExamExitPin) {
@@ -108,6 +130,11 @@
 						(window as any).ExambroBridge.setExamExitPin(String(attempt.exam_exit_pin));
 					} catch (e) {}
 				}
+			}
+			if ((window as any).ExambroBridge?.setExamPaused) {
+				try {
+					(window as any).ExambroBridge.setExamPaused(isPausedByProctor);
+				} catch (e) {}
 			}
 		}
 		const savedWarnings = localStorage.getItem(`warnings_${attempt.id}`);
@@ -627,16 +654,33 @@
 	async function enterFullscreen() {
 		unlockAudioAndVibration();
 		handleReturnToExam();
+		hasEnteredFullscreenOnce = true;
+		if (browser) {
+			localStorage.setItem(`hasEnteredFullscreen_${attempt.id}`, 'true');
+			const isExambro = navigator.userAgent.includes('ExambroMadrasah') || typeof (window as any).ExambroBridge !== 'undefined';
+			if (isExambro) {
+				isFullscreen = true;
+				return;
+			}
+		}
 		try {
 			if (document.documentElement.requestFullscreen) {
 				await document.documentElement.requestFullscreen();
-				hasEnteredFullscreenOnce = true;
-				localStorage.setItem(`hasEnteredFullscreen_${attempt.id}`, 'true');
+				isFullscreen = true;
+			} else {
+				isFullscreen = true;
 			}
-		} catch (err) {}
+		} catch (err) {
+			// Fallback jika API requestFullscreen ditolak/tidak didukung WebView
+			isFullscreen = true;
+		}
 	}
 
 	function handleFullscreenChange() {
+		if (isExambroApp) {
+			isFullscreen = true;
+			return;
+		}
 		isFullscreen = !!document.fullscreenElement;
 		if (isFullscreen) {
 			hasEnteredFullscreenOnce = true;
@@ -1023,6 +1067,7 @@
 	{#if attempt?.exam_exit_pin}
 		<meta name="exambro-exit-pin" content={attempt.exam_exit_pin} />
 	{/if}
+	<meta name="exambro-paused" content={isPausedByProctor ? "1" : "0"} />
 </svelte:head>
 
 <svelte:window 
@@ -1337,7 +1382,7 @@
 	</div>
 {/if}
 
-{#if !isFullscreen && !isExamBlurred && !isPausedByProctor}
+{#if !isExambroApp && !isFullscreen && !isExamBlurred && !isPausedByProctor}
 	<div class="fixed inset-0 z-[60] flex flex-col items-center justify-center p-4 bg-slate-900/95 backdrop-blur-xl">
 		<div class="text-center text-white max-w-md animate-in fade-in zoom-in duration-300">
 			<svg class="w-16 h-16 mx-auto mb-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">

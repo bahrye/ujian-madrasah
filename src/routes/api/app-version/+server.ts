@@ -4,9 +4,9 @@ import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async () => {
 	// Endpoint informasi versi resmi aplikasi Exambro Android
 	return json({
-		versionCode: 3,
-		versionName: '1.0.2',
-		downloadUrl: 'https://github.com/bahrye/ujian-madrasah/actions',
-		changelog: '1. Menu Beranda Awal (Masuk Ujian, Cek Update, Tentang Kami).\n2. Informasi profil pembuat & kontak WhatsApp pembuat.\n3. Tanda tangan resmi rilis bebas deteksi aplikasi palsu.\n4. Pembaruan langsung tanpa harus hapus aplikasi lama.'
+		versionCode: 4,
+		versionName: '1.0.3',
+		downloadUrl: 'https://github.com/bahrye/ujian-madrasah/releases',
+		changelog: '1. Mode layar penuh langsung aktif otomatis di lembar soal ujian tanpa terblokir tombol.\n2. Blokir bilah status & tarikan notifikasi atas saat ujian (otomatis dibuka saat ujian dijeda pengawas untuk menyalakan data/WiFi).\n3. Konfirmasi kembali ke Beranda saat tombol kembali ditekan di halaman login setelah keluar akun.\n4. Integrasi PIN keluar ujian acak per ujian.'
 	});
 };

@@ -1,6 +1,7 @@
 package com.madrasah.exambro
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -11,6 +12,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType
+import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.webkit.CookieManager
@@ -72,6 +74,7 @@ class MainActivity : AppCompatActivity() {
     private var isAppStarted = false
     private var currentUrl: String = ""
     private var currentExamExitPin: String? = null
+    private var isExamPaused: Boolean = false
 
     companion object {
         private const val PREFS_NAME = "exambro_prefs"
@@ -136,7 +139,45 @@ class MainActivity : AppCompatActivity() {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) {
             applyImmersiveMode()
+        } else if (isExamInProgress() && !isExamPaused) {
+            collapseNotificationShade()
+            applyImmersiveMode()
         }
+    }
+
+    private fun collapseNotificationShade() {
+        try {
+            @Suppress("DEPRECATION")
+            val closeDialogIntent = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
+            sendBroadcast(closeDialogIntent)
+        } catch (e: Exception) {}
+
+        try {
+            @SuppressLint("WrongConstant")
+            val statusBarService = getSystemService("statusbar")
+            val statusBarManager = Class.forName("android.app.StatusBarManager")
+            val collapse = statusBarManager.getMethod("collapsePanels")
+            collapse.invoke(statusBarService)
+        } catch (e: Exception) {
+            try {
+                @SuppressLint("WrongConstant")
+                val statusBarService = getSystemService("statusbar")
+                val statusBarManager = Class.forName("android.app.StatusBarManager")
+                val collapse = statusBarManager.getMethod("collapse")
+                collapse.invoke(statusBarService)
+            } catch (e2: Exception) {}
+        }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev != null && isExamInProgress() && !isExamPaused) {
+            // Blokir sentuhan atau tarikan dari bilah paling atas layar (status bar area 0-100px)
+            // agar laci notifikasi atas tidak dapat ditarik turun sama sekali saat ujian aktif
+            if (ev.rawY < 100) {
+                return true
+            }
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     private fun initViews() {
@@ -330,6 +371,10 @@ class MainActivity : AppCompatActivity() {
                 progressBar.visibility = View.GONE
                 url?.let { currentUrl = it }
 
+                if (url?.contains("/login") == true) {
+                    webView.clearHistory()
+                }
+
                 if (isExamInProgress()) {
                     webView.evaluateJavascript("(function() { return document.querySelector('meta[name=\"exambro-exit-pin\"]')?.getAttribute('content') || window.exambroExitPin || ''; })()") { pin ->
                         val cleanPin = pin?.replace("\"", "")?.trim()
@@ -337,8 +382,21 @@ class MainActivity : AppCompatActivity() {
                             currentExamExitPin = cleanPin
                         }
                     }
+
+                    webView.evaluateJavascript("(function() { return document.querySelector('meta[name=\"exambro-paused\"]')?.getAttribute('content') || (window.exambroPaused ? '1' : '0'); })()") { paused ->
+                        val cleanPaused = paused?.replace("\"", "")?.trim()
+                        val isPaused = cleanPaused == "1" || cleanPaused == "true"
+                        isExamPaused = isPaused
+                        if (isPaused) {
+                            runOnUiThread {
+                                val controller = WindowInsetsControllerCompat(window, window.decorView)
+                                controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+                            }
+                        }
+                    }
                 } else {
                     currentExamExitPin = null
+                    isExamPaused = false
                 }
             }
 
@@ -376,6 +434,20 @@ class MainActivity : AppCompatActivity() {
         @android.webkit.JavascriptInterface
         fun setExamExitPin(pin: String?) {
             currentExamExitPin = pin?.trim()
+        }
+
+        @android.webkit.JavascriptInterface
+        fun setExamPaused(paused: Boolean) {
+            isExamPaused = paused
+            runOnUiThread {
+                if (paused) {
+                    // Ketika ujian dijeda oleh pengawas, izinkan akses ke bilah atas untuk menyalakan data/wifi
+                    val controller = WindowInsetsControllerCompat(window, window.decorView)
+                    controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+                } else {
+                    applyImmersiveMode()
+                }
+            }
         }
     }
 
@@ -470,33 +542,39 @@ class MainActivity : AppCompatActivity() {
     // PENANGANAN TOMBOL KEMBALI
     @Suppress("DEPRECATION")
     override fun onBackPressed() {
+        val activeUrl = webView.url ?: currentUrl
+        val isLoginPage = activeUrl.contains("/login") || activeUrl.endsWith("/login") || activeUrl == prefs.getString(KEY_EXAM_URL, DEFAULT_URL)
+
         if (layoutLanding.visibility == View.VISIBLE) {
             // Saat di Beranda Utama: Konfirmasi keluar dari aplikasi
             showNormalExitDialog()
         } else if (isExamInProgress()) {
             // Saat sedang ujian: Tombol kembali DIBLOKIR, butuh PIN Pengawas untuk keluar
             promptProctorPinToExit()
+        } else if (isLoginPage || !webView.canGoBack()) {
+            // Saat di halaman login (misal setelah keluar akun) atau tidak bisa kembali lagi:
+            // Tampilkan pesan konfirmasi apakah ingin kembali ke Beranda
+            showReturnToHomeDialog()
         } else {
-            // Saat belum masuk ujian (misal halaman Login): Kembali di WebView atau tawarkan kembali ke Beranda
-            if (webView.canGoBack()) {
-                webView.goBack()
-            } else {
-                AlertDialog.Builder(this)
-                    .setTitle("Kembali ke Beranda")
-                    .setMessage("Apakah Anda ingin kembali ke menu Beranda Exambro?")
-                    .setPositiveButton("Ya, ke Beranda") { _, _ ->
-                        showLandingScreen()
-                    }
-                    .setNeutralButton("Keluar Aplikasi") { _, _ ->
-                        finish()
-                    }
-                    .setNegativeButton("Batal") { dialog, _ ->
-                        dialog.dismiss()
-                        applyImmersiveMode()
-                    }
-                    .show()
-            }
+            webView.goBack()
         }
+    }
+
+    private fun showReturnToHomeDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Kembali ke Beranda")
+            .setMessage("Apakah Anda ingin kembali ke menu Beranda Exambro?")
+            .setPositiveButton("Ya, ke Beranda") { _, _ ->
+                showLandingScreen()
+            }
+            .setNeutralButton("Keluar Aplikasi") { _, _ ->
+                finish()
+            }
+            .setNegativeButton("Batal") { dialog, _ ->
+                dialog.dismiss()
+                applyImmersiveMode()
+            }
+            .show()
     }
 
     private fun showNormalExitDialog() {
