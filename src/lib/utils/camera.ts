@@ -6,14 +6,15 @@
 export interface CameraSnapshotOptions {
 	maxWidth?: number;
 	maxHeight?: number;
-	quality?: number; // 0.1 - 1.0 (default 0.65 for sharp ~20-30KB file)
+	quality?: number; // 0.1 - 1.0 (default 0.72 — tajam & jernih di WebP, ~25-35KB)
 	timeoutMs?: number;
 }
 
 /**
  * Captures a single lightweight micro-snapshot from the front webcam/camera,
- * compresses it to 480x360 WebP (or JPEG fallback), and immediately shuts off
- * the camera hardware to prevent battery drain and overheating.
+ * compresses it to 480x360 WebP (or JPEG fallback) using supersampling for
+ * extra sharpness, and immediately shuts off the camera hardware to prevent
+ * battery drain and overheating.
  */
 export async function captureMicroSnapshot(options: CameraSnapshotOptions = {}): Promise<string | null> {
 	if (typeof window === 'undefined' || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -27,7 +28,7 @@ export async function captureMicroSnapshot(options: CameraSnapshotOptions = {}):
 
 	const width = options.maxWidth || 480;
 	const height = options.maxHeight || 360;
-	const quality = options.quality || 0.65;
+	const quality = options.quality || 0.72;
 	const timeoutMs = options.timeoutMs || 3000;
 
 	let stream: MediaStream | null = null;
@@ -100,13 +101,27 @@ export async function captureMicroSnapshot(options: CameraSnapshotOptions = {}):
 		const targetW = Math.max(160, Math.round(vw * scale));
 		const targetH = Math.max(120, Math.round(vh * scale));
 
+		// Supersampling: render di 2× resolusi target lalu downscale ke canvas akhir
+		// Menghasilkan foto wajah lebih tajam & detail tanpa menambah ukuran file output
+		const ssScale = 2;
+		const ssCanvas = document.createElement('canvas');
+		ssCanvas.width = targetW * ssScale;
+		ssCanvas.height = targetH * ssScale;
+		const ssCtx = ssCanvas.getContext('2d');
+		if (!ssCtx) return null;
+		ssCtx.imageSmoothingEnabled = true;
+		ssCtx.imageSmoothingQuality = 'high';
+		ssCtx.drawImage(video, 0, 0, ssCanvas.width, ssCanvas.height);
+
+		// Canvas output ukuran final (downscale dari 2× → tajam & anti-aliased)
 		const canvas = document.createElement('canvas');
 		canvas.width = targetW;
 		canvas.height = targetH;
 		const ctx = canvas.getContext('2d');
 		if (!ctx) return null;
-
-		ctx.drawImage(video, 0, 0, targetW, targetH);
+		ctx.imageSmoothingEnabled = true;
+		ctx.imageSmoothingQuality = 'high';
+		ctx.drawImage(ssCanvas, 0, 0, targetW, targetH);
 
 		// Compress to WebP or JPEG
 		let dataUrl = canvas.toDataURL('image/webp', quality);
