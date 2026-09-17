@@ -29,7 +29,7 @@ export async function captureMicroSnapshot(options: CameraSnapshotOptions = {}):
 	const width = options.maxWidth || 480;
 	const height = options.maxHeight || 360;
 	const quality = options.quality || 0.72;
-	const timeoutMs = options.timeoutMs || 3000;
+	const timeoutMs = options.timeoutMs || 5000;
 
 	let stream: MediaStream | null = null;
 
@@ -81,18 +81,24 @@ export async function captureMicroSnapshot(options: CameraSnapshotOptions = {}):
 					done = true;
 					video.removeEventListener('loadeddata', onReady);
 					video.removeEventListener('playing', onReady);
+					video.removeEventListener('timeupdate', onReady);
 					resolve();
 				}
 			};
 			video.addEventListener('loadeddata', onReady);
 			video.addEventListener('playing', onReady);
+			video.addEventListener('timeupdate', onReady);
 			setTimeout(() => {
 				if (!done) {
 					done = true;
 					resolve();
 				}
-			}, 1000);
+			}, 2000);
 		});
+
+		if (!video.videoWidth || !video.videoHeight) {
+			return null;
+		}
 
 		// Skala frame proporsional ke canvas
 		const vw = video.videoWidth || width;

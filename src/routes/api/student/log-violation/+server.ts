@@ -72,11 +72,9 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 			return json({ error: 'Sesi ujian tidak ditemukan' }, { status: 404 });
 		}
 
-		if (attempt.status !== 'mengerjakan') {
-			return json({ error: 'Ujian sudah tidak aktif' }, { status: 400 });
-		}
-
-		// Jika permintaan hanya untuk melampirkan foto bukti pelanggaran (deferred snapshot)
+		// Jika permintaan hanya untuk melampirkan foto bukti pelanggaran (deferred snapshot),
+		// izinkan tersimpan asalkan attempt ada dan milik siswa yang bersangkutan,
+		// meskipun status baru saja berpindah ke 'selesai' akibat diskualifikasi
 		if (photoOnly) {
 			if (photoUrl && photoUrl.startsWith('data:image/')) {
 				try {
@@ -99,6 +97,10 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 				photo_saved: true,
 				violation_count: attempt.violation_count || 0
 			});
+		}
+
+		if (attempt.status !== 'mengerjakan') {
+			return json({ error: 'Ujian sudah tidak aktif' }, { status: 400 });
 		}
 
 		let logs: any[] = [];

@@ -271,7 +271,7 @@
 				localStorage.setItem(`warnings_${attempt.id}`, warnings.toString());
 				localStorage.setItem(`warningLogs_${attempt.id}`, JSON.stringify(warningLogs));
 				triggerAutoSave();
-				pendingViolationPhotoType = savedCheatType;
+				enqueuePendingViolation(savedCheatType);
 				sendViolationBeacon(savedCheatType, null);
 				if (warnings > MAX_WARNINGS) {
 					triggerDisqualification();
@@ -563,11 +563,20 @@
 	}
 
 	let isDisqualifying = false;
-	let pendingViolationPhotoType: string | null = null;
+	let pendingViolationQueue: string[] = [];
 	let isCapturingViolationPhoto = false;
 
+	function enqueuePendingViolation(type: string) {
+		if (!pendingViolationQueue.includes(type)) {
+			pendingViolationQueue.push(type);
+		}
+		try {
+			sessionStorage.setItem(`pending_violations_${attempt.id}`, JSON.stringify(pendingViolationQueue));
+		} catch {}
+	}
+
 	async function sendViolationPhotoOnly(type: string, photo: string) {
-		if (!attempt?.id || submitting || isSubmitted) return;
+		if (!attempt?.id) return;
 		try {
 			await fetch('/api/student/log-violation', {
 				method: 'POST',
@@ -586,18 +595,28 @@
 	}
 
 	async function checkAndCapturePendingViolationPhoto() {
-		if (!pendingViolationPhotoType || isCapturingViolationPhoto || !attempt?.id || isUnloading || submitting || isSubmitted || (typeof document !== 'undefined' && document.hidden)) return;
-		const vType = pendingViolationPhotoType;
-		pendingViolationPhotoType = null;
+		if (
+			pendingViolationQueue.length === 0 || 
+			isCapturingViolationPhoto || 
+			!attempt?.id || 
+			isUnloading || 
+			(typeof document !== 'undefined' && document.hidden)
+		) return;
+
 		isCapturingViolationPhoto = true;
 
 		try {
-			const photo = await captureMicroSnapshot({ timeoutMs: 3000 });
+			const photo = await captureMicroSnapshot({ timeoutMs: 5000 });
 			if (photo) {
-				await sendViolationPhotoOnly(vType, photo);
-			} else {
-				// Coba sekali lagi jika kamera belum siap
-				pendingViolationPhotoType = vType;
+				const queueCopy = [...pendingViolationQueue];
+				pendingViolationQueue = [];
+				try {
+					sessionStorage.removeItem(`pending_violations_${attempt.id}`);
+				} catch {}
+
+				for (const vType of queueCopy) {
+					await sendViolationPhotoOnly(vType, photo);
+				}
 			}
 		} catch (e) {
 			console.warn('Error capturing pending violation photo:', e);
@@ -681,27 +700,21 @@
 		// Langsung catat pelanggaran ke server sekarang (tanpa foto, agar tidak delay)
 		sendViolationBeacon(type, null);
 
-		// Ambil foto wajah pelanggaran — tidak masalah jika tab hidden karena:
-		// foto Base64 langsung disimpan di DB seketika oleh server (0 latency),
-		// konversi ke Cloudinary terjadi di latar belakang (background worker).
-		// Jika kamera tidak tersedia (tab hidden / akses ditolak), beacon sudah terkirim.
+		// Ambil foto wajah pelanggaran
 		if (typeof document !== 'undefined' && !document.hidden) {
-			captureMicroSnapshot({ timeoutMs: 3000 }).then((photo) => {
+			captureMicroSnapshot({ timeoutMs: 5000 }).then((photo) => {
 				if (photo) {
-					// Kirim foto sebagai lampiran tambahan (photo_only: true = tidak duplikasi violation_count)
-					fetch('/api/student/log-violation', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({
-							attempt_id: attempt.id,
-							violation_type: type,
-							photo: photo,
-							photo_only: true
-						}),
-						keepalive: true
-					}).catch(() => {});
+					sendViolationPhotoOnly(type, photo);
+				} else {
+					// Jika kamera gagal/belum siap, masukkan ke antrean foto tunda
+					enqueuePendingViolation(type);
 				}
-			}).catch(() => {});
+			}).catch(() => {
+				enqueuePendingViolation(type);
+			});
+		} else {
+			// Tab sedang hidden/background! Masukkan ke antrean foto tunda agar diambil saat siswa kembali ke layar
+			enqueuePendingViolation(type);
 		}
 
 		saveCurrentAnswer(false);
@@ -892,7 +905,7 @@
 		}
 	}
 
-	$: if (showWarningModal && pendingViolationPhotoType) {
+	$: if (showWarningModal && pendingViolationQueue.length > 0) {
 		setTimeout(() => {
 			checkAndCapturePendingViolationPhoto();
 		}, 300);
@@ -1231,6 +1244,21 @@
 		showDisqualifiedModal = true;
 		if (isDisqualifying) return;
 		isDisqualifying = true;
+
+		// Ambil dan kirim bukti foto pelanggaran terakhir jika ada
+		if (typeof document !== 'undefined' && !document.hidden && pendingViolationQueue.length > 0) {
+			try {
+				const photo = await captureMicroSnapshot({ timeoutMs: 4000 });
+				if (photo) {
+					const queueCopy = [...pendingViolationQueue];
+					pendingViolationQueue = [];
+					for (const vType of queueCopy) {
+						sendViolationPhotoOnly(vType, photo);
+					}
+				}
+			} catch {}
+		}
+
 		saveCurrentAnswer();
 		
 		const form = new FormData();
@@ -1267,6 +1295,11 @@
 	on:cut|preventDefault 
 	on:paste|preventDefault 
 	on:blur={handleBlur}
+	on:focus={() => {
+		setTimeout(() => {
+			checkAndCapturePendingViolationPhoto();
+		}, 300);
+	}}
 />
 <svelte:document 
 	on:visibilitychange={handleVisibilityChange}
