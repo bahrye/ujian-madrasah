@@ -371,6 +371,41 @@
 		{/if}
 	</div>
 
+	{#if data.examFilter && data.currentExam}
+		<div class="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-200/80 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+			<div class="flex items-center gap-3">
+				<div class="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-700 flex items-center justify-center shrink-0">
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+					</svg>
+				</div>
+				<div>
+					<div class="text-xs font-semibold uppercase tracking-wider text-amber-800">PIN Keluar Ujian (Aplikasi Exambro)</div>
+					<div class="text-xs text-amber-700">Gunakan PIN ini jika pengawas ingin mengeluarkan siswa dari aplikasi ujian saat pengerjaan berlangsung.</div>
+				</div>
+			</div>
+			<div class="flex items-center gap-2 self-stretch sm:self-auto justify-between sm:justify-end">
+				<div class="flex items-center gap-2 bg-white border-2 border-amber-300 px-3.5 py-1.5 rounded-lg shadow-xs">
+					<span class="text-xs text-slate-500 font-medium">PIN:</span>
+					<span class="font-mono text-xl font-black tracking-widest text-amber-600 select-all">{data.currentExam.exit_pin || '-----'}</span>
+				</div>
+				<form method="POST" action="?/regenerateExitPin" use:enhance>
+					<input type="hidden" name="exam_id" value={data.currentExam.id} />
+					<button 
+						type="submit" 
+						class="btn-sm btn-ghost border border-amber-200 bg-white hover:bg-amber-50 text-amber-800 flex items-center gap-1.5 text-xs font-medium shadow-xs"
+						title="Acak PIN Keluar Baru"
+					>
+						<svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+						</svg>
+						<span>Acak PIN</span>
+					</button>
+				</form>
+			</div>
+		</div>
+	{/if}
+
 	<!-- Monitor Table -->
 	<div class="card overflow-hidden">
 		{#if !data.examFilter}

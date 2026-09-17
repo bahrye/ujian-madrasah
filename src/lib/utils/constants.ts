@@ -94,6 +94,7 @@ export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
 		{ label: 'Hasil Ujian', href: '/admin/results', icon: 'results' },
 		{ label: 'Laporan & Analisis', href: '/admin/laporan-analisis', icon: 'analytics' },
 		{ label: 'Papan Peringkat', href: '/admin/papan-peringkat', icon: 'trophy' },
+		{ label: 'Pengaturan APK', href: '/admin/apk-settings', icon: 'device' },
 		{ label: 'Log Aktivitas', href: '/admin/activity-logs', icon: 'history' }
 	],
 	guru: [
@@ -177,5 +178,6 @@ export const ICONS: Record<string, string> = {
 	print: 'M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z',
 	history: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
 	room: 'M3 21h18M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16M9 10a1 1 0 100 2 1 1 0 000-2z',
-	trophy: 'M6.22 12.17A8 8 0 0112 3a8 8 0 015.78 9.17M15 21H9m3-3v3M5 7H3a2 2 0 00-2 2v1c0 1.1.9 2 2 2h2m14-5h2a2 2 0 012 2v1a2 2 0 01-2 2h-2M5 7v5a7 7 0 007 7 7 7 0 007-7V7H5z'
+	trophy: 'M6.22 12.17A8 8 0 0112 3a8 8 0 015.78 9.17M15 21H9m3-3v3M5 7H3a2 2 0 00-2 2v1c0 1.1.9 2 2 2h2m14-5h2a2 2 0 012 2v1a2 2 0 01-2 2h-2M5 7v5a7 7 0 007 7 7 7 0 007-7V7H5z',
+	device: 'M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z'
 };

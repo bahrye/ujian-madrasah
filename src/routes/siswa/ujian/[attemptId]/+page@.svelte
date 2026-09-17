@@ -101,6 +101,14 @@
 		
 		if (browser) {
 			isFullscreen = !!document.fullscreenElement;
+			if (attempt?.exam_exit_pin) {
+				(window as any).exambroExitPin = String(attempt.exam_exit_pin);
+				if ((window as any).ExambroBridge?.setExamExitPin) {
+					try {
+						(window as any).ExambroBridge.setExamExitPin(String(attempt.exam_exit_pin));
+					} catch (e) {}
+				}
+			}
 		}
 		const savedWarnings = localStorage.getItem(`warnings_${attempt.id}`);
 		const savedLogs = localStorage.getItem(`warningLogs_${attempt.id}`);
@@ -1010,7 +1018,12 @@
 	}
 </script>
 
-<svelte:head><title>{attempt?.exam_title || 'Ujian Online'} — Ujian Online Madrasah</title></svelte:head>
+<svelte:head>
+	<title>{attempt?.exam_title || 'Ujian Online'} — Ujian Online Madrasah</title>
+	{#if attempt?.exam_exit_pin}
+		<meta name="exambro-exit-pin" content={attempt.exam_exit_pin} />
+	{/if}
+</svelte:head>
 
 <svelte:window 
 	on:beforeunload={handleBeforeUnload}

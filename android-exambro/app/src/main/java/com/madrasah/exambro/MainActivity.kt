@@ -71,6 +71,7 @@ class MainActivity : AppCompatActivity() {
     private var isRequestingPermission = false
     private var isAppStarted = false
     private var currentUrl: String = ""
+    private var currentExamExitPin: String? = null
 
     companion object {
         private const val PREFS_NAME = "exambro_prefs"
@@ -315,6 +316,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        webView.addJavascriptInterface(ExambroWebAppInterface(), "ExambroBridge")
+
         webView.webViewClient = object : WebViewClient() {
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
@@ -326,6 +329,17 @@ class MainActivity : AppCompatActivity() {
                 super.onPageFinished(view, url)
                 progressBar.visibility = View.GONE
                 url?.let { currentUrl = it }
+
+                if (isExamInProgress()) {
+                    webView.evaluateJavascript("(function() { return document.querySelector('meta[name=\"exambro-exit-pin\"]')?.getAttribute('content') || window.exambroExitPin || ''; })()") { pin ->
+                        val cleanPin = pin?.replace("\"", "")?.trim()
+                        if (!cleanPin.isNullOrEmpty() && cleanPin != "null") {
+                            currentExamExitPin = cleanPin
+                        }
+                    }
+                } else {
+                    currentExamExitPin = null
+                }
             }
 
             override fun doUpdateVisitedHistory(view: WebView?, url: String?, isReload: Boolean) {
@@ -355,6 +369,13 @@ class MainActivity : AppCompatActivity() {
                 }
                 return true
             }
+        }
+    }
+
+    inner class ExambroWebAppInterface {
+        @android.webkit.JavascriptInterface
+        fun setExamExitPin(pin: String?) {
+            currentExamExitPin = pin?.trim()
         }
     }
 
@@ -392,12 +413,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Memeriksa apakah siswa sedang berada di dalam halaman pengerjaan ujian.
-     * Deteksi pelanggaran HANYA aktif saat siswa berada di ruang ujian aktif.
+     * Memeriksa apakah siswa sedang berada di dalam halaman pengerjaan soal ujian.
+     * Deteksi pelanggaran dan proteksi PIN keluar HANYA aktif saat siswa berada di ruang soal aktif (/siswa/ujian/{attemptId}).
+     * TIDAK aktif saat siswa masih berada di halaman input token atau modal konfirmasi (/siswa/ujian).
      */
     private fun isExamInProgress(): Boolean {
         val activeUrl = webView.url ?: currentUrl
-        return activeUrl.contains("/siswa/ujian") || activeUrl.contains("/ujian/")
+        val questionPageRegex = Regex(".*/siswa/ujian/\\d+.*")
+        return questionPageRegex.matches(activeUrl)
     }
 
     // DETEKSI SISWA KELUAR APLIKASI (HOME / RECENT APPS / SPLIT SCREEN)
@@ -505,16 +528,17 @@ class MainActivity : AppCompatActivity() {
 
         AlertDialog.Builder(this)
             .setTitle(getString(R.string.dialog_exit_title))
-            .setMessage(getString(R.string.dialog_exit_msg))
+            .setMessage("Masukkan PIN Keluar Ujian yang tertera pada layar Monitoring Pengawas:")
             .setView(container)
             .setCancelable(false)
             .setPositiveButton(getString(R.string.dialog_btn_exit)) { _, _ ->
                 val enteredPin = input.text.toString().trim()
-                val correctPin = prefs.getString(KEY_PROCTOR_PIN, DEFAULT_PIN) ?: DEFAULT_PIN
-                if (enteredPin == correctPin) {
+                val masterPin = prefs.getString(KEY_PROCTOR_PIN, DEFAULT_PIN) ?: DEFAULT_PIN
+                val isValid = (currentExamExitPin != null && enteredPin == currentExamExitPin) || (enteredPin == masterPin)
+                if (isValid) {
                     showLandingScreen()
                 } else {
-                    Toast.makeText(this, getString(R.string.pin_wrong), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "PIN Keluar Ujian salah! Silakan minta PIN kepada Pengawas Ruang.", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton(getString(R.string.dialog_btn_cancel)) { dialog, _ ->

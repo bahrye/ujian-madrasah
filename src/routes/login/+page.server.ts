@@ -73,8 +73,21 @@ export const actions: Actions = {
 
 			let sessionToken: string | null = null;
 
-			// Proteksi Login Siswa Multi-Perangkat (dengan toleransi 3 menit tidak ada aktivitas)
+			// Proteksi Login Siswa Multi-Perangkat & Wajib Exambro
 			if (user.role === 'siswa') {
+				// Cek apakah madrasah mewajibkan penggunaan aplikasi Exambro
+				if (user.school_id) {
+					const school = await db.prepare('SELECT require_exambro FROM schools WHERE id = ?').bind(user.school_id).first<{ require_exambro: number }>();
+					if (school && school.require_exambro === 1) {
+						const reqUserAgent = request.headers.get('user-agent') || '';
+						if (!reqUserAgent.includes('ExambroMadrasah')) {
+							return fail(403, {
+								error: 'Akses Dibatasi: Madrasah mewajibkan login dan ujian menggunakan aplikasi resmi Exambro Madrasah. Silakan login lewat aplikasi Exambro.'
+							});
+						}
+					}
+				}
+
 				if (user.is_logged_in === 1 && user.last_active_at) {
 					let inactiveSec = 9999;
 					let lastActiveStr = String(user.last_active_at).trim();

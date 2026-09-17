@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS schools (
     district TEXT,
     village TEXT,
     postal_code TEXT,
+    require_exambro INTEGER NOT NULL DEFAULT 0,
     is_active INTEGER NOT NULL DEFAULT 1,
     created_at TEXT NOT NULL DEFAULT (to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS')),
     updated_at TEXT NOT NULL DEFAULT (to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS'))
@@ -134,6 +135,7 @@ CREATE TABLE IF NOT EXISTS exams (
     show_score_type TEXT DEFAULT 'after_submit',
     is_score_released INTEGER NOT NULL DEFAULT 0,
     show_result INTEGER NOT NULL DEFAULT 0,
+    exit_pin TEXT,
     max_attempts INTEGER NOT NULL DEFAULT 1,
     created_by INTEGER REFERENCES users(id),
     created_at TEXT NOT NULL DEFAULT (to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS')),

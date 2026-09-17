@@ -124,6 +124,23 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 			}
 		}
 
+		let currentExam: { id: number; title: string; exit_pin: string } | null = null;
+		if (validExamFilter !== null) {
+			const examRow = await db.prepare(`SELECT id, title, exit_pin FROM exams WHERE id = ? AND school_id = ?`).bind(validExamFilter, locals.user.school_id).first<any>();
+			if (examRow) {
+				let pin = examRow.exit_pin;
+				if (!pin) {
+					pin = Math.floor(10000 + Math.random() * 90000).toString();
+					await db.prepare(`UPDATE exams SET exit_pin = ? WHERE id = ?`).bind(pin, examRow.id).run();
+				}
+				currentExam = {
+					id: examRow.id,
+					title: examRow.title,
+					exit_pin: pin
+				};
+			}
+		}
+
 		let attempts: any[] = [];
 		if (validExamFilter !== null) {
 			let query = `
@@ -257,6 +274,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 
 		return {
 			exams,
+			currentExam,
 			availableSessions,
 			attempts: attemptsWithProgress,
 			examFilter: validExamFilter ? String(validExamFilter) : '',
@@ -459,6 +477,33 @@ export const actions: Actions = {
 		} catch (e: any) {
 			console.error(e);
 			return fail(500, { error: e.message || 'Gagal mengumpulkan ujian siswa.' });
+		}
+	},
+	regenerateExitPin: async ({ request, platform, locals }) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
+		const db = getDB(platform);
+		const form = await request.formData();
+		const examIdStr = form.get('exam_id')?.toString();
+		const parsedExamId = parseInt(examIdStr || '', 10);
+		if (isNaN(parsedExamId)) return fail(400, { error: 'ID ujian tidak valid.' });
+
+		const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
+		const isAdmin = locals.user.role === 'admin';
+
+		if (!isSuperAdmin && !isAdmin) {
+			const assigned = await db.prepare(`
+				SELECT id FROM exam_proctors WHERE exam_id = ? AND proctor_id = ? AND COALESCE(proctor_role, 'p1') NOT IN ('pt', 'cm')
+			`).bind(parsedExamId, locals.user.id).first();
+			if (!assigned) return fail(403, { error: 'Anda tidak memiliki akses ke ujian ini.' });
+		}
+
+		try {
+			const newPin = Math.floor(10000 + Math.random() * 90000).toString();
+			await db.prepare(`UPDATE exams SET exit_pin = ? WHERE id = ? AND school_id = ?`).bind(newPin, parsedExamId, locals.user.school_id).run();
+			return { success: `PIN Keluar ujian berhasil diperbarui: ${newPin}` };
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { error: e.message || 'Gagal mengacak ulang PIN keluar' });
 		}
 	}
 };

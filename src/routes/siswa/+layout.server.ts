@@ -2,11 +2,17 @@ import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 
-export const load: LayoutServerLoad = async ({ locals, platform }) => {
+export const load: LayoutServerLoad = async ({ locals, platform, request, url }) => {
 	if (!locals.user || locals.user.role !== 'siswa') throw redirect(302, '/login');
+
+	const isExambroNoticePage = url.pathname === '/siswa/wajib-exambro';
+	const userAgent = request.headers.get('user-agent') || '';
+	const isExambroApp = userAgent.includes('ExambroMadrasah');
 
 	let schoolName = '';
 	let userInfo: any = {};
+	let requireExambro = 0;
+
 	try {
 		const db = getDB(platform);
 		let schoolId = locals.user.school_id;
@@ -17,11 +23,13 @@ export const load: LayoutServerLoad = async ({ locals, platform }) => {
 			schoolId = u?.school_id ?? null;
 		}
 		if (schoolId) {
-			const school = await db.prepare('SELECT name FROM schools WHERE id = ?').bind(schoolId).first<{ name: string }>();
+			const school = await db.prepare('SELECT name, require_exambro FROM schools WHERE id = ?').bind(schoolId).first<{ name: string; require_exambro: number }>();
 			schoolName = school?.name || '';
+			requireExambro = school?.require_exambro || 0;
 		} else {
-			const firstSchool = await db.prepare('SELECT name FROM schools ORDER BY id ASC LIMIT 1').first<{ name: string }>();
+			const firstSchool = await db.prepare('SELECT name, require_exambro FROM schools ORDER BY id ASC LIMIT 1').first<{ name: string; require_exambro: number }>();
 			schoolName = firstSchool?.name || '';
+			requireExambro = firstSchool?.require_exambro || 0;
 		}
 		userInfo.school_name = schoolName;
 
@@ -38,6 +46,14 @@ export const load: LayoutServerLoad = async ({ locals, platform }) => {
 		console.warn('Failed to load siswa school/student data:', e);
 	}
 
-	return { user: locals.user, schoolName, userInfo };
+	if (requireExambro === 1) {
+		if (!isExambroApp && !isExambroNoticePage) {
+			throw redirect(302, '/siswa/wajib-exambro');
+		} else if (isExambroApp && isExambroNoticePage) {
+			throw redirect(302, '/siswa');
+		}
+	}
+
+	return { user: locals.user, schoolName, userInfo, isExambroApp, requireExambro };
 };
 

@@ -28,6 +28,7 @@ export const load: PageServerLoad = async ({ platform, locals, params, cookies }
 			       t.is_released as token_is_released, 
 			       t.released_at as token_released_at, 
 			       t.expires_at as token_expires_at,
+			       e.exit_pin as exam_exit_pin,
 			       e.is_active as exam_active
 			FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
@@ -41,6 +42,14 @@ export const load: PageServerLoad = async ({ platform, locals, params, cookies }
 
 		if (!attempt) {
 			throw redirect(302, '/siswa');
+		}
+
+		if (!attempt.exam_exit_pin) {
+			const randomPin = Math.floor(10000 + Math.random() * 90000).toString();
+			try {
+				await db.prepare('UPDATE exams SET exit_pin = ? WHERE id = ?').bind(randomPin, attempt.exam_id).run();
+				attempt.exam_exit_pin = randomPin;
+			} catch (e) {}
 		}
 
 		attempt.exam_title = formatExamTitle({
