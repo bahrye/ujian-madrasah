@@ -18,10 +18,10 @@ export const load: PageServerLoad = async ({ locals, platform, url }) => {
 	}
 
 	const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
-	let allSchools: { id: number; name: string; npsn: string | null; require_exambro: number }[] = [];
+	let allSchools: { id: number; name: string; npsn: string | null; require_exambro: number; master_exit_pin: string | null }[] = [];
 
 	if (isSuperAdmin) {
-		const schoolsRes = await db.prepare('SELECT id, name, npsn, require_exambro FROM schools ORDER BY id ASC').all<any>();
+		const schoolsRes = await db.prepare('SELECT id, name, npsn, require_exambro, master_exit_pin FROM schools ORDER BY id ASC').all<any>();
 		allSchools = schoolsRes.results || [];
 		
 		const requestedSchoolId = url.searchParams.get('school_id');
@@ -40,18 +40,18 @@ export const load: PageServerLoad = async ({ locals, platform, url }) => {
 	let school = null;
 	if (schoolId) {
 		school = await db
-			.prepare('SELECT id, name, npsn, require_exambro FROM schools WHERE id = ?')
+			.prepare('SELECT id, name, npsn, require_exambro, master_exit_pin FROM schools WHERE id = ?')
 			.bind(schoolId)
-			.first<{ id: number; name: string; npsn: string; require_exambro: number }>();
+			.first<{ id: number; name: string; npsn: string; require_exambro: number; master_exit_pin: string | null }>();
 	}
 
 	if (!school) {
-		const firstSchool = await db.prepare('SELECT id, name, npsn, require_exambro FROM schools ORDER BY id ASC LIMIT 1').first<any>();
+		const firstSchool = await db.prepare('SELECT id, name, npsn, require_exambro, master_exit_pin FROM schools ORDER BY id ASC LIMIT 1').first<any>();
 		school = firstSchool;
 	}
 
 	return {
-		school: school || { id: 1, name: 'Madrasah', npsn: '', require_exambro: 0 },
+		school: school || { id: 1, name: 'Madrasah', npsn: '', require_exambro: 0, master_exit_pin: null },
 		allSchools,
 		isSuperAdmin,
 		selectedSchoolId: school?.id || schoolId || 1
@@ -119,6 +119,59 @@ export const actions: Actions = {
 		} catch (e: any) {
 			console.error('Error updating require_exambro:', e);
 			return fail(500, { error: 'Gagal menyimpan pengaturan APK: ' + (e.message || String(e)) });
+		}
+	},
+
+	update_pin: async ({ request, locals, platform }) => {
+		if (!locals.user) return fail(401, { error: 'Unauthorized' });
+		if (locals.user.role !== 'admin' && locals.user.role !== 'superadmin') {
+			return fail(403, { error: 'Hanya administrator yang dapat mengubah PIN master.' });
+		}
+
+		const db = getDB(platform);
+		const data = await request.formData();
+		const newPin = data.get('master_exit_pin')?.toString().trim() || '';
+
+		// Validasi: hanya angka, panjang 4-8 digit
+		if (!/^\d{4,8}$/.test(newPin)) {
+			return fail(400, { error: 'PIN Master harus berupa angka dengan panjang 4 hingga 8 digit.' });
+		}
+
+		let targetSchoolId = locals.user.school_id;
+		const formSchoolId = data.get('school_id')?.toString();
+		if (formSchoolId) {
+			const parsed = parseInt(formSchoolId, 10);
+			if (!isNaN(parsed) && (locals.user.role === 'superadmin' || locals.user.school_id === parsed || locals.user.school_id === null)) {
+				targetSchoolId = parsed;
+			}
+		}
+
+		if (!targetSchoolId) {
+			const firstSchool = await db.prepare('SELECT id FROM schools ORDER BY id ASC LIMIT 1').first<{ id: number }>();
+			targetSchoolId = firstSchool?.id ?? null;
+		}
+
+		if (!targetSchoolId) return fail(400, { error: 'Sekolah tidak ditemukan.' });
+
+		try {
+			// Tambahkan kolom jika belum ada (untuk kompatibilitas database lama)
+			try {
+				await db.prepare(`ALTER TABLE schools ADD COLUMN master_exit_pin TEXT`).run();
+			} catch (_) { /* kolom sudah ada */ }
+
+			await db
+				.prepare(`UPDATE schools SET master_exit_pin = ?, updated_at = datetime('now') WHERE id = ?`)
+				.bind(newPin, targetSchoolId)
+				.run();
+
+			return {
+				success_pin: true,
+				master_exit_pin: newPin,
+				message: `PIN Master Pengawas berhasil diperbarui menjadi: ${newPin}`
+			};
+		} catch (e: any) {
+			console.error('Error updating master_exit_pin:', e);
+			return fail(500, { error: 'Gagal menyimpan PIN Master: ' + (e.message || String(e)) });
 		}
 	}
 };

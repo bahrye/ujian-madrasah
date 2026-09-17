@@ -103,6 +103,12 @@
 		} catch (e) {}
 	}
 
+	$: if (browser && attempt?.master_exit_pin && typeof (window as any).ExambroBridge?.setMasterPin === 'function') {
+		try {
+			(window as any).ExambroBridge.setMasterPin(String(attempt.master_exit_pin));
+		} catch (e) {}
+	}
+
 	$: if (browser && typeof (window as any).ExambroBridge?.setExamPaused === 'function') {
 		try {
 			(window as any).ExambroBridge.setExamPaused(isPausedByProctor);
@@ -167,6 +173,13 @@
 				if ((window as any).ExambroBridge?.setExamExitPin) {
 					try {
 						(window as any).ExambroBridge.setExamExitPin(String(attempt.exam_exit_pin));
+					} catch (e) {}
+				}
+			}
+			if (attempt?.master_exit_pin) {
+				if ((window as any).ExambroBridge?.setMasterPin) {
+					try {
+						(window as any).ExambroBridge.setMasterPin(String(attempt.master_exit_pin));
 					} catch (e) {}
 				}
 			}
@@ -289,12 +302,20 @@
 						checkedMilestones.clear();
 					}
 					isPausedByProctor = data.is_paused;
-					// Sinkron PIN keluar ke APK setiap polling agar selalu cocok dengan yang di server
+					// Sinkron PIN keluar per-ujian ke APK
 					if (data.exam_exit_pin) {
 						(window as any).exambroExitPin = String(data.exam_exit_pin);
 						try {
 							if ((window as any).ExambroBridge?.setExamExitPin) {
 								(window as any).ExambroBridge.setExamExitPin(String(data.exam_exit_pin));
+							}
+						} catch (e) {}
+					}
+					// Sinkron PIN master (dari Pengaturan APK admin) ke APK sebagai fallback
+					if (data.master_exit_pin) {
+						try {
+							if ((window as any).ExambroBridge?.setMasterPin) {
+								(window as any).ExambroBridge.setMasterPin(String(data.master_exit_pin));
 							}
 						} catch (e) {}
 					}

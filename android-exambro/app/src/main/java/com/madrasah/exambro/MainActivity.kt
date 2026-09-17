@@ -75,6 +75,7 @@ class MainActivity : AppCompatActivity() {
     private var isAppStarted = false
     private var currentUrl: String = ""
     private var currentExamExitPin: String? = null
+    private var currentMasterPin: String? = null  // PIN master dari Pengaturan APK admin (database)
     private var isExamPaused: Boolean = false
     private var isExamActive: Boolean = false
     private var touchStartedInTopZone: Boolean = false
@@ -111,6 +112,8 @@ class MainActivity : AppCompatActivity() {
         prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         // Reset pelanggaran setiap kali aplikasi dibuka fresh
         prefs.edit().putInt(KEY_VIOLATIONS, 0).apply()
+        // Ambil PIN master yang tersimpan di prefs (jika pernah disinkronkan sebelumnya)
+        currentMasterPin = prefs.getString(KEY_PROCTOR_PIN, null)
 
         initViews()
         setupWebView()
@@ -200,6 +203,13 @@ class MainActivity : AppCompatActivity() {
                         val pin = json.optString("exam_exit_pin", "")
                         if (pin.isNotEmpty() && pin != "null") {
                             currentExamExitPin = pin.trim()
+                        }
+                        val mPin = json.optString("master_exit_pin", "")
+                        if (mPin.isNotEmpty() && mPin != "null") {
+                            currentMasterPin = mPin.trim()
+                            prefs.edit().putString(KEY_PROCTOR_PIN, mPin.trim()).apply()
+                        }
+                        if (!currentExamExitPin.isNullOrEmpty()) {
                             break // PIN berhasil didapat, tidak perlu retry lagi
                         }
                     }
@@ -662,6 +672,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         @android.webkit.JavascriptInterface
+        fun setMasterPin(pin: String?) {
+            // PIN Master dari Pengaturan APK admin (disimpan di database kolom schools.master_exit_pin)
+            // Dikirim saat polling attempt-status dan onMount halaman soal
+            val cleaned = pin?.trim()
+            if (!cleaned.isNullOrEmpty() && cleaned != "null") {
+                currentMasterPin = cleaned
+                prefs.edit().putString(KEY_PROCTOR_PIN, cleaned).apply()
+            }
+        }
+
+        @android.webkit.JavascriptInterface
         fun setExamPaused(paused: Boolean) {
             isExamPaused = paused
             runOnUiThread {
@@ -882,12 +903,17 @@ class MainActivity : AppCompatActivity() {
             .setCancelable(false)
             .setPositiveButton(getString(R.string.dialog_btn_exit)) { _, _ ->
                 val enteredPin = input.text.toString().trim()
-                // Validasi: cek PIN dari server (exam_exit_pin) ATAU master PIN pengawas (SharedPreferences)
+                // Urutan prioritas validasi PIN:
+                // 1. PIN per-ujian acak (exam_exit_pin) dari database — paling spesifik
+                // 2. PIN Master dari Pengaturan APK admin (master_exit_pin di database / tersimpan di preferences)
+                // 3. Hanya jika BELUM PERNAH diatur oleh admin sama sekali, fallback ke DEFAULT_PIN (12345)
                 val serverPin = currentExamExitPin?.trim()
-                val masterPin = prefs.getString(KEY_PROCTOR_PIN, DEFAULT_PIN) ?: DEFAULT_PIN
+                val dbMasterPin = currentMasterPin?.trim() ?: prefs.getString(KEY_PROCTOR_PIN, null)?.trim()
                 val isValidServerPin = !serverPin.isNullOrEmpty() && enteredPin == serverPin
-                val isValidMasterPin = enteredPin == masterPin
-                if (isValidServerPin || isValidMasterPin) {
+                val isValidDbMaster = !dbMasterPin.isNullOrEmpty() && enteredPin == dbMasterPin
+                // Jika admin sudah menentukan PIN Master, PIN default 12345 dinonaktifkan
+                val isValidDefaultPin = dbMasterPin.isNullOrEmpty() && enteredPin == DEFAULT_PIN
+                if (isValidServerPin || isValidDbMaster || isValidDefaultPin) {
                     stopPinPolling()
                     stopLockTaskMode()
                     isExamActive = false
@@ -919,7 +945,8 @@ class MainActivity : AppCompatActivity() {
     private fun promptProctorPinThenShowSettings() {
         val input = EditText(this)
         input.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
-        input.hint = "PIN Pengawas (Default: 12345)"
+        val activeMasterPin = currentMasterPin?.trim() ?: prefs.getString(KEY_PROCTOR_PIN, null)?.trim() ?: DEFAULT_PIN
+        input.hint = if (activeMasterPin == DEFAULT_PIN) "PIN Pengawas (Default: 12345)" else "PIN Pengawas"
 
         val container = LinearLayout(this)
         container.orientation = LinearLayout.VERTICAL
@@ -937,7 +964,7 @@ class MainActivity : AppCompatActivity() {
             .setView(container)
             .setPositiveButton("Buka") { _, _ ->
                 val enteredPin = input.text.toString().trim()
-                val correctPin = prefs.getString(KEY_PROCTOR_PIN, DEFAULT_PIN) ?: DEFAULT_PIN
+                val correctPin = currentMasterPin?.trim() ?: prefs.getString(KEY_PROCTOR_PIN, null)?.trim() ?: DEFAULT_PIN
                 if (enteredPin == correctPin) {
                     showSettingsDialog()
                 } else {

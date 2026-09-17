@@ -389,6 +389,12 @@
 					<span class="text-xs text-slate-500 font-medium">PIN:</span>
 					<span class="font-mono text-xl font-black tracking-widest text-amber-600 select-all">{data.currentExam.exit_pin || '-----'}</span>
 				</div>
+				{#if data.masterExitPin}
+					<div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg shadow-xs" title="PIN Master darurat (diatur di Pengaturan APK admin)">
+						<span class="text-xs text-slate-400 font-medium">Master:</span>
+						<span class="font-mono text-sm font-bold text-slate-700 select-all">{data.masterExitPin}</span>
+					</div>
+				{/if}
 				<form method="POST" action="?/regenerateExitPin" use:enhance>
 					<input type="hidden" name="exam_id" value={data.currentExam.id} />
 					<button 

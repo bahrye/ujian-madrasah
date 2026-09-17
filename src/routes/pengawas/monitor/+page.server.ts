@@ -141,6 +141,12 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 			}
 		}
 
+		let masterExitPin: string | null = null;
+		if (locals.user.school_id) {
+			const sc = await db.prepare(`SELECT master_exit_pin FROM schools WHERE id = ?`).bind(locals.user.school_id).first<any>();
+			masterExitPin = sc?.master_exit_pin || null;
+		}
+
 		let attempts: any[] = [];
 		if (validExamFilter !== null) {
 			let query = `
@@ -275,6 +281,7 @@ export const load: PageServerLoad = async ({ platform, url, locals }) => {
 		return {
 			exams,
 			currentExam,
+			masterExitPin,
 			availableSessions,
 			attempts: attemptsWithProgress,
 			examFilter: validExamFilter ? String(validExamFilter) : '',

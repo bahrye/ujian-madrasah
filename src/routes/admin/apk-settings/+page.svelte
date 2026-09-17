@@ -8,6 +8,9 @@
 
 	$: school = data.school;
 	let requireExambro = '0';
+	let masterExitPin = '';
+	let showPin = false;
+	let isSavingPin = false;
 
 	// Pastikan nilai selalu sinkron dan reaktif dengan data dari server
 	$: if (school?.require_exambro !== undefined) {
@@ -16,11 +19,20 @@
 	$: if (form?.require_exambro !== undefined) {
 		requireExambro = String(form.require_exambro);
 	}
+	// Sinkron PIN master dari server
+	$: if (school?.master_exit_pin) {
+		masterExitPin = school.master_exit_pin;
+	}
+	$: if ((form as any)?.master_exit_pin) {
+		masterExitPin = (form as any).master_exit_pin;
+	}
 
 	$: if (form?.error) {
 		toasts.error(form.error);
-	} else if (form?.success) {
-		toasts.success(form.message || 'Pengaturan APK berhasil disimpan.');
+	} else if ((form as any)?.success) {
+		toasts.success((form as any).message || 'Pengaturan APK berhasil disimpan.');
+	} else if ((form as any)?.success_pin) {
+		toasts.success((form as any).message || 'PIN Master berhasil diperbarui.');
 	}
 
 	let isSaving = false;
@@ -296,5 +308,105 @@
 				</li>
 			</ul>
 		</div>
+	</div>
+
+	<!-- Card: PIN Master Pengawas -->
+	<div class="card p-6 bg-white border border-slate-200/80 rounded-xl shadow-xs">
+		<div class="flex items-center gap-3 mb-5">
+			<div class="w-10 h-10 rounded-lg bg-rose-50 text-rose-700 flex items-center justify-center shrink-0">
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+				</svg>
+			</div>
+			<div>
+				<h3 class="text-sm font-bold text-slate-800">PIN Master Pengawas (Cadangan Darurat)</h3>
+				<p class="text-xs text-slate-500">PIN ini digunakan sebagai cadangan jika PIN per-ujian tidak tersedia di APK siswa.</p>
+			</div>
+		</div>
+
+		<form
+			method="POST"
+			action="?/update_pin"
+			use:enhance={() => {
+				isSavingPin = true;
+				return async ({ update }) => {
+					isSavingPin = false;
+					await update({ reset: false });
+				};
+			}}
+			class="space-y-4"
+		>
+			<input type="hidden" name="school_id" value={school?.id} />
+
+			<!-- Info box -->
+			<div class="p-3 bg-amber-50 rounded-lg border border-amber-200/80 text-xs text-amber-900 leading-relaxed">
+				<div class="flex items-start gap-2">
+					<svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+					<span>
+						<strong>Prioritas PIN saat siswa ingin keluar ujian:</strong><br/>
+						1. PIN per-ujian acak (tampil di halaman Monitoring — lebih aman, berbeda tiap ujian)<br/>
+						2. PIN Master ini (cadangan jika PIN per-ujian belum tersinkron ke APK)
+					</span>
+				</div>
+			</div>
+
+			<div class="flex flex-col sm:flex-row sm:items-end gap-3">
+				<div class="flex-1 space-y-1.5">
+					<label for="master_exit_pin" class="block text-xs font-semibold text-slate-700">
+						PIN Master Baru
+						<span class="font-normal text-slate-400">(4–8 digit angka)</span>
+					</label>
+					<div class="relative">
+						<input
+							id="master_exit_pin"
+							name="master_exit_pin"
+							type={showPin ? 'text' : 'password'}
+							inputmode="numeric"
+							pattern={"[0-9]{4,8}"}
+							maxlength="8"
+							placeholder={masterExitPin ? '••••••' : 'Contoh: 98523'}
+							bind:value={masterExitPin}
+							required
+							class="input pr-10 font-mono text-lg tracking-widest w-full"
+						/>
+						<button
+							type="button"
+							class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+							on:click={() => showPin = !showPin}
+							title={showPin ? 'Sembunyikan PIN' : 'Tampilkan PIN'}
+						>
+							{#if showPin}
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+							{:else}
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+							{/if}
+						</button>
+					</div>
+					{#if school?.master_exit_pin}
+						<p class="text-xs text-slate-500">
+							PIN master saat ini: 
+							<code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono font-bold text-slate-700">{showPin ? school.master_exit_pin : '•'.repeat(school.master_exit_pin.length)}</code>
+						</p>
+					{:else}
+						<p class="text-xs text-amber-600 font-medium">
+							⚠ PIN master belum diatur — APK menggunakan PIN default <code class="bg-amber-100 px-1 rounded font-mono">12345</code> yang diketahui publik.
+						</p>
+					{/if}
+				</div>
+				<button
+					type="submit"
+					class="btn-primary flex items-center gap-2 text-sm px-5 py-2.5 shrink-0 shadow-sm"
+					disabled={isSavingPin}
+				>
+					{#if isSavingPin}
+						<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+						<span>Menyimpan...</span>
+					{:else}
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
+						<span>Simpan PIN Master</span>
+					{/if}
+				</button>
+			</div>
+		</form>
 	</div>
 </div>

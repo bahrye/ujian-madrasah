@@ -29,7 +29,8 @@ export const load: PageServerLoad = async ({ platform, locals, params, cookies }
 			       t.released_at as token_released_at, 
 			       t.expires_at as token_expires_at,
 			       e.exit_pin as exam_exit_pin,
-			       e.is_active as exam_active
+			       e.is_active as exam_active,
+			       sc.master_exit_pin
 			FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
 			LEFT JOIN tokens t ON sa.token_id = t.id
@@ -37,6 +38,7 @@ export const load: PageServerLoad = async ({ platform, locals, params, cookies }
 			LEFT JOIN exam_types et ON e.exam_type_id = et.id
 			JOIN users u ON sa.student_id = u.id
 			LEFT JOIN classes c ON u.class_id = c.id
+			LEFT JOIN schools sc ON u.school_id = sc.id
 			WHERE sa.id = ? AND sa.student_id = ?
 		`).bind(parsedAttemptId, locals.user.id).first<any>();
 
