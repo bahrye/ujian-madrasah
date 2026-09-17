@@ -143,6 +143,22 @@
 	let isPolling = false;
 	$: if (data.examFilter || data.sessionFilter) {
 		monitorVersion = '';
+		attemptsMap.clear();
+		if (data.attempts && Array.isArray(data.attempts)) {
+			data.attempts.forEach(a => {
+				const key = a.student_id || a.attempt_id;
+				attemptsMap.set(key, a.warnings || 0);
+			});
+		}
+	}
+
+	$: if (data.attempts && Array.isArray(data.attempts)) {
+		data.attempts.forEach(a => {
+			const key = a.student_id || a.attempt_id;
+			if (!attemptsMap.has(key)) {
+				attemptsMap.set(key, a.warnings || 0);
+			}
+		});
 	}
 
 	async function pollLiveStatus() {
@@ -168,10 +184,13 @@
 
 			if (result.attempts && Array.isArray(result.attempts)) {
 				result.attempts.forEach((newA: any) => {
-					const key = newA.attempt_id || newA.student_id;
+					const key = newA.student_id || newA.attempt_id;
 					const prevWarnings = attemptsMap.get(key) ?? (newA.warnings || 0);
 					
-					if (newA.warnings > prevWarnings) {
+					// HANYA bunyikan alarm suara dan munculkan notifikasi jika:
+					// 1. Siswa MASIH dalam status 'mengerjakan' (bukan selesai / waktu_habis / belum_mengerjakan)
+					// 2. Jumlah pelanggaran bertambah dibanding baseline sebelumnya
+					if (newA.status === 'mengerjakan' && newA.warnings > prevWarnings) {
 						let violationType = 'melakukan pelanggaran';
 						if (newA.warningLogs && newA.warningLogs.length > 0) {
 							const lastLog = newA.warningLogs[newA.warningLogs.length - 1];
@@ -182,10 +201,10 @@
 							}
 						}
 
-						toasts.warning(`⚠️ Pelanggaran! ${newA.student_name} (${violationType})`);
+						toasts.warning(`⚠️ Pelanggaran! ${newA.student_name || 'Siswa'} (${violationType})`);
 						playViolationBeep();
 						setTimeout(() => {
-							speakViolationAlert(`Peringatan! Siswa ${newA.student_name}, ${violationType}.`);
+							speakViolationAlert(`Peringatan! Siswa ${newA.student_name || 'Siswa'}, ${violationType}.`);
 						}, 350);
 					}
 					attemptsMap.set(key, newA.warnings || 0);
@@ -212,7 +231,7 @@
 
 		if (attempts && Array.isArray(attempts)) {
 			attempts.forEach(a => {
-				const key = a.attempt_id || a.student_id;
+				const key = a.student_id || a.attempt_id;
 				attemptsMap.set(key, a.warnings || 0);
 			});
 		}

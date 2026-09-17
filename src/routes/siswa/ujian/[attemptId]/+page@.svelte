@@ -24,6 +24,7 @@
 	let finishConfirmationInput = '';
 	$: isFinishConfirmed = finishConfirmationInput.trim().toUpperCase() === 'SELESAI';
 	let submitting = false;
+	let isSubmitted = false;
 	let finishPhoto = '';
 	$: if (showSubmitConfirm && !finishPhoto) {
 		captureMicroSnapshot({ timeoutMs: 2000 }).then((photo) => {
@@ -419,7 +420,7 @@
 	let isDisqualifying = false;
 
 	function sendViolationBeacon(type: string, photo?: string | null) {
-		if (!attempt?.id) return;
+		if (!attempt?.id || submitting || isSubmitted || isUnloading || isDisqualifying || attempt?.status !== 'mengerjakan') return;
 		const payload = JSON.stringify({
 			attempt_id: attempt.id,
 			violation_type: type,
@@ -451,7 +452,20 @@
 		localStorage.removeItem(`cheat_type_${attempt.id}`);
 		sessionStorage.removeItem(`cheat_deadline_${attempt.id}`);
 		sessionStorage.removeItem(`cheat_type_${attempt.id}`);
-		if (isUnloading || isManualReload || isOfficialReload || !isMountedAndReady || showWarningModal || showDisqualifiedModal || submitting || isPausedByProctor) return;
+		if (
+			isUnloading ||
+			isManualReload ||
+			isOfficialReload ||
+			!isMountedAndReady ||
+			showWarningModal ||
+			showDisqualifiedModal ||
+			showSubmitConfirm ||
+			showTimeUpModal ||
+			submitting ||
+			isSubmitted ||
+			isPausedByProctor ||
+			attempt?.status !== 'mengerjakan'
+		) return;
 		
 		warnings += 1;
 		warningLogs.push({ time: Date.now(), type });
@@ -478,7 +492,20 @@
 	}
 
 	function handleCheatWarning(type: string, toleranceMs: number) {
-		if (isUnloading || isManualReload || isOfficialReload || (!isMountedAndReady && !localStorage.getItem(`cheat_deadline_${attempt.id}`) && !sessionStorage.getItem(`cheat_deadline_${attempt.id}`)) || showWarningModal || showDisqualifiedModal || submitting || isPausedByProctor) return;
+		if (
+			isUnloading ||
+			isManualReload ||
+			isOfficialReload ||
+			(!isMountedAndReady && !localStorage.getItem(`cheat_deadline_${attempt.id}`) && !sessionStorage.getItem(`cheat_deadline_${attempt.id}`)) ||
+			showWarningModal ||
+			showDisqualifiedModal ||
+			showSubmitConfirm ||
+			showTimeUpModal ||
+			submitting ||
+			isSubmitted ||
+			isPausedByProctor ||
+			attempt?.status !== 'mengerjakan'
+		) return;
 		
 		isExamBlurred = true;
 		if (cheatWarningTimeout) clearTimeout(cheatWarningTimeout);
@@ -562,20 +589,58 @@
 			hasEnteredFullscreenOnce = true;
 			localStorage.setItem(`hasEnteredFullscreen_${attempt.id}`, 'true');
 			handleReturnToExam();
-		} else if (isMountedAndReady && !isUnloading && !isManualReload && !isOfficialReload && !isExamBlurred && !showWarningModal && !showDisqualifiedModal && !submitting && hasEnteredFullscreenOnce) {
+		} else if (
+			isMountedAndReady &&
+			!isUnloading &&
+			!isManualReload &&
+			!isOfficialReload &&
+			!isExamBlurred &&
+			!showWarningModal &&
+			!showDisqualifiedModal &&
+			!showSubmitConfirm &&
+			!showTimeUpModal &&
+			!submitting &&
+			!isSubmitted &&
+			attempt?.status === 'mengerjakan' &&
+			hasEnteredFullscreenOnce
+		) {
 			// Hanya mulai countdown jika siswa SUDAH PERNAH masuk fullscreen sebelumnya
 			handleCheatWarning('Keluar dari Layar Penuh', 10000); // 10 detik jeda toleransi
 		}
 	}
 
 	function handleVisibilityChange() {
-		if (isMountedAndReady && !isUnloading && !isManualReload && !isOfficialReload && document.visibilityState === 'hidden') {
+		if (
+			isMountedAndReady &&
+			!isUnloading &&
+			!isManualReload &&
+			!isOfficialReload &&
+			!submitting &&
+			!isSubmitted &&
+			!showSubmitConfirm &&
+			!showTimeUpModal &&
+			!showDisqualifiedModal &&
+			attempt?.status === 'mengerjakan' &&
+			document.visibilityState === 'hidden'
+		) {
 			triggerViolation('Keluar dari aplikasi ujian (Berpindah Tab/Layar)');
 		}
 	}
 
 	function handleBlur() {
-		if (isMountedAndReady && !isUnloading && !isManualReload && !isOfficialReload && document.visibilityState !== 'hidden') {
+		if (
+			isMountedAndReady &&
+			!isUnloading &&
+			!isManualReload &&
+			!isOfficialReload &&
+			!submitting &&
+			!isSubmitted &&
+			!showSubmitConfirm &&
+			!showTimeUpModal &&
+			!showDisqualifiedModal &&
+			attempt?.status === 'mengerjakan' &&
+			document.visibilityState !== 'hidden'
+		) {
 			// Muncul aplikasi melayang / ditariknya notifikasi bar
 			handleCheatWarning('Membuka aplikasi melayang / Notifikasi', 10000); // 10 detik jeda toleransi
 		}
@@ -819,8 +884,25 @@
 	}
 
 	async function handleAutoSubmit() {
-		if (submitting || isPausedByProctor) return;
+		if (submitting || isSubmitted || isPausedByProctor) return;
+		isSubmitted = true;
 		submitting = true;
+		if (cheatWarningTimeout) {
+			clearTimeout(cheatWarningTimeout);
+			cheatWarningTimeout = null;
+		}
+		if (cheatCountdownInterval) {
+			clearInterval(cheatCountdownInterval);
+			cheatCountdownInterval = null;
+		}
+		stopWarningSoundLoop();
+		isExamBlurred = false;
+		showWarningModal = false;
+		localStorage.removeItem(`cheat_deadline_${attempt.id}`);
+		localStorage.removeItem(`cheat_type_${attempt.id}`);
+		sessionStorage.removeItem(`cheat_deadline_${attempt.id}`);
+		sessionStorage.removeItem(`cheat_type_${attempt.id}`);
+
 		saveCurrentAnswer();
 		
 		const form = new FormData();
@@ -842,6 +924,7 @@
 		} catch (err) {
 			console.error('Submit error:', err);
 			submitting = false;
+			isSubmitted = false;
 		}
 	}
 
@@ -1137,8 +1220,25 @@
 						cancel();
 						return;
 					}
-					flushPendingSingleAnswer();
+					isSubmitted = true;
 					submitting = true;
+					if (cheatWarningTimeout) {
+						clearTimeout(cheatWarningTimeout);
+						cheatWarningTimeout = null;
+					}
+					if (cheatCountdownInterval) {
+						clearInterval(cheatCountdownInterval);
+						cheatCountdownInterval = null;
+					}
+					stopWarningSoundLoop();
+					isExamBlurred = false;
+					showWarningModal = false;
+					localStorage.removeItem(`cheat_deadline_${attempt.id}`);
+					localStorage.removeItem(`cheat_type_${attempt.id}`);
+					sessionStorage.removeItem(`cheat_deadline_${attempt.id}`);
+					sessionStorage.removeItem(`cheat_type_${attempt.id}`);
+
+					flushPendingSingleAnswer();
 					formData.set('answers', JSON.stringify(localAnswers));
 					formData.set('doubts', JSON.stringify(localDoubts));
 					formData.set('warnings', warnings.toString());
@@ -1149,6 +1249,7 @@
 					return async ({ result, update }) => {
 						if (result.type !== 'redirect') {
 							submitting = false; 
+							isSubmitted = false;
 						}
 						await update();
 					};

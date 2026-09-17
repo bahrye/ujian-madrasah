@@ -136,6 +136,11 @@ export const actions: Actions = {
 		const isVerified = await verifyExamTokenSignature(cookieVal, parsedAttemptId, locals.user.id);
 		if (!isVerified) return fail(401, { error: 'Sesi token tidak valid.' });
 
+		const attemptCheck = await db.prepare('SELECT status FROM student_attempts WHERE id = ? AND student_id = ?').bind(parsedAttemptId, locals.user.id).first<any>();
+		if (!attemptCheck || attemptCheck.status !== 'mengerjakan') {
+			return fail(400, { error: 'Sesi ujian sudah tidak aktif.' });
+		}
+
 		const form = await request.formData();
 		const answersStr = form.get('answers')?.toString();
 		const doubtsStr = form.get('doubts')?.toString();
@@ -173,7 +178,7 @@ export const actions: Actions = {
 					db.prepare(`
 						UPDATE student_attempts 
 						SET violation_count = ?, violation_logs = ?, updated_at = datetime('now')
-						WHERE id = ? AND student_id = ?
+						WHERE id = ? AND student_id = ? AND status = 'mengerjakan'
 					`).bind(warnings, warningLogs, parsedAttemptId, locals.user.id)
 				);
 
