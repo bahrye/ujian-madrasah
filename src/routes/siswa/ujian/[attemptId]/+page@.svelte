@@ -423,48 +423,6 @@
 	}
 
 	let isDisqualifying = false;
-	let pendingViolationPhotoType: string | null = null;
-	let isCapturingViolationPhoto = false;
-
-	async function sendViolationPhotoOnly(type: string, photo: string) {
-		if (!attempt?.id || submitting || isSubmitted) return;
-		try {
-			await fetch('/api/student/log-violation', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					attempt_id: attempt.id,
-					violation_type: type,
-					photo: photo,
-					photo_only: true
-				}),
-				keepalive: true
-			});
-		} catch (e) {
-			console.warn('Failed to send deferred violation photo:', e);
-		}
-	}
-
-	async function checkAndCapturePendingViolationPhoto() {
-		if (!pendingViolationPhotoType || isCapturingViolationPhoto || !attempt?.id || isUnloading || submitting || isSubmitted || (typeof document !== 'undefined' && document.hidden)) return;
-		const vType = pendingViolationPhotoType;
-		pendingViolationPhotoType = null;
-		isCapturingViolationPhoto = true;
-
-		try {
-			const photo = await captureMicroSnapshot({ timeoutMs: 3000 });
-			if (photo) {
-				await sendViolationPhotoOnly(vType, photo);
-			} else {
-				// Coba sekali lagi jika kamera belum siap
-				pendingViolationPhotoType = vType;
-			}
-		} catch (e) {
-			console.warn('Error capturing pending violation photo:', e);
-		} finally {
-			isCapturingViolationPhoto = false;
-		}
-	}
 
 	function sendViolationBeacon(type: string, photo?: string | null) {
 		if (!attempt?.id || submitting || isSubmitted || isUnloading || isDisqualifying || attempt?.status !== 'mengerjakan') return;
@@ -474,7 +432,7 @@
 			photo: photo || undefined
 		});
 
-		// Jika membawa payload foto Base64, prioritaskan fetch POST keepalive agar tidak terpotong batasan 64KB navigator.sendBeacon
+		// Jika membawa foto Base64, gunakan fetch keepalive agar tidak terpotong limit sendBeacon (64KB)
 		if (photo && typeof fetch !== 'undefined') {
 			fetch('/api/student/log-violation', {
 				method: 'POST',
@@ -482,6 +440,7 @@
 				body: payload,
 				keepalive: true
 			}).catch(() => {
+				// Fallback ke sendBeacon jika fetch gagal
 				if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
 					try {
 						const blob = new Blob([payload], { type: 'application/json' });
@@ -537,27 +496,30 @@
 		localStorage.setItem(`warnings_${attempt.id}`, warnings.toString());
 		localStorage.setItem(`warningLogs_${attempt.id}`, JSON.stringify(warningLogs));
 		
-		const isTabVisible = typeof document !== 'undefined' && !document.hidden;
+		// Langsung catat pelanggaran ke server sekarang (tanpa foto, agar tidak delay)
+		sendViolationBeacon(type, null);
 
-		if (isTabVisible) {
-			// Tab aktif di layar: langsung ambil foto snapshot pelanggaran
+		// Ambil foto wajah pelanggaran — tidak masalah jika tab hidden karena:
+		// foto Base64 langsung disimpan di DB seketika oleh server (0 latency),
+		// konversi ke Cloudinary terjadi di latar belakang (background worker).
+		// Jika kamera tidak tersedia (tab hidden / akses ditolak), beacon sudah terkirim.
+		if (typeof document !== 'undefined' && !document.hidden) {
 			captureMicroSnapshot({ timeoutMs: 3000 }).then((photo) => {
 				if (photo) {
-					sendViolationBeacon(type, photo);
-				} else {
-					pendingViolationPhotoType = type;
-					sendViolationBeacon(type, null);
+					// Kirim foto sebagai lampiran tambahan (photo_only: true = tidak duplikasi violation_count)
+					fetch('/api/student/log-violation', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							attempt_id: attempt.id,
+							violation_type: type,
+							photo: photo,
+							photo_only: true
+						}),
+						keepalive: true
+					}).catch(() => {});
 				}
-			}).catch(() => {
-				pendingViolationPhotoType = type;
-				sendViolationBeacon(type, null);
-			});
-		} else {
-			// Tab tersembunyi (siswa berpindah layar/aplikasi):
-			// Browser melarang akses kamera saat tab hidden. Catat pelanggaran seketika,
-			// dan antrikan pengambilan foto begitu siswa kembali ke layar ujian.
-			pendingViolationPhotoType = type;
-			sendViolationBeacon(type, null);
+			}).catch(() => {});
 		}
 
 		saveCurrentAnswer(false);

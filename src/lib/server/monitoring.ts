@@ -83,30 +83,17 @@ export interface MonitoringPhotoInput {
 export async function saveMonitoringPhoto(
 	db: any,
 	input: MonitoringPhotoInput,
-	env?: any
+	env?: any,
+	waitUntil?: ((promise: Promise<any>) => void) | null
 ): Promise<boolean> {
 	if (!db || !input.examId || !input.studentId || !input.photoUrl) return false;
 
 	await ensureMonitoringPhotosTable(db);
 
-	let finalPhotoUrl = input.photoUrl;
-
-	// Simpan foto ke Cloudinary secara langsung jika berupa base64
-	if (input.photoUrl.startsWith('data:image/')) {
-		try {
-			const uploadRes = await uploadToCloudinary(input.photoUrl, env, 'ujian_monitoring_photos');
-			if (uploadRes.success && uploadRes.url) {
-				finalPhotoUrl = uploadRes.url;
-			} else {
-				console.warn('Upload monitoring photo to Cloudinary skipped or failed:', uploadRes.error);
-			}
-		} catch (uploadErr) {
-			console.warn('Failed to upload monitoring photo to Cloudinary:', uploadErr);
-		}
-	}
-
 	try {
-		await db.prepare(`
+		// 1. Simpan foto ke database seketika dalam format teks Base64
+		// Hasil: Pengawas & Admin langsung melihat foto tanpa jeda (0 latency), tidak akan timeout/gagal!
+		const insertRes = await db.prepare(`
 			INSERT INTO exam_monitoring_photos (school_id, exam_id, attempt_id, student_id, photo_type, photo_url, caption)
 			VALUES (?, ?, ?, ?, ?, ?, ?)
 		`).bind(
@@ -115,9 +102,35 @@ export async function saveMonitoringPhoto(
 			input.attemptId || null,
 			input.studentId,
 			input.photoType,
-			finalPhotoUrl,
+			input.photoUrl,
 			input.caption || null
 		).run();
+
+		const photoId = insertRes?.meta?.last_row_id || insertRes?.lastInsertRowid;
+
+		// 2. Di latar belakang (asinkron), konversikan teks Base64 menjadi link Cloudinary
+		if (photoId && input.photoUrl.startsWith('data:image/')) {
+			const backgroundConversion = async () => {
+				try {
+					const uploadRes = await uploadToCloudinary(input.photoUrl, env, 'ujian_monitoring_photos');
+					if (uploadRes && uploadRes.success && uploadRes.url) {
+						await db.prepare(`
+							UPDATE exam_monitoring_photos 
+							SET photo_url = ? 
+							WHERE id = ?
+						`).bind(uploadRes.url, photoId).run();
+					}
+				} catch (uploadErr) {
+					console.warn('Background Cloudinary conversion skipped or failed:', uploadErr);
+				}
+			};
+
+			if (waitUntil && typeof waitUntil === 'function') {
+				waitUntil(backgroundConversion());
+			} else {
+				backgroundConversion().catch(() => {});
+			}
+		}
 
 		return true;
 	} catch (err) {

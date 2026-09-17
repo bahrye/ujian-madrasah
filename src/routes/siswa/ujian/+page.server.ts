@@ -285,6 +285,7 @@ export const actions: Actions = {
 			let facePhotoStr = form.get('face_photo')?.toString() || '';
 			if (facePhotoStr && facePhotoStr.startsWith('data:image/')) {
 				try {
+					const waitUntil = platform?.context?.waitUntil?.bind(platform.context) || null;
 					await saveMonitoringPhoto(db, {
 						schoolId: locals.user!.school_id,
 						examId: token.exam_id,
@@ -293,7 +294,7 @@ export const actions: Actions = {
 						photoType: 'start',
 						photoUrl: facePhotoStr,
 						caption: 'Foto Absensi Kehadiran'
-					}, mergedEnv);
+					}, mergedEnv, waitUntil);
 				} catch (photoErr) {
 					console.warn('Failed to save start face photo:', photoErr);
 				}

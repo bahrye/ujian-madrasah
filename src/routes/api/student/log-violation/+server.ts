@@ -80,6 +80,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 		if (photoOnly) {
 			if (photoUrl && photoUrl.startsWith('data:image/')) {
 				try {
+					const waitUntil = platform?.context?.waitUntil?.bind(platform.context) || null;
 					await saveMonitoringPhoto(db, {
 						schoolId: locals.user.school_id,
 						examId: attempt.exam_id,
@@ -88,7 +89,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 						photoType: 'violation',
 						photoUrl,
 						caption: `Pelanggaran: ${violationType}`
-					}, mergedEnv);
+					}, mergedEnv, waitUntil);
 				} catch (photoErr) {
 					console.warn('Failed to save deferred violation photo:', photoErr);
 				}
@@ -126,6 +127,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 		// Save violation snapshot photo if provided
 		if (photoUrl && photoUrl.startsWith('data:image/')) {
 			try {
+				const waitUntil = platform?.context?.waitUntil?.bind(platform.context) || null;
 				await saveMonitoringPhoto(db, {
 					schoolId: locals.user.school_id,
 					examId: attempt.exam_id,
@@ -134,7 +136,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 					photoType: 'violation',
 					photoUrl,
 					caption: `Pelanggaran: ${violationType}`
-				}, mergedEnv);
+				}, mergedEnv, waitUntil);
 			} catch (photoErr) {
 				console.warn('Failed to save violation photo:', photoErr);
 			}
