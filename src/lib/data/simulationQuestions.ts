@@ -4013,18 +4013,1055 @@ export const MA_QUESTIONS_GRADE_10: SimulationQuestion[] = [
 	}
 ];
 
-// Soal MA Kelas 11 & 12
-export const MA_QUESTIONS_GRADE_11: SimulationQuestion[] = MA_QUESTIONS_GRADE_10.map((q, i) => ({
-	...q,
-	id: 601 + i,
-	grade: 11
-}));
+// ==========================================
+// 6. BANK SOAL SIMULASI MA KELAS 11 (25 NOMOR)
+// Khusus siswa MA Kelas 11 (Materi Kurikulum Kelas 11)
+// ==========================================
+export const MA_QUESTIONS_GRADE_11: SimulationQuestion[] = [
+	{
+		id: 601,
+		type: 'pilihan_ganda',
+		subject: "Al-Qur'an Hadis",
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Hadis riwayat Bukhari dan Muslim menyatakan: <strong>كُلُّكُمْ رَاعٍ وَكُلُّكُمْ مَسْئُولٌ عَنْ رَعِيَّتِهِ</strong>. Kandungan pokok hadis tersebut menegaskan tentang...</p>',
+		question_number: 1,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Setiap manusia adalah pemimpin dan akan dimintai pertanggungjawaban atas apa yang dipimpinnya' },
+			{ key: 'B', text: 'Kewajiban berhijrah ke negeri yang aman' },
+			{ key: 'C', text: 'Keutamaan menunaikan ibadah haji ke Baitullah' },
+			{ key: 'D', text: 'Larangan memakan riba dalam berniaga' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Hadis tentang amanah kepemimpinan dan tanggung jawab sosial setiap insan.'
+	},
+	{
+		id: 602,
+		type: 'pilihan_ganda',
+		subject: 'Akidah Akhlak',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Salah satu aliran teologi (Ilmu Kalam) dalam sejarah pemikiran Islam yang mengedepankan akal rasional dan terkenal dengan doktrin <em>Ushulul Khamsah</em> adalah aliran...</p>',
+		question_number: 2,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Mu\'tazilah' },
+			{ key: 'B', text: 'Asy\'ariyah' },
+			{ key: 'C', text: 'Maturidiyah' },
+			{ key: 'D', text: 'Jabariyah' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Aliran Mu\'tazilah memiliki 5 prinsip pokok (Ushulul Khamsah).'
+	},
+	{
+		id: 603,
+		type: 'pilihan_ganda',
+		subject: 'Fikih',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Menuduh orang lain yang baik-baik berbuat zina tanpa disertai empat orang saksi yang adil dalam hukum pidana Islam dinamakan...</p>',
+		question_number: 3,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Qadzaf' },
+			{ key: 'B', text: 'Li\'an' },
+			{ key: 'C', text: 'Zhihar' },
+			{ key: 'D', text: 'Bughat' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Qadzaf adalah tuduhan palsu berbuat zina dan dikenai hukuman hudud 80 kali cambuk.'
+	},
+	{
+		id: 604,
+		type: 'pilihan_ganda',
+		subject: 'SKI',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Pusat peradaban dan kebudayaan Islam di benua Eropa yang mencapai puncak kemegahan pada masa Daulah Umayyah II terletak di kota...</p>',
+		question_number: 4,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Cordoba (Spanyol)' },
+			{ key: 'B', text: 'Roma (Italia)' },
+			{ key: 'C', text: 'Wina (Austria)' },
+			{ key: 'D', text: 'Paris (Prancis)' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Cordoba di Andalusia merupakan mercusuar ilmu pengetahuan Eropa era keemasan Islam.'
+	},
+	{
+		id: 605,
+		type: 'pilihan_ganda',
+		subject: 'Bahasa Arab',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Dalam kalimat: <strong>هَذَا طَالِبٌ نَشِيْطٌ</strong>, kedudukan kata <strong>نَشِيْطٌ</strong> adalah sebagai...</p>',
+		question_number: 5,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Na\'at (Sifat)' },
+			{ key: 'B', text: 'Mubtada\'' },
+			{ key: 'C', text: 'Maf\'ul Bih' },
+			{ key: 'D', text: 'Zharf' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'نَشِيْطٌ adalah na\'at (kata sifat) yang menyifati kata thalibun (man\'ut).'
+	},
+	{
+		id: 606,
+		type: 'pilihan_ganda',
+		subject: 'Matematika',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Turunan pertama dari fungsi <strong>f(x) = 2x³ - 4x² + 5x - 7</strong> adalah f\'(x) = ...</p>',
+		question_number: 6,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: '6x² - 8x + 5' },
+			{ key: 'B', text: '6x² - 4x + 5' },
+			{ key: 'C', text: '3x² - 8x + 5' },
+			{ key: 'D', text: '6x² - 8x' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'f\'(x) = 2(3)x² - 4(2)x + 5 = 6x² - 8x + 5.'
+	},
+	{
+		id: 607,
+		type: 'pilihan_ganda',
+		subject: 'Bahasa Indonesia',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Bagian pendahuluan dalam teks ceramah yang berisi pengenalan isu, masalah, serta pandangan umum pembicara disebut bagian...</p>',
+		question_number: 7,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Pembuka (Tesis)' },
+			{ key: 'B', text: 'Rangkaian Argumen' },
+			{ key: 'C', text: 'Penegasan Ulang' },
+			{ key: 'D', text: 'Resolusi' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Struktur teks ceramah diawali tesis (pembuka), rangkaian argumen (isi), dan penegasan ulang (penutup).'
+	},
+	{
+		id: 608,
+		type: 'pilihan_ganda',
+		subject: 'IPA',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Organel sel yang berfungsi sebagai tempat modifikasi, penyortiran, dan pengemasan protein sebelum disekresikan ke luar sel adalah...</p>',
+		question_number: 8,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Badan Golgi (Aparatus Golgi)' },
+			{ key: 'B', text: 'Lisosom' },
+			{ key: 'C', text: 'Vakuola' },
+			{ key: 'D', text: 'Sentriol' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Badan Golgi berperan dalam sekresi dan glikosilasi protein seluler.'
+	},
+	{
+		id: 609,
+		type: 'pilihan_ganda',
+		subject: 'IPS',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Pengelompokan masyarakat secara horizontal berdasarkan perbedaan suku, agama, ras, dan klan tanpa adanya hierarki tingkatan sosial disebut...</p>',
+		question_number: 9,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Diferensiasi Sosial' },
+			{ key: 'B', text: 'Stratifikasi Sosial' },
+			{ key: 'C', text: 'Konflik Sosial' },
+			{ key: 'D', text: 'Asimilasi Sosial' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Diferensiasi sosial adalah pembedaan masyarakat secara horizontal/sejajar.'
+	},
+	{
+		id: 610,
+		type: 'pilihan_ganda',
+		subject: 'Akidah Akhlak',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Perilaku membelanjakan harta secara boros dan berlebih-lebihan untuk hal-hal yang tidak berguna atau bernilai maksiat dinamakan...</p>',
+		question_number: 10,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Isyraf dan Tabdzir' },
+			{ key: 'B', text: 'Qana\'ah' },
+			{ key: 'C', text: 'Wara\'' },
+			{ key: 'D', text: 'Iffah' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Isyraf dan Tabdzir adalah sikap boros dan menyia-nyiakan nikmat harta.'
+	},
+	{
+		id: 611,
+		type: 'pilihan_ganda',
+		subject: 'Matematika',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Jumlah tak hingga dari deret geometri konvergen <strong>12 + 6 + 3 + 3/2 + ...</strong> adalah...</p>',
+		question_number: 11,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: '24' },
+			{ key: 'B', text: '20' },
+			{ key: 'C', text: '18' },
+			{ key: 'D', text: '36' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'a = 12, r = 1/2. S tak hingga = a / (1 - r) = 12 / (1 - 1/2) = 12 / (1/2) = 24.'
+	},
+	{
+		id: 612,
+		type: 'pilihan_ganda',
+		subject: 'Fikih',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Ahli waris yang mendapatkan sisa harta warisan setelah harta dibagikan kepada ahli waris ashhabul furudh dinamakan...</p>',
+		question_number: 12,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Ashabah' },
+			{ key: 'B', text: 'Zawil Arham' },
+			{ key: 'C', text: 'Hijab Nuqsan' },
+			{ key: 'D', text: 'Hijab Hirman' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Ashabah adalah penerima sisa tirkah warisan.'
+	},
+	{
+		id: 613,
+		type: 'pilihan_ganda',
+		subject: 'IPA',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Hukum Pertama Termodinamika pada dasarnya merupakan pernyataan dari hukum...</p>',
+		question_number: 13,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Kekekalan Energi' },
+			{ key: 'B', text: 'Kekekalan Momentum' },
+			{ key: 'C', text: 'Entropi Maksimum' },
+			{ key: 'D', text: 'Aksi-Reaksi' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Hukum I Termodinamika: Energi tidak dapat diciptakan atau dimusnahkan (ΔU = Q - W).'
+	},
+	{
+		id: 614,
+		type: 'pilihan_ganda',
+		subject: 'Bahasa Arab',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Huruf <strong>لَنْ</strong> dalam tata bahasa Arab berfungsi sebagai amil nawashib yang bertugas...</p>',
+		question_number: 14,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Menashabkan fi\'il mudhari\' dan menafikan masa depan' },
+			{ key: 'B', text: 'Menjazamkan fi\'il mudhari\'' },
+			{ key: 'C', text: 'Meng-kasrahkan isim' },
+			{ key: 'D', text: 'Menjadikan fi\'il bermakna lampau' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Lan adalah huruf nafi dan nashab untuk waktu mustaqbal.'
+	},
+	{
+		id: 615,
+		type: 'pilihan_ganda',
+		subject: 'SKI',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Universitas Islam Al-Azhar di Kairo Mesir dibangun pada masa pemerintahan Dinasti...</p>',
+		question_number: 15,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Fathimiyah' },
+			{ key: 'B', text: 'Ayyubiyah' },
+			{ key: 'C', text: 'Umayyah' },
+			{ key: 'D', text: 'Abbasiyah' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Masjid dan Universitas Al-Azhar didirikan oleh panglima Jauhar As-Siqili era Dinasti Fathimiyah.'
+	},
+	{
+		id: 616,
+		type: 'pilihan_ganda_kompleks',
+		subject: "Al-Qur'an Hadis",
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Hadis riwayat Al-Miqdam bin Ma\'dikarib RA menyatakan bahwa makanan terbaik bagi seorang hamba adalah makanan dari... <em>(Pilih 2 jawaban yang tepat)</em></p>',
+		question_number: 16,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Hasil kerja keringat tangannya sendiri secara halal' },
+			{ key: 'B', text: 'Nafkah yang diperoleh dari usaha yang jujur sebagaimana Nabi Daud AS' },
+			{ key: 'C', text: 'Meminta-minta belas kasihan orang lain di jalanan' },
+			{ key: 'D', text: 'Harta rampasan tanpa usaha yang sah' }
+		]),
+		correct_answer: '["A","B"]',
+		points: 4,
+		explanation: 'Nabi bersabda tidak ada makanan yang lebih baik daripada hasil usaha tangannya sendiri.'
+	},
+	{
+		id: 617,
+		type: 'pilihan_ganda_kompleks',
+		subject: 'IPA',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Faktor-faktor berikut yang dapat <strong>mempercepat laju suatu reaksi kimia</strong> adalah... <em>(Pilih 2 jawaban)</em></p>',
+		question_number: 17,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Menaikkan suhu sistem reaksi' },
+			{ key: 'B', text: 'Menambahkan zat katalisator' },
+			{ key: 'C', text: 'Memperkecil luas permukaan bidang sentuh' },
+			{ key: 'D', text: 'Menurunkan konsentrasi zat pereaksi' }
+		]),
+		correct_answer: '["A","B"]',
+		points: 4,
+		explanation: 'Kenaikan suhu dan penambahan katalisator mempercepat tercapainya energi aktivasi.'
+	},
+	{
+		id: 618,
+		type: 'pilihan_ganda_kompleks',
+		subject: 'IPS',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Ciri-ciri masyarakat multikultural yang berhasil menjaga <strong>integrasi sosial</strong> adalah... <em>(Pilih 2 jawaban)</em></p>',
+		question_number: 18,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Tumbuhnya sikap toleransi dan saling menghormati perbedaan suku serta agama' },
+			{ key: 'B', text: 'Tercapainya konsensus bersama mengenai nilai-nilai dasar kemasyarakatan' },
+			{ key: 'C', text: 'Dominasi satu kelompok mayoritas atas kelompok minoritas' },
+			{ key: 'D', text: 'Terjadinya disintegrasi antardaerah secara terus-menerus' }
+		]),
+		correct_answer: '["A","B"]',
+		points: 4,
+		explanation: 'Toleransi dan konsensus bersama merupakan fondasi integrasi bangsa.'
+	},
+	{
+		id: 619,
+		type: 'benar_salah',
+		subject: 'Fikih',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Tentukan status kebenaran (<strong>Benar</strong> atau <strong>Salah</strong>) mengenai ketentuan hukum waris Islam:</p>',
+		question_number: 19,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ id: '1', statement: 'Ketentuan bagian waris anak laki-laki adalah dua kali lipat dari bagian anak perempuan.' },
+			{ id: '2', statement: 'Ahli waris yang membunuh pewarisnya tetap berhak menerima harta warisan peninggalan korban.' }
+		]),
+		correct_answer: '{"1":"benar","2":"salah"}',
+		points: 4,
+		explanation: 'Laki-laki 2 bagian perempuan 1 bagian (Benar). Pembunuhan adalah penghalang warisan (Mani\'ul Irtsi) (Salah).'
+	},
+	{
+		id: 620,
+		type: 'benar_salah',
+		subject: 'Matematika',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Tentukan status kebenaran pernyataan matematika seputar <strong>Limit Fungsi</strong> berikut:</p>',
+		question_number: 20,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ id: '1', statement: 'Nilai dari lim (x→2) (x² - 4)/(x - 2) adalah sama dengan 4.' },
+			{ id: '2', statement: 'Jika hasil substitusi langsung pada limit fungsi menghasilkan bentuk 0/0, maka nilai limit tersebut otomatis tak terdefinisi dan tidak bisa dicari.' }
+		]),
+		correct_answer: '{"1":"benar","2":"salah"}',
+		points: 4,
+		explanation: '(x-2)(x+2)/(x-2) = x+2 -> 2+2 = 4 (Benar). Bentuk 0/0 adalah tak tentu dan dapat diselesaikan dengan pemfaktoran/L\'Hopital (Salah).'
+	},
+	{
+		id: 621,
+		type: 'menjodohkan',
+		subject: 'Matematika',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Jodohkan turunan pertama fungsi berikut:</p>',
+		question_number: 21,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify({
+			left: [
+				{ key: '1', text: 'f(x) = x³' },
+				{ key: '2', text: 'f(x) = 5x²' },
+				{ key: '3', text: 'f(x) = 7x' }
+			],
+			right: [
+				{ key: 'A', text: 'f\'(x) = 3x²' },
+				{ key: 'B', text: 'f\'(x) = 10x' },
+				{ key: 'C', text: 'f\'(x) = 7' }
+			]
+		}),
+		correct_answer: '{"1":"A","2":"B","3":"C"}',
+		points: 4,
+		explanation: 'Turunan fungsi aljabar dasar ax^n -> n.a.x^(n-1).'
+	},
+	{
+		id: 622,
+		type: 'menjodohkan',
+		subject: 'SKI',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Jodohkan ilmuwan muslim masa Daulah Umayyah di Andalusia dengan bidang keahliannya:</p>',
+		question_number: 22,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify({
+			left: [
+				{ key: '1', text: 'Ibnu Rusyd (Averroes)' },
+				{ key: '2', text: 'Az-Zahrawi (Albucasis)' },
+				{ key: '3', text: 'Abbas bin Firnas' }
+			],
+			right: [
+				{ key: 'A', text: 'Filsuf dan Pengarang Bidayatul Mujtahid' },
+				{ key: 'B', text: 'Bapak Ilmu Bedah Medis Modern' },
+				{ key: 'C', text: 'Pelopor Penerbangan dan Pembuat Sayap Buatan' }
+			]
+		}),
+		correct_answer: '{"1":"A","2":"B","3":"C"}',
+		points: 4,
+		explanation: 'Para ilmuwan terkemuka Andalusia Spanyol.'
+	},
+	{
+		id: 623,
+		type: 'isian_singkat',
+		subject: 'Matematika',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Jika f(x) = x² - 3x + 8, maka nilai f\'(4) adalah ... <em>(Tuliskan angka jawabannya saja)</em></p>',
+		question_number: 23,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: null,
+		correct_answer: '5',
+		points: 4,
+		explanation: 'f\'(x) = 2x - 3. f\'(4) = 2(4) - 3 = 8 - 3 = 5.'
+	},
+	{
+		id: 624,
+		type: 'isian_singkat',
+		subject: 'Bahasa Indonesia',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Majas perbandingan yang menyamakan dua hal secara langsung tanpa menggunakan kata pembanding (seperti "buku adalah jendela dunia") dinamakan majas...</p>',
+		question_number: 24,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: null,
+		correct_answer: 'metafora',
+		points: 4,
+		explanation: 'Majas metafora menyamakan dua hal secara analogis langsung.'
+	},
+	{
+		id: 625,
+		type: 'essay',
+		subject: 'Akidah Akhlak',
+		jenjang: 'MA',
+		grade: 11,
+		question_text: '<p>Jelaskan bahaya dari sifat <strong>Namimah (Adu Domba)</strong> dan <strong>Fitnah</strong> terhadap kerukunan umat Islam serta bagaimana cara membentengi diri darinya!</p>',
+		question_number: 25,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: null,
+		correct_answer: 'Namimah dan fitnah dapat menghancurkan ukhuwah persaudaraan, menimbulkan kebencian, dan diancam tidak masuk surga. Cara membentengi diri adalah dengan tabayyun (klarifikasi berita), menjaga lisan, dan senantiasa berprasangka baik (husnuzhan).',
+		points: 4,
+		explanation: 'Jawaban mencakup bahaya perpecahan sosial, ancaman dosa, dan pentingnya sikap tabayyun.'
+	}
+];
 
-export const MA_QUESTIONS_GRADE_12: SimulationQuestion[] = MA_QUESTIONS_GRADE_10.map((q, i) => ({
-	...q,
-	id: 701 + i,
-	grade: 12
-}));
+// ==========================================
+// 7. BANK SOAL SIMULASI MA KELAS 12 (25 NOMOR)
+// Khusus siswa MA Kelas 12 (Persiapan Asesmen Madrasah Tingkat Akhir)
+// ==========================================
+export const MA_QUESTIONS_GRADE_12: SimulationQuestion[] = [
+	{
+		id: 701,
+		type: 'pilihan_ganda',
+		subject: "Al-Qur'an Hadis",
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Kandungan <strong>Surah Ali \'Imran ayat 190-191</strong> memerintahkan orang-orang yang berakal (<em>Ulil Albab</em>) untuk senantiasa...</p>',
+		question_number: 1,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Mengingat Allah sambil berdiri, duduk, atau berbaring dan merenungkan penciptaan langit dan bumi' },
+			{ key: 'B', text: 'Mengasingkan diri dari pergaulan masyarakat ramai' },
+			{ key: 'C', text: 'Berpuasa setiap hari tanpa berbuka' },
+			{ key: 'D', text: 'Menghindari ilmu pengetahuan modern' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Karakter Ulil Albab memadukan zikir kepada Allah dan fikir atas keagungan ciptaan-Nya.'
+	},
+	{
+		id: 702,
+		type: 'pilihan_ganda',
+		subject: 'Akidah Akhlak',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Sikap saling menghormati dan menghargai perbedaan keyakinan dan pandangan tanpa menggadaikan prinsip akidah Islam disebut sikap...</p>',
+		question_number: 2,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Tasamuh (Toleransi)' },
+			{ key: 'B', text: 'Ta\'ashub (Fanatisme buta)' },
+			{ key: 'C', text: 'Ananiah' },
+			{ key: 'D', text: 'Tamalluq' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Tasamuh adalah toleransi yang berlandaskan lakum diinukum waliyadiin.'
+	},
+	{
+		id: 703,
+		type: 'pilihan_ganda',
+		subject: 'Fikih',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Rukun pernikahan dalam Islam yang menjadi simbol kerelaan dan ikatan suci antara wali pengantin wanita dengan calon mempelai pria disebut...</p>',
+		question_number: 3,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Ijab dan Qabul (Akad Nikah)' },
+			{ key: 'B', text: 'Khitbah (Lamaran)' },
+			{ key: 'C', text: 'Walimatul \'Ursy' },
+			{ key: 'D', text: 'Rujuk' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Ijab qabul adalah rukun inti terjadinya akad pernikahan.'
+	},
+	{
+		id: 704,
+		type: 'pilihan_ganda',
+		subject: 'SKI',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Tokoh pembaharu Islam dari Mesir yang menyerukan dibukanya pintu ijtihad dan pembaharuan sistem pendidikan Islam adalah...</p>',
+		question_number: 4,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Muhammad Abduh' },
+			{ key: 'B', text: 'Musthafa Kemal Ataturk' },
+			{ key: 'C', text: 'Shah Waliullah' },
+			{ key: 'D', text: 'Ali Jinnah' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Muhammad Abduh adalah mufti dan tokoh pembaharuan Islam Mesir.'
+	},
+	{
+		id: 705,
+		type: 'pilihan_ganda',
+		subject: 'Bahasa Arab',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Ilmu yang mempelajari kaidah keindahan susunan gaya bahasa Arab agar sesuai dengan situasi dan kondisi dinamakan ilmu...</p>',
+		question_number: 5,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Balaghah' },
+			{ key: 'B', text: 'Nahwu' },
+			{ key: 'C', text: 'Sharaf' },
+			{ key: 'D', text: 'Tajwid' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Ilmu Balaghah mencakup kajian Ma\'ani, Bayan, dan Badi\'.'
+	},
+	{
+		id: 706,
+		type: 'pilihan_ganda',
+		subject: 'Matematika',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Hasil dari integral tak tentu <strong>∫ (6x² - 4x + 3) dx</strong> adalah...</p>',
+		question_number: 6,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: '2x³ - 2x² + 3x + C' },
+			{ key: 'B', text: '3x³ - 2x² + 3x + C' },
+			{ key: 'C', text: '2x³ - 4x² + 3x + C' },
+			{ key: 'D', text: '6x³ - 2x² + 3x + C' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: '∫ 6x² dx = 2x³, ∫ -4x dx = -2x², ∫ 3 dx = 3x. Hasil: 2x³ - 2x² + 3x + C.'
+	},
+	{
+		id: 707,
+		type: 'pilihan_ganda',
+		subject: 'Bahasa Indonesia',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Artikel opini resmi yang ditulis oleh redaksi surat kabar untuk menanggapi suatu peristiwa aktual yang sedang hangat diperbincangkan disebut...</p>',
+		question_number: 7,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Teks Editorial (Tajuk Rencana)' },
+			{ key: 'B', text: 'Teks Iklan' },
+			{ key: 'C', text: 'Teks Cerpen' },
+			{ key: 'D', text: 'Teks Deskripsi' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Teks editorial adalah sikap dan pandangan resmi dewan redaksi media.'
+	},
+	{
+		id: 708,
+		type: 'pilihan_ganda',
+		subject: 'IPA',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Gelombang elektromagnetik yang memiliki frekuensi tertinggi dan daya tembus paling kuat sehingga dimanfaatkan dalam terapi kanker adalah...</p>',
+		question_number: 8,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Sinar Gamma' },
+			{ key: 'B', text: 'Sinar Inframerah' },
+			{ key: 'C', text: 'Gelombang Mikro' },
+			{ key: 'D', text: 'Gelombang Radio' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Sinar gamma memiliki energi foton dan frekuensi paling tinggi dalam spektrum EM.'
+	},
+	{
+		id: 709,
+		type: 'pilihan_ganda',
+		subject: 'IPS',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Kondisi terjadinya ketidakseimbangan atau jurang pemisah yang mencolok dalam pemenuhan hak dan fasilitas ekonomi antara kelompok kaya dan miskin disebut...</p>',
+		question_number: 9,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Ketimpangan Sosial Ekonomi' },
+			{ key: 'B', text: 'Integrasi Bangsa' },
+			{ key: 'C', text: 'Asimilasi Budaya' },
+			{ key: 'D', text: 'Akomodasi' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Ketimpangan sosial adalah disparitas nyata antarlapisan masyarakat.'
+	},
+	{
+		id: 710,
+		type: 'pilihan_ganda',
+		subject: 'Akidah Akhlak',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Konsep moderasi beragama dalam Islam yang menempatkan umat di jalan tengah yang adil, seimbang, dan tidak ekstrem dinamakan...</p>',
+		question_number: 10,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Wasathiyah (Ummatan Wasathan)' },
+			{ key: 'B', text: 'Ghulww (Ekstremisme)' },
+			{ key: 'C', text: 'Ifrath' },
+			{ key: 'D', text: 'Tafrith' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Wasathiyah adalah prinsip jalan tengah moderat rahmatan lil \'alamin.'
+	},
+	{
+		id: 711,
+		type: 'pilihan_ganda',
+		subject: 'Matematika',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Dari 5 orang calon pengurus madrasah, akan dipilih 3 orang anggota delegasi. Banyaknya cara pemilihan delegasi tersebut adalah...</p>',
+		question_number: 11,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: '10' },
+			{ key: 'B', text: '20' },
+			{ key: 'C', text: '15' },
+			{ key: 'D', text: '60' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Kombinasi C(5,3) = 5! / (3! × 2!) = (5 × 4) / 2 = 10 cara.'
+	},
+	{
+		id: 712,
+		type: 'pilihan_ganda',
+		subject: 'Fikih',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Menyamakan hukum suatu perkara baru yang belum ada nashnya dengan perkara yang sudah ada nash hukumnya karena kesamaan \'illat (alasan) hukum dinamakan...</p>',
+		question_number: 12,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Qiyas' },
+			{ key: 'B', text: 'Ijma\'' },
+			{ key: 'C', text: 'Istihsan' },
+			{ key: 'D', text: 'Maslahah Mursalah' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Qiyas adalah analogi hukum atas dasar kesamaan \'illat.'
+	},
+	{
+		id: 713,
+		type: 'pilihan_ganda',
+		subject: 'IPA',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Peristiwa terlepasnya elektron dari permukaan suatu logam akibat disinari radiasi cahaya berfrekuensi di atas frekuensi ambang dinamakan peristiwa...</p>',
+		question_number: 13,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Efek Fotolistrik' },
+			{ key: 'B', text: 'Efek Compton' },
+			{ key: 'C', text: 'Difraksi Sinar-X' },
+			{ key: 'D', text: 'Radiasi Benda Hitam' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Efek fotolistrik dibuktikan oleh Albert Einstein (penghargaan Nobel Fisika).'
+	},
+	{
+		id: 714,
+		type: 'pilihan_ganda',
+		subject: 'Bahasa Arab',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Susunan kalimat \'Adad Ma\'dud yang tepat untuk mengungkapkan <em>"tiga orang laki-laki"</em> dalam bahasa Arab adalah...</p>',
+		question_number: 14,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'ثَلَاثَةُ رِجَالٍ' },
+			{ key: 'B', text: 'ثَلَاثُ رِجَالٍ' },
+			{ key: 'C', text: 'ثَلَاثَةُ نِسَاءٍ' },
+			{ key: 'D', text: 'ثَلَاثُ امْرَأَةٍ' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Untuk bilangan 3-10, jenis \'adad berlawanan dengan mufrad ma\'dud (rijal mudzakkar maka adad muannats: tsalatsatu rijalin).'
+	},
+	{
+		id: 715,
+		type: 'pilihan_ganda',
+		subject: 'SKI',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Organisasi pergerakan Islam terbesar di Nusantara yang didirikan oleh para ulama pesantren di bawah kepemimpinan KH. Hasyim Asy\'ari pada tahun 1926 adalah...</p>',
+		question_number: 15,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Nahdlatul Ulama (NU)' },
+			{ key: 'B', text: 'Muhammadiyah' },
+			{ key: 'C', text: 'Sarekat Islam' },
+			{ key: 'D', text: 'Persatuan Islam (Persis)' }
+		]),
+		correct_answer: 'A',
+		points: 4,
+		explanation: 'Nahdlatul Ulama didirikan pada 16 Rajab 1344 H / 31 Januari 1926 di Surabaya.'
+	},
+	{
+		id: 716,
+		type: 'pilihan_ganda_kompleks',
+		subject: "Al-Qur'an Hadis",
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Berdasarkan <strong>Surah Ali \'Imran ayat 159</strong>, prinsip utama dalam bermusyawarah dan menyelesaikan masalah umat adalah... <em>(Pilih 2 jawaban)</em></p>',
+		question_number: 16,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Bersikap lemah lembut dan tidak berhati kasar' },
+			{ key: 'B', text: 'Memberi maaf dan memohonkan ampunan bagi sesama' },
+			{ key: 'C', text: 'Memaksakan kehendak pribadi kepada orang lain' },
+			{ key: 'D', text: 'Mementingkan keuntungan kelompok sendiri' }
+		]),
+		correct_answer: '["A","B"]',
+		points: 4,
+		explanation: 'QS Ali Imran: 159 memerintahkan lemah lembut, pemaaf, dan musyawarah.'
+	},
+	{
+		id: 717,
+		type: 'pilihan_ganda_kompleks',
+		subject: 'IPA',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Berikut ini yang merupakan contoh penerapan <strong>Bioteknologi Rekayasa Genetika</strong> modern di bidang kesehatan adalah... <em>(Pilih 2 jawaban)</em></p>',
+		question_number: 17,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Pembuatan hormon insulin rekombinan dengan bakteri E. coli' },
+			{ key: 'B', text: 'Produksi antibodi monoklonal untuk pengobatan tumor' },
+			{ key: 'C', text: 'Pembuatan tapai ketan menggunakan ragi tradisional' },
+			{ key: 'D', text: 'Pembuatan cuka makan dari fermentasi alkohol' }
+		]),
+		correct_answer: '["A","B"]',
+		points: 4,
+		explanation: 'Insulin rekombinan dan antibodi monoklonal adalah bioteknologi modern DNA.'
+	},
+	{
+		id: 718,
+		type: 'pilihan_ganda_kompleks',
+		subject: 'IPS',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Sikap kritis dan bijaksana yang harus dimiliki oleh generasi muda dalam menghadapi <strong>arus globalisasi</strong> adalah... <em>(Pilih 2 jawaban)</em></p>',
+		question_number: 18,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Menyaring budaya asing dengan berpegang teguh pada nilai agama dan Pancasila' },
+			{ key: 'B', text: 'Memanfaatkan kemajuan IPTEK dunia untuk kemajuan bangsa dan madrasah' },
+			{ key: 'C', text: 'Menerima seluruh tren barat secara membabi buta' },
+			{ key: 'D', text: 'Menutup diri total dari perkembangan dunia luar' }
+		]),
+		correct_answer: '["A","B"]',
+		points: 4,
+		explanation: 'Menyaring budaya secara kritis dan memanfaatkan kemajuan teknologi secara positif.'
+	},
+	{
+		id: 719,
+		type: 'benar_salah',
+		subject: 'Fikih',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Tentukan status kebenaran (<strong>Benar</strong> atau <strong>Salah</strong>) mengenai hukum pernikahan dan talak:</p>',
+		question_number: 19,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ id: '1', statement: 'Mahar (mas kawin) merupakan hak murni milik mempelai wanita dan bukan milik orang tuanya.' },
+			{ id: '2', statement: 'Suami yang menjatuhkan talak tiga (talak bain kubra) boleh langsung rujuk kembali kapan saja tanpa syarat.' }
+		]),
+		correct_answer: '{"1":"benar","2":"salah"}',
+		points: 4,
+		explanation: 'Mahar adalah hak mutlak istri (Benar). Talak tiga mensyaratkan muhallil sah agar boleh menikah kembali (Salah).'
+	},
+	{
+		id: 720,
+		type: 'benar_salah',
+		subject: 'Matematika',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Tentukan status kebenaran pernyataan matematika kaidah pencacahan berikut:</p>',
+		question_number: 20,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ id: '1', statement: 'Nilai dari 5 faktorial (5!) adalah sama dengan 120.' },
+			{ id: '2', statement: 'Rumus permutasi digunakan apabila urutan pemilihan objek tidak diperhatikan sama sekali.' }
+		]),
+		correct_answer: '{"1":"benar","2":"salah"}',
+		points: 4,
+		explanation: '5! = 5×4×3×2×1 = 120 (Benar). Permutasi memperhatikan urutan, yang tidak memperhatikan urutan adalah kombinasi (Salah).'
+	},
+	{
+		id: 721,
+		type: 'menjodohkan',
+		subject: 'Matematika',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Jodohkan nilai integral tentu berikut:</p>',
+		question_number: 21,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify({
+			left: [
+				{ key: '1', text: '∫ (dari 0 sampai 2) 2x dx' },
+				{ key: '2', text: '∫ (dari 0 sampai 1) 3x² dx' },
+				{ key: '3', text: '∫ (dari 1 sampai 3) 2 dx' }
+			],
+			right: [
+				{ key: 'A', text: '4' },
+				{ key: 'B', text: '1' },
+				{ key: 'C', text: '4' }
+			]
+		}),
+		correct_answer: '{"1":"A","2":"B","3":"C"}',
+		points: 4,
+		explanation: '[x²](0->2) = 4; [x³](0->1) = 1; [2x](1->3) = 6 - 2 = 4.'
+	},
+	{
+		id: 722,
+		type: 'menjodohkan',
+		subject: 'SKI',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Jodohkan organisasi Islam di Indonesia berikut dengan tokoh pendirinya:</p>',
+		question_number: 22,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify({
+			left: [
+				{ key: '1', text: 'Nahdlatul Ulama' },
+				{ key: '2', text: 'Muhammadiyah' },
+				{ key: '3', text: 'Sarekat Islam' }
+			],
+			right: [
+				{ key: 'A', text: 'KH. Hasyim Asy\'ari' },
+				{ key: 'B', text: 'KH. Ahmad Dahlan' },
+				{ key: 'C', text: 'HOS Tjokroaminoto' }
+			]
+		}),
+		correct_answer: '{"1":"A","2":"B","3":"C"}',
+		points: 4,
+		explanation: 'NU (KH Hasyim Asy\'ari), Muhammadiyah (KH Ahmad Dahlan), Sarekat Islam (HOS Tjokroaminoto).'
+	},
+	{
+		id: 723,
+		type: 'isian_singkat',
+		subject: 'Matematika',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Banyaknya susunan huruf yang dapat dibentuk dari kata <strong>"BUMI"</strong> tanpa pengulangan adalah ... <em>(Tuliskan angka jawabannya saja)</em></p>',
+		question_number: 23,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: null,
+		correct_answer: '24',
+		points: 4,
+		explanation: '4 huruf berbeda: 4! = 4 × 3 × 2 × 1 = 24 susunan.'
+	},
+	{
+		id: 724,
+		type: 'isian_singkat',
+		subject: 'Bahasa Indonesia',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Surat yang dibuat oleh pelamar yang ditujukan kepada instansi atau perusahaan dengan maksud memohon pekerjaan dinamakan surat...</p>',
+		question_number: 24,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: null,
+		correct_answer: 'lamaran pekerjaan',
+		points: 4,
+		explanation: 'Surat lamaran pekerjaan dibuat untuk mengajukan permohonan bekerja.'
+	},
+	{
+		id: 725,
+		type: 'essay',
+		subject: 'Akidah Akhlak',
+		jenjang: 'MA',
+		grade: 12,
+		question_text: '<p>Uraikan tiga pilar persaudaraan dalam ajaran Islam: <strong>Ukhuwah Islamiyah, Ukhuwah Wathaniyah, dan Ukhuwah Basyariyah</strong> dalam menjaga kerukunan bangsa Indonesia!</p>',
+		question_number: 25,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: null,
+		correct_answer: 'Ukhuwah Islamiyah adalah persaudaraan sesama muslim; Ukhuwah Wathaniyah adalah persaudaraan sebangsa dan setanah air meski berbeda suku dan agama; Ukhuwah Basyariyah adalah persaudaraan universal sesama umat manusia. Ketiganya menjadi pondasi kerukunan dan kedamaian NKRI.',
+		points: 4,
+		explanation: 'Jawaban mencakup konsep tiga dimensi persaudaraan dalam pemikiran moderasi Islam Indonesia.'
+	}
+];
 
 // ==========================================
 // FUNGSI PARSER TINGKAT KELAS & JENJANG
