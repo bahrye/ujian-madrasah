@@ -22,6 +22,7 @@ export interface ExamSelectItem {
 
 export const load: PageServerLoad = async ({ platform, locals }) => {
 	if (!locals.user) throw redirect(302, '/login');
+	const db = getDB(platform);
 	const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
 
 	const tokensRaw = await db.prepare(`
@@ -56,21 +57,21 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		JOIN exam_types et ON e.exam_type_id = et.id
 		LEFT JOIN classes c ON e.class_id = c.id
-		WHERE e.is_active = 1 AND et.is_active = 1 AND e.school_id = ?
+		WHERE e.is_active = 1 AND et.is_active = 1 AND (? IS NULL OR e.school_id = ?)
 		ORDER BY e.title
-	`).bind(locals.user.school_id).all<any>();
+	`).bind(locals.user.school_id, locals.user.school_id).all<any>();
 
-	const examIds = examsRaw.results.map((e: any) => e.id);
+	const examIds = (examsRaw.results || []).map((e: any) => e.id);
 	let dbSessions: any[] = [];
 	if (examIds.length > 0) {
 		const placeholders = examIds.map(() => '?').join(',');
 		const sessionsResult = await db.prepare(
 			`SELECT exam_id, session_number, start_time, end_time FROM exam_sessions WHERE exam_id IN (${placeholders}) ORDER BY session_number`
 		).bind(...examIds).all();
-		dbSessions = sessionsResult.results;
+		dbSessions = sessionsResult.results || [];
 	}
 
-	const processedExams: ExamSelectItem[] = examsRaw.results.map((exam: any) => {
+	const processedExams: ExamSelectItem[] = (examsRaw.results || []).map((exam: any) => {
 		const examDbSessions = dbSessions.filter((s: any) => s.exam_id === exam.id);
 		let finalSessions: ExamSessionItem[] = [];
 
