@@ -37,12 +37,21 @@ export const load: LayoutServerLoad = async ({ locals, platform }) => {
 			}
 
 			if (locals.user.role === 'siswa') {
-				const student = await db.prepare('SELECT place_of_birth, date_of_birth FROM users WHERE id = ?')
+				const student = await db.prepare('SELECT nisn, nomor_peserta, place_of_birth, date_of_birth FROM users WHERE id = ?')
 					.bind(locals.user.id)
-					.first<{ place_of_birth: string; date_of_birth: string }>();
+					.first<{ nisn: string | null; nomor_peserta: string | null; place_of_birth: string | null; date_of_birth: string | null }>();
 				if (student) {
+					userInfo.nisn = student.nisn;
+					userInfo.nomor_peserta = student.nomor_peserta;
 					userInfo.place_of_birth = student.place_of_birth;
 					userInfo.date_of_birth = student.date_of_birth;
+				}
+			} else if (locals.user.role === 'guru' || locals.user.role === 'pengawas') {
+				const staff = await db.prepare('SELECT nip FROM users WHERE id = ?')
+					.bind(locals.user.id)
+					.first<{ nip: string | null }>();
+				if (staff?.nip) {
+					userInfo.nip = staff.nip;
 				}
 			}
 		} catch (e) {

@@ -113,6 +113,19 @@
 						{/if}
 
 						{#if user?.role === 'siswa'}
+							<!-- Nomor Peserta -->
+							{#if userInfo?.nomor_peserta || user?.username}
+								<div class="flex items-start gap-3 text-sm group">
+									<div class="w-8 h-8 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center flex-shrink-0 group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300 shadow-sm">
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+									</div>
+									<div class="min-w-0 flex-1 pt-0.5">
+										<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Nomor Peserta</p>
+										<p class="font-semibold text-slate-700 text-xs truncate">{userInfo?.nomor_peserta || user?.username}</p>
+									</div>
+								</div>
+							{/if}
+
 							<!-- NISN -->
 							<div class="flex items-start gap-3 text-sm group">
 								<div class="w-8 h-8 rounded-xl bg-sky-50 text-sky-500 flex items-center justify-center flex-shrink-0 group-hover:bg-sky-500 group-hover:text-white transition-colors duration-300 shadow-sm">
@@ -120,7 +133,7 @@
 								</div>
 								<div class="min-w-0 flex-1 pt-0.5">
 									<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">NISN</p>
-									<p class="font-semibold text-slate-700 text-xs truncate">{user?.username}</p>
+									<p class="font-semibold text-slate-700 text-xs truncate font-mono">{userInfo?.nisn || '-'}</p>
 								</div>
 							</div>
 							
@@ -132,6 +145,17 @@
 								<div class="min-w-0 flex-1 pt-0.5">
 									<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Tempat, Tanggal Lahir</p>
 									<p class="font-semibold text-slate-700 text-xs truncate">{formatBirth(userInfo?.place_of_birth, userInfo?.date_of_birth)}</p>
+								</div>
+							</div>
+						{:else if (user?.role === 'guru' || user?.role === 'pengawas') && userInfo?.nip}
+							<!-- NIP -->
+							<div class="flex items-start gap-3 text-sm group">
+								<div class="w-8 h-8 rounded-xl bg-sky-50 text-sky-500 flex items-center justify-center flex-shrink-0 group-hover:bg-sky-500 group-hover:text-white transition-colors duration-300 shadow-sm">
+									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" /></svg>
+								</div>
+								<div class="min-w-0 flex-1 pt-0.5">
+									<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">NIP</p>
+									<p class="font-semibold text-slate-700 text-xs truncate font-mono">{userInfo.nip}</p>
 								</div>
 							</div>
 						{/if}
