@@ -15,11 +15,1591 @@ export interface SimulationQuestion {
 	explanation?: string;
 }
 
-// ==========================================
-// 1. BANK SOAL SIMULASI MI (15 NOMOR)
+// =========================================================================
+// 1. BANK SOAL SIMULASI MI KELAS 1 (15 NOMOR)
 // Meliputi: Bahasa Arab, Matematika, IPA, IPS, Bahasa Indonesia, Akidah Akhlak, SKI, Fikih, Al-Qur'an Hadis
-// ==========================================
-export const MI_QUESTIONS_UPPER: SimulationQuestion[] = [
+// =========================================================================
+export const MI_QUESTIONS_GRADE_1: SimulationQuestion[] = [
+	{
+		id: 1101,
+		type: 'pilihan_ganda',
+		subject: "Al-Qur'an Hadis",
+		jenjang: 'MI',
+		grade: 1,
+		question_text: '<p>Huruf hijaiyah <strong>بَ</strong> jika diberi tanda baca fathah dibaca...</p>',
+		question_number: 1,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Ba' },
+			{ key: 'B', text: 'Bi' },
+			{ key: 'C', text: 'Bu' },
+			{ key: 'D', text: 'Ban' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Huruf Ba dengan tanda fathah di atasnya dibaca "Ba".'
+	},
+	{
+		id: 1102,
+		type: 'pilihan_ganda',
+		subject: 'Akidah Akhlak',
+		jenjang: 'MI',
+		grade: 1,
+		question_text: '<p>Dua kalimat syahadat berbunyi <em>"Asyhadu an laa ilaaha illallaah..."</em> artinya bersaksi bahwa tidak ada Tuhan selain...</p>',
+		question_number: 2,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Allah SWT' },
+			{ key: 'B', text: 'Malaikat' },
+			{ key: 'C', text: 'Nabi' },
+			{ key: 'D', text: 'Matahari' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Syahadat tauhid bermakna tiada sesembahan yang berhak disembah selain Allah SWT.'
+	},
+	{
+		id: 1103,
+		type: 'pilihan_ganda',
+		subject: 'Fikih',
+		jenjang: 'MI',
+		grade: 1,
+		question_text: '<p>Shalat fardhu yang dikerjakan pada pagi hari sebelum terbit matahari sebanyak dua rakaat adalah shalat...</p>',
+		question_number: 3,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Subuh' },
+			{ key: 'B', text: 'Dzuhur' },
+			{ key: 'C', text: 'Ashar' },
+			{ key: 'D', text: 'Maghrib' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Shalat Subuh berjumlah dua rakaat pada waktu fajar subuh.'
+	},
+	{
+		id: 1104,
+		type: 'pilihan_ganda',
+		subject: 'SKI',
+		jenjang: 'MI',
+		grade: 1,
+		question_text: '<p>Nabi dan Rasul terakhir yang menjadi teladan dan panutan kita semua adalah Nabi...</p>',
+		question_number: 4,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Muhammad SAW' },
+			{ key: 'B', text: 'Ibrahim AS' },
+			{ key: 'C', text: 'Musa AS' },
+			{ key: 'D', text: 'Adam AS' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Nabi Muhammad SAW adalah nabi dan rasul terakhir penutup para nabi (Khatamul Anbiya).'
+	},
+	{
+		id: 1105,
+		type: 'pilihan_ganda',
+		subject: 'Bahasa Arab',
+		jenjang: 'MI',
+		grade: 1,
+		question_text: '<p>Angka satu (1) dalam bahasa Arab adalah...</p>',
+		question_number: 5,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'وَاحِدٌ (Wahidun)' },
+			{ key: 'B', text: 'اِثْنَانِ (Itsnani)' },
+			{ key: 'C', text: 'ثَلَاثَةٌ (Tsalatsatun)' },
+			{ key: 'D', text: 'أَرْبَعَةٌ (Arba\'atun)' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'وَاحِدٌ (Wahidun) artinya satu.'
+	},
+	{
+		id: 1106,
+		type: 'pilihan_ganda',
+		subject: 'Bahasa Indonesia',
+		jenjang: 'MI',
+		grade: 1,
+		question_text: '<p>Huruf vokal yang terdapat pada kata <strong>"BUKU"</strong> adalah huruf...</p>',
+		question_number: 6,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'u' },
+			{ key: 'B', text: 'b' },
+			{ key: 'C', text: 'k' },
+			{ key: 'D', text: 'm' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Huruf vokal ada 5: a, i, u, e, o. Pada kata "buku", huruf vokalnya adalah u.'
+	},
+	{
+		id: 1107,
+		type: 'pilihan_ganda',
+		subject: 'Matematika',
+		jenjang: 'MI',
+		grade: 1,
+		question_text: '<p>Di meja ada 8 pensil warna. Kakak menaruh lagi 5 pensil warna. Berapa jumlah semua pensil warna sekarang?</p>',
+		question_number: 7,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: '13' },
+			{ key: 'B', text: '12' },
+			{ key: 'C', text: '14' },
+			{ key: 'D', text: '11' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: '8 + 5 = 13 pensil warna.'
+	},
+	{
+		id: 1108,
+		type: 'pilihan_ganda',
+		subject: 'IPA',
+		jenjang: 'MI',
+		grade: 1,
+		question_text: '<p>Bagian tubuh kita yang berguna untuk mendengarkan suara bel madrasah berbunyi adalah...</p>',
+		question_number: 8,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Telinga' },
+			{ key: 'B', text: 'Mata' },
+			{ key: 'C', text: 'Hidung' },
+			{ key: 'D', text: 'Lidah' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Telinga adalah panca indra untuk mendengar bunyi.'
+	},
+	{
+		id: 1109,
+		type: 'pilihan_ganda',
+		subject: 'IPS',
+		jenjang: 'MI',
+		grade: 1,
+		question_text: '<p>Orang tua perempuan yang melahirkan, menyayangi, dan merawat kita di rumah disebut...</p>',
+		question_number: 9,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Ibu' },
+			{ key: 'B', text: 'Bibi' },
+			{ key: 'C', text: 'Kakak' },
+			{ key: 'D', text: 'Nenek' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Ibu adalah orang tua perempuan yang merawat dan mengasuh kita.'
+	},
+	{
+		id: 1110,
+		type: 'pilihan_ganda_kompleks',
+		subject: "Al-Qur'an Hadis",
+		jenjang: 'MI',
+		grade: 1,
+		question_text: '<p>Kalimat thayyibah yang kita ucapkan <strong>sebelum makan</strong> dan <strong>setelah selesai makan</strong> adalah... <em>(Pilih 2 jawaban)</em></p>',
+		question_number: 10,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Bismillah (sebelum makan)' },
+			{ key: 'B', text: 'Alhamdulillah (setelah makan)' },
+			{ key: 'C', text: 'Innalillahi' },
+			{ key: 'D', text: 'Astaghfirullah' }
+		]),
+		correct_answer: '["A","B"]',
+		points: 7,
+		explanation: 'Sebelum makan membaca Bismillah, sesudah makan bersyukur dengan Alhamdulillah.'
+	},
+	{
+		id: 1111,
+		type: 'pilihan_ganda_kompleks',
+		subject: 'IPA',
+		jenjang: 'MI',
+		grade: 1,
+		question_text: '<p>Benda-benda di sekitar kita berikut ini yang memiliki bentuk <strong>lingkaran</strong> adalah... <em>(Pilih 2 jawaban)</em></p>',
+		question_number: 11,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Uang koin logam' },
+			{ key: 'B', text: 'Roda sepeda' },
+			{ key: 'C', text: 'Buku tulis' },
+			{ key: 'D', text: 'Pintu kelas' }
+		]),
+		correct_answer: '["A","B"]',
+		points: 7,
+		explanation: 'Uang koin dan roda sepeda berbentuk lingkaran.'
+	},
+	{
+		id: 1112,
+		type: 'benar_salah',
+		subject: 'Fikih',
+		jenjang: 'MI',
+		grade: 1,
+		question_text: '<p>Tentukan apakah pernyataan jumlah rakaat shalat fardhu berikut <strong>Benar</strong> atau <strong>Salah</strong>:</p>',
+		question_number: 12,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ id: '1', statement: 'Shalat Subuh terdiri dari 2 rakaat.' },
+			{ id: '2', statement: 'Shalat Maghrib terdiri dari 4 rakaat.' }
+		]),
+		correct_answer: '{"1":"benar","2":"salah"}',
+		points: 7,
+		explanation: 'Shalat Subuh 2 rakaat (Benar). Shalat Maghrib 3 rakaat bukan 4 (Salah).'
+	},
+	{
+		id: 1113,
+		type: 'menjodohkan',
+		subject: 'Bahasa Arab',
+		jenjang: 'MI',
+		grade: 1,
+		question_text: '<p>Jodohkan panggilan keluarga dalam bahasa Arab dengan artinya:</p>',
+		question_number: 13,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify({
+			left: [
+				{ key: '1', text: 'أَبٌ (Abun)' },
+				{ key: '2', text: 'أُمٌّ (Ummun)' },
+				{ key: '3', text: 'أَخٌ (Akhun)' }
+			],
+			right: [
+				{ key: 'A', text: 'Ayah' },
+				{ key: 'B', text: 'Ibu' },
+				{ key: 'C', text: 'Saudara Laki-laki' }
+			]
+		}),
+		correct_answer: '{"1":"A","2":"B","3":"C"}',
+		points: 7,
+		explanation: 'Abun = Ayah, Ummun = Ibu, Akhun = Saudara laki-laki.'
+	},
+	{
+		id: 1114,
+		type: 'isian_singkat',
+		subject: 'Matematika',
+		jenjang: 'MI',
+		grade: 1,
+		question_text: '<p>Berapa hasil dari <strong>15 - 6</strong>? <em>(Tuliskan angka jawabannya saja)</em></p>',
+		question_number: 14,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: null,
+		correct_answer: '9',
+		points: 7,
+		explanation: '15 dikurangi 6 sama dengan 9.'
+	},
+	{
+		id: 1115,
+		type: 'essay',
+		subject: 'Akidah Akhlak',
+		jenjang: 'MI',
+		grade: 1,
+		question_text: '<p>Tuliskan contoh perbuatan patuh dan hormat kepada ayah dan ibu ketika berada di rumah!</p>',
+		question_number: 15,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: null,
+		correct_answer: 'Mendengarkan nasehat orang tua, mencium tangan saat pamit, dan membantu merapikan mainan.',
+		points: 7,
+		explanation: 'Sikap sopan, patuh, dan membantu orang tua adalah akhlak mulia anak sholeh.'
+	}
+];
+
+// =========================================================================
+// 2. BANK SOAL SIMULASI MI KELAS 2 (15 NOMOR)
+// Meliputi: Bahasa Arab, Matematika, IPA, IPS, Bahasa Indonesia, Akidah Akhlak, SKI, Fikih, Al-Qur'an Hadis
+// =========================================================================
+export const MI_QUESTIONS_GRADE_2: SimulationQuestion[] = [
+	{
+		id: 1201,
+		type: 'pilihan_ganda',
+		subject: "Al-Qur'an Hadis",
+		jenjang: 'MI',
+		grade: 2,
+		question_text: '<p>Surah An-Nas dan Surah Al-Falaq disebut juga <em>Al-Mu\'awwidzatain</em> yang diturunkan untuk memohon perlindungan kepada Allah dari...</p>',
+		question_number: 1,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Segala macam kejahatan makhluk dan godaan setan' },
+			{ key: 'B', text: 'Rasa lapar dan haus semata' },
+			{ key: 'C', text: 'Hujan deras dan petir' },
+			{ key: 'D', text: 'Rasa kantuk di siang hari' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Al-Mu\'awwidzatain adalah dua surah perlindungan dari kejahatan malam, sihir, hasad, dan bisikan setan.'
+	},
+	{
+		id: 1202,
+		type: 'pilihan_ganda',
+		subject: 'Akidah Akhlak',
+		jenjang: 'MI',
+		grade: 2,
+		question_text: '<p>Allah SWT memiliki Asmaul Husna <strong>Al-Khaliq</strong>, yang artinya Allah Maha...</p>',
+		question_number: 2,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Pencipta seluruh alam semesta' },
+			{ key: 'B', text: 'Mendengar' },
+			{ key: 'C', text: 'Melihat' },
+			{ key: 'D', text: 'Merajai' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Al-Khaliq bermakna Allah Maha Pencipta segala sesuatu.'
+	},
+	{
+		id: 1203,
+		type: 'pilihan_ganda',
+		subject: 'Fikih',
+		jenjang: 'MI',
+		grade: 2,
+		question_text: '<p>Hal yang dapat membatalkan wudhu seorang muslim adalah...</p>',
+		question_number: 3,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Buang air kecil atau buang angin (kentut)' },
+			{ key: 'B', text: 'Minum segelas air putih' },
+			{ key: 'C', text: 'Berbicara sopan kepada guru' },
+			{ key: 'D', text: 'Tersenyum ramah kepada teman' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Keluarnya sesuatu dari qubul dan dubur membatalkan wudhu.'
+	},
+	{
+		id: 1204,
+		type: 'pilihan_ganda',
+		subject: 'SKI',
+		jenjang: 'MI',
+		grade: 2,
+		question_text: '<p>Ketika masih bayi, Nabi Muhammad SAW diasuh dan disusui oleh seorang ibu yang baik hati dari perkampungan Bani Sa\'ad bernama...</p>',
+		question_number: 4,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Halimah As-Sa\'diyah' },
+			{ key: 'B', text: 'Ummu Aiman' },
+			{ key: 'C', text: 'Fatimah binti Asad' },
+			{ key: 'D', text: 'Khadijah' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Ibu susuan Nabi Muhammad SAW adalah Halimah As-Sa\'diyah.'
+	},
+	{
+		id: 1205,
+		type: 'pilihan_ganda',
+		subject: 'Bahasa Arab',
+		jenjang: 'MI',
+		grade: 2,
+		question_text: '<p>Perhatikan gambar dan kata berikut: <strong>مِسْطَرَةٌ</strong>. Benda perlengkapan sekolah ini adalah...</p>',
+		question_number: 5,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Penggaris' },
+			{ key: 'B', text: 'Buku tulis' },
+			{ key: 'C', text: 'Kotak pensil' },
+			{ key: 'D', text: 'Tas sekolah' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'مِسْطَرَةٌ (Misthorotun) berarti penggaris.'
+	},
+	{
+		id: 1206,
+		type: 'pilihan_ganda',
+		subject: 'Bahasa Indonesia',
+		jenjang: 'MI',
+		grade: 2,
+		question_text: '<p>Penulisan huruf kapital yang tepat di awal nama orang dan awal kalimat adalah...</p>',
+		question_number: 6,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Ahmad dan Yusuf membaca Al-Qur\'an di serambi masjid.' },
+			{ key: 'B', text: 'ahmad dan yusuf membaca al-qur\'an di serambi masjid.' },
+			{ key: 'C', text: 'Ahmad Dan Yusuf Membaca Al-qur\'an di serambi masjid.' },
+			{ key: 'D', text: 'ahmad Dan yusuf Membaca Al-Qur\'an di serambi masjid.' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Awal kalimat dan nama orang wajib menggunakan huruf kapital (Ahmad, Yusuf).'
+	},
+	{
+		id: 1207,
+		type: 'pilihan_ganda',
+		subject: 'Matematika',
+		jenjang: 'MI',
+		grade: 2,
+		question_text: '<p>Berapa hasil dari <strong>4 × 5</strong>?</p>',
+		question_number: 7,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: '20' },
+			{ key: 'B', text: '16' },
+			{ key: 'C', text: '24' },
+			{ key: 'D', text: '25' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: '4 × 5 = 5 + 5 + 5 + 5 = 20.'
+	},
+	{
+		id: 1208,
+		type: 'pilihan_ganda',
+		subject: 'IPA',
+		jenjang: 'MI',
+		grade: 2,
+		question_text: '<p>Hewan dan tumbuhan membutuhkan air dan makanan agar dapat bertahan hidup. Hal ini membuktikan bahwa makhluk hidup mengalami proses...</p>',
+		question_number: 8,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Pertumbuhan dan perkembangan' },
+			{ key: 'B', text: 'Pembekuan' },
+			{ key: 'C', text: 'Penguapan' },
+			{ key: 'D', text: 'Pencairan' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Makanan dan air diperlukan untuk tumbuh kembang makhluk hidup.'
+	},
+	{
+		id: 1209,
+		type: 'pilihan_ganda',
+		subject: 'IPS',
+		jenjang: 'MI',
+		grade: 2,
+		question_text: '<p>Ketika tetangga sebelah rumah sedang tertimpa musibah sakit, sikap terpuji yang harus kita lakukan adalah...</p>',
+		question_number: 9,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Menjenguk dan mendoakan kesembuhannya' },
+			{ key: 'B', text: 'Membuat suara bising di depan rumahnya' },
+			{ key: 'C', text: 'Masa bodoh dan pura-pura tidak kenal' },
+			{ key: 'D', text: 'Menertawakan kemalangannya' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Menjenguk orang sakit dan mendoakan adalah adab hidup bertetangga.'
+	},
+	{
+		id: 1210,
+		type: 'pilihan_ganda_kompleks',
+		subject: 'Fikih',
+		jenjang: 'MI',
+		grade: 2,
+		question_text: '<p>Bagian anggota tubuh yang <strong>wajib dibasuh (rukun)</strong> saat berwudhu adalah... <em>(Pilih 2 jawaban)</em></p>',
+		question_number: 10,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Membasuh seluruh wajah (muka)' },
+			{ key: 'B', text: 'Membasuh kedua tangan sampai siku' },
+			{ key: 'C', text: 'Membasuh perut' },
+			{ key: 'D', text: 'Membasuh leher' }
+		]),
+		correct_answer: '["A","B"]',
+		points: 7,
+		explanation: 'Rukun wudhu mencakup membasuh muka dan kedua tangan sampai siku.'
+	},
+	{
+		id: 1211,
+		type: 'pilihan_ganda_kompleks',
+		subject: 'IPA',
+		jenjang: 'MI',
+		grade: 2,
+		question_text: '<p>Hewan-hewan berikut yang berkembang biak dengan cara <strong>bertelur</strong> adalah... <em>(Pilih 2 jawaban)</em></p>',
+		question_number: 11,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Ayam' },
+			{ key: 'B', text: 'Bebek' },
+			{ key: 'C', text: 'Kucing' },
+			{ key: 'D', text: 'Sapi' }
+		]),
+		correct_answer: '["A","B"]',
+		points: 7,
+		explanation: 'Ayam dan bebek berkembang biak secara ovipar (bertelur).'
+	},
+	{
+		id: 1212,
+		type: 'benar_salah',
+		subject: 'Fikih',
+		jenjang: 'MI',
+		grade: 2,
+		question_text: '<p>Tentukan status kebenaran (<strong>Benar</strong> atau <strong>Salah</strong>) syarat sah shalat berikut:</p>',
+		question_number: 12,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ id: '1', statement: 'Menghadap ke arah kiblat merupakan syarat sah shalat.' },
+			{ id: '2', statement: 'Makan dan minum sambil shalat tidak membatalkan shalat.' }
+		]),
+		correct_answer: '{"1":"benar","2":"salah"}',
+		points: 7,
+		explanation: 'Menghadap kiblat syarat sah shalat (Benar). Makan minum membatalkan shalat (Salah).'
+	},
+	{
+		id: 1213,
+		type: 'menjodohkan',
+		subject: 'Bahasa Arab',
+		jenjang: 'MI',
+		grade: 2,
+		question_text: '<p>Jodohkan nama warna dalam bahasa Arab dengan artinya:</p>',
+		question_number: 13,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify({
+			left: [
+				{ key: '1', text: 'أَبْيَضُ (Abyadhu)' },
+				{ key: '2', text: 'أَسْوَدُ (Aswadu)' },
+				{ key: '3', text: 'أَحْمَرُ (Ahmaru)' }
+			],
+			right: [
+				{ key: 'A', text: 'Putih' },
+				{ key: 'B', text: 'Hitam' },
+				{ key: 'C', text: 'Merah' }
+			]
+		}),
+		correct_answer: '{"1":"A","2":"B","3":"C"}',
+		points: 7,
+		explanation: 'Abyadhu = Putih, Aswadu = Hitam, Ahmaru = Merah.'
+	},
+	{
+		id: 1214,
+		type: 'isian_singkat',
+		subject: 'Matematika',
+		jenjang: 'MI',
+		grade: 2,
+		question_text: '<p>Jarum panjang menunjuk angka 12 dan jarum pendek menunjuk angka 4. Jam tersebut menunjukkan pukul ... <em>(Tuliskan angka jamnya saja)</em></p>',
+		question_number: 14,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: null,
+		correct_answer: '4',
+		points: 7,
+		explanation: 'Jarum pendek ke 4 dan jarum panjang ke 12 menunjukkan tepat pukul 4.'
+	},
+	{
+		id: 1215,
+		type: 'essay',
+		subject: 'Akidah Akhlak',
+		jenjang: 'MI',
+		grade: 2,
+		question_text: '<p>Mengapa kita tidak boleh berbohong dan harus selalu berkata jujur kepada guru dan orang tua?</p>',
+		question_number: 15,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: null,
+		correct_answer: 'Karena jujur disukai Allah, membawa ketenangan hati, dan membuat orang tua serta guru percaya kepada kita.',
+		points: 7,
+		explanation: 'Jujur adalah sifat terpuji para nabi yang mendatangkan berkah dan ridha Allah.'
+	}
+];
+
+// =========================================================================
+// 3. BANK SOAL SIMULASI MI KELAS 3 (15 NOMOR)
+// Meliputi: Bahasa Arab, Matematika, IPA, IPS, Bahasa Indonesia, Akidah Akhlak, SKI, Fikih, Al-Qur'an Hadis
+// =========================================================================
+export const MI_QUESTIONS_GRADE_3: SimulationQuestion[] = [
+	{
+		id: 1301,
+		type: 'pilihan_ganda',
+		subject: "Al-Qur'an Hadis",
+		jenjang: 'MI',
+		grade: 3,
+		question_text: '<p>Huruf-huruf Mad Thabi\'i (Mad Asli) dalam kaidah tajwid Al-Qur\'an terdiri dari 3 huruf yaitu...</p>',
+		question_number: 1,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Alif, Wawu, dan Ya (ا, و, ي)' },
+			{ key: 'B', text: 'Ba, Ta, dan Tsa' },
+			{ key: 'C', text: 'Kaf, Lam, dan Mim' },
+			{ key: 'D', text: 'Hamzah, Ha, dan Kha' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Huruf Mad Thabi\'i adalah alif sukun setelah fathah, wawu sukun setelah dhammah, dan ya sukun setelah kasrah.'
+	},
+	{
+		id: 1302,
+		type: 'pilihan_ganda',
+		subject: 'Akidah Akhlak',
+		jenjang: 'MI',
+		grade: 3,
+		question_text: '<p>Allah SWT memiliki sifat wajib <strong>Qidam</strong>, yang artinya Allah Maha...</p>',
+		question_number: 2,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Terdahulu (ada tanpa permulaan)' },
+			{ key: 'B', text: 'Kekal abadi' },
+			{ key: 'C', text: 'Maha Kuasa' },
+			{ key: 'D', text: 'Maha Mendengar' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Qidam artinya terdahulu, ada sebelum segala sesuatu tercipta tanpa permulaan.'
+	},
+	{
+		id: 1303,
+		type: 'pilihan_ganda',
+		subject: 'Fikih',
+		jenjang: 'MI',
+		grade: 3,
+		question_text: '<p>Shalat sunnah yang dikerjakan sebelum shalat fardhu Subuh memiliki keutamaan yang sangat besar, shalat sunnah ini disebut rawatib...</p>',
+		question_number: 3,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Qabliyah Subuh' },
+			{ key: 'B', text: 'Ba\'diyah Subuh' },
+			{ key: 'C', text: 'Tarawih' },
+			{ key: 'D', text: 'Witir' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Shalat dua rakaat qabliyah subuh lebih baik daripada dunia dan seisinya.'
+	},
+	{
+		id: 1304,
+		type: 'pilihan_ganda',
+		subject: 'SKI',
+		jenjang: 'MI',
+		grade: 3,
+		question_text: '<p>Sejak usia muda, Nabi Muhammad SAW dikenal memiliki kepribadian yang sangat jujur dan amanah sehingga penduduk kota Makkah memberinya gelar...</p>',
+		question_number: 4,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Al-Amin' },
+			{ key: 'B', text: 'As-Shiddiq' },
+			{ key: 'C', text: 'Al-Faruq' },
+			{ key: 'D', text: 'Dzulqarnain' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Al-Amin artinya orang yang dapat dipercaya.'
+	},
+	{
+		id: 1305,
+		type: 'pilihan_ganda',
+		subject: 'Bahasa Arab',
+		jenjang: 'MI',
+		grade: 3,
+		question_text: '<p>Perhatikan kata anggota tubuh berikut: <strong>رَأْسٌ</strong>. Anggota tubuh yang dimaksud adalah...</p>',
+		question_number: 5,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Kepala' },
+			{ key: 'B', text: 'Mata' },
+			{ key: 'C', text: 'Tangan' },
+			{ key: 'D', text: 'Kaki' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'رَأْسٌ (Ra\'sun) berarti kepala.'
+	},
+	{
+		id: 1306,
+		type: 'pilihan_ganda',
+		subject: 'Bahasa Indonesia',
+		jenjang: 'MI',
+		grade: 3,
+		question_text: '<p>Cerita dongeng fiksi yang menceritakan kehidupan hewan-hewan yang bertingkah laku dan berbicara seperti manusia dinamakan...</p>',
+		question_number: 6,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Fabel' },
+			{ key: 'B', text: 'Mite' },
+			{ key: 'C', text: 'Legenda' },
+			{ key: 'D', text: 'Sage' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Fabel adalah cerita rakyat yang tokoh-tokohnya diperankan oleh binatang.'
+	},
+	{
+		id: 1307,
+		type: 'pilihan_ganda',
+		subject: 'Matematika',
+		jenjang: 'MI',
+		grade: 3,
+		question_text: '<p>Sebuah semangka dibelah menjadi 8 potong sama besar. Fatimah memakan 3 potong semangka. Bagian semangka yang dimakan Fatimah dinyatakan dalam pecahan adalah...</p>',
+		question_number: 7,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: '3/8' },
+			{ key: 'B', text: '1/8' },
+			{ key: 'C', text: '5/8' },
+			{ key: 'D', text: '3/5' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: '3 potong dari total 8 potong semangka ditulis 3/8.'
+	},
+	{
+		id: 1308,
+		type: 'pilihan_ganda',
+		subject: 'IPA',
+		jenjang: 'MI',
+		grade: 3,
+		question_text: '<p>Perubahan wujud benda dari cair menjadi padat, seperti air yang dimasukkan ke dalam freezer kulkas, dinamakan peristiwa...</p>',
+		question_number: 8,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Membeku' },
+			{ key: 'B', text: 'Mencair' },
+			{ key: 'C', text: 'Menguap' },
+			{ key: 'D', text: 'Menyublim' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Cair menjadi padat dinamakan membeku.'
+	},
+	{
+		id: 1309,
+		type: 'pilihan_ganda',
+		subject: 'IPS',
+		jenjang: 'MI',
+		grade: 3,
+		question_text: '<p>Gambar sederhana yang menunjukkan tata letak ruang kelas, kantor guru, dan perpustakaan di madrasah dinamakan...</p>',
+		question_number: 9,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Denah' },
+			{ key: 'B', text: 'Foto' },
+			{ key: 'C', text: 'Lukisan' },
+			{ key: 'D', text: 'Kaligrafi' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Denah menggambarkan tata letak ruangan atau tempat tertentu.'
+	},
+	{
+		id: 1310,
+		type: 'pilihan_ganda_kompleks',
+		subject: "Al-Qur'an Hadis",
+		jenjang: 'MI',
+		grade: 3,
+		question_text: '<p>Rasulullah SAW bersabda: <em>"Kebersihan itu sebagian dari iman"</em>. Tindakan nyata menjaga kebersihan di lingkungan madrasah adalah... <em>(Pilih 2 jawaban)</em></p>',
+		question_number: 10,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Membuang bungkus makanan ke tempat sampah' },
+			{ key: 'B', text: 'Melaksanakan piket menyapu kelas bersama teman' },
+			{ key: 'C', text: 'Menyimpan sampah di laci meja kelas' },
+			{ key: 'D', text: 'Mencoret-coret meja madrasah dengan spidol' }
+		]),
+		correct_answer: '["A","B"]',
+		points: 7,
+		explanation: 'Membuang sampah pada tempatnya dan rajin piket membersihkan kelas.'
+	},
+	{
+		id: 1311,
+		type: 'pilihan_ganda_kompleks',
+		subject: 'IPA',
+		jenjang: 'MI',
+		grade: 3,
+		question_text: '<p>Benda-benda berikut yang <strong>dapat ditarik oleh gaya magnet</strong> adalah... <em>(Pilih 2 jawaban)</em></p>',
+		question_number: 11,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Paku besi' },
+			{ key: 'B', text: 'Klip kertas dari logam' },
+			{ key: 'C', text: 'Penggaris plastik' },
+			{ key: 'D', text: 'Buku tulis kertas' }
+		]),
+		correct_answer: '["A","B"]',
+		points: 7,
+		explanation: 'Benda magnetis yang terbuat dari besi/baja dapat ditarik magnet.'
+	},
+	{
+		id: 1312,
+		type: 'benar_salah',
+		subject: 'Fikih',
+		jenjang: 'MI',
+		grade: 3,
+		question_text: '<p>Tentukan status kebenaran (<strong>Benar</strong> atau <strong>Salah</strong>) mengenai shalat berjamaah:</p>',
+		question_number: 12,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ id: '1', statement: 'Pahala shalat berjamaah dilipatgandakan 27 derajat dibanding shalat sendirian (munfarid).' },
+			{ id: '2', statement: 'Makmum diperbolehkan mendahului gerakan ruku\' dan sujud imam.' }
+		]),
+		correct_answer: '{"1":"benar","2":"salah"}',
+		points: 7,
+		explanation: 'Pahala shalat jamaah 27 derajat (Benar). Makmum haram mendahului gerakan imam (Salah).'
+	},
+	{
+		id: 1313,
+		type: 'menjodohkan',
+		subject: 'Bahasa Arab',
+		jenjang: 'MI',
+		grade: 3,
+		question_text: '<p>Jodohkan nama anggota tubuh bahasa Arab berikut dengan artinya:</p>',
+		question_number: 13,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify({
+			left: [
+				{ key: '1', text: 'عَيْنٌ (\'Ainun)' },
+				{ key: '2', text: 'أَنْفٌ (Anfun)' },
+				{ key: '3', text: 'يَدٌ (Yadun)' }
+			],
+			right: [
+				{ key: 'A', text: 'Mata' },
+				{ key: 'B', text: 'Hidung' },
+				{ key: 'C', text: 'Tangan' }
+			]
+		}),
+		correct_answer: '{"1":"A","2":"B","3":"C"}',
+		points: 7,
+		explanation: '\'Ainun = Mata, Anfun = Hidung, Yadun = Tangan.'
+	},
+	{
+		id: 1314,
+		type: 'isian_singkat',
+		subject: 'Matematika',
+		jenjang: 'MI',
+		grade: 3,
+		question_text: '<p>Sebuah persegi memiliki panjang sisi 6 cm. Keliling persegi tersebut adalah ... cm. <em>(Tuliskan angka jawabannya saja)</em></p>',
+		question_number: 14,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: null,
+		correct_answer: '24',
+		points: 7,
+		explanation: 'Keliling persegi = 4 × sisi = 4 × 6 = 24 cm.'
+	},
+	{
+		id: 1315,
+		type: 'essay',
+		subject: 'Akidah Akhlak',
+		jenjang: 'MI',
+		grade: 3,
+		question_text: '<p>Jelaskan mengapa seorang murid madrasah tidak boleh menyontek saat mengerjakan ulangan atau ujian!</p>',
+		question_number: 15,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: null,
+		correct_answer: 'Karena menyontek adalah perbuatan curang yang berdosa, dilarang oleh Allah dan Rasulullah, serta merugikan diri sendiri dan orang lain.',
+		points: 7,
+		explanation: 'Menyontek melanggar nilai kejujuran dan amanah dalam Islam.'
+	}
+];
+
+// =========================================================================
+// 4. BANK SOAL SIMULASI MI KELAS 4 (15 NOMOR)
+// Meliputi: Bahasa Arab, Matematika, IPA, IPS, Bahasa Indonesia, Akidah Akhlak, SKI, Fikih, Al-Qur'an Hadis
+// =========================================================================
+export const MI_QUESTIONS_GRADE_4: SimulationQuestion[] = [
+	{
+		id: 1401,
+		type: 'pilihan_ganda',
+		subject: "Al-Qur'an Hadis",
+		jenjang: 'MI',
+		grade: 4,
+		question_text: '<p>Hukum bacaan nun sukun (نْ) bertemu huruf Ba (ب) yang dibaca dengan mengubah bunyi huruf nun menjadi mim sukun disertai dengung disebut hukum...</p>',
+		question_number: 1,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Iqlab' },
+			{ key: 'B', text: 'Idzhar Halqi' },
+			{ key: 'C', text: 'Idgham Bighunnah' },
+			{ key: 'D', text: 'Ikhfa Haqiqi' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Iqlab terjadi apabila nun sukun atau tanwin bertemu huruf ba.'
+	},
+	{
+		id: 1402,
+		type: 'pilihan_ganda',
+		subject: 'Akidah Akhlak',
+		jenjang: 'MI',
+		grade: 4,
+		question_text: '<p>Malaikat yang bertugas menyampaikan wahyu dari Allah SWT kepada para Nabi dan Rasul adalah Malaikat...</p>',
+		question_number: 2,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Jibril' },
+			{ key: 'B', text: 'Mikail' },
+			{ key: 'C', text: 'Israfil' },
+			{ key: 'D', text: 'Izrail' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Malaikat Jibril adalah penyampai wahyu Allah SWT.'
+	},
+	{
+		id: 1403,
+		type: 'pilihan_ganda',
+		subject: 'Fikih',
+		jenjang: 'MI',
+		grade: 4,
+		question_text: '<p>Shalat fardhu yang wajib dikerjakan bagi setiap muslim laki-laki secara berjamaah di masjid pada hari Jumat sebagai pengganti shalat Dzuhur adalah...</p>',
+		question_number: 3,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Shalat Jumat' },
+			{ key: 'B', text: 'Shalat Duha' },
+			{ key: 'C', text: 'Shalat Jenazah' },
+			{ key: 'D', text: 'Shalat Hajat' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Shalat Jumat dilaksanakan dua rakaat setelah dua khutbah pada waktu Dzuhur.'
+	},
+	{
+		id: 1404,
+		type: 'pilihan_ganda',
+		subject: 'SKI',
+		jenjang: 'MI',
+		grade: 4,
+		question_text: '<p>Keluarga muslim pertama yang mati syahid di Makkah demi mempertahankan keimanan kepada Allah SWT dari siksaan kaum kafir Quraisy adalah keluarga...</p>',
+		question_number: 4,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Yasir dan Sumayyah' },
+			{ key: 'B', text: 'Abu Bakar' },
+			{ key: 'C', text: 'Umar bin Khattab' },
+			{ key: 'D', text: 'Utsman bin Affan' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Sumayyah dan suaminya Yasir adalah syahidah dan syahid pertama dalam sejarah Islam.'
+	},
+	{
+		id: 1405,
+		type: 'pilihan_ganda',
+		subject: 'Bahasa Arab',
+		jenjang: 'MI',
+		grade: 4,
+		question_text: '<p>Perhatikan kalimat: <strong>مَنْ هُوَ؟ ... هُوَ طَبِيْبٌ فِي الْمُسْتَشْفَى</strong>. Profesi yang dimaksud dalam kalimat tersebut adalah seorang...</p>',
+		question_number: 5,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Dokter' },
+			{ key: 'B', text: 'Guru' },
+			{ key: 'C', text: 'Petani' },
+			{ key: 'D', text: 'Polisi' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'طَبِيْبٌ (Thobibun) berarti dokter, bekerja di الْمُسْتَشْفَى (Rumah Sakit).'
+	},
+	{
+		id: 1406,
+		type: 'pilihan_ganda',
+		subject: 'Bahasa Indonesia',
+		jenjang: 'MI',
+		grade: 4,
+		question_text: '<p>Kalimat yang membutuhkan objek penderita agar maknanya menjadi jelas dan utuh disebut kalimat...</p>',
+		question_number: 6,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Transitif' },
+			{ key: 'B', text: 'Intransitif' },
+			{ key: 'C', text: 'Perintah' },
+			{ key: 'D', text: 'Tanya' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Kalimat transitif memerlukan objek, contoh: "Ali membaca (predikat) buku (objek)".'
+	},
+	{
+		id: 1407,
+		type: 'pilihan_ganda',
+		subject: 'Matematika',
+		jenjang: 'MI',
+		grade: 4,
+		question_text: '<p>Faktor Persekutuan Terbesar (FPB) dari bilangan <strong>12 dan 18</strong> adalah...</p>',
+		question_number: 7,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: '6' },
+			{ key: 'B', text: '3' },
+			{ key: 'C', text: '4' },
+			{ key: 'D', text: '2' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Faktor 12: 1, 2, 3, 4, 6, 12. Faktor 18: 1, 2, 3, 6, 9, 18. FPB = 6.'
+	},
+	{
+		id: 1408,
+		type: 'pilihan_ganda',
+		subject: 'IPA',
+		jenjang: 'MI',
+		grade: 4,
+		question_text: '<p>Bagian tumbuhan yang memiliki zat hijau daun (klorofil) dan berfungsi sebagai tempat terjadinya proses fotosintesis adalah...</p>',
+		question_number: 8,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Daun' },
+			{ key: 'B', text: 'Akar' },
+			{ key: 'C', text: 'Batang' },
+			{ key: 'D', text: 'Bunga' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Fotosintesis utama tumbuhan berlangsung di organ daun yang mengandung klorofil.'
+	},
+	{
+		id: 1409,
+		type: 'pilihan_ganda',
+		subject: 'IPS',
+		jenjang: 'MI',
+		grade: 4,
+		question_text: '<p>Rumah adat khas suku Minangkabau di Sumatera Barat yang memiliki atap runcing bertingkat menyerupai tanduk kerbau adalah...</p>',
+		question_number: 9,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Rumah Gadang' },
+			{ key: 'B', text: 'Rumah Joglo' },
+			{ key: 'C', text: 'Rumah Honai' },
+			{ key: 'D', text: 'Rumah Tongkonan' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Rumah Gadang adalah rumah tradisional suku Minangkabau.'
+	},
+	{
+		id: 1410,
+		type: 'pilihan_ganda_kompleks',
+		subject: 'Akidah Akhlak',
+		jenjang: 'MI',
+		grade: 4,
+		question_text: '<p>Malaikat yang bertugas <strong>mencatat seluruh amal baik dan amal buruk</strong> manusia selama hidup di dunia adalah... <em>(Pilih 2 jawaban)</em></p>',
+		question_number: 10,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Malaikat Raqib (pencatat amal kebaikan)' },
+			{ key: 'B', text: 'Malaikat Atid (pencatat amal keburukan)' },
+			{ key: 'C', text: 'Malaikat Malik (penjaga neraka)' },
+			{ key: 'D', text: 'Malaikat Ridwan (penjaga surga)' }
+		]),
+		correct_answer: '["A","B"]',
+		points: 7,
+		explanation: 'Raqib dan Atid senantiasa mengawasi dan mencatat perbuatan manusia.'
+	},
+	{
+		id: 1411,
+		type: 'pilihan_ganda_kompleks',
+		subject: 'IPA',
+		jenjang: 'MI',
+		grade: 4,
+		question_text: '<p>Berikut ini yang merupakan contoh <strong>simbiosis mutualisme</strong> (hubungan antarmakhluk hidup yang saling menguntungkan) adalah... <em>(Pilih 2 jawaban)</em></p>',
+		question_number: 11,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Lebah yang mengisap nektar bunga sambil membantu penyerbukan' },
+			{ key: 'B', text: 'Burung jalak yang memakan kutu pada tubuh kerbau' },
+			{ key: 'C', text: 'Tanaman benalu yang hidup menempel pada pohon mangga' },
+			{ key: 'D', text: 'Nyamuk yang menggigit dan mengisap darah manusia' }
+		]),
+		correct_answer: '["A","B"]',
+		points: 7,
+		explanation: 'Lebah-bunga dan burung jalak-kerbau saling menguntungkan kedua pihak.'
+	},
+	{
+		id: 1412,
+		type: 'benar_salah',
+		subject: 'Fikih',
+		jenjang: 'MI',
+		grade: 4,
+		question_text: '<p>Tentukan status kebenaran (<strong>Benar</strong> atau <strong>Salah</strong>) mengenai batas aurat dalam shalat:</p>',
+		question_number: 12,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ id: '1', statement: 'Batas aurat laki-laki dalam shalat adalah antara pusar hingga lutut.' },
+			{ id: '2', statement: 'Aurat perempuan dalam shalat meliputi seluruh tubuh kecuali wajah dan kedua telapak tangan.' }
+		]),
+		correct_answer: '{"1":"benar","2":"benar"}',
+		points: 7,
+		explanation: 'Kedua pernyataan mengenai batasan aurat laki-laki dan perempuan adalah benar.'
+	},
+	{
+		id: 1413,
+		type: 'menjodohkan',
+		subject: 'Bahasa Arab',
+		jenjang: 'MI',
+		grade: 4,
+		question_text: '<p>Jodohkan profesi dalam bahasa Arab berikut dengan artinya:</p>',
+		question_number: 13,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify({
+			left: [
+				{ key: '1', text: 'مُدَرِّسٌ (Mudarrisun)' },
+				{ key: '2', text: 'فَلَّاحٌ (Fallahun)' },
+				{ key: '3', text: 'شُرْطِيٌّ (Syurthiyyun)' }
+			],
+			right: [
+				{ key: 'A', text: 'Guru' },
+				{ key: 'B', text: 'Petani' },
+				{ key: 'C', text: 'Polisi' }
+			]
+		}),
+		correct_answer: '{"1":"A","2":"B","3":"C"}',
+		points: 7,
+		explanation: 'Mudarrisun = Guru, Fallahun = Petani, Syurthiyyun = Polisi.'
+	},
+	{
+		id: 1414,
+		type: 'isian_singkat',
+		subject: 'Matematika',
+		jenjang: 'MI',
+		grade: 4,
+		question_text: '<p>Kelipatan Persekutuan Terkecil (KPK) dari bilangan <strong>4 dan 6</strong> adalah ... <em>(Tuliskan angka jawabannya saja)</em></p>',
+		question_number: 14,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: null,
+		correct_answer: '12',
+		points: 7,
+		explanation: 'Kelipatan 4: 4, 8, 12, 16... Kelipatan 6: 6, 12, 18... KPK = 12.'
+	},
+	{
+		id: 1415,
+		type: 'essay',
+		subject: 'Akidah Akhlak',
+		jenjang: 'MI',
+		grade: 4,
+		question_text: '<p>Jelaskan pengertian sikap rendah hati (<strong>Tawadhu\'</strong>) dan sebutkan satu contoh penerapannya ketika bergaul dengan teman di madrasah!</p>',
+		question_number: 15,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: null,
+		correct_answer: 'Tawadhu adalah sikap tidak menyombongkan diri meskipun memiliki kelebihan. Contoh: tidak memamerkan nilai tinggi dan mau berteman dengan siapa saja.',
+		points: 7,
+		explanation: 'Tawadhu merupakan lawan dari takabur yang sangat dicintai oleh Allah SWT.'
+	}
+];
+
+// =========================================================================
+// 5. BANK SOAL SIMULASI MI KELAS 5 (15 NOMOR)
+// Meliputi: Bahasa Arab, Matematika, IPA, IPS, Bahasa Indonesia, Akidah Akhlak, SKI, Fikih, Al-Qur'an Hadis
+// =========================================================================
+export const MI_QUESTIONS_GRADE_5: SimulationQuestion[] = [
+	{
+		id: 1501,
+		type: 'pilihan_ganda',
+		subject: "Al-Qur'an Hadis",
+		jenjang: 'MI',
+		grade: 5,
+		question_text: '<p>Hukum bacaan yang terjadi apabila huruf Mim Sukun (مْ) bertemu dengan huruf Mim (م) dinamakan hukum bacaan...</p>',
+		question_number: 1,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Idgham Mimi (Idgham Mutamatsilain)' },
+			{ key: 'B', text: 'Ikhfa Syafawi' },
+			{ key: 'C', text: 'Idzhar Syafawi' },
+			{ key: 'D', text: 'Iqlab' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Mim sukun bertemu mim dibaca melebur disertai ghunnah (Idgham Mimi).'
+	},
+	{
+		id: 1502,
+		type: 'pilihan_ganda',
+		subject: 'Akidah Akhlak',
+		jenjang: 'MI',
+		grade: 5,
+		question_text: '<p>Peristiwa kebangkitan kembali seluruh umat manusia dari alam kubur setelah ditiupkannya sangkakala kedua dinamakan...</p>',
+		question_number: 2,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Yaumul Ba\'ats' },
+			{ key: 'B', text: 'Yaumul Hisab' },
+			{ key: 'C', text: 'Yaumul Mizan' },
+			{ key: 'D', text: 'Yaumul Jaza\'' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Yaumul Ba\'ats adalah hari dibangkitkannya manusia dari kubur.'
+	},
+	{
+		id: 1503,
+		type: 'pilihan_ganda',
+		subject: 'Fikih',
+		jenjang: 'MI',
+		grade: 5,
+		question_text: '<p>Menahan diri dari makan, minum, serta segala hal yang membatalkan dari terbit fajar shadiq hingga terbenam matahari dengan niat beribadah adalah pengertian dari ibadah...</p>',
+		question_number: 3,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Puasa (Shaum)' },
+			{ key: 'B', text: 'I\'tikaf' },
+			{ key: 'C', text: 'Zakat' },
+			{ key: 'D', text: 'Haji' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Pengertian puasa secara syariat adalah imsak dari terbit fajar sampai terbenam matahari.'
+	},
+	{
+		id: 1504,
+		type: 'pilihan_ganda',
+		subject: 'SKI',
+		jenjang: 'MI',
+		grade: 5,
+		question_text: '<p>Perjanjian setia yang dilakukan oleh penduduk Yatsrib kepada Nabi Muhammad SAW di bukit Aqabah sebelum peristiwa Hijrah dikenal dengan nama...</p>',
+		question_number: 4,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Bai\'atul Aqabah' },
+			{ key: 'B', text: 'Perjanjian Hudaibiyah' },
+			{ key: 'C', text: 'Piagam Madinah' },
+			{ key: 'D', text: 'Fathu Makkah' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Bai\'atul Aqabah I dan II menjadi tonggak awal hijrah ke Madinah.'
+	},
+	{
+		id: 1505,
+		type: 'pilihan_ganda',
+		subject: 'Bahasa Arab',
+		jenjang: 'MI',
+		grade: 5,
+		question_text: '<p>Perhatikan kalimat berikut: <strong>أَنَا أَذْهَبُ إِلَى الْمَدْرَسَةِ فِي السَّاعَةِ السَّادِسَةِ وَالنِّصْفِ</strong>. Jam keberangkatan sekolah yang dimaksud adalah pukul...</p>',
+		question_number: 5,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: '06.30 (Setengah tujuh pagi)' },
+			{ key: 'B', text: '06.00 (Pukul enam tepat)' },
+			{ key: 'C', text: '07.00 (Pukul tujuh tepat)' },
+			{ key: 'D', text: '07.30 (Setengah delapan pagi)' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'السَّادِسَةِ (enam) وَالنِّصْفِ (lewat setengah/tiga puluh menit) = 06.30.'
+	},
+	{
+		id: 1506,
+		type: 'pilihan_ganda',
+		subject: 'Bahasa Indonesia',
+		jenjang: 'MI',
+		grade: 5,
+		question_text: '<p>Teks yang memuat penjelasan ilmiah mengenai sebab dan akibat terjadinya peristiwa alam seperti banjir, gunung meletus, atau gempa bumi disebut teks...</p>',
+		question_number: 6,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Eksplanasi' },
+			{ key: 'B', text: 'Narasi' },
+			{ key: 'C', text: 'Deskripsi' },
+			{ key: 'D', text: 'Fabel' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Teks eksplanasi menjelaskan proses "mengapa" dan "bagaimana" fenomena alam terjadi.'
+	},
+	{
+		id: 1507,
+		type: 'pilihan_ganda',
+		subject: 'Matematika',
+		jenjang: 'MI',
+		grade: 5,
+		question_text: '<p>Hasil dari operasi penjumlahan pecahan <strong>(3/4) + (2/5)</strong> adalah...</p>',
+		question_number: 7,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: '23/20' },
+			{ key: 'B', text: '5/9' },
+			{ key: 'C', text: '6/20' },
+			{ key: 'D', text: '15/20' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Penyebut KPK 4 dan 5 adalah 20. (15/20) + (8/20) = 23/20 = 1 3/20.'
+	},
+	{
+		id: 1508,
+		type: 'pilihan_ganda',
+		subject: 'IPA',
+		jenjang: 'MI',
+		grade: 5,
+		question_text: '<p>Bagian paru-paru yang berupa gelembung-gelembung halus dan berfungsi sebagai tempat pertukaran oksigen dengan karbon dioksida adalah...</p>',
+		question_number: 8,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Alveolus' },
+			{ key: 'B', text: 'Trakea' },
+			{ key: 'C', text: 'Bronkus' },
+			{ key: 'D', text: 'Laring' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Alveolus adalah tempat pertukaran gas O2 dan CO2 pada sistem pernapasan.'
+	},
+	{
+		id: 1509,
+		type: 'pilihan_ganda',
+		subject: 'IPS',
+		jenjang: 'MI',
+		grade: 5,
+		question_text: '<p>Pahlawan nasional yang gigih memimpin perlawanan rakyat Maluku melawan monopoli perdagangan rempah VOC Belanda pada tahun 1817 adalah...</p>',
+		question_number: 9,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Kapitan Pattimura (Thomas Matulessy)' },
+			{ key: 'B', text: 'Pangeran Diponegoro' },
+			{ key: 'C', text: 'Tuanku Imam Bonjol' },
+			{ key: 'D', text: 'Sultan Hasanuddin' }
+		]),
+		correct_answer: 'A',
+		points: 7,
+		explanation: 'Kapitan Pattimura adalah pahlawan nasional dari kepulauan Maluku.'
+	},
+	{
+		id: 1510,
+		type: 'pilihan_ganda_kompleks',
+		subject: "Al-Qur'an Hadis",
+		jenjang: 'MI',
+		grade: 5,
+		question_text: '<p>Berdasarkan kandungan <strong>Surah Al-Humazah</strong>, sifat tercela yang diancam dengan siksa neraka Huthamah adalah... <em>(Pilih 2 jawaban)</em></p>',
+		question_number: 10,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Suka mengumpat dan mencela kehormatan orang lain' },
+			{ key: 'B', text: 'Mengumpulkan harta secara serakah dan kikir tanpa mau bersedekah' },
+			{ key: 'C', text: 'Suka menolong sesama yang membutuhkan bantuan' },
+			{ key: 'D', text: 'Menjaga lisan dari perkataan kotor' }
+		]),
+		correct_answer: '["A","B"]',
+		points: 7,
+		explanation: 'Surah Al-Humazah mencela orang yang suka mengumpat (humazah lumazah) dan menumpuk harta.'
+	},
+	{
+		id: 1511,
+		type: 'pilihan_ganda_kompleks',
+		subject: 'IPA',
+		jenjang: 'MI',
+		grade: 5,
+		question_text: '<p>Organ pencernaan manusia yang berfungsi melakukan pencernaan makanan secara kimiawi dengan bantuan getah lambung adalah... <em>(Pilih 2 organ)</em></p>',
+		question_number: 11,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ key: 'A', text: 'Mulut (enzim ptialin)' },
+			{ key: 'B', text: 'Lambung (enzim pepsin & renin)' },
+			{ key: 'C', text: 'Paru-paru' },
+			{ key: 'D', text: 'Hidung' }
+		]),
+		correct_answer: '["A","B"]',
+		points: 7,
+		explanation: 'Mulut dan lambung memproses makanan secara mekanik dan kimiawi.'
+	},
+	{
+		id: 1512,
+		type: 'benar_salah',
+		subject: 'Fikih',
+		jenjang: 'MI',
+		grade: 5,
+		question_text: '<p>Tentukan status kebenaran (<strong>Benar</strong> atau <strong>Salah</strong>) mengenai ketentuan puasa Ramadhan:</p>',
+		question_number: 12,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify([
+			{ id: '1', statement: 'Orang yang sakit berat atau dalam perjalanan jauh (musafir) boleh berbuka puasa dan wajib menggantinya (qadha) di hari lain.' },
+			{ id: '2', statement: 'Muntah secara tidak sengaja dapat membatalkan puasa seseorang.' }
+		]),
+		correct_answer: '{"1":"benar","2":"salah"}',
+		points: 7,
+		explanation: 'Rukhsah bagi orang sakit/musafir qadha puasa (Benar). Muntah tanpa sengaja tidak membatalkan puasa (Salah).'
+	},
+	{
+		id: 1513,
+		type: 'menjodohkan',
+		subject: 'SKI',
+		jenjang: 'MI',
+		grade: 5,
+		question_text: '<p>Jodohkan tokoh pahlawan perlawanan Nusantara berikut dengan daerah asalnya:</p>',
+		question_number: 13,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: JSON.stringify({
+			left: [
+				{ key: '1', text: 'Pangeran Diponegoro' },
+				{ key: '2', text: 'Tuanku Imam Bonjol' },
+				{ key: '3', text: 'Sultan Hasanuddin' }
+			],
+			right: [
+				{ key: 'A', text: 'Jawa Tengah (Perang Jawa)' },
+				{ key: 'B', text: 'Sumatera Barat (Perang Padri)' },
+				{ key: 'C', text: 'Sulawesi Selatan / Makassar' }
+			]
+		}),
+		correct_answer: '{"1":"A","2":"B","3":"C"}',
+		points: 7,
+		explanation: 'Pangeran Diponegoro (Jawa), Tuanku Imam Bonjol (Minang), Sultan Hasanuddin (Makassar).'
+	},
+	{
+		id: 1514,
+		type: 'isian_singkat',
+		subject: 'Matematika',
+		jenjang: 'MI',
+		grade: 5,
+		question_text: '<p>Jarak antara kota A dan kota B pada peta adalah 4 cm. Jika skala peta tersebut adalah 1 : 200.000, maka jarak sebenarnya kedua kota tersebut adalah ... km. <em>(Tuliskan angka jawabannya saja)</em></p>',
+		question_number: 14,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: null,
+		correct_answer: '8',
+		points: 7,
+		explanation: 'Jarak sebenarnya = 4 cm × 200.000 = 800.000 cm = 8 km.'
+	},
+	{
+		id: 1515,
+		type: 'essay',
+		subject: 'Akidah Akhlak',
+		jenjang: 'MI',
+		grade: 5,
+		question_text: '<p>Sebutkan <strong>tiga (3) hikmah beriman kepada Hari Akhir (Kiamat)</strong> yang dapat membimbing tingkah laku seorang pelajar madrasah!</p>',
+		question_number: 15,
+		media_type: null,
+		media_url: null,
+		audio_max_plays: 0,
+		options_json: null,
+		correct_answer: 'Termotivasi untuk rajin beribadah dan beramal shaleh, selalu menjaga kejujuran karena sadar ada hisab amal, serta menjauhi perbuatan dosa dan maksiat.',
+		points: 7,
+		explanation: 'Iman pada Hari Akhir membimbing manusia bersikap jujur dan senantiasa beramal shaleh.'
+	}
+];
+
+// =========================================================================
+// 6. BANK SOAL SIMULASI MI KELAS 6 (15 NOMOR)
+// Meliputi: Bahasa Arab, Matematika, IPA, IPS, Bahasa Indonesia, Akidah Akhlak, SKI, Fikih, Al-Qur'an Hadis
+// =========================================================================
+export const MI_QUESTIONS_GRADE_6: SimulationQuestion[] = [
 	{
 		id: 101,
 		type: 'pilihan_ganda',
@@ -330,6 +1910,8 @@ export const MI_QUESTIONS_UPPER: SimulationQuestion[] = [
 		explanation: 'Jawaban mencakup ucapan sopan santun, kepatuhan dalam kebaikan, dan mendoakan orang tua serta guru.'
 	}
 ];
+
+export const MI_QUESTIONS_UPPER = MI_QUESTIONS_GRADE_6;
 
 // ==========================================
 // 2. BANK SOAL SIMULASI MTS KELAS 7 (25 NOMOR)
@@ -2477,7 +4059,7 @@ export function parseGradeAndJenjang(
 
 	// 2. Ekstrak Tingkat Kelas (Grade)
 	let grade = 0;
-	const combined = `${normClassLevel} ${normClassName}`.toUpperCase();
+	const combined = ` ${normClassLevel} ${normClassName} `.toUpperCase();
 
 	if (/\b(XII|12)\b/.test(combined)) {
 		grade = 12;
@@ -2497,22 +4079,22 @@ export function parseGradeAndJenjang(
 	} else if (/\b(VII|7)\b/.test(combined)) {
 		grade = 7;
 		if (!normSchoolJenjang && !normSchoolName) jenjang = 'MTS';
-	} else if (/\b(VI|6)\b/.test(combined)) {
+	} else if (/\b(VI|6)\b/.test(combined) || /\b6[A-Z]?\b/.test(combined)) {
 		grade = 6;
 		if (!normSchoolJenjang && !normSchoolName) jenjang = 'MI';
-	} else if (/\b(V|5)\b/.test(combined)) {
+	} else if (/\b(V|5)\b/.test(combined) || /\b5[A-Z]?\b/.test(combined)) {
 		grade = 5;
 		if (!normSchoolJenjang && !normSchoolName) jenjang = 'MI';
-	} else if (/\b(IV|4)\b/.test(combined)) {
+	} else if (/\b(IV|4)\b/.test(combined) || /\b4[A-Z]?\b/.test(combined)) {
 		grade = 4;
 		if (!normSchoolJenjang && !normSchoolName) jenjang = 'MI';
-	} else if (/\b(III|3)\b/.test(combined)) {
+	} else if (/\b(III|3)\b/.test(combined) || /\b3[A-Z]?\b/.test(combined)) {
 		grade = 3;
 		if (!normSchoolJenjang && !normSchoolName) jenjang = 'MI';
-	} else if (/\b(II|2)\b/.test(combined)) {
+	} else if (/\b(II|2)\b/.test(combined) || /\b2[A-Z]?\b/.test(combined)) {
 		grade = 2;
 		if (!normSchoolJenjang && !normSchoolName) jenjang = 'MI';
-	} else if (/\b(I|1)\b/.test(combined)) {
+	} else if (/\b(I|1)\b/.test(combined) || /\b1[A-Z]?\b/.test(combined)) {
 		grade = 1;
 		if (!normSchoolJenjang && !normSchoolName) jenjang = 'MI';
 	}
@@ -2541,8 +4123,13 @@ export function getSimulationQuestionsForStudent(
 	grade: number
 ): SimulationQuestion[] {
 	if (jenjang === 'MI') {
-		// Siswa MI mendapatkan 15 nomor lengkap mencakup seluruh mapel wajib
-		return MI_QUESTIONS_UPPER;
+		// Siswa MI kelas 1-5 dan 6 mendapatkan 15 nomor khusus sesuai kelasnya
+		if (grade === 1) return MI_QUESTIONS_GRADE_1;
+		if (grade === 2) return MI_QUESTIONS_GRADE_2;
+		if (grade === 3) return MI_QUESTIONS_GRADE_3;
+		if (grade === 4) return MI_QUESTIONS_GRADE_4;
+		if (grade === 5) return MI_QUESTIONS_GRADE_5;
+		return MI_QUESTIONS_GRADE_6;
 	}
 
 	if (jenjang === 'MTS') {
