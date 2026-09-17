@@ -89,8 +89,9 @@
 	}
 
 	function initSimulation() {
-		// Acak urutan 25 soal
-		const shuffled = shuffleArray(SIMULATION_QUESTIONS).map((q, idx) => ({
+		const sourceQuestions = (data.questions && data.questions.length > 0) ? data.questions : SIMULATION_QUESTIONS;
+		// Acak urutan soal yang disesuaikan dengan jenjang dan kelas siswa
+		const shuffled = shuffleArray(sourceQuestions).map((q, idx) => ({
 			...q,
 			question_number: idx + 1
 		}));
@@ -262,8 +263,9 @@
 			}
 		}
 
+		const totalMaxScore = questions.reduce((sum, q) => sum + (q.points || 4), 0);
 		scoreResult = {
-			totalScore: Math.min(100, Math.round((score / (questions.length * 4)) * 100)),
+			totalScore: totalMaxScore > 0 ? Math.min(100, Math.round((score / totalMaxScore) * 100)) : 0,
 			correctCount: correct,
 			wrongCount: wrong,
 			unansweredCount: unans
@@ -323,16 +325,16 @@
 				{#if isTitleOverflowing}
 					<div class="inline-flex whitespace-nowrap gap-10 animate-marquee py-0.5">
 						<span bind:this={titleElement} class="text-sm sm:text-base font-bold text-slate-800 tracking-tight shrink-0">
-							[SIMULASI] Simulasi Mandiri CBT Madrasah (25 Soal - Semua Tipe)
+							[SIMULASI] CBT Madrasah — {data.displayLevel || 'Mandiri'} ({questions.length} Soal)
 						</span>
 						<span class="text-sm sm:text-base font-bold text-slate-800 tracking-tight shrink-0" aria-hidden="true">
-							[SIMULASI] Simulasi Mandiri CBT Madrasah (25 Soal - Semua Tipe)
+							[SIMULASI] CBT Madrasah — {data.displayLevel || 'Mandiri'} ({questions.length} Soal)
 						</span>
 					</div>
 				{:else}
 					<div class="w-full flex items-center justify-between py-0.5">
 						<h1 bind:this={titleElement} class="text-sm sm:text-base font-bold text-slate-800 tracking-tight truncate">
-							<span class="text-indigo-600 font-extrabold">[SIMULASI]</span> Simulasi Mandiri CBT Madrasah (25 Soal - Semua Tipe)
+							<span class="text-indigo-600 font-extrabold">[SIMULASI]</span> CBT Madrasah — {data.displayLevel || 'Mandiri'} ({questions.length} Soal)
 						</h1>
 						<span class="text-xs font-semibold text-slate-400 hidden sm:inline shrink-0 ml-2">
 							{data.schoolName || 'Ujian Madrasah'}
@@ -400,6 +402,21 @@
 	<main class="flex-1 max-w-4xl mx-auto w-full px-4 py-6">
 		{#if currentQuestion}
 			{#key currentQuestion.id}
+				<div class="mb-3 flex items-center justify-between">
+					<div class="flex items-center gap-2">
+						{#if currentQuestion.subject}
+							<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+								{currentQuestion.subject}
+							</span>
+						{/if}
+						<span class="text-xs font-semibold text-slate-500">
+							{data.displayLevel || 'Simulasi CBT'}
+						</span>
+					</div>
+					<span class="text-xs font-medium text-slate-400">
+						Soal {currentIndex + 1} dari {questions.length}
+					</span>
+				</div>
 				<QuestionRenderer
 					question={currentQuestion}
 					displayNumber={currentIndex + 1}
@@ -637,16 +654,19 @@
 				</div>
 			</div>
 
-			<!-- Info Tipe Soal yang Diujikan -->
+			<!-- Info Tipe Soal & Mapel yang Diujikan -->
 			<div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2 text-xs">
-				<p class="font-bold text-slate-700">Tipe Soal yang Telah Dicoba (25 Nomor):</p>
+				<p class="font-bold text-slate-700">Mata Pelajaran yang Telah Dicoba ({questions.length} Nomor — {data.displayLevel || 'Madrasah'}):</p>
 				<div class="flex flex-wrap gap-1.5">
-					<span class="px-2 py-0.5 rounded-lg bg-indigo-100 text-indigo-800 font-semibold">10 Pilihan Ganda</span>
-					<span class="px-2 py-0.5 rounded-lg bg-blue-100 text-blue-800 font-semibold">4 Pilihan Ganda Kompleks</span>
-					<span class="px-2 py-0.5 rounded-lg bg-amber-100 text-amber-800 font-semibold">4 Benar/Salah</span>
-					<span class="px-2 py-0.5 rounded-lg bg-purple-100 text-purple-800 font-semibold">3 Menjodohkan</span>
-					<span class="px-2 py-0.5 rounded-lg bg-teal-100 text-teal-800 font-semibold">2 Isian Singkat</span>
-					<span class="px-2 py-0.5 rounded-lg bg-rose-100 text-rose-800 font-semibold">2 Essay / Uraian</span>
+					<span class="px-2 py-0.5 rounded-lg bg-indigo-100 text-indigo-800 font-semibold">Bahasa Arab</span>
+					<span class="px-2 py-0.5 rounded-lg bg-blue-100 text-blue-800 font-semibold">Matematika</span>
+					<span class="px-2 py-0.5 rounded-lg bg-emerald-100 text-emerald-800 font-semibold">IPA</span>
+					<span class="px-2 py-0.5 rounded-lg bg-amber-100 text-amber-800 font-semibold">IPS</span>
+					<span class="px-2 py-0.5 rounded-lg bg-cyan-100 text-cyan-800 font-semibold">Bahasa Indonesia</span>
+					<span class="px-2 py-0.5 rounded-lg bg-violet-100 text-violet-800 font-semibold">Akidah Akhlak</span>
+					<span class="px-2 py-0.5 rounded-lg bg-orange-100 text-orange-800 font-semibold">SKI</span>
+					<span class="px-2 py-0.5 rounded-lg bg-teal-100 text-teal-800 font-semibold">Fikih</span>
+					<span class="px-2 py-0.5 rounded-lg bg-rose-100 text-rose-800 font-semibold">Al-Qur'an Hadis</span>
 				</div>
 			</div>
 
