@@ -1,41 +1,82 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { browser } from '$app/environment';
+	import Timer from '$lib/components/exam/Timer.svelte';
 	import QuestionRenderer from '$lib/components/exam/QuestionRenderer.svelte';
 	import QuestionNav from '$lib/components/exam/QuestionNav.svelte';
 	import { SIMULATION_QUESTIONS, type SimulationQuestion } from '$lib/data/simulationQuestions';
-	import { ICONS, QUESTION_TYPE_LABELS } from '$lib/utils/constants';
+	import { ICONS } from '$lib/utils/constants';
 
 	export let data;
 
 	// Daftar 25 soal simulasi yang diacak
 	let questions: SimulationQuestion[] = [];
 	let currentIndex = 0;
-	let showNavDrawer = false;
-	let showFinishConfirmModal = false;
+	let showNav = false;
+	let showSubmitConfirm = false;
+	let finishConfirmationInput = '';
+	$: isFinishConfirmed = finishConfirmationInput.trim().toUpperCase() === 'SELESAI';
 	let showResultModal = false;
-	let showExitConfirmModal = false;
+	let showExitConfirm = false;
 
 	// State jawaban siswa
-	let answers: Record<number, string> = {};
-	let doubts: Record<number, boolean> = {};
+	let localAnswers: Record<number, string> = {};
+	let localDoubts: Record<number, boolean> = {};
 
-	// Timer 30 menit (1800 detik)
-	const INITIAL_DURATION_SEC = 30 * 60;
-	let remainingSeconds = INITIAL_DURATION_SEC;
-	let timerInterval: any = null;
-	let isTimeUp = false;
-	let timeElapsed = 0;
+	// Timer 30 menit (ISO datetime)
+	let currentEndTime = '';
+	let timeElapsedSeconds = 0;
+	let elapsedInterval: any = null;
 
-	// Skor hasil simulasi
-	let scoreResult = {
-		totalScore: 0,
-		maxScore: 100,
-		correctCount: 0,
-		wrongCount: 0,
-		unansweredCount: 0,
-		answeredCount: 0
-	};
+	// Fullscreen state
+	let isFullscreen = false;
+	let hasRequestedFullscreen = false;
+
+	// Header title marquee detection
+	let titleElement: HTMLElement;
+	let titleClientWidth = 0;
+	let isTitleOverflowing = false;
+	$: if (titleElement && titleClientWidth) {
+		setTimeout(() => {
+			if (titleElement) {
+				isTitleOverflowing = titleElement.scrollWidth > titleClientWidth;
+			}
+		}, 0);
+	}
+
+	// Wake lock
+	let wakeLock: any = null;
+	async function requestWakeLock() {
+		try {
+			if ('wakeLock' in navigator) {
+				wakeLock = await (navigator as any).wakeLock.request('screen');
+			}
+		} catch (err) {
+			console.warn('Wake Lock error:', err);
+		}
+	}
+
+	// Fullscreen handlers
+	async function toggleFullscreen() {
+		if (!browser) return;
+		try {
+			if (!document.fullscreenElement) {
+				await document.documentElement.requestFullscreen();
+				isFullscreen = true;
+			} else {
+				await document.exitFullscreen();
+				isFullscreen = false;
+			}
+		} catch (err) {
+			console.warn('Fullscreen error:', err);
+		}
+	}
+
+	function handleFullscreenChange() {
+		if (!browser) return;
+		isFullscreen = !!document.fullscreenElement;
+	}
 
 	// Fisher-Yates Shuffle
 	function shuffleArray<T>(array: T[]): T[] {
@@ -55,52 +96,37 @@
 		}));
 		questions = shuffled;
 		currentIndex = 0;
-		answers = {};
-		doubts = {};
-		remainingSeconds = INITIAL_DURATION_SEC;
-		timeElapsed = 0;
-		isTimeUp = false;
-		showFinishConfirmModal = false;
+		localAnswers = {};
+		localDoubts = {};
+		finishConfirmationInput = '';
+		showNav = false;
+		showSubmitConfirm = false;
 		showResultModal = false;
-		showExitConfirmModal = false;
+		showExitConfirm = false;
 
-		startTimer();
-	}
+		// Set waktu 30 menit dari sekarang
+		const end = new Date(Date.now() + 30 * 60 * 1000);
+		currentEndTime = end.toISOString();
 
-	function startTimer() {
-		if (timerInterval) clearInterval(timerInterval);
-		timerInterval = setInterval(() => {
-			if (remainingSeconds > 0) {
-				remainingSeconds--;
-				timeElapsed++;
-			} else {
-				clearInterval(timerInterval);
-				isTimeUp = true;
-				finishSimulation();
-			}
+		timeElapsedSeconds = 0;
+		if (elapsedInterval) clearInterval(elapsedInterval);
+		elapsedInterval = setInterval(() => {
+			timeElapsedSeconds++;
 		}, 1000);
+
+		scrollToTop();
 	}
 
 	$: currentQuestion = questions[currentIndex] || null;
 
-	$: formattedTime = (() => {
-		const m = Math.floor(remainingSeconds / 60);
-		const s = remainingSeconds % 60;
-		return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-	})();
-
-	$: isTimeWarning = remainingSeconds <= 300 && remainingSeconds > 60;
-	$: isTimeCritical = remainingSeconds <= 60;
-
-	// Status navigasi soal
 	$: navQuestions = questions.map((q, idx) => {
-		const ans = answers[q.id];
+		const ans = localAnswers[q.id];
 		const isAnswered = ans !== undefined && ans !== null && ans !== '' && ans !== '[]' && ans !== '{}';
 		return {
 			id: q.id,
 			question_number: idx + 1,
 			answered: isAnswered,
-			doubted: !!doubts[q.id]
+			doubted: !!localDoubts[q.id]
 		};
 	});
 
@@ -108,41 +134,67 @@
 	$: doubtedCount = navQuestions.filter(q => q.doubted).length;
 	$: unansweredCount = questions.length - answeredCount;
 
-	function handleAnswer(e: CustomEvent<{ questionId: number; answer: string }>) {
-		answers[e.detail.questionId] = e.detail.answer;
-		answers = { ...answers };
-	}
-
-	function handleDoubt(e: CustomEvent<{ questionId: number; doubted: boolean }>) {
-		doubts[e.detail.questionId] = e.detail.doubted;
-		doubts = { ...doubts };
-	}
-
-	function toggleCurrentDoubt() {
-		if (!currentQuestion) return;
-		doubts[currentQuestion.id] = !doubts[currentQuestion.id];
-		doubts = { ...doubts };
-	}
-
-	function goToIndex(idx: number) {
-		if (idx >= 0 && idx < questions.length) {
-			currentIndex = idx;
-			showNavDrawer = false;
-			// Scroll ke atas soal
-			if (typeof window !== 'undefined') {
-				window.scrollTo({ top: 0, behavior: 'smooth' });
-			}
+	function scrollToTop() {
+		if (browser) {
+			window.scrollTo({ top: 0, behavior: 'smooth' });
 		}
 	}
 
-	function evaluateSimulation() {
+	function handleAnswer(e: CustomEvent<{ questionId: number; answer: string }>) {
+		localAnswers[e.detail.questionId] = e.detail.answer;
+		localAnswers = { ...localAnswers };
+	}
+
+	function handleDoubt(e: CustomEvent<{ questionId: number; doubted: boolean }>) {
+		localDoubts[e.detail.questionId] = e.detail.doubted;
+		localDoubts = { ...localDoubts };
+	}
+
+	function next() {
+		if (currentIndex < questions.length - 1) {
+			currentIndex++;
+			scrollToTop();
+		}
+	}
+
+	function prev() {
+		if (currentIndex > 0) {
+			currentIndex--;
+			scrollToTop();
+		}
+	}
+
+	function goToQuestion(index: number) {
+		if (index >= 0 && index < questions.length) {
+			currentIndex = index;
+			showNav = false;
+			scrollToTop();
+		}
+	}
+
+	function handleTimeUp() {
+		evaluateAndFinish();
+	}
+
+	// Evaluasi Nilai Simulasi
+	let scoreResult = {
+		totalScore: 0,
+		correctCount: 0,
+		wrongCount: 0,
+		unansweredCount: 0
+	};
+
+	function evaluateAndFinish() {
+		if (elapsedInterval) clearInterval(elapsedInterval);
+		showSubmitConfirm = false;
+
 		let correct = 0;
 		let wrong = 0;
 		let unans = 0;
 		let score = 0;
 
 		for (const q of questions) {
-			const ans = answers[q.id];
+			const ans = localAnswers[q.id];
 			if (!ans || ans === '' || ans === '[]' || ans === '{}') {
 				unans++;
 				continue;
@@ -199,7 +251,6 @@
 				const cleanCorrect = String(q.correct_answer).trim().toLowerCase();
 				isCorrect = cleanUser === cleanCorrect || cleanCorrect.includes(cleanUser);
 			} else if (q.type === 'essay') {
-				// Untuk essay simulasi mandiri, jika siswa mengisi lebih dari 15 karakter dianggap mencoba menjawab dengan baik
 				isCorrect = String(ans).trim().length > 15;
 			}
 
@@ -213,350 +264,321 @@
 
 		scoreResult = {
 			totalScore: Math.min(100, Math.round((score / (questions.length * 4)) * 100)),
-			maxScore: 100,
 			correctCount: correct,
 			wrongCount: wrong,
-			unansweredCount: unans,
-			answeredCount: correct + wrong
+			unansweredCount: unans
 		};
-	}
 
-	function finishSimulation() {
-		if (timerInterval) clearInterval(timerInterval);
-		showFinishConfirmModal = false;
-		evaluateSimulation();
 		showResultModal = true;
 	}
 
 	function exitSimulation() {
-		if (timerInterval) clearInterval(timerInterval);
+		if (elapsedInterval) clearInterval(elapsedInterval);
+		if (browser && document.fullscreenElement) {
+			document.exitFullscreen().catch(() => {});
+		}
 		goto('/siswa');
 	}
 
 	onMount(() => {
 		initSimulation();
+		requestWakeLock();
+		if (browser) {
+			isFullscreen = !!document.fullscreenElement;
+			// Coba minta fullscreen jika pengguna berinteraksi
+			const handleFirstInteraction = () => {
+				if (!hasRequestedFullscreen && !document.fullscreenElement) {
+					hasRequestedFullscreen = true;
+					document.documentElement.requestFullscreen().catch(() => {});
+				}
+				window.removeEventListener('click', handleFirstInteraction);
+			};
+			window.addEventListener('click', handleFirstInteraction, { once: true });
+		}
 	});
 
 	onDestroy(() => {
-		if (timerInterval) clearInterval(timerInterval);
+		if (elapsedInterval) clearInterval(elapsedInterval);
+		if (wakeLock) {
+			wakeLock.release().catch(() => {});
+		}
 	});
 </script>
 
 <svelte:head>
-	<title>Simulasi Ujian CBT Madrasah — Ujian Online</title>
+	<title>Simulasi Ujian CBT Madrasah — Ujian Online Madrasah</title>
 </svelte:head>
 
-<div class="min-h-screen bg-slate-100 flex flex-col text-slate-800 select-none">
-	<!-- Top Bar Exam Header -->
-	<header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-sm px-4 sm:px-6 py-2.5">
-		<div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
-			<!-- Left: Exam Info -->
-			<div class="flex items-center gap-3 min-w-0">
-				<button
-					type="button"
-					on:click={() => (showExitConfirmModal = true)}
-					class="p-2 -ml-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors flex items-center gap-1.5 text-xs font-semibold"
-					title="Keluar dari simulasi"
-				>
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-					</svg>
-					<span class="hidden sm:inline">Keluar</span>
-				</button>
-				<div class="min-w-0">
-					<div class="flex items-center gap-1.5 flex-wrap">
-						<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-indigo-100 text-indigo-700 border border-indigo-200">
-							Simulasi CBT
+<svelte:document on:fullscreenchange={handleFullscreenChange} />
+
+<div class="min-h-screen bg-slate-50 flex flex-col select-none">
+	<!-- Exam Header (SAMA PERSIS DENGAN TAMPILAN UJIAN ASLI) -->
+	<header class="sticky top-0 z-30 bg-white/95 backdrop-blur-xl border-b border-slate-200 px-4 py-2.5 shadow-xs">
+		<div class="max-w-4xl mx-auto flex flex-col gap-2">
+			<!-- Row 1: Nama Mapel / Judul Ujian (Satu Baris & Berjalan jika Panjang) -->
+			<div 
+				class="w-full overflow-hidden relative" 
+				bind:clientWidth={titleClientWidth}
+			>
+				{#if isTitleOverflowing}
+					<div class="inline-flex whitespace-nowrap gap-10 animate-marquee py-0.5">
+						<span bind:this={titleElement} class="text-sm sm:text-base font-bold text-slate-800 tracking-tight shrink-0">
+							[SIMULASI] Simulasi Mandiri CBT Madrasah (25 Soal - Semua Tipe)
 						</span>
-						<span class="text-xs font-bold text-slate-700 truncate hidden md:inline">
+						<span class="text-sm sm:text-base font-bold text-slate-800 tracking-tight shrink-0" aria-hidden="true">
+							[SIMULASI] Simulasi Mandiri CBT Madrasah (25 Soal - Semua Tipe)
+						</span>
+					</div>
+				{:else}
+					<div class="w-full flex items-center justify-between py-0.5">
+						<h1 bind:this={titleElement} class="text-sm sm:text-base font-bold text-slate-800 tracking-tight truncate">
+							<span class="text-indigo-600 font-extrabold">[SIMULASI]</span> Simulasi Mandiri CBT Madrasah (25 Soal - Semua Tipe)
+						</h1>
+						<span class="text-xs font-semibold text-slate-400 hidden sm:inline shrink-0 ml-2">
 							{data.schoolName || 'Ujian Madrasah'}
 						</span>
 					</div>
-					<h1 class="text-xs sm:text-sm font-extrabold text-slate-900 truncate">
-						Simulasi Mandiri 25 Soal (Semua Tipe)
-					</h1>
+				{/if}
+			</div>
+
+			<!-- Row 2: Status Tersimpan, Tombol Fullscreen, & Waktu Ujian -->
+			<div class="flex items-center justify-between gap-3">
+				<!-- Kiri: Status Tersimpan (Ikon Keren Asli) -->
+				<div class="flex items-center gap-2">
+					<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 shadow-xs" title="Simulasi mandiri lokal aktif">
+						<svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+						</svg>
+						<span class="text-[11px] font-semibold">Tersimpan</span>
+					</div>
+
+					<!-- Tombol Fullscreen -->
+					<button
+						type="button"
+						on:click={toggleFullscreen}
+						class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors
+							{isFullscreen 
+								? 'bg-indigo-50 text-indigo-700 border-indigo-200' 
+								: 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}"
+						title={isFullscreen ? 'Keluar dari layar penuh' : 'Masuk ke layar penuh'}
+					>
+						{#if isFullscreen}
+							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M9 9L4 4m0 0l5 0m-5 0l0 5M15 9l5-5m0 0l-5 0m5 0l0 5M9 15l-5 5m0 0l5 0m-5 0l0-5M15 15l5 5m0 0l-5 0m5 0l0-5" />
+							</svg>
+							<span class="hidden sm:inline">Layar Penuh</span>
+						{:else}
+							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+							</svg>
+							<span class="hidden sm:inline">Layar Penuh</span>
+						{/if}
+					</button>
+				</div>
+
+				<!-- Kanan: Waktu Ujian (30 Menit Countdown) -->
+				<div class="flex items-center gap-2 sm:gap-3 shrink-0">
+					{#if currentEndTime}
+						<Timer endTime={currentEndTime} isPaused={false} on:timeup={handleTimeUp} />
+					{/if}
 				</div>
 			</div>
 
-			<!-- Center/Right: Timer & Drawer Trigger -->
-			<div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-				<!-- Countdown Timer -->
-				<div class="flex items-center gap-2 px-3 py-1.5 rounded-xl border font-mono font-black text-sm sm:text-base shadow-sm
-					{isTimeCritical 
-						? 'bg-rose-50 text-rose-600 border-rose-300 animate-pulse' 
-						: isTimeWarning 
-							? 'bg-amber-50 text-amber-600 border-amber-300' 
-							: 'bg-slate-50 text-slate-700 border-slate-200'}">
-					<svg class="w-4 h-4 sm:w-5 sm:h-5 {isTimeCritical ? 'text-rose-500' : 'text-slate-400'}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.clock} />
-					</svg>
-					<span>{formattedTime}</span>
+			<!-- Progress Bar -->
+			<div class="w-full">
+				<div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+					<div
+						class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-500"
+						style="width: {questions && questions.length > 0 ? (answeredCount / questions.length) * 100 : 0}%"
+					></div>
 				</div>
-
-				<!-- Tombol Daftar Soal (Mobile & Desktop) -->
-				<button
-					type="button"
-					on:click={() => (showNavDrawer = !showNavDrawer)}
-					class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 shadow-md shadow-indigo-500/20 active:scale-95 transition-all"
-				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-					</svg>
-					<span>Daftar Soal</span>
-					<span class="ml-1 px-1.5 py-0.2 rounded-full bg-white/25 text-[11px] font-extrabold leading-tight">
-						{answeredCount}/25
-					</span>
-				</button>
 			</div>
 		</div>
 	</header>
 
-	<!-- Main Exam Area -->
-	<main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-		<!-- Question Container (Left 3 Columns on Large Screen) -->
-		<div class="lg:col-span-3 space-y-4">
-			{#if currentQuestion}
-				<!-- Question Header Info Card -->
-				<div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm flex items-center justify-between gap-3">
-					<div class="flex items-center gap-2.5">
-						<div class="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 font-extrabold flex items-center justify-center text-sm shadow-inner">
-							{currentIndex + 1}
-						</div>
-						<div>
-							<div class="flex items-center gap-2">
-								<span class="text-xs font-bold text-slate-900">
-									Soal No. {currentIndex + 1}
-								</span>
-								<span class="text-[10px] text-slate-400">dari 25 Soal</span>
-							</div>
-							<p class="text-[11px] font-semibold text-indigo-600">
-								{QUESTION_TYPE_LABELS[currentQuestion.type] || currentQuestion.type}
-							</p>
-						</div>
-					</div>
+	<!-- Main Content (SAMA PERSIS DENGAN UJIAN ASLI) -->
+	<main class="flex-1 max-w-4xl mx-auto w-full px-4 py-6">
+		{#if currentQuestion}
+			{#key currentQuestion.id}
+				<QuestionRenderer
+					question={currentQuestion}
+					displayNumber={currentIndex + 1}
+					answer={localAnswers[currentQuestion.id] || ''}
+					isDoubted={localDoubts[currentQuestion.id] || false}
+					on:answer={handleAnswer}
+					on:doubt={handleDoubt}
+				/>
+			{/key}
+		{/if}
+	</main>
 
-					<!-- Ragu-ragu status badge -->
-					{#if doubts[currentQuestion.id]}
-						<span class="inline-flex items-center gap-1 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-300 px-2.5 py-1 rounded-xl shadow-xs">
-							⚠️ Ragu-ragu
-						</span>
-					{/if}
+	<!-- Bottom Navigation (SAMA PERSIS DENGAN UJIAN ASLI) -->
+	<footer class="sticky bottom-0 z-30 bg-white/90 backdrop-blur-xl border-t border-slate-200">
+		<div class="max-w-4xl mx-auto px-4 py-3">
+			<!-- Nav Toggle + Info -->
+			<div class="flex items-center justify-between mb-3">
+				<div class="flex items-center gap-2">
+					<button
+						type="button"
+						class="btn-sm btn-ghost border border-slate-200"
+						on:click={() => (showNav = !showNav)}
+					>
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+						</svg>
+						Navigasi Soal
+					</button>
+					<button
+						type="button"
+						class="btn-sm btn-ghost border border-slate-200 text-slate-500 hover:text-rose-600 hover:bg-rose-50"
+						on:click={() => (showExitConfirm = true)}
+						title="Keluar dari Simulasi"
+					>
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.logout} />
+						</svg>
+						<span class="hidden sm:inline">Keluar</span>
+					</button>
 				</div>
+				<div class="flex items-center gap-3 text-xs">
+					<span class="text-emerald-600 font-semibold">{answeredCount} terjawab</span>
+					{#if doubtedCount > 0}
+						<span class="text-amber-600 font-semibold">{doubtedCount} ragu</span>
+					{/if}
+					<span class="text-slate-400">{unansweredCount} belum</span>
+				</div>
+			</div>
 
-				<!-- Question Body & Choices Card -->
-				<div class="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200/80 shadow-sm overflow-hidden">
-					<QuestionRenderer
-						question={currentQuestion}
-						answer={answers[currentQuestion.id] || ''}
-						isDoubted={!!doubts[currentQuestion.id]}
-						displayNumber={currentIndex + 1}
-						on:answer={handleAnswer}
-						on:doubt={handleDoubt}
+			<!-- Question Grid (collapsible) -->
+			{#if showNav}
+				<div class="mb-3 p-3 bg-slate-50 rounded-xl animate-in">
+					<QuestionNav
+						questions={navQuestions}
+						{currentIndex}
+						on:navigate={(e) => goToQuestion(e.detail.index)}
 					/>
 				</div>
+			{/if}
 
-				<!-- Navigation Footer Bar -->
-				<div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
-					<!-- Prev Button -->
+			<!-- Prev / Next / Submit -->
+			<div class="flex items-center gap-3">
+				<button
+					type="button"
+					class="btn-ghost flex-1 justify-center"
+					disabled={currentIndex === 0}
+					on:click={prev}
+				>
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.chevronLeft} />
+					</svg>
+					Sebelumnya
+				</button>
+
+				{#if questions && currentIndex < questions.length - 1}
+					<button type="button" class="btn-primary flex-1 justify-center" on:click={next}>
+						Selanjutnya
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.chevronRight} />
+						</svg>
+					</button>
+				{:else}
 					<button
 						type="button"
-						disabled={currentIndex === 0}
-						on:click={() => goToIndex(currentIndex - 1)}
-						class="w-full sm:w-auto px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all
-							{currentIndex === 0 
-								? 'bg-slate-100 text-slate-400 cursor-not-allowed' 
-								: 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 shadow-xs'}"
+						class="btn-success flex-1 justify-center"
+						on:click={() => { finishConfirmationInput = ''; showSubmitConfirm = true; }}
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+							<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.check} />
 						</svg>
-						Soal Sebelumnya
+						Selesai & Kumpulkan
 					</button>
-
-					<!-- Ragu-Ragu Checkbox Button -->
-					<button
-						type="button"
-						on:click={toggleCurrentDoubt}
-						class="w-full sm:w-auto px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-xs
-							{doubts[currentQuestion.id] 
-								? 'bg-amber-500 text-white shadow-amber-500/20' 
-								: 'bg-amber-50 text-amber-700 border border-amber-300 hover:bg-amber-100'}"
-					>
-						<input
-							type="checkbox"
-							checked={!!doubts[currentQuestion.id]}
-							class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500 pointer-events-none"
-						/>
-						Ragu-ragu
-					</button>
-
-					<!-- Next / Finish Button -->
-					{#if currentIndex < questions.length - 1}
-						<button
-							type="button"
-							on:click={() => goToIndex(currentIndex + 1)}
-							class="w-full sm:w-auto px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-500/20 flex items-center justify-center gap-1.5 transition-all"
-						>
-							Soal Selanjutnya
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-							</svg>
-						</button>
-					{:else}
-						<button
-							type="button"
-							on:click={() => (showFinishConfirmModal = true)}
-							class="w-full sm:w-auto px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-500/20 flex items-center justify-center gap-1.5 transition-all"
-						>
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-								<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.check} />
-							</svg>
-							Selesai Ujian
-						</button>
-					{/if}
-				</div>
-			{/if}
-		</div>
-
-		<!-- Right Column: Question Grid (Persistent on Desktop) -->
-		<div class="hidden lg:block lg:col-span-1 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm sticky top-20 space-y-4">
-			<div class="flex items-center justify-between pb-3 border-b border-slate-100">
-				<h3 class="font-extrabold text-sm text-slate-800">Nomor Soal</h3>
-				<span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">
-					25 Soal
-				</span>
-			</div>
-
-			<QuestionNav
-				questions={navQuestions}
-				{currentIndex}
-				on:navigate={(e) => goToIndex(e.detail.index)}
-			/>
-
-			<div class="pt-3 border-t border-slate-100">
-				<button
-					type="button"
-					on:click={() => (showFinishConfirmModal = true)}
-					class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-500/20 flex items-center justify-center gap-1.5 transition-all"
-				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.check} />
-					</svg>
-					Kumpulkan Ujian
-				</button>
+				{/if}
 			</div>
 		</div>
-	</main>
+	</footer>
 </div>
 
-<!-- Drawer Nomor Soal untuk Mobile / Tablet -->
-{#if showNavDrawer}
+<!-- Submit Confirmation Modal (SAMA PERSIS DENGAN UJIAN ASLI DENGAN INPUT "SELESAI") -->
+{#if showSubmitConfirm}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div
-		class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex justify-end"
-		on:click={() => (showNavDrawer = false)}
-	>
-		<div
-			class="w-full max-w-xs sm:max-w-sm h-full bg-white p-5 flex flex-col shadow-2xl animate-in slide-in-from-right duration-200"
-			on:click|stopPropagation
-		>
-			<div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
-				<div>
-					<h3 class="font-extrabold text-base text-slate-800">Daftar Nomor Soal</h3>
-					<p class="text-xs text-slate-500">{answeredCount} dari 25 terjawab</p>
-				</div>
-				<button
-					type="button"
-					class="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100"
-					on:click={() => (showNavDrawer = false)}
-				>
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.close} />
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto" on:click={() => { showSubmitConfirm = false; finishConfirmationInput = ''; }}>
+		<div class="max-h-[92vh] overflow-y-auto card p-4 sm:p-6 w-full max-w-[380px] sm:max-w-md animate-bounce-in text-center shadow-2xl rounded-2xl my-auto" on:click|stopPropagation>
+			<div class="w-12 h-12 sm:w-14 sm:h-14 mx-auto rounded-full bg-emerald-100 flex items-center justify-center mb-3 text-emerald-600 shadow-sm shrink-0">
+				<svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.check} />
+				</svg>
+			</div>
+			<h3 class="text-base sm:text-lg font-bold text-slate-800 mb-2">Kumpulkan Jawaban?</h3>
+
+			<div class="bg-slate-50 rounded-xl p-2.5 sm:p-3 mb-3 text-left text-xs sm:text-sm space-y-1 border border-slate-100">
+				<p class="flex justify-between items-center"><span class="text-slate-500">Terjawab:</span> <span class="font-semibold text-emerald-600">{answeredCount} / {questions?.length || 0}</span></p>
+				<p class="flex justify-between items-center"><span class="text-slate-500">Ragu-ragu:</span> <span class="font-semibold text-amber-600">{doubtedCount}</span></p>
+				<p class="flex justify-between items-center"><span class="text-slate-500">Belum dijawab:</span> <span class="font-semibold text-rose-600">{unansweredCount}</span></p>
+			</div>
+
+			{#if unansweredCount > 0}
+				<div class="p-2 sm:p-2.5 rounded-lg bg-rose-50 border border-rose-200/80 text-rose-700 text-xs font-semibold mb-3 flex items-center gap-1.5 text-left">
+					<svg class="w-4 h-4 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
 					</svg>
-				</button>
-			</div>
-
-			<div class="flex-1 overflow-y-auto">
-				<QuestionNav
-					questions={navQuestions}
-					{currentIndex}
-					on:navigate={(e) => goToIndex(e.detail.index)}
-				/>
-			</div>
-
-			<div class="pt-4 border-t border-slate-100 mt-4 space-y-2">
-				<button
-					type="button"
-					on:click={() => {
-						showNavDrawer = false;
-						showFinishConfirmModal = true;
-					}}
-					class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md shadow-emerald-500/20 flex items-center justify-center gap-1.5"
-				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.check} />
-					</svg>
-					Selesai Ujian
-				</button>
-			</div>
-		</div>
-	</div>
-{/if}
-
-<!-- Modal Konfirmasi Selesai Ujian -->
-{#if showFinishConfirmModal}
-	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-		<div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200">
-			<div class="text-center space-y-2">
-				<div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center border border-emerald-200 shadow-inner">
-					<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-					</svg>
-				</div>
-				<h3 class="text-lg font-extrabold text-slate-800">Selesaikan Simulasi Ujian?</h3>
-				<p class="text-xs text-slate-500">
-					Periksa ringkasan jawaban Anda sebelum mengakhiri simulasi ini.
-				</p>
-			</div>
-
-			<!-- Ringkasan Status Jawaban -->
-			<div class="grid grid-cols-3 gap-2.5 text-center">
-				<div class="p-3 rounded-2xl bg-emerald-50 border border-emerald-200">
-					<p class="text-xl font-black text-emerald-700">{answeredCount}</p>
-					<p class="text-[10px] font-bold text-emerald-600 uppercase">Terjawab</p>
-				</div>
-				<div class="p-3 rounded-2xl bg-amber-50 border border-amber-200">
-					<p class="text-xl font-black text-amber-700">{doubtedCount}</p>
-					<p class="text-[10px] font-bold text-amber-600 uppercase">Ragu-ragu</p>
-				</div>
-				<div class="p-3 rounded-2xl bg-slate-50 border border-slate-200">
-					<p class="text-xl font-black text-slate-700">{unansweredCount}</p>
-					<p class="text-[10px] font-bold text-slate-500 uppercase">Kosong</p>
-				</div>
-			</div>
-
-			{#if unansweredCount > 0 || doubtedCount > 0}
-				<div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-start gap-2">
-					<span>⚠️</span>
-					<span>Masih ada <strong>{unansweredCount} soal belum dijawab</strong> dan <strong>{doubtedCount} soal ragu-ragu</strong>. Anda yakin ingin menyelesaikan sekarang?</span>
+					<span>Masih ada {unansweredCount} soal yang belum dijawab!</span>
 				</div>
 			{/if}
 
-			<div class="flex gap-3 pt-2">
+			<!-- Konfirmasi Kata SELESAI -->
+			<div class="bg-amber-50/70 border border-amber-200/80 rounded-xl p-3 mb-4 text-left">
+				<div class="flex items-start gap-2 mb-1.5">
+					<svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+					</svg>
+					<p class="text-xs text-slate-700 leading-relaxed">
+						Untuk mengonfirmasi pengumpulan, ketik kata <span class="font-bold text-slate-900 bg-amber-100/90 px-1.5 py-0.5 rounded border border-amber-300 font-mono">SELESAI</span> di bawah:
+					</p>
+				</div>
+				<div class="relative mt-2">
+					<input
+						id="finish-confirm-input"
+						type="text"
+						bind:value={finishConfirmationInput}
+						placeholder='Ketik kata "SELESAI"'
+						autocomplete="off"
+						spellcheck="false"
+						on:keydown={(e) => {
+							if (e.key === 'Enter' && isFinishConfirmed) {
+								e.preventDefault();
+								evaluateAndFinish();
+							}
+						}}
+						class="input w-full text-center font-bold tracking-widest text-base py-2.5 sm:py-3 pr-10 transition-all bg-white uppercase {isFinishConfirmed ? 'border-emerald-500 ring-2 ring-emerald-500/20 text-emerald-700' : 'border-slate-300 focus:border-indigo-500'}"
+					/>
+					{#if isFinishConfirmed}
+						<div class="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none text-emerald-600">
+							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+						</div>
+					{/if}
+				</div>
+				{#if !isFinishConfirmed && finishConfirmationInput.trim().length > 0}
+					<p class="text-[11px] text-rose-600 mt-1.5 font-medium flex items-center gap-1">
+						<svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+						</svg>
+						Tuliskan kata "SELESAI" untuk mengaktifkan tombol.
+					</p>
+				{/if}
+			</div>
+
+			<div class="flex gap-2 sm:gap-3">
+				<button type="button" class="btn-ghost flex-1 py-2 sm:py-2.5 text-xs sm:text-sm" on:click={() => { showSubmitConfirm = false; finishConfirmationInput = ''; }}>Batal</button>
 				<button
 					type="button"
-					class="btn btn-secondary flex-1 text-xs sm:text-sm py-2.5 rounded-xl"
-					on:click={() => (showFinishConfirmModal = false)}
+					class="btn-success flex-1 py-2 sm:py-2.5 text-xs sm:text-sm {isFinishConfirmed ? '' : 'opacity-50 cursor-not-allowed'}"
+					disabled={!isFinishConfirmed}
+					on:click={evaluateAndFinish}
 				>
-					Lanjut Mengerjakan
-				</button>
-				<button
-					type="button"
-					class="btn btn-primary flex-1 text-xs sm:text-sm py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 border-none shadow-md shadow-emerald-500/20"
-					on:click={finishSimulation}
-				>
-					Ya, Kumpulkan
+					Kumpulkan Jawaban
 				</button>
 			</div>
 		</div>
@@ -576,7 +598,7 @@
 					Hasil Simulasi Ujian Mandiri
 				</h2>
 				<p class="text-xs text-slate-500">
-					Waktu pengerjaan: {Math.floor(timeElapsed / 60)} menit {timeElapsed % 60} detik
+					Waktu pengerjaan: {Math.floor(timeElapsedSeconds / 60)} menit {timeElapsedSeconds % 60} detik
 				</p>
 			</div>
 
@@ -594,7 +616,7 @@
 					{:else if scoreResult.totalScore >= 65}
 						👍 Bagus! Terus latih pemahaman pada tipe soal yang masih ragu.
 					{:else}
-						📚 Tetap semangat! Simulasi ini membantu Anda membiasakan diri dengan sistem ujian.
+						📚 Tetap semangat! Simulasi ini membantu Anda membiasakan diri dengan sistem ujian CBT.
 					{/if}
 				</p>
 			</div>
@@ -653,7 +675,7 @@
 {/if}
 
 <!-- Modal Konfirmasi Keluar Simulasi -->
-{#if showExitConfirmModal}
+{#if showExitConfirm}
 	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
 		<div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4 animate-in zoom-in-95 duration-200">
 			<div class="text-center space-y-2">
@@ -672,7 +694,7 @@
 				<button
 					type="button"
 					class="btn btn-secondary flex-1 text-xs py-2.5 rounded-xl"
-					on:click={() => (showExitConfirmModal = false)}
+					on:click={() => (showExitConfirm = false)}
 				>
 					Lanjut Simulasi
 				</button>
