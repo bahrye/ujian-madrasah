@@ -80,7 +80,7 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		`).bind(locals.user.school_id).all<any>();
 	} else {
 		tokensRaw = await db.prepare(`
-			SELECT DISTINCT t.*, e.title as exam_title, s.name as subject_name, et.code as exam_type_code, c.name as class_name,
+			SELECT t.*, e.title as exam_title, s.name as subject_name, et.code as exam_type_code, c.name as class_name,
 			COALESCE((
 				SELECT json_group_array(
 					json_object(
@@ -98,13 +98,16 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 			), '[]') as used_by_students_json
 			FROM tokens t 
 			JOIN exams e ON t.exam_id = e.id
-			JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
 			LEFT JOIN subjects s ON e.subject_id = s.id
 			LEFT JOIN exam_types et ON e.exam_type_id = et.id
 			LEFT JOIN classes c ON e.class_id = c.id
 			WHERE e.school_id = ?
+			  AND EXISTS (
+				SELECT 1 FROM exam_proctors ep
+				WHERE ep.exam_id = e.id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
+			  )
 			ORDER BY t.created_at DESC
-		`).bind(locals.user.id, locals.user.school_id).all<any>();
+		`).bind(locals.user.school_id, locals.user.id).all<any>();
 	}
 
 	const tokens = (tokensRaw.results || []).map((t: any) => {
@@ -234,19 +237,7 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		};
 	});
 
-	const processedTokens = tokens.map((t: any) => {
-		let usedBy = [];
-		try {
-			usedBy = t.active_students_json ? JSON.parse(t.active_students_json) : [];
-			if (usedBy.length === 1 && usedBy[0].id === null) usedBy = [];
-		} catch (e) {}
-		return {
-			...t,
-			used_by_students: usedBy
-		};
-	});
-
-	return { tokens: processedTokens, exams: processedExams };
+	return { tokens, exams: processedExams };
 };
 
 export const actions: Actions = {
