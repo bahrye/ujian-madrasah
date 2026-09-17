@@ -47,6 +47,9 @@ class MainActivity : AppCompatActivity() {
     private var tripleTapCount = 0
     private var lastTapTime = 0L
     private var hasLeftApp = false
+    private var isRequestingPermission = false
+    private var isAppStarted = false
+    private var currentUrl: String = ""
 
     companion object {
         private const val PREFS_NAME = "exambro_prefs"
@@ -76,6 +79,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        // Reset pelanggaran setiap kali aplikasi dibuka fresh
+        prefs.edit().putInt(KEY_VIOLATIONS, 0).apply()
 
         initViews()
         setupWebView()
@@ -83,6 +88,11 @@ class MainActivity : AppCompatActivity() {
 
         // Muat URL ujian
         loadExamUrl()
+
+        // Beri jeda 3 detik sebelum mengaktifkan deteksi agar startup/splash tidak memicu peringatan
+        window.decorView.postDelayed({
+            isAppStarted = true
+        }, 3000)
     }
 
     private fun applyImmersiveMode() {
@@ -184,11 +194,18 @@ class MainActivity : AppCompatActivity() {
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
                 progressBar.visibility = View.VISIBLE
+                url?.let { currentUrl = it }
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 progressBar.visibility = View.GONE
+                url?.let { currentUrl = it }
+            }
+
+            override fun doUpdateVisitedHistory(view: WebView?, url: String?, isReload: Boolean) {
+                super.doUpdateVisitedHistory(view, url, isReload)
+                url?.let { currentUrl = it }
             }
 
             override fun onReceivedError(
@@ -208,7 +225,6 @@ class MainActivity : AppCompatActivity() {
                 request: WebResourceRequest?
             ): Boolean {
                 val url = request?.url?.toString() ?: return false
-                // Tetap navigasi di dalam webview
                 if (url.startsWith("http://") || url.startsWith("https://")) {
                     return false
                 }
@@ -219,6 +235,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadExamUrl() {
         val url = prefs.getString(KEY_EXAM_URL, DEFAULT_URL) ?: DEFAULT_URL
+        currentUrl = url
         webView.loadUrl(url)
     }
 
@@ -226,6 +243,7 @@ class MainActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED
         ) {
+            isRequestingPermission = true
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.CAMERA),
@@ -234,9 +252,41 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQ_CAMERA_PERMISSION) {
+            // Beri sedikit jeda agar dialog izin tertutup sempurna sebelum membuka deteksi
+            window.decorView.postDelayed({
+                isRequestingPermission = false
+            }, 1000)
+        }
+    }
+
+    /**
+     * Memeriksa apakah siswa sedang berada di dalam halaman pengerjaan ujian.
+     * Deteksi pelanggaran HANYA aktif saat siswa berada di ruang ujian aktif.
+     */
+    private fun isExamInProgress(): Boolean {
+        val activeUrl = webView.url ?: currentUrl
+        return activeUrl.contains("/siswa/ujian") || activeUrl.contains("/ujian/")
+    }
+
     // 4. DETEKSI SISWA KELUAR APLIKASI (HOME / RECENT APPS / SPLIT SCREEN)
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
+
+        // Jangan catat pelanggaran jika:
+        // 1. Sedang memunculkan dialog izin kamera sistem
+        // 2. Aplikasi baru saja dibuka (< 3 detik)
+        // 3. Siswa BELUM masuk ke halaman pengerjaan soal ujian (misal masih di login / menu siswa)
+        if (isRequestingPermission || !isAppStarted || !isExamInProgress()) {
+            return
+        }
+
         hasLeftApp = true
         val currentViolations = prefs.getInt(KEY_VIOLATIONS, 0) + 1
         prefs.edit().putInt(KEY_VIOLATIONS, currentViolations).apply()
@@ -246,10 +296,13 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         applyImmersiveMode()
 
-        if (hasLeftApp) {
+        // Tampilkan dialog pelanggaran HANYA jika siswa sedang ujian dan benar-benar keluar
+        if (hasLeftApp && isExamInProgress()) {
             hasLeftApp = false
             val count = prefs.getInt(KEY_VIOLATIONS, 0)
             showViolationWarningDialog(count)
+        } else {
+            hasLeftApp = false
         }
     }
 
@@ -266,10 +319,32 @@ class MainActivity : AppCompatActivity() {
         alert.show()
     }
 
-    // 5. BLOKIR TOMBOL KEMBALI: Butuh PIN Pengawas untuk Keluar
+    // 5. BLOKIR TOMBOL KEMBALI
     @Suppress("DEPRECATION")
     override fun onBackPressed() {
-        promptProctorPinToExit()
+        if (isExamInProgress()) {
+            // Saat sedang ujian: Tombol kembali DIBLOKIR, butuh PIN Pengawas untuk keluar
+            promptProctorPinToExit()
+        } else {
+            // Saat belum masuk ujian (Login/Dashboard): Bisa navigasi kembali atau konfirmasi keluar biasa
+            if (webView.canGoBack()) {
+                webView.goBack()
+            } else {
+                showNormalExitDialog()
+            }
+        }
+    }
+
+    private fun showNormalExitDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Keluar Aplikasi")
+            .setMessage("Apakah Anda yakin ingin menutup aplikasi ujian?")
+            .setPositiveButton("Ya") { _, _ -> finish() }
+            .setNegativeButton("Tidak") { dialog, _ ->
+                dialog.dismiss()
+                applyImmersiveMode()
+            }
+            .show()
     }
 
     private fun promptProctorPinToExit() {
@@ -346,8 +421,8 @@ class MainActivity : AppCompatActivity() {
         val tvViolations = view.findViewById<TextView>(R.id.tvViolationStatus)
         val btnResetViolations = view.findViewById<Button>(R.id.btnResetViolations)
 
-        val currentUrl = prefs.getString(KEY_EXAM_URL, DEFAULT_URL) ?: DEFAULT_URL
-        etUrl.setText(currentUrl)
+        val currentStoredUrl = prefs.getString(KEY_EXAM_URL, DEFAULT_URL) ?: DEFAULT_URL
+        etUrl.setText(currentStoredUrl)
 
         fun updateViolationText() {
             val count = prefs.getInt(KEY_VIOLATIONS, 0)
@@ -367,6 +442,7 @@ class MainActivity : AppCompatActivity() {
                 val newUrl = etUrl.text.toString().trim()
                 if (newUrl.isNotEmpty()) {
                     prefs.edit().putString(KEY_EXAM_URL, newUrl).apply()
+                    currentUrl = newUrl
                     layoutError.visibility = View.GONE
                     webView.visibility = View.VISIBLE
                     webView.loadUrl(newUrl)
