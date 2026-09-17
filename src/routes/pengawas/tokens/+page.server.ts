@@ -36,21 +36,23 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 						'id', u.id, 
 						'name', u.name, 
 						'username', u.username, 
-						'start_time', sa.start_time
+						'start_time', sa.start_time,
+						'status', sa.status
 					)
 				)
 				FROM student_attempts sa
 				JOIN users u ON sa.student_id = u.id
-				WHERE sa.token_id = t.id AND sa.status = 'mengerjakan'
-			), '[]') as active_students_json
+				WHERE sa.token_id = t.id 
+				   OR (sa.token_id IS NULL AND sa.exam_id = t.exam_id AND (t.session_number IS NULL OR t.session_number = COALESCE(u.session_number, 1)))
+			), '[]') as used_by_students_json
 			FROM tokens t 
 			JOIN exams e ON t.exam_id = e.id
 			LEFT JOIN subjects s ON e.subject_id = s.id
 			LEFT JOIN exam_types et ON e.exam_type_id = et.id
 			LEFT JOIN classes c ON e.class_id = c.id
-			WHERE e.school_id = ?
+			WHERE (? IS NULL OR e.school_id = ?)
 			ORDER BY t.created_at DESC
-		`).bind(locals.user.school_id).all<any>();
+		`).bind(locals.user.school_id, locals.user.school_id).all<any>();
 	} else {
 		tokensRaw = await db.prepare(`
 			SELECT DISTINCT t.*, e.title as exam_title, s.name as subject_name, et.code as exam_type_code, c.name as class_name,
@@ -60,13 +62,15 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 						'id', u.id, 
 						'name', u.name, 
 						'username', u.username, 
-						'start_time', sa.start_time
+						'start_time', sa.start_time,
+						'status', sa.status
 					)
 				)
 				FROM student_attempts sa
 				JOIN users u ON sa.student_id = u.id
-				WHERE sa.token_id = t.id AND sa.status = 'mengerjakan'
-			), '[]') as active_students_json
+				WHERE sa.token_id = t.id 
+				   OR (sa.token_id IS NULL AND sa.exam_id = t.exam_id AND (t.session_number IS NULL OR t.session_number = COALESCE(u.session_number, 1)))
+			), '[]') as used_by_students_json
 			FROM tokens t 
 			JOIN exams e ON t.exam_id = e.id
 			JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
@@ -78,16 +82,30 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		`).bind(locals.user.id, locals.user.school_id).all<any>();
 	}
 
-	const tokens = (tokensRaw.results || []).map((t: any) => ({
-		...t,
-		exam_title: formatExamTitle({
-			title: t.exam_title,
-			examTypeCode: t.exam_type_code,
-			subjectName: t.subject_name,
-			className: t.class_name
-		}),
-		used_by_students: [] // Placeholder to maintain structure compatibility
-	}));
+	const tokens = (tokensRaw.results || []).map((t: any) => {
+		let usedBy: any[] = [];
+		try {
+			usedBy = t.used_by_students_json ? JSON.parse(t.used_by_students_json) : [];
+			if (Array.isArray(usedBy)) {
+				usedBy = usedBy.filter((u: any) => u && u.id !== null);
+			} else {
+				usedBy = [];
+			}
+		} catch (e) {
+			usedBy = [];
+		}
+
+		return {
+			...t,
+			exam_title: formatExamTitle({
+				title: t.exam_title,
+				examTypeCode: t.exam_type_code,
+				subjectName: t.subject_name,
+				className: t.class_name
+			}),
+			used_by_students: usedBy
+		};
+	});
 
 	let rawExamsList: any[] = [];
 

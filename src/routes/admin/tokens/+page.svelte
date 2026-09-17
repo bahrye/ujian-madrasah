@@ -186,11 +186,19 @@
 								</form>
 							{/if}
 						{/if}
-						<button type="button" class="btn-sm btn-ghost text-indigo-400 hover:text-indigo-600" on:click={() => openStudentsModal(token)} title="Lihat Penggunaan">
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+						<button 
+							type="button" 
+							class="btn-sm btn-ghost text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 flex items-center gap-1.5 transition-colors" 
+							on:click={() => openStudentsModal(token)} 
+							title="Lihat Penggunaan Token"
+						>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
 								<path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
 							</svg>
+							<span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded-full border border-indigo-100">
+								{token.used_by_students?.length || 0}
+							</span>
 						</button>
 						<form method="POST" action="?/delete" use:enhance>
 							<input type="hidden" name="id" value={token.id} />
@@ -219,7 +227,11 @@
 			<div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
 				<div>
 					<h3 class="font-bold text-slate-800 text-lg">Penggunaan Token</h3>
-					<p class="text-sm text-slate-500 font-mono tracking-widest">{selectedToken.token_code}</p>
+					<div class="flex items-center gap-2 mt-0.5">
+						<span class="text-sm text-slate-700 font-mono tracking-widest font-bold">{selectedToken.token_code}</span>
+						<span class="text-xs text-slate-300">•</span>
+						<span class="text-xs font-semibold text-indigo-600">{selectedToken.used_by_students?.length || 0} siswa</span>
+					</div>
 				</div>
 				<button class="text-slate-400 hover:text-slate-600 p-2 rounded-lg hover:bg-slate-100 transition-colors" aria-label="Tutup" on:click={() => showStudentsModal = false}>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -232,19 +244,28 @@
 				{#if selectedToken.used_by_students && selectedToken.used_by_students.length > 0}
 					<div class="space-y-3">
 						{#each selectedToken.used_by_students as student, i}
-							<div class="flex items-center gap-3 p-3 rounded-xl border border-slate-100 bg-white hover:border-indigo-100 transition-all">
-								<div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500 font-bold text-xs">
+							<div class="flex items-center gap-3 p-3 rounded-xl border border-slate-100 bg-white hover:border-indigo-100 transition-all shadow-xs">
+								<div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-xs shrink-0">
 									{i + 1}
 								</div>
 								<div class="flex-1 min-w-0">
-									<p class="font-medium text-slate-800 truncate">{student.name}</p>
-									<p class="text-xs text-slate-500">
-										NISN: {student.username}
+									<div class="flex items-center gap-2 flex-wrap">
+										<p class="font-semibold text-slate-800 truncate text-sm">{student.name}</p>
+										{#if student.status === 'selesai'}
+											<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Selesai</span>
+										{:else if student.status === 'waktu_habis'}
+											<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">Waktu Habis</span>
+										{:else}
+											<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">Mengerjakan</span>
+										{/if}
+									</div>
+									<p class="text-xs text-slate-500 mt-0.5">
+										NISN / Username: <span class="font-mono">{student.username}</span>
 									</p>
 								</div>
 								<div class="text-right flex-shrink-0">
-									<p class="text-xs font-medium text-slate-700">Waktu Akses</p>
-									<p class="text-[10px] text-slate-500">{parseDate(student.start_time).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+									<p class="text-[11px] font-medium text-slate-600">Waktu Akses</p>
+									<p class="text-[10px] text-slate-400">{parseDate(student.start_time).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
 								</div>
 							</div>
 						{/each}

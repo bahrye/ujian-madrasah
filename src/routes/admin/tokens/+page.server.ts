@@ -22,7 +22,7 @@ export interface ExamSelectItem {
 
 export const load: PageServerLoad = async ({ platform, locals }) => {
 	if (!locals.user) throw redirect(302, '/login');
-	const db = getDB(platform);
+	const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
 
 	const tokensRaw = await db.prepare(`
 		SELECT t.*, e.title as exam_title, s.name as subject_name, et.code as exam_type_code, c.name as class_name,
@@ -32,21 +32,23 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 					'id', u.id, 
 					'name', u.name, 
 					'username', u.username, 
-					'start_time', sa.start_time
+					'start_time', sa.start_time,
+					'status', sa.status
 				)
 			)
 			FROM student_attempts sa
 			JOIN users u ON sa.student_id = u.id
 			WHERE sa.token_id = t.id
+			   OR (sa.token_id IS NULL AND sa.exam_id = t.exam_id AND (t.session_number IS NULL OR t.session_number = COALESCE(u.session_number, 1)))
 		), '[]') as used_by_students_json
 		FROM tokens t 
 		JOIN exams e ON t.exam_id = e.id
 		LEFT JOIN subjects s ON e.subject_id = s.id
 		LEFT JOIN exam_types et ON e.exam_type_id = et.id
 		LEFT JOIN classes c ON e.class_id = c.id
-		WHERE t.school_id = ?
+		WHERE (? IS NULL OR t.school_id = ?)
 		ORDER BY t.created_at DESC
-	`).bind(locals.user.school_id).all<any>();
+	`).bind(locals.user.school_id, locals.user.school_id).all<any>();
 
 	const examsRaw = await db.prepare(`
 		SELECT e.id, e.title, e.start_time, e.end_time, s.name as subject_name, et.code as exam_type_code, c.name as class_name
@@ -101,11 +103,17 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 	});
 
 	const processedTokens = (tokensRaw.results || []).map((t: any) => {
-		let usedBy = [];
+		let usedBy: any[] = [];
 		try {
 			usedBy = t.used_by_students_json ? JSON.parse(t.used_by_students_json) : [];
-			if (usedBy.length === 1 && usedBy[0].id === null) usedBy = [];
-		} catch (e) {}
+			if (Array.isArray(usedBy)) {
+				usedBy = usedBy.filter((u: any) => u && u.id !== null);
+			} else {
+				usedBy = [];
+			}
+		} catch (e) {
+			usedBy = [];
+		}
 
 		return {
 			...t,

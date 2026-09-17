@@ -153,6 +153,8 @@ export const actions: Actions = {
 			if (allAttempts.results && allAttempts.results.length > 0) {
 				const mengerjakanAttempt = allAttempts.results.find((a) => a.status === 'mengerjakan');
 				if (mengerjakanAttempt) {
+					await db.prepare('UPDATE student_attempts SET token_id = ? WHERE id = ?')
+						.bind(token.id, mengerjakanAttempt.id).run();
 					const signedCookie = await signExamToken(mengerjakanAttempt.id, locals.user!.id);
 					cookies.set('exam_token_verified_' + mengerjakanAttempt.id, signedCookie, { path: '/', httpOnly: true, sameSite: 'lax' });
 					throw redirect(302, `/siswa/ujian/${mengerjakanAttempt.id}`);
@@ -256,6 +258,8 @@ export const actions: Actions = {
 			if (allAttempts.results && allAttempts.results.length > 0) {
 				const mengerjakanAttempt = allAttempts.results.find((a) => a.status === 'mengerjakan');
 				if (mengerjakanAttempt) {
+					await db.prepare('UPDATE student_attempts SET token_id = ? WHERE id = ?')
+						.bind(token.id, mengerjakanAttempt.id).run();
 					const signedCookie = await signExamToken(mengerjakanAttempt.id, locals.user!.id);
 					cookies.set('exam_token_verified_' + mengerjakanAttempt.id, signedCookie, { path: '/', httpOnly: true, sameSite: 'lax' });
 					throw redirect(302, `/siswa/ujian/${mengerjakanAttempt.id}`);
