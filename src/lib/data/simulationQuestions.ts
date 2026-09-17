@@ -5067,17 +5067,17 @@ export const MA_QUESTIONS_GRADE_12: SimulationQuestion[] = [
 // FUNGSI PARSER TINGKAT KELAS & JENJANG
 // ==========================================
 export function parseGradeAndJenjang(
-	schoolJenjang: string | null | undefined,
-	schoolName: string | null | undefined,
-	classLevel: string | null | undefined,
-	className: string | null | undefined
+	schoolJenjang: unknown,
+	schoolName: unknown,
+	classLevel: unknown,
+	className: unknown
 ): { jenjang: 'MI' | 'MTS' | 'MA'; grade: number; displayGrade: string } {
 	let jenjang: 'MI' | 'MTS' | 'MA' = 'MTS';
 
-	const normSchoolJenjang = (schoolJenjang || '').trim().toUpperCase();
-	const normSchoolName = (schoolName || '').trim().toUpperCase();
-	const normClassLevel = (classLevel || '').trim().toUpperCase();
-	const normClassName = (className || '').trim().toUpperCase();
+	const normSchoolJenjang = String(schoolJenjang ?? '').trim().toUpperCase();
+	const normSchoolName = String(schoolName ?? '').trim().toUpperCase();
+	const normClassLevel = String(classLevel ?? '').trim().toUpperCase();
+	const normClassName = String(className ?? '').trim().toUpperCase();
 
 	// 1. Tentukan Jenjang Sekolah Utama
 	if (normSchoolJenjang.includes('MI') || normSchoolJenjang.includes('SD')) {

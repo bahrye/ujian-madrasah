@@ -39,10 +39,10 @@ export const load: PageServerLoad = async ({ locals, platform }) => {
 			}>();
 
 		if (studentInfo) {
-			schoolName = studentInfo.school_name || '';
-			schoolJenjang = studentInfo.school_jenjang || studentInfo.school_level || null;
-			className = studentInfo.class_name || '';
-			classLevel = studentInfo.class_level || null;
+			schoolName = String(studentInfo.school_name || '');
+			schoolJenjang = studentInfo.school_jenjang ? String(studentInfo.school_jenjang) : (studentInfo.school_level ? String(studentInfo.school_level) : null);
+			className = String(studentInfo.class_name || '');
+			classLevel = studentInfo.class_level ? String(studentInfo.class_level) : null;
 		}
 	} catch (e) {
 		console.warn('Failed to load student simulation info:', e);

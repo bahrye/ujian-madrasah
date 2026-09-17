@@ -133,7 +133,12 @@ function sanitizeRow<T = Record<string, unknown>>(row: T): T {
 		'expires_at',
 		'answered_at',
 		'last_active_at',
-		'date_of_birth'
+		'date_of_birth',
+		'level',
+		'class_level',
+		'school_level',
+		'jenjang',
+		'school_jenjang'
 	];
 
 	for (const [key, val] of Object.entries(row as Record<string, unknown>)) {
