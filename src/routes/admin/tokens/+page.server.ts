@@ -146,9 +146,15 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 	const processedTokens = (tokensRaw.results || []).map((t: any) => {
 		let usedBy: any[] = [];
 		try {
-			usedBy = t.used_by_students_json ? JSON.parse(t.used_by_students_json) : [];
+			if (Array.isArray(t.used_by_students_json)) {
+				usedBy = t.used_by_students_json;
+			} else if (typeof t.used_by_students_json === 'string') {
+				usedBy = JSON.parse(t.used_by_students_json);
+			} else if (t.used_by_students_json && typeof t.used_by_students_json === 'object') {
+				usedBy = [t.used_by_students_json];
+			}
 			if (Array.isArray(usedBy)) {
-				usedBy = usedBy.filter((u: any) => u && u.id !== null);
+				usedBy = usedBy.filter((u: any) => u && u.id !== null && u.name);
 			} else {
 				usedBy = [];
 			}
