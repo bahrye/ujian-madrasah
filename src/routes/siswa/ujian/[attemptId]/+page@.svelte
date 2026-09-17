@@ -119,6 +119,20 @@
 	let showWarningModal = false;
 	let showDisqualifiedModal = false;
 	let showTimeUpModal = false;
+	let timeUpCountdown = 5;
+	let timeUpInterval: any = null;
+
+	function startTimeUpCountdown() {
+		timeUpCountdown = 5;
+		if (timeUpInterval) clearInterval(timeUpInterval);
+		timeUpInterval = setInterval(() => {
+			timeUpCountdown--;
+			if (timeUpCountdown <= 0) {
+				clearInterval(timeUpInterval);
+				window.location.href = '/siswa';
+			}
+		}, 1000);
+	}
 	const MAX_WARNINGS = 3;
 	let isUnloading = false;
 	
@@ -1155,6 +1169,12 @@
 				headers: { 'x-sveltekit-action': 'true' } 
 			});
 			showTimeUpModal = true;
+			if (typeof (window as any).ExambroBridge?.setExamActive === 'function') {
+				try {
+					(window as any).ExambroBridge.setExamActive(false, '');
+				} catch (e) {}
+			}
+			startTimeUpCountdown();
 		} catch (err) {
 			console.error('Submit error:', err);
 			submitting = false;
@@ -1463,6 +1483,11 @@
 					}
 					isSubmitted = true;
 					submitting = true;
+					if (typeof (window as any).ExambroBridge?.setExamActive === 'function') {
+						try {
+							(window as any).ExambroBridge.setExamActive(false, '');
+						} catch (e) {}
+					}
 					if (cheatWarningTimeout) {
 						clearTimeout(cheatWarningTimeout);
 						cheatWarningTimeout = null;
@@ -1606,8 +1631,11 @@
 			</div>
 			<h3 class="text-xl font-bold text-slate-800 mb-2">Waktu Habis!</h3>
 			<p class="text-slate-600 mb-6 text-sm">Waktu pengerjaan ujian Anda telah selesai. Jawaban Anda telah berhasil dikumpulkan secara otomatis oleh sistem.</p>
-			<button class="btn-primary w-full" on:click={() => window.location.href = '/siswa'}>
-				Kembali ke Dashboard
+			<button class="btn-primary w-full flex items-center justify-center gap-2" on:click={() => { if (timeUpInterval) clearInterval(timeUpInterval); window.location.href = '/siswa'; }}>
+				<span>Kembali ke Dashboard</span>
+				{#if timeUpCountdown > 0}
+					<span class="px-2 py-0.5 rounded-full bg-white/20 text-xs font-mono font-bold">({timeUpCountdown}d)</span>
+				{/if}
 			</button>
 		</div>
 	</div>

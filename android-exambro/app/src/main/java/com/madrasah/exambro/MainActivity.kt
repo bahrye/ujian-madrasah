@@ -560,7 +560,9 @@ class MainActivity : AppCompatActivity() {
                     webView.clearHistory()
                 }
 
-                if (isExamInProgress()) {
+                val isQuestionPage = url?.matches(Regex(".*/siswa/ujian/\\d+.*")) == true
+
+                if (isQuestionPage) {
                     webView.evaluateJavascript("(function() { return document.querySelector('meta[name=\"exambro-exit-pin\"]')?.getAttribute('content') || window.exambroExitPin || ''; })()") { pin ->
                         val cleanPin = pin?.replace("\"", "")?.trim()
                         if (!cleanPin.isNullOrEmpty() && cleanPin != "null") {
@@ -601,11 +603,16 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 } else {
+                    // Ketika siswa bukan di halaman soal (misal di dashboard /siswa setelah submit atau logout):
+                    // Buka penyematan layar (LockTask) dan kembalikan navigasi normal
                     stopPinPolling()
                     stopLockTaskMode()
                     isExamActive = false
                     currentExamExitPin = null
                     isExamPaused = false
+                    runOnUiThread {
+                        applyImmersiveMode()
+                    }
                 }
             }
 
@@ -749,12 +756,15 @@ class MainActivity : AppCompatActivity() {
      * TIDAK aktif saat siswa masih berada di halaman input token atau modal konfirmasi (/siswa/ujian).
      */
     private fun isExamInProgress(): Boolean {
-        if (isExamActive) return true
         if (!::webView.isInitialized) return false
         val activeUrl = webView.url ?: currentUrl
         if (activeUrl.isEmpty()) return false
         val questionPageRegex = Regex(".*/siswa/ujian/\\d+.*")
-        return questionPageRegex.matches(activeUrl)
+        val isQuestionPage = questionPageRegex.matches(activeUrl)
+        if (!isQuestionPage) {
+            return false
+        }
+        return isExamActive || activeUrl.contains("/siswa/ujian/")
     }
 
     // DETEKSI SISWA KELUAR APLIKASI (HOME / RECENT APPS / SPLIT SCREEN)
@@ -836,6 +846,7 @@ class MainActivity : AppCompatActivity() {
         val activeUrl = webView.url ?: currentUrl
         val defaultUrl = prefs.getString(KEY_EXAM_URL, DEFAULT_URL) ?: DEFAULT_URL
         val isLoginPage = activeUrl.contains("/login") || activeUrl.endsWith("/login") || activeUrl == defaultUrl
+        val isDashboardPage = activeUrl.endsWith("/siswa") || activeUrl.contains("/siswa?")
 
         if (layoutLanding.visibility == View.VISIBLE) {
             // Saat di Beranda Utama: Konfirmasi keluar dari aplikasi
@@ -843,8 +854,8 @@ class MainActivity : AppCompatActivity() {
         } else if (isExamInProgress()) {
             // Saat sedang ujian: Tombol kembali DIBLOKIR, butuh PIN Pengawas untuk keluar
             promptProctorPinToExit()
-        } else if (isLoginPage || !webView.canGoBack()) {
-            // Saat di halaman login (misal setelah keluar akun) atau tidak bisa kembali lagi:
+        } else if (isLoginPage || isDashboardPage || !webView.canGoBack()) {
+            // Saat di halaman login atau dashboard siswa (atau tidak bisa kembali lagi):
             // Tampilkan pesan konfirmasi apakah ingin kembali ke Beranda
             showReturnToHomeDialog()
         } else {
