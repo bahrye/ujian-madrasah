@@ -32,7 +32,23 @@
 		pengawas: 'from-amber-500 to-orange-500',
 		siswa: 'from-cyan-500 to-sky-500'
 	};
+	let profileContainerEl: HTMLElement;
+
+	function handleOutsideInteraction(event: Event) {
+		if (!showProfileMenu) return;
+		const target = event.target as Node;
+		if (profileContainerEl && !profileContainerEl.contains(target)) {
+			showProfileMenu = false;
+		}
+	}
 </script>
+
+<svelte:window 
+	on:pointerdown={handleOutsideInteraction}
+	on:touchstart={handleOutsideInteraction}
+	on:click={handleOutsideInteraction}
+	on:keydown={(e) => { if (e.key === 'Escape') showProfileMenu = false; }}
+/>
 
 <header class="lg:hidden sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 px-4 py-3">
 	<div class="flex items-center justify-between">
@@ -55,12 +71,12 @@
 				<span class="font-bold text-sm text-slate-800">Ujian Madrasah</span>
 			</div>
 		</div>
-		<div class="flex items-center gap-2 relative">
+		<div class="flex items-center gap-2 relative" bind:this={profileContainerEl}>
 			<span class="text-xs font-medium text-slate-500 hidden sm:block">
 				{ROLE_LABELS[user?.role ?? ''] ?? ''}
 			</span>
 			<button
-				class="w-8 h-8 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-xs font-bold text-white shadow-md hover:ring-2 ring-offset-1 ring-indigo-500 transition-all focus:outline-none overflow-hidden"
+				class="w-8 h-8 rounded-full bg-gradient-to-br {roleGradients[user?.role ?? 'siswa']} flex items-center justify-center text-xs font-bold text-white shadow-md hover:ring-2 ring-offset-1 ring-indigo-500 transition-all focus:outline-none overflow-hidden cursor-pointer"
 				on:click={() => (showProfileMenu = !showProfileMenu)}
 				aria-label="Toggle profile menu"
 			>
@@ -72,9 +88,6 @@
 			</button>
 
 			{#if showProfileMenu}
-				<!-- svelte-ignore a11y-click-events-have-key-events -->
-				<!-- svelte-ignore a11y-no-static-element-interactions -->
-				<div class="fixed inset-0 z-40" on:click={() => (showProfileMenu = false)}></div>
 				<div class="absolute right-0 top-full mt-3 w-72 bg-white rounded-2xl shadow-2xl shadow-indigo-500/10 z-50 border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 origin-top-right duration-200">
 					<!-- Header Section -->
 					<div class="bg-gradient-to-r {roleGradients[user?.role ?? 'siswa']} p-5 text-white relative overflow-hidden">
