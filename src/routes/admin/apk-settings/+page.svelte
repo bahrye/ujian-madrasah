@@ -7,7 +7,15 @@
 	export let form: ActionData;
 
 	$: school = data.school;
-	let requireExambro = (school?.require_exambro === 1 ? '1' : '0');
+	let requireExambro = '0';
+
+	// Pastikan nilai selalu sinkron dan reaktif dengan data dari server
+	$: if (school?.require_exambro !== undefined) {
+		requireExambro = String(school.require_exambro);
+	}
+	$: if (form?.require_exambro !== undefined) {
+		requireExambro = String(form.require_exambro);
+	}
 
 	$: if (form?.error) {
 		toasts.error(form.error);
@@ -28,23 +36,53 @@
 		<div>
 			<h1 class="text-2xl font-bold text-slate-800">Pengaturan Aplikasi Exambro (APK)</h1>
 			<p class="text-sm text-slate-500 mt-1">
-				Atur kebijakan akses ujian siswa, apakah bebas melalui web browser atau wajib menggunakan aplikasi resmi Exambro Madrasah.
+				Atur kebijakan akses ujian siswa untuk <strong class="text-slate-700">{school?.name || 'Madrasah'}</strong>.
 			</p>
 		</div>
 		<div class="shrink-0">
 			{#if requireExambro === '1'}
-				<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+				<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-xs">
 					<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
 					Wajib Aplikasi Exambro Aktif
 				</span>
 			{:else}
-				<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 border border-blue-200">
+				<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 border border-blue-200 shadow-xs">
 					<span class="w-2 h-2 rounded-full bg-blue-500"></span>
 					Mode Bebas (Web & APK)
 				</span>
 			{/if}
 		</div>
 	</div>
+
+	<!-- Superadmin School Switcher (jika ada lebih dari 1 sekolah) -->
+	{#if data.isSuperAdmin && data.allSchools && data.allSchools.length > 1}
+		<div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+			<div class="flex items-center gap-3">
+				<div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+					</svg>
+				</div>
+				<div>
+					<span class="text-xs font-bold uppercase tracking-wider text-slate-700 block">Pilih Sekolah yang Dikelola (Superadmin):</span>
+					<span class="text-xs text-slate-500">Anda login sebagai Superadmin. Pilih sekolah yang ingin diatur kebijakannya.</span>
+				</div>
+			</div>
+			<select 
+				class="select text-xs font-medium w-full sm:w-72 bg-white"
+				value={data.selectedSchoolId}
+				on:change={(e) => {
+					window.location.href = `/admin/apk-settings?school_id=${e.currentTarget.value}`;
+				}}
+			>
+				{#each data.allSchools as s}
+					<option value={s.id}>
+						{s.name} — [{s.require_exambro === 1 ? 'Wajib Exambro' : 'Bebas Web'}]
+					</option>
+				{/each}
+			</select>
+		</div>
+	{/if}
 
 	<!-- Form Card -->
 	<form 
@@ -54,21 +92,36 @@
 			isSaving = true;
 			return async ({ update }) => {
 				isSaving = false;
-				await update();
+				// reset: false penting agar pilihan radio tidak ter-reset ke bawaan DOM
+				await update({ reset: false });
 			};
 		}} 
 		class="space-y-6"
 	>
+		<input type="hidden" name="school_id" value={school?.id} />
+
 		<div class="card p-6 border border-slate-200/80 shadow-xs bg-white rounded-xl">
-			<div class="mb-5">
-				<h2 class="text-base font-bold text-slate-800">Kebijakan Akses Siswa</h2>
-				<p class="text-xs text-slate-500 mt-0.5">Pilih metode yang diizinkan bagi siswa untuk login dan mengerjakan ujian.</p>
+			<div class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+				<div>
+					<h2 class="text-base font-bold text-slate-800">Kebijakan Akses Siswa</h2>
+					<p class="text-xs text-slate-500 mt-0.5">Pilih metode yang diizinkan bagi siswa sekolah <strong class="text-slate-700">{school?.name}</strong> untuk login dan ujian.</p>
+				</div>
+				{#if data.isSuperAdmin}
+					<label class="inline-flex items-center gap-2 text-xs text-slate-600 cursor-pointer bg-slate-50 hover:bg-slate-100 p-2 rounded-lg border border-slate-200 transition-colors">
+						<input type="checkbox" name="apply_all" value="1" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+						<span class="font-medium">Terapkan ke <strong>Semua Madrasah</strong></span>
+					</label>
+				{/if}
 			</div>
 
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 				<!-- Option 1: Bebas (Web & APK) -->
-				<label 
+				<div 
+					role="button"
+					tabindex="0"
 					class="relative flex flex-col p-5 rounded-xl border-2 cursor-pointer transition-all duration-200 {requireExambro === '0' ? 'border-indigo-600 bg-indigo-50/40 shadow-sm ring-2 ring-indigo-600/10' : 'border-slate-200 hover:border-slate-300 bg-white'}"
+					on:click={() => requireExambro = '0'}
+					on:keydown={(e) => { if (e.key === ' ' || e.key === 'Enter') requireExambro = '0'; }}
 				>
 					<div class="flex items-start justify-between gap-3 mb-3">
 						<div class="flex items-center gap-3">
@@ -79,13 +132,14 @@
 							</div>
 							<div>
 								<span class="font-bold text-sm text-slate-800 block">Bebas (Web Browser & APK)</span>
-								<span class="text-xs text-slate-500">Fleksibel untuk semua perangkat</span>
+								<span class="text-xs text-slate-500">Fleksibel untuk semua jenis perangkat</span>
 							</div>
 						</div>
 						<input 
 							type="radio" 
 							name="require_exambro" 
 							value="0" 
+							checked={requireExambro === '0'}
 							bind:group={requireExambro}
 							class="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 mt-1"
 						/>
@@ -104,11 +158,15 @@
 							<span>Pengamanan hanya menggunakan anti-cheat berbasis web (tab blur & fullscreen).</span>
 						</li>
 					</ul>
-				</label>
+				</div>
 
 				<!-- Option 2: Wajib Aplikasi Exambro -->
-				<label 
+				<div 
+					role="button"
+					tabindex="0"
 					class="relative flex flex-col p-5 rounded-xl border-2 cursor-pointer transition-all duration-200 {requireExambro === '1' ? 'border-emerald-600 bg-emerald-50/40 shadow-sm ring-2 ring-emerald-600/10' : 'border-slate-200 hover:border-slate-300 bg-white'}"
+					on:click={() => requireExambro = '1'}
+					on:keydown={(e) => { if (e.key === ' ' || e.key === 'Enter') requireExambro = '1'; }}
 				>
 					<div class="flex items-start justify-between gap-3 mb-3">
 						<div class="flex items-center gap-3">
@@ -129,6 +187,7 @@
 							type="radio" 
 							name="require_exambro" 
 							value="1" 
+							checked={requireExambro === '1'}
 							bind:group={requireExambro}
 							class="w-4 h-4 text-emerald-600 border-slate-300 focus:ring-emerald-500 mt-1"
 						/>
@@ -147,7 +206,7 @@
 							<span>Guru, Pengawas, dan Administrator tetap dapat membuka web dari browser biasa tanpa batas.</span>
 						</li>
 					</ul>
-				</label>
+				</div>
 			</div>
 
 			<div class="mt-6 pt-5 border-t border-slate-100 flex items-center justify-end gap-3">
