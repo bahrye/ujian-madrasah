@@ -123,6 +123,65 @@
 	let matchingContainerEl: HTMLDivElement | null = null;
 	let connectionLines: Array<{ x1: number; y1: number; x2: number; y2: number; color: string; leftIdx: number; rightIdx: number }> = [];
 
+	function getLeftKey(idx: number): string {
+		const item = matchingLeft[idx];
+		return (item && typeof item === 'object' && item.key !== undefined) ? String(item.key) : String(idx);
+	}
+
+	function getRightKey(idx: number): string {
+		const item = matchingRight[idx];
+		return (item && typeof item === 'object' && item.key !== undefined) ? String(item.key) : String.fromCharCode(65 + idx);
+	}
+
+	function getRightIdxFromVal(val: string | number | undefined): number | null {
+		if (val === undefined || val === null || val === '') return null;
+		const s = String(val).trim().toUpperCase();
+		const byKey = matchingRight.findIndex((it: any) => it && typeof it === 'object' && it.key !== undefined && String(it.key).trim().toUpperCase() === s);
+		if (byKey !== -1) return byKey;
+		if (s.length === 1 && s >= 'A' && s <= 'Z') {
+			const idx = s.charCodeAt(0) - 65;
+			if (idx >= 0 && idx < matchingRight.length) return idx;
+		}
+		const n = parseInt(s, 10);
+		if (!isNaN(n)) {
+			if (n >= 0 && n < matchingRight.length) return n;
+			if (n >= 1 && n <= matchingRight.length) return n - 1;
+		}
+		return null;
+	}
+
+	function getLeftIdxFromKey(k: string | number): number | null {
+		const s = String(k).trim().toUpperCase();
+		const byKey = matchingLeft.findIndex((it: any) => it && typeof it === 'object' && it.key !== undefined && String(it.key).trim().toUpperCase() === s);
+		if (byKey !== -1) return byKey;
+		const n = parseInt(s, 10);
+		if (!isNaN(n)) {
+			if (n >= 0 && n < matchingLeft.length) return n;
+			if (n >= 1 && n <= matchingLeft.length) return n - 1;
+		}
+		return null;
+	}
+
+	function getMatchForLeft(leftIdx: number): number | null {
+		const lKey = getLeftKey(leftIdx);
+		const val = matchingAnswers[lKey] !== undefined ? matchingAnswers[lKey] : matchingAnswers[String(leftIdx)];
+		return getRightIdxFromVal(val);
+	}
+
+	function getMatchesForRight(rightIdx: number): number[] {
+		const result: number[] = [];
+		for (const [k, v] of Object.entries(matchingAnswers)) {
+			const rIdx = getRightIdxFromVal(v);
+			if (rIdx === rightIdx) {
+				const lIdx = getLeftIdxFromKey(k);
+				if (lIdx !== null && !result.includes(lIdx)) {
+					result.push(lIdx);
+				}
+			}
+		}
+		return result;
+	}
+
 	function selectLeftItem(idx: number) {
 		if (selectedLeftIdx === idx) {
 			selectedLeftIdx = null;
@@ -150,7 +209,11 @@
 	}
 
 	function handleMatchingConnect(leftIdx: number, rightIdx: number) {
-		matchingAnswers[String(leftIdx)] = String(rightIdx);
+		const lKey = getLeftKey(leftIdx);
+		const rKey = getRightKey(rightIdx);
+		delete matchingAnswers[String(leftIdx)];
+		delete matchingAnswers[lKey];
+		matchingAnswers[lKey] = rKey;
 		matchingAnswers = { ...matchingAnswers };
 		dispatch('answer', { questionId: question.id, answer: JSON.stringify(matchingAnswers) });
 		scheduleRecalculate();
@@ -158,7 +221,9 @@
 
 	function removeMatchingPair(leftIdx: number, e?: Event) {
 		if (e) e.stopPropagation();
+		const lKey = getLeftKey(leftIdx);
 		delete matchingAnswers[String(leftIdx)];
+		delete matchingAnswers[lKey];
 		matchingAnswers = { ...matchingAnswers };
 		dispatch('answer', { questionId: question.id, answer: JSON.stringify(matchingAnswers) });
 		scheduleRecalculate();
@@ -183,10 +248,9 @@
 
 		const lines: typeof connectionLines = [];
 
-		Object.entries(matchingAnswers).forEach(([leftKey, rightVal]) => {
-			const leftI = parseInt(leftKey, 10);
-			const rightI = parseInt(String(rightVal), 10);
-			if (isNaN(leftI) || isNaN(rightI)) return;
+		matchingLeft.forEach((_, leftI) => {
+			const rightI = getMatchForLeft(leftI);
+			if (rightI === null) return;
 
 			const leftPort = document.getElementById(`match-port-left-${question.id}-${leftI}`);
 			const rightPort = document.getElementById(`match-port-right-${question.id}-${rightI}`);
@@ -617,10 +681,12 @@
 						<div class="space-y-2 sm:space-y-3">
 							<div class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Kolom Kiri (Pernyataan)</div>
 							{#each matchingLeft as leftItem, leftIdx}
-								{@const hasMatch = matchingAnswers[String(leftIdx)] !== undefined}
-								{@const matchedRightIdx = hasMatch ? Number(matchingAnswers[String(leftIdx)]) : null}
+								{@const matchedRightIdx = getMatchForLeft(leftIdx)}
+								{@const hasMatch = matchedRightIdx !== null}
 								{@const pairColor = MATCH_COLORS[leftIdx % MATCH_COLORS.length]}
 								{@const isSelected = selectedLeftIdx === leftIdx}
+								{@const leftLabel = (leftItem && typeof leftItem === 'object' && leftItem.key !== undefined) ? leftItem.key : (leftIdx + 1)}
+								{@const rightLabel = matchedRightIdx !== null ? ((matchingRight[matchedRightIdx] && typeof matchingRight[matchedRightIdx] === 'object' && matchingRight[matchedRightIdx].key !== undefined) ? matchingRight[matchedRightIdx].key : String.fromCharCode(65 + matchedRightIdx)) : ''}
 								
 								<div 
 									role="button"
@@ -633,16 +699,16 @@
 									<div class="flex items-start gap-1.5 sm:gap-2.5 flex-1 min-w-0">
 										<span class="w-5 h-5 sm:w-7 sm:h-7 rounded-lg sm:rounded-xl flex items-center justify-center text-[10px] sm:text-xs font-bold shrink-0 transition-colors
 											{hasMatch ? pairColor.badge : (isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600')}">
-											{leftIdx + 1}
+											{leftLabel}
 										</span>
-										<div class="flex-1 min-w-0" use:mathRender={leftItem} use:arabicRender={leftItem}>
+										<div class="flex-1 min-w-0" use:mathRender={getOptionHtml(leftItem)} use:arabicRender={getOptionHtml(leftItem)}>
 											<div class="text-xs sm:text-sm font-medium {hasMatch ? 'text-slate-900 font-semibold' : 'text-slate-700'} prose prose-sm max-w-none break-words">
-												{@html leftItem}
+												{@html getOptionHtml(leftItem)}
 											</div>
 											{#if hasMatch && matchedRightIdx !== null}
 												<div class="flex items-center gap-1 mt-1 sm:mt-2 flex-wrap">
 													<span class="px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[11px] font-bold {pairColor.badge} shadow-xs">
-														➔ [{String.fromCharCode(65 + matchedRightIdx)}]
+														➔ [{rightLabel}]
 													</span>
 													<button 
 														type="button" 
@@ -675,11 +741,12 @@
 						<div class="space-y-2 sm:space-y-3">
 							<div class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Kolom Kanan (Pilihan Jawaban)</div>
 							{#each matchingRight as rightItem, rightIdx}
-								{@const matchedLeftKeys = Object.keys(matchingAnswers).filter(k => matchingAnswers[k] === String(rightIdx))}
-								{@const isMatched = matchedLeftKeys.length > 0}
-								{@const primaryLeftIdx = isMatched ? Number(matchedLeftKeys[0]) : null}
+								{@const matchedLeftIndices = getMatchesForRight(rightIdx)}
+								{@const isMatched = matchedLeftIndices.length > 0}
+								{@const primaryLeftIdx = isMatched ? matchedLeftIndices[0] : null}
 								{@const pairColor = primaryLeftIdx !== null ? MATCH_COLORS[primaryLeftIdx % MATCH_COLORS.length] : MATCH_COLORS[rightIdx % MATCH_COLORS.length]}
 								{@const isSelected = selectedRightIdx === rightIdx}
+								{@const rightLabel = (rightItem && typeof rightItem === 'object' && rightItem.key !== undefined) ? rightItem.key : String.fromCharCode(65 + rightIdx)}
 								
 								<div 
 									role="button"
@@ -703,17 +770,18 @@
 									<div class="flex items-start gap-1.5 sm:gap-2.5 flex-1 min-w-0">
 										<span class="w-5 h-5 sm:w-7 sm:h-7 rounded-lg sm:rounded-xl flex items-center justify-center text-[10px] sm:text-xs font-bold shrink-0 transition-colors
 											{isMatched ? pairColor.badge : (isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600')}">
-											{String.fromCharCode(65 + rightIdx)}
+											{rightLabel}
 										</span>
-										<div class="flex-1 min-w-0" use:mathRender={rightItem} use:arabicRender={rightItem}>
+										<div class="flex-1 min-w-0" use:mathRender={getOptionHtml(rightItem)} use:arabicRender={getOptionHtml(rightItem)}>
 											<div class="text-xs sm:text-sm font-medium {isMatched ? 'text-slate-900 font-semibold' : 'text-slate-700'} prose prose-sm max-w-none break-words">
-												{@html rightItem}
+												{@html getOptionHtml(rightItem)}
 											</div>
 											{#if isMatched}
 												<div class="flex items-center gap-1 mt-1 sm:mt-2 flex-wrap">
-													{#each matchedLeftKeys as lKey}
-														<span class="px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[11px] font-bold {MATCH_COLORS[Number(lKey) % MATCH_COLORS.length].badge} shadow-xs">
-															No. {Number(lKey) + 1}
+													{#each matchedLeftIndices as lIdx}
+														{@const lLabel = (matchingLeft[lIdx] && typeof matchingLeft[lIdx] === 'object' && matchingLeft[lIdx].key !== undefined) ? matchingLeft[lIdx].key : (lIdx + 1)}
+														<span class="px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[11px] font-bold {MATCH_COLORS[lIdx % MATCH_COLORS.length].badge} shadow-xs">
+															No. {lLabel}
 														</span>
 													{/each}
 												</div>

@@ -135,9 +135,11 @@
 										{#each Object.entries(safeParseJson(ans.answer_given, {})) as [key, value]}
 											{@const lIdx = parseInt(key)}
 											{@const rIdx = parseInt(String(value))}
-											{@const lText = opts.left?.[lIdx] || `No. ${lIdx + 1}`}
-											{@const rLetter = !isNaN(rIdx) ? String.fromCharCode(65 + rIdx) : '-'}
-											{@const rText = opts.right?.[rIdx] || value}
+											{@const rawL = opts.left?.[lIdx] || `No. ${lIdx + 1}`}
+											{@const lText = typeof rawL === 'object' ? (rawL?.text || rawL?.content || rawL?.html || '') : rawL}
+											{@const rLetter = !isNaN(rIdx) ? String.fromCharCode(65 + rIdx) : (typeof value === 'string' && value.length === 1 ? value : '-')}
+											{@const rawR = opts.right?.[rIdx] || value}
+											{@const rText = typeof rawR === 'object' ? (rawR?.text || rawR?.content || rawR?.html || '') : rawR}
 											<div class="flex items-center gap-1.5 py-0.5 border-b border-slate-100 last:border-0">
 												<span class="px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 font-bold shrink-0">{lIdx + 1}</span>
 												<span class="font-medium text-slate-700 truncate max-w-[45%]">{@html lText}</span>
@@ -217,9 +219,11 @@
 											{#each safeParseObjectEntries(ans.correct_answer_json) as [key, value]}
 												{@const lIdx = parseInt(key)}
 												{@const rIdx = parseInt(String(value))}
-												{@const lText = opts.left?.[lIdx] || `No. ${lIdx + 1}`}
-												{@const rLetter = !isNaN(rIdx) ? String.fromCharCode(65 + rIdx) : '-'}
-												{@const rText = opts.right?.[rIdx] || value}
+												{@const rawL = opts.left?.[lIdx] || `No. ${lIdx + 1}`}
+												{@const lText = typeof rawL === 'object' ? (rawL?.text || rawL?.content || rawL?.html || '') : rawL}
+												{@const rLetter = !isNaN(rIdx) ? String.fromCharCode(65 + rIdx) : (typeof value === 'string' && value.length === 1 ? value : '-')}
+												{@const rawR = opts.right?.[rIdx] || value}
+												{@const rText = typeof rawR === 'object' ? (rawR?.text || rawR?.content || rawR?.html || '') : rawR}
 												<div class="flex items-center gap-1.5 py-0.5 border-b border-emerald-200/50 last:border-0">
 													<span class="px-1.5 py-0.5 rounded bg-emerald-200 text-emerald-800 font-bold shrink-0">{lIdx + 1}</span>
 													<span class="font-medium text-emerald-900 truncate max-w-[45%]">{@html lText}</span>

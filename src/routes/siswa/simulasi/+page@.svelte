@@ -238,7 +238,19 @@
 					const correctAns = JSON.parse(q.correct_answer);
 					let allMatch = true;
 					for (const key of Object.keys(correctAns)) {
-						if (String(userAns[key]) !== String(correctAns[key])) {
+						const expected = String(correctAns[key]).trim().toUpperCase();
+						let actual = userAns[key] !== undefined ? String(userAns[key]).trim().toUpperCase() : undefined;
+						if (actual === undefined) {
+							const numKey = parseInt(key, 10);
+							if (!isNaN(numKey)) {
+								if (userAns[String(numKey - 1)] !== undefined) actual = String(userAns[String(numKey - 1)]).trim().toUpperCase();
+								else if (userAns[String(numKey + 1)] !== undefined) actual = String(userAns[String(numKey + 1)]).trim().toUpperCase();
+							}
+						}
+						const isMatch = actual === expected ||
+							(actual !== undefined && expected.length === 1 && expected >= 'A' && expected <= 'Z' && actual === String(expected.charCodeAt(0) - 65)) ||
+							(actual !== undefined && actual.length === 1 && actual >= 'A' && actual <= 'Z' && expected === String(actual.charCodeAt(0) - 65));
+						if (!isMatch) {
 							allMatch = false;
 							break;
 						}
