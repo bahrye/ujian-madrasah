@@ -268,7 +268,6 @@ class MainActivity : AppCompatActivity() {
 
     // 5. BLOKIR TOMBOL KEMBALI: Butuh PIN Pengawas untuk Keluar
     @Suppress("DEPRECATION")
-    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         promptProctorPinToExit()
     }
