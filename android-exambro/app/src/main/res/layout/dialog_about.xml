@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@color/white">
+
+    <!-- Header Icon -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/ic_school_cap"
+            android:contentDescription="Logo Madrasah" />
+
+        <TextView
+            android:id="@+id/tvAboutAppName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Exambro Madrasah"
+            android:textColor="@color/slate_900"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Ujian Online Berbasis Android &amp; Komputer"
+            android:textColor="@color/gray_text"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="16dp"
+        android:background="#E2E8F0" />
+
+    <!-- Info List -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_badge_server"
+        android:padding="16dp">
+
+        <!-- Versi Aplikasi -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Versi Aplikasi"
+                android:textColor="@color/gray_text"
+                android:textSize="13sp" />
+            <TextView
+                android:id="@+id/tvAboutVersionName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1.0.2"
+                android:textColor="@color/slate_800"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Kode Aplikasi (Version Code) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Kode Aplikasi (Build)"
+                android:textColor="@color/gray_text"
+                android:textSize="13sp" />
+            <TextView
+                android:id="@+id/tvAboutVersionCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3"
+                android:textColor="@color/slate_800"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Nama Pembuat -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Nama Pembuat"
+                android:textColor="@color/gray_text"
+                android:textSize="13sp" />
+            <TextView
+                android:id="@+id/tvAboutAuthor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Syamsul Bahri"
+                android:textColor="@color/primary"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Proteksi Keamanan -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Proteksi Ujian"
+                android:textColor="@color/gray_text"
+                android:textSize="13sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kiosk &amp; Anti-Cheat"
+                android:textColor="#16A34A"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Tombol Hubungi Pembuat (WhatsApp) -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnContactAuthor"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="@color/whatsapp_green"
+        android:text="Hubungi Pembuat (WhatsApp)"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:cornerRadius="12dp"
+        app:icon="@drawable/ic_whatsapp"
+        app:iconGravity="textStart"
+        app:iconTint="@color/white" />
+
+    <!-- Tombol Tutup -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCloseAbout"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginTop="4dp"
+        android:text="Tutup"
+        android:textColor="@color/gray_text"
+        android:textSize="13sp" />
+
+</LinearLayout>

@@ -2,6 +2,7 @@
 <resources>
     <color name="primary">#059669</color>
     <color name="primary_dark">#047857</color>
+    <color name="primary_light">#ECFDF5</color>
     <color name="accent">#10B981</color>
     <color name="bg_dark">#0F172A</color>
     <color name="white">#FFFFFF</color>
@@ -9,4 +10,11 @@
     <color name="danger">#EF4444</color>
     <color name="warning">#F59E0B</color>
     <color name="gray_text">#64748B</color>
+    <color name="slate_900">#0F172A</color>
+    <color name="slate_800">#1E293B</color>
+    <color name="slate_700">#334155</color>
+    <color name="slate_100">#F1F5F9</color>
+    <color name="slate_50">#F8FAFC</color>
+    <color name="whatsapp_green">#25D366</color>
+    <color name="whatsapp_dark">#128C7E</color>
 </resources>

@@ -3,9 +3,11 @@ package com.madrasah.exambro
 import android.Manifest
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType
@@ -21,8 +23,10 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -32,8 +36,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import android.content.Intent
-import android.net.Uri
+import com.google.android.material.button.MaterialButton
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -42,12 +45,23 @@ import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
+    // Komponen Tampilan Utama
     private lateinit var webView: WebView
     private lateinit var progressBar: ProgressBar
     private lateinit var layoutError: LinearLayout
     private lateinit var btnRetry: Button
     private lateinit var btnSettings: Button
+    private lateinit var btnBackToLandingFromError: Button
     private lateinit var proctorTrigger: View
+
+    // Komponen Beranda / Landing Screen
+    private lateinit var layoutLanding: RelativeLayout
+    private lateinit var btnEnterExam: MaterialButton
+    private lateinit var btnCheckUpdateLanding: MaterialButton
+    private lateinit var btnAboutUsLanding: MaterialButton
+    private lateinit var btnLandingSettings: ImageButton
+    private lateinit var tvLandingServerStatus: TextView
+    private lateinit var tvLandingVersion: TextView
 
     private lateinit var prefs: SharedPreferences
 
@@ -66,6 +80,8 @@ class MainActivity : AppCompatActivity() {
         private const val DEFAULT_URL = "https://ujian-madrasah.vercel.app"
         private const val DEFAULT_PIN = "12345"
         private const val REQ_CAMERA_PERMISSION = 101
+        private const val AUTHOR_NAME = "Syamsul Bahri"
+        private const val AUTHOR_WA_LINK = "https://wa.me/qr/FMVS3NLDIRUAA1"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,18 +109,18 @@ class MainActivity : AppCompatActivity() {
         setupWebView()
         requestCameraPermissionIfNeeded()
 
-        // Muat URL ujian
-        loadExamUrl()
+        // Tampilkan Beranda Landing Screen saat aplikasi pertama kali dibuka
+        showLandingScreen()
 
         // Beri jeda 3 detik sebelum mengaktifkan deteksi agar startup/splash tidak memicu peringatan
         window.decorView.postDelayed({
             isAppStarted = true
         }, 3000)
 
-        // Periksa pembaruan di latar belakang setelah 6 detik
+        // Periksa pembaruan di latar belakang secara otomatis
         window.decorView.postDelayed({
             checkAppUpdate(false)
-        }, 6000)
+        }, 8000)
     }
 
     private fun applyImmersiveMode() {
@@ -123,12 +139,51 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
+        // Komponen Web & Error
         webView = findViewById(R.id.webView)
         progressBar = findViewById(R.id.progressBar)
         layoutError = findViewById(R.id.layoutError)
         btnRetry = findViewById(R.id.btnRetry)
         btnSettings = findViewById(R.id.btnSettings)
+        btnBackToLandingFromError = findViewById(R.id.btnBackToLandingFromError)
         proctorTrigger = findViewById(R.id.proctorTrigger)
+
+        // Komponen Landing Screen
+        layoutLanding = findViewById(R.id.layoutLanding)
+        btnEnterExam = findViewById(R.id.btnEnterExam)
+        btnCheckUpdateLanding = findViewById(R.id.btnCheckUpdateLanding)
+        btnAboutUsLanding = findViewById(R.id.btnAboutUsLanding)
+        btnLandingSettings = findViewById(R.id.btnLandingSettings)
+        tvLandingServerStatus = findViewById(R.id.tvLandingServerStatus)
+        tvLandingVersion = findViewById(R.id.tvLandingVersion)
+
+        // 1. Tombol Masuk Ujian
+        btnEnterExam.setOnClickListener {
+            layoutLanding.visibility = View.GONE
+            webView.visibility = View.VISIBLE
+            loadExamUrl()
+            applyImmersiveMode()
+        }
+
+        // 2. Tombol Cek Update
+        btnCheckUpdateLanding.setOnClickListener {
+            checkAppUpdate(true)
+        }
+
+        // 3. Tombol Tentang Kami
+        btnAboutUsLanding.setOnClickListener {
+            showAboutDialog()
+        }
+
+        // 4. Tombol Pengaturan Server dari Landing Screen
+        btnLandingSettings.setOnClickListener {
+            promptProctorPinThenShowSettings()
+        }
+
+        // Tombol Kembali ke Beranda dari layar error koneksi
+        btnBackToLandingFromError.setOnClickListener {
+            showLandingScreen()
+        }
 
         btnRetry.setOnClickListener {
             layoutError.visibility = View.GONE
@@ -156,6 +211,64 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun showLandingScreen() {
+        layoutLanding.visibility = View.VISIBLE
+        webView.visibility = View.GONE
+        layoutError.visibility = View.GONE
+        updateLandingInfo()
+        applyImmersiveMode()
+    }
+
+    private fun updateLandingInfo() {
+        val currentStoredUrl = prefs.getString(KEY_EXAM_URL, DEFAULT_URL) ?: DEFAULT_URL
+        try {
+            val uri = Uri.parse(currentStoredUrl)
+            tvLandingServerStatus.text = "🌐 Server: ${uri.host ?: currentStoredUrl}"
+        } catch (e: Exception) {
+            tvLandingServerStatus.text = "🌐 Server: $currentStoredUrl"
+        }
+        tvLandingVersion.text = "Madrasah Mandiri Berprestasi • v${BuildConfig.VERSION_NAME}"
+    }
+
+    /**
+     * Menampilkan dialog Tentang Kami sesuai permintaan user
+     */
+    private fun showAboutDialog() {
+        val view = layoutInflater.inflate(R.layout.dialog_about, null)
+        val tvAppName = view.findViewById<TextView>(R.id.tvAboutAppName)
+        val tvVersionName = view.findViewById<TextView>(R.id.tvAboutVersionName)
+        val tvVersionCode = view.findViewById<TextView>(R.id.tvAboutVersionCode)
+        val tvAuthor = view.findViewById<TextView>(R.id.tvAboutAuthor)
+        val btnContactAuthor = view.findViewById<MaterialButton>(R.id.btnContactAuthor)
+        val btnClose = view.findViewById<MaterialButton>(R.id.btnCloseAbout)
+
+        tvAppName.text = getString(R.string.app_name)
+        tvVersionName.text = "v${BuildConfig.VERSION_NAME}"
+        tvVersionCode.text = BuildConfig.VERSION_CODE.toString()
+        tvAuthor.text = AUTHOR_NAME
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(view)
+            .setCancelable(true)
+            .create()
+
+        btnContactAuthor.setOnClickListener {
+            try {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(AUTHOR_WA_LINK))
+                startActivity(intent)
+            } catch (e: Exception) {
+                Toast.makeText(this, "Tidak dapat membuka link WhatsApp", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        btnClose.setOnClickListener {
+            dialog.dismiss()
+            applyImmersiveMode()
+        }
+
+        dialog.show()
+    }
+
     private fun setupWebView() {
         val settings = webView.settings
         settings.javaScriptEnabled = true
@@ -170,7 +283,7 @@ class MainActivity : AppCompatActivity() {
         settings.setSupportZoom(false)
 
         // Custom User-Agent agar server mengenali request dari Exambro resmi
-        settings.userAgentString = "${settings.userAgentString} ExambroMadrasah/1.0"
+        settings.userAgentString = "${settings.userAgentString} ExambroMadrasah/${BuildConfig.VERSION_NAME}"
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
@@ -287,15 +400,15 @@ class MainActivity : AppCompatActivity() {
         return activeUrl.contains("/siswa/ujian") || activeUrl.contains("/ujian/")
     }
 
-    // 4. DETEKSI SISWA KELUAR APLIKASI (HOME / RECENT APPS / SPLIT SCREEN)
+    // DETEKSI SISWA KELUAR APLIKASI (HOME / RECENT APPS / SPLIT SCREEN)
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
 
         // Jangan catat pelanggaran jika:
         // 1. Sedang memunculkan dialog izin kamera sistem
         // 2. Aplikasi baru saja dibuka (< 3 detik)
-        // 3. Siswa BELUM masuk ke halaman pengerjaan soal ujian (misal masih di login / menu siswa)
-        if (isRequestingPermission || !isAppStarted || !isExamInProgress()) {
+        // 3. Masih di Beranda awal atau belum masuk ke halaman pengerjaan soal ujian
+        if (isRequestingPermission || !isAppStarted || !isExamInProgress() || layoutLanding.visibility == View.VISIBLE) {
             return
         }
 
@@ -331,18 +444,34 @@ class MainActivity : AppCompatActivity() {
         alert.show()
     }
 
-    // 5. BLOKIR TOMBOL KEMBALI
+    // PENANGANAN TOMBOL KEMBALI
     @Suppress("DEPRECATION")
     override fun onBackPressed() {
-        if (isExamInProgress()) {
+        if (layoutLanding.visibility == View.VISIBLE) {
+            // Saat di Beranda Utama: Konfirmasi keluar dari aplikasi
+            showNormalExitDialog()
+        } else if (isExamInProgress()) {
             // Saat sedang ujian: Tombol kembali DIBLOKIR, butuh PIN Pengawas untuk keluar
             promptProctorPinToExit()
         } else {
-            // Saat belum masuk ujian (Login/Dashboard): Bisa navigasi kembali atau konfirmasi keluar biasa
+            // Saat belum masuk ujian (misal halaman Login): Kembali di WebView atau tawarkan kembali ke Beranda
             if (webView.canGoBack()) {
                 webView.goBack()
             } else {
-                showNormalExitDialog()
+                AlertDialog.Builder(this)
+                    .setTitle("Kembali ke Beranda")
+                    .setMessage("Apakah Anda ingin kembali ke menu Beranda Exambro?")
+                    .setPositiveButton("Ya, ke Beranda") { _, _ ->
+                        showLandingScreen()
+                    }
+                    .setNeutralButton("Keluar Aplikasi") { _, _ ->
+                        finish()
+                    }
+                    .setNegativeButton("Batal") { dialog, _ ->
+                        dialog.dismiss()
+                        applyImmersiveMode()
+                    }
+                    .show()
             }
         }
     }
@@ -350,9 +479,9 @@ class MainActivity : AppCompatActivity() {
     private fun showNormalExitDialog() {
         AlertDialog.Builder(this)
             .setTitle("Keluar Aplikasi")
-            .setMessage("Apakah Anda yakin ingin menutup aplikasi ujian?")
-            .setPositiveButton("Ya") { _, _ -> finish() }
-            .setNegativeButton("Tidak") { dialog, _ ->
+            .setMessage("Apakah Anda yakin ingin menutup aplikasi Exambro?")
+            .setPositiveButton("Ya, Keluar") { _, _ -> finish() }
+            .setNegativeButton("Batal") { dialog, _ ->
                 dialog.dismiss()
                 applyImmersiveMode()
             }
@@ -383,7 +512,7 @@ class MainActivity : AppCompatActivity() {
                 val enteredPin = input.text.toString().trim()
                 val correctPin = prefs.getString(KEY_PROCTOR_PIN, DEFAULT_PIN) ?: DEFAULT_PIN
                 if (enteredPin == correctPin) {
-                    finish()
+                    showLandingScreen()
                 } else {
                     Toast.makeText(this, getString(R.string.pin_wrong), Toast.LENGTH_SHORT).show()
                 }
@@ -432,6 +561,8 @@ class MainActivity : AppCompatActivity() {
         val etUrl = view.findViewById<EditText>(R.id.etExamUrl)
         val tvViolations = view.findViewById<TextView>(R.id.tvViolationStatus)
         val btnResetViolations = view.findViewById<Button>(R.id.btnResetViolations)
+        val btnCheckUpdate = view.findViewById<Button>(R.id.btnCheckUpdate)
+        val btnReturnLanding = view.findViewById<Button>(R.id.btnReturnLanding)
 
         val currentStoredUrl = prefs.getString(KEY_EXAM_URL, DEFAULT_URL) ?: DEFAULT_URL
         etUrl.setText(currentStoredUrl)
@@ -448,21 +579,18 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Riwayat pelanggaran berhasil di-reset ke 0", Toast.LENGTH_SHORT).show()
         }
 
-        val btnCheckUpdate = view.findViewById<Button>(R.id.btnCheckUpdate)
         btnCheckUpdate.setOnClickListener {
             checkAppUpdate(true)
         }
 
-        AlertDialog.Builder(this)
+        val settingsDialog = AlertDialog.Builder(this)
             .setView(view)
-            .setPositiveButton("Simpan & Muat Ulang") { _, _ ->
+            .setPositiveButton("Simpan") { _, _ ->
                 val newUrl = etUrl.text.toString().trim()
                 if (newUrl.isNotEmpty()) {
                     prefs.edit().putString(KEY_EXAM_URL, newUrl).apply()
                     currentUrl = newUrl
-                    layoutError.visibility = View.GONE
-                    webView.visibility = View.VISIBLE
-                    webView.loadUrl(newUrl)
+                    updateLandingInfo()
                     Toast.makeText(this, "Server disimpan: $newUrl", Toast.LENGTH_SHORT).show()
                 }
                 applyImmersiveMode()
@@ -471,10 +599,21 @@ class MainActivity : AppCompatActivity() {
                 dialog.dismiss()
                 applyImmersiveMode()
             }
-            .show()
+            .create()
+
+        btnReturnLanding.setOnClickListener {
+            settingsDialog.dismiss()
+            showLandingScreen()
+        }
+
+        settingsDialog.show()
     }
 
     private fun checkAppUpdate(isManual: Boolean) {
+        if (isManual) {
+            Toast.makeText(this, "Memeriksa pembaruan aplikasi...", Toast.LENGTH_SHORT).show()
+        }
+
         val currentServerUrl = prefs.getString(KEY_EXAM_URL, DEFAULT_URL) ?: DEFAULT_URL
         val endpoint = if (currentServerUrl.endsWith("/")) "${currentServerUrl}api/app-version" else "$currentServerUrl/api/app-version"
 
@@ -482,8 +621,8 @@ class MainActivity : AppCompatActivity() {
             try {
                 val url = URL(endpoint)
                 val conn = url.openConnection() as HttpURLConnection
-                conn.connectTimeout = 5000
-                conn.readTimeout = 5000
+                conn.connectTimeout = 6000
+                conn.readTimeout = 6000
                 conn.requestMethod = "GET"
 
                 if (conn.responseCode == 200) {
@@ -501,7 +640,7 @@ class MainActivity : AppCompatActivity() {
                         if (remoteVersionCode > BuildConfig.VERSION_CODE) {
                             AlertDialog.Builder(this)
                                 .setTitle("Pembaruan Tersedia (v$remoteVersionName)")
-                                .setMessage("Versi baru aplikasi telah dirilis.\n\nCatatan:\n$changelog\n\nVersi Anda: v${BuildConfig.VERSION_NAME}\nVersi Baru: v$remoteVersionName\n\nApakah Anda ingin mengunduh pembaruan?")
+                                .setMessage("Versi baru aplikasi telah dirilis.\n\nCatatan:\n$changelog\n\nVersi Anda: v${BuildConfig.VERSION_NAME} (Build ${BuildConfig.VERSION_CODE})\nVersi Baru: v$remoteVersionName (Build $remoteVersionCode)\n\nApakah Anda ingin mengunduh pembaruan?")
                                 .setCancelable(false)
                                 .setPositiveButton("Unduh Pembaruan") { _, _ ->
                                     if (downloadUrl.isNotEmpty()) {
@@ -515,11 +654,14 @@ class MainActivity : AppCompatActivity() {
                                 }
                                 .show()
                         } else if (isManual) {
-                            Toast.makeText(
-                                this,
-                                "Aplikasi sudah versi terbaru (v${BuildConfig.VERSION_NAME})",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            AlertDialog.Builder(this)
+                                .setTitle("Aplikasi Sudah Versi Terbaru")
+                                .setMessage("Aplikasi Anda sudah menggunakan versi resmi terbaru v${BuildConfig.VERSION_NAME} (Build ${BuildConfig.VERSION_CODE}).\nTidak ada pembaruan yang diperlukan.")
+                                .setPositiveButton("OK") { dialog, _ ->
+                                    dialog.dismiss()
+                                    applyImmersiveMode()
+                                }
+                                .show()
                         }
                     }
                 } else if (isManual) {

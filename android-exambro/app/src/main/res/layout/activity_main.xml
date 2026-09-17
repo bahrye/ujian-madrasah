@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/slate_50">
 
-    <!-- WebView Utama Ujian -->
+    <!-- WebView Utama Ujian (Disembunyikan saat di Beranda) -->
     <WebView
         android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="none" />
+        android:scrollbars="none"
+        android:visibility="gone" />
 
     <!-- Progress Bar Loading -->
     <ProgressBar
@@ -20,6 +22,213 @@
         android:layout_alignParentTop="true"
         android:progressDrawable="@drawable/custom_progress"
         android:visibility="gone" />
+
+    <!-- Area Beranda / Portal Awal Saat Aplikasi Dibuka -->
+    <RelativeLayout
+        android:id="@+id/layoutLanding"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/slate_50"
+        android:visibility="visible">
+
+        <!-- Top Bar with Proctor Setting Gear -->
+        <LinearLayout
+            android:id="@+id/topBarLanding"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="🛡️ Safe Exam Browser"
+                android:textColor="@color/gray_text"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <!-- Tombol Pengaturan Server Pengawas -->
+            <ImageButton
+                android:id="@+id/btnLandingSettings"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_settings"
+                android:contentDescription="Pengaturan Pengawas"
+                app:tint="@color/gray_text" />
+        </LinearLayout>
+
+        <!-- Center Content: Logo, Judul & 3 Tombol Utama -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/topBarLanding"
+            android:layout_above="@id/footerLanding"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingHorizontal="28dp"
+                android:paddingVertical="16dp">
+
+                <!-- Logo Madrasah & Emblem -->
+                <FrameLayout
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:layout_marginBottom="16dp">
+
+                    <View
+                        android:layout_width="96dp"
+                        android:layout_height="96dp"
+                        android:background="@drawable/bg_badge_server" />
+
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_school_cap"
+                        android:contentDescription="Logo Ujian" />
+                </FrameLayout>
+
+                <!-- Judul Aplikasi -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Exambro Madrasah"
+                    android:textColor="@color/slate_900"
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    android:gravity="center" />
+
+                <!-- Deskripsi Subtitle -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Aplikasi Resmi Ujian Berbasis Komputer &amp; Android"
+                    android:textColor="@color/gray_text"
+                    android:textSize="13sp"
+                    android:gravity="center" />
+
+                <!-- Server Badge Indicator -->
+                <TextView
+                    android:id="@+id/tvLandingServerStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginBottom="28dp"
+                    android:background="@drawable/bg_badge_server"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="6dp"
+                    android:text="🌐 Server: ujian-madrasah.vercel.app"
+                    android:textColor="@color/slate_700"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <!-- Group 3 Tombol Utama Sesuai Permintaan -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxWidth="340dp"
+                    android:orientation="vertical">
+
+                    <!-- 1. Tombol MASUK UJIAN (Primary Button) -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnEnterExam"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:backgroundTint="@color/primary"
+                        android:text="Masuk Ujian"
+                        android:textColor="@color/white"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="14dp"
+                        app:elevation="4dp"
+                        app:icon="@drawable/ic_rocket"
+                        app:iconGravity="textStart"
+                        app:iconSize="20dp"
+                        app:iconTint="@color/white" />
+
+                    <!-- 2. Tombol CEK UPDATE -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCheckUpdateLanding"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="12dp"
+                        android:text="Cek Update"
+                        android:textColor="@color/primary"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="14dp"
+                        app:icon="@drawable/ic_refresh"
+                        app:iconGravity="textStart"
+                        app:iconSize="18dp"
+                        app:iconTint="@color/primary"
+                        app:strokeColor="@color/primary"
+                        app:strokeWidth="1.5dp" />
+
+                    <!-- 3. Tombol TENTANG KAMI -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAboutUsLanding"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="10dp"
+                        android:text="Tentang Kami"
+                        android:textColor="@color/slate_800"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="14dp"
+                        app:icon="@drawable/ic_info"
+                        app:iconGravity="textStart"
+                        app:iconSize="18dp"
+                        app:iconTint="@color/slate_800"
+                        app:strokeColor="#CBD5E1"
+                        app:strokeWidth="1dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- Footer Branding -->
+        <LinearLayout
+            android:id="@+id/footerLanding"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:paddingBottom="16dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kementerian Agama Republik Indonesia"
+                android:textColor="@color/gray_text"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvLandingVersion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Madrasah Mandiri Berprestasi • v1.0.2"
+                android:textColor="#94A3B8"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+    </RelativeLayout>
 
     <!-- Area Error / Tidak Ada Sinyal -->
     <LinearLayout
@@ -69,11 +278,20 @@
             android:textColor="@color/white" />
 
         <Button
+            android:id="@+id/btnBackToLandingFromError"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Kembali ke Beranda"
+            android:textColor="@color/gray_text" />
+
+        <Button
             android:id="@+id/btnSettings"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="2dp"
             android:text="@string/btn_settings"
             android:textColor="@color/primary" />
     </LinearLayout>
