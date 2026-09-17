@@ -64,6 +64,45 @@
 		hasEnteredFullscreenOnce = true;
 	}
 
+	onMount(() => {
+		if (browser && typeof (window as any).ExambroBridge?.setExamActive === 'function') {
+			try {
+				(window as any).ExambroBridge.setExamActive(true, attempt?.exam_exit_pin || '');
+			} catch (e) {}
+		}
+	});
+
+	onDestroy(() => {
+		if (browser && typeof (window as any).ExambroBridge?.setExamActive === 'function') {
+			try {
+				(window as any).ExambroBridge.setExamActive(false, '');
+			} catch (e) {}
+		}
+	});
+
+	$: if (browser && attempt?.id && attempt?.status !== 'selesai' && !isSubmitted && !submitting && !showDisqualifiedModal && !showTimeUpModal) {
+		if (typeof (window as any).ExambroBridge?.setExamActive === 'function') {
+			try {
+				(window as any).ExambroBridge.setExamActive(true, attempt?.exam_exit_pin || '');
+			} catch (e) {}
+		}
+		if (attempt?.exam_exit_pin) {
+			(window as any).exambroExitPin = attempt.exam_exit_pin;
+		}
+	} else if (browser && (submitting || isSubmitted || showDisqualifiedModal || showTimeUpModal || attempt?.status === 'selesai')) {
+		if (typeof (window as any).ExambroBridge?.setExamActive === 'function') {
+			try {
+				(window as any).ExambroBridge.setExamActive(false, '');
+			} catch (e) {}
+		}
+	}
+
+	$: if (browser && attempt?.exam_exit_pin && typeof (window as any).ExambroBridge?.setExamExitPin === 'function') {
+		try {
+			(window as any).ExambroBridge.setExamExitPin(attempt.exam_exit_pin);
+		} catch (e) {}
+	}
+
 	$: if (browser && typeof (window as any).ExambroBridge?.setExamPaused === 'function') {
 		try {
 			(window as any).ExambroBridge.setExamPaused(isPausedByProctor);
@@ -1068,6 +1107,7 @@
 		<meta name="exambro-exit-pin" content={attempt.exam_exit_pin} />
 	{/if}
 	<meta name="exambro-paused" content={isPausedByProctor ? "1" : "0"} />
+	<meta name="exambro-active" content={(!isSubmitted && !submitting && attempt?.status !== 'selesai') ? "1" : "0"} />
 </svelte:head>
 
 <svelte:window 

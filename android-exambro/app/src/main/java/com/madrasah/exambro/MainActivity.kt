@@ -2,6 +2,7 @@ package com.madrasah.exambro
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.ActivityManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -75,6 +76,8 @@ class MainActivity : AppCompatActivity() {
     private var currentUrl: String = ""
     private var currentExamExitPin: String? = null
     private var isExamPaused: Boolean = false
+    private var isExamActive: Boolean = false
+    private var touchStartedInTopZone: Boolean = false
 
     companion object {
         private const val PREFS_NAME = "exambro_prefs"
@@ -131,18 +134,101 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         val controller = WindowInsetsControllerCompat(window, window.decorView)
         controller.hide(WindowInsetsCompat.Type.systemBars())
-        controller.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
+        if (isExamInProgress() && !isExamPaused) {
+            // Saat ujian aktif: sembunyikan bilah status permanen dan cegah muncul saat swipe
+            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_FULLSCREEN
+            )
+        } else {
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.attributes.layoutInDisplayCutoutMode =
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) {
             applyImmersiveMode()
+            if (isExamInProgress() && !isExamPaused) {
+                startLockTaskMode()
+            }
         } else if (isExamInProgress() && !isExamPaused) {
             collapseNotificationShade()
             applyImmersiveMode()
+            window.decorView.postDelayed({
+                if (isExamInProgress() && !isExamPaused) {
+                    collapseNotificationShade()
+                    bringAppToFront()
+                }
+            }, 150)
         }
+    }
+
+    private fun startLockTaskMode() {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                val am = getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (am?.lockTaskModeState == ActivityManager.LOCK_TASK_MODE_NONE) {
+                        startLockTask()
+                    }
+                } else {
+                    startLockTask()
+                }
+            }
+        } catch (e: Exception) {}
+    }
+
+    private fun stopLockTaskMode() {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                val am = getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (am?.lockTaskModeState != ActivityManager.LOCK_TASK_MODE_NONE) {
+                        stopLockTask()
+                    }
+                } else {
+                    stopLockTask()
+                }
+            }
+        } catch (e: Exception) {}
+    }
+
+    private fun bringAppToFront() {
+        if (!isExamInProgress() || isExamPaused) return
+        try {
+            val am = getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
+            am?.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
+        } catch (e: Exception) {}
+
+        try {
+            val intent = Intent(this, MainActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            }
+            startActivity(intent)
+        } catch (e: Exception) {}
+    }
+
+    private fun getStatusBarHeight(): Int {
+        var result = 0
+        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
+        if (resourceId > 0) {
+            result = resources.getDimensionPixelSize(resourceId)
+        }
+        return if (result > 0) result else (28 * resources.displayMetrics.density).toInt()
     }
 
     private fun collapseNotificationShade() {
@@ -171,10 +257,31 @@ class MainActivity : AppCompatActivity() {
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         if (ev != null && isExamInProgress() && !isExamPaused) {
-            // Blokir sentuhan atau tarikan dari bilah paling atas layar (status bar area 0-100px)
-            // agar laci notifikasi atas tidak dapat ditarik turun sama sekali saat ujian aktif
-            if (ev.rawY < 100) {
-                return true
+            val statusBarHeight = getStatusBarHeight()
+            // Intercept zone diperluas agar mencakup notch dan threshold tarikan gesture bilah atas Android
+            val interceptZone = Math.max(statusBarHeight + (45 * resources.displayMetrics.density).toInt(), 180)
+
+            when (ev.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    if (ev.rawY <= interceptZone) {
+                        touchStartedInTopZone = true
+                        collapseNotificationShade()
+                        return true
+                    }
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    if (touchStartedInTopZone || ev.rawY <= interceptZone) {
+                        collapseNotificationShade()
+                        return true
+                    }
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    if (touchStartedInTopZone) {
+                        touchStartedInTopZone = false
+                        collapseNotificationShade()
+                        return true
+                    }
+                }
             }
         }
         return super.dispatchTouchEvent(ev)
@@ -254,6 +361,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showLandingScreen() {
+        stopLockTaskMode()
+        isExamActive = false
+        currentExamExitPin = null
+        isExamPaused = false
         layoutLanding.visibility = View.VISIBLE
         webView.visibility = View.GONE
         layoutError.visibility = View.GONE
@@ -387,14 +498,31 @@ class MainActivity : AppCompatActivity() {
                         val cleanPaused = paused?.replace("\"", "")?.trim()
                         val isPaused = cleanPaused == "1" || cleanPaused == "true"
                         isExamPaused = isPaused
-                        if (isPaused) {
-                            runOnUiThread {
+                        runOnUiThread {
+                            if (isPaused) {
+                                stopLockTaskMode()
                                 val controller = WindowInsetsControllerCompat(window, window.decorView)
-                                controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+                                controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                            } else {
+                                startLockTaskMode()
+                                applyImmersiveMode()
+                            }
+                        }
+                    }
+
+                    webView.evaluateJavascript("(function() { return document.querySelector('meta[name=\"exambro-active\"]')?.getAttribute('content') || ''; })()") { active ->
+                        val cleanActive = active?.replace("\"", "")?.trim()
+                        if (cleanActive == "1" || cleanActive == "true") {
+                            isExamActive = true
+                            runOnUiThread {
+                                startLockTaskMode()
+                                applyImmersiveMode()
                             }
                         }
                     }
                 } else {
+                    stopLockTaskMode()
+                    isExamActive = false
                     currentExamExitPin = null
                     isExamPaused = false
                 }
@@ -432,6 +560,22 @@ class MainActivity : AppCompatActivity() {
 
     inner class ExambroWebAppInterface {
         @android.webkit.JavascriptInterface
+        fun setExamActive(active: Boolean, exitPin: String?) {
+            runOnUiThread {
+                isExamActive = active
+                if (!exitPin.isNullOrEmpty() && exitPin != "null") {
+                    currentExamExitPin = exitPin.trim()
+                }
+                if (active) {
+                    startLockTaskMode()
+                } else {
+                    stopLockTaskMode()
+                }
+                applyImmersiveMode()
+            }
+        }
+
+        @android.webkit.JavascriptInterface
         fun setExamExitPin(pin: String?) {
             currentExamExitPin = pin?.trim()
         }
@@ -441,11 +585,17 @@ class MainActivity : AppCompatActivity() {
             isExamPaused = paused
             runOnUiThread {
                 if (paused) {
-                    // Ketika ujian dijeda oleh pengawas, izinkan akses ke bilah atas untuk menyalakan data/wifi
+                    // Ketika ujian dijeda oleh pengawas, hentikan LockTask sementara dan izinkan akses bilah atas untuk menyalakan data/WiFi
+                    stopLockTaskMode()
                     val controller = WindowInsetsControllerCompat(window, window.decorView)
-                    controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+                    controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                    Toast.makeText(this@MainActivity, "Ujian dijeda pengawas. Pengaturan data/WiFi dibuka.", Toast.LENGTH_SHORT).show()
                 } else {
+                    if (isExamInProgress()) {
+                        startLockTaskMode()
+                    }
                     applyImmersiveMode()
+                    Toast.makeText(this@MainActivity, "Ujian dilanjutkan. Mode terkunci diaktifkan kembali.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -490,6 +640,7 @@ class MainActivity : AppCompatActivity() {
      * TIDAK aktif saat siswa masih berada di halaman input token atau modal konfirmasi (/siswa/ujian).
      */
     private fun isExamInProgress(): Boolean {
+        if (isExamActive) return true
         val activeUrl = webView.url ?: currentUrl
         val questionPageRegex = Regex(".*/siswa/ujian/\\d+.*")
         return questionPageRegex.matches(activeUrl)
@@ -510,11 +661,30 @@ class MainActivity : AppCompatActivity() {
         hasLeftApp = true
         val currentViolations = prefs.getInt(KEY_VIOLATIONS, 0) + 1
         prefs.edit().putInt(KEY_VIOLATIONS, currentViolations).apply()
+        bringAppToFront()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (isExamInProgress() && !isExamPaused && !isRequestingPermission) {
+            collapseNotificationShade()
+            bringAppToFront()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (isExamInProgress() && !isExamPaused && !isRequestingPermission) {
+            bringAppToFront()
+        }
     }
 
     override fun onResume() {
         super.onResume()
         applyImmersiveMode()
+        if (isExamInProgress() && !isExamPaused) {
+            startLockTaskMode()
+        }
 
         // Tampilkan dialog pelanggaran HANYA jika siswa sedang ujian dan benar-benar keluar
         if (hasLeftApp && isExamInProgress()) {
@@ -614,9 +784,13 @@ class MainActivity : AppCompatActivity() {
                 val masterPin = prefs.getString(KEY_PROCTOR_PIN, DEFAULT_PIN) ?: DEFAULT_PIN
                 val isValid = (currentExamExitPin != null && enteredPin == currentExamExitPin) || (enteredPin == masterPin)
                 if (isValid) {
+                    stopLockTaskMode()
+                    isExamActive = false
                     showLandingScreen()
+                    Toast.makeText(this, "Berhasil keluar dari ujian", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(this, "PIN Keluar Ujian salah! Silakan minta PIN kepada Pengawas Ruang.", Toast.LENGTH_SHORT).show()
+                    applyImmersiveMode()
                 }
             }
             .setNegativeButton(getString(R.string.dialog_btn_cancel)) { dialog, _ ->
