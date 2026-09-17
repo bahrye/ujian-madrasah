@@ -3058,20 +3058,20 @@ export const MTS_QUESTIONS_GRADE_9: SimulationQuestion[] = [
 		subject: 'Bahasa Arab',
 		jenjang: 'MTS',
 		grade: 9,
-		question_text: '<p>Peristiwa hijrahnya Nabi Muhammad SAW dari Makkah ke Madinah dijadikan sebagai permulaan penanggalan kalender...</p>',
+		question_text: '<p>عُمَرُ بْنُ الْخَطَّابِ هُوَ الَّذِي ... التَّقْوِيْمَ الْهِجْرِيَّ.</p>',
 		question_number: 5,
 		media_type: null,
 		media_url: null,
 		audio_max_plays: 0,
 		options_json: JSON.stringify([
-			{ key: 'A', text: 'Hijriyyah (السَّنَةُ الْهِجْرِيَّةُ)' },
-			{ key: 'B', text: 'Masehi' },
-			{ key: 'C', text: 'Syamsiyyah' },
-			{ key: 'D', text: 'Jawa Kuno' }
+			{ key: 'A', text: 'وَضَعَ' },
+			{ key: 'B', text: 'وَضَعَتْ' },
+			{ key: 'C', text: 'وَضَعُوْا' },
+			{ key: 'D', text: 'وَضَعْتَ' }
 		]),
 		correct_answer: 'A',
 		points: 4,
-		explanation: 'Kalender Hijriyyah ditetapkan pertama kali pada masa Khalifah Umar bin Khattab berdasarkan momen Hijrah.'
+		explanation: 'Dhamir untuk \'عُمَرُ بْنُ الْخَطَّابِ\' adalah هُوَ (dia laki-laki tunggal), sehingga bentuk fi\'il madhi yang tepat adalah وَضَعَ (wada\'a).'
 	},
 	{
 		id: 406,
@@ -3247,20 +3247,20 @@ export const MTS_QUESTIONS_GRADE_9: SimulationQuestion[] = [
 		subject: 'Bahasa Arab',
 		jenjang: 'MTS',
 		grade: 9,
-		question_text: '<p>Peristiwa turunnya Al-Qur\'an pertama kali kepada Nabi Muhammad SAW di Gua Hira diperingati pada tanggal...</p>',
+		question_text: '<p>فِي أَيِّ شَهْرٍ نَزَلَ الْقُرْآنُ الْكَرِيْمُ أَوَّلَ مَرَّةٍ عَلَى النَّبِيِّ مُحَمَّدٍ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ فِي غَارِ حِرَاءَ؟</p>',
 		question_number: 14,
 		media_type: null,
 		media_url: null,
 		audio_max_plays: 0,
 		options_json: JSON.stringify([
-			{ key: 'A', text: '17 Ramadhan (نُزُوْلُ الْقُرْآن)' },
-			{ key: 'B', text: '1 Syawwal' },
-			{ key: 'C', text: '1 Muharram' },
-			{ key: 'D', text: '12 Rabi\'ul Awwal' }
+			{ key: 'A', text: 'شَهْرِ رَمَضَانَ (Bulan Ramadhan)' },
+			{ key: 'B', text: 'شَهْرِ شَوَّالٍ (Bulan Syawwal)' },
+			{ key: 'C', text: 'شَهْرِ مُحَرَّمٍ (Bulan Muharram)' },
+			{ key: 'D', text: 'شَهْرِ رَبِيْعِ الأَوَّلِ (Bulan Rabi\'ul Awwal)' }
 		]),
 		correct_answer: 'A',
 		points: 4,
-		explanation: 'Malam Nuzulul Qur\'an diperingati setiap malam 17 Ramadhan.'
+		explanation: 'Al-Qur\'an pertama kali diturunkan kepada Nabi Muhammad SAW di Gua Hira pada bulan Ramadhan (شَهْرُ رَمَضَانَ) atau malam Nuzulul Qur\'an.'
 	},
 	{
 		id: 415,

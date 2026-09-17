@@ -136,35 +136,46 @@
 	function getRightIdxFromVal(val: string | number | undefined): number | null {
 		if (val === undefined || val === null || val === '') return null;
 		const s = String(val).trim().toUpperCase();
-		const byKey = matchingRight.findIndex((it: any) => it && typeof it === 'object' && it.key !== undefined && String(it.key).trim().toUpperCase() === s);
-		if (byKey !== -1) return byKey;
+		const hasExplicitKeys = matchingRight.some((it: any) => it && typeof it === 'object' && it.key !== undefined);
+		if (hasExplicitKeys) {
+			const byKey = matchingRight.findIndex((it: any) => it && typeof it === 'object' && it.key !== undefined && String(it.key).trim().toUpperCase() === s);
+			return byKey !== -1 ? byKey : null;
+		}
 		if (s.length === 1 && s >= 'A' && s <= 'Z') {
 			const idx = s.charCodeAt(0) - 65;
 			if (idx >= 0 && idx < matchingRight.length) return idx;
 		}
 		const n = parseInt(s, 10);
-		if (!isNaN(n)) {
-			if (n >= 0 && n < matchingRight.length) return n;
-			if (n >= 1 && n <= matchingRight.length) return n - 1;
+		if (!isNaN(n) && n >= 0 && n < matchingRight.length) {
+			return n;
 		}
 		return null;
 	}
 
 	function getLeftIdxFromKey(k: string | number): number | null {
 		const s = String(k).trim().toUpperCase();
-		const byKey = matchingLeft.findIndex((it: any) => it && typeof it === 'object' && it.key !== undefined && String(it.key).trim().toUpperCase() === s);
-		if (byKey !== -1) return byKey;
+		const hasExplicitKeys = matchingLeft.some((it: any) => it && typeof it === 'object' && it.key !== undefined);
+		if (hasExplicitKeys) {
+			const byKey = matchingLeft.findIndex((it: any) => it && typeof it === 'object' && it.key !== undefined && String(it.key).trim().toUpperCase() === s);
+			return byKey !== -1 ? byKey : null;
+		}
 		const n = parseInt(s, 10);
-		if (!isNaN(n)) {
-			if (n >= 0 && n < matchingLeft.length) return n;
-			if (n >= 1 && n <= matchingLeft.length) return n - 1;
+		if (!isNaN(n) && n >= 0 && n < matchingLeft.length) {
+			return n;
 		}
 		return null;
 	}
 
 	function getMatchForLeft(leftIdx: number): number | null {
 		const lKey = getLeftKey(leftIdx);
-		const val = matchingAnswers[lKey] !== undefined ? matchingAnswers[lKey] : matchingAnswers[String(leftIdx)];
+		let val = matchingAnswers[lKey];
+		if (val === undefined) {
+			const item = matchingLeft[leftIdx];
+			const hasExplicitKey = item && typeof item === 'object' && item.key !== undefined;
+			if (!hasExplicitKey) {
+				val = matchingAnswers[String(leftIdx)];
+			}
+		}
 		return getRightIdxFromVal(val);
 	}
 
@@ -211,7 +222,6 @@
 	function handleMatchingConnect(leftIdx: number, rightIdx: number) {
 		const lKey = getLeftKey(leftIdx);
 		const rKey = getRightKey(rightIdx);
-		delete matchingAnswers[String(leftIdx)];
 		delete matchingAnswers[lKey];
 		matchingAnswers[lKey] = rKey;
 		matchingAnswers = { ...matchingAnswers };
@@ -222,7 +232,6 @@
 	function removeMatchingPair(leftIdx: number, e?: Event) {
 		if (e) e.stopPropagation();
 		const lKey = getLeftKey(leftIdx);
-		delete matchingAnswers[String(leftIdx)];
 		delete matchingAnswers[lKey];
 		matchingAnswers = { ...matchingAnswers };
 		dispatch('answer', { questionId: question.id, answer: JSON.stringify(matchingAnswers) });

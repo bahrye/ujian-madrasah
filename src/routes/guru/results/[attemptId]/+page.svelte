@@ -133,15 +133,14 @@
 									{@const opts = safeParseJson(ans.options_json, {left:[], right:[]})}
 									<div class="space-y-1.5 text-xs bg-white p-2.5 rounded-lg border border-slate-200">
 										{#each Object.entries(safeParseJson(ans.answer_given, {})) as [key, value]}
-											{@const lIdx = parseInt(key)}
-											{@const rIdx = parseInt(String(value))}
-											{@const rawL = opts.left?.[lIdx] || `No. ${lIdx + 1}`}
-											{@const lText = typeof rawL === 'object' ? (rawL?.text || rawL?.content || rawL?.html || '') : rawL}
-											{@const rLetter = !isNaN(rIdx) ? String.fromCharCode(65 + rIdx) : (typeof value === 'string' && value.length === 1 ? value : '-')}
-											{@const rawR = opts.right?.[rIdx] || value}
-											{@const rText = typeof rawR === 'object' ? (rawR?.text || rawR?.content || rawR?.html || '') : rawR}
+											{@const lItem = Array.isArray(opts.left) ? (opts.left.find((it) => it && typeof it === 'object' && String(it.key).trim() === String(key).trim()) || opts.left[parseInt(key)]) : null}
+											{@const lLabel = lItem && typeof lItem === 'object' && lItem.key !== undefined ? lItem.key : (parseInt(key) + 1)}
+											{@const lText = lItem ? (typeof lItem === 'object' ? (lItem.text || lItem.content || lItem.html || '') : lItem) : (opts.left?.[parseInt(key)] || `No. ${key}`)}
+											{@const rItem = Array.isArray(opts.right) ? (opts.right.find((it) => it && typeof it === 'object' && String(it.key).trim() === String(value).trim()) || opts.right[parseInt(String(value))]) : null}
+											{@const rLetter = rItem && typeof rItem === 'object' && rItem.key !== undefined ? rItem.key : (!isNaN(parseInt(String(value))) ? String.fromCharCode(65 + parseInt(String(value))) : (typeof value === 'string' && value.length === 1 ? value : '-'))}
+											{@const rText = rItem ? (typeof rItem === 'object' ? (rItem.text || rItem.content || rItem.html || '') : rItem) : (opts.right?.[parseInt(String(value))] || value)}
 											<div class="flex items-center gap-1.5 py-0.5 border-b border-slate-100 last:border-0">
-												<span class="px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 font-bold shrink-0">{lIdx + 1}</span>
+												<span class="px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 font-bold shrink-0">{lLabel}</span>
 												<span class="font-medium text-slate-700 truncate max-w-[45%]">{@html lText}</span>
 												<span class="text-indigo-500 font-bold">➔</span>
 												<span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold shrink-0">{rLetter}</span>
@@ -217,15 +216,14 @@
 										{@const opts = safeParseJson(ans.options_json, {left:[], right:[]})}
 										<div class="space-y-1.5 text-xs bg-emerald-50/70 p-2.5 rounded-lg border border-emerald-200">
 											{#each safeParseObjectEntries(ans.correct_answer_json) as [key, value]}
-												{@const lIdx = parseInt(key)}
-												{@const rIdx = parseInt(String(value))}
-												{@const rawL = opts.left?.[lIdx] || `No. ${lIdx + 1}`}
-												{@const lText = typeof rawL === 'object' ? (rawL?.text || rawL?.content || rawL?.html || '') : rawL}
-												{@const rLetter = !isNaN(rIdx) ? String.fromCharCode(65 + rIdx) : (typeof value === 'string' && value.length === 1 ? value : '-')}
-												{@const rawR = opts.right?.[rIdx] || value}
-												{@const rText = typeof rawR === 'object' ? (rawR?.text || rawR?.content || rawR?.html || '') : rawR}
+												{@const lItem = Array.isArray(opts.left) ? (opts.left.find((it) => it && typeof it === 'object' && String(it.key).trim() === String(key).trim()) || opts.left[parseInt(key)]) : null}
+												{@const lLabel = lItem && typeof lItem === 'object' && lItem.key !== undefined ? lItem.key : (parseInt(key) + 1)}
+												{@const lText = lItem ? (typeof lItem === 'object' ? (lItem.text || lItem.content || lItem.html || '') : lItem) : (opts.left?.[parseInt(key)] || `No. ${key}`)}
+												{@const rItem = Array.isArray(opts.right) ? (opts.right.find((it) => it && typeof it === 'object' && String(it.key).trim() === String(value).trim()) || opts.right[parseInt(String(value))]) : null}
+												{@const rLetter = rItem && typeof rItem === 'object' && rItem.key !== undefined ? rItem.key : (!isNaN(parseInt(String(value))) ? String.fromCharCode(65 + parseInt(String(value))) : (typeof value === 'string' && value.length === 1 ? value : '-'))}
+												{@const rText = rItem ? (typeof rItem === 'object' ? (rItem.text || rItem.content || rItem.html || '') : rItem) : (opts.right?.[parseInt(String(value))] || value)}
 												<div class="flex items-center gap-1.5 py-0.5 border-b border-emerald-200/50 last:border-0">
-													<span class="px-1.5 py-0.5 rounded bg-emerald-200 text-emerald-800 font-bold shrink-0">{lIdx + 1}</span>
+													<span class="px-1.5 py-0.5 rounded bg-emerald-200 text-emerald-800 font-bold shrink-0">{lLabel}</span>
 													<span class="font-medium text-emerald-900 truncate max-w-[45%]">{@html lText}</span>
 													<span class="text-emerald-600 font-bold">➔</span>
 													<span class="px-1.5 py-0.5 rounded bg-emerald-700 text-white font-bold shrink-0">{rLetter}</span>
