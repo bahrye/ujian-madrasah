@@ -398,19 +398,22 @@ export const actions: Actions = {
 			const rawIds = JSON.parse(idsStr);
 			if (!Array.isArray(rawIds) || rawIds.length === 0) return fail(400, { error: 'Daftar ID tidak valid.' });
 
+			const numericIds = rawIds.map((id: any) => Number(id)).filter((id: number) => !isNaN(id) && id > 0);
+			if (numericIds.length === 0) return fail(400, { error: 'Daftar ID tidak valid.' });
+
 			// Filter ID yang benar-benar milik ujian ini
-			const placeholders = rawIds.map(() => '?').join(',');
+			const placeholders = numericIds.map(() => '?').join(',');
 			const validQuestions = await db.prepare(`
 				SELECT q.id
 				FROM questions q
 				WHERE q.id IN (${placeholders}) AND q.exam_id = ?
-			`).bind(...rawIds, parsedExamId).all<{ id: number }>();
+			`).bind(...numericIds, parsedExamId).all<{ id: number }>();
 
 			if (validQuestions.results.length === 0) {
 				return fail(400, { error: 'Tidak ada soal valid yang dapat dihapus.' });
 			}
 
-			const validIds = validQuestions.results.map(q => q.id);
+			const validIds = validQuestions.results.map(q => Number(q.id));
 			const validPlaceholders = validIds.map(() => '?').join(',');
 
 			const mergedEnv = { ...env, ...(platform?.env as any) };

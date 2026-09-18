@@ -30,7 +30,8 @@ export async function deleteFromCloudinary(url: string | null, env: Record<strin
 					versionFound = true;
 					continue;
 				}
-				if (seg.includes(',') || /^[a-z]{1,3}_/.test(seg)) {
+				// Known Cloudinary transformation patterns: e.g. c_scale, w_100, or multiple comma-separated
+				if (seg.includes(',') || /^(?:[a-z]{1,2}_|fl_|pg_|fps_)[a-zA-Z0-9_,:]+$/i.test(seg)) {
 					continue;
 				}
 			}
@@ -42,36 +43,54 @@ export async function deleteFromCloudinary(url: string | null, env: Record<strin
 		const publicId = lastDotIndex !== -1 ? cleanPath.substring(0, lastDotIndex) : cleanPath;
 
 		// Cloudinary treats audio files as 'video' resource type for their API
-		const resourceType = url.includes('/video/') ? 'video' : url.includes('/raw/') ? 'raw' : 'image';
+		const defaultResourceType = url.includes('/video/') ? 'video' : url.includes('/raw/') ? 'raw' : 'image';
 
-		const timestamp = Math.round(new Date().getTime() / 1000).toString();
-		const strToSign = `public_id=${publicId}&timestamp=${timestamp}${apiSecret}`;
+		// Helper function to call Cloudinary destroy API with SHA-1 signature and invalidate: true
+		async function callDestroy(pid: string, resType: string): Promise<any> {
+			const timestamp = Math.round(new Date().getTime() / 1000).toString();
+			// Signature parameters must be in alphabetical order: invalidate, public_id, timestamp
+			const strToSign = `invalidate=true&public_id=${pid}&timestamp=${timestamp}${apiSecret}`;
 
-		// Web Crypto API for SHA-1 (Compatible with Cloudflare Workers)
-		const encoder = new TextEncoder();
-		const data = encoder.encode(strToSign);
-		const hashBuffer = await crypto.subtle.digest('SHA-1', data);
-		const hashArray = Array.from(new Uint8Array(hashBuffer));
-		const signature = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+			const encoder = new TextEncoder();
+			const data = encoder.encode(strToSign);
+			const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+			const hashArray = Array.from(new Uint8Array(hashBuffer));
+			const signature = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 
-		const formData = new FormData();
-		formData.append('public_id', publicId);
-		formData.append('api_key', apiKey);
-		formData.append('timestamp', timestamp);
-		formData.append('signature', signature);
+			const formData = new FormData();
+			formData.append('public_id', pid);
+			formData.append('api_key', apiKey);
+			formData.append('timestamp', timestamp);
+			formData.append('signature', signature);
+			formData.append('invalidate', 'true');
 
-		const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/destroy`, {
-			method: 'POST',
-			body: formData
-		});
-		
-		const result = (await res.json()) as any;
-		console.log('Cloudinary Destroy Result:', publicId, result);
-		
-		if (result.result === 'ok' || result.result === 'not found') {
+			const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/${resType}/destroy`, {
+				method: 'POST',
+				body: formData
+			});
+			return await res.json();
+		}
+
+		// Attempt 1: publicId without extension
+		let result = await callDestroy(publicId, defaultResourceType);
+		console.log('Cloudinary Destroy Attempt 1 (without ext):', publicId, defaultResourceType, result);
+
+		// If not found and cleanPath has an extension, Attempt 2: with extension
+		if (result?.result === 'not found' && cleanPath !== publicId) {
+			result = await callDestroy(cleanPath, defaultResourceType);
+			console.log('Cloudinary Destroy Attempt 2 (with ext):', cleanPath, defaultResourceType, result);
+		}
+
+		// If still not found and default was 'image', Attempt 3: raw resource type
+		if (result?.result === 'not found' && defaultResourceType === 'image') {
+			result = await callDestroy(cleanPath, 'raw');
+			console.log('Cloudinary Destroy Attempt 3 (raw):', cleanPath, result);
+		}
+
+		if (result?.result === 'ok' || result?.result === 'not found') {
 			return { success: true };
 		} else {
-			return { success: false, error: result.error?.message || result.result || 'Unknown error' };
+			return { success: false, error: result?.error?.message || result?.result || 'Unknown error' };
 		}
 	} catch (err: any) {
 		console.error('Failed to delete from Cloudinary:', err);
@@ -84,13 +103,21 @@ export async function deleteFromCloudinary(url: string | null, env: Record<strin
  */
 export function extractCloudinaryUrls(text: string | null | undefined): string[] {
 	if (!text) return [];
-	const normalized = text.replace(/\\\//g, '/');
-	const matches = normalized.match(/https:\/\/res\.cloudinary\.com\/[^\s'"><),}\]]+/g);
+	// Decode escaped characters dan HTML entities yang umum di JSON/HTML
+	const normalized = text
+		.replace(/\\\//g, '/')
+		.replace(/\\"/g, '"')
+		.replace(/\\'/g, "'")
+		.replace(/&quot;/g, '"')
+		.replace(/&amp;/g, '&')
+		.replace(/&#39;/g, "'");
+
+	const matches = normalized.match(/https:\/\/res\.cloudinary\.com\/[^\s"'<>\)\]\}\\\^]+/g);
 	if (!matches) return [];
 
 	const results = new Set<string>();
 	for (let u of matches) {
-		u = u.replace(/[,;.)]+$/, '').trim();
+		u = u.replace(/[,;.)\\"'&]+$/, '').trim();
 		if (u.includes('res.cloudinary.com')) {
 			results.add(u);
 		}
@@ -163,29 +190,37 @@ export async function deleteMediaForQuestionIds(
 	if (!questionIds || questionIds.length === 0) return;
 
 	try {
-		const placeholders = questionIds.map(() => '?').join(',');
-		const rows = await db
-			.prepare(
-				`SELECT media_url, question_text, options_json, correct_answer_json FROM questions WHERE id IN (${placeholders})`
-			)
-			.bind(...questionIds)
-			.all<{
-				media_url?: string;
-				question_text?: string;
-				options_json?: string;
-				correct_answer_json?: string;
-			}>();
+		const safeIds = questionIds.map((id) => Number(id)).filter((id) => !isNaN(id) && id > 0);
+		if (safeIds.length === 0) return;
 
 		const urlsToDelete = new Set<string>();
 
-		for (const row of rows.results || []) {
-			if (row.media_url && row.media_url.includes('res.cloudinary.com')) {
-				urlsToDelete.add(row.media_url.trim());
-			}
-			const textBlock = `${row.question_text || ''} ${row.options_json || ''} ${row.correct_answer_json || ''}`;
-			const extracted = extractCloudinaryUrls(textBlock);
-			for (const u of extracted) {
-				urlsToDelete.add(u);
+		// Chunk ID untuk mencegah limit parameter SQL
+		const chunkSize = 100;
+		for (let i = 0; i < safeIds.length; i += chunkSize) {
+			const chunk = safeIds.slice(i, i + chunkSize);
+			const placeholders = chunk.map(() => '?').join(',');
+			const rows = await db
+				.prepare(
+					`SELECT media_url, question_text, options_json, correct_answer_json FROM questions WHERE id IN (${placeholders})`
+				)
+				.bind(...chunk)
+				.all<{
+					media_url?: string;
+					question_text?: string;
+					options_json?: string;
+					correct_answer_json?: string;
+				}>();
+
+			for (const row of rows.results || []) {
+				if (row.media_url && row.media_url.includes('res.cloudinary.com')) {
+					urlsToDelete.add(row.media_url.trim());
+				}
+				const textBlock = `${row.question_text || ''} ${row.options_json || ''} ${row.correct_answer_json || ''}`;
+				const extracted = extractCloudinaryUrls(textBlock);
+				for (const u of extracted) {
+					urlsToDelete.add(u);
+				}
 			}
 		}
 

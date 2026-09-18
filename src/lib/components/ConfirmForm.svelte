@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { fade, scale } from 'svelte/transition';
+	import { createEventDispatcher } from 'svelte';
 	import type { SubmitFunction } from '@sveltejs/kit';
 
 	export let action: string;
@@ -10,6 +11,8 @@
 	export let buttonTitle: string = '';
 	export let verifyText: string | null = null;
 	export let verifyPlaceholder: string | null = null;
+
+	const dispatch = createEventDispatcher();
 
 	let showModal = false;
 	let formElement: HTMLFormElement;
@@ -21,8 +24,11 @@
 			cancel();
 			showModal = true;
 		}
-		return async ({ update }) => {
+		return async ({ update, result }) => {
 			await update();
+			if (result.type === 'success') {
+				dispatch('success', result.data);
+			}
 		};
 	};
 

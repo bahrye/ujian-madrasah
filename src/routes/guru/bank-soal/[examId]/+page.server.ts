@@ -332,7 +332,7 @@ export const actions: Actions = {
 				await db.batch(statements);
 			}
 
-			return { success: 'Soal berhasil dihapus.' };
+			return { success: 'Soal berhasil dihapus.', deletedIds: [parsedId] };
 		} catch (e: any) {
 			console.error(e);
 			return fail(500, { error: e.message || 'Gagal menghapus soal' });
@@ -437,13 +437,32 @@ export const actions: Actions = {
 			const ids = JSON.parse(idsStr);
 			if (!Array.isArray(ids) || ids.length === 0) return fail(400, { error: 'Daftar ID tidak valid.' });
 
+			const numericIds = ids.map((id: any) => Number(id)).filter((id: number) => !isNaN(id) && id > 0);
+			if (numericIds.length === 0) return fail(400, { error: 'Daftar ID tidak valid.' });
+
+			// Filter ID yang benar-benar milik ujian ini
+			const placeholders = numericIds.map(() => '?').join(',');
+			const validQuestions = await db.prepare(`
+				SELECT q.id
+				FROM questions q
+				WHERE q.id IN (${placeholders}) AND q.exam_id = ?
+			`).bind(...numericIds, parsedExamId).all<{ id: number }>();
+
+			if (validQuestions.results.length === 0) {
+				return fail(400, { error: 'Tidak ada soal valid yang dapat dihapus.' });
+			}
+
+			const validIds = validQuestions.results.map(q => Number(q.id));
+			const validPlaceholders = validIds.map(() => '?').join(',');
+
 			const mergedEnv = { ...env, ...(platform?.env as any) };
 			// Hapus seluruh media terkait soal dari Cloudinary & tabel uploaded_media
-			await deleteMediaForQuestionIds(db, mergedEnv, ids, locals.user!.school_id);
+			await deleteMediaForQuestionIds(db, mergedEnv, validIds, locals.user!.school_id);
 
-			const placeholders = ids.map(() => '?').join(',');
-			await db.prepare(`DELETE FROM student_answers WHERE question_id IN (${placeholders})`).bind(...ids).run();
-			await db.prepare(`DELETE FROM questions WHERE id IN (${placeholders})`).bind(...ids).run();
+			await db.batch([
+				db.prepare(`DELETE FROM student_answers WHERE question_id IN (${validPlaceholders})`).bind(...validIds),
+				db.prepare(`DELETE FROM questions WHERE id IN (${validPlaceholders}) AND exam_id = ?`).bind(...validIds, parsedExamId)
+			]);
 			
 			// Resequence remaining questions
 			const remainingQuestions = await db.prepare('SELECT id FROM questions WHERE exam_id = ? ORDER BY question_number ASC, id ASC').bind(parsedExamId).all();
@@ -456,7 +475,7 @@ export const actions: Actions = {
 				await db.batch(statements);
 			}
 			
-			return { success: `${ids.length} soal berhasil dihapus.` };
+			return { success: `${validIds.length} soal berhasil dihapus.`, deletedIds: validIds };
 		} catch (e: any) {
 			console.error('Error delete bulk:', e);
 			return fail(500, { error: 'Gagal menghapus soal secara massal.' });

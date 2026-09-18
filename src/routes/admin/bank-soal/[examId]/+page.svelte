@@ -861,178 +861,184 @@
 		</div>
 	{/if}
 
-	<div class="space-y-3" use:mathRender={questions} use:arabicRender={questions}>
-		{#each questions as q, idx (q.id)}
-			<div class="card p-4 flex items-start gap-4 group {selectedQuestionIds.has(q.id) ? 'ring-2 ring-indigo-500 bg-indigo-50/20' : ''}">
-				{#if isBulkSelectMode}
-					<div class="flex flex-col items-center justify-center pt-2" transition:slide={{axis: 'x'}}>
-						<input type="checkbox" class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" 
-							checked={selectedQuestionIds.has(q.id)}
-							on:change={(e) => {
-								if (e.currentTarget.checked) selectedQuestionIds.add(q.id);
-								else selectedQuestionIds.delete(q.id);
-								selectedQuestionIds = selectedQuestionIds;
-							}}
-						/>
-					</div>
-				{/if}
-				<span class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-md shadow-indigo-500/20">
-					{q.question_number}
-				</span>
-				<div class="flex-1 min-w-0">
-					<div class="flex items-center gap-2 mb-1">
-						<span class="badge-primary text-[10px]">{QUESTION_TYPE_LABELS[q.type] || q.type}</span>
-						<span class="text-xs text-slate-400">{q.points} poin</span>
-						{#if q.media_type && q.media_type !== 'none'}
-							<span class="badge-info text-[10px]">📎 {q.media_type === 'image' ? 'Gambar' : 'Audio'}</span>
-						{/if}
-					</div>
-					<!-- svelte-ignore a11y-click-events-have-key-events -->
-					<!-- svelte-ignore a11y-no-static-element-interactions -->
-					<div 
-						class="text-sm text-slate-700 prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 [&_img]:cursor-zoom-in [&_img:not([style*='display: block'])]:inline-block [&_img:not([style*='display: block'])]:align-middle [&_img:not([style*='display: block'])]:max-h-48 [&_img[style*='display: block']]:block [&_img[style*='display: block']]:mx-auto"
-						on:click={handleCardImageClick}
-					>
-						{@html normalizeQuestionHtml(q.question_text)}
-					</div>
-					{#if q.media_url && q.media_type === 'image'}
+	{#if questions.length === 0}
+		<div class="card p-12 text-center text-slate-400 border border-dashed border-slate-200">
+			<svg class="w-12 h-12 mx-auto mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+			<p class="font-medium text-slate-600">Belum ada soal dalam ujian ini.</p>
+			<p class="text-sm text-slate-400 mt-1">Klik "Tambah Soal" atau "Import Word" untuk menambahkan soal.</p>
+		</div>
+	{:else}
+		<div class="space-y-3">
+			{#each questions as q, idx (q.id)}
+				<div class="card p-4 flex items-start gap-4 group {selectedQuestionIds.has(q.id) ? 'ring-2 ring-indigo-500 bg-indigo-50/20' : ''}">
+					{#if isBulkSelectMode}
+						<div class="flex flex-col items-center justify-center pt-2">
+							<input type="checkbox" class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" 
+								checked={selectedQuestionIds.has(q.id)}
+								on:change={(e) => {
+									if (e.currentTarget.checked) selectedQuestionIds.add(q.id);
+									else selectedQuestionIds.delete(q.id);
+									selectedQuestionIds = selectedQuestionIds;
+								}}
+							/>
+						</div>
+					{/if}
+					<span class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-md shadow-indigo-500/20">
+						{q.question_number}
+					</span>
+					<div class="flex-1 min-w-0">
+						<div class="flex items-center gap-2 mb-1">
+							<span class="badge-primary text-[10px]">{QUESTION_TYPE_LABELS[q.type] || q.type}</span>
+							<span class="text-xs text-slate-400">{q.points} poin</span>
+							{#if q.media_type && q.media_type !== 'none'}
+								<span class="badge-info text-[10px]">📎 {q.media_type === 'image' ? 'Gambar' : 'Audio'}</span>
+							{/if}
+						</div>
 						<!-- svelte-ignore a11y-click-events-have-key-events -->
 						<!-- svelte-ignore a11y-no-static-element-interactions -->
-						<div class="my-2" on:click={handleCardImageClick}>
-							<img src={q.media_url} alt="Media soal {q.question_number}" class="max-h-64 object-contain rounded-lg border border-slate-200 shadow-xs cursor-zoom-in hover:opacity-90 transition-opacity" loading="lazy" />
+						<div 
+							class="text-sm text-slate-700 prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 [&_img]:cursor-zoom-in [&_img:not([style*='display: block'])]:inline-block [&_img:not([style*='display: block'])]:align-middle [&_img:not([style*='display: block'])]:max-h-48 [&_img[style*='display: block']]:block [&_img[style*='display: block']]:mx-auto"
+							use:mathRender={q.question_text}
+							use:arabicRender={q.question_text}
+							on:click={handleCardImageClick}
+						>
+							{@html normalizeQuestionHtml(q.question_text)}
 						</div>
-					{:else if q.media_url && q.media_type === 'audio'}
-						<div class="my-2">
-							<audio controls src={q.media_url} class="w-full max-w-md"></audio>
-						</div>
-					{/if}
-					{#if q.options_json}
-						{@const opts = JSON.parse(q.options_json)}
-						{@const correct = q.correct_answer_json ? JSON.parse(q.correct_answer_json) : null}
-						{#if Array.isArray(opts)}
+						{#if q.media_url && q.media_type === 'image'}
 							<!-- svelte-ignore a11y-click-events-have-key-events -->
 							<!-- svelte-ignore a11y-no-static-element-interactions -->
-							<div class="flex flex-wrap gap-1.5 mt-2" on:click={handleCardImageClick}>
-								{#each opts as opt, i}
-									{@const isCorrect = (q.type === 'pilihan_ganda' && correct === String.fromCharCode(65 + i)) || (q.type === 'pilihan_ganda_kompleks' && Array.isArray(correct) && correct.includes(String.fromCharCode(65 + i))) || (q.type === 'benar_salah' && correct === opt)}
-									<span class="text-[10px] px-2 py-0.5 rounded-md {isCorrect ? 'bg-green-100 text-green-700 font-bold border border-green-200' : 'bg-slate-100 text-slate-600'} flex items-center gap-1 [&_img]:max-h-16 [&_img]:inline-block [&_img]:align-middle [&_img]:cursor-zoom-in">
-										{q.type.startsWith('pilihan_ganda') ? `${String.fromCharCode(65 + i)}.` : ''} {@html normalizeQuestionHtml(opt)}
-									</span>
-								{/each}
+							<div class="my-2" on:click={handleCardImageClick}>
+								<img src={q.media_url} alt="Media soal {q.question_number}" class="max-h-64 object-contain rounded-lg border border-slate-200 shadow-xs cursor-zoom-in hover:opacity-90 transition-opacity" loading="lazy" />
 							</div>
-						{:else if q.type === 'benar_salah' && opts.statements}
-							<div class="mt-2 space-y-1 text-xs">
-								{#each opts.statements as stmt, i}
-									{@const ansKey = typeof correct === 'object' && correct !== null ? (correct[String(i)] || correct[i] || 'Benar') : (correct || 'Benar')}
-									<div class="flex items-center gap-2 text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
-										<span class="font-bold text-slate-700">{i + 1}.</span>
-										<span class="flex-1 truncate">{@html stmt}</span>
-										<span class="px-2 py-0.5 rounded text-[10px] font-bold {ansKey === 'Benar' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-rose-100 text-rose-700 border border-rose-200'}">
-											{ansKey}
-										</span>
-									</div>
-								{/each}
-							</div>
-						{:else if q.type === 'menjodohkan' && opts.left}
-							{@const correctMap = q.correct_answer_json ? JSON.parse(q.correct_answer_json) : {}}
-							<div class="mt-2 text-xs space-y-1.5 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-								<div class="font-semibold text-slate-700 mb-1">Kunci Pasangan:</div>
-								{#each opts.left as l, i}
-									{@const targetIdx = correctMap ? (correctMap[String(i)] ?? correctMap[i] ?? i) : i}
-									{@const targetLetter = String.fromCharCode(65 + Number(targetIdx))}
-									{@const targetText = opts.right?.[Number(targetIdx)] ?? '-'}
-									<div class="flex items-center gap-2 text-slate-600">
-										<span class="w-4 h-4 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
-										<span class="font-medium text-slate-700 truncate max-w-[40%]">{@html l}</span>
-										<span class="text-indigo-500 font-bold">➔</span>
-										<span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold text-[10px] shrink-0">{targetLetter}</span>
-										<span class="text-slate-600 truncate flex-1">{@html targetText}</span>
-									</div>
-								{/each}
-								{#if opts.right && opts.right.length > opts.left.length}
-									{@const pairedRightIdxs = new Set((opts.left as any[]).map((_: any, i: number) => String(correctMap ? (correctMap[String(i)] ?? correctMap[i] ?? i) : i)))}
-									{@const distractors = (opts.right as any[]).map((r: any, j: number) => ({ text: r, letter: String.fromCharCode(65 + j), idx: String(j) })).filter((item: any) => !pairedRightIdxs.has(item.idx))}
-									{#if distractors.length > 0}
-										<div class="pt-1.5 mt-1.5 border-t border-slate-200/80 flex items-center gap-1.5 flex-wrap">
-											<span class="text-amber-700 font-semibold">Pilihan Pengecoh:</span>
-											{#each distractors as d}
-												<span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-medium border border-amber-200">
-													[{d.letter}] {@html d.text}
-												</span>
-											{/each}
-										</div>
-									{/if}
-								{/if}
+						{:else if q.media_url && q.media_type === 'audio'}
+							<div class="my-2">
+								<audio controls src={q.media_url} class="w-full max-w-md"></audio>
 							</div>
 						{/if}
-					{/if}
-					{#if q.type === 'isian_singkat' && q.correct_answer_json}
-						<div class="mt-2 text-xs">
-							<span class="text-slate-500">Jawaban Benar:</span>
-							<span class="font-bold text-green-600 ml-1">{JSON.parse(q.correct_answer_json)}</span>
-						</div>
-					{/if}
-				</div>
-				<div class="flex items-start gap-2">
-					<button type="button" class="p-2 rounded-xl text-sky-600 bg-sky-50 hover:bg-sky-500 hover:text-white transition-all shadow-sm" title="Preview soal" on:click={() => previewQuestionId = q.id}>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-							<path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-						</svg>
-					</button>
-					<div class="flex flex-col gap-2">
-						<button type="button" class="p-2 rounded-xl text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-700 transition-colors" title="Edit soal" on:click={() => {
-							editingQuestion = { ...q };
-							editQuestionText = normalizeQuestionHtml(q.question_text || '');
-							// Migrate old media to rich text
-							if (editingQuestion.media_url && editingQuestion.media_type !== 'none') {
-								const mediaHtml = editingQuestion.media_type === 'audio' 
-									? `<br><audio controls src="${editingQuestion.media_url}" class="w-full mt-2 mb-2"></audio>`
-									: `<br><img src="${editingQuestion.media_url}" class="inline-block align-middle max-h-48 object-contain my-0.5 mx-1" style="vertical-align: middle;">`;
-								editQuestionText += mediaHtml;
-								editingQuestion.media_url = null;
-								editingQuestion.media_type = 'none';
-							}
-							if (q.type.startsWith('pilihan_ganda') && q.options_json) {
-								editOptionCount = JSON.parse(q.options_json).length;
-							}
-							if (q.type === 'menjodohkan' && q.options_json) {
-								const parsed = JSON.parse(q.options_json);
-								if (parsed.left) editMenjodohkanLeftCount = parsed.left.length;
-								if (parsed.right) editMenjodohkanRightCount = parsed.right.length;
-							}
-						}}>
+						{#if q.options_json}
+							{@const opts = JSON.parse(q.options_json)}
+							{@const correct = q.correct_answer_json ? JSON.parse(q.correct_answer_json) : null}
+							{#if Array.isArray(opts)}
+								<!-- svelte-ignore a11y-click-events-have-key-events -->
+								<!-- svelte-ignore a11y-no-static-element-interactions -->
+								<div class="flex flex-wrap gap-1.5 mt-2" on:click={handleCardImageClick}>
+									{#each opts as opt, i}
+										{@const isCorrect = (q.type === 'pilihan_ganda' && correct === String.fromCharCode(65 + i)) || (q.type === 'pilihan_ganda_kompleks' && Array.isArray(correct) && correct.includes(String.fromCharCode(65 + i))) || (q.type === 'benar_salah' && correct === opt)}
+										<span class="text-[10px] px-2 py-0.5 rounded-md {isCorrect ? 'bg-green-100 text-green-700 font-bold border border-green-200' : 'bg-slate-100 text-slate-600'} flex items-center gap-1 [&_img]:max-h-16 [&_img]:inline-block [&_img]:align-middle [&_img]:cursor-zoom-in" use:mathRender={opt} use:arabicRender={opt}>
+											{q.type.startsWith('pilihan_ganda') ? `${String.fromCharCode(65 + i)}.` : ''} {@html normalizeQuestionHtml(opt)}
+										</span>
+									{/each}
+								</div>
+							{:else if q.type === 'benar_salah' && opts.statements}
+								<div class="mt-2 space-y-1 text-xs">
+									{#each opts.statements as stmt, i}
+										{@const ansKey = typeof correct === 'object' && correct !== null ? (correct[String(i)] || correct[i] || 'Benar') : (correct || 'Benar')}
+										<div class="flex items-center gap-2 text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
+											<span class="font-bold text-slate-700">{i + 1}.</span>
+											<span class="flex-1 truncate" use:mathRender={stmt} use:arabicRender={stmt}>{@html stmt}</span>
+											<span class="px-2 py-0.5 rounded text-[10px] font-bold {ansKey === 'Benar' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-rose-100 text-rose-700 border border-rose-200'}">
+												{ansKey}
+											</span>
+										</div>
+									{/each}
+								</div>
+							{:else if q.type === 'menjodohkan' && opts.left}
+								{@const correctMap = q.correct_answer_json ? JSON.parse(q.correct_answer_json) : {}}
+								<div class="mt-2 text-xs space-y-1.5 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+									<div class="font-semibold text-slate-700 mb-1">Kunci Pasangan:</div>
+									{#each opts.left as l, i}
+										{@const targetIdx = correctMap ? (correctMap[String(i)] ?? correctMap[i] ?? i) : i}
+										{@const targetLetter = String.fromCharCode(65 + Number(targetIdx))}
+										{@const targetText = opts.right?.[Number(targetIdx)] ?? '-'}
+										<div class="flex items-center gap-2 text-slate-600">
+											<span class="w-4 h-4 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+											<span class="font-medium text-slate-700 truncate max-w-[40%]" use:mathRender={l} use:arabicRender={l}>{@html l}</span>
+											<span class="text-indigo-500 font-bold">➔</span>
+											<span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold text-[10px] shrink-0">{targetLetter}</span>
+											<span class="text-slate-600 truncate flex-1" use:mathRender={targetText} use:arabicRender={targetText}>{@html targetText}</span>
+										</div>
+									{/each}
+									{#if opts.right && opts.right.length > opts.left.length}
+										{@const pairedRightIdxs = new Set((opts.left as any[]).map((_: any, i: number) => String(correctMap ? (correctMap[String(i)] ?? correctMap[i] ?? i) : i)))}
+										{@const distractors = (opts.right as any[]).map((r: any, j: number) => ({ text: r, letter: String.fromCharCode(65 + j), idx: String(j) })).filter((item: any) => !pairedRightIdxs.has(item.idx))}
+										{#if distractors.length > 0}
+											<div class="pt-1.5 mt-1.5 border-t border-slate-200/80 flex items-center gap-1.5 flex-wrap">
+												<span class="text-amber-700 font-semibold">Pilihan Pengecoh:</span>
+												{#each distractors as d}
+													<span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-medium border border-amber-200" use:mathRender={d.text} use:arabicRender={d.text}>
+														[{d.letter}] {@html d.text}
+													</span>
+												{/each}
+											</div>
+										{/if}
+									{/if}
+								</div>
+							{/if}
+						{/if}
+						{#if q.type === 'isian_singkat' && q.correct_answer_json}
+							<div class="mt-2 text-xs">
+								<span class="text-slate-500">Jawaban Benar:</span>
+								<span class="font-bold text-green-600 ml-1">{JSON.parse(q.correct_answer_json)}</span>
+							</div>
+						{/if}
+					</div>
+					<div class="flex items-start gap-2">
+						<button type="button" class="p-2 rounded-xl text-sky-600 bg-sky-50 hover:bg-sky-500 hover:text-white transition-all shadow-sm" title="Preview soal" on:click={() => previewQuestionId = q.id}>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-								<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.edit} />
+								<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+								<path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
 							</svg>
 						</button>
-						<ConfirmForm 
-						action="?/delete"
-						confirmTitle="Hapus Soal"
-						confirmMessage={q.answers_count > 0 ? `Hapus soal ini? <br><br><strong>Perhatian:</strong> Sudah ada ${q.answers_count} jawaban siswa untuk soal ini. Menghapus soal akan ikut menghapus riwayat jawaban mereka.` : "Hapus soal ini?"}
-						verifyText={q.answers_count > 0 ? q.question_number.toString() : null}
-						verifyPlaceholder="Nomor soal"
-						buttonClass="p-2 rounded-xl text-rose-600 bg-rose-50 hover:bg-rose-500 hover:text-white transition-all shadow-sm flex items-center justify-center"
-						buttonTitle="Hapus soal"
-					>
-						<svelte:fragment slot="inputs">
-							<input type="hidden" name="id" value={q.id} />
-						</svelte:fragment>
-						<svelte:fragment slot="buttonContent">
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-								<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
-							</svg>
-						</svelte:fragment>
-					</ConfirmForm>
+						<div class="flex flex-col gap-2">
+							<button type="button" class="p-2 rounded-xl text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-700 transition-colors" title="Edit soal" on:click={() => {
+								editingQuestion = { ...q };
+								editQuestionText = normalizeQuestionHtml(q.question_text || '');
+								// Migrate old media to rich text
+								if (editingQuestion.media_url && editingQuestion.media_type !== 'none') {
+									const mediaHtml = editingQuestion.media_type === 'audio' 
+										? `<br><audio controls src="${editingQuestion.media_url}" class="w-full mt-2 mb-2"></audio>`
+										: `<br><img src="${editingQuestion.media_url}" class="inline-block align-middle max-h-48 object-contain my-0.5 mx-1" style="vertical-align: middle;">`;
+									editQuestionText += mediaHtml;
+									editingQuestion.media_url = null;
+									editingQuestion.media_type = 'none';
+								}
+								if (q.type.startsWith('pilihan_ganda') && q.options_json) {
+									editOptionCount = JSON.parse(q.options_json).length;
+								}
+								if (q.type === 'menjodohkan' && q.options_json) {
+									const parsed = JSON.parse(q.options_json);
+									if (parsed.left) editMenjodohkanLeftCount = parsed.left.length;
+									if (parsed.right) editMenjodohkanRightCount = parsed.right.length;
+								}
+							}}>
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.edit} />
+								</svg>
+							</button>
+							<ConfirmForm 
+							action="?/delete"
+							confirmTitle="Hapus Soal"
+							confirmMessage={q.answers_count > 0 ? `Hapus soal ini? <br><br><strong>Perhatian:</strong> Sudah ada ${q.answers_count} jawaban siswa untuk soal ini. Menghapus soal akan ikut menghapus riwayat jawaban mereka.` : "Hapus soal ini?"}
+							verifyText={q.answers_count > 0 ? q.question_number.toString() : null}
+							verifyPlaceholder="Nomor soal"
+							buttonClass="p-2 rounded-xl text-rose-600 bg-rose-50 hover:bg-rose-500 hover:text-white transition-all shadow-sm flex items-center justify-center"
+							buttonTitle="Hapus soal"
+						>
+							<svelte:fragment slot="inputs">
+								<input type="hidden" name="id" value={q.id} />
+							</svelte:fragment>
+							<svelte:fragment slot="buttonContent">
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.trash} />
+								</svg>
+							</svelte:fragment>
+						</ConfirmForm>
+					</div>
 				</div>
 			</div>
+			{/each}
 		</div>
-		{:else}
-			<div class="text-center py-12 text-slate-400">
-				<p>Belum ada soal. Klik "Tambah Soal" untuk memulai.</p>
-			</div>
-		{/each}
-	</div>
+	{/if}
 
 	{#if selectedQuestionIds.size > 0}
 		<div use:portal class="fixed bottom-4 sm:bottom-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
@@ -1053,6 +1059,14 @@
 						verifyPlaceholder="Ketik HAPUS MASSAL"
 						buttonClass="btn px-3 sm:px-4 bg-rose-600 text-white hover:bg-rose-700 shadow-sm border-none whitespace-nowrap flex items-center"
 						buttonTitle="Hapus {selectedQuestionIds.size} soal"
+						on:success={(e) => {
+							const deleted = e.detail?.deletedIds || Array.from(selectedQuestionIds);
+							deleted.forEach((id) => deletedLocalIds.add(Number(id)));
+							deletedLocalIds = deletedLocalIds;
+							selectedQuestionIds.clear();
+							selectedQuestionIds = selectedQuestionIds;
+							isBulkSelectMode = false;
+						}}
 					>
 						<svelte:fragment slot="inputs">
 							<input type="hidden" name="ids" value={JSON.stringify(Array.from(selectedQuestionIds))} />
