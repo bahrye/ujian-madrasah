@@ -157,20 +157,32 @@
 		return secureUrl;
 	}
 
-	// Mengganti placeholder gambar dengan URL Cloudinary yang berhasil terunggah
+	// Mengganti placeholder gambar dengan URL Cloudinary yang berhasil terunggah tanpa merusak posisi/class gambar
 	function replaceImageInQuestions(imgId: string, cloudUrl: string) {
-		const placeholderRegex = new RegExp(`<img[^>]*data-img-id=["']${imgId}["'][^>]*>`, 'g');
-		const replacementHtml = `<img src="${cloudUrl}" alt="Gambar Soal" class="max-h-64 object-contain rounded-lg border border-slate-200 my-2" loading="lazy" />`;
+		const placeholderRegex = new RegExp(`<img\\b([^>]*data-img-id=["']${imgId}["'][^>]*)>`, 'gi');
+
+		const replacer = (_match: string, attrs: string) => {
+			let updated = attrs;
+			if (/\bsrc=["'][^"']*["']/i.test(updated)) {
+				updated = updated.replace(/\bsrc=["'][^"']*["']/i, `src="${cloudUrl}"`);
+			} else {
+				updated = ` src="${cloudUrl}"` + updated;
+			}
+			if (!/\bloading=/i.test(updated)) {
+				updated += ' loading="lazy"';
+			}
+			return `<img${updated}>`;
+		};
 
 		for (const q of parsedData) {
-			if (q.question_text && q.question_text.includes(`data-img-id="${imgId}"`)) {
-				q.question_text = q.question_text.replace(placeholderRegex, replacementHtml);
+			if (q.question_text && q.question_text.includes(imgId)) {
+				q.question_text = q.question_text.replace(placeholderRegex, replacer);
 			}
 			if (Array.isArray(q.options)) {
 				let changed = false;
 				for (let j = 0; j < q.options.length; j++) {
-					if (q.options[j] && q.options[j].includes(`data-img-id="${imgId}"`)) {
-						q.options[j] = q.options[j].replace(placeholderRegex, replacementHtml);
+					if (q.options[j] && q.options[j].includes(imgId)) {
+						q.options[j] = q.options[j].replace(placeholderRegex, replacer);
 						changed = true;
 					}
 				}
@@ -183,18 +195,28 @@
 	}
 
 	function markImageErrorInQuestions(imgId: string) {
-		const placeholderRegex = new RegExp(`<img[^>]*data-img-id=["']${imgId}["'][^>]*>`, 'g');
-		const errorPlaceholder = `<img src="${createPlaceholderSvgUri('error')}" data-img-id="${imgId}" class="docx-img-placeholder my-2 rounded-xl border border-rose-200 bg-rose-50/50 p-2 max-h-24 inline-block object-contain" alt="[IMAGE - Gagal diunggah]" />`;
+		const placeholderRegex = new RegExp(`<img\\b([^>]*data-img-id=["']${imgId}["'][^>]*)>`, 'gi');
+		const errorPlaceholderUri = createPlaceholderSvgUri('error');
+
+		const replacer = (_match: string, attrs: string) => {
+			let updated = attrs;
+			if (/\bsrc=["'][^"']*["']/i.test(updated)) {
+				updated = updated.replace(/\bsrc=["'][^"']*["']/i, `src="${errorPlaceholderUri}"`);
+			} else {
+				updated = ` src="${errorPlaceholderUri}"` + updated;
+			}
+			return `<img${updated}>`;
+		};
 
 		for (const q of parsedData) {
-			if (q.question_text && q.question_text.includes(`data-img-id="${imgId}"`)) {
-				q.question_text = q.question_text.replace(placeholderRegex, errorPlaceholder);
+			if (q.question_text && q.question_text.includes(imgId)) {
+				q.question_text = q.question_text.replace(placeholderRegex, replacer);
 			}
 			if (Array.isArray(q.options)) {
 				let changed = false;
 				for (let j = 0; j < q.options.length; j++) {
-					if (q.options[j] && q.options[j].includes(`data-img-id="${imgId}"`)) {
-						q.options[j] = q.options[j].replace(placeholderRegex, errorPlaceholder);
+					if (q.options[j] && q.options[j].includes(imgId)) {
+						q.options[j] = q.options[j].replace(placeholderRegex, replacer);
 						changed = true;
 					}
 				}
@@ -264,17 +286,26 @@
 				task.retryCount = 0;
 				task.error = undefined;
 				
-				// Kembalikan placeholder loading
-				const placeholderRegex = new RegExp(`<img[^>]*data-img-id=["']${id}["'][^>]*>`, 'g');
-				const loadingPlaceholder = `<img src="${createPlaceholderSvgUri('loading')}" data-img-id="${id}" class="docx-img-placeholder my-2 rounded-xl border border-indigo-200 bg-slate-50 p-2 max-h-32 inline-block object-contain" alt="[IMAGE - Memproses gambar...]" />`;
+				// Kembalikan placeholder loading tanpa merusak atribut
+				const placeholderRegex = new RegExp(`<img\\b([^>]*data-img-id=["']${id}["'][^>]*)>`, 'gi');
+				const loadingPlaceholderUri = createPlaceholderSvgUri('loading');
+				const replacer = (_match: string, attrs: string) => {
+					let updated = attrs;
+					if (/\bsrc=["'][^"']*["']/i.test(updated)) {
+						updated = updated.replace(/\bsrc=["'][^"']*["']/i, `src="${loadingPlaceholderUri}"`);
+					} else {
+						updated = ` src="${loadingPlaceholderUri}"` + updated;
+					}
+					return `<img${updated}>`;
+				};
 				for (const q of parsedData) {
-					if (q.question_text && q.question_text.includes(`data-img-id="${id}"`)) {
-						q.question_text = q.question_text.replace(placeholderRegex, loadingPlaceholder);
+					if (q.question_text && q.question_text.includes(id)) {
+						q.question_text = q.question_text.replace(placeholderRegex, replacer);
 					}
 					if (Array.isArray(q.options)) {
 						for (let j = 0; j < q.options.length; j++) {
-							if (q.options[j] && q.options[j].includes(`data-img-id="${id}"`)) {
-								q.options[j] = q.options[j].replace(placeholderRegex, loadingPlaceholder);
+							if (q.options[j] && q.options[j].includes(id)) {
+								q.options[j] = q.options[j].replace(placeholderRegex, replacer);
 							}
 						}
 					}
@@ -395,8 +426,6 @@
 					return {
 						src: `data:${mimeType};base64,${imageBuffer}`,
 						'data-img-id': imgId,
-						class: 'inline-block align-middle max-h-48 object-contain my-0.5 mx-1',
-						style: 'vertical-align: middle;',
 						alt: 'Gambar Soal'
 					};
 				})

@@ -132,7 +132,7 @@ export async function deleteCloudinaryMediaList(
 	urls: (string | null | undefined)[],
 	env: any,
 	db?: any,
-	schoolId?: number
+	schoolId?: number | null
 ): Promise<void> {
 	const validUrls = Array.from(
 		new Set(
@@ -185,7 +185,7 @@ export async function deleteMediaForQuestionIds(
 	db: any,
 	env: any,
 	questionIds: number[],
-	schoolId?: number
+	schoolId?: number | null
 ): Promise<void> {
 	if (!questionIds || questionIds.length === 0) return;
 
@@ -237,7 +237,7 @@ export async function deleteMediaForExam(
 	db: any,
 	env: any,
 	examId: number,
-	schoolId?: number
+	schoolId?: number | null
 ): Promise<void> {
 	try {
 		const rows = await db

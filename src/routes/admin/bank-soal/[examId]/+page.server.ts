@@ -282,7 +282,7 @@ export const actions: Actions = {
 		try {
 			const mergedEnv = { ...env, ...(platform?.env as any) };
 			// Hapus seluruh media terkait soal dari Cloudinary & tabel uploaded_media
-			await deleteMediaForQuestionIds(db, mergedEnv, [parsedId], locals.user!.school_id);
+			await deleteMediaForQuestionIds(db, mergedEnv, [parsedId], locals.user?.school_id);
 
 			// Hapus referensi jawaban siswa untuk mencegah error foreign key
 			await db.prepare('DELETE FROM student_answers WHERE question_id = ?').bind(parsedId).run();
@@ -418,7 +418,7 @@ export const actions: Actions = {
 
 			const mergedEnv = { ...env, ...(platform?.env as any) };
 			// Hapus seluruh media terkait soal dari Cloudinary & tabel uploaded_media
-			await deleteMediaForQuestionIds(db, mergedEnv, validIds, locals.user!.school_id);
+			await deleteMediaForQuestionIds(db, mergedEnv, validIds, locals.user?.school_id);
 
 			await db.batch([
 				db.prepare(`DELETE FROM student_answers WHERE question_id IN (${validPlaceholders})`).bind(...validIds),
