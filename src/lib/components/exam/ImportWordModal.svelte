@@ -392,10 +392,10 @@
 					}
 
 					return {
-						src: createPlaceholderSvgUri('pending'),
+						src: `data:${mimeType};base64,${imageBuffer}`,
 						'data-img-id': imgId,
-						class: 'docx-img-placeholder my-2 rounded-xl border border-indigo-200 bg-slate-50 p-2 max-h-32 inline-block object-contain shadow-xs transition-all',
-						alt: '[IMAGE - Siap Diunggah]'
+						class: 'max-h-56 object-contain rounded-lg border border-slate-200 my-2 shadow-xs block',
+						alt: 'Gambar Soal'
 					};
 				})
 			};
@@ -670,7 +670,7 @@
 										<span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs shrink-0">
 											📷
 										</span>
-										<span>Terdeteksi <b>{totalImages} gambar</b> pada dokumen. Gambar ditampilkan dengan ikon <b>IMAGE</b> dan akan otomatis diunggah cepat saat Anda menekan tombol <b>Import</b>.</span>
+										<span>Terdeteksi <b>{totalImages} gambar</b> pada dokumen. Gambar asli ditampilkan agar Anda dapat memastikan kesesuaian soal, dan akan otomatis dikompresi serta diunggah ke cloud saat Anda menekan tombol <b>Import</b>.</span>
 									</div>
 									<span class="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-medium shrink-0">Bebas File Sampah</span>
 								</div>
