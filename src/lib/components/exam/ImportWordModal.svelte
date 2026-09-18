@@ -35,15 +35,20 @@
 	let uploadErrorsCount = 0;
 
 	// Generator placeholder SVG Data URI dengan ikon IMAGE dan teks
-	function createPlaceholderSvgUri(status: 'loading' | 'error' = 'loading'): string {
+	function createPlaceholderSvgUri(status: 'pending' | 'uploading' | 'error' = 'pending'): string {
 		const isError = status === 'error';
-		const bg = isError ? '#FFF1F2' : '#F8FAFC';
-		const border = isError ? '#FDA4AF' : '#CBD5E1';
-		const iconBoxBg = isError ? '#FFE4E6' : '#EEF2FF';
+		const isUploading = status === 'uploading';
+		const bg = isError ? '#FFF1F2' : isUploading ? '#EEF2FF' : '#F8FAFC';
+		const border = isError ? '#FDA4AF' : isUploading ? '#818CF8' : '#CBD5E1';
+		const iconBoxBg = isError ? '#FFE4E6' : isUploading ? '#E0E7FF' : '#EEF2FF';
 		const iconColor = isError ? '#E11D48' : '#6366F1';
 		const textColor = isError ? '#E11D48' : '#4F46E5';
-		const subtextColor = isError ? '#BE123C' : '#64748B';
-		const label = isError ? 'Gagal diunggah' : 'Memproses gambar...';
+		const subtextColor = isError ? '#BE123C' : isUploading ? '#4338CA' : '#64748B';
+		const label = isError 
+			? 'Gagal diunggah' 
+			: isUploading 
+				? 'Mengunggah ke cloud...' 
+				: 'Gambar terdeteksi (siap diunggah)';
 
 		const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 76" width="220" height="76" fill="none">
   <rect width="220" height="76" rx="10" fill="${bg}" stroke="${border}" stroke-width="1.5" stroke-dasharray="${isError ? 'none' : '4 3'}"/>
@@ -387,10 +392,10 @@
 					}
 
 					return {
-						src: createPlaceholderSvgUri('loading'),
+						src: createPlaceholderSvgUri('pending'),
 						'data-img-id': imgId,
 						class: 'docx-img-placeholder my-2 rounded-xl border border-indigo-200 bg-slate-50 p-2 max-h-32 inline-block object-contain shadow-xs transition-all',
-						alt: '[IMAGE - Memproses gambar...]'
+						alt: '[IMAGE - Siap Diunggah]'
 					};
 				})
 			};
@@ -428,7 +433,7 @@
 				};
 			});
 
-			// Daftarkan tugas unggah gambar untuk background upload
+			// Daftarkan tugas unggah gambar di memori lokal (TIDAK langsung diunggah ke Cloudinary agar tidak jadi sampah jika dibatalkan)
 			for (const item of imageMap.values()) {
 				imageTasks.set(item.id, {
 					id: item.id,
@@ -442,11 +447,7 @@
 			totalImages = imageTasks.size;
 			uploadedCount = 0;
 			uploadErrorsCount = 0;
-
-			// Mulai unggah di latar belakang seketika setelah parsing selesai
-			if (imageTasks.size > 0) {
-				startBackgroundUpload();
-			}
+			// Solusi 1: Gambar disiapkan di memori browser. Unggah Cloudinary baru dipicu saat klik 'Import Soal'
 			
 		} catch (error: any) {
 			errorMsg = error.message || 'Terjadi kesalahan saat memproses file.';
@@ -459,18 +460,18 @@
 	async function confirmImport() {
 		if (parsedData.length === 0) return;
 
-		// Jika masih ada gambar yang sedang diunggah di latar belakang, tunggu hingga selesai
-		if (isUploadingImages) {
+		// Jika ada gambar yang perlu diunggah ke Cloudinary, unggah paralel sekarang
+		if (imageTasks.size > 0 && uploadedCount < totalImages) {
 			isImporting = true;
-			while (isUploadingImages) {
-				await new Promise((r) => setTimeout(r, 200));
-			}
-		}
+			errorMsg = '';
+			
+			await startBackgroundUpload();
 
-		if (uploadErrorsCount > 0) {
-			isImporting = false;
-			errorMsg = `Terdapat ${uploadErrorsCount} gambar yang gagal diunggah ke server. Silakan klik tombol "Coba Lagi Unggah" di atas tabel preview.`;
-			return;
+			if (uploadErrorsCount > 0) {
+				isImporting = false;
+				errorMsg = `Terdapat ${uploadErrorsCount} gambar yang gagal diunggah ke server. Silakan periksa koneksi internet Anda atau coba lagi.`;
+				return;
+			}
 		}
 
 		isImporting = true;
@@ -599,12 +600,16 @@
 								{#if isUploadingImages}
 									<span class="text-xs font-medium text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100 flex items-center gap-1.5">
 										<span class="w-2 h-2 rounded-full bg-indigo-500 animate-ping"></span>
-										Mengunggah Gambar ({uploadedCount}/{totalImages})
+										Mengunggah ({uploadedCount}/{totalImages})
 									</span>
-								{:else if uploadErrorsCount === 0}
+								{:else if uploadedCount === totalImages}
 									<span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100 flex items-center gap-1">
 										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
 										Siap Diimport ({totalImages} Gambar Terunggah)
+									</span>
+								{:else}
+									<span class="text-xs font-medium text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100 flex items-center gap-1.5">
+										📷 {totalImages} Gambar Terdeteksi
 									</span>
 								{/if}
 							{:else}
@@ -612,7 +617,7 @@
 							{/if}
 						</div>
 
-						<!-- Status Unggah Gambar Latar Belakang -->
+						<!-- Status Unggah Gambar -->
 						{#if totalImages > 0}
 							{#if isUploadingImages}
 								<div class="bg-indigo-50 border border-indigo-200/80 rounded-xl p-3.5 mb-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -625,11 +630,11 @@
 										</div>
 										<div>
 											<p class="text-xs font-bold text-indigo-900 flex items-center gap-2">
-												Mengunggah gambar di latar belakang...
-												<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-100 text-indigo-700">Otomatis & Cepat</span>
+												Mengunggah gambar ke cloud storage...
+												<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-100 text-indigo-700">Paralel & Terkompresi</span>
 											</p>
 											<p class="text-[11px] text-indigo-700 mt-0.5">
-												{uploadedCount} dari {totalImages} gambar selesai ({totalImages > 0 ? Math.round((uploadedCount / totalImages) * 100) : 0}%). Ikon <span class="font-semibold text-indigo-800">IMAGE</span> akan berganti menjadi gambar asli saat terunggah.
+												{uploadedCount} dari {totalImages} gambar selesai ({totalImages > 0 ? Math.round((uploadedCount / totalImages) * 100) : 0}%).
 											</p>
 										</div>
 									</div>
@@ -639,7 +644,7 @@
 										</div>
 									</div>
 								</div>
-							{:else if uploadErrorsCount === 0}
+							{:else if uploadedCount === totalImages && totalImages > 0}
 								<div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-4 shadow-xs flex items-center justify-between text-emerald-800 text-xs font-medium">
 									<div class="flex items-center gap-2.5">
 										<span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
@@ -649,7 +654,7 @@
 									</div>
 									<span class="px-2 py-0.5 rounded bg-emerald-100/80 text-emerald-700 text-[10px] font-bold">100% Selesai</span>
 								</div>
-							{:else}
+							{:else if uploadErrorsCount > 0}
 								<div class="bg-rose-50 border border-rose-200 rounded-xl p-3 mb-4 shadow-xs flex items-center justify-between gap-3 text-rose-800 text-xs">
 									<div class="flex items-center gap-2.5">
 										<svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
@@ -658,6 +663,16 @@
 									<button type="button" class="btn btn-sm bg-rose-600 hover:bg-rose-700 text-white rounded-lg px-3 py-1.5 text-xs font-semibold whitespace-nowrap shadow-xs" on:click={retryFailedUploads}>
 										Coba Lagi Unggah
 									</button>
+								</div>
+							{:else}
+								<div class="bg-indigo-50/70 border border-indigo-100 rounded-xl p-3 mb-4 shadow-xs flex items-center justify-between text-indigo-900 text-xs">
+									<div class="flex items-center gap-2.5">
+										<span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs shrink-0">
+											📷
+										</span>
+										<span>Terdeteksi <b>{totalImages} gambar</b> pada dokumen. Gambar ditampilkan dengan ikon <b>IMAGE</b> dan akan otomatis diunggah cepat saat Anda menekan tombol <b>Import</b>.</span>
+									</div>
+									<span class="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-medium shrink-0">Bebas File Sampah</span>
 								</div>
 							{/if}
 						{/if}
