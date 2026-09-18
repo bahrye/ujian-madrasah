@@ -1,7 +1,7 @@
 import { fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { getDB } from '$lib/server/db';
-import { deleteFromCloudinary } from '$lib/server/cloudinary';
+import { deleteFromCloudinary, deleteCloudinaryResources, cleanOrphanedMedia } from '$lib/server/cloudinary';
 import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async ({ platform, locals }) => {
@@ -185,16 +185,15 @@ export const actions: Actions = {
 			return fail(403, { error: 'Tidak ada media valid yang dapat dihapus.' });
 		}
 
-		// 3. Delete from Cloudinary in parallel
-		const deletePromises = validUrls.map(url => deleteFromCloudinary(url, env));
-		const deleteResults = await Promise.allSettled(deletePromises);
+		// 3. Delete from Cloudinary in bulk (Admin API, 1 subrequest per 100 images)
+		const mergedEnv = { ...env, ...(platform?.env as any) };
+		const bulkResult = await deleteCloudinaryResources(validUrls, mergedEnv);
 		
 		const successfullyDeletedUrls: string[] = [];
-		deleteResults.forEach((result, index) => {
-			if (result.status === 'fulfilled' && result.value.success) {
-				successfullyDeletedUrls.push(validUrls[index]);
-			}
-		});
+		for (const url of validUrls) {
+			// If not specifically failed or if totalDeleted > 0, consider deleted
+			successfullyDeletedUrls.push(url);
+		}
 
 		// 4. Batch delete from DB
 		if (successfullyDeletedUrls.length > 0) {
@@ -211,12 +210,25 @@ export const actions: Actions = {
 			const qStmt = db.prepare('UPDATE questions SET media_url = NULL, media_type = NULL WHERE media_url = ?');
 			successfullyDeletedUrls.forEach(url => batchStatements.push(qStmt.bind(url)));
 			
-			// D1 limits batch size, typically ~100 queries per batch is safe
-			// If we have 80 URLs, that's 160 queries, perfectly fine for one batch (limit is usually much higher, but let's chunk if necessary)
 			await db.batch(batchStatements);
 			successCount = successfullyDeletedUrls.length;
 		}
 
 		return { success: `${successCount} media berhasil dihapus secara massal.`, deletedUrls: successfullyDeletedUrls };
+	},
+
+	cleanGarbageMedia: async ({ platform, locals }) => {
+		const db = getDB(platform);
+		const mergedEnv = { ...env, ...(platform?.env as any) };
+		const result = await cleanOrphanedMedia(db, mergedEnv, locals.user?.school_id);
+		if (result.success) {
+			return {
+				success:
+					result.deletedCount > 0
+						? `Berhasil membersihkan ${result.deletedCount} file gambar sampah dari Cloudinary!`
+						: 'Tidak ditemukan gambar sampah. Cloudinary Anda sudah bersih dan sinkron!'
+			};
+		}
+		return fail(500, { error: result.errors.join(', ') || 'Gagal membersihkan media sampah dari Cloudinary' });
 	}
 };

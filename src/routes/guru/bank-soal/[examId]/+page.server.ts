@@ -1,7 +1,7 @@
 import { fail, error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
-import { deleteFromCloudinary, deleteMediaForQuestionIds } from '$lib/server/cloudinary';
+import { deleteFromCloudinary, deleteMediaForQuestionIds, cleanOrphanedMedia } from '$lib/server/cloudinary';
 import { env } from '$env/dynamic/private';
 
 import { formatExamTitle } from '$lib/utils/exam';
@@ -473,6 +473,11 @@ export const actions: Actions = {
 					statements.push(stmt.bind(idx + 1, q.id));
 				});
 				await db.batch(statements);
+			} else {
+				// Jika semua soal dalam ujian ini sudah habis terhapus, bersihkan juga file gambar yang mungkin tersisa
+				await cleanOrphanedMedia(db, mergedEnv, locals.user?.school_id).catch((err) => {
+					console.error('Auto clean orphaned media error:', err);
+				});
 			}
 			
 			return { success: `${validIds.length} soal berhasil dihapus.`, deletedIds: validIds };
@@ -480,5 +485,20 @@ export const actions: Actions = {
 			console.error('Error delete bulk:', e);
 			return fail(500, { error: 'Gagal menghapus soal secara massal.' });
 		}
+	},
+
+	cleanGarbageMedia: async ({ platform, locals }) => {
+		const db = getDB(platform);
+		const mergedEnv = { ...env, ...(platform?.env as any) };
+		const result = await cleanOrphanedMedia(db, mergedEnv, locals.user?.school_id);
+		if (result.success) {
+			return {
+				success:
+					result.deletedCount > 0
+						? `Berhasil membersihkan ${result.deletedCount} file gambar sampah dari Cloudinary!`
+						: 'Tidak ditemukan gambar sampah. Cloudinary Anda sudah bersih dan sinkron!'
+			};
+		}
+		return fail(500, { error: result.errors.join(', ') || 'Gagal membersihkan media sampah dari Cloudinary' });
 	}
 };

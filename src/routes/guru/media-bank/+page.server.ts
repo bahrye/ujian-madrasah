@@ -1,7 +1,7 @@
 import { fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { getDB } from '$lib/server/db';
-import { deleteFromCloudinary } from '$lib/server/cloudinary';
+import { deleteFromCloudinary, deleteCloudinaryResources, cleanOrphanedMedia } from '$lib/server/cloudinary';
 import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async ({ platform, locals }) => {
@@ -139,27 +139,50 @@ export const actions: Actions = {
 			return fail(400, { error: 'Tidak ada media yang dipilih.' });
 		}
 
-		let successCount = 0;
+		const validUrls: string[] = [];
 		for (const url of urls) {
-			if (url.includes('res.cloudinary.com')) {
+			if (typeof url === 'string' && url.includes('res.cloudinary.com')) {
 				const row = await db.prepare('SELECT uploaded_by, school_id FROM uploaded_media WHERE url = ? AND school_id = ?')
 					.bind(url, schoolId)
 					.first<{uploaded_by: number, school_id: number}>();
 				
-				if (!row || (row.uploaded_by !== locals.user?.id && locals.user?.role !== 'admin' && locals.user?.role !== 'superadmin')) {
-					continue;
-				}
-
-				const mergedEnv = platform?.env || env;
-				const deleteResult = await deleteFromCloudinary(url, mergedEnv);
-				if (deleteResult.success) {
-					await db.prepare('DELETE FROM uploaded_media WHERE url = ? AND school_id = ?').bind(url, schoolId).run();
-					await db.prepare('UPDATE questions SET media_url = NULL, media_type = NULL WHERE media_url = ?').bind(url).run();
-					successCount++;
+				if (row && (row.uploaded_by === locals.user?.id || locals.user?.role === 'admin' || locals.user?.role === 'superadmin')) {
+					validUrls.push(url);
 				}
 			}
 		}
 
-		return { success: `${successCount} media berhasil dihapus secara massal.` };
+		if (validUrls.length === 0) {
+			return fail(400, { error: 'Tidak ada media valid yang dapat dihapus.' });
+		}
+
+		const mergedEnv = { ...env, ...(platform?.env as any) };
+		await deleteCloudinaryResources(validUrls, mergedEnv);
+
+		const batchStatements: any[] = [];
+		for (const url of validUrls) {
+			batchStatements.push(db.prepare('DELETE FROM uploaded_media WHERE url = ? AND school_id = ?').bind(url, schoolId));
+			batchStatements.push(db.prepare('UPDATE questions SET media_url = NULL, media_type = NULL WHERE media_url = ?').bind(url));
+		}
+		if (batchStatements.length > 0) {
+			await db.batch(batchStatements);
+		}
+
+		return { success: `${validUrls.length} media berhasil dihapus secara massal.` };
+	},
+
+	cleanGarbageMedia: async ({ platform, locals }) => {
+		const db = getDB(platform);
+		const mergedEnv = { ...env, ...(platform?.env as any) };
+		const result = await cleanOrphanedMedia(db, mergedEnv, locals.user?.school_id);
+		if (result.success) {
+			return {
+				success:
+					result.deletedCount > 0
+						? `Berhasil membersihkan ${result.deletedCount} file gambar sampah dari Cloudinary!`
+						: 'Tidak ditemukan gambar sampah. Cloudinary Anda sudah bersih dan sinkron!'
+			};
+		}
+		return fail(500, { error: result.errors.join(', ') || 'Gagal membersihkan media sampah dari Cloudinary' });
 	}
 };

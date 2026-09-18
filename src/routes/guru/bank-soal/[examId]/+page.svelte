@@ -560,10 +560,20 @@
 					<span class="text-[13px] sm:text-sm font-semibold">{isBulkSelectMode ? 'Batal Pilih' : 'Pilih Massal'}</span>
 				</button>
 			{/if}
-			<!-- <button class="btn px-2 sm:px-4 justify-center bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-all shadow-sm" on:click={() => (showImportModal = true)}>
-				<svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-				<span class="text-[13px] sm:text-sm font-semibold">Import Excel</span>
-			</button> -->
+			<ConfirmForm
+				action="?/cleanGarbageMedia"
+				confirmTitle="Bersihkan File Sampah"
+				confirmMessage="Pindai dan bersihkan gambar di Cloudinary yang sudah tidak digunakan lagi oleh soal mana pun?"
+				buttonClass="btn px-2 sm:px-3 bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 hover:border-amber-300 transition-all shadow-sm flex items-center"
+				buttonTitle="Bersihkan file gambar yang tidak terpakai di Cloudinary"
+			>
+				<svelte:fragment slot="buttonContent">
+					<svg class="w-4 h-4 mr-1 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+					</svg>
+					<span class="text-[13px] sm:text-sm font-semibold whitespace-nowrap">Bersihkan Sampah</span>
+				</svelte:fragment>
+			</ConfirmForm>
 			<button class="btn-primary px-2 sm:px-4 justify-center shadow-md shadow-indigo-500/20" on:click={() => (showCreateForm = !showCreateForm)}>
 				<svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 					<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.plus} />
@@ -865,7 +875,23 @@
 		<div class="card p-12 text-center text-slate-400 border border-dashed border-slate-200">
 			<svg class="w-12 h-12 mx-auto mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
 			<p class="font-medium text-slate-600">Belum ada soal dalam ujian ini.</p>
-			<p class="text-sm text-slate-400 mt-1">Klik "Tambah Soal" atau "Import Word" untuk menambahkan soal.</p>
+			<p class="text-sm text-slate-400 mt-1 mb-4">Klik "Tambah Soal" atau "Import Word" untuk menambahkan soal.</p>
+			<div class="flex justify-center">
+				<ConfirmForm
+					action="?/cleanGarbageMedia"
+					confirmTitle="Bersihkan File Sampah"
+					confirmMessage="Pindai dan bersihkan sisa gambar di Cloudinary yang sudah tidak digunakan lagi oleh soal mana pun?"
+					buttonClass="btn px-4 py-2 bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 hover:border-amber-300 transition-all shadow-sm flex items-center gap-2"
+					buttonTitle="Bersihkan file gambar yang tidak terpakai di Cloudinary"
+				>
+					<svelte:fragment slot="buttonContent">
+						<svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+						</svg>
+						<span class="text-sm font-semibold">Bersihkan Gambar Sampah di Cloudinary</span>
+					</svelte:fragment>
+				</ConfirmForm>
+			</div>
 		</div>
 	{:else}
 		<div class="space-y-3">
