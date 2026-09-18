@@ -18,12 +18,280 @@
 	const cloudName = env.PUBLIC_CLOUDINARY_CLOUD_NAME || 'dfhtjgwcz';
 	const uploadPreset = env.PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'ujian-madrasah';
 
+	interface DocxImageTask {
+		id: string;
+		base64: string;
+		mimeType: string;
+		status: 'pending' | 'uploading' | 'success' | 'error';
+		url?: string;
+		error?: string;
+		retryCount: number;
+	}
+
+	let imageTasks: Map<string, DocxImageTask> = new Map();
+	let isUploadingImages = false;
+	let uploadedCount = 0;
+	let totalImages = 0;
+	let uploadErrorsCount = 0;
+
+	// Generator placeholder SVG Data URI dengan ikon IMAGE dan teks
+	function createPlaceholderSvgUri(status: 'loading' | 'error' = 'loading'): string {
+		const isError = status === 'error';
+		const bg = isError ? '#FFF1F2' : '#F8FAFC';
+		const border = isError ? '#FDA4AF' : '#CBD5E1';
+		const iconBoxBg = isError ? '#FFE4E6' : '#EEF2FF';
+		const iconColor = isError ? '#E11D48' : '#6366F1';
+		const textColor = isError ? '#E11D48' : '#4F46E5';
+		const subtextColor = isError ? '#BE123C' : '#64748B';
+		const label = isError ? 'Gagal diunggah' : 'Memproses gambar...';
+
+		const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 76" width="220" height="76" fill="none">
+  <rect width="220" height="76" rx="10" fill="${bg}" stroke="${border}" stroke-width="1.5" stroke-dasharray="${isError ? 'none' : '4 3'}"/>
+  <g transform="translate(14, 18)">
+    <rect width="40" height="40" rx="8" fill="${iconBoxBg}" stroke="${iconColor}" stroke-width="1.5"/>
+    <circle cx="13" cy="14" r="3.5" fill="${iconColor}"/>
+    <path d="M6 32 L16 20 L24 28 L30 22 L36 32" fill="none" stroke="${iconColor}" stroke-width="1.5" stroke-linejoin="round"/>
+  </g>
+  <text x="64" y="36" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="${textColor}" letter-spacing="0.5">IMAGE</text>
+  <text x="64" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="500" fill="${subtextColor}">${label}</text>
+</svg>`;
+
+		return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+	}
+
+	// Kompresi gambar sisi klien menggunakan Canvas (WebP/JPEG 0.82, max dimension 1200px)
+	async function compressImageToBlob(base64Data: string, mimeType: string): Promise<Blob> {
+		const dataUri = base64Data.startsWith('data:') ? base64Data : `data:${mimeType};base64,${base64Data}`;
+		
+		const img = new Image();
+		await new Promise((resolve, reject) => {
+			img.onload = resolve;
+			img.onerror = () => reject(new Error('Gagal memuat gambar untuk kompresi'));
+			img.src = dataUri;
+		});
+
+		const maxDim = 1200;
+		let width = img.naturalWidth || img.width;
+		let height = img.naturalHeight || img.height;
+
+		if (width > maxDim || height > maxDim) {
+			if (width > height) {
+				height = Math.round((height * maxDim) / width);
+				width = maxDim;
+			} else {
+				width = Math.round((width * maxDim) / height);
+				height = maxDim;
+			}
+		}
+
+		const canvas = document.createElement('canvas');
+		canvas.width = width;
+		canvas.height = height;
+		const ctx = canvas.getContext('2d');
+		if (!ctx) throw new Error('Canvas 2D context tidak tersedia');
+
+		ctx.drawImage(img, 0, 0, width, height);
+
+		return new Promise((resolve, reject) => {
+			// Coba export sebagai WebP untuk efisiensi maksimal, fallback ke JPEG
+			canvas.toBlob(
+				(blob) => {
+					if (blob) {
+						resolve(blob);
+					} else {
+						canvas.toBlob(
+							(fallbackBlob) => {
+								if (fallbackBlob) resolve(fallbackBlob);
+								else reject(new Error('Gagal mengompres gambar'));
+							},
+							'image/jpeg',
+							0.82
+						);
+					}
+				},
+				'image/webp',
+				0.82
+			);
+		});
+	}
+
+	// Unggah binary Blob langsung ke Cloudinary
+	async function uploadBlobToCloudinary(blob: Blob): Promise<string> {
+		if (!cloudName || !uploadPreset) {
+			throw new Error('Sistem belum dikonfigurasi untuk unggah media.');
+		}
+
+		const formData = new FormData();
+		formData.append('file', blob, 'image.webp');
+		formData.append('upload_preset', uploadPreset);
+		formData.append('folder', 'ujian-madrasah/media');
+
+		const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+			method: 'POST',
+			body: formData
+		});
+
+		if (!response.ok) {
+			const errJson = await response.json().catch(() => null);
+			throw new Error(errJson?.error?.message || 'Gagal mengunggah gambar ke server.');
+		}
+
+		const data = (await response.json()) as any;
+		const secureUrl = data?.secure_url;
+		if (!secureUrl) throw new Error('URL gambar tidak diterima dari server.');
+
+		// Simpan pelacakan media di database (latar belakang)
+		try {
+			fetch('/api/track-media', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ url: secureUrl, media_type: 'image' })
+			}).catch(() => {});
+		} catch {}
+
+		return secureUrl;
+	}
+
+	// Mengganti placeholder gambar dengan URL Cloudinary yang berhasil terunggah
+	function replaceImageInQuestions(imgId: string, cloudUrl: string) {
+		const placeholderRegex = new RegExp(`<img[^>]*data-img-id=["']${imgId}["'][^>]*>`, 'g');
+		const replacementHtml = `<img src="${cloudUrl}" alt="Gambar Soal" class="max-h-64 object-contain rounded-lg border border-slate-200 my-2" loading="lazy" />`;
+
+		for (const q of parsedData) {
+			if (q.question_text && q.question_text.includes(`data-img-id="${imgId}"`)) {
+				q.question_text = q.question_text.replace(placeholderRegex, replacementHtml);
+			}
+			if (Array.isArray(q.options)) {
+				let changed = false;
+				for (let j = 0; j < q.options.length; j++) {
+					if (q.options[j] && q.options[j].includes(`data-img-id="${imgId}"`)) {
+						q.options[j] = q.options[j].replace(placeholderRegex, replacementHtml);
+						changed = true;
+					}
+				}
+				if (changed) {
+					q.options_json = JSON.stringify(q.options);
+				}
+			}
+		}
+		parsedData = parsedData; // Reaktivitas Svelte agar preview terupdate seketika
+	}
+
+	function markImageErrorInQuestions(imgId: string) {
+		const placeholderRegex = new RegExp(`<img[^>]*data-img-id=["']${imgId}["'][^>]*>`, 'g');
+		const errorPlaceholder = `<img src="${createPlaceholderSvgUri('error')}" data-img-id="${imgId}" class="docx-img-placeholder my-2 rounded-xl border border-rose-200 bg-rose-50/50 p-2 max-h-24 inline-block object-contain" alt="[IMAGE - Gagal diunggah]" />`;
+
+		for (const q of parsedData) {
+			if (q.question_text && q.question_text.includes(`data-img-id="${imgId}"`)) {
+				q.question_text = q.question_text.replace(placeholderRegex, errorPlaceholder);
+			}
+			if (Array.isArray(q.options)) {
+				let changed = false;
+				for (let j = 0; j < q.options.length; j++) {
+					if (q.options[j] && q.options[j].includes(`data-img-id="${imgId}"`)) {
+						q.options[j] = q.options[j].replace(placeholderRegex, errorPlaceholder);
+						changed = true;
+					}
+				}
+				if (changed) {
+					q.options_json = JSON.stringify(q.options);
+				}
+			}
+		}
+		parsedData = parsedData;
+	}
+
+	// Proses unggah satu item dengan auto-retry
+	async function processTask(task: DocxImageTask) {
+		task.status = 'uploading';
+		imageTasks.set(task.id, task);
+
+		try {
+			const compressedBlob = await compressImageToBlob(task.base64, task.mimeType);
+			const url = await uploadBlobToCloudinary(compressedBlob);
+			task.url = url;
+			task.status = 'success';
+			replaceImageInQuestions(task.id, url);
+			uploadedCount++;
+		} catch (err: any) {
+			console.error(`Gagal mengunggah gambar ${task.id}:`, err);
+			if (task.retryCount < 2) {
+				task.retryCount++;
+				await new Promise((r) => setTimeout(r, 700));
+				return processTask(task);
+			}
+			task.status = 'error';
+			task.error = err.message || 'Gagal mengunggah gambar';
+			markImageErrorInQuestions(task.id);
+			uploadErrorsCount++;
+		}
+	}
+
+	// Memulai unggah paralel di latar belakang (concurrency 4)
+	async function startBackgroundUpload() {
+		if (isUploadingImages || imageTasks.size === 0) return;
+		isUploadingImages = true;
+		uploadedCount = Array.from(imageTasks.values()).filter((t) => t.status === 'success').length;
+		uploadErrorsCount = 0;
+		totalImages = imageTasks.size;
+
+		const pendingTasks = Array.from(imageTasks.values()).filter((t) => t.status !== 'success');
+		const concurrencyLimit = 4;
+		let taskIndex = 0;
+
+		async function worker() {
+			while (taskIndex < pendingTasks.length) {
+				const currentTask = pendingTasks[taskIndex++];
+				await processTask(currentTask);
+			}
+		}
+
+		const workers = Array.from({ length: Math.min(concurrencyLimit, pendingTasks.length) }, () => worker());
+		await Promise.all(workers);
+
+		isUploadingImages = false;
+	}
+
+	function retryFailedUploads() {
+		for (const [id, task] of imageTasks.entries()) {
+			if (task.status === 'error') {
+				task.status = 'pending';
+				task.retryCount = 0;
+				task.error = undefined;
+				
+				// Kembalikan placeholder loading
+				const placeholderRegex = new RegExp(`<img[^>]*data-img-id=["']${id}["'][^>]*>`, 'g');
+				const loadingPlaceholder = `<img src="${createPlaceholderSvgUri('loading')}" data-img-id="${id}" class="docx-img-placeholder my-2 rounded-xl border border-indigo-200 bg-slate-50 p-2 max-h-32 inline-block object-contain" alt="[IMAGE - Memproses gambar...]" />`;
+				for (const q of parsedData) {
+					if (q.question_text && q.question_text.includes(`data-img-id="${id}"`)) {
+						q.question_text = q.question_text.replace(placeholderRegex, loadingPlaceholder);
+					}
+					if (Array.isArray(q.options)) {
+						for (let j = 0; j < q.options.length; j++) {
+							if (q.options[j] && q.options[j].includes(`data-img-id="${id}"`)) {
+								q.options[j] = q.options[j].replace(placeholderRegex, loadingPlaceholder);
+							}
+						}
+					}
+				}
+			}
+		}
+		parsedData = parsedData;
+		uploadErrorsCount = 0;
+		startBackgroundUpload();
+	}
+
 	function close() {
 		show = false;
 		selectedFile = null;
 		parsedData = [];
 		errorMsg = '';
 		isImporting = false;
+		isUploadingImages = false;
+		imageTasks.clear();
+		uploadedCount = 0;
+		totalImages = 0;
+		uploadErrorsCount = 0;
 		if (fileInput) fileInput.value = '';
 		dispatch('close');
 	}
@@ -51,62 +319,11 @@
 			selectedFile = input.files[0];
 			errorMsg = '';
 			parsedData = [];
+			imageTasks.clear();
+			uploadedCount = 0;
+			totalImages = 0;
+			uploadErrorsCount = 0;
 		}
-	}
-
-	// Upload image to Cloudinary and return the URL
-	async function uploadImageToCloudinary(base64Data: string, mimeType: string): Promise<string> {
-		if (!cloudName || !uploadPreset) {
-			throw new Error('Sistem belum dikonfigurasi untuk unggah media.');
-		}
-
-		// Mammoth returns base64 without the data URI prefix.
-		const dataUri = `data:${mimeType};base64,${base64Data}`;
-
-		const formData = new FormData();
-		formData.append('file', dataUri);
-		formData.append('upload_preset', uploadPreset);
-		formData.append('folder', 'ujian-madrasah/media');
-
-		const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-			method: 'POST',
-			body: formData
-		});
-
-		if (!response.ok) {
-			throw new Error('Gagal mengunggah gambar ke server.');
-		}
-
-		const data = (await response.json()) as any;
-		return data?.secure_url;
-	}
-
-	async function processHtmlForImages(html: string): Promise<string> {
-		if (!html) return html;
-		
-		const dataUriRegex = /src="data:(image\/[^;]+);base64,([^"]+)"/g;
-		let match;
-		let processedHtml = html;
-		
-		const matches = [];
-		while ((match = dataUriRegex.exec(html)) !== null) {
-			matches.push({
-				fullMatch: match[0],
-				mimeType: match[1],
-				base64Data: match[2]
-			});
-		}
-		
-		for (const m of matches) {
-			try {
-				const url = await uploadImageToCloudinary(m.base64Data, m.mimeType);
-				processedHtml = processedHtml.replace(m.fullMatch, `src="${url}"`);
-			} catch (e) {
-				console.error("Failed to upload image during import", e);
-			}
-		}
-		
-		return processedHtml;
 	}
 
 	async function parseWord() {
@@ -114,6 +331,10 @@
 		isParsing = true;
 		errorMsg = '';
 		parsedData = [];
+		imageTasks.clear();
+		uploadedCount = 0;
+		totalImages = 0;
+		uploadErrorsCount = 0;
 
 		try {
 			const [mammothModule, jszipModule] = await Promise.all([
@@ -126,27 +347,20 @@
 			const arrayBuffer = await selectedFile.arrayBuffer();
 
 			// --- PREPROCESS DOCX FOR OMML (Math Equations) ---
-			// MS Word Equation Editor uses OMML (<m:oMath>). Mammoth ignores these tags.
-			// We use JSZip to read document.xml, extract the plain text from <m:t> tags,
-			// and convert them to standard Word text runs (<w:r><w:t>) so Mammoth can read them.
 			const zip = await JSZip.loadAsync(arrayBuffer);
 			const docXmlFile = zip.file("word/document.xml");
 			let modifiedArrayBuffer = arrayBuffer;
 			
 			if (docXmlFile) {
 				let xml = await docXmlFile.async("string");
-				
-				// 1. Convert <m:t> to <w:t>
 				xml = xml.replace(/<m:t>/g, '<w:t>');
 				xml = xml.replace(/<m:t ([^>]+)>/g, '<w:t $1>');
 				xml = xml.replace(/<\/m:t>/g, '</w:t>');
 
-				// 2. Convert <m:r> to <w:r>
 				xml = xml.replace(/<m:r>/g, '<w:r>');
 				xml = xml.replace(/<m:r ([^>]+)>/g, '<w:r $1>');
 				xml = xml.replace(/<\/m:r>/g, '</w:r>');
 
-				// 3. Remove all remaining m: tags (like m:oMath, m:f, m:num, etc)
 				xml = xml.replace(/<\/?m:[^>]+>/g, '');
 				
 				zip.file("word/document.xml", xml);
@@ -154,15 +368,30 @@
 			}
 			// --- END PREPROCESS ---
 			
-			// Konfigurasi Mammoth.js untuk mengonversi dokumen Word ke HTML
-			// Gambar di-render sebagai Base64 untuk preview, upload ditunda ke fase Import
+			let imgCounter = 0;
+			const imageMap = new Map<string, { id: string; base64: string; mimeType: string }>();
+
+			// Konfigurasi Mammoth.js: Gambar langsung diberi placeholder ikon IMAGE dan diunggah di latar belakang
 			const options = {
-				convertImage: (mammoth as any).images.imgElement(function(image: any) {
-					return image.read("base64").then(function(imageBuffer: any) {
-						return {
-							src: `data:${image.contentType};base64,${imageBuffer}`
-						};
-					});
+				convertImage: (mammoth as any).images.imgElement(async function(image: any) {
+					const imageBuffer = await image.read("base64");
+					const mimeType = image.contentType || 'image/png';
+					const fingerprint = `${imageBuffer.length}_${imageBuffer.slice(0, 100)}_${imageBuffer.slice(-100)}`;
+
+					let imgId: string;
+					if (imageMap.has(fingerprint)) {
+						imgId = imageMap.get(fingerprint)!.id;
+					} else {
+						imgId = `docx_img_${imgCounter++}`;
+						imageMap.set(fingerprint, { id: imgId, base64: imageBuffer, mimeType });
+					}
+
+					return {
+						src: createPlaceholderSvgUri('loading'),
+						'data-img-id': imgId,
+						class: 'docx-img-placeholder my-2 rounded-xl border border-indigo-200 bg-slate-50 p-2 max-h-32 inline-block object-contain shadow-xs transition-all',
+						alt: '[IMAGE - Memproses gambar...]'
+					};
 				})
 			};
 
@@ -173,7 +402,7 @@
 				console.warn("Mammoth messages:", result.messages);
 			}
 
-			// Menggunakan parser utilitas kita untuk memecah HTML menjadi objek-objek JSON
+			// Menggunakan parser utilitas untuk memecah HTML menjadi soal
 			const questions = parseWordHtmlToQuestions(html);
 
 			if (questions.length === 0) {
@@ -198,6 +427,26 @@
 					points: 1
 				};
 			});
+
+			// Daftarkan tugas unggah gambar untuk background upload
+			for (const item of imageMap.values()) {
+				imageTasks.set(item.id, {
+					id: item.id,
+					base64: item.base64,
+					mimeType: item.mimeType,
+					status: 'pending',
+					retryCount: 0
+				});
+			}
+
+			totalImages = imageTasks.size;
+			uploadedCount = 0;
+			uploadErrorsCount = 0;
+
+			// Mulai unggah di latar belakang seketika setelah parsing selesai
+			if (imageTasks.size > 0) {
+				startBackgroundUpload();
+			}
 			
 		} catch (error: any) {
 			errorMsg = error.message || 'Terjadi kesalahan saat memproses file.';
@@ -208,29 +457,31 @@
 	}
 
 	async function confirmImport() {
-		if (parsedData.length > 0) {
+		if (parsedData.length === 0) return;
+
+		// Jika masih ada gambar yang sedang diunggah di latar belakang, tunggu hingga selesai
+		if (isUploadingImages) {
 			isImporting = true;
-			try {
-				// Proses upload gambar ke Cloudinary sebelum dispatch
-				for (let i = 0; i < parsedData.length; i++) {
-					const q = parsedData[i];
-					
-					q.question_text = await processHtmlForImages(q.question_text);
-					
-					for (let j = 0; j < q.options.length; j++) {
-						q.options[j] = await processHtmlForImages(q.options[j]);
-					}
-					q.options_json = JSON.stringify(q.options);
-				}
-				
-				dispatch('import', { questions: parsedData });
-				close();
-			} catch (error: any) {
-				errorMsg = error.message || "Gagal memproses gambar saat import.";
-				console.error("Error uploading images during import:", error);
-			} finally {
-				isImporting = false;
+			while (isUploadingImages) {
+				await new Promise((r) => setTimeout(r, 200));
 			}
+		}
+
+		if (uploadErrorsCount > 0) {
+			isImporting = false;
+			errorMsg = `Terdapat ${uploadErrorsCount} gambar yang gagal diunggah ke server. Silakan klik tombol "Coba Lagi Unggah" di atas tabel preview.`;
+			return;
+		}
+
+		isImporting = true;
+		try {
+			dispatch('import', { questions: parsedData });
+			close();
+		} catch (error: any) {
+			errorMsg = error.message || "Gagal memproses import soal.";
+			console.error("Error confirming import:", error);
+		} finally {
+			isImporting = false;
 		}
 	}
 </script>
@@ -344,8 +595,72 @@
 					<div>
 						<div class="flex items-center justify-between mb-3">
 							<h4 class="font-bold text-slate-800">Preview Data ({parsedData.length} Soal)</h4>
-							<span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">Siap Diimport</span>
+							{#if totalImages > 0}
+								{#if isUploadingImages}
+									<span class="text-xs font-medium text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100 flex items-center gap-1.5">
+										<span class="w-2 h-2 rounded-full bg-indigo-500 animate-ping"></span>
+										Mengunggah Gambar ({uploadedCount}/{totalImages})
+									</span>
+								{:else if uploadErrorsCount === 0}
+									<span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100 flex items-center gap-1">
+										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+										Siap Diimport ({totalImages} Gambar Terunggah)
+									</span>
+								{/if}
+							{:else}
+								<span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">Siap Diimport</span>
+							{/if}
 						</div>
+
+						<!-- Status Unggah Gambar Latar Belakang -->
+						{#if totalImages > 0}
+							{#if isUploadingImages}
+								<div class="bg-indigo-50 border border-indigo-200/80 rounded-xl p-3.5 mb-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+									<div class="flex items-center gap-3">
+										<div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+											<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+												<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+												<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+											</svg>
+										</div>
+										<div>
+											<p class="text-xs font-bold text-indigo-900 flex items-center gap-2">
+												Mengunggah gambar di latar belakang...
+												<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-100 text-indigo-700">Otomatis & Cepat</span>
+											</p>
+											<p class="text-[11px] text-indigo-700 mt-0.5">
+												{uploadedCount} dari {totalImages} gambar selesai ({totalImages > 0 ? Math.round((uploadedCount / totalImages) * 100) : 0}%). Ikon <span class="font-semibold text-indigo-800">IMAGE</span> akan berganti menjadi gambar asli saat terunggah.
+											</p>
+										</div>
+									</div>
+									<div class="w-full sm:w-44 shrink-0">
+										<div class="w-full bg-indigo-200/70 rounded-full h-2.5 overflow-hidden">
+											<div class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: {totalImages > 0 ? Math.round((uploadedCount / totalImages) * 100) : 0}%"></div>
+										</div>
+									</div>
+								</div>
+							{:else if uploadErrorsCount === 0}
+								<div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-4 shadow-xs flex items-center justify-between text-emerald-800 text-xs font-medium">
+									<div class="flex items-center gap-2.5">
+										<span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+										</span>
+										<span>Semua {totalImages} gambar berhasil diunggah ke cloud storage dan siap disimpan ke bank soal.</span>
+									</div>
+									<span class="px-2 py-0.5 rounded bg-emerald-100/80 text-emerald-700 text-[10px] font-bold">100% Selesai</span>
+								</div>
+							{:else}
+								<div class="bg-rose-50 border border-rose-200 rounded-xl p-3 mb-4 shadow-xs flex items-center justify-between gap-3 text-rose-800 text-xs">
+									<div class="flex items-center gap-2.5">
+										<svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+										<span>{uploadErrorsCount} dari {totalImages} gambar gagal diunggah karena kendala koneksi.</span>
+									</div>
+									<button type="button" class="btn btn-sm bg-rose-600 hover:bg-rose-700 text-white rounded-lg px-3 py-1.5 text-xs font-semibold whitespace-nowrap shadow-xs" on:click={retryFailedUploads}>
+										Coba Lagi Unggah
+									</button>
+								</div>
+							{/if}
+						{/if}
 						
 						<div class="overflow-hidden border border-slate-200 rounded-xl shadow-sm">
 							<div class="max-h-[300px] overflow-y-auto bg-slate-50">
@@ -398,9 +713,12 @@
 					disabled={parsedData.length === 0 || isImporting}
 					on:click={confirmImport}
 				>
-					{#if isImporting}
+					{#if isImporting && isUploadingImages}
 						<svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-						Memproses Gambar...
+						Menyelesaikan Unggah ({uploadedCount}/{totalImages})...
+					{:else if isImporting}
+						<svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+						Menyimpan Soal...
 					{:else}
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
 						Import {parsedData.length > 0 ? `${parsedData.length} Soal` : ''}

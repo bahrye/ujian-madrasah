@@ -46,10 +46,17 @@
 		const { questions: importedQuestions } = event.detail;
 		const formData = new FormData();
 		formData.append('questions_json', JSON.stringify(importedQuestions));
-		const response = await fetch('?/importExcel', { method: 'POST', body: formData });
-		if (response.ok) {
-			toasts.success('Berhasil mengimpor soal');
-			location.reload();
+		try {
+			const response = await fetch('?/importExcel', { method: 'POST', body: formData });
+			if (response.ok) {
+				toasts.success('Berhasil mengimpor soal');
+				location.reload();
+			} else {
+				const resJson = await response.json().catch(() => null);
+				toasts.error(resJson?.data?.error || resJson?.error || 'Gagal menyimpan soal ke server');
+			}
+		} catch (e: any) {
+			toasts.error(e.message || 'Terjadi kesalahan saat mengimpor soal');
 		}
 	}
 
