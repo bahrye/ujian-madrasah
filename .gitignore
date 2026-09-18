@@ -1,23 +1,93 @@
-# SvelteKit and Vite build directories
+# ========================================================
+# Environment & Secret Files (Sangat Penting)
+# ========================================================
+.env
+.env.*
+*.env
+!.env.example
+*.pem
+*.key
+*.cert
+*.crt
+
+# ========================================================
+# Database & Backup Dumps (Data Pribadi Siswa, Guru & Password)
+# ========================================================
+*.sql.bak
+*.sql.dump
+*.dump
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.db-wal
+d1_remote_latest.sql
+data_only.sql
+data_only_utf8.sql
+db.sql
+db_backup_original.sql
+db_fixed.sql
+db_topo.sql
+db_topo_clean.sql
+remote_db.sql
+
+# ========================================================
+# Android Keystore, Signing Keys & Local Properties
+# ========================================================
+*.jks
+*.keystore
+*.p12
+*.pfx
+release.jks
+android-exambro/release.jks
+android-exambro/*.jks
+android-exambro/**/*.jks
+android-exambro/*.keystore
+android-exambro/**/*.keystore
+android-exambro/local.properties
+android-exambro/.gradle/
+android-exambro/build/
+android-exambro/*/build/
+.gradle/
+
+# ========================================================
+# Build Outputs & Framework Directories
+# ========================================================
 .svelte-kit/
 .wrangler/
 .vercel/
 dist/
 build/
 
-# Node modules
+# ========================================================
+# Dependencies
+# ========================================================
 node_modules/
 
-# Environment files
-.env
-.env.*
-!.env.example
-
-# Temporary / OS files
-.DS_Store
-Thumbs.db
+# ========================================================
+# Logs & Temporary Files
+# ========================================================
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+tmp/
+temp/
 scratch/
 tmp.txt
 output.txt
-.gradle/
+parse-errors.js
+check-leaks.mjs
+
+# ========================================================
+# OS & IDE Files
+# ========================================================
+.DS_Store
+Thumbs.db
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
