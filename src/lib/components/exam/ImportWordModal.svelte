@@ -286,7 +286,8 @@
 		startBackgroundUpload();
 	}
 
-	function close() {
+	function close(force = false) {
+		if (isImporting && !force) return;
 		show = false;
 		selectedFile = null;
 		parsedData = [];
@@ -458,13 +459,13 @@
 	}
 
 	async function confirmImport() {
-		if (parsedData.length === 0) return;
+		if (parsedData.length === 0 || isImporting) return;
+
+		isImporting = true;
+		errorMsg = '';
 
 		// Jika ada gambar yang perlu diunggah ke Cloudinary, unggah paralel sekarang
 		if (imageTasks.size > 0 && uploadedCount < totalImages) {
-			isImporting = true;
-			errorMsg = '';
-			
 			await startBackgroundUpload();
 
 			if (uploadErrorsCount > 0) {
@@ -474,23 +475,23 @@
 			}
 		}
 
-		isImporting = true;
 		try {
 			dispatch('import', { questions: parsedData });
-			close();
+			close(true);
 		} catch (error: any) {
 			errorMsg = error.message || "Gagal memproses import soal.";
 			console.error("Error confirming import:", error);
-		} finally {
 			isImporting = false;
 		}
 	}
 </script>
 
+<svelte:window on:keydown={(e) => { if (show && e.key === 'Escape' && !isImporting) close(); }} />
+
 {#if show}
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<div use:portal class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" on:click={close}>
+	<div use:portal class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" on:click={() => { if (!isImporting) close(); }}>
 		<div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden" on:click|stopPropagation>
 			<!-- Header -->
 			<div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
@@ -500,7 +501,13 @@
 					</svg>
 					Import dari Word (.docx)
 				</h3>
-				<button type="button" class="text-slate-400 hover:text-slate-600 p-2 rounded-lg hover:bg-slate-100 transition-colors" on:click={close}>
+				<button 
+					type="button" 
+					class="text-slate-400 hover:text-slate-600 p-2 rounded-lg hover:bg-slate-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent" 
+					disabled={isImporting} 
+					title={isImporting ? 'Proses unggah dan import sedang berjalan...' : 'Tutup'}
+					on:click={() => close()}
+				>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
 				</button>
 			</div>
@@ -564,13 +571,14 @@
 							bind:this={fileInput}
 							type="file"
 							accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-							class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 border border-slate-200 rounded-xl cursor-pointer"
+							class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 border border-slate-200 rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+							disabled={isParsing || isImporting}
 							on:change={handleFileChange}
 						/>
 						<button 
-							type="button"
+							type="button" 
 							class="btn btn-primary whitespace-nowrap min-w-[120px] shadow-sm rounded-xl"
-							disabled={!selectedFile || isParsing}
+							disabled={!selectedFile || isParsing || isImporting}
 							on:click={parseWord}
 						>
 							{#if isParsing}
@@ -718,27 +726,43 @@
 			</div>
 
 			<!-- Footer -->
-			<div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3 rounded-b-2xl">
-				<button type="button" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-200 hover:text-slate-900 transition-colors" on:click={close}>
-					Batal
-				</button>
-				<button 
-					type="button" 
-					class="btn btn-primary rounded-xl px-6 py-2.5 shadow-sm flex items-center gap-2" 
-					disabled={parsedData.length === 0 || isImporting}
-					on:click={confirmImport}
-				>
-					{#if isImporting && isUploadingImages}
-						<svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-						Menyelesaikan Unggah ({uploadedCount}/{totalImages})...
-					{:else if isImporting}
-						<svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-						Menyimpan Soal...
-					{:else}
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-						Import {parsedData.length > 0 ? `${parsedData.length} Soal` : ''}
-					{/if}
-				</button>
+			<div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3 rounded-b-2xl">
+				{#if isImporting}
+					<div class="flex items-center gap-2 text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg shadow-2xs">
+						<svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+						<span>Proses import & unggah terkunci (batal dinonaktifkan).</span>
+					</div>
+				{:else}
+					<div></div>
+				{/if}
+				<div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+					<button 
+						type="button" 
+						class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-200 hover:text-slate-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-slate-400" 
+						disabled={isImporting}
+						title={isImporting ? 'Tidak dapat membatalkan saat proses unggah dan import sedang berlangsung' : 'Batal'}
+						on:click={() => close()}
+					>
+						Batal
+					</button>
+					<button 
+						type="button" 
+						class="btn btn-primary rounded-xl px-6 py-2.5 shadow-sm flex items-center gap-2" 
+						disabled={parsedData.length === 0 || isImporting}
+						on:click={confirmImport}
+					>
+						{#if isImporting && isUploadingImages}
+							<svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+							Menyelesaikan Unggah ({uploadedCount}/{totalImages})...
+						{:else if isImporting}
+							<svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+							Menyimpan Soal...
+						{:else}
+							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+							Import {parsedData.length > 0 ? `${parsedData.length} Soal` : ''}
+						{/if}
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>

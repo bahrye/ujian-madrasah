@@ -1,7 +1,7 @@
 import { fail, error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
-import { deleteFromCloudinary } from '$lib/server/cloudinary';
+import { deleteFromCloudinary, deleteMediaForQuestionIds } from '$lib/server/cloudinary';
 import { env } from '$env/dynamic/private';
 
 import { formatExamTitle } from '$lib/utils/exam';
@@ -312,11 +312,9 @@ export const actions: Actions = {
 		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid.' });
 
 		try {
-			// Delete media from Cloudinary if it exists
-			const q = await db.prepare('SELECT media_url FROM questions WHERE id = ?').bind(parsedId).first<{media_url: string}>();
-			if (q && q.media_url && q.media_url.includes('res.cloudinary.com')) {
-				await deleteFromCloudinary(q.media_url, env);
-			}
+			const mergedEnv = { ...env, ...(platform?.env as any) };
+			// Hapus seluruh media terkait soal dari Cloudinary & tabel uploaded_media
+			await deleteMediaForQuestionIds(db, mergedEnv, [parsedId], locals.user!.school_id);
 
 			// Hapus referensi jawaban siswa untuk mencegah error foreign key
 			await db.prepare('DELETE FROM student_answers WHERE question_id = ?').bind(parsedId).run();
@@ -439,16 +437,11 @@ export const actions: Actions = {
 			const ids = JSON.parse(idsStr);
 			if (!Array.isArray(ids) || ids.length === 0) return fail(400, { error: 'Daftar ID tidak valid.' });
 
-			// Delete media from Cloudinary if exists
-			const placeholders = ids.map(() => '?').join(',');
-			const questions = await db.prepare(`SELECT media_url FROM questions WHERE id IN (${placeholders})`).bind(...ids).all<{media_url: string}>();
-			
-			for (const q of questions.results) {
-				if (q.media_url && q.media_url.includes('res.cloudinary.com')) {
-					await deleteFromCloudinary(q.media_url, env);
-				}
-			}
+			const mergedEnv = { ...env, ...(platform?.env as any) };
+			// Hapus seluruh media terkait soal dari Cloudinary & tabel uploaded_media
+			await deleteMediaForQuestionIds(db, mergedEnv, ids, locals.user!.school_id);
 
+			const placeholders = ids.map(() => '?').join(',');
 			await db.prepare(`DELETE FROM student_answers WHERE question_id IN (${placeholders})`).bind(...ids).run();
 			await db.prepare(`DELETE FROM questions WHERE id IN (${placeholders})`).bind(...ids).run();
 			

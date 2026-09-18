@@ -4,6 +4,7 @@ import { getDB } from '$lib/server/db';
 
 import { formatExamTitle } from '$lib/utils/exam';
 import { deleteMonitoringPhotos } from '$lib/server/monitoring';
+import { deleteMediaForExam } from '$lib/server/cloudinary';
 import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async ({ params, platform, locals }) => {
@@ -296,8 +297,10 @@ export const actions: Actions = {
 		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid.' });
 
 		try {
-			const mergedEnv = platform?.env || env;
+			const mergedEnv = platform?.env ? { ...env, ...platform.env } : env;
 			await deleteMonitoringPhotos(db, mergedEnv, { examId: parsedId });
+			// Hapus seluruh media Cloudinary pada soal-soal ujian ini dan bersihkan tabel uploaded_media
+			await deleteMediaForExam(db, mergedEnv, parsedId, locals.user!.school_id);
 
 			const attempts = await db.prepare('SELECT id FROM student_attempts WHERE exam_id = ?').bind(parsedId).all<{ id: number }>();
 			const attemptIds = attempts.results.map((a: any) => a.id);

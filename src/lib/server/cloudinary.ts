@@ -7,26 +7,42 @@ export async function deleteFromCloudinary(url: string | null, env: Record<strin
 
 	if (!apiKey || !apiSecret) {
 		console.warn('Cloudinary API credentials missing. Skipping automatic deletion.');
-		return { success: false, error: 'API Key atau Secret Cloudinary belum diatur di Environment Variables (Cloudflare Pages / Vercel)' };
+		return { success: false, error: 'API Key atau Secret Cloudinary belum diatur di Environment Variables' };
 	}
 
 	try {
+		// Clean query params or hash
+		const cleanUrl = url.split('?')[0].split('#')[0];
+
 		// Extract public_id correctly handling versions (v123456789) and folders
-		const uploadSplit = url.split('/upload/');
+		const uploadSplit = cleanUrl.split('/upload/');
 		if (uploadSplit.length < 2) return { success: false, error: 'Format URL tidak dikenali' };
 		
-		let afterUpload = uploadSplit[1];
-		// Remove version prefix if exists (e.g. v1722666666/)
-		if (afterUpload.match(/^v\d+\//)) {
-			afterUpload = afterUpload.replace(/^v\d+\//, '');
+		const afterUpload = uploadSplit[1];
+		const segments = afterUpload.split('/');
+		const cleanedSegments: string[] = [];
+		let versionFound = false;
+
+		for (let i = 0; i < segments.length; i++) {
+			const seg = segments[i];
+			if (!versionFound) {
+				if (/^v\d+$/.test(seg)) {
+					versionFound = true;
+					continue;
+				}
+				if (seg.includes(',') || /^[a-z]{1,3}_/.test(seg)) {
+					continue;
+				}
+			}
+			cleanedSegments.push(seg);
 		}
-		
-		// Remove extension to get public_id
-		const lastDotIndex = afterUpload.lastIndexOf('.');
-		const publicId = lastDotIndex !== -1 ? afterUpload.substring(0, lastDotIndex) : afterUpload;
+
+		const cleanPath = cleanedSegments.length > 0 ? cleanedSegments.join('/') : afterUpload.replace(/^v\d+\//, '');
+		const lastDotIndex = cleanPath.lastIndexOf('.');
+		const publicId = lastDotIndex !== -1 ? cleanPath.substring(0, lastDotIndex) : cleanPath;
 
 		// Cloudinary treats audio files as 'video' resource type for their API
-		const resourceType = url.includes('/video/') ? 'video' : 'image';
+		const resourceType = url.includes('/video/') ? 'video' : url.includes('/raw/') ? 'raw' : 'image';
 
 		const timestamp = Math.round(new Date().getTime() / 1000).toString();
 		const strToSign = `public_id=${publicId}&timestamp=${timestamp}${apiSecret}`;
@@ -50,7 +66,7 @@ export async function deleteFromCloudinary(url: string | null, env: Record<strin
 		});
 		
 		const result = (await res.json()) as any;
-		console.log('Cloudinary Destroy Result:', result);
+		console.log('Cloudinary Destroy Result:', publicId, result);
 		
 		if (result.result === 'ok' || result.result === 'not found') {
 			return { success: true };
@@ -60,6 +76,177 @@ export async function deleteFromCloudinary(url: string | null, env: Record<strin
 	} catch (err: any) {
 		console.error('Failed to delete from Cloudinary:', err);
 		return { success: false, error: err.message || 'Kesalahan koneksi ke Cloudinary API' };
+	}
+}
+
+/**
+ * Ekstrak semua URL Cloudinary dari teks/HTML/JSON apa pun (seperti question_text atau options_json)
+ */
+export function extractCloudinaryUrls(text: string | null | undefined): string[] {
+	if (!text) return [];
+	const normalized = text.replace(/\\\//g, '/');
+	const matches = normalized.match(/https:\/\/res\.cloudinary\.com\/[^\s'"><),}\]]+/g);
+	if (!matches) return [];
+
+	const results = new Set<string>();
+	for (let u of matches) {
+		u = u.replace(/[,;.)]+$/, '').trim();
+		if (u.includes('res.cloudinary.com')) {
+			results.add(u);
+		}
+	}
+	return Array.from(results);
+}
+
+/**
+ * Hapus daftar URL Cloudinary secara paralel dan bersihkan dari tabel uploaded_media
+ */
+export async function deleteCloudinaryMediaList(
+	urls: (string | null | undefined)[],
+	env: any,
+	db?: any,
+	schoolId?: number
+): Promise<void> {
+	const validUrls = Array.from(
+		new Set(
+			urls
+				.filter((u): u is string => !!u && typeof u === 'string' && u.includes('res.cloudinary.com'))
+				.map((u) => u.trim())
+		)
+	);
+
+	if (validUrls.length === 0) return;
+
+	// Hapus media dari Cloudinary secara paralel tanpa blocking error fatal
+	await Promise.allSettled(
+		validUrls.map((url) =>
+			deleteFromCloudinary(url, env).catch((err) => {
+				console.error('Gagal menghapus media dari Cloudinary:', url, err);
+			})
+		)
+	);
+
+	// Bersihkan juga dari pelacakan uploaded_media di DB
+	if (db) {
+		try {
+			const chunkSize = 50;
+			for (let i = 0; i < validUrls.length; i += chunkSize) {
+				const chunk = validUrls.slice(i, i + chunkSize);
+				const placeholders = chunk.map(() => '?').join(',');
+				if (schoolId) {
+					await db
+						.prepare(`DELETE FROM uploaded_media WHERE url IN (${placeholders}) AND school_id = ?`)
+						.bind(...chunk, schoolId)
+						.run();
+				} else {
+					await db
+						.prepare(`DELETE FROM uploaded_media WHERE url IN (${placeholders})`)
+						.bind(...chunk)
+						.run();
+				}
+			}
+		} catch (err) {
+			console.error('Gagal membersihkan uploaded_media:', err);
+		}
+	}
+}
+
+/**
+ * Hapus semua gambar Cloudinary milik soal-soal tertentu berdasarkan ID soal
+ */
+export async function deleteMediaForQuestionIds(
+	db: any,
+	env: any,
+	questionIds: number[],
+	schoolId?: number
+): Promise<void> {
+	if (!questionIds || questionIds.length === 0) return;
+
+	try {
+		const placeholders = questionIds.map(() => '?').join(',');
+		const rows = await db
+			.prepare(
+				`SELECT media_url, question_text, options_json, correct_answer_json FROM questions WHERE id IN (${placeholders})`
+			)
+			.bind(...questionIds)
+			.all<{
+				media_url?: string;
+				question_text?: string;
+				options_json?: string;
+				correct_answer_json?: string;
+			}>();
+
+		const urlsToDelete = new Set<string>();
+
+		for (const row of rows.results || []) {
+			if (row.media_url && row.media_url.includes('res.cloudinary.com')) {
+				urlsToDelete.add(row.media_url.trim());
+			}
+			const textBlock = `${row.question_text || ''} ${row.options_json || ''} ${row.correct_answer_json || ''}`;
+			const extracted = extractCloudinaryUrls(textBlock);
+			for (const u of extracted) {
+				urlsToDelete.add(u);
+			}
+		}
+
+		await deleteCloudinaryMediaList(Array.from(urlsToDelete), env, db, schoolId);
+	} catch (err) {
+		console.error('Error deleteMediaForQuestionIds:', err);
+	}
+}
+
+/**
+ * Hapus semua gambar Cloudinary milik seluruh soal dalam satu ujian
+ */
+export async function deleteMediaForExam(
+	db: any,
+	env: any,
+	examId: number,
+	schoolId?: number
+): Promise<void> {
+	try {
+		const rows = await db
+			.prepare(
+				`SELECT media_url, question_text, options_json, correct_answer_json FROM questions WHERE exam_id = ?`
+			)
+			.bind(examId)
+			.all<{
+				media_url?: string;
+				question_text?: string;
+				options_json?: string;
+				correct_answer_json?: string;
+			}>();
+
+		const urlsToDelete = new Set<string>();
+
+		for (const row of rows.results || []) {
+			if (row.media_url && row.media_url.includes('res.cloudinary.com')) {
+				urlsToDelete.add(row.media_url.trim());
+			}
+			const textBlock = `${row.question_text || ''} ${row.options_json || ''} ${row.correct_answer_json || ''}`;
+			const extracted = extractCloudinaryUrls(textBlock);
+			for (const u of extracted) {
+				urlsToDelete.add(u);
+			}
+		}
+
+		// Periksa juga deskripsi ujian jika ada gambar
+		try {
+			const examRow = await db
+				.prepare('SELECT description FROM exams WHERE id = ?')
+				.bind(examId)
+				.first<{ description?: string }>();
+			if (examRow?.description) {
+				const descUrls = extractCloudinaryUrls(examRow.description);
+				for (const u of descUrls) {
+					urlsToDelete.add(u);
+				}
+			}
+		} catch {}
+
+		await deleteCloudinaryMediaList(Array.from(urlsToDelete), env, db, schoolId);
+	} catch (err) {
+		console.error('Error deleteMediaForExam:', err);
 	}
 }
 

@@ -1,6 +1,8 @@
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
+import { deleteMediaForExam } from '$lib/server/cloudinary';
+import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async ({ platform, locals }) => {
 	const db = getDB(platform);
@@ -83,6 +85,10 @@ export const actions: Actions = {
 		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid.' });
 
 		try {
+			const mergedEnv = platform?.env ? { ...env, ...platform.env } : env;
+			// Hapus seluruh media Cloudinary pada soal-soal ujian ini dan bersihkan tabel uploaded_media
+			await deleteMediaForExam(db, mergedEnv, parsedId, locals.user!.school_id);
+
 			// Manually cascade deletes to prevent constraint errors
 			await db.batch([
 				db.prepare('DELETE FROM student_answers WHERE attempt_id IN (SELECT id FROM student_attempts WHERE exam_id = ?)').bind(parsedId),

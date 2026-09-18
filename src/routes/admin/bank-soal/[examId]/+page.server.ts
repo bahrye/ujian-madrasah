@@ -1,7 +1,7 @@
 import { fail, error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
-import { deleteFromCloudinary } from '$lib/server/cloudinary';
+import { deleteFromCloudinary, deleteMediaForQuestionIds } from '$lib/server/cloudinary';
 import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async ({ platform, params, locals }) => {
@@ -280,22 +280,9 @@ export const actions: Actions = {
 		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid.' });
 
 		try {
-			const q = await db.prepare('SELECT media_url, question_text, options FROM questions WHERE id = ?').bind(parsedId).first<{media_url: string, question_text: string, options: string}>();
-			if (q) {
-				const urlsToDelete = new Set<string>();
-				if (q.media_url && q.media_url.includes('res.cloudinary.com')) {
-					urlsToDelete.add(q.media_url);
-				}
-				
-				const combinedHtml = (q.question_text || '') + ' ' + (q.options || '');
-				const embeddedUrls = combinedHtml.match(/https:\/\/res\.cloudinary\.com\/[^\s'"]+/g) || [];
-				for (const url of embeddedUrls) urlsToDelete.add(url);
-				
-				// Delete in background
-				urlsToDelete.forEach(url => {
-					deleteFromCloudinary(url, env).catch(e => console.error('Background delete failed:', e));
-				});
-			}
+			const mergedEnv = { ...env, ...(platform?.env as any) };
+			// Hapus seluruh media terkait soal dari Cloudinary & tabel uploaded_media
+			await deleteMediaForQuestionIds(db, mergedEnv, [parsedId], locals.user!.school_id);
 
 			// Hapus referensi jawaban siswa untuk mencegah error foreign key
 			await db.prepare('DELETE FROM student_answers WHERE question_id = ?').bind(parsedId).run();
@@ -414,10 +401,10 @@ export const actions: Actions = {
 			// Filter ID yang benar-benar milik ujian ini
 			const placeholders = rawIds.map(() => '?').join(',');
 			const validQuestions = await db.prepare(`
-				SELECT q.id, q.media_url, q.question_text, q.options 
+				SELECT q.id
 				FROM questions q
 				WHERE q.id IN (${placeholders}) AND q.exam_id = ?
-			`).bind(...rawIds, parsedExamId).all<{ id: number; media_url: string; question_text: string; options: string }>();
+			`).bind(...rawIds, parsedExamId).all<{ id: number }>();
 
 			if (validQuestions.results.length === 0) {
 				return fail(400, { error: 'Tidak ada soal valid yang dapat dihapus.' });
@@ -426,20 +413,9 @@ export const actions: Actions = {
 			const validIds = validQuestions.results.map(q => q.id);
 			const validPlaceholders = validIds.map(() => '?').join(',');
 
-			const urlsToDelete = new Set<string>();
-			for (const q of validQuestions.results) {
-				if (q.media_url && q.media_url.includes('res.cloudinary.com')) {
-					urlsToDelete.add(q.media_url);
-				}
-				const combinedHtml = (q.question_text || '') + ' ' + (q.options || '');
-				const embeddedUrls = combinedHtml.match(/https:\/\/res\.cloudinary\.com\/[^\s'"]+/g) || [];
-				for (const url of embeddedUrls) urlsToDelete.add(url);
-			}
-			
-			// Delete in background
-			urlsToDelete.forEach(url => {
-				deleteFromCloudinary(url, env).catch(e => console.error('Background delete failed:', e));
-			});
+			const mergedEnv = { ...env, ...(platform?.env as any) };
+			// Hapus seluruh media terkait soal dari Cloudinary & tabel uploaded_media
+			await deleteMediaForQuestionIds(db, mergedEnv, validIds, locals.user!.school_id);
 
 			await db.batch([
 				db.prepare(`DELETE FROM student_answers WHERE question_id IN (${validPlaceholders})`).bind(...validIds),
