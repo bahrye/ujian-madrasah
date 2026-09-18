@@ -873,7 +873,18 @@
 							<span class="badge-info text-[10px]">📎 {q.media_type === 'image' ? 'Gambar' : 'Audio'}</span>
 						{/if}
 					</div>
-					<div class="text-sm text-slate-700 line-clamp-2 prose prose-sm max-w-none prose-p:m-0 prose-img:m-0 prose-ul:m-0">{@html q.question_text}</div>
+					<div class="text-sm text-slate-700 prose prose-sm max-w-none prose-p:my-1 prose-img:my-2 prose-img:max-h-64 prose-img:object-contain prose-img:rounded-lg prose-img:border prose-img:border-slate-200 prose-img:shadow-xs prose-ul:my-1">
+						{@html q.question_text}
+					</div>
+					{#if q.media_url && q.media_type === 'image'}
+						<div class="my-2">
+							<img src={q.media_url} alt="Media soal {q.question_number}" class="max-h-64 object-contain rounded-lg border border-slate-200 shadow-xs" loading="lazy" />
+						</div>
+					{:else if q.media_url && q.media_type === 'audio'}
+						<div class="my-2">
+							<audio controls src={q.media_url} class="w-full max-w-md"></audio>
+						</div>
+					{/if}
 					{#if q.options_json}
 						{@const opts = JSON.parse(q.options_json)}
 						{@const correct = q.correct_answer_json ? JSON.parse(q.correct_answer_json) : null}
@@ -881,7 +892,7 @@
 							<div class="flex flex-wrap gap-1.5 mt-2">
 								{#each opts as opt, i}
 									{@const isCorrect = (q.type === 'pilihan_ganda' && correct === String.fromCharCode(65 + i)) || (q.type === 'pilihan_ganda_kompleks' && Array.isArray(correct) && correct.includes(String.fromCharCode(65 + i))) || (q.type === 'benar_salah' && correct === opt)}
-									<span class="text-[10px] px-2 py-0.5 rounded-md {isCorrect ? 'bg-green-100 text-green-700 font-bold border border-green-200' : 'bg-slate-100 text-slate-600'} flex items-center gap-1">
+									<span class="text-[10px] px-2 py-0.5 rounded-md {isCorrect ? 'bg-green-100 text-green-700 font-bold border border-green-200' : 'bg-slate-100 text-slate-600'} flex items-center gap-1 [&_img]:max-h-16 [&_img]:inline-block [&_img]:rounded">
 										{q.type.startsWith('pilihan_ganda') ? `${String.fromCharCode(65 + i)}.` : ''} {@html opt}
 									</span>
 								{/each}
