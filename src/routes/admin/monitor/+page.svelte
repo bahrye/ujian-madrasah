@@ -248,7 +248,7 @@
 					interval = setInterval(() => {
 						currentTime = Date.now();
 						pollLiveStatus();
-					}, 10000);
+					}, 20000);
 				}
 			}
 		};
@@ -260,7 +260,7 @@
 				currentTime = Date.now();
 				pollLiveStatus();
 			}
-		}, 10000);
+		}, 20000);
 
 		return () => {
 			document.removeEventListener('visibilitychange', handleVisibilityChange);

@@ -354,16 +354,16 @@
 
 			const now = Date.now();
 
-			// 1. Jika sedang ditahan oleh pengawas, periksa tiap 5 detik agar segera lanjut saat dibuka
+			// 1. Jika sedang ditahan oleh pengawas, periksa tiap 10 detik agar segera lanjut saat dibuka
 			if (isPausedByProctor) {
-				if (now - lastStatusFetchTime >= 5000) {
+				if (now - lastStatusFetchTime >= 10000) {
 					await fetchAttemptStatus();
 				}
 				return;
 			}
 
-			// 2. Jika normal berjalan, cek berkala setiap 15 detik jika belum ada aktivitas sync
-			if (now - lastStatusFetchTime >= 15000) {
+			// 2. Jika normal berjalan, cek berkala setiap 60 detik jika belum ada aktivitas sync (hemat Edge Requests & CPU)
+			if (now - lastStatusFetchTime >= 60000) {
 				await fetchAttemptStatus();
 				return;
 			}

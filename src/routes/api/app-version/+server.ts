@@ -8,5 +8,9 @@ export const GET: RequestHandler = async () => {
 		versionName: '1.0.7',
 		downloadUrl: 'https://github.com/bahrye/ujian-madrasah/releases/latest/download/ExambroMadrasah.apk',
 		changelog: '1. Fitur PIN Master Kustom: Administrator madrasah dapat mengubah PIN Master darurat melalui menu Pengaturan APK di web admin.\n2. Proteksi PIN Default: PIN default 12345 otomatis dinonaktifkan jika madrasah sudah menyetel PIN Master khusus.\n3. Sinkronisasi Instan: PIN Master langsung disinkronkan ke perangkat siswa saat ujian dimulai.\n4. Perbaikan penyematan aplikasi & polling status ujian.'
+	}, {
+		headers: {
+			'Cache-Control': 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400'
+		}
 	});
 };

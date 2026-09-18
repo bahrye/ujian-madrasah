@@ -4,6 +4,14 @@ import { getDB } from '$lib/server/db';
 // Cache timestamp aktivitas terakhir siswa untuk throttling write DB
 const lastActiveMap = new Map<number, number>();
 
+// Cache validasi sesi siswa di RAM untuk menghemat CPU & query DB berulang
+interface SessionCacheEntry {
+	sessionToken: string;
+	isValid: boolean;
+	expiresAt: number;
+}
+const sessionCache = new Map<number, SessionCacheEntry>();
+
 export const handle: Handle = async ({ event, resolve }) => {
 	const token = event.cookies.get(COOKIE_NAME);
 
@@ -12,20 +20,41 @@ export const handle: Handle = async ({ event, resolve }) => {
 		if (user) {
 			if (user.role === 'siswa' && user.session_token) {
 				try {
-					const db = getDB(event.platform);
-					const dbUser = await db.prepare('SELECT is_logged_in, session_token FROM users WHERE id = ?')
-						.bind(user.id)
-						.first<{ is_logged_in: number; session_token: string | null }>();
+					const now = Date.now();
+					const cached = sessionCache.get(user.id);
+					let isValidSession = false;
 
-					if (!dbUser || dbUser.is_logged_in !== 1 || dbUser.session_token !== user.session_token) {
+					if (cached && cached.expiresAt > now && cached.sessionToken === user.session_token) {
+						isValidSession = cached.isValid;
+					} else {
+						const db = getDB(event.platform);
+						const dbUser = await db.prepare('SELECT is_logged_in, session_token FROM users WHERE id = ?')
+							.bind(user.id)
+							.first<{ is_logged_in: number; session_token: string | null }>();
+
+						isValidSession = Boolean(dbUser && dbUser.is_logged_in === 1 && dbUser.session_token === user.session_token);
+						sessionCache.set(user.id, {
+							sessionToken: user.session_token,
+							isValid: isValidSession,
+							expiresAt: now + 15000 // Cache 15 detik di RAM
+						});
+
+						if (sessionCache.size > 2000) {
+							for (const [uid, item] of sessionCache) {
+								if (now > item.expiresAt) sessionCache.delete(uid);
+							}
+						}
+					}
+
+					if (!isValidSession) {
 						// Session invalid or reset by Pengawas
+						sessionCache.delete(user.id);
 						event.cookies.delete(COOKIE_NAME, { path: '/' });
 						event.locals.user = null;
 						return resolve(event);
 					}
 
 					// Update active timestamp in background maksimal 1x per 60 detik per siswa
-					const now = Date.now();
 					const lastActive = lastActiveMap.get(user.id) || 0;
 					if (now - lastActive > 60000) {
 						lastActiveMap.set(user.id, now);
@@ -36,6 +65,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 							}
 						}
 
+						const db = getDB(event.platform);
 						const updatePromise = db.prepare(`UPDATE users SET last_active_at = datetime('now') WHERE id = ?`)
 							.bind(user.id)
 							.run()

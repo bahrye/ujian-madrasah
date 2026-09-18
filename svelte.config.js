@@ -39,7 +39,9 @@ const config = {
 		adapter: isVercel
 			? vercel({
 					runtime: 'nodejs20.x',
-					regions: ['sin1']
+					regions: ['sin1'],
+					split: false,
+					maxDuration: 15
 			  })
 			: cloudflare({
 					routes: {
