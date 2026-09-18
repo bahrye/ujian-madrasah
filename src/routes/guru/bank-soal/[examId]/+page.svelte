@@ -14,9 +14,23 @@
 	import { arabicRender } from '$lib/actions/arabicRender';
 	import { env } from '$env/dynamic/public';
 	import RichTextEditor from '$lib/components/RichTextEditor.svelte';
+	import ImageZoomModal from '$lib/components/exam/ImageZoomModal.svelte';
+	import { normalizeQuestionHtml } from '$lib/utils/wordParser';
 
 	export let data: PageData;
 	export let form: ActionData;
+
+	let zoomImageSrc: string | null = null;
+	let zoomImageAlt: string = 'Pratinjau Gambar';
+
+	function handleCardImageClick(e: MouseEvent) {
+		const target = e.target as HTMLElement;
+		if (target && target.tagName === 'IMG') {
+			e.stopPropagation();
+			zoomImageSrc = (target as HTMLImageElement).src;
+			zoomImageAlt = (target as HTMLImageElement).alt || 'Pratinjau Gambar';
+		}
+	}
 
 	let showCreateForm = false;
 	let showImportModal = false;
@@ -386,7 +400,7 @@
 
 			const url = await uploadPastedImage(file);
 			if (url) {
-				const imgHtml = `<img src="${url}" class="max-h-64 object-contain rounded-lg border border-slate-200 mt-2 mb-2">&nbsp;`;
+				const imgHtml = `<img src="${url}" class="inline-block align-middle max-h-48 object-contain my-0.5 mx-1" style="vertical-align: middle;">&nbsp;`;
 				if (targetComponent) {
 					targetComponent.insertHtml(imgHtml);
 				}
@@ -405,7 +419,7 @@
 					
 					const url = await uploadPastedImage(file);
 					if (url) {
-						const imgHtml = `<img src="${url}" class="max-h-64 object-contain rounded-lg border border-slate-200 mt-2 mb-2">&nbsp;`;
+						const imgHtml = `<img src="${url}" class="inline-block align-middle max-h-48 object-contain my-0.5 mx-1" style="vertical-align: middle;">&nbsp;`;
 						if (targetComponent) {
 							targetComponent.insertHtml(imgHtml);
 						}
@@ -438,7 +452,7 @@
 		if (!activeMediaTarget) return;
 
 		const htmlToInsert = mediaType === 'image' 
-			? `<img src="${url}" class="max-h-64 object-contain rounded-lg border border-slate-200 mt-2 mb-2">&nbsp;`
+			? `<img src="${url}" class="inline-block align-middle max-h-48 object-contain my-0.5 mx-1" style="vertical-align: middle;">&nbsp;`
 			: `<audio controls src="${url}" class="w-full mt-2 mb-2"></audio>&nbsp;`;
 
 		if (activeMediaTarget.type === 'editor' && activeMediaTarget.target) {
@@ -861,12 +875,19 @@
 							<span class="badge-info text-[10px]">📎 {q.media_type === 'image' ? 'Gambar' : 'Audio'}</span>
 						{/if}
 					</div>
-					<div class="text-sm text-slate-700 prose prose-sm max-w-none prose-p:my-1 prose-img:my-2 prose-img:max-h-64 prose-img:object-contain prose-img:rounded-lg prose-img:border prose-img:border-slate-200 prose-img:shadow-xs prose-ul:my-1">
-						{@html q.question_text}
+					<!-- svelte-ignore a11y-click-events-have-key-events -->
+					<!-- svelte-ignore a11y-no-static-element-interactions -->
+					<div 
+						class="text-sm text-slate-700 prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 [&_img]:cursor-zoom-in [&_img:not([style*='display: block'])]:inline-block [&_img:not([style*='display: block'])]:align-middle [&_img:not([style*='display: block'])]:max-h-48 [&_img[style*='display: block']]:block [&_img[style*='display: block']]:mx-auto"
+						on:click={handleCardImageClick}
+					>
+						{@html normalizeQuestionHtml(q.question_text)}
 					</div>
 					{#if q.media_url && q.media_type === 'image'}
-						<div class="my-2">
-							<img src={q.media_url} alt="Media soal {q.question_number}" class="max-h-64 object-contain rounded-lg border border-slate-200 shadow-xs" loading="lazy" />
+						<!-- svelte-ignore a11y-click-events-have-key-events -->
+						<!-- svelte-ignore a11y-no-static-element-interactions -->
+						<div class="my-2" on:click={handleCardImageClick}>
+							<img src={q.media_url} alt="Media soal {q.question_number}" class="max-h-64 object-contain rounded-lg border border-slate-200 shadow-xs cursor-zoom-in hover:opacity-90 transition-opacity" loading="lazy" />
 						</div>
 					{:else if q.media_url && q.media_type === 'audio'}
 						<div class="my-2">
@@ -877,11 +898,13 @@
 						{@const opts = JSON.parse(q.options_json)}
 						{@const correct = q.correct_answer_json ? JSON.parse(q.correct_answer_json) : null}
 						{#if Array.isArray(opts)}
-							<div class="flex flex-wrap gap-1.5 mt-2">
+							<!-- svelte-ignore a11y-click-events-have-key-events -->
+							<!-- svelte-ignore a11y-no-static-element-interactions -->
+							<div class="flex flex-wrap gap-1.5 mt-2" on:click={handleCardImageClick}>
 								{#each opts as opt, i}
 									{@const isCorrect = (q.type === 'pilihan_ganda' && correct === String.fromCharCode(65 + i)) || (q.type === 'pilihan_ganda_kompleks' && Array.isArray(correct) && correct.includes(String.fromCharCode(65 + i))) || (q.type === 'benar_salah' && correct === opt)}
-									<span class="text-[10px] px-2 py-0.5 rounded-md {isCorrect ? 'bg-green-100 text-green-700 font-bold border border-green-200' : 'bg-slate-100 text-slate-600'} flex items-center gap-1 [&_img]:max-h-16 [&_img]:inline-block [&_img]:rounded">
-										{q.type.startsWith('pilihan_ganda') ? `${String.fromCharCode(65 + i)}.` : ''} {@html opt}
+									<span class="text-[10px] px-2 py-0.5 rounded-md {isCorrect ? 'bg-green-100 text-green-700 font-bold border border-green-200' : 'bg-slate-100 text-slate-600'} flex items-center gap-1 [&_img]:max-h-16 [&_img]:inline-block [&_img]:align-middle [&_img]:cursor-zoom-in">
+										{q.type.startsWith('pilihan_ganda') ? `${String.fromCharCode(65 + i)}.` : ''} {@html normalizeQuestionHtml(opt)}
 									</span>
 								{/each}
 							</div>
@@ -948,12 +971,12 @@
 					<div class="flex flex-col gap-2">
 						<button type="button" class="p-2 rounded-xl text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-700 transition-colors" title="Edit soal" on:click={() => {
 							editingQuestion = { ...q };
-							editQuestionText = q.question_text || '';
+							editQuestionText = normalizeQuestionHtml(q.question_text || '');
 							// Migrate old media to rich text
 							if (editingQuestion.media_url && editingQuestion.media_type !== 'none') {
 								const mediaHtml = editingQuestion.media_type === 'audio' 
 									? `<br><audio controls src="${editingQuestion.media_url}" class="w-full mt-2 mb-2"></audio>`
-									: `<br><img src="${editingQuestion.media_url}" class="max-h-64 object-contain rounded-lg border border-slate-200 mt-2 mb-2">`;
+									: `<br><img src="${editingQuestion.media_url}" class="inline-block align-middle max-h-48 object-contain my-0.5 mx-1" style="vertical-align: middle;">`;
 								editQuestionText += mediaHtml;
 								editingQuestion.media_url = null;
 								editingQuestion.media_type = 'none';
@@ -1381,3 +1404,11 @@
 		</div>
 	</div>
 {/if}
+
+<!-- Fullscreen Image Lightbox with Zoom Bar for Question Cards -->
+<ImageZoomModal
+	src={zoomImageSrc}
+	isOpen={!!zoomImageSrc}
+	alt={zoomImageAlt}
+	on:close={() => (zoomImageSrc = null)}
+/>

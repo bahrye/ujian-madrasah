@@ -395,7 +395,8 @@
 					return {
 						src: `data:${mimeType};base64,${imageBuffer}`,
 						'data-img-id': imgId,
-						class: 'max-h-56 object-contain rounded-lg border border-slate-200 my-2 shadow-xs block',
+						class: 'inline-block align-middle max-h-48 object-contain my-0.5 mx-1',
+						style: 'vertical-align: middle;',
 						alt: 'Gambar Soal'
 					};
 				})

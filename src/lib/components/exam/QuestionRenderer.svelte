@@ -6,6 +6,7 @@
 	import { mathRender } from '$lib/actions/mathRender';
 	import { arabicRender } from '$lib/actions/arabicRender';
 	import { pinchZoom } from '$lib/actions/pinchZoom';
+	import { normalizeQuestionHtml } from '$lib/utils/wordParser';
 
 	export let question: {
 		id: number;
@@ -58,11 +59,14 @@
 
 	function getOptionHtml(opt: any): string {
 		if (opt == null) return '';
+		let str = '';
 		if (typeof opt === 'object') {
-			const str = opt.html || opt.text || opt.label || opt.content || '';
-			return String(str).replace(/^(<br\s*\/?>\s*)+/i, '');
+			str = opt.html || opt.text || opt.label || opt.content || '';
+		} else {
+			str = String(opt);
 		}
-		return String(opt).replace(/^(<br\s*\/?>\s*)+/i, '');
+		const cleaned = str.replace(/^(<br\s*\/?>\s*)+/i, '');
+		return normalizeQuestionHtml(cleaned);
 	}
 
 	// Untuk menjodohkan, answer disimpan sebagai JSON string mapping
@@ -463,7 +467,7 @@
 
 	<!-- Question Text -->
 	<div class="text-base text-slate-800 leading-relaxed font-medium prose prose-sm max-w-none" use:mathRender={question.question_text} use:arabicRender={question.question_text}>
-		{@html question.question_text}
+		{@html normalizeQuestionHtml(question.question_text)}
 	</div>
 
 	<!-- Answer Area -->
@@ -834,8 +838,17 @@
 	}
 	:global(.prose img) {
 		cursor: zoom-in !important;
-		border-radius: 0.5rem;
+		border-radius: 0.375rem;
 		transition: transform 0.15s ease, box-shadow 0.15s ease;
+	}
+	:global(.prose img:not([style*='display: block'])) {
+		display: inline-block !important;
+		vertical-align: middle !important;
+		margin: 2px 4px !important;
+	}
+	:global(.prose img[style*='display: block']) {
+		display: block !important;
+		margin: 12px auto !important;
 	}
 	:global(.prose img:hover) {
 		box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);

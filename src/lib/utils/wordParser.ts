@@ -288,12 +288,80 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 				type = 'isian_singkat';
 			}
 		}
-		
+
 		return {
-			question_text: cleanEq(q.questionHtml.join('')),
-			options: q.options.map(opt => cleanEq(opt.html)),
+			question_text: normalizeQuestionHtml(cleanEq(q.questionHtml.join(''))),
+			options: q.options.map(opt => normalizeQuestionHtml(cleanEq(opt.html))),
 			correct_answer: finalAnswer,
 			type: type
 		};
 	});
+}
+
+export function normalizeQuestionHtml(html: string): string {
+	if (!html || typeof html !== 'string') return html || '';
+
+	let res = html;
+
+	// 1. Normalize image elements: remove forced 'block' class and strip heavy borders from legacy imports
+	res = res.replace(/<img\b([^>]*)>/gi, (match, attrs) => {
+		let newAttrs = attrs;
+		const hasExplicitDisplay = /style\s*=\s*"[^"]*display\s*:[^"]*"/i.test(newAttrs);
+
+		if (/class\s*=\s*"([^"]*)"/i.test(newAttrs)) {
+			newAttrs = newAttrs.replace(/class\s*=\s*"([^"]*)"/i, (_: string, cls: string) => {
+				let classes = cls.split(/\s+/).filter(Boolean);
+				// If not explicitly set with another display, remove 'block'
+				if (!hasExplicitDisplay) {
+					classes = classes.filter(c => c !== 'block');
+					if (!classes.includes('inline-block') && !classes.includes('flex')) {
+						classes.push('inline-block');
+					}
+					if (!classes.includes('align-middle')) {
+						classes.push('align-middle');
+					}
+				}
+				// Clean up margin
+				classes = classes.map(c => (c === 'my-2' ? 'my-0.5' : c));
+				if (!classes.includes('mx-0.5') && !classes.includes('mx-1')) {
+					classes.push('mx-0.5');
+				}
+				// If it was the legacy word import class, strip the border and shadow so math formulas look clean
+				if (classes.includes('border-slate-200') && classes.includes('shadow-xs')) {
+					classes = classes.filter(c => !['border', 'border-slate-200', 'shadow-xs', 'rounded-lg'].includes(c));
+				}
+				return `class="${classes.join(' ')}"`;
+			});
+		} else {
+			newAttrs += ' class="inline-block align-middle max-w-full my-0.5 mx-0.5 object-contain"';
+		}
+
+		// Ensure vertical-align if no style attribute exists
+		if (!/style\s*=/i.test(newAttrs) && !hasExplicitDisplay) {
+			newAttrs += ' style="vertical-align: middle;"';
+		}
+
+		return `<img${newAttrs}>`;
+	});
+
+	// 2. Merge paragraphs broken around inline images into a single paragraph
+	// e.g. <p>Text</p><p><img ...></p><p>Text</p>
+	res = res.replace(/<\/p>\s*<p[^>]*>\s*(<img[^>]*>)\s*<\/p>\s*<p[^>]*>/gi, ' $1 ');
+
+	// e.g. <p>Text</p><p><img ...>
+	res = res.replace(/<\/p>\s*<p[^>]*>\s*(<img[^>]*>)/gi, ' $1');
+
+	// e.g. <img ...></p><p>Text (if following text starts with lowercase, continuation punctuation, or symbol)
+	res = res.replace(/(<img[^>]*>)\s*<\/p>\s*<p[^>]*>(?=\s*[a-z0-9,\.\+\-\*\/=><\(\[\{])/gi, '$1 ');
+
+	// Merge any leftover <img ...></p><p> where image was meant to be inline
+	res = res.replace(/(<img[^>]*>)\s*<\/p>\s*<p[^>]*>/gi, '$1 ');
+
+	// Merge continuation paragraphs that start with lowercase (e.g. broken math sentences)
+	res = res.replace(/<\/p>\s*<p[^>]*>(?=\s*[a-z,\.\+\-\*\/=><])/g, ' ');
+
+	// Clean up any empty paragraphs
+	res = res.replace(/<p[^>]*>\s*<\/p>/gi, '');
+
+	return res;
 }
