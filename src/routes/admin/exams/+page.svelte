@@ -37,8 +37,8 @@
 		try {
 			const resp = await fetch(`/api/exam-type-classes?exam_type_id=${examTypeId}`);
 			if (resp.ok) {
-				const json = await resp.json();
-				classesLoaded = json.classes || [];
+				const json = (await resp.json()) as any;
+				classesLoaded = json?.classes || [];
 			}
 		} catch {}
 		classesLoading = false;
@@ -54,8 +54,8 @@
 		try {
 			const resp = await fetch(`/api/exam-type-proctors?exam_type_id=${examTypeId}`);
 			if (resp.ok) {
-				const json = await resp.json();
-				proctorsLoaded = json.proctors || [];
+				const json = (await resp.json()) as any;
+				proctorsLoaded = json?.proctors || [];
 			}
 		} catch {}
 		proctorsLoading = false;

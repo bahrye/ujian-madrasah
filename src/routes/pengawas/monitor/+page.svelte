@@ -49,8 +49,8 @@
 			});
 			const res = await fetch(`/api/proctor/monitoring-photos?${query.toString()}`);
 			if (res.ok) {
-				const json = await res.json();
-				selectedStudentPhotos = json.photos || [];
+				const json = (await res.json()) as any;
+				selectedStudentPhotos = json?.photos || [];
 			} else {
 				toasts.error('Gagal memuat foto pengawasan.');
 			}

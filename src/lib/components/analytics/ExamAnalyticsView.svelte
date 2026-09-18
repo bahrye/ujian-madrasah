@@ -85,8 +85,8 @@
 		try {
 			const res = await fetch(`/api/export-analytics/${selectedExamId}?kkm=${kkm}`);
 			if (!res.ok) {
-				const err = await res.json();
-				throw new Error(err.error || 'Gagal mengekspor laporan');
+				const err = (await res.json()) as any;
+				throw new Error(err?.error || 'Gagal mengekspor laporan');
 			}
 			const blob = await res.blob();
 			const downloadUrl = window.URL.createObjectURL(blob);

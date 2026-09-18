@@ -140,17 +140,26 @@ export const actions: Actions = {
 
 			const isNowFullyGraded = (remainingUngraded?.c || 0) === 0 ? 1 : 0;
 
-			// Recalculate total score for the attempt
-			const totalResult = await db.prepare(`
-				SELECT SUM(COALESCE(sa.score_given, 0)) as total_score, SUM(q.points) as total_points
-				FROM student_answers sa JOIN questions q ON sa.question_id = q.id
-				WHERE sa.attempt_id = ?
-			`).bind(answerAuthCheck.attempt_id).first<{ total_score: number; total_points: number }>();
+			// Recalculate total score for the attempt based on total exam points
+			const totalScoreRes = await db.prepare(`
+				SELECT SUM(COALESCE(score_given, 0)) as total_score
+				FROM student_answers
+				WHERE attempt_id = ?
+			`).bind(answerAuthCheck.attempt_id).first<{ total_score: number }>();
 
-			if (totalResult && totalResult.total_points > 0) {
-				const score = (totalResult.total_score / totalResult.total_points) * 100;
-				await db.prepare('UPDATE student_attempts SET score = ?, is_graded = ? WHERE id = ?')
-					.bind(Math.round(score * 10) / 10, isNowFullyGraded, answerAuthCheck.attempt_id).run();
+			const examPointsRes = await db.prepare(`
+				SELECT SUM(points) as total_points
+				FROM questions
+				WHERE exam_id = (SELECT exam_id FROM student_attempts WHERE id = ?)
+			`).bind(answerAuthCheck.attempt_id).first<{ total_points: number }>();
+
+			const totalScore = totalScoreRes?.total_score || 0;
+			const totalPoints = examPointsRes?.total_points || 0;
+
+			if (totalPoints > 0) {
+				const score = (totalScore / totalPoints) * 100;
+				await db.prepare('UPDATE student_attempts SET score = ?, is_graded = ?, total_points = ? WHERE id = ?')
+					.bind(Math.round(score * 10) / 10, isNowFullyGraded, totalPoints, answerAuthCheck.attempt_id).run();
 			}
 
 			// If exam is already released and this attempt is now fully graded, release attempt score
@@ -222,23 +231,29 @@ export const actions: Actions = {
 			`).bind(...attemptIds).run();
 
 			// 2. Recalculate score for each attempt and set is_graded = 1
+			const examPointsRes = await db.prepare(`
+				SELECT SUM(points) as total_points FROM questions WHERE exam_id = ?
+			`).bind(parsedExamId).first<{ total_points: number }>();
+			const examTotalPoints = examPointsRes?.total_points || 0;
+
 			for (const attemptId of attemptIds) {
-				const totalResult = await db.prepare(`
-					SELECT SUM(COALESCE(sa.score_given, 0)) as total_score, SUM(q.points) as total_points
-					FROM student_answers sa JOIN questions q ON sa.question_id = q.id
-					WHERE sa.attempt_id = ?
-				`).bind(attemptId).first<{ total_score: number; total_points: number }>();
+				const totalScoreRes = await db.prepare(`
+					SELECT SUM(COALESCE(score_given, 0)) as total_score
+					FROM student_answers
+					WHERE attempt_id = ?
+				`).bind(attemptId).first<{ total_score: number }>();
 
 				let score = 0;
-				if (totalResult && totalResult.total_points > 0) {
-					score = (totalResult.total_score / totalResult.total_points) * 100;
+				const totalScore = totalScoreRes?.total_score || 0;
+				if (examTotalPoints > 0) {
+					score = (totalScore / examTotalPoints) * 100;
 				}
 
 				await db.prepare(`
 					UPDATE student_attempts 
-					SET score = ?, is_graded = 1 
+					SET score = ?, is_graded = 1, total_points = ? 
 					WHERE id = ?
-				`).bind(Math.round(score * 10) / 10, attemptId).run();
+				`).bind(Math.round(score * 10) / 10, examTotalPoints, attemptId).run();
 			}
 
 			// If exam is already released, release newly finalized attempts

@@ -18,8 +18,8 @@
 		try {
 			const res = await fetch('/api/profile/qr-token');
 			if (res.ok) {
-				const data = await res.json();
-				fetchedQrToken = data.qr_token || '';
+				const data = (await res.json()) as any;
+				fetchedQrToken = data?.qr_token || '';
 			}
 		} catch (e) {
 			console.warn('Failed to load secure QR token:', e);

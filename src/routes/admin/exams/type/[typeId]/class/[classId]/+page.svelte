@@ -164,7 +164,7 @@
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
 						</svg>
-						Nilai: {({ after_type_end_time: 'Jadwal Tipe Ujian', after_submit: 'Langsung Tampil', after_end_time: 'Jadwal Ujian', objective_only: 'Hanya Nilai Otomatis', manual: 'Manual (Guru/Admin)' })[exam.show_score_type || 'after_submit'] || 'Langsung Tampil'}
+						Nilai: {({ after_type_end_time: 'Jadwal Tipe Ujian', after_submit: 'Langsung Tampil', after_end_time: 'Jadwal Ujian', objective_only: 'Hanya Nilai Otomatis', manual: 'Manual (Guru/Admin)' } as Record<string, string>)[exam.show_score_type || 'after_submit'] || 'Langsung Tampil'}
 					</span>
 					
 					{#if exam.proctors}
@@ -444,7 +444,7 @@
 					</label>
 					<div class="grid grid-cols-2 gap-3 pl-6 border-l-2 border-indigo-100 mt-3" class:hidden={!useSessionsEdit}>
 						{#each [1, 2, 3, 4] as sessionNum}
-							{@const session = editingExam.sessions?.find(s => s.session_number === sessionNum) || {}}
+							{@const session = editingExam.sessions?.find((s: any) => s.session_number === sessionNum) || {}}
 							<div class="col-span-2 bg-white p-3 rounded border border-slate-100 grid grid-cols-2 gap-3 shadow-sm">
 								<div class="col-span-2 text-sm font-medium text-slate-700">Sesi {sessionNum}</div>
 								<div>

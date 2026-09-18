@@ -20,3 +20,4 @@ Thumbs.db
 scratch/
 tmp.txt
 output.txt
+.gradle/

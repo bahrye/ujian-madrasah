@@ -257,7 +257,7 @@
 
 		const lines: typeof connectionLines = [];
 
-		matchingLeft.forEach((_, leftI) => {
+		matchingLeft.forEach((_: any, leftI: number) => {
 			const rightI = getMatchForLeft(leftI);
 			if (rightI === null) return;
 
@@ -634,7 +634,6 @@
 				on:blur={(e) => handleTextBlur(e.currentTarget.value)}
 				rows="8"
 				autocomplete="off"
-				autocorrect="off"
 				autocapitalize="off"
 				spellcheck="false"
 			></textarea>

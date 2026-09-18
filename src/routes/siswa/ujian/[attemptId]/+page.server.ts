@@ -29,8 +29,7 @@ export const load: PageServerLoad = async ({ platform, locals, params, cookies }
 			       t.released_at as token_released_at, 
 			       t.expires_at as token_expires_at,
 			       e.exit_pin as exam_exit_pin,
-			       e.is_active as exam_active,
-			       sc.master_exit_pin
+			       e.is_active as exam_active
 			FROM student_attempts sa
 			JOIN exams e ON sa.exam_id = e.id
 			LEFT JOIN tokens t ON sa.token_id = t.id
@@ -285,61 +284,78 @@ export const actions: Actions = {
 			}
 
 			// Auto-grade soal objektif
-			const answers = await db.prepare(`
+			// Ambil semua soal ujian untuk totalPoints yang akurat
+			const questionsRes = await db.prepare('SELECT id, type, points, correct_answer_json FROM questions WHERE exam_id = ?')
+				.bind(attempt.exam_id).all<any>();
+			const allQuestions = (questionsRes.results || []) as any[];
+
+			let totalPoints = 0;
+			for (const q of allQuestions) {
+				totalPoints += q.points || 1;
+			}
+
+			// Ambil jawaban siswa yang tersimpan
+			const answersRes = await db.prepare(`
 				SELECT sa.*, q.type, q.correct_answer_json, q.points
 				FROM student_answers sa
 				JOIN questions q ON sa.question_id = q.id
 				WHERE sa.attempt_id = ?
 			`).bind(parsedAttemptId).all();
 
+			const answersList = (answersRes.results || []) as any[];
+			const answersMap = new Map<number, any>();
+			for (const ans of answersList) {
+				answersMap.set(ans.question_id, ans);
+			}
+
 			let totalScore = 0;
-			let totalPoints = 0;
-
 			const updateStmts: any[] = [];
+			let hasUnfinishedGrading = false;
 
-			for (const ans of answers.results as any[]) {
-				totalPoints += ans.points;
+			for (const q of allQuestions) {
+				const qPoints = q.points || 1;
+				const ans = answersMap.get(q.id);
 
-				if (ans.type === 'essay') {
-					// Essay dinilai manual oleh guru
+				if (q.type === 'essay') {
+					hasUnfinishedGrading = true;
 					continue;
 				}
 
-				if (ans.type === 'isian_singkat') {
-					// Jika siswa tidak menjawab (kosong), beri nilai 0
-					if (!ans.answer_given || !String(ans.answer_given).trim()) {
-						updateStmts.push(
-							db.prepare('UPDATE student_answers SET score_given = 0, is_correct = 0 WHERE id = ?').bind(ans.id)
-						);
+				if (q.type === 'isian_singkat') {
+					if (!ans || !ans.answer_given || !String(ans.answer_given).trim()) {
+						if (ans) {
+							updateStmts.push(
+								db.prepare('UPDATE student_answers SET score_given = 0, is_correct = 0 WHERE id = ?').bind(ans.id)
+							);
+						}
 						continue;
 					}
 
-					// Cek kecocokan otomatis (case-insensitive, toleran spasi dan tanda baca)
-					const isMatched = matchShortAnswer(ans.answer_given, ans.correct_answer_json);
+					const isMatched = matchShortAnswer(ans.answer_given, q.correct_answer_json);
 					if (isMatched) {
-						// Jawaban sama / cocok -> Otomatis Benar!
-						const scoreGiven = ans.points;
-						totalScore += scoreGiven;
+						totalScore += qPoints;
 						updateStmts.push(
 							db.prepare('UPDATE student_answers SET score_given = ?, is_correct = 1 WHERE id = ?')
-								.bind(scoreGiven, ans.id)
+								.bind(qPoints, ans.id)
 						);
 					} else {
-						// Jawaban berbeda / bervariasi -> Dibiarkan NULL agar dinilai manual oleh guru
+						hasUnfinishedGrading = true;
 					}
 					continue;
 				}
 
-				if (!ans.correct_answer_json || !ans.answer_given) {
-					updateStmts.push(
-						db.prepare('UPDATE student_answers SET score_given = 0, is_correct = 0 WHERE id = ?').bind(ans.id)
-					);
+				if (!ans || !ans.answer_given || !q.correct_answer_json) {
+					if (ans) {
+						updateStmts.push(
+							db.prepare('UPDATE student_answers SET score_given = 0, is_correct = 0 WHERE id = ?').bind(ans.id)
+						);
+					}
 					continue;
 				}
 
 				let correctAnswer: any;
 				try {
-					correctAnswer = JSON.parse(ans.correct_answer_json);
+					correctAnswer = JSON.parse(q.correct_answer_json);
 				} catch {
 					continue;
 				}
@@ -347,9 +363,9 @@ export const actions: Actions = {
 				let isCorrect = false;
 				let partialScore: number | null = null;
 
-				if (ans.type === 'pilihan_ganda') {
+				if (q.type === 'pilihan_ganda') {
 					isCorrect = String(ans.answer_given).trim() === String(correctAnswer).trim();
-				} else if (ans.type === 'benar_salah') {
+				} else if (q.type === 'benar_salah') {
 					if (typeof correctAnswer === 'object' && correctAnswer !== null && !Array.isArray(correctAnswer)) {
 						try {
 							const givenMap = typeof ans.answer_given === 'string' ? JSON.parse(ans.answer_given) : ans.answer_given;
@@ -363,7 +379,7 @@ export const actions: Actions = {
 									}
 								}
 								isCorrect = correctCount === totalStatements;
-								partialScore = Math.round((correctCount / totalStatements) * ans.points * 100) / 100;
+								partialScore = Math.round((correctCount / totalStatements) * qPoints * 100) / 100;
 							}
 						} catch {
 							isCorrect = false;
@@ -371,7 +387,7 @@ export const actions: Actions = {
 					} else {
 						isCorrect = String(ans.answer_given).trim().toLowerCase() === String(correctAnswer).trim().toLowerCase();
 					}
-				} else if (ans.type === 'pilihan_ganda_kompleks') {
+				} else if (q.type === 'pilihan_ganda_kompleks') {
 					try {
 						const givenRaw = typeof ans.answer_given === 'string' ? JSON.parse(ans.answer_given) : ans.answer_given;
 						const correctRaw = Array.isArray(correctAnswer) ? correctAnswer : (typeof correctAnswer === 'string' ? JSON.parse(correctAnswer) : []);
@@ -394,12 +410,12 @@ export const actions: Actions = {
 							if (rawScore < 0) rawScore = 0;
 
 							isCorrect = correctPicks === correctAnswers.length && wrongPicks === 0;
-							partialScore = Math.round(rawScore * ans.points * 100) / 100;
+							partialScore = Math.round(rawScore * qPoints * 100) / 100;
 						}
 					} catch {
 						isCorrect = false;
 					}
-				} else if (ans.type === 'menjodohkan') {
+				} else if (q.type === 'menjodohkan') {
 					try {
 						const givenMap = typeof ans.answer_given === 'string' ? JSON.parse(ans.answer_given) : ans.answer_given;
 						const correctMap = typeof correctAnswer === 'string' ? JSON.parse(correctAnswer) : correctAnswer;
@@ -415,7 +431,7 @@ export const actions: Actions = {
 									}
 								}
 								isCorrect = correctCount === totalPairs;
-								partialScore = Math.round((correctCount / totalPairs) * ans.points * 100) / 100;
+								partialScore = Math.round((correctCount / totalPairs) * qPoints * 100) / 100;
 							}
 						}
 					} catch {
@@ -423,7 +439,7 @@ export const actions: Actions = {
 					}
 				}
 
-				const scoreGiven = partialScore !== null ? partialScore : (isCorrect ? ans.points : 0);
+				const scoreGiven = partialScore !== null ? partialScore : (isCorrect ? qPoints : 0);
 				totalScore += scoreGiven;
 
 				updateStmts.push(
@@ -432,22 +448,8 @@ export const actions: Actions = {
 				);
 			}
 
-			// Hitung skor persentase
+			// Hitung skor persentase (skala 100)
 			const finalScore = totalPoints > 0 ? Math.round((totalScore / totalPoints) * 1000) / 10 : 0;
-			
-			// Cek apakah masih ada soal yang memerlukan penilaian manual guru:
-			// 1. Soal essay
-			// 2. Soal isian_singkat yang tidak cocok otomatis dengan kunci (jawaban berbeda)
-			const hasUnfinishedGrading = (answers.results as any[]).some((ans: any) => {
-				if (ans.type === 'essay') {
-					return true;
-				}
-				if (ans.type === 'isian_singkat') {
-					if (!ans.answer_given || !String(ans.answer_given).trim()) return false;
-					return !matchShortAnswer(ans.answer_given, ans.correct_answer_json);
-				}
-				return false;
-			});
 			const isGraded = hasUnfinishedGrading ? 0 : 1;
 
 			// Simpan status selesai ke student_attempts

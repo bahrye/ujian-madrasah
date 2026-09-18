@@ -77,8 +77,8 @@
 			throw new Error('Gagal mengunggah gambar ke server.');
 		}
 
-		const data = await response.json();
-		return data.secure_url;
+		const data = (await response.json()) as any;
+		return data?.secure_url;
 	}
 
 	async function processHtmlForImages(html: string): Promise<string> {
@@ -157,8 +157,8 @@
 			// Konfigurasi Mammoth.js untuk mengonversi dokumen Word ke HTML
 			// Gambar di-render sebagai Base64 untuk preview, upload ditunda ke fase Import
 			const options = {
-				convertImage: mammoth.images.imgElement(function(image) {
-					return image.read("base64").then(function(imageBuffer) {
+				convertImage: (mammoth as any).images.imgElement(function(image: any) {
+					return image.read("base64").then(function(imageBuffer: any) {
 						return {
 							src: `data:${image.contentType};base64,${imageBuffer}`
 						};

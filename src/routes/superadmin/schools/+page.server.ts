@@ -19,7 +19,8 @@ export const load: PageServerLoad = async ({ platform }) => {
 };
 
 export const actions: Actions = {
-	add: async ({ request, platform }) => {
+	add: async ({ request, platform, locals }) => {
+		if (!locals.user || locals.user.role !== 'superadmin') return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const data = await request.formData();
 		const name = data.get('name')?.toString().trim();
@@ -40,7 +41,8 @@ export const actions: Actions = {
 			return fail(500, { error: e.message || 'Gagal menambahkan sekolah', name, address });
 		}
 	},
-	toggleStatus: async ({ request, platform }) => {
+	toggleStatus: async ({ request, platform, locals }) => {
+		if (!locals.user || locals.user.role !== 'superadmin') return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const data = await request.formData();
 		const idStr = data.get('id')?.toString();
@@ -62,7 +64,8 @@ export const actions: Actions = {
 			return fail(500, { error: e.message || 'Gagal merubah status sekolah' });
 		}
 	},
-	edit: async ({ request, platform }) => {
+	edit: async ({ request, platform, locals }) => {
+		if (!locals.user || locals.user.role !== 'superadmin') return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const data = await request.formData();
 		const idStr = data.get('id')?.toString();
@@ -85,7 +88,8 @@ export const actions: Actions = {
 			return fail(500, { error: e.message || 'Gagal mengupdate sekolah', name, address });
 		}
 	},
-	delete: async ({ request, platform }) => {
+	delete: async ({ request, platform, locals }) => {
+		if (!locals.user || locals.user.role !== 'superadmin') return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const data = await request.formData();
 		const idStr = data.get('id')?.toString();

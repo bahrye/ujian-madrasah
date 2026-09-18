@@ -117,8 +117,8 @@
 			});
 
 			if (!res.ok) throw new Error('Upload ke Cloudinary gagal');
-			const result = await res.json();
-			const secureUrl = result.secure_url;
+			const result = (await res.json()) as any;
+			const secureUrl = result?.secure_url;
 
 			// Update to database
 			const dbFd = new FormData();
@@ -395,7 +395,7 @@
 					</tr>
 				</thead>
 				<tbody class="divide-y divide-slate-100 text-slate-700">
-					{#each data.users as user (user.id)}
+					{#each (data.users as any[]) as user (user.id)}
 						<tr class="hover:bg-slate-50/80 transition-colors {selectedIds.includes(user.id) ? 'bg-indigo-50/40' : ''}">
 							<td class="p-4 text-center whitespace-nowrap">
 								<input
@@ -546,12 +546,12 @@
 
 <ImportStudentsModal 
 	bind:show={showImportModal} 
-	classes={data.classes}
+	classes={data.classes as any}
 />
 
 <LoginCardModal
 	bind:show={showLoginCardModal}
-	classes={data.classes}
+	classes={data.classes as any}
 	students={data.users as any[]}
 	schoolName={data.schoolName}
 	schoolLogo={data.schoolLogo}

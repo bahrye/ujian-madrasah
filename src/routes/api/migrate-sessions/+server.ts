@@ -2,7 +2,10 @@ import { json } from '@sveltejs/kit';
 import { getDB, dbRun } from '$lib/server/db';
 import type { RequestHandler } from './$types';
 
-export const GET: RequestHandler = async ({ platform }) => {
+export const GET: RequestHandler = async ({ platform, locals }) => {
+    if (!locals.user || locals.user.role !== 'superadmin') {
+        return json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
     const db = getDB(platform);
     try {
         

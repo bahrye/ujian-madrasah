@@ -314,6 +314,7 @@ export const actions: Actions = {
 	},
 
 	addTypeProctor: async ({ request, platform, locals }) => {
+		if (!locals.user || !['admin', 'panitia', 'superadmin'].includes(locals.user.role)) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const form = await request.formData();
 		const examTypeIdStr = form.get('exam_type_id')?.toString();
@@ -324,6 +325,11 @@ export const actions: Actions = {
 		const proctorId = parseInt(proctorIdStr || '', 10);
 
 		if (isNaN(examTypeId) || isNaN(proctorId)) return fail(400, { error: 'Data petugas tidak valid.' });
+
+		if (locals.user.role !== 'superadmin' && locals.user.school_id) {
+			const et = await db.prepare('SELECT id FROM exam_types WHERE id = ? AND school_id = ?').bind(examTypeId, locals.user.school_id).first();
+			if (!et) return fail(404, { error: 'Tipe ujian tidak ditemukan.' });
+		}
 
 		try {
 			await db.prepare(`
@@ -344,12 +350,19 @@ export const actions: Actions = {
 	},
 
 	removeTypeProctor: async ({ request, platform, locals }) => {
+		if (!locals.user || !['admin', 'panitia', 'superadmin'].includes(locals.user.role)) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const form = await request.formData();
 		const idStr = form.get('id')?.toString();
 		const id = parseInt(idStr || '', 10);
 
 		if (isNaN(id)) return fail(400, { error: 'ID tidak valid.' });
+
+		if (locals.user.role !== 'superadmin' && locals.user.school_id) {
+			const check = await db.prepare('SELECT etp.id FROM exam_type_proctors etp JOIN exam_types et ON etp.exam_type_id = et.id WHERE etp.id = ? AND et.school_id = ?')
+				.bind(id, locals.user.school_id).first();
+			if (!check) return fail(404, { error: 'Data petugas tidak ditemukan.' });
+		}
 
 		await db.prepare('DELETE FROM exam_type_proctors WHERE id = ?').bind(id).run();
 		try {

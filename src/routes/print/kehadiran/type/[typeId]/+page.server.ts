@@ -9,12 +9,21 @@ export const load: PageServerLoad = async ({ platform, params, locals, url }) =>
 	const typeId = parseInt(typeIdStr, 10);
 	if (isNaN(typeId)) throw error(400, 'ID Tipe Ujian tidak valid');
 
-	// Get school info
-	const school = await db.prepare('SELECT * FROM schools WHERE id = ?').bind(locals.user!.school_id).first();
+	let examType: any = null;
+	let effectiveSchoolId = locals.user?.school_id;
 
-	// Get exam type info
-	const examType = await db.prepare('SELECT * FROM exam_types WHERE id = ? AND school_id = ?').bind(typeId, locals.user!.school_id).first();
+	if (locals.user?.role === 'superadmin') {
+		examType = await db.prepare('SELECT * FROM exam_types WHERE id = ?').bind(typeId).first();
+		if (examType) {
+			effectiveSchoolId = examType.school_id;
+		}
+	} else {
+		examType = await db.prepare('SELECT * FROM exam_types WHERE id = ? AND school_id = ?').bind(typeId, effectiveSchoolId).first();
+	}
 	if (!examType) throw error(404, 'Tipe Ujian tidak ditemukan');
+
+	// Get school info
+	const school = await db.prepare('SELECT * FROM schools WHERE id = ?').bind(effectiveSchoolId).first();
 
 	// Optional class filter
 	const classIdStr = url.searchParams.get('class_id');
@@ -27,7 +36,7 @@ export const load: PageServerLoad = async ({ platform, params, locals, url }) =>
 		LEFT JOIN exam_types et ON e.exam_type_id = et.id
 		WHERE e.exam_type_id = ? AND e.school_id = ?
 	`;
-	const examsParams: any[] = [typeId, locals.user!.school_id];
+	const examsParams: any[] = [typeId, effectiveSchoolId];
 
 	if (!isNaN(classId)) {
 		examsQuery += ` AND (e.class_id = ? OR e.class_id IS NULL)`;
@@ -40,7 +49,7 @@ export const load: PageServerLoad = async ({ platform, params, locals, url }) =>
 	const examsList = (examsRes.results || []) as any[];
 
 	// Check login mode
-	const sample = await db.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(locals.user!.school_id).first();
+	const sample = await db.prepare("SELECT username, nisn, nomor_peserta FROM users WHERE school_id = ? AND role = 'siswa' AND nomor_peserta IS NOT NULL LIMIT 1").bind(effectiveSchoolId).first();
 	const isNomorPesertaMode = (sample && sample.username === sample.nomor_peserta);
 
 	// Fetch all teachers/proctors/admins in school once
@@ -49,7 +58,7 @@ export const load: PageServerLoad = async ({ platform, params, locals, url }) =>
 		FROM users
 		WHERE school_id = ? AND role IN ('guru', 'pengawas', 'admin') AND is_active = 1
 		ORDER BY name ASC
-	`).bind(locals.user!.school_id).all();
+	`).bind(effectiveSchoolId).all();
 	const schoolTeachers = (schoolTeachersRes.results || []) as any[];
 
 	// For each exam, build data

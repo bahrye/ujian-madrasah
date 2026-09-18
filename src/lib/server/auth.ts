@@ -3,7 +3,13 @@ import { env } from '$env/dynamic/private';
 
 // Secret key untuk JWT — gunakan environment variable JWT_SECRET jika tersedia
 export function getJwtSecret(): Uint8Array {
-	const secret = env.JWT_SECRET || process?.env?.JWT_SECRET || 'ujian-madrasah-jwt-secret-2024-ganti-di-production';
+	const secret = env.JWT_SECRET || (typeof process !== 'undefined' ? process.env?.JWT_SECRET : undefined);
+	if (!secret) {
+		if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'production') {
+			throw new Error('JWT_SECRET environment variable is required in production!');
+		}
+		return new TextEncoder().encode('ujian-madrasah-dev-secret-only-change-in-production');
+	}
 	return new TextEncoder().encode(secret);
 }
 

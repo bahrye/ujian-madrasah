@@ -37,7 +37,8 @@ export const load: PageServerLoad = async ({ platform }) => {
 };
 
 export const actions: Actions = {
-	add: async ({ request, platform }) => {
+	add: async ({ request, platform, locals }) => {
+		if (!locals.user || locals.user.role !== 'superadmin') return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const data = await request.formData();
 		const schoolIdStr = data.get('school_id')?.toString();
@@ -72,7 +73,8 @@ export const actions: Actions = {
 			return fail(500, { error: e.message || 'Gagal menambahkan admin', school_id: schoolIdStr, username, name });
 		}
 	},
-	toggleStatus: async ({ request, platform }) => {
+	toggleStatus: async ({ request, platform, locals }) => {
+		if (!locals.user || locals.user.role !== 'superadmin') return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const data = await request.formData();
 		const idStr = data.get('id')?.toString();

@@ -13,7 +13,7 @@
 	let fileInput: HTMLInputElement;
 
 	let showBankModal = false;
-	let bankMedia: {url: string, media_type: string}[] = [];
+	let bankMedia: { url: string; media_type: string; name?: string }[] = [];
 	let loadingBank = false;
 
 	async function openBankModal() {
@@ -22,7 +22,7 @@
 			loadingBank = true;
 			try {
 				const res = await fetch('/api/media');
-				const data = await res.json();
+				const data = (await res.json()) as any;
 				if (data.success) bankMedia = data.media;
 			} catch (e) {
 				console.error(e);
@@ -78,11 +78,11 @@
 
 			progress = 80;
 			if (!response.ok) {
-				const errData = await response.json();
-				throw new Error(errData.error?.message || 'Gagal mengunggah file.');
+				const errData = (await response.json()) as any;
+				throw new Error(errData?.error?.message || 'Gagal mengunggah file.');
 			}
 
-			const data = await response.json();
+			const data = (await response.json()) as any;
 			const newUrl = data.secure_url;
 			const newType = file.type.startsWith('image/') ? 'image' : 'audio';
 			

@@ -1,10 +1,6 @@
 import { neon } from '@neondatabase/serverless';
 import { env as privateEnv } from '$env/dynamic/private';
 
-// Default fallback connection string from configuration
-const DEFAULT_DATABASE_URL =
-	'postgresql://neondb_owner:npg_cH3eDR5VhETs@ep-soft-wildflower-az092xod-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require';
-
 // Neon client cache
 const clientCache = new Map<string, ReturnType<typeof neon>>();
 
@@ -360,8 +356,7 @@ export function getDB(platform?: App.Platform): D1Database {
 	const dbUrl =
 		platform?.env?.DATABASE_URL ||
 		privateEnv?.DATABASE_URL ||
-		(typeof process !== 'undefined' ? process.env?.DATABASE_URL : undefined) ||
-		DEFAULT_DATABASE_URL;
+		(typeof process !== 'undefined' ? process.env?.DATABASE_URL : undefined);
 
 	if (dbUrl) {
 		return createNeonD1Adapter(dbUrl);
@@ -372,8 +367,7 @@ export function getDB(platform?: App.Platform): D1Database {
 		return platform.env.DB;
 	}
 
-	// 3. Gunakan DEFAULT_DATABASE_URL sebagai fallback aman
-	return createNeonD1Adapter(DEFAULT_DATABASE_URL);
+	throw new Error('DATABASE_URL environment variable is required but not configured.');
 }
 
 /**

@@ -18,9 +18,12 @@ export function parseDate(dateStr: any): Date {
         str = str.replace(' ', 'T') + 'Z';
         return new Date(str);
     } 
-    // Handle local datetime strings "2026-08-07T10:00:00" from inputs (no Z, no offset)
-    else if (str.includes('T') && !str.includes('Z') && !str.includes('+') && !str.includes('-')) {
-        return parseLocalDate(str);
+    // Handle local datetime strings "2026-08-07T10:00:00" from inputs (no Z, no offset after T)
+    else if (str.includes('T') && !str.includes('Z')) {
+        const timePart = str.split('T')[1] || '';
+        if (!timePart.includes('+') && !/-\d{2}/.test(timePart)) {
+            return parseLocalDate(str);
+        }
     }
     
     return new Date(str);

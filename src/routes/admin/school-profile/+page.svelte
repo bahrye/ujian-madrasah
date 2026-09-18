@@ -10,7 +10,7 @@
 	$: school = data.school as any;
 
 	// Logo state — separate from form, injected manually on submit
-	let logoUrl: string = data.school?.logo_url || '';
+	let logoUrl: string = (data.school as any)?.logo_url || '';
 	let isUploading = false;
 	let uploadProgress = 0;
 	let uploadError = '';

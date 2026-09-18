@@ -232,10 +232,10 @@
 										{@const opts = safeParseJson(ans.options_json, {left:[], right:[]})}
 										<div class="space-y-0.5 text-[10px]">
 											{#each Object.entries(safeParseJson(ans.answer_given, {})) as [key, value]}
-												{@const lItem = Array.isArray(opts.left) ? (opts.left.find((it) => it && typeof it === 'object' && String(it.key).trim() === String(key).trim()) || opts.left[parseInt(key)]) : null}
+												{@const lItem = Array.isArray(opts.left) ? (opts.left.find((it: any) => it && typeof it === 'object' && String(it.key).trim() === String(key).trim()) || opts.left[parseInt(key)]) : null}
 												{@const lLabel = lItem && typeof lItem === 'object' && lItem.key !== undefined ? lItem.key : (parseInt(key) + 1)}
 												{@const lText = lItem ? (typeof lItem === 'object' ? (lItem.text || lItem.content || lItem.html || '') : lItem) : (opts.left?.[parseInt(key)] || `No. ${key}`)}
-												{@const rItem = Array.isArray(opts.right) ? (opts.right.find((it) => it && typeof it === 'object' && String(it.key).trim() === String(value).trim()) || opts.right[parseInt(String(value))]) : null}
+												{@const rItem = Array.isArray(opts.right) ? (opts.right.find((it: any) => it && typeof it === 'object' && String(it.key).trim() === String(value).trim()) || opts.right[parseInt(String(value))]) : null}
 												{@const rLetter = rItem && typeof rItem === 'object' && rItem.key !== undefined ? rItem.key : (!isNaN(parseInt(String(value))) ? String.fromCharCode(65 + parseInt(String(value))) : (typeof value === 'string' && value.length === 1 ? value : '-'))}
 												{@const rText = rItem ? (typeof rItem === 'object' ? (rItem.text || rItem.content || rItem.html || '') : rItem) : (opts.right?.[parseInt(String(value))] || value)}
 												<div class="flex items-center gap-1 border-b border-slate-200/50 last:border-0 pb-0.5">
@@ -309,10 +309,10 @@
 											{@const opts = safeParseJson(ans.options_json, {left:[], right:[]})}
 											<div class="space-y-0.5 text-[10px]">
 												{#each safeParseObjectEntries(ans.correct_answer_json) as [key, value]}
-													{@const lItem = Array.isArray(opts.left) ? (opts.left.find((it) => it && typeof it === 'object' && String(it.key).trim() === String(key).trim()) || opts.left[parseInt(key)]) : null}
+													{@const lItem = Array.isArray(opts.left) ? (opts.left.find((it: any) => it && typeof it === 'object' && String(it.key).trim() === String(key).trim()) || opts.left[parseInt(key)]) : null}
 													{@const lLabel = lItem && typeof lItem === 'object' && lItem.key !== undefined ? lItem.key : (parseInt(key) + 1)}
 													{@const lText = lItem ? (typeof lItem === 'object' ? (lItem.text || lItem.content || lItem.html || '') : lItem) : (opts.left?.[parseInt(key)] || `No. ${key}`)}
-													{@const rItem = Array.isArray(opts.right) ? (opts.right.find((it) => it && typeof it === 'object' && String(it.key).trim() === String(value).trim()) || opts.right[parseInt(String(value))]) : null}
+													{@const rItem = Array.isArray(opts.right) ? (opts.right.find((it: any) => it && typeof it === 'object' && String(it.key).trim() === String(value).trim()) || opts.right[parseInt(String(value))]) : null}
 													{@const rLetter = rItem && typeof rItem === 'object' && rItem.key !== undefined ? rItem.key : (!isNaN(parseInt(String(value))) ? String.fromCharCode(65 + parseInt(String(value))) : (typeof value === 'string' && value.length === 1 ? value : '-'))}
 													{@const rText = rItem ? (typeof rItem === 'object' ? (rItem.text || rItem.content || rItem.html || '') : rItem) : (opts.right?.[parseInt(String(value))] || value)}
 													<div class="flex items-center gap-1 border-b border-emerald-200/60 last:border-0 pb-0.5">

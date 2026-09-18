@@ -10,13 +10,22 @@ export const load: PageServerLoad = async ({ platform, params, locals, url }) =>
 	
 	if (isNaN(typeId)) throw error(400, 'ID Tipe Ujian tidak valid');
 
-	// Get school info
-	const school = await db.prepare('SELECT * FROM schools WHERE id = ?').bind(locals.user!.school_id).first();
-	
-	// Get exam type info
-	const examType = await db.prepare('SELECT * FROM exam_types WHERE id = ? AND school_id = ?').bind(typeId, locals.user!.school_id).first();
+	let examType: any = null;
+	let effectiveSchoolId = locals.user?.school_id;
+
+	if (locals.user?.role === 'superadmin') {
+		examType = await db.prepare('SELECT * FROM exam_types WHERE id = ?').bind(typeId).first();
+		if (examType) {
+			effectiveSchoolId = examType.school_id;
+		}
+	} else {
+		examType = await db.prepare('SELECT * FROM exam_types WHERE id = ? AND school_id = ?').bind(typeId, effectiveSchoolId).first();
+	}
 	
 	if (!examType) throw error(404, 'Tipe Ujian tidak ditemukan');
+
+	// Get school info
+	const school = await db.prepare('SELECT * FROM schools WHERE id = ?').bind(effectiveSchoolId).first();
 
 	// Get all active students for this school
 	// Including both username (which can be NISN or Nomor Peserta) and the explicit fields
@@ -29,7 +38,7 @@ export const load: PageServerLoad = async ({ platform, params, locals, url }) =>
 		JOIN exam_type_classes etc ON etc.class_id = u.class_id
 		WHERE u.school_id = ? AND u.role = 'siswa' AND u.is_active = 1 AND etc.exam_type_id = ?
 	`;
-	let paramsArr: any[] = [locals.user!.school_id, typeId];
+	let paramsArr: any[] = [effectiveSchoolId, typeId];
 
 	if (!isNaN(classId)) {
 		query += ` AND u.class_id = ?`;

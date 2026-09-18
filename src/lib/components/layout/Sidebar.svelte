@@ -70,7 +70,7 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ name: profileName, username: profileUsername, password: profilePassword })
 			});
-			const data = await res.json();
+			const data = (await res.json()) as any;
 			if (!res.ok) {
 				toasts.error(data.error || 'Terjadi kesalahan.');
 			} else {

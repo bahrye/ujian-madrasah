@@ -9,7 +9,7 @@
 
 	export let data;
 
-	$: exam = data.exam;
+	$: exam = data.exam as any;
 	$: participants = data.participants as any[];
 	$: allStudents = data.allStudents as any[];
 	$: activeToken = data.activeToken as any;

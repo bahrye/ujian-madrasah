@@ -4,7 +4,7 @@
 	export let value: string = '';
 	export let placeholder: string = 'Masukkan kata sandi';
 	export let required: boolean = false;
-	export let autocomplete: string = 'current-password';
+	export let autocomplete: import('svelte/elements').HTMLInputAttributes['autocomplete'] = 'current-password';
 	export let iconLeft: boolean = false;
 	export let disabled: boolean = false;
 

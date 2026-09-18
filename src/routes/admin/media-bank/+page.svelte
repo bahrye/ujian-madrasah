@@ -39,16 +39,25 @@
 		return 'Tanpa Folder';
 	}
 
+	interface MediaItem {
+		id: number;
+		media_url: string;
+		media_type: 'image' | 'audio';
+		name?: string;
+		created_at?: string;
+		[key: string]: any;
+	}
+
 	let activeFolder = 'Semua Media';
-	$: actualMediaItems = data.mediaItems.filter(item => !deletedLocalUrls.has(item.media_url));
+	let deletedLocalUrls = new Set<string>();
+	$: rawMediaItems = ((data.mediaItems || []) as any[]) as MediaItem[];
+	$: actualMediaItems = rawMediaItems.filter(item => !deletedLocalUrls.has(item.media_url));
 	$: folders = ['Semua Media', ...Array.from(new Set(actualMediaItems.map(item => getCloudinaryFolder(item.media_url)))).sort()];
 	$: filteredMedia = activeFolder === 'Semua Media' 
 		? actualMediaItems 
 		: actualMediaItems.filter(item => getCloudinaryFolder(item.media_url) === activeFolder);
 	
 	$: isAllSelected = filteredMedia.length > 0 && selectedMediaUrls.size === filteredMedia.length;
-
-	let deletedLocalUrls = new Set<string>();
 	$: {
 		if (form?.success) {
 			successMsg = form.success;

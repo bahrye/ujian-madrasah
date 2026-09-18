@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getDB } from '$lib/server/db';
 import { verifyExamTokenSignature } from '$lib/server/auth';
+import { parseDate } from '$lib/utils/date';
 
 export const POST: RequestHandler = async ({ request, platform, locals, cookies }) => {
 	if (!locals.user) {
@@ -61,6 +62,19 @@ export const POST: RequestHandler = async ({ request, platform, locals, cookies 
 
 		if (!attempt || attempt.status !== 'mengerjakan') {
 			return json({ error: 'Sesi ujian tidak aktif' }, { status: 400 });
+		}
+
+		if (attempt.end_time) {
+			const endTimeMs = parseDate(attempt.end_time).getTime();
+			// 60-second grace period for network latency
+			if (!isNaN(endTimeMs) && Date.now() > endTimeMs + 60000) {
+				return json({ 
+					error: 'Waktu ujian telah berakhir',
+					is_time_up: true,
+					status: 'waktu_habis',
+					end_time: attempt.end_time
+				}, { status: 403 });
+			}
 		}
 
 		if (attempt.is_paused === 1) {

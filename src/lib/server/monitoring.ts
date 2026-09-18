@@ -168,8 +168,8 @@ export async function deleteMonitoringPhotos(
 
 		if (bindings.length === 0) return 0;
 
-		const photosRes = await db.prepare(query).bind(...bindings).all<{ id: number; photo_url: string }>();
-		const photos = photosRes.results || [];
+		const photosRes = (await (db.prepare(query).bind(...bindings) as any).all()) as { results?: { id: number; photo_url: string }[] };
+		const photos = photosRes?.results || [];
 		if (photos.length === 0) return 0;
 
 		// Hapus dari Cloudinary jika berupa URL Cloudinary

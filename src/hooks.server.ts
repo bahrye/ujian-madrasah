@@ -1,4 +1,4 @@
-import { type Handle } from '@sveltejs/kit';
+import { type Handle, redirect } from '@sveltejs/kit';
 import { verifyToken, COOKIE_NAME } from '$lib/server/auth';
 import { getDB } from '$lib/server/db';
 // Cache timestamp aktivitas terakhir siswa untuk throttling write DB
@@ -55,6 +55,64 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	} else {
 		event.locals.user = null;
+	}
+
+	// RBAC Central Route Protection
+	const pathname = event.url.pathname;
+	const user = event.locals.user;
+
+	// Helper for unauthorized redirect
+	const requireAuth = (allowedRoles: string[]) => {
+		if (!user) {
+			if (event.request.headers.get('accept')?.includes('application/json') && pathname.startsWith('/api/')) {
+				return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+					status: 401,
+					headers: { 'Content-Type': 'application/json' }
+				});
+			}
+			throw redirect(302, '/login');
+		}
+
+		if (!allowedRoles.includes(user.role)) {
+			if (event.request.headers.get('accept')?.includes('application/json') && pathname.startsWith('/api/')) {
+				return new Response(JSON.stringify({ error: 'Forbidden' }), {
+					status: 403,
+					headers: { 'Content-Type': 'application/json' }
+				});
+			}
+			const fallbackRoute = user.role === 'panitia' ? '/admin' : `/${user.role}`;
+			throw redirect(302, fallbackRoute);
+		}
+
+		return null;
+	};
+
+	if (pathname.startsWith('/superadmin')) {
+		const res = requireAuth(['superadmin']);
+		if (res) return res;
+	} else if (pathname.startsWith('/admin')) {
+		const res = requireAuth(['admin', 'panitia', 'superadmin']);
+		if (res) return res;
+
+		// Panitia sub-module restriction
+		if (user?.role === 'panitia') {
+			const restrictedPaths = ['/admin/school-profile', '/admin/users', '/admin/students', '/admin/classes'];
+			if (restrictedPaths.some(p => pathname.startsWith(p))) {
+				throw redirect(302, '/admin');
+			}
+		}
+	} else if (pathname.startsWith('/guru')) {
+		const res = requireAuth(['guru', 'admin', 'panitia', 'superadmin']);
+		if (res) return res;
+	} else if (pathname.startsWith('/pengawas')) {
+		const res = requireAuth(['pengawas', 'admin', 'panitia', 'superadmin']);
+		if (res) return res;
+	} else if (pathname.startsWith('/siswa')) {
+		const res = requireAuth(['siswa']);
+		if (res) return res;
+	} else if (pathname.startsWith('/print')) {
+		const res = requireAuth(['superadmin', 'admin', 'guru', 'panitia']);
+		if (res) return res;
 	}
 
 	return resolve(event);

@@ -67,7 +67,7 @@
 			if (devices && devices.length) {
 				cameras = devices;
 				// Prefer back camera on mobile or default first camera
-				const backCam = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('rear') || d.label.toLowerCase().includes('environment'));
+				const backCam = devices.find((d: any) => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('rear') || d.label.toLowerCase().includes('environment'));
 				selectedCameraId = backCam ? backCam.id : devices[0].id;
 			}
 		} catch (err) {

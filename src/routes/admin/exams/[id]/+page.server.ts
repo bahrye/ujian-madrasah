@@ -270,17 +270,24 @@ export const actions: Actions = {
 	},
 
 	updateParticipantRoom: async ({ request, platform, params, locals }) => {
+		if (!locals.user || !['admin', 'panitia', 'superadmin'].includes(locals.user.role)) return fail(401, { error: 'Unauthorized' });
 		const db = getDB(platform);
 		const form = await request.formData();
 		const participantId = parseInt(form.get('participant_id')?.toString() || '', 10);
 		const roomIdStr = form.get('room_id')?.toString();
 		const roomId = roomIdStr ? parseInt(roomIdStr, 10) : null;
+		const examId = parseInt(params.id, 10);
 
-		if (isNaN(participantId)) return fail(400, { error: 'Data tidak valid' });
+		if (isNaN(participantId) || isNaN(examId)) return fail(400, { error: 'Data tidak valid' });
+
+		if (locals.user.role !== 'superadmin' && locals.user.school_id) {
+			const examCheck = await db.prepare('SELECT id FROM exams WHERE id = ? AND school_id = ?').bind(examId, locals.user.school_id).first();
+			if (!examCheck) return fail(404, { error: 'Ujian tidak ditemukan.' });
+		}
 
 		try {
 			await db.prepare('UPDATE exam_participants SET room_id = ? WHERE id = ? AND exam_id = ?')
-				.bind(roomId, participantId, parseInt(params.id, 10)).run();
+				.bind(roomId, participantId, examId).run();
 			return { success: 'Ruang peserta berhasil diperbarui.' };
 		} catch (err: any) {
 			console.error('Error in updateParticipantRoom:', err);

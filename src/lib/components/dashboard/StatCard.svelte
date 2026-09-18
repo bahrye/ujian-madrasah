@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let value: string = '';
+	export let value: string | number = '';
 	export let label: string = '';
 	export let gradient: 'indigo' | 'cyan' | 'emerald' | 'amber' | 'rose' = 'indigo';
 	export let icon: string = '';

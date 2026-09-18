@@ -41,8 +41,8 @@
 		try {
 			const res = await fetch(`/api/auth/check-pin?u=${encodeURIComponent(qrUsername)}`);
 			if (res.ok) {
-				const data = await res.json();
-				if (data.requires_pin) {
+				const data = (await res.json()) as any;
+				if (data?.requires_pin) {
 					isAuthenticatingQr = false;
 					pinUserInfo = {
 						name: data.name || '',

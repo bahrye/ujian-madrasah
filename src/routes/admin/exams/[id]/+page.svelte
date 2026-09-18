@@ -161,7 +161,7 @@
 			</span>
 			<span class="flex items-center gap-1">
 				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-				Tampilan Nilai: <strong class="text-slate-600 font-medium">{({ after_type_end_time: 'Jadwal Tipe Ujian', after_submit: 'Langsung Tampil', after_end_time: 'Jadwal Ujian', objective_only: 'Hanya Nilai Otomatis', manual: 'Manual (Guru/Admin)' })[exam.show_score_type || 'after_submit'] || 'Langsung Tampil'}</strong>
+				Tampilan Nilai: <strong class="text-slate-600 font-medium">{({ after_type_end_time: 'Jadwal Tipe Ujian', after_submit: 'Langsung Tampil', after_end_time: 'Jadwal Ujian', objective_only: 'Hanya Nilai Otomatis', manual: 'Manual (Guru/Admin)' } as Record<string, string>)[exam.show_score_type || 'after_submit'] || 'Langsung Tampil'}</strong>
 			</span>
 		</div>
 	</div>
@@ -792,7 +792,7 @@
 			
 			<form method="POST" action="?/addProctor" use:enhance={() => { return async ({ update }) => { showAddProctorModal = false; proctorSearch = ''; await update(); }; }} class="flex flex-col flex-1 overflow-hidden">
 				<div class="overflow-y-auto flex-1 mb-4 border border-slate-200 rounded-lg p-2 bg-slate-50">
-					{#each data.allProctors.filter((p) => p.name.toLowerCase().includes(proctorSearch.toLowerCase()) || p.username.toLowerCase().includes(proctorSearch.toLowerCase())) as proctor}
+					{#each ((data.allProctors || []) as any[]).filter((p) => (p.name || '').toLowerCase().includes(proctorSearch.toLowerCase()) || (p.username || '').toLowerCase().includes(proctorSearch.toLowerCase())) as proctor}
 						{@const isAdded = examProctors.some((p) => p.user_id === proctor.id)}
 						<label class="flex items-center gap-3 p-3 hover:bg-white rounded-lg cursor-pointer border-b border-slate-100 last:border-0 {isAdded ? 'opacity-50' : ''}">
 							<input type="checkbox" name="proctor_ids" value={proctor.id} class="w-4 h-4 text-indigo-600 rounded" disabled={isAdded} />

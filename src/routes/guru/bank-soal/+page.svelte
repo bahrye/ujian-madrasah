@@ -23,8 +23,8 @@
 		try {
 			const res = await fetch(`/api/exams/${exam.id}/questions`);
 			if (res.ok) {
-				const json = await res.json();
-				questionsToCopy = json.questions || [];
+				const json = (await res.json()) as any;
+				questionsToCopy = json?.questions || [];
 			}
 		} catch (e) {
 			console.error(e);

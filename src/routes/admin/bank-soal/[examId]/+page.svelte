@@ -73,7 +73,7 @@
 
 			if (!response.ok) throw new Error('Gagal mengunggah gambar');
 
-			const data = await response.json();
+			const data = (await response.json()) as any;
 			
 			try {
 				await fetch('/api/track-media', {
@@ -119,7 +119,7 @@
 			if (textData && textData.trim().length > 0) {
 				let textToPaste = textData;
 				let smartPasted = false;
-				let parsedOptions = [];
+				let parsedOptions: any[] = [];
 
 				// Fitur Smart Paste: Deteksi opsi A, B, C, D jika paste di Teks Soal
 				const isPilihanGanda = selectedType === 'pilihan_ganda' || selectedType === 'pilihan_ganda_kompleks';
@@ -127,7 +127,7 @@
 				
 				if (isMainEditor && isPilihanGanda) {
 					const lines = textData.split('\n');
-					let questionLines = [];
+					let questionLines: string[] = [];
 
 					for (let i = 0; i < lines.length; i++) {
 						const line = lines[i].trim();
@@ -222,11 +222,11 @@
 						const parser = new DOMParser();
 						const doc = parser.parseFromString(htmlData, 'text/html');
 						
-						const htmlOptionsExtracted = [];
+						const htmlOptionsExtracted: Element[] = [];
 						const candidateElements = Array.from(doc.querySelectorAll('li, p, div'));
 						
-						candidateElements.forEach(el => {
-							if (htmlOptionsExtracted.some(parent => parent.contains(el))) return;
+						candidateElements.forEach((el: Element) => {
+							if (htmlOptionsExtracted.some((parent: Element) => parent.contains(el))) return;
 							
 							const text = el.textContent?.trim() || '';
 							const html = el.innerHTML || '';
@@ -307,10 +307,10 @@
 					if (smartPasted && parsedDoc) {
 						const doc = parsedDoc;
 						
-						const htmlOptionsExtracted = [];
+						const htmlOptionsExtracted: Element[] = [];
 						const candidateElements = Array.from(doc.querySelectorAll('li, p, div'));
-						candidateElements.forEach(el => {
-							if (htmlOptionsExtracted.some(parent => parent.contains(el))) return;
+						candidateElements.forEach((el: Element) => {
+							if (htmlOptionsExtracted.some((parent: Element) => parent.contains(el))) return;
 							const text = el.textContent?.trim() || '';
 							const html = el.innerHTML || '';
 							if (/^[a-eA-E][\.\)]/i.test(text) || /^\s*(?:<[^>]+>|\s|<!--.*?-->)*[a-eA-E][\.\)]/i.test(html)) {
@@ -319,18 +319,18 @@
 						});
 						
 						if (htmlOptionsExtracted.length === parsedOptions.length) {
-							htmlOptionsExtracted.forEach(el => el.remove());
+							htmlOptionsExtracted.forEach((el: Element) => el.remove());
 						}
 						
-						const walker = document.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, null, false);
-						let firstTextNode = null;
+						const walker = document.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
+						let firstTextNode: Node | null = null;
 						while (walker.nextNode()) {
-							if (walker.currentNode.nodeValue.trim().length > 0) {
+							if ((walker.currentNode?.nodeValue || '').trim().length > 0) {
 								firstTextNode = walker.currentNode;
 								break;
 							}
 						}
-						if (firstTextNode) {
+						if (firstTextNode && firstTextNode.nodeValue) {
 							firstTextNode.nodeValue = firstTextNode.nodeValue.replace(/^\s*\d+[\.\)]\s+/, '');
 						}
 						questionHtmlToPaste = doc.body.innerHTML
@@ -495,36 +495,6 @@
 		}
 	}
 
-	async function removeEmptyMenjodohkanRow(mode: 'create' | 'edit') {
-		const count = mode === 'create' ? createMenjodohkanCount : editMenjodohkanCount;
-		if (count <= 1) return;
-
-		let rows = [];
-		for (let i = 0; i < count; i++) {
-			const leftInput = document.getElementById(`${mode}_left_${i}`) as HTMLInputElement;
-			const rightInput = document.getElementById(`${mode}_right_${i}`) as HTMLInputElement;
-			rows.push({ left: leftInput?.value || '', right: rightInput?.value || '' });
-		}
-
-		// Find the last empty row
-		const emptyIndex = rows.findLastIndex(r => !r.left.trim() && !r.right.trim());
-		if (emptyIndex !== -1) {
-			rows.splice(emptyIndex, 1);
-			if (mode === 'create') createMenjodohkanCount--;
-			else editMenjodohkanCount--;
-
-			await tick(); // wait for DOM to remove the last row
-
-			for (let i = 0; i < rows.length; i++) {
-				const leftInput = document.getElementById(`${mode}_left_${i}`) as HTMLInputElement;
-				const rightInput = document.getElementById(`${mode}_right_${i}`) as HTMLInputElement;
-				if (leftInput) leftInput.value = rows[i].left;
-				if (rightInput) rightInput.value = rows[i].right;
-			}
-		} else {
-			toasts.error('Semua baris terisi. Hapus isi baris terlebih dahulu jika ingin menguranginya.');
-		}
-	}
 
 	let deletedLocalIds = new Set<number>();
 	$: if (form?.success) {
@@ -595,7 +565,8 @@
 						createQuestionText = '';
 						options = ['', '', '', '', ''];
 						optionCount = 4;
-						createMenjodohkanCount = 4;
+						createMenjodohkanLeftCount = 3;
+						createMenjodohkanRightCount = 4;
 						await update({ reset: true });
 					} else {
 						await update();
@@ -660,7 +631,7 @@
 								<div class="flex-1">
 									<RichTextEditor id="create_option_{i}" name="option_{i}" placeholder="Opsi {String.fromCharCode(65 + i)}" bind:value={options[i]} compact={true} />
 								</div>
-								<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 shrink-0" on:click={() => openMediaPickerForOption('create', selectedType, i)} title="Tambahkan Media">
+								<button type="button" class="btn bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-2 shrink-0" on:click={() => openMediaPickerForOption('create', selectedType as any, i)} title="Tambahkan Media">
 									🖼️
 								</button>
 								{#if selectedType === 'pilihan_ganda_kompleks'}
@@ -837,7 +808,8 @@
 						createQuestionText = '';
 						options = ['', '', '', ''];
 						optionCount = 4;
-						createMenjodohkanCount = 4;
+						createMenjodohkanLeftCount = 3;
+						createMenjodohkanRightCount = 4;
 						createBenarSalahCount = 3;
 						createBenarSalahMultiMode = false;
 					}}>Batal</button>
@@ -937,8 +909,8 @@
 									</div>
 								{/each}
 								{#if opts.right && opts.right.length > opts.left.length}
-									{@const pairedRightIdxs = new Set(opts.left.map((_, i) => String(correctMap ? (correctMap[String(i)] ?? correctMap[i] ?? i) : i)))}
-									{@const distractors = opts.right.map((r, j) => ({ text: r, letter: String.fromCharCode(65 + j), idx: String(j) })).filter(item => !pairedRightIdxs.has(item.idx))}
+									{@const pairedRightIdxs = new Set((opts.left as any[]).map((_: any, i: number) => String(correctMap ? (correctMap[String(i)] ?? correctMap[i] ?? i) : i)))}
+									{@const distractors = (opts.right as any[]).map((r: any, j: number) => ({ text: r, letter: String.fromCharCode(65 + j), idx: String(j) })).filter((item: any) => !pairedRightIdxs.has(item.idx))}
 									{#if distractors.length > 0}
 										<div class="pt-1.5 mt-1.5 border-t border-slate-200/80 flex items-center gap-1.5 flex-wrap">
 											<span class="text-amber-700 font-semibold">Pilihan Pengecoh:</span>
