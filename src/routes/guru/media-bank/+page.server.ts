@@ -1,10 +1,16 @@
-import { fail } from '@sveltejs/kit';
+import { fail, error } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { getDB } from '$lib/server/db';
 import { deleteFromCloudinary, deleteCloudinaryResources, cleanOrphanedMedia } from '$lib/server/cloudinary';
 import { env } from '$env/dynamic/private';
 
-export const load: PageServerLoad = async ({ platform, locals }) => {
+// FITUR DINONAKTIFKAN SEMENTARA: Halaman Bank Media disembunyikan dan dinonaktifkan
+export const load: PageServerLoad = async () => {
+	throw error(404, 'Halaman Bank Media dinonaktifkan.');
+};
+
+/* --- KODE ASLI DISIMPAN AGAR BISA DIAKTIFKAN KEMBALI DI MASA DEPAN ---
+export const loadOriginal: PageServerLoad = async ({ platform, locals }) => {
 	const db = getDB(platform);
 	const schoolId = locals.user?.school_id || -1;
 	const userId = locals.user?.id || -1;
@@ -40,8 +46,18 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 		return { mediaItems: [] };
 	}
 };
+*/
 
 export const actions: Actions = {
+	deleteMedia: async () => fail(403, { error: 'Fitur Bank Media dinonaktifkan.' }),
+	toggleVisibility: async () => fail(403, { error: 'Fitur Bank Media dinonaktifkan.' }),
+	updateName: async () => fail(403, { error: 'Fitur Bank Media dinonaktifkan.' }),
+	deleteBulk: async () => fail(403, { error: 'Fitur Bank Media dinonaktifkan.' }),
+	cleanGarbageMedia: async () => fail(403, { error: 'Fitur Bank Media dinonaktifkan.' })
+};
+
+/* --- KODE ASLI ACTIONS DISIMPAN AGAR BISA DIAKTIFKAN KEMBALI DI MASA DEPAN ---
+export const originalActions: Actions = {
 	deleteMedia: async ({ request, platform, locals }) => {
 		const schoolId = locals.user?.school_id || -1;
 		const db = getDB(platform);
@@ -186,3 +202,4 @@ export const actions: Actions = {
 		return fail(500, { error: result.errors.join(', ') || 'Gagal membersihkan media sampah dari Cloudinary' });
 	}
 };
+*/

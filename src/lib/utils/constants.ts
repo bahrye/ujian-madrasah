@@ -80,7 +80,7 @@ export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
 		{ label: 'Ruang Ujian', href: '/admin/rooms', icon: 'room' },
 		{ label: 'Mata Pelajaran', href: '/admin/subjects', icon: 'subject' },
 		{ label: 'Bank Soal', href: '/admin/bank-soal', icon: 'questions' },
-		{ label: 'Bank Media', href: '/admin/media-bank', icon: 'folder' },
+		// { label: 'Bank Media', href: '/admin/media-bank', icon: 'folder' }, // Disembunyikan sementara
 		{ 
 			label: 'Ujian', 
 			icon: 'exam',
@@ -101,7 +101,7 @@ export const SIDEBAR_MENUS: Record<string, MenuItem[]> = {
 		{ label: 'Dashboard', href: '/guru', icon: 'dashboard' },
 		{ label: 'Ujian Remedial', href: '/guru/remedial', icon: 'exam' },
 		{ label: 'Bank Soal', href: '/guru/bank-soal', icon: 'questions' },
-		{ label: 'Bank Media', href: '/guru/media-bank', icon: 'folder' },
+		// { label: 'Bank Media', href: '/guru/media-bank', icon: 'folder' }, // Disembunyikan sementara
 		{ label: 'Penilaian', href: '/guru/penilaian', icon: 'grading' },
 		{ label: 'Hasil Ujian', href: '/guru/results', icon: 'results' },
 		{ label: 'Laporan & Analisis', href: '/guru/laporan-analisis', icon: 'analytics' },
