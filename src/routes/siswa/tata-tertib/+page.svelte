@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { ICONS } from '$lib/utils/constants';
 	import QuestionRenderer from '$lib/components/exam/QuestionRenderer.svelte';
 	
@@ -126,16 +127,34 @@
 		demoAnswers = { ...demoAnswers };
 	}
 
-	function nextType() {
+	async function nextType() {
 		const currentIdx = questionTypes.findIndex(t => t.id === activeTypeTab);
 		const nextIdx = (currentIdx + 1) % questionTypes.length;
 		activeTypeTab = questionTypes[nextIdx].id;
+		await tick();
+		keepSimulationInView();
 	}
 
-	function prevType() {
+	async function prevType() {
 		const currentIdx = questionTypes.findIndex(t => t.id === activeTypeTab);
 		const prevIdx = (currentIdx - 1 + questionTypes.length) % questionTypes.length;
 		activeTypeTab = questionTypes[prevIdx].id;
+		await tick();
+		keepSimulationInView();
+	}
+
+	function keepSimulationInView() {
+		if (typeof window === 'undefined') return;
+		const el = document.getElementById('simulasi-interaktif-box');
+		if (!el) return;
+		const rect = el.getBoundingClientRect();
+		const topThreshold = 80;
+		// If simulation box header scrolled above the top navbar or out of screen,
+		// scroll smoothly back so the simulation box header is comfortably in view
+		if (rect.top < topThreshold) {
+			const targetY = window.scrollY + rect.top - topThreshold;
+			window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+		}
 	}
 
 	const questionTypes = [
@@ -681,7 +700,7 @@
 					</div>
 
 					<!-- Wide Single-Layer Interactive Simulation Box -->
-					<div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+					<div id="simulasi-interaktif-box" class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-xs overflow-hidden scroll-mt-24">
 						<div class="flex items-center justify-between px-3 sm:px-5 py-2.5 border-b border-slate-200 bg-slate-50/80">
 							<div class="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold text-slate-800">
 								<span>🎮</span>

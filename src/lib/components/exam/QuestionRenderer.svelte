@@ -22,6 +22,7 @@
 	export let answer: string = '';
 	export let isDoubted: boolean = false;
 	export let displayNumber: number | undefined = undefined;
+	export let autoScrollOnMount: boolean = false;
 
 	const dispatch = createEventDispatcher();
 
@@ -290,7 +291,7 @@
 	}
 
 	onMount(() => {
-		if (typeof window !== 'undefined') {
+		if (autoScrollOnMount && typeof window !== 'undefined') {
 			window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
 			if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
 			if (document.documentElement) document.documentElement.scrollTop = 0;

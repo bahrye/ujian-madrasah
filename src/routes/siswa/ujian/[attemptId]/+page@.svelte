@@ -1388,6 +1388,7 @@
 		{#if currentQuestion}
 			{#key currentQuestion.id}
 				<QuestionRenderer
+					autoScrollOnMount={true}
 					question={currentQuestion}
 					displayNumber={currentIndex + 1}
 					answer={localAnswers[currentQuestion.id] || ''}
