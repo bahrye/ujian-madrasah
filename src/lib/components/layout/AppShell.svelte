@@ -70,6 +70,50 @@
 		return crumbs.filter((c, idx) => idx === 0 || c.label !== crumbs[idx - 1].label);
 	}
 
+	function parsePathRest(baseHref: string, rest: string): BreadcrumbItem[] {
+		const rawParts = rest.split('/').filter(Boolean);
+		const items: { label: string; href: string }[] = [];
+		let currentUrl = baseHref;
+
+		let i = 0;
+		while (i < rawParts.length) {
+			const p = rawParts[i];
+
+			// Handle structural keywords paired with an ID (e.g. /type/1 or /class/2)
+			if ((p === 'type' || p === 'class') && i + 1 < rawParts.length) {
+				const nextPart = rawParts[i + 1];
+				currentUrl += `/${p}/${nextPart}`;
+				const label = p === 'type' ? 'Tipe Ujian' : 'Kelas';
+				items.push({ label, href: currentUrl });
+				i += 2;
+				continue;
+			}
+
+			// If bare 'type' or 'class' without following ID, skip completely
+			if (p === 'type' || p === 'class') {
+				i++;
+				continue;
+			}
+
+			currentUrl += `/${p}`;
+			let label = KNOWN_LABELS[p];
+			if (!label) {
+				if (!isNaN(Number(p))) {
+					label = baseHref.includes('bank-soal') ? 'Detail Soal' : (baseHref.includes('exams') ? 'Detail Ujian' : 'Detail');
+				} else {
+					label = formatSegment(p);
+				}
+			}
+			items.push({ label, href: currentUrl });
+			i++;
+		}
+
+		return items.map((item, idx) => ({
+			label: item.label,
+			href: idx === items.length - 1 ? undefined : item.href
+		}));
+	}
+
 	function buildBreadcrumbs(path: string, items: MenuItem[], baseHome: string): BreadcrumbItem[] {
 		const cleanPath = path.replace(/\/+$/, '') || '/';
 		if (cleanPath === baseHome || cleanPath === '' || cleanPath === '/') {
@@ -101,7 +145,7 @@
 			}
 		}
 
-		// 3. Prefix match in subItems (e.g. /admin/exams/12/jawaban-siswa)
+		// 3. Prefix match in subItems (e.g. /admin/exams/12/jawaban-siswa or /admin/exams/type/1)
 		for (const item of items) {
 			if (item.subItems) {
 				for (const sub of item.subItems) {
@@ -110,17 +154,7 @@
 						crumbs.push({ label: sub.label, href: sub.href });
 						const rest = cleanPath.slice(sub.href.length).replace(/^\/+/, '');
 						if (rest) {
-							const parts = rest.split('/');
-							for (let i = 0; i < parts.length; i++) {
-								const p = parts[i];
-								if (!p) continue;
-								const isLast = i === parts.length - 1;
-								const label = KNOWN_LABELS[p] || (isNaN(Number(p)) ? formatSegment(p) : 'Detail');
-								crumbs.push({
-									label,
-									href: isLast ? undefined : `${sub.href}/${parts.slice(0, i + 1).join('/')}`
-								});
-							}
+							crumbs.push(...parsePathRest(sub.href, rest));
 						}
 						return dedupeCrumbs(crumbs);
 					}
@@ -128,23 +162,13 @@
 			}
 		}
 
-		// 4. Prefix match in direct items (e.g. /guru/bank-soal/12/preview)
+		// 4. Prefix match in direct items (e.g. /guru/bank-soal/12/preview or /admin/papan-peringkat/type/1)
 		for (const item of items) {
 			if (item.href && item.href !== baseHome && cleanPath.startsWith(item.href + '/')) {
 				crumbs.push({ label: item.label, href: item.href });
 				const rest = cleanPath.slice(item.href.length).replace(/^\/+/, '');
 				if (rest) {
-					const parts = rest.split('/');
-					for (let i = 0; i < parts.length; i++) {
-						const p = parts[i];
-						if (!p) continue;
-						const isLast = i === parts.length - 1;
-						const label = KNOWN_LABELS[p] || (isNaN(Number(p)) ? formatSegment(p) : 'Detail');
-						crumbs.push({
-							label,
-							href: isLast ? undefined : `${item.href}/${parts.slice(0, i + 1).join('/')}`
-						});
-					}
+					crumbs.push(...parsePathRest(item.href, rest));
 				}
 				return dedupeCrumbs(crumbs);
 			}
@@ -152,19 +176,7 @@
 
 		// 5. Fallback path parsing
 		const relativePath = cleanPath.startsWith(baseHome) ? cleanPath.slice(baseHome.length) : cleanPath;
-		const parts = relativePath.split('/').filter(Boolean);
-		let acc = baseHome;
-		for (let i = 0; i < parts.length; i++) {
-			const p = parts[i];
-			acc += `/${p}`;
-			const isLast = i === parts.length - 1;
-			const label = KNOWN_LABELS[p] || (isNaN(Number(p)) ? formatSegment(p) : 'Detail');
-			crumbs.push({
-				label,
-				href: isLast ? undefined : acc
-			});
-		}
-
+		crumbs.push(...parsePathRest(baseHome, relativePath));
 		return dedupeCrumbs(crumbs);
 	}
 
