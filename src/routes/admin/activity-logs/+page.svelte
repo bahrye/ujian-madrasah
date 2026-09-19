@@ -11,6 +11,10 @@
 	let isSearching = false;
 
 	$: logs = data.logs || [];
+	$: pagination = data.pagination || { page: 1, pageSize: 50, totalCount: logs.length, totalPages: 1 };
+	$: startItem = pagination.totalCount === 0 ? 0 : (pagination.page - 1) * pagination.pageSize + 1;
+	$: endItem = Math.min(pagination.page * pagination.pageSize, pagination.totalCount);
+	$: pageNumbers = getPageNumbers(pagination.page, pagination.totalPages);
 
 	function handleSearch(e?: Event) {
 		if (e) e.preventDefault();
@@ -21,9 +25,46 @@
 		} else {
 			queryParams.delete('q');
 		}
+		queryParams.delete('page'); // Reset ke halaman 1 setiap melakukan pencarian baru
 		goto(`?${queryParams.toString()}`, { keepFocus: true, noScroll: true }).finally(() => {
 			isSearching = false;
 		});
+	}
+
+	function goToPage(targetPage: number) {
+		if (targetPage < 1 || targetPage > pagination.totalPages || targetPage === pagination.page) return;
+		const queryParams = new URLSearchParams($page.url.searchParams);
+		if (targetPage === 1) {
+			queryParams.delete('page');
+		} else {
+			queryParams.set('page', targetPage.toString());
+		}
+		goto(`?${queryParams.toString()}`, { noScroll: true });
+	}
+
+	function getPageNumbers(current: number, total: number): (number | string)[] {
+		if (total <= 7) {
+			return Array.from({ length: total }, (_, i) => i + 1);
+		}
+		const pages: (number | string)[] = [];
+		if (current <= 4) {
+			for (let i = 1; i <= 5; i++) pages.push(i);
+			pages.push('...');
+			pages.push(total);
+		} else if (current >= total - 3) {
+			pages.push(1);
+			pages.push('...');
+			for (let i = total - 4; i <= total; i++) pages.push(i);
+		} else {
+			pages.push(1);
+			pages.push('...');
+			pages.push(current - 1);
+			pages.push(current);
+			pages.push(current + 1);
+			pages.push('...');
+			pages.push(total);
+		}
+		return pages;
 	}
 
 	function handleReset() {
@@ -79,7 +120,7 @@
 		<div>
 			<h1 class="text-2xl font-bold text-slate-900 tracking-tight">Log aktivitas sistem</h1>
 			<p class="text-sm text-slate-500 mt-1">
-				Mencatat login, perubahan data, token, dan aksi penting lainnya (300 terbaru).
+				Mencatat login, perubahan data, token, dan aksi penting lainnya (50 per halaman).
 			</p>
 		</div>
 
@@ -192,14 +233,85 @@
 			</table>
 		</div>
 
-		<!-- Footer count -->
+		<!-- Footer count & Pagination -->
 		{#if logs.length > 0}
-			<div class="px-4 py-3 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-				<span>Menampilkan <b>{logs.length}</b> log aktivitas terbaru</span>
-				{#if data.searchQuery}
-					<span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md font-medium">
-						Filter: "{data.searchQuery}"
+			<div class="px-4 py-3.5 bg-slate-50/70 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+				<!-- Item count info -->
+				<div class="flex items-center gap-2 flex-wrap">
+					<span>
+						Menampilkan <b>{startItem} - {endItem}</b> dari <b>{pagination.totalCount.toLocaleString('id-ID')}</b> log
 					</span>
+					<span class="text-slate-300">•</span>
+					<span class="text-slate-500">50 per halaman</span>
+					{#if data.searchQuery}
+						<span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md font-medium">
+							Filter: "{data.searchQuery}"
+						</span>
+					{/if}
+				</div>
+
+				<!-- Pagination controls -->
+				{#if pagination.totalPages > 1}
+					<div class="flex items-center gap-1 flex-wrap justify-center">
+						<!-- First Page -->
+						<button
+							type="button"
+							on:click={() => goToPage(1)}
+							disabled={pagination.page <= 1}
+							class="px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-colors {pagination.page <= 1 ? 'border-slate-200 text-slate-300 bg-slate-50 cursor-not-allowed' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100 shadow-2xs'}"
+							title="Halaman Pertama"
+						>
+							«
+						</button>
+
+						<!-- Prev Page -->
+						<button
+							type="button"
+							on:click={() => goToPage(pagination.page - 1)}
+							disabled={pagination.page <= 1}
+							class="px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-colors {pagination.page <= 1 ? 'border-slate-200 text-slate-300 bg-slate-50 cursor-not-allowed' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100 shadow-2xs'}"
+							title="Halaman Sebelumnya"
+						>
+							‹
+						</button>
+
+						<!-- Page Numbers -->
+						{#each pageNumbers as p}
+							{#if p === '...'}
+								<span class="px-2 py-1 text-slate-400 font-medium">...</span>
+							{:else}
+								<button
+									type="button"
+									on:click={() => goToPage(Number(p))}
+									class="min-w-[32px] px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-colors {p === pagination.page ? 'bg-blue-600 border-blue-600 text-white shadow-xs' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'}"
+								>
+									{p}
+								</button>
+							{/if}
+						{/each}
+
+						<!-- Next Page -->
+						<button
+							type="button"
+							on:click={() => goToPage(pagination.page + 1)}
+							disabled={pagination.page >= pagination.totalPages}
+							class="px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-colors {pagination.page >= pagination.totalPages ? 'border-slate-200 text-slate-300 bg-slate-50 cursor-not-allowed' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100 shadow-2xs'}"
+							title="Halaman Berikutnya"
+						>
+							›
+						</button>
+
+						<!-- Last Page -->
+						<button
+							type="button"
+							on:click={() => goToPage(pagination.totalPages)}
+							disabled={pagination.page >= pagination.totalPages}
+							class="px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-colors {pagination.page >= pagination.totalPages ? 'border-slate-200 text-slate-300 bg-slate-50 cursor-not-allowed' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100 shadow-2xs'}"
+							title="Halaman Terakhir"
+						>
+							»
+						</button>
+					</div>
 				{/if}
 			</div>
 		{/if}
