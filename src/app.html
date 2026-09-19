@@ -10,6 +10,18 @@
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 		<title>Ujian Online Madrasah</title>
+		<script>
+			// Guard against Chrome DevTools Soft Navigation internal bug (reportAllChanges / reading 'startTime')
+			try {
+				window.devToolsReportSoftNavs = false;
+				window.addEventListener('error', function(event) {
+					if (event && event.message && event.message.includes("reading 'startTime'")) {
+						event.stopImmediatePropagation();
+						event.preventDefault();
+					}
+				}, true);
+			} catch (e) {}
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="tap">
