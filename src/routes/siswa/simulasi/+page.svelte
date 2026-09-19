@@ -422,44 +422,29 @@
 <svelte:document on:fullscreenchange={handleFullscreenChange} />
 
 {#if !isSimulating}
-	<!-- Dedicated Explanation Page: "Halaman Khusus Penjelasan Soal, Jumlah Soal, Mapel, Tata Cara, & Tombol Mulai Simulasi" -->
-	<div class="min-h-screen bg-slate-50 flex flex-col text-slate-800 antialiased">
-		<!-- Top Bar -->
-		<header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 py-3 shadow-xs">
-			<div class="max-w-5xl mx-auto flex items-center justify-between gap-4">
-				<a
-					href="/siswa"
-					class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors py-1.5 px-3 rounded-xl hover:bg-slate-100/80"
-				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-					</svg>
-					<span>Kembali ke Beranda</span>
-				</a>
-
-				<div class="flex items-center gap-2">
-					<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold">
-						<span class="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></span>
-						Simulasi CBT Madrasah
-					</span>
-				</div>
-
-				<a
-					href="/siswa/tata-tertib"
-					class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-700 hover:underline"
-				>
-					<span class="hidden sm:inline">Panduan &</span> Tata Tertib
-					<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-					</svg>
-				</a>
+	<!-- Dedicated Explanation Page inside Student Layout (with Sidebar) -->
+	<div class="space-y-6 sm:space-y-8 pb-12">
+		<!-- Breadcrumb / Header Quick Link -->
+		<div class="flex items-center justify-between flex-wrap gap-3">
+			<div class="flex items-center gap-2 text-xs font-semibold text-slate-500">
+				<a href="/siswa" class="hover:text-indigo-600 transition-colors">Beranda</a>
+				<span>/</span>
+				<span class="text-indigo-600 font-bold">Simulasi CBT</span>
 			</div>
-		</header>
 
-		<!-- Main Content Container -->
-		<main class="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
-			<!-- Hero Card with Gradient & Details -->
-			<div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-700 via-indigo-800 to-purple-900 text-white p-6 sm:p-8 md:p-10 shadow-xl border border-indigo-600/30">
+			<a
+				href="/siswa/tata-tertib"
+				class="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100/80 px-3 py-1.5 rounded-xl border border-indigo-200/60 transition-colors"
+			>
+				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+				</svg>
+				<span>Panduan & Tata Tertib Lengkap</span>
+			</a>
+		</div>
+
+		<!-- Hero Card with Gradient & Details -->
+		<div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-700 via-indigo-800 to-purple-900 text-white p-6 sm:p-8 md:p-10 shadow-xl border border-indigo-600/30">
 				<!-- Ambient Glow Elements -->
 				<div class="absolute -right-16 -bottom-16 w-64 h-64 rounded-full bg-white/10 blur-2xl pointer-events-none"></div>
 				<div class="absolute top-0 right-1/4 w-32 h-32 rounded-full bg-purple-500/20 blur-xl pointer-events-none"></div>
@@ -768,10 +753,9 @@
 					</svg>
 				</a>
 			</div>
-		</main>
 	</div>
 {:else}
-	<div class="min-h-screen bg-slate-50 flex flex-col select-none">
+	<div class="fixed inset-0 z-50 bg-slate-50 flex flex-col select-none overflow-y-auto">
 	<!-- Exam Header (SAMA PERSIS DENGAN TAMPILAN UJIAN ASLI) -->
 	<header class="sticky top-0 z-30 bg-white/95 backdrop-blur-xl border-b border-slate-200 px-4 py-2.5 shadow-xs">
 		<div class="max-w-4xl mx-auto flex flex-col gap-2">
