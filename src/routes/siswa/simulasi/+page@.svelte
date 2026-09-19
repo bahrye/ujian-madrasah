@@ -10,7 +10,10 @@
 
 	export let data;
 
-	// Daftar 25 soal simulasi yang diacak
+	// State apakah sedang di halaman pengantar atau sedang menjalankan ujian simulasi
+	let isSimulating = false;
+
+	// Daftar soal simulasi yang diacak saat simulasi dimulai
 	let questions: SimulationQuestion[] = [];
 	let currentIndex = 0;
 	let showNav = false;
@@ -28,6 +31,89 @@
 	let currentEndTime = '';
 	let timeElapsedSeconds = 0;
 	let elapsedInterval: any = null;
+
+	// Metadata & Perhitungan untuk Halaman Penjelasan
+	$: sourceQuestions = (data.questions && data.questions.length > 0) ? data.questions : SIMULATION_QUESTIONS;
+
+	const SUBJECT_META: Record<string, { bg: string; text: string; border: string; icon: string }> = {
+		'Matematika': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', icon: '📐' },
+		'IPA': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', icon: '🔬' },
+		'IPS': { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200', icon: '🌍' },
+		'Bahasa Indonesia': { bg: 'bg-cyan-50', text: 'text-cyan-700', border: 'border-cyan-200', icon: '📖' },
+		'Bahasa Arab': { bg: 'bg-teal-50', text: 'text-teal-700', border: 'border-teal-200', icon: '🕌' },
+		'Bahasa Inggris': { bg: 'bg-sky-50', text: 'text-sky-700', border: 'border-sky-200', icon: '🌐' },
+		"Al-Qur'an Hadis": { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200', icon: '📗' },
+		'Akidah Akhlak': { bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200', icon: '🤲' },
+		'Fikih': { bg: 'bg-violet-50', text: 'text-violet-700', border: 'border-violet-200', icon: '⚖️' },
+		'SKI': { bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-200', icon: '📜' }
+	};
+
+	$: subjectDistribution = (() => {
+		const map: Record<string, number> = {};
+		for (const q of sourceQuestions) {
+			const s = q.subject || 'Umum';
+			map[s] = (map[s] || 0) + 1;
+		}
+		return Object.entries(map).map(([name, count]) => ({
+			name,
+			count,
+			meta: SUBJECT_META[name] || { bg: 'bg-slate-50', text: 'text-slate-700', border: 'border-slate-200', icon: '📚' }
+		}));
+	})();
+
+	const TYPE_METADATA: Record<string, { label: string; icon: string; badge: string; color: string; desc: string }> = {
+		pilihan_ganda: {
+			label: 'Pilihan Ganda',
+			icon: '🔘',
+			badge: 'Tunggal',
+			color: 'bg-blue-100 text-blue-700 border-blue-200',
+			desc: 'Memilih 1 jawaban paling tepat dari opsi yang tersedia (A, B, C, D, atau E).'
+		},
+		pilihan_ganda_kompleks: {
+			label: 'Pilihan Ganda Kompleks',
+			icon: '☑️',
+			badge: 'Centang Banyak',
+			color: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+			desc: 'Memiliki lebih dari satu jawaban benar. Centang seluruh kotak opsi yang sesuai.'
+		},
+		benar_salah: {
+			label: 'Benar / Salah',
+			icon: '⚖️',
+			badge: 'B / S',
+			color: 'bg-amber-100 text-amber-700 border-amber-200',
+			desc: 'Menilai kebenaran dari pernyataan tunggal atau baris tabel dengan tombol B (Benar) atau S (Salah).'
+		},
+		menjodohkan: {
+			label: 'Menjodohkan',
+			icon: '🔗',
+			badge: 'Pasangan Kartu',
+			color: 'bg-purple-100 text-purple-700 border-purple-200',
+			desc: 'Menghubungkan kartu pertanyaan di sisi kiri dengan pasangan jawaban di sisi kanan.'
+		},
+		isian_singkat: {
+			label: 'Isian Singkat',
+			icon: '✍️',
+			badge: 'Ketik Singkat',
+			color: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+			desc: 'Mengetik jawaban singkat langsung ke dalam kolom teks berupa kata kunci, frasa, atau angka.'
+		},
+		essay: {
+			label: 'Uraian / Essay',
+			icon: '📝',
+			badge: 'Uraian Teks',
+			color: 'bg-rose-100 text-rose-700 border-rose-200',
+			desc: 'Menuliskan uraian, argumen, atau langkah penyelesaian secara lengkap pada kotak jawaban.'
+		}
+	};
+
+	$: typeDistribution = (() => {
+		const map: Record<string, number> = {};
+		for (const q of sourceQuestions) {
+			const t = q.type || 'pilihan_ganda';
+			map[t] = (map[t] || 0) + 1;
+		}
+		return map;
+	})();
 
 	// Fullscreen state
 	let isFullscreen = false;
@@ -286,6 +372,27 @@
 		showResultModal = true;
 	}
 
+	function startSimulation() {
+		isSimulating = true;
+		initSimulation();
+		requestWakeLock();
+		if (browser && !document.fullscreenElement) {
+			document.documentElement.requestFullscreen().catch(() => {});
+		}
+		scrollToTop();
+	}
+
+	function backToExplanation() {
+		if (elapsedInterval) clearInterval(elapsedInterval);
+		if (browser && document.fullscreenElement) {
+			document.exitFullscreen().catch(() => {});
+		}
+		showExitConfirm = false;
+		showResultModal = false;
+		isSimulating = false;
+		scrollToTop();
+	}
+
 	function exitSimulation() {
 		if (elapsedInterval) clearInterval(elapsedInterval);
 		if (browser && document.fullscreenElement) {
@@ -295,19 +402,8 @@
 	}
 
 	onMount(() => {
-		initSimulation();
-		requestWakeLock();
 		if (browser) {
 			isFullscreen = !!document.fullscreenElement;
-			// Coba minta fullscreen jika pengguna berinteraksi
-			const handleFirstInteraction = () => {
-				if (!hasRequestedFullscreen && !document.fullscreenElement) {
-					hasRequestedFullscreen = true;
-					document.documentElement.requestFullscreen().catch(() => {});
-				}
-				window.removeEventListener('click', handleFirstInteraction);
-			};
-			window.addEventListener('click', handleFirstInteraction, { once: true });
 		}
 	});
 
@@ -320,12 +416,362 @@
 </script>
 
 <svelte:head>
-	<title>Simulasi Ujian CBT Madrasah — Ujian Online Madrasah</title>
+	<title>{isSimulating ? '[SIMULASI] CBT' : 'Informasi & Panduan Simulasi'} — Ujian Online Madrasah</title>
 </svelte:head>
 
 <svelte:document on:fullscreenchange={handleFullscreenChange} />
 
-<div class="min-h-screen bg-slate-50 flex flex-col select-none">
+{#if !isSimulating}
+	<!-- Dedicated Explanation Page: "Halaman Khusus Penjelasan Soal, Jumlah Soal, Mapel, Tata Cara, & Tombol Mulai Simulasi" -->
+	<div class="min-h-screen bg-slate-50 flex flex-col text-slate-800 antialiased">
+		<!-- Top Bar -->
+		<header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 py-3 shadow-xs">
+			<div class="max-w-5xl mx-auto flex items-center justify-between gap-4">
+				<a
+					href="/siswa"
+					class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors py-1.5 px-3 rounded-xl hover:bg-slate-100/80"
+				>
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+					</svg>
+					<span>Kembali ke Beranda</span>
+				</a>
+
+				<div class="flex items-center gap-2">
+					<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold">
+						<span class="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></span>
+						Simulasi CBT Madrasah
+					</span>
+				</div>
+
+				<a
+					href="/siswa/tata-tertib"
+					class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-700 hover:underline"
+				>
+					<span class="hidden sm:inline">Panduan &</span> Tata Tertib
+					<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+					</svg>
+				</a>
+			</div>
+		</header>
+
+		<!-- Main Content Container -->
+		<main class="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
+			<!-- Hero Card with Gradient & Details -->
+			<div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-700 via-indigo-800 to-purple-900 text-white p-6 sm:p-8 md:p-10 shadow-xl border border-indigo-600/30">
+				<!-- Ambient Glow Elements -->
+				<div class="absolute -right-16 -bottom-16 w-64 h-64 rounded-full bg-white/10 blur-2xl pointer-events-none"></div>
+				<div class="absolute top-0 right-1/4 w-32 h-32 rounded-full bg-purple-500/20 blur-xl pointer-events-none"></div>
+
+				<div class="relative z-10 max-w-3xl space-y-3 sm:space-y-4">
+					<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-indigo-100 text-xs font-bold tracking-wide uppercase">
+						<span>✨</span>
+						<span>Latihan Mandiri & Uji Coba CBT</span>
+					</div>
+
+					<h1 class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight leading-tight">
+						Simulasi Ujian Berbasis Komputer
+					</h1>
+
+					<p class="text-indigo-100/90 text-xs sm:text-sm md:text-base leading-relaxed">
+						Halaman simulasi ini dirancang khusus menyerupai antarmuka ujian resmi CBT Madrasah. Pelajari seluruh penjelasan soal, rincian mata pelajaran, dan tata cara menjawab di bawah sebelum memulai ujian.
+					</p>
+
+					<!-- Student & School Badge Chips -->
+					<div class="flex items-center gap-2 pt-2 flex-wrap text-xs font-semibold">
+						<span class="px-3 py-1 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center gap-1.5">
+							<span>👤</span>
+							<span>{data.user?.name || 'Peserta Ujian'}</span>
+						</span>
+						<span class="px-3 py-1 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center gap-1.5">
+							<span>🏫</span>
+							<span>{data.schoolName || 'Madrasah'}</span>
+						</span>
+						<span class="px-3 py-1 rounded-xl bg-emerald-400/20 border border-emerald-400/40 text-emerald-200 flex items-center gap-1.5">
+							<span>🎓</span>
+							<span>{data.displayLevel || data.className || 'Tingkat Siswa'}</span>
+						</span>
+					</div>
+				</div>
+			</div>
+
+			<!-- 4 Overview Metric Cards -->
+			<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+				<!-- Jumlah Soal -->
+				<div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs space-y-2 hover:border-indigo-200 transition-colors">
+					<div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl">
+						📝
+					</div>
+					<div>
+						<p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Jumlah Soal</p>
+						<p class="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">{sourceQuestions.length} Nomor</p>
+						<p class="text-[11px] text-slate-400 mt-0.5">Soal teracak otomatis</p>
+					</div>
+				</div>
+
+				<!-- Alokasi Waktu -->
+				<div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs space-y-2 hover:border-amber-200 transition-colors">
+					<div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
+						⏱️
+					</div>
+					<div>
+						<p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Durasi Waktu</p>
+						<p class="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">30 Menit</p>
+						<p class="text-[11px] text-slate-400 mt-0.5">Timer hitung mundur</p>
+					</div>
+				</div>
+
+				<!-- Mata Pelajaran -->
+				<div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs space-y-2 hover:border-emerald-200 transition-colors">
+					<div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
+						📚
+					</div>
+					<div>
+						<p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Mata Pelajaran</p>
+						<p class="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">{subjectDistribution.length} Mapel</p>
+						<p class="text-[11px] text-slate-400 mt-0.5">Kombinasi kurikulum</p>
+					</div>
+				</div>
+
+				<!-- Sistem Evaluasi -->
+				<div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs space-y-2 hover:border-purple-200 transition-colors">
+					<div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
+						🎯
+					</div>
+					<div>
+						<p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Hasil & Nilai</p>
+						<p class="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">Skor Instan</p>
+						<p class="text-[11px] text-slate-400 mt-0.5">Skala 0 - 100 langsung</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Section 1: Mapel Soal (Mata Pelajaran yang Diujikan) -->
+			<div class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 border border-slate-200 shadow-xs space-y-4">
+				<div class="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-slate-100">
+					<div>
+						<div class="flex items-center gap-2">
+							<span class="text-xl">📚</span>
+							<h2 class="text-base sm:text-lg font-bold text-slate-800">Mata Pelajaran yang Diujikan (Mapel Soal)</h2>
+						</div>
+						<p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+							Paket simulasi ini merangkum {subjectDistribution.length} mata pelajaran pokok yang disesuaikan dengan kurikulum <strong>{data.displayLevel || 'Madrasah'}</strong>:
+						</p>
+					</div>
+					<span class="px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold">
+						Total {sourceQuestions.length} Butir Soal
+					</span>
+				</div>
+
+				<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-3 pt-1">
+					{#each subjectDistribution as sub}
+						<div class="p-3 rounded-xl border {sub.meta.border} {sub.meta.bg} flex items-center justify-between gap-2 shadow-2xs">
+							<div class="flex items-center gap-2 min-w-0">
+								<span class="text-base sm:text-lg shrink-0">{sub.meta.icon}</span>
+								<span class="text-xs font-bold {sub.meta.text} truncate" title={sub.name}>{sub.name}</span>
+							</div>
+							<span class="text-[10px] sm:text-xs font-extrabold px-2 py-0.5 rounded-md bg-white/90 border border-slate-200/80 {sub.meta.text} shrink-0">
+								{sub.count} Soal
+							</span>
+						</div>
+					{/each}
+				</div>
+			</div>
+
+			<!-- Section 2: Penjelasan Soal-Soal yang Ada (Tipe Soal) -->
+			<div class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 border border-slate-200 shadow-xs space-y-4">
+				<div class="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-slate-100">
+					<div>
+						<div class="flex items-center gap-2">
+							<span class="text-xl">🧩</span>
+							<h2 class="text-base sm:text-lg font-bold text-slate-800">Penjelasan Model Tipe Soal Ujian</h2>
+						</div>
+						<p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+							Terdapat 6 ragam model tipe soal yang akan diuji dalam sesi simulasi ini:
+						</p>
+					</div>
+					<a
+						href="/siswa/tata-tertib"
+						class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 hover:underline"
+					>
+						Coba Simulasi Interaktif
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+						</svg>
+					</a>
+				</div>
+
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 pt-1">
+					{#each Object.entries(TYPE_METADATA) as [typeKey, typeInfo]}
+						{@const count = typeDistribution[typeKey] || 0}
+						<div class="p-4 rounded-2xl border border-slate-200/90 bg-slate-50/50 hover:bg-white hover:border-indigo-200 hover:shadow-xs transition-all space-y-2 flex flex-col justify-between">
+							<div class="space-y-2">
+								<div class="flex items-center justify-between gap-2">
+									<div class="flex items-center gap-2">
+										<span class="text-2xl">{typeInfo.icon}</span>
+										<h3 class="text-sm font-bold text-slate-800">{typeInfo.label}</h3>
+									</div>
+									<span class="text-[10px] font-bold px-2 py-0.5 rounded-full border {typeInfo.color}">
+										{typeInfo.badge}
+									</span>
+								</div>
+								<p class="text-xs text-slate-600 leading-relaxed">
+									{typeInfo.desc}
+								</p>
+							</div>
+
+							<div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+								<span>Kuantitas Soal:</span>
+								<span class="font-extrabold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
+									{count} Soal
+								</span>
+							</div>
+						</div>
+					{/each}
+				</div>
+			</div>
+
+			<!-- Section 3: Tata Cara Menjawab Soal & Aturan Simulasi -->
+			<div class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 border border-slate-200 shadow-xs space-y-4">
+				<div class="pb-3 border-b border-slate-100">
+					<div class="flex items-center gap-2">
+						<span class="text-xl">💡</span>
+						<h2 class="text-base sm:text-lg font-bold text-slate-800">Tata Cara Menjawab Soal & Panduan Pengerjaan</h2>
+					</div>
+					<p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+						Ikuti petunjuk teknis berikut agar simulasi pengerjaan Anda berjalan lancar:
+					</p>
+				</div>
+
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 pt-1">
+					<!-- Step 1 -->
+					<div class="flex items-start gap-3 p-3.5 rounded-2xl bg-indigo-50/50 border border-indigo-100/80">
+						<div class="w-7 h-7 rounded-xl bg-indigo-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
+							1
+						</div>
+						<div class="space-y-1">
+							<h4 class="text-xs sm:text-sm font-bold text-slate-800">Memilih & Mengisi Jawaban</h4>
+							<p class="text-xs text-slate-600 leading-relaxed">
+								Klik opsi jawaban untuk pilihan ganda, centang beberapa opsi untuk pilihan ganda kompleks, klik tombol <strong>B/S</strong> untuk benar-salah, hubungkan kartu untuk menjodohkan, atau ketik langsung untuk isian dan uraian. Jawaban tersimpan otomatis secara real-time.
+							</p>
+						</div>
+					</div>
+
+					<!-- Step 2 -->
+					<div class="flex items-start gap-3 p-3.5 rounded-2xl bg-amber-50/50 border border-amber-100/80">
+						<div class="w-7 h-7 rounded-xl bg-amber-500 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
+							2
+						</div>
+						<div class="space-y-1">
+							<h4 class="text-xs sm:text-sm font-bold text-slate-800">Menggunakan Tombol Ragu-Ragu</h4>
+							<p class="text-xs text-slate-600 leading-relaxed">
+								Jika Anda belum yakin dengan jawaban yang dipilih, klik tombol <strong>Ragu-Ragu</strong> (kuning). Nomor soal akan berubah warna kuning pada panel Navigasi Soal sehingga Anda dapat meninjaunya kembali dengan mudah.
+							</p>
+						</div>
+					</div>
+
+					<!-- Step 3 -->
+					<div class="flex items-start gap-3 p-3.5 rounded-2xl bg-blue-50/50 border border-blue-100/80">
+						<div class="w-7 h-7 rounded-xl bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
+							3
+						</div>
+						<div class="space-y-1">
+							<h4 class="text-xs sm:text-sm font-bold text-slate-800">Navigasi Antar Nomor Soal</h4>
+							<p class="text-xs text-slate-600 leading-relaxed">
+								Gunakan tombol <strong>Sebelumnya</strong> dan <strong>Selanjutnya</strong> di bagian bawah untuk berpindah soal. Anda juga dapat menekan tombol <strong>Navigasi Soal</strong> untuk membuka kisi-kisi seluruh nomor dan melompat ke nomor manapun.
+							</p>
+						</div>
+					</div>
+
+					<!-- Step 4 -->
+					<div class="flex items-start gap-3 p-3.5 rounded-2xl bg-purple-50/50 border border-purple-100/80">
+						<div class="w-7 h-7 rounded-xl bg-purple-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
+							4
+						</div>
+						<div class="space-y-1">
+							<h4 class="text-xs sm:text-sm font-bold text-slate-800">Batas Waktu & Mode Layar Penuh</h4>
+							<p class="text-xs text-slate-600 leading-relaxed">
+								Timer 30 menit akan berjalan mundur di bagian atas layar. Anda disarankan mengaktifkan mode <strong>Layar Penuh (Fullscreen)</strong> agar tampilan lebih leluasa dan terbebas dari gangguan notifikasi lain.
+							</p>
+						</div>
+					</div>
+
+					<!-- Step 5 -->
+					<div class="sm:col-span-2 flex items-start gap-3 p-3.5 rounded-2xl bg-emerald-50/50 border border-emerald-100/80">
+						<div class="w-7 h-7 rounded-xl bg-emerald-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
+							5
+						</div>
+						<div class="space-y-1">
+							<h4 class="text-xs sm:text-sm font-bold text-slate-800">Menyelesaikan & Melihat Hasil Simulasi</h4>
+							<p class="text-xs text-slate-600 leading-relaxed">
+								Pada nomor soal terakhir, tombol hijau <strong>Selesai & Kumpulkan</strong> akan muncul. Ketikkan kata <span class="font-bold text-slate-900 bg-white px-1.5 py-0.5 rounded border border-emerald-300 font-mono">SELESAI</span> untuk konfirmasi akhir. Nilai skor pencapaian, jumlah benar, dan jumlah salah akan langsung ditampilkan.
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Big CTA Card: Tombol Mulai Simulasi -->
+			<div class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-indigo-700/50 relative overflow-hidden">
+				<div class="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+					<div class="space-y-2 text-center md:text-left">
+						<span class="inline-block px-3 py-0.5 rounded-full bg-indigo-500/30 border border-indigo-400/30 text-indigo-200 text-xs font-bold">
+							🚀 Siap Menguji Pemahaman Anda?
+						</span>
+						<h3 class="text-xl sm:text-2xl font-black">
+							Mulai Ujian Simulasi Sekarang
+						</h3>
+						<p class="text-xs sm:text-sm text-indigo-200/90 max-w-xl">
+							Tekan tombol di samping untuk langsung masuk ke antarmuka ujian CBT. Waktu pengerjaan 30 menit akan aktif setelah Anda memulai.
+						</p>
+					</div>
+
+					<div class="shrink-0 w-full md:w-auto flex flex-col sm:flex-row md:flex-col items-center gap-2.5">
+						<button
+							type="button"
+							on:click={startSimulation}
+							class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-600 hover:to-teal-600 text-white font-extrabold text-base sm:text-lg rounded-2xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer"
+						>
+							<svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+								<path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+							</svg>
+							<span>Mulai Simulasi Ujian</span>
+						</button>
+						<span class="text-[11px] text-indigo-300 flex items-center gap-1">
+							<span>⏱️</span> Waktu 30 menit otomatis berjalan
+						</span>
+					</div>
+				</div>
+			</div>
+
+			<!-- Secondary Footer Links -->
+			<div class="flex items-center justify-between flex-wrap gap-3 pt-2 text-xs text-slate-500 pb-8">
+				<a
+					href="/siswa"
+					class="hover:text-indigo-600 font-semibold flex items-center gap-1.5 transition-colors"
+				>
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+					</svg>
+					Kembali ke Beranda Siswa
+				</a>
+
+				<a
+					href="/siswa/tata-tertib"
+					class="hover:text-indigo-600 font-semibold flex items-center gap-1.5 transition-colors"
+				>
+					<span>Pelajari Panduan & Tata Tertib Ujian</span>
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+					</svg>
+				</a>
+			</div>
+		</main>
+	</div>
+{:else}
+	<div class="min-h-screen bg-slate-50 flex flex-col select-none">
 	<!-- Exam Header (SAMA PERSIS DENGAN TAMPILAN UJIAN ASLI) -->
 	<header class="sticky top-0 z-30 bg-white/95 backdrop-blur-xl border-b border-slate-200 px-4 py-2.5 shadow-xs">
 		<div class="max-w-4xl mx-auto flex flex-col gap-2">
@@ -387,6 +833,19 @@
 							</svg>
 							<span class="hidden sm:inline">Layar Penuh</span>
 						{/if}
+					</button>
+
+					<!-- Tombol Keluar Simulasi -->
+					<button
+						type="button"
+						on:click={() => (showExitConfirm = true)}
+						class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-rose-200 text-rose-600 bg-rose-50 hover:bg-rose-100 transition-colors"
+						title="Keluar dari simulasi"
+					>
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+						</svg>
+						<span class="hidden sm:inline">Keluar</span>
 					</button>
 				</div>
 
@@ -671,20 +1130,16 @@
 			<div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2 text-xs">
 				<p class="font-bold text-slate-700">Mata Pelajaran yang Telah Dicoba ({questions.length} Nomor — {data.displayLevel || 'Madrasah'}):</p>
 				<div class="flex flex-wrap gap-1.5">
-					<span class="px-2 py-0.5 rounded-lg bg-indigo-100 text-indigo-800 font-semibold">Bahasa Arab</span>
-					<span class="px-2 py-0.5 rounded-lg bg-blue-100 text-blue-800 font-semibold">Matematika</span>
-					<span class="px-2 py-0.5 rounded-lg bg-emerald-100 text-emerald-800 font-semibold">IPA</span>
-					<span class="px-2 py-0.5 rounded-lg bg-amber-100 text-amber-800 font-semibold">IPS</span>
-					<span class="px-2 py-0.5 rounded-lg bg-cyan-100 text-cyan-800 font-semibold">Bahasa Indonesia</span>
-					<span class="px-2 py-0.5 rounded-lg bg-violet-100 text-violet-800 font-semibold">Akidah Akhlak</span>
-					<span class="px-2 py-0.5 rounded-lg bg-orange-100 text-orange-800 font-semibold">SKI</span>
-					<span class="px-2 py-0.5 rounded-lg bg-teal-100 text-teal-800 font-semibold">Fikih</span>
-					<span class="px-2 py-0.5 rounded-lg bg-rose-100 text-rose-800 font-semibold">Al-Qur'an Hadis</span>
+					{#each subjectDistribution as sub}
+						<span class="px-2 py-0.5 rounded-lg {sub.meta.bg} {sub.meta.text} border {sub.meta.border} font-semibold">
+							{sub.meta.icon} {sub.name} ({sub.count})
+						</span>
+					{/each}
 				</div>
 			</div>
 
 			<!-- Action Buttons -->
-			<div class="flex flex-col sm:flex-row gap-3 pt-2">
+			<div class="flex flex-col sm:flex-row gap-2.5 pt-2">
 				<button
 					type="button"
 					on:click={initSimulation}
@@ -693,14 +1148,21 @@
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d={ICONS.refresh} />
 					</svg>
-					Ulangi Simulasi (Acak Soal Baru)
+					Ulangi Simulasi
+				</button>
+				<button
+					type="button"
+					on:click={backToExplanation}
+					class="btn btn-secondary flex-1 py-3 rounded-xl text-xs sm:text-sm font-bold"
+				>
+					Info & Panduan
 				</button>
 				<button
 					type="button"
 					on:click={exitSimulation}
-					class="btn btn-secondary flex-1 py-3 rounded-xl text-xs sm:text-sm font-bold"
+					class="btn btn-ghost flex-1 py-3 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:bg-slate-100"
 				>
-					Kembali ke Dashboard
+					Ke Dashboard
 				</button>
 			</div>
 		</div>
@@ -719,26 +1181,34 @@
 				</div>
 				<h3 class="text-base font-extrabold text-slate-800">Keluar dari Simulasi?</h3>
 				<p class="text-xs text-slate-500">
-					Progres simulasi saat ini akan dibatalkan dan Anda akan kembali ke halaman Dashboard Siswa.
+					Pilih apakah Anda ingin kembali ke halaman informasi atau kembali ke Beranda Siswa.
 				</p>
 			</div>
 
-			<div class="flex gap-2.5 pt-2">
+			<div class="flex flex-col sm:flex-row gap-2 pt-2">
 				<button
 					type="button"
 					class="btn btn-secondary flex-1 text-xs py-2.5 rounded-xl"
 					on:click={() => (showExitConfirm = false)}
 				>
-					Lanjut Simulasi
+					Lanjut Ujian
+				</button>
+				<button
+					type="button"
+					class="btn btn-warning flex-1 text-xs py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 border-none text-white font-bold"
+					on:click={backToExplanation}
+				>
+					Ke Info
 				</button>
 				<button
 					type="button"
 					class="btn btn-danger flex-1 text-xs py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 border-none text-white font-bold"
 					on:click={exitSimulation}
 				>
-					Keluar
+					Dashboard
 				</button>
 			</div>
 		</div>
 	</div>
+{/if}
 {/if}
