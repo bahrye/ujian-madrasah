@@ -181,14 +181,15 @@
 	}
 
 	$: breadcrumbs = buildBreadcrumbs(currentPath, menuItems, homeUrl);
+	$: isExamPage = currentPath.startsWith('/siswa/ujian');
 </script>
 
-<div class="min-h-screen bg-slate-50">
+<div class="min-h-screen bg-slate-50 flex flex-col">
 	<Sidebar {menuItems} {user} bind:isOpen={sidebarOpen} />
 	<Navbar {user} {userInfo} on:toggle={() => (sidebarOpen = !sidebarOpen)} />
 
-	<main class="lg:ml-64 min-h-screen">
-		<div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+	<main class="lg:ml-64 min-h-screen flex flex-col justify-between">
+		<div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full flex-1">
 			<!-- Breadcrumb Navigation for Fast Return to Home -->
 			{#if breadcrumbs && breadcrumbs.length > 1}
 				<nav class="mb-4 sm:mb-6 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold text-slate-500 flex-wrap select-none" aria-label="Breadcrumb">
@@ -216,6 +217,12 @@
 
 			<slot />
 		</div>
+
+		{#if !isExamPage}
+			<footer class="mt-auto py-3.5 px-4 border-t border-slate-200/70 text-center text-xs text-slate-400 select-none">
+				Dibuat oleh <a href="https://wa.me/qr/FMVS3NLDIRUAA1" target="_blank" rel="noopener noreferrer" class="font-semibold text-slate-600 hover:text-indigo-600 transition-colors hover:underline">SYAMSUL BAHRI</a>
+			</footer>
+		{/if}
 	</main>
 
 	<Toast />

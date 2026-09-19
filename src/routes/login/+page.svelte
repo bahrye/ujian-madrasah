@@ -262,9 +262,14 @@
 		</div>
 
 		<!-- Footer -->
-		<p class="text-center text-xs text-primary-300/60 mt-6">
-			© 2024 Ujian Online Madrasah. Seluruh hak dilindungi.
-		</p>
+		<div class="text-center space-y-1 mt-6 select-none">
+			<p class="text-xs text-primary-300/60">
+				© 2024 Ujian Online Madrasah. Seluruh hak dilindungi.
+			</p>
+			<p class="text-[11px] text-primary-300/60">
+				Dibuat oleh <a href="https://wa.me/qr/FMVS3NLDIRUAA1" target="_blank" rel="noopener noreferrer" class="font-semibold text-white/80 hover:text-white hover:underline transition-colors">SYAMSUL BAHRI</a>
+			</p>
+		</div>
 	</div>
 </div>
 
