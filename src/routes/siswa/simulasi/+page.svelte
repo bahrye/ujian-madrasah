@@ -424,14 +424,8 @@
 {#if !isSimulating}
 	<!-- Dedicated Explanation Page inside Student Layout (with Sidebar) -->
 	<div class="space-y-6 sm:space-y-8 pb-12">
-		<!-- Breadcrumb / Header Quick Link -->
-		<div class="flex items-center justify-between flex-wrap gap-3">
-			<div class="flex items-center gap-2 text-xs font-semibold text-slate-500">
-				<a href="/siswa" class="hover:text-indigo-600 transition-colors">Beranda</a>
-				<span>/</span>
-				<span class="text-indigo-600 font-bold">Simulasi CBT</span>
-			</div>
-
+		<!-- Header Quick Link -->
+		<div class="flex items-center justify-end">
 			<a
 				href="/siswa/tata-tertib"
 				class="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100/80 px-3 py-1.5 rounded-xl border border-indigo-200/60 transition-colors"
