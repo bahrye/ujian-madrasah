@@ -307,7 +307,7 @@
 			DAFTAR NILAI UJIAN
 		</h2>
 		<p class="text-xs sm:text-sm font-semibold text-black mt-1 m-0 uppercase">
-			{exam?.title || 'Ujian'}
+			{exam?.exam_type_name || exam?.exam_type_code || 'Ulangan Harian'}
 		</p>
 	</div>
 
@@ -403,7 +403,7 @@
 							</td>
 							<td class="text-center font-mono text-xs whitespace-nowrap">{s.nisn}</td>
 							<td class="text-center whitespace-nowrap">{s.className}</td>
-							<td class="text-center whitespace-nowrap">{s.roomName}</td>
+							<td class="text-center whitespace-nowrap">{s.roomName && s.roomName !== '-' ? s.roomName : '1'}</td>
 							<td class="text-center font-bold whitespace-nowrap">{s.correctCount}</td>
 							<td class="text-center font-bold whitespace-nowrap">{s.incorrectCount}</td>
 							<td class="text-center font-bold whitespace-nowrap">{s.score}</td>
