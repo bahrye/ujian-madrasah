@@ -306,8 +306,8 @@
 		<h2 class="text-base sm:text-lg font-black uppercase tracking-wider text-black underline decoration-1 underline-offset-4 m-0">
 			DAFTAR NILAI UJIAN
 		</h2>
-		<p class="text-xs sm:text-sm font-semibold text-black mt-1 m-0">
-			{exam?.exam_type_name || exam?.exam_type_code || 'Ulangan Harian'} — {exam?.title || 'Ujian'} — {classSubtitle}
+		<p class="text-xs sm:text-sm font-semibold text-black mt-1 m-0 uppercase">
+			{exam?.title || 'Ujian'}
 		</p>
 	</div>
 
@@ -376,15 +376,15 @@
 		<table class="print-table">
 			<thead>
 				<tr>
-					<th class="w-10">No</th>
+					<th class="w-[1%] whitespace-nowrap">No</th>
 					<th>Nama peserta</th>
-					<th class="w-24">NISN</th>
-					<th class="w-24">Kelas</th>
-					<th class="w-20">Ruang</th>
-					<th class="w-16">Benar</th>
-					<th class="w-16">Salah</th>
-					<th class="w-20">Nilai</th>
-					<th class="w-28">Keterangan</th>
+					<th class="w-[1%] whitespace-nowrap">NISN</th>
+					<th class="w-[1%] whitespace-nowrap">Kelas</th>
+					<th class="w-[1%] whitespace-nowrap">Ruang</th>
+					<th class="w-[1%] whitespace-nowrap">Benar</th>
+					<th class="w-[1%] whitespace-nowrap">Salah</th>
+					<th class="w-[1%] whitespace-nowrap">Nilai</th>
+					<th class="w-[1%] whitespace-nowrap">Keterangan</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -397,15 +397,17 @@
 				{:else}
 					{#each evaluatedStudents as s}
 						<tr>
-							<td class="text-center font-bold">{s.no}</td>
-							<td class="font-semibold">{s.studentName}</td>
-							<td class="text-center font-mono text-xs">{s.nisn}</td>
-							<td class="text-center">{s.className}</td>
-							<td class="text-center">{s.roomName}</td>
-							<td class="text-center font-bold">{s.correctCount}</td>
-							<td class="text-center font-bold">{s.incorrectCount}</td>
-							<td class="text-center font-bold">{s.score}</td>
-							<td class="text-center font-medium">{s.keterangan}</td>
+							<td class="text-center font-bold whitespace-nowrap">{s.no}</td>
+							<td class="font-semibold">
+								<div class="line-clamp-2 leading-tight" title={s.studentName}>{s.studentName}</div>
+							</td>
+							<td class="text-center font-mono text-xs whitespace-nowrap">{s.nisn}</td>
+							<td class="text-center whitespace-nowrap">{s.className}</td>
+							<td class="text-center whitespace-nowrap">{s.roomName}</td>
+							<td class="text-center font-bold whitespace-nowrap">{s.correctCount}</td>
+							<td class="text-center font-bold whitespace-nowrap">{s.incorrectCount}</td>
+							<td class="text-center font-bold whitespace-nowrap">{s.score}</td>
+							<td class="text-center font-medium whitespace-nowrap">{s.keterangan}</td>
 						</tr>
 					{/each}
 				{/if}
