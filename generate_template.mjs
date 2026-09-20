@@ -32,6 +32,12 @@ const doc = new Document({
             new Paragraph({ text: "" }),
             new Paragraph({ text: "=================================================" }),
             new Paragraph({ text: "" }),
+            new Paragraph({
+                children: [
+                    new TextRun({ text: "[MULAI SOAL]", color: "FF0000", bold: true }),
+                ],
+            }),
+            new Paragraph({ text: "" }),
             
             // Soal 1
             new Paragraph({ text: "1. Siapa presiden pertama Republik Indonesia?" }),
