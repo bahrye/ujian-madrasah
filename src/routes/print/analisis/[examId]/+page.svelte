@@ -466,28 +466,52 @@
 
 	<!-- LAMPIRAN KUNCI JAWABAN PANJANG -->
 	{#if analysis.some(q => q.correctKey && q.correctKey.length > 15)}
-		<div class="page-break mt-12 pt-8">
-			<h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 mb-4 text-center">
-				LAMPIRAN KUNCI JAWABAN
-			</h3>
-			<table class="print-table mx-auto" style="width: 80%;">
-				<thead>
-					<tr>
-						<th class="w-12">No</th>
-						<th class="w-40">Tipe Soal</th>
-						<th>Kunci Jawaban Lengkap</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each analysis.filter(q => q.correctKey && q.correctKey.length > 15) as q}
-						<tr>
-							<td class="text-center font-bold">{q.no}</td>
-							<td class="text-center text-[9pt]">{QUESTION_TYPE_LABELS[q.type] || q.type}</td>
-							<td class="text-left font-mono text-[9pt] break-all">{q.correctKey}</td>
-						</tr>
-					{/each}
-				</tbody>
-			</table>
+		<div class="page-break pt-8">
+			<div class="border-[1.5px] border-slate-800 rounded-xl p-6 bg-white shadow-sm print:shadow-none mb-8 relative overflow-hidden">
+				<!-- Dekorasi Latar -->
+				<div class="absolute top-0 right-0 w-32 h-32 bg-slate-100 rounded-bl-full -mr-8 -mt-8 opacity-50"></div>
+				
+				<div class="flex items-center gap-3 mb-6 relative z-10 border-b-[1.5px] border-slate-300 pb-4">
+					<div class="w-10 h-10 rounded-full bg-slate-800 text-white flex items-center justify-center shrink-0">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+						</svg>
+					</div>
+					<div>
+						<h3 class="text-lg font-black uppercase tracking-widest text-slate-900 m-0 leading-tight">
+							Lampiran Kunci Jawaban
+						</h3>
+						<p class="text-xs text-slate-600 m-0 mt-0.5 font-medium">
+							Referensi kunci jawaban lengkap untuk format soal dengan kunci yang kompleks.
+						</p>
+					</div>
+				</div>
+
+				<div class="relative z-10">
+					<table class="print-table w-full">
+						<thead>
+							<tr>
+								<th class="w-14 text-slate-900 bg-slate-100" style="padding: 8px;">No. Soal</th>
+								<th class="w-48 text-slate-900 bg-slate-100" style="padding: 8px;">Tipe Soal</th>
+								<th class="text-slate-900 bg-slate-100" style="padding: 8px;">Kunci Jawaban Lengkap</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each analysis.filter(q => q.correctKey && q.correctKey.length > 15) as q}
+								<tr>
+									<td class="text-center font-bold text-[11pt] text-slate-800 bg-slate-50/50">{q.no}</td>
+									<td class="text-center text-[9.5pt] font-semibold text-slate-700 bg-slate-50/50">
+										{QUESTION_TYPE_LABELS[q.type] || q.type}
+									</td>
+									<td class="text-left font-mono text-[9pt] break-all leading-relaxed text-slate-800" style="padding: 10px 14px;">
+										{q.correctKey}
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			</div>
 		</div>
 	{/if}
 </div>
