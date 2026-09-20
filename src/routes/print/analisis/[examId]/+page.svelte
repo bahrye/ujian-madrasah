@@ -384,7 +384,13 @@
 						<tr>
 							<td class="text-center font-bold">{q.no}</td>
 							<td class="text-center text-[9pt]">{QUESTION_TYPE_LABELS[q.type] || q.type}</td>
-							<td class="text-center font-bold text-[9pt]">{q.correctKey}</td>
+							<td class="text-center font-bold text-[9pt]">
+								{#if q.correctKey && q.correctKey.length > 15}
+									<span class="text-[7.5pt] italic text-slate-500 font-normal">Lihat Lampiran</span>
+								{:else}
+									{q.correctKey}
+								{/if}
+							</td>
 							<td class="text-center">{q.points}</td>
 							
 							<!-- Tingkat Kesukaran (P) -->
@@ -457,4 +463,31 @@
 			<p class="text-[11px] text-slate-600">NIP. {currentTeacherNip}</p>
 		</div>
 	</div>
+
+	<!-- LAMPIRAN KUNCI JAWABAN PANJANG -->
+	{#if analysis.some(q => q.correctKey && q.correctKey.length > 15)}
+		<div class="page-break mt-12 pt-8">
+			<h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 mb-4 text-center">
+				LAMPIRAN KUNCI JAWABAN
+			</h3>
+			<table class="print-table mx-auto" style="width: 80%;">
+				<thead>
+					<tr>
+						<th class="w-12">No</th>
+						<th class="w-40">Tipe Soal</th>
+						<th>Kunci Jawaban Lengkap</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each analysis.filter(q => q.correctKey && q.correctKey.length > 15) as q}
+						<tr>
+							<td class="text-center font-bold">{q.no}</td>
+							<td class="text-center text-[9pt]">{QUESTION_TYPE_LABELS[q.type] || q.type}</td>
+							<td class="text-left font-mono text-[9pt] break-all">{q.correctKey}</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
+	{/if}
 </div>
