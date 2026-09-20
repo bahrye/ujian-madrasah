@@ -111,6 +111,25 @@
 
 	$: avgWrongPct = questions.length > 0 ? (Math.round((questionDiagnostics.reduce((acc, q) => acc + q.wrongPercentage, 0) / questions.length) * 10) / 10).toString().replace('.', ',') : '0';
 	$: avgCorrectPct = questions.length > 0 ? (Math.round((questionDiagnostics.reduce((acc, q) => acc + q.correctPercentage, 0) / questions.length) * 10) / 10).toString().replace('.', ',') : '0';
+
+	// Chunk questions into groups of 20 so the matrix doesn't overflow horizontally
+	const CHUNK_SIZE = 20;
+	$: questionChunks = (() => {
+		const chunks: any[][] = [];
+		for (let i = 0; i < questions.length; i += CHUNK_SIZE) {
+			chunks.push(questions.slice(i, i + CHUNK_SIZE));
+		}
+		return chunks;
+	})();
+
+	// Detect questions with long keys (for lampiran)
+	$: longKeyQuestions = questionDiagnostics.filter((q: any) => q.correctKey && String(q.correctKey).length > 15);
+
+	// Detect if an answer display value is too long to show in matrix cell
+	function isLongAnswer(type: string, val: any): boolean {
+		if (val == null || val === '') return false;
+		return formatAnswerDisplay(type, val).length > 6;
+	}
 </script>
 
 <svelte:head>
@@ -282,93 +301,124 @@
 		</div>
 	</div>
 
-	<!-- TABEL 1: MATRIKS JAWABAN SISWA -->
+	<!-- TABEL 1: MATRIKS JAWABAN SISWA (dipecah per 20 soal) -->
 	<div class="mb-5">
 		<h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 mb-1.5 flex items-center gap-1.5">
 			<span class="w-2 h-2 rounded-full bg-slate-800"></span>
 			I. Matriks Jawaban Siswa per Butir Soal
 		</h3>
 
-		<div class="overflow-x-auto">
-			<table class="w-full border border-collapse border-black text-[10px] text-center">
-				<thead>
-					<tr class="bg-slate-100 font-bold">
-						<th class="border border-black px-1 py-1 w-8">No</th>
-						<th class="border border-black px-2 py-1 text-left min-w-[140px]">Nama Siswa</th>
-						<th class="border border-black px-1 py-1 w-14">Kelas</th>
-						<th class="border border-black px-1 py-1 w-12">Nilai</th>
-						{#each questions as q, idx}
-							<th class="border border-black px-0.5 py-1 font-mono text-[9px] min-w-[18px]">
-								S{q.question_number || idx + 1}
-							</th>
-						{/each}
-						<th class="border border-black px-1 py-1 w-12 bg-amber-50">Benar</th>
-						<th class="border border-black px-1 py-1 w-12 bg-amber-50">%</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each attempts as att, attIdx}
-						{@const stats = getStudentStats(att.id)}
-						<tr class="border-b border-black">
-							<td class="border border-black py-0.5">{attIdx + 1}</td>
-							<td class="border border-black px-1.5 py-0.5 text-left font-medium truncate max-w-[140px]">{att.student_name}</td>
-							<td class="border border-black py-0.5">{att.class_name || '-'}</td>
-							<td class="border border-black py-0.5 font-bold">{att.score != null ? att.score : 0}</td>
-
-							{#each questions as q}
-								{@const ans = answerMatrixMap[`${att.id}_${q.id}`]}
-								{@const displayAns = formatAnswerDisplay(q.type, ans?.answer_given)}
-								{#if !ans || ans.answer_given == null || ans.answer_given === ''}
-									<td class="border border-black py-0.5 text-slate-400 bg-slate-50">-</td>
-								{:else if ans.is_correct === 1 || ans.is_correct === true}
-									<td class="border border-black py-0.5 font-bold text-emerald-800 bg-emerald-50">{displayAns}</td>
-								{:else}
-									<td class="border border-black py-0.5 font-bold text-rose-800 bg-rose-50">{displayAns}</td>
+		{#each questionChunks as chunk, chunkIdx}
+			{@const chunkStart = chunkIdx * CHUNK_SIZE}
+			{@const chunkDiag = questionDiagnostics.slice(chunkStart, chunkStart + chunk.length)}
+			<div class="{chunkIdx > 0 ? 'mt-4 page-break' : ''}">
+				{#if questionChunks.length > 1}
+					<p class="text-[9px] font-semibold text-slate-500 mb-1">
+						Soal No. {(chunk[0].question_number || chunkStart + 1)} – {(chunk[chunk.length - 1].question_number || chunkStart + chunk.length)}
+					</p>
+				{/if}
+				<div class="overflow-x-auto">
+					<table class="w-full border border-collapse border-black text-[10px] text-center">
+						<thead>
+							<tr class="bg-slate-100 font-bold">
+								<th class="border border-black px-1 py-1 w-8">No</th>
+								<th class="border border-black px-2 py-1 text-left min-w-[120px]">Nama Siswa</th>
+								<th class="border border-black px-1 py-1 w-12">Kelas</th>
+								<th class="border border-black px-1 py-1 w-10">Nilai</th>
+								{#each chunk as q, idx}
+									<th class="border border-black px-0.5 py-1 font-mono text-[9px] min-w-[18px]">
+										S{q.question_number || chunkStart + idx + 1}
+									</th>
+								{/each}
+								{#if chunkIdx === questionChunks.length - 1}
+									<th class="border border-black px-1 py-1 w-12 bg-amber-50">Benar</th>
+									<th class="border border-black px-1 py-1 w-12 bg-amber-50">%</th>
 								{/if}
-							{/each}
-							<td class="border border-black py-0.5 font-bold bg-amber-50/50">{stats.ratio}</td>
-							<td class="border border-black py-0.5 font-bold bg-amber-50/50">{stats.pctStr}</td>
-						</tr>
-					{/each}
-				</tbody>
+							</tr>
+						</thead>
+						<tbody>
+							{#each attempts as att, attIdx}
+								{@const stats = getStudentStats(att.id)}
+								<tr class="border-b border-black">
+									<td class="border border-black py-0.5">{attIdx + 1}</td>
+									<td class="border border-black px-1.5 py-0.5 text-left font-medium truncate max-w-[120px]">{att.student_name}</td>
+									<td class="border border-black py-0.5">{att.class_name || '-'}</td>
+									<td class="border border-black py-0.5 font-bold">{att.score != null ? att.score : 0}</td>
 
-				<!-- Summary Rows -->
-				<tfoot>
-					<tr class="font-bold bg-slate-100 border-t border-black">
-						<td colspan="4" class="border border-black text-right px-2 py-1">KUNCI JAWABAN RESMI</td>
-						{#each questionDiagnostics as q}
-							<td class="border border-black py-0.5 text-emerald-900 bg-emerald-100 font-bold">{q.correctKey}</td>
-						{/each}
-						<td class="border border-black py-0.5 font-bold bg-emerald-100">{questions.length}/{questions.length}</td>
-						<td class="border border-black py-0.5 font-bold bg-emerald-100">100%</td>
-					</tr>
-					<tr class="font-bold bg-slate-50">
-						<td colspan="4" class="border border-black text-right px-2 py-1">JUMLAH SISWA BENAR</td>
-						{#each questionDiagnostics as q}
-							<td class="border border-black py-0.5 text-emerald-700">{q.correctCount}</td>
-						{/each}
-						<td class="border border-black py-0.5 text-slate-500">-</td>
-						<td class="border border-black py-0.5 text-slate-500">-</td>
-					</tr>
-					<tr class="font-bold bg-slate-50">
-						<td colspan="4" class="border border-black text-right px-2 py-1">TINGKAT KESALAHAN (%)</td>
-						{#each questionDiagnostics as q}
-							<td class="border border-black py-0.5 {getWrongHeatColor(q.wrongPercentage)}">{q.wrongPercentage}%</td>
-						{/each}
-						<td class="border border-black py-0.5 text-slate-500">-</td>
-						<td class="border border-black py-0.5 font-bold text-rose-800">{avgWrongPct}%</td>
-					</tr>
-					<tr class="font-bold bg-slate-50">
-						<td colspan="4" class="border border-black text-right px-2 py-1">TINGKAT BENAR (%)</td>
-						{#each questionDiagnostics as q}
-							<td class="border border-black py-0.5 text-emerald-800">{q.correctPercentage}%</td>
-						{/each}
-						<td class="border border-black py-0.5 text-slate-500">-</td>
-						<td class="border border-black py-0.5 font-bold text-emerald-800">{avgCorrectPct}%</td>
-					</tr>
-				</tfoot>
-			</table>
-		</div>
+									{#each chunk as q}
+										{@const ans = answerMatrixMap[`${att.id}_${q.id}`]}
+										{@const displayAns = formatAnswerDisplay(q.type, ans?.answer_given)}
+										{@const tooLong = isLongAnswer(q.type, ans?.answer_given)}
+										{#if !ans || ans.answer_given == null || ans.answer_given === ''}
+											<td class="border border-black py-0.5 text-slate-400 bg-slate-50">-</td>
+										{:else if ans.is_correct === 1 || ans.is_correct === true}
+											<td class="border border-black py-0.5 font-bold text-emerald-800 bg-emerald-50" title={tooLong ? displayAns : ''}>
+												{tooLong ? '✓' : displayAns}
+											</td>
+										{:else}
+											<td class="border border-black py-0.5 font-bold text-rose-800 bg-rose-50" title={tooLong ? displayAns : ''}>
+												{tooLong ? '✗' : displayAns}
+											</td>
+										{/if}
+									{/each}
+
+									{#if chunkIdx === questionChunks.length - 1}
+										<td class="border border-black py-0.5 font-bold bg-amber-50/50">{stats.ratio}</td>
+										<td class="border border-black py-0.5 font-bold bg-amber-50/50">{stats.pctStr}</td>
+									{/if}
+								</tr>
+							{/each}
+						</tbody>
+
+						<!-- Summary Rows -->
+						<tfoot>
+							<tr class="font-bold bg-slate-100 border-t border-black">
+								<td colspan="4" class="border border-black text-right px-2 py-1">KUNCI JAWABAN RESMI</td>
+								{#each chunkDiag as q}
+									<td class="border border-black py-0.5 text-emerald-900 bg-emerald-100 font-bold text-[8px]">
+										{q.correctKey && String(q.correctKey).length > 4 ? '★' : q.correctKey}
+									</td>
+								{/each}
+								{#if chunkIdx === questionChunks.length - 1}
+									<td class="border border-black py-0.5 font-bold bg-emerald-100">{questions.length}/{questions.length}</td>
+									<td class="border border-black py-0.5 font-bold bg-emerald-100">100%</td>
+								{/if}
+							</tr>
+							<tr class="font-bold bg-slate-50">
+								<td colspan="4" class="border border-black text-right px-2 py-1">JUMLAH SISWA BENAR</td>
+								{#each chunkDiag as q}
+									<td class="border border-black py-0.5 text-emerald-700">{q.correctCount}</td>
+								{/each}
+								{#if chunkIdx === questionChunks.length - 1}
+									<td class="border border-black py-0.5 text-slate-500">-</td>
+									<td class="border border-black py-0.5 text-slate-500">-</td>
+								{/if}
+							</tr>
+							<tr class="font-bold bg-slate-50">
+								<td colspan="4" class="border border-black text-right px-2 py-1">TINGKAT KESALAHAN (%)</td>
+								{#each chunkDiag as q}
+									<td class="border border-black py-0.5 {getWrongHeatColor(q.wrongPercentage)}">{q.wrongPercentage}%</td>
+								{/each}
+								{#if chunkIdx === questionChunks.length - 1}
+									<td class="border border-black py-0.5 text-slate-500">-</td>
+									<td class="border border-black py-0.5 font-bold text-rose-800">{avgWrongPct}%</td>
+								{/if}
+							</tr>
+							<tr class="font-bold bg-slate-50">
+								<td colspan="4" class="border border-black text-right px-2 py-1">TINGKAT BENAR (%)</td>
+								{#each chunkDiag as q}
+									<td class="border border-black py-0.5 text-emerald-800">{q.correctPercentage}%</td>
+								{/each}
+								{#if chunkIdx === questionChunks.length - 1}
+									<td class="border border-black py-0.5 text-slate-500">-</td>
+									<td class="border border-black py-0.5 font-bold text-emerald-800">{avgCorrectPct}%</td>
+								{/if}
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+			</div>
+		{/each}
 	</div>
 
 	<!-- TABEL 2: DIAGNOSA POLA KESALAHAN & JEBAKAN MISKONSEPSI -->
@@ -399,7 +449,13 @@
 						<td class="border border-black py-0.5">{idx + 1}</td>
 						<td class="border border-black py-0.5 font-bold">Soal #{q.question_number}</td>
 						<td class="border border-black py-0.5">{QUESTION_TYPE_LABELS[q.type] || q.type}</td>
-						<td class="border border-black py-0.5 font-bold text-emerald-800 bg-emerald-50">{q.correctKey}</td>
+						<td class="border border-black py-0.5 font-bold text-emerald-800 bg-emerald-50">
+							{#if q.correctKey && String(q.correctKey).length > 15}
+								<span class="text-[7.5pt] italic text-slate-500 font-normal">Lihat Lampiran</span>
+							{:else}
+								{q.correctKey}
+							{/if}
+						</td>
 						<td class="border border-black px-2 py-0.5 text-left font-semibold text-rose-800">
 							{q.dominantDistractor !== '-' ? `Opsi ${q.dominantDistractor}` : '-'}
 						</td>
@@ -442,6 +498,103 @@
 			</p>
 		</div>
 	</div>
+
+	<!-- LAMPIRAN KUNCI JAWABAN & JAWABAN KOMPLEKS -->
+	{#if longKeyQuestions.length > 0}
+		<div class="page-break pt-8">
+			<div class="border-[1.5px] border-slate-800 rounded-xl p-6 bg-white shadow-sm print:shadow-none mb-8 relative overflow-hidden">
+				<!-- Dekorasi Latar -->
+				<div class="absolute top-0 right-0 w-40 h-40 bg-slate-100 rounded-bl-full -mr-10 -mt-10 opacity-40"></div>
+				<div class="absolute bottom-0 left-0 w-24 h-24 bg-slate-100 rounded-tr-full -ml-6 -mb-6 opacity-30"></div>
+
+				<div class="flex items-center gap-3 mb-6 relative z-10 border-b-[1.5px] border-slate-300 pb-4">
+					<div class="w-10 h-10 rounded-full bg-slate-800 text-white flex items-center justify-center shrink-0">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+						</svg>
+					</div>
+					<div>
+						<h3 class="text-lg font-black uppercase tracking-widest text-slate-900 m-0 leading-tight">
+							Lampiran Kunci Jawaban Lengkap
+						</h3>
+						<p class="text-xs text-slate-600 m-0 mt-0.5 font-medium">
+							Referensi kunci jawaban dan jawaban siswa untuk soal dengan format kompleks (Menjodohkan, Pilihan Ganda Kompleks, dsb.)
+						</p>
+					</div>
+				</div>
+
+				<!-- Tabel Kunci Jawaban Panjang -->
+				<div class="relative z-10 mb-6">
+					<h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">A. Kunci Jawaban Soal Kompleks</h4>
+					<table class="w-full border border-collapse border-slate-400 text-[10px]">
+						<thead>
+							<tr>
+								<th class="border border-slate-400 px-3 py-2 bg-slate-100 text-slate-900 w-16 text-center">No. Soal</th>
+								<th class="border border-slate-400 px-3 py-2 bg-slate-100 text-slate-900 w-40 text-center">Tipe Soal</th>
+								<th class="border border-slate-400 px-3 py-2 bg-slate-100 text-slate-900 text-left">Kunci Jawaban Lengkap</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each longKeyQuestions as q}
+								<tr>
+									<td class="border border-slate-400 py-2 text-center font-bold text-[11pt] text-slate-800 bg-emerald-50/50">
+										Soal #{q.question_number}
+									</td>
+									<td class="border border-slate-400 py-2 text-center text-[9.5pt] font-semibold text-slate-700">
+										{QUESTION_TYPE_LABELS[q.type] || q.type}
+									</td>
+									<td class="border border-slate-400 font-mono text-[9pt] break-all leading-relaxed text-slate-800 text-left" style="padding: 10px 14px;">
+										{q.correctKey}
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+
+				<!-- Tabel Jawaban Siswa yang Kompleks -->
+				{#each longKeyQuestions as q}
+					<div class="mb-5 relative z-10">
+						<h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+							B. Rekap Jawaban Siswa — Soal #{q.question_number}
+							<span class="ml-2 font-normal normal-case text-slate-500">({QUESTION_TYPE_LABELS[q.type] || q.type})</span>
+						</h4>
+						<p class="text-[9pt] text-emerald-800 font-semibold mb-2 bg-emerald-50 border border-emerald-200 rounded px-3 py-1.5 inline-block">
+							Kunci: {q.correctKey}
+						</p>
+						<table class="w-full border border-collapse border-slate-400 text-[10px]">
+							<thead>
+								<tr>
+									<th class="border border-slate-400 px-2 py-2 bg-slate-100 w-10 text-center">No</th>
+									<th class="border border-slate-400 px-3 py-2 bg-slate-100 text-left min-w-[150px]">Nama Siswa</th>
+									<th class="border border-slate-400 px-3 py-2 bg-slate-100 text-left">Jawaban Siswa</th>
+									<th class="border border-slate-400 px-2 py-2 bg-slate-100 w-20 text-center">Status</th>
+								</tr>
+							</thead>
+							<tbody>
+								{#each attempts as att, attIdx}
+									{@const ans = answerMatrixMap[`${att.id}_${q.question_id || questions.find(qs => qs.question_number === q.question_number)?.id}`]}
+									{@const displayAns = formatAnswerDisplay(q.type, ans?.answer_given)}
+									{@const isCorrect = ans && (ans.is_correct === 1 || ans.is_correct === true)}
+									<tr>
+										<td class="border border-slate-400 py-1.5 text-center text-slate-700">{attIdx + 1}</td>
+										<td class="border border-slate-400 px-3 py-1.5 font-medium text-slate-800">{att.student_name}</td>
+										<td class="border border-slate-400 px-3 py-1.5 font-mono text-[9pt] break-all {isCorrect ? 'text-emerald-800 bg-emerald-50/40' : 'text-rose-800 bg-rose-50/40'}">
+											{ans?.answer_given != null ? displayAns : '-'}
+										</td>
+										<td class="border border-slate-400 py-1.5 text-center font-bold text-[9pt] {isCorrect ? 'text-emerald-700' : 'text-rose-700'}">
+											{!ans || ans.answer_given == null ? '-' : isCorrect ? '✓ Benar' : '✗ Salah'}
+										</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					</div>
+				{/each}
+			</div>
+		</div>
+	{/if}
+
 </div>
 
 <style>
