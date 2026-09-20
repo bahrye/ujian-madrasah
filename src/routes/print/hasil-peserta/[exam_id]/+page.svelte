@@ -305,8 +305,8 @@
 				<h2 class="text-base sm:text-lg font-black uppercase tracking-wider text-black underline decoration-1 underline-offset-4 m-0">
 					LAPORAN HASIL UJIAN PESERTA
 				</h2>
-				<p class="text-xs sm:text-sm font-semibold text-black mt-1 m-0">
-					{exam?.exam_type_name || exam?.exam_type_code || 'Ulangan Harian'} — {exam?.title || 'Ujian'}
+				<p class="text-xs sm:text-sm font-semibold text-black mt-1 m-0 uppercase">
+					{exam?.exam_type_name || exam?.exam_type_code || 'Ulangan Harian'}
 				</p>
 			</div>
 
