@@ -120,6 +120,7 @@ export const load: PageServerLoad = async ({ platform, params, locals, url }) =>
 		return {
 			no: idx + 1,
 			studentName: att.student_name,
+			nomorPeserta: att.nomor_peserta || '-',
 			nisn: att.nisn || '-',
 			nis: att.nisn || '-',
 			className: att.class_name || '-',

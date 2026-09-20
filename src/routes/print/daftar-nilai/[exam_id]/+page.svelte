@@ -400,6 +400,9 @@
 							<td class="text-center font-bold whitespace-nowrap">{s.no}</td>
 							<td class="font-semibold">
 								<div class="line-clamp-2 leading-tight" title={s.studentName}>{s.studentName}</div>
+								{#if s.nomorPeserta && s.nomorPeserta !== '-'}
+									<div class="text-[10px] font-normal text-slate-600 font-mono mt-0.5 leading-none" title="No. Peserta">{s.nomorPeserta}</div>
+								{/if}
 							</td>
 							<td class="text-center font-mono text-xs whitespace-nowrap">{s.nisn}</td>
 							<td class="text-center whitespace-nowrap">{s.className}</td>

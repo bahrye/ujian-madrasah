@@ -322,7 +322,12 @@
 										<tr>
 											<td class="w-28 font-semibold py-0.5">Nama peserta</td>
 											<td class="w-3">:</td>
-											<td class="font-normal py-0.5">{s.studentName}</td>
+											<td class="font-normal py-0.5">
+												<div>{s.studentName}</div>
+												{#if s.nomorPeserta && s.nomorPeserta !== '-'}
+													<div class="text-[10px] text-slate-600 font-mono mt-0.5 leading-none" title="No. Peserta">{s.nomorPeserta}</div>
+												{/if}
+											</td>
 										</tr>
 										<tr>
 											<td class="font-semibold py-0.5">NISN</td>
