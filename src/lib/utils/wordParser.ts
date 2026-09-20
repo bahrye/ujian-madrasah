@@ -29,13 +29,20 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 	
 	const chunks: Element[][] = [];
 	let currentChunk: Element[] = [];
+	let insideKiri = false;
 	
 	for (let i = 0; i < elements.length; i++) {
 		const el = elements[i];
 		const text = el.textContent?.trim() || '';
 		
+		if (/^\[(KIRI|PERNYATAAN|KOLOM\s*A|KOLOM\s*KIRI)\]/i.test(text)) {
+			insideKiri = true;
+		} else if (/^\[(KANAN|PILIHAN|JAWABAN|KOLOM\s*B|KOLOM\s*KANAN)\]/i.test(text)) {
+			insideKiri = false;
+		}
+		
 		// If we see a new question start, AND the current chunk already has substantial content
-		if (/^\d+[\.\)]\s/.test(text)) {
+		if (/^\d+[\.\)]\s/.test(text) && !insideKiri) {
 			const hasContent = currentChunk.some(e => e.textContent?.trim() || e.querySelector('img'));
 			// Only split if we have already seen options OR a table OR [KIRI] marker in the current chunk
 			const hasExplicitOptions = currentChunk.some(e => /^[a-eA-E][\.\)]\s/i.test(e.textContent?.trim() || ''));
@@ -44,6 +51,7 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 			if (hasContent && (hasExplicitOptions || hasMenjodohkanMarker)) {
 				chunks.push(currentChunk);
 				currentChunk = [];
+				insideKiri = false;
 			}
 		}
 		
@@ -52,6 +60,7 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 		if (/^KUNCI:\s*(.+)/i.test(text)) {
 			chunks.push(currentChunk);
 			currentChunk = [];
+			insideKiri = false;
 		}
 	}
 	
