@@ -1,7 +1,9 @@
 export interface FinalQuestion {
 	question_text: string;
-	options: string[];
-	correct_answer: string | string[] | null;
+	// For regular question types: string[]
+	// For menjodohkan: { left: string[]; right: string[] }
+	options: string[] | { left: string[]; right: string[] };
+	correct_answer: string | string[] | Record<string, string> | null;
 	type: string;
 }
 
@@ -35,11 +37,11 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 		// If we see a new question start, AND the current chunk already has substantial content
 		if (/^\d+[\.\)]\s/.test(text)) {
 			const hasContent = currentChunk.some(e => e.textContent?.trim() || e.querySelector('img'));
-			// Only split if we have already seen options in the current chunk.
-			// This prevents splitting on numbered statements (e.g. "1. Pernyataan satu") which appear before options.
+			// Only split if we have already seen options OR a table OR [KIRI] marker in the current chunk
 			const hasExplicitOptions = currentChunk.some(e => /^[a-eA-E][\.\)]\s/i.test(e.textContent?.trim() || ''));
+			const hasMenjodohkanMarker = currentChunk.some(e => e.tagName === 'TABLE' || /^\[(KIRI|KANAN|MULAI SOAL)\]/i.test(e.textContent?.trim() || ''));
 			
-			if (hasContent && hasExplicitOptions) {
+			if (hasContent && (hasExplicitOptions || hasMenjodohkanMarker)) {
 				chunks.push(currentChunk);
 				currentChunk = [];
 			}
@@ -63,6 +65,11 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 		questionHtml: string[];
 		options: {id: string; html: string}[];
 		answer: string | null;
+		// For menjodohkan:
+		isMenjodohkan?: boolean;
+		menjodohkanLeft?: string[];
+		menjodohkanRight?: string[];
+		menjodohkanMapping?: Record<string, string>;
 	}[] = [];
 	
 	for (const chunk of chunks) {
@@ -81,6 +88,33 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 		
 		const workingElements = kunciIndex >= 0 ? chunk.slice(0, kunciIndex) : chunk;
 		if (workingElements.length === 0) continue;
+
+		// ── MENJODOHKAN DETECTION ────────────────────────────────────────
+		// Check for 2-column TABLE format
+		const tableEl = workingElements.find(el => el.tagName === 'TABLE');
+		// Check for [KIRI] / [KANAN] tag format
+		const kiriIdx = workingElements.findIndex(el => /^\[(KIRI|PERNYATAAN|KOLOM\s*A|KOLOM\s*KIRI)\]/i.test(el.textContent?.trim() || ''));
+		const kananIdx = workingElements.findIndex(el => /^\[(KANAN|PILIHAN|JAWABAN|KOLOM\s*B|KOLOM\s*KANAN)\]/i.test(el.textContent?.trim() || ''));
+		
+		const isMenjodohkanTable = !!tableEl;
+		const isMenjodohkanTags = kiriIdx !== -1 && kananIdx !== -1 && kananIdx > kiriIdx;
+		
+		if (isMenjodohkanTable || isMenjodohkanTags) {
+			const parsed = parseMenjodohkanChunk(workingElements, answerKey, tableEl || null, kiriIdx, kananIdx);
+			if (parsed) {
+				parsedQuestions.push({
+					questionHtml: parsed.questionHtml,
+					options: [],
+					answer: answerKey,
+					isMenjodohkan: true,
+					menjodohkanLeft: parsed.left,
+					menjodohkanRight: parsed.right,
+					menjodohkanMapping: parsed.mapping
+				});
+				continue;
+			}
+		}
+		// ── END MENJODOHKAN ──────────────────────────────────────────────
 		
 		let options: {id: string, html: string}[] = [];
 		let questionElements: Element[] = [];
@@ -300,6 +334,35 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 
 			return cleaned;
 		};
+
+		// ── MENJODOHKAN RETURN ────────────────────────────────────────────
+		if (q.isMenjodohkan) {
+			const leftItems = (q.menjodohkanLeft || []).map(html => normalizeMatchingItemHtml(cleanEq(html)));
+			const rightItems = (q.menjodohkanRight || []).map(html => normalizeMatchingItemHtml(cleanEq(html)));
+			
+			// Convert letter mapping (e.g. {"0": "A"}) to index mapping (e.g. {"0": "0"})
+			// The system stores mapping as {leftIdx: rightIdx} where both are string numbers
+			const rawMapping = q.menjodohkanMapping || {};
+			const finalMapping: Record<string, string> = {};
+			for (const [lKey, rVal] of Object.entries(rawMapping)) {
+				// rVal may be a letter ("A") or index ("0") — normalise to index
+				let rIdx: string;
+				if (/^[A-Za-z]$/.test(rVal)) {
+					rIdx = String(rVal.toUpperCase().charCodeAt(0) - 65);
+				} else {
+					rIdx = rVal;
+				}
+				finalMapping[lKey] = rIdx;
+			}
+			
+			return {
+				question_text: normalizeQuestionHtml(cleanEq(q.questionHtml.join(''))),
+				options: { left: leftItems, right: rightItems },
+				correct_answer: finalMapping,
+				type: 'menjodohkan'
+			} as FinalQuestion;
+		}
+		// ── END MENJODOHKAN ───────────────────────────────────────────────
 		
 		let type = 'pilihan_ganda';
 		let finalAnswer: string | string[] | null = q.answer;
@@ -332,6 +395,275 @@ export function parseWordHtmlToQuestions(html: string): FinalQuestion[] {
 			type: type
 		};
 	});
+}
+
+/**
+ * Parse a menjodohkan chunk from a 2-column table or [KIRI]/[KANAN] markers.
+ * Returns { questionHtml, left, right, mapping } or null if detection failed.
+ */
+function parseMenjodohkanChunk(
+	workingElements: Element[],
+	answerKey: string | null,
+	tableEl: Element | null,
+	kiriIdx: number,
+	kananIdx: number
+): { questionHtml: string[]; left: string[]; right: string[]; mapping: Record<string, string> } | null {
+	
+	const leftItems: string[] = [];
+	const rightItems: string[] = [];
+	let questionElements: Element[] = [];
+
+	if (tableEl) {
+		// ── FORMAT A: TABLE ──────────────────────────────────────────────
+		const tableIdx = workingElements.indexOf(tableEl);
+		// Everything before the table is the question text
+		questionElements = workingElements.slice(0, tableIdx).filter(el => {
+			const t = el.textContent?.trim();
+			return t !== '{' && t !== '}';
+		});
+
+		const rows = Array.from(tableEl.querySelectorAll('tr'));
+		if (rows.length < 2) return null;
+
+		// Detect if first row is a header row (text-only, descriptive)
+		const firstRowCells = Array.from(rows[0].querySelectorAll('td, th'));
+		if (firstRowCells.length < 2) return null;
+
+		const c0text = firstRowCells[0].textContent?.trim().toLowerCase() || '';
+		const c1text = firstRowCells[1].textContent?.trim().toLowerCase() || '';
+		const isHeaderRow = (
+			c0text.includes('pernyataan') || c0text.includes('kolom') || c0text.includes('kiri') || c0text.includes('soal') ||
+			c1text.includes('jawaban') || c1text.includes('pilihan') || c1text.includes('kanan')
+		) && !firstRowCells[0].querySelector('img');
+
+		const dataRows = isHeaderRow ? rows.slice(1) : rows;
+		
+		for (const row of dataRows) {
+			const cells = Array.from(row.querySelectorAll('td, th'));
+			if (cells.length < 2) continue;
+			
+			const lCell = cells[0];
+			const rCell = cells[1];
+			const lText = lCell.textContent?.trim() || '';
+			const rText = rCell.textContent?.trim() || '';
+			
+			// Extract left cell: strip leading number prefix (e.g. "1. ", "(1) ")
+			if (lText || lCell.querySelector('img')) {
+				const lHtml = formatMatchingCellHtml(lCell);
+				const stripped = stripLeadingNumberPrefix(lHtml);
+				leftItems.push(stripped);
+			}
+			
+			// Extract right cell: strip leading letter prefix (e.g. "A. ", "(A) ")
+			if (rText || rCell.querySelector('img')) {
+				const rHtml = formatMatchingCellHtml(rCell);
+				const stripped = stripLeadingLetterPrefix(rHtml);
+				rightItems.push(stripped);
+			}
+		}
+		
+		if (leftItems.length === 0) return null;
+
+	} else if (kiriIdx !== -1 && kananIdx !== -1) {
+		// ── FORMAT B: [KIRI] / [KANAN] TAGS ─────────────────────────────
+		questionElements = workingElements.slice(0, kiriIdx).filter(el => {
+			const t = el.textContent?.trim();
+			return t !== '{' && t !== '}';
+		});
+		
+		const leftEls = workingElements.slice(kiriIdx + 1, kananIdx);
+		const rightEls = workingElements.slice(kananIdx + 1);
+		
+		for (const el of leftEls) {
+			const text = el.textContent?.trim();
+			if (!text && !el.querySelector('img')) continue;
+			const html = formatMatchingCellHtml(el);
+			leftItems.push(stripLeadingNumberPrefix(html));
+		}
+		
+		for (const el of rightEls) {
+			const text = el.textContent?.trim();
+			if (!text && !el.querySelector('img')) continue;
+			const html = formatMatchingCellHtml(el);
+			rightItems.push(stripLeadingLetterPrefix(html));
+		}
+		
+		if (leftItems.length === 0) return null;
+	} else {
+		return null;
+	}
+
+	// Strip question number prefix from first question element
+	if (questionElements.length > 0) {
+		const firstEl = questionElements[0];
+		const t = firstEl.textContent?.trim() || '';
+		if (/^\d+[\.\)]\s/.test(t)) {
+			const cloned = firstEl.cloneNode(true) as Element;
+			const walker = document.createTreeWalker(cloned, NodeFilter.SHOW_TEXT);
+			let node = walker.nextNode();
+			while (node) {
+				if (node.nodeValue && node.nodeValue.trim().length > 0) {
+					node.nodeValue = node.nodeValue.replace(/^\d+[\.\)]\s*/, '');
+					break;
+				}
+				node = walker.nextNode();
+			}
+			questionElements[0] = cloned;
+		}
+		formatElementsImages(questionElements);
+	}
+
+	// ── PARSE MAPPING FROM ANSWER KEY ────────────────────────────────
+	// Supported formats:
+	//   "1-C, 2-A, 3-B"  "1:C, 2:A"  "1=C, 2=A"  "1->C, 2->A"
+	//   "C, A, B"  (positional, same order as left items)
+	//   "MENJODOHKAN" (default 1-to-1)
+	const mapping: Record<string, string> = {};
+	const cleanKey = (answerKey || '').replace(/^(MENJODOHKAN|JODOHKAN)\s*[:\-]?\s*/i, '').trim();
+	
+	if (cleanKey) {
+		// Try explicit pair format: "1-C" or "1:C" or "1=C" or "1->C"
+		const pairRegex = /(?:no\.?\s*)?(\d+)\s*(?:[-:=]|->|➔)\s*([A-Za-z\d]+)/gi;
+		let m;
+		const found: Array<{l: number; r: string}> = [];
+		while ((m = pairRegex.exec(cleanKey)) !== null) {
+			found.push({ l: parseInt(m[1], 10) - 1, r: m[2].trim().toUpperCase() });
+		}
+		
+		if (found.length > 0) {
+			for (const pair of found) {
+				let rIdx: string;
+				if (/^[A-Z]$/.test(pair.r)) {
+					rIdx = String(pair.r.charCodeAt(0) - 65);
+				} else {
+					rIdx = pair.r;
+				}
+				mapping[String(pair.l)] = rIdx;
+			}
+		} else {
+			// Positional: "C, A, B" → left[0]→C(2), left[1]→A(0), left[2]→B(1)
+			const letters = cleanKey.split(/[,\s]+/).map(s => s.trim().toUpperCase()).filter(Boolean);
+			letters.forEach((letter, idx) => {
+				if (idx < leftItems.length) {
+					let rIdx: string;
+					if (/^[A-Z]$/.test(letter)) {
+						rIdx = String(letter.charCodeAt(0) - 65);
+					} else {
+						rIdx = letter;
+					}
+					mapping[String(idx)] = rIdx;
+				}
+			});
+		}
+	} else {
+		// No key or just "MENJODOHKAN" → default 1-to-1
+		for (let i = 0; i < leftItems.length; i++) {
+			mapping[String(i)] = String(i);
+		}
+	}
+
+	return {
+		questionHtml: questionElements.map(e => e.outerHTML),
+		left: leftItems,
+		right: rightItems,
+		mapping
+	};
+}
+
+/**
+ * Format images inside a matching cell or [KIRI]/[KANAN] item.
+ * Images rendered inline with text (max-h-36) or block-centered if image-only.
+ */
+function formatMatchingCellHtml(el: Element): string {
+	const tempDiv = document.createElement('div');
+	// Flatten all paragraph content from cell into tempDiv
+	const paras = Array.from(el.querySelectorAll('p'));
+	if (paras.length > 0) {
+		// Use inner content of paragraphs, joined by space
+		tempDiv.innerHTML = paras.map(p => p.innerHTML).join(' ');
+	} else {
+		tempDiv.innerHTML = el.innerHTML;
+	}
+	
+	const imgs = Array.from(tempDiv.querySelectorAll('img'));
+	const textContent = tempDiv.textContent?.replace(/\s+/g, '').trim() || '';
+	const isImageOnly = imgs.length > 0 && textContent.length === 0;
+	
+	for (const img of imgs) {
+		img.removeAttribute('width');
+		img.removeAttribute('height');
+		img.classList.remove('block', 'mx-auto', 'inline-block', 'align-middle');
+		if (isImageOnly) {
+			// Block-centered image — no accompanying text
+			img.classList.add('block', 'mx-auto', 'max-h-36', 'max-w-full', 'object-contain', 'rounded-lg', 'my-1');
+			img.setAttribute('data-display', 'block');
+		} else {
+			// Inline image alongside text
+			img.classList.add('inline-block', 'align-middle', 'max-h-24', 'max-w-full', 'object-contain', 'mx-1', 'my-0.5');
+			img.style.verticalAlign = 'middle';
+			img.setAttribute('data-display', 'inline');
+		}
+	}
+	
+	return tempDiv.innerHTML.trim();
+}
+
+/**
+ * Strip a leading number prefix like "1. ", "2) ", "(3) " from the beginning of HTML content.
+ */
+function stripLeadingNumberPrefix(html: string): string {
+	return html.replace(/^\s*(?:\(\d+\)|\d+[.\)])\s*/i, '').trim();
+}
+
+/**
+ * Strip a leading letter prefix like "A. ", "B) ", "(C) " from the beginning of HTML content.
+ */
+function stripLeadingLetterPrefix(html: string): string {
+	return html.replace(/^\s*(?:\([A-Za-z]\)|[A-Za-z][.\)])\s*/i, '').trim();
+}
+
+/**
+ * Normalize HTML for a menjodohkan item (left or right card).
+ * Applies image classes, merges broken paragraphs, cleans empty tags.
+ */
+function normalizeMatchingItemHtml(html: string): string {
+	if (!html || typeof html !== 'string') return html || '';
+	let res = html;
+	// Apply correct image classes based on data-display attribute
+	res = res.replace(/<img\b([^>]*)>/gi, (match, attrs) => {
+		let newAttrs = attrs;
+		const isBlock = /\bdata-display\s*=\s*"block"/i.test(newAttrs);
+		if (/class\s*=\s*"([^"]*)"/i.test(newAttrs)) {
+			newAttrs = newAttrs.replace(/class\s*=\s*"([^"]*)"/i, (_: string, cls: string) => {
+				let classes = cls.split(/\s+/).filter(Boolean);
+				if (isBlock) {
+					classes = classes.filter(c => c !== 'inline-block' && c !== 'align-middle');
+					if (!classes.includes('block')) classes.push('block');
+					if (!classes.includes('mx-auto')) classes.push('mx-auto');
+					if (!classes.some(c => c.startsWith('max-h-'))) classes.push('max-h-36');
+					if (!classes.includes('object-contain')) classes.push('object-contain');
+					if (!classes.includes('rounded-lg')) classes.push('rounded-lg');
+				} else {
+					classes = classes.filter(c => c !== 'block' && c !== 'mx-auto');
+					if (!classes.includes('inline-block')) classes.push('inline-block');
+					if (!classes.includes('align-middle')) classes.push('align-middle');
+					if (!classes.some(c => c.startsWith('max-h-'))) classes.push('max-h-24');
+					if (!classes.includes('object-contain')) classes.push('object-contain');
+				}
+				return `class="${classes.join(' ')}"`;
+			});
+		} else {
+			if (isBlock) {
+				newAttrs += ' class="block mx-auto max-h-36 max-w-full object-contain rounded-lg my-1"';
+			} else {
+				newAttrs += ' class="inline-block align-middle max-h-24 max-w-full object-contain mx-1 my-0.5"';
+			}
+		}
+		return `<img${newAttrs}>`;
+	});
+	// Clean empty paragraphs
+	res = res.replace(/<p[^>]*>\s*<\/p>/gi, '');
+	return res.trim();
 }
 
 function formatElementsImages(elements: Element[]) {

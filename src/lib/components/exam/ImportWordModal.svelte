@@ -137,7 +137,7 @@
 		});
 
 		if (!response.ok) {
-			const errJson = await response.json().catch(() => null);
+			const errJson = (await response.json().catch(() => null)) as any;
 			throw new Error(errJson?.error?.message || 'Gagal mengunggah gambar ke server.');
 		}
 
@@ -189,6 +189,29 @@
 				if (changed) {
 					q.options_json = JSON.stringify(q.options);
 				}
+			} else if (q.options && typeof q.options === 'object' && (q.options.left || q.options.right)) {
+				// Menjodohkan: ganti gambar di kolom kiri dan kanan
+				let changed = false;
+				const opts = q.options as { left: string[]; right: string[] };
+				if (Array.isArray(opts.left)) {
+					for (let j = 0; j < opts.left.length; j++) {
+						if (opts.left[j] && opts.left[j].includes(imgId)) {
+							opts.left[j] = opts.left[j].replace(placeholderRegex, replacer);
+							changed = true;
+						}
+					}
+				}
+				if (Array.isArray(opts.right)) {
+					for (let j = 0; j < opts.right.length; j++) {
+						if (opts.right[j] && opts.right[j].includes(imgId)) {
+							opts.right[j] = opts.right[j].replace(placeholderRegex, replacer);
+							changed = true;
+						}
+					}
+				}
+				if (changed) {
+					q.options_json = JSON.stringify(opts);
+				}
 			}
 		}
 		parsedData = parsedData; // Reaktivitas Svelte agar preview terupdate seketika
@@ -222,6 +245,28 @@
 				}
 				if (changed) {
 					q.options_json = JSON.stringify(q.options);
+				}
+			} else if (q.options && typeof q.options === 'object' && (q.options.left || q.options.right)) {
+				let changed = false;
+				const opts = q.options as { left: string[]; right: string[] };
+				if (Array.isArray(opts.left)) {
+					for (let j = 0; j < opts.left.length; j++) {
+						if (opts.left[j] && opts.left[j].includes(imgId)) {
+							opts.left[j] = opts.left[j].replace(placeholderRegex, replacer);
+							changed = true;
+						}
+					}
+				}
+				if (Array.isArray(opts.right)) {
+					for (let j = 0; j < opts.right.length; j++) {
+						if (opts.right[j] && opts.right[j].includes(imgId)) {
+							opts.right[j] = opts.right[j].replace(placeholderRegex, replacer);
+							changed = true;
+						}
+					}
+				}
+				if (changed) {
+					q.options_json = JSON.stringify(opts);
 				}
 			}
 		}
@@ -288,7 +333,7 @@
 				
 				// Kembalikan placeholder loading tanpa merusak atribut
 				const placeholderRegex = new RegExp(`<img\\b([^>]*data-img-id=["']${id}["'][^>]*)>`, 'gi');
-				const loadingPlaceholderUri = createPlaceholderSvgUri('loading');
+				const loadingPlaceholderUri = createPlaceholderSvgUri('pending');
 				const replacer = (_match: string, attrs: string) => {
 					let updated = attrs;
 					if (/\bsrc=["'][^"']*["']/i.test(updated)) {
@@ -308,6 +353,23 @@
 								q.options[j] = q.options[j].replace(placeholderRegex, replacer);
 							}
 						}
+					} else if (q.options && typeof q.options === 'object' && (q.options.left || q.options.right)) {
+						const opts = q.options as { left: string[]; right: string[] };
+						if (Array.isArray(opts.left)) {
+							for (let j = 0; j < opts.left.length; j++) {
+								if (opts.left[j] && opts.left[j].includes(id)) {
+									opts.left[j] = opts.left[j].replace(placeholderRegex, replacer);
+								}
+							}
+						}
+						if (Array.isArray(opts.right)) {
+							for (let j = 0; j < opts.right.length; j++) {
+								if (opts.right[j] && opts.right[j].includes(id)) {
+									opts.right[j] = opts.right[j].replace(placeholderRegex, replacer);
+								}
+							}
+						}
+						q.options_json = JSON.stringify(opts);
 					}
 				}
 			}
@@ -446,10 +508,30 @@
 			}
 
 			parsedData = questions.map((q, i) => {
+				// Menjodohkan validation
+				if (q.type === 'menjodohkan') {
+					const opts = q.options as { left: string[]; right: string[] };
+					if (!opts || !Array.isArray(opts.left) || opts.left.length < 2) {
+						throw new Error(`Soal nomor ${i+1} (Menjodohkan) harus memiliki minimal 2 pasangan di kolom kiri. Pastikan format tabel 2 kolom atau [KIRI]/[KANAN] sudah benar.`);
+					}
+					if (!Array.isArray(opts.right) || opts.right.length < 1) {
+						throw new Error(`Soal nomor ${i+1} (Menjodohkan) harus memiliki minimal 1 pilihan di kolom kanan.`);
+					}
+					return {
+						type: q.type,
+						question_text: q.question_text,
+						options: opts,
+						options_json: JSON.stringify(opts),
+						correct_answer: q.correct_answer,
+						correct_answer_json: JSON.stringify(q.correct_answer),
+						points: 1
+					};
+				}
+
 				if (!q.correct_answer && q.type !== 'essay') {
 					throw new Error(`Soal nomor ${i+1} kehilangan Kunci Jawaban. Pastikan ada tulisan "KUNCI: A" (atau jawaban lainnya) di bawah opsi.`);
 				}
-				if (q.type.startsWith('pilihan_ganda') && q.options.length < 2) {
+				if (q.type.startsWith('pilihan_ganda') && Array.isArray(q.options) && (q.options as string[]).length < 2) {
 					throw new Error(`Soal nomor ${i+1} (Pilihan Ganda) tidak memiliki opsi jawaban yang cukup. Pastikan diawali huruf kapital dan titik/kurung (misal "A. " atau "a) ").`);
 				}
 
@@ -555,11 +637,13 @@
 						<li><b>Pilihan Ganda:</b> Opsi A,B,C,D dan <code>KUNCI: A</code></li>
 						<li><b>Pilihan Ganda Kompleks:</b> Kunci lebih dari satu (pisahkan koma) <code>KUNCI: A, B</code></li>
 						<li><b>Benar Salah:</b> Opsi tidak perlu ditulis, cukup <code>KUNCI: Benar</code> atau <code>KUNCI: Salah</code></li>
-						<li><b>Isian Singkat:</b> Opsi tidak perlu ditulis, cukup <code>KUNCI: [jawaban Anda]</code></li>
+						<li><b>Isisan Singkat:</b> Opsi tidak perlu ditulis, cukup <code>KUNCI: [jawaban Anda]</code></li>
 						<li><b>Esai:</b> Opsi tidak perlu ditulis, cukup <code>KUNCI: ESSAY</code></li>
 						<li><b>Pernyataan Bersusun:</b> Apit pernyataan bernomor dengan kurung kurawal <code>&#123;</code> dan <code>&#125;</code> di baris tersendiri agar formatnya tidak rusak (contoh lihat template).</li>
-						<li><b>Tips Kualitas Gambar:</b> Di Word: <b>File > Options > Advanced > Image Size and Quality</b> centang <b>"Do not compress images in file"</b>.</li>
-						<li><b>Rumus & Teks Arab:</b> Fitur <i>Equation</i> tidak didukung. Untuk rumus, gunakan LaTeX (contoh: <code>$$ x = \frac{1}{2} $$</code>) atau jadikan gambar. Untuk teks Arab, gunakan font Unicode biasa (Arial/Times New Roman), jangan gunakan <i>Equation</i>.</li>
+						<li><b>Menjodohkan (Tabel):</b> Buat <b>tabel 2 kolom</b> di Word — kolom kiri berisi pernyataan/gambar, kolom kanan berisi pilihan jawaban/gambar — lalu tulis <code>KUNCI: 1-C, 2-A, 3-B</code>. Gambar dapat disisipkan langsung di sel tabel.</li>
+						<li><b>Menjodohkan ([KIRI]/[KANAN]):</b> Alternatif tanpa tabel. Tulis <code>[KIRI]</code>, daftar pernyataan, lalu <code>[KANAN]</code>, daftar pilihan. Akhiri dengan <code>KUNCI: 1-C, 2-A, 3-B</code>.</li>
+						<li><b>Tips Kualitas Gambar:</b> Di Word: <b>File &gt; Options &gt; Advanced &gt; Image Size and Quality</b> centang <b>"Do not compress images in file"</b>.</li>
+						<li><b>Rumus &amp; Teks Arab:</b> Fitur <i>Equation</i> tidak didukung. Untuk rumus, gunakan LaTeX (contoh: <code>$$ x = \frac{1}{2} $$</code>) atau jadikan gambar. Untuk teks Arab, gunakan font Unicode biasa (Arial/Times New Roman), jangan gunakan <i>Equation</i>.</li>
 					</ul>
 					
 					<div class="bg-white p-3 rounded-lg border border-indigo-100 text-sm text-slate-600 font-mono mb-3 max-h-48 overflow-y-auto">
@@ -584,7 +668,12 @@
 						Pernyataan yang benar adalah...<br>
 						A. 1<br>
 						B. 2<br>
-						KUNCI: A
+						KUNCI: A<br>
+						<br>
+						5. Jodohkan negara dengan ibukotanya! <span class="text-purple-600 font-semibold">[Tabel 2 Kolom]</span><br>
+						<span class="text-purple-700">[KIRI] Indonesia | Jepang | Perancis</span><br>
+						<span class="text-emerald-700">[KANAN] A. Tokyo | B. Paris | C. Jakarta</span><br>
+						KUNCI: 1-C, 2-A, 3-B
 					</div>
 
 					<a href="/template_soal_ujian.docx" download class="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700 bg-white px-3 py-1.5 rounded-lg border border-indigo-200 shadow-sm transition-all hover:shadow">
@@ -731,19 +820,60 @@
 												<td class="p-3 text-center text-slate-500 font-medium align-top">{i + 1}</td>
 												<td class="p-3 align-top">
 													<div class="text-slate-800 font-medium mb-2 prose prose-sm max-w-none">{@html row.question_text}</div>
-													<div class="text-xs text-slate-500 space-y-1">
-														{#each row.options as opt, optIdx}
-															<div class="flex gap-1.5">
-																<span class="font-bold">{String.fromCharCode(65 + optIdx)}.</span>
-																<div class="prose prose-sm max-w-none">{@html opt}</div>
+													{#if row.type === 'menjodohkan' && row.options && !Array.isArray(row.options)}
+														{@const mOpts = row.options}
+														{@const mMap = (() => { try { return JSON.parse(row.correct_answer_json); } catch { return {}; } })()}
+														<div class="mt-1">
+															<span class="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded-md mb-1.5">🔗 Menjodohkan</span>
+															<div class="grid grid-cols-2 gap-1 text-xs">
+																<div class="space-y-1">
+																	<div class="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Kolom Kiri</div>
+																	{#each mOpts.left as item, li}
+																		<div class="flex items-start gap-1 bg-indigo-50 px-1.5 py-1 rounded">
+																			<span class="w-4 h-4 rounded-full bg-indigo-200 text-indigo-800 text-[9px] font-bold flex items-center justify-center shrink-0 mt-0.5">{li + 1}</span>
+																			<div class="flex-1 min-w-0 prose prose-xs max-w-none">{@html item}</div>
+																		</div>
+																	{/each}
+																</div>
+																<div class="space-y-1">
+																	<div class="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Kolom Kanan</div>
+																	{#each mOpts.right as item, ri}
+																		<div class="flex items-start gap-1 bg-emerald-50 px-1.5 py-1 rounded">
+																			<span class="w-4 h-4 rounded-full bg-emerald-200 text-emerald-800 text-[9px] font-bold flex items-center justify-center shrink-0 mt-0.5">{String.fromCharCode(65 + ri)}</span>
+																			<div class="flex-1 min-w-0 prose prose-xs max-w-none">{@html item}</div>
+																		</div>
+																	{/each}
+																</div>
 															</div>
-														{/each}
-													</div>
+														</div>
+													{:else}
+														<div class="text-xs text-slate-500 space-y-1">
+															{#each (Array.isArray(row.options) ? row.options : []) as opt, optIdx}
+																<div class="flex gap-1.5">
+																	<span class="font-bold">{String.fromCharCode(65 + optIdx)}.</span>
+																	<div class="prose prose-sm max-w-none">{@html opt}</div>
+																</div>
+															{/each}
+														</div>
+													{/if}
 												</td>
 												<td class="p-3 text-center align-top">
-													<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 font-bold border border-emerald-200">
-														{row.correct_answer}
-													</span>
+													{#if row.type === 'menjodohkan'}
+														{@const mMap = (() => { try { return JSON.parse(row.correct_answer_json); } catch { return {}; } })()}
+														<div class="text-[10px] text-left space-y-0.5">
+															{#each Object.entries(mMap) as [lk, rv]}
+																<div class="flex items-center gap-1">
+																	<span class="px-1 py-0.5 rounded bg-indigo-100 text-indigo-700 font-bold">{parseInt(lk) + 1}</span>
+																	<span class="text-slate-400">→</span>
+																	<span class="px-1 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold">{String.fromCharCode(65 + parseInt(String(rv)))}</span>
+																</div>
+															{/each}
+														</div>
+													{:else}
+														<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 font-bold border border-emerald-200">
+															{row.correct_answer}
+														</span>
+													{/if}
 												</td>
 											</tr>
 										{/each}
