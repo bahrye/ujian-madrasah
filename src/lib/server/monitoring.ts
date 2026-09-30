@@ -91,8 +91,31 @@ export async function saveMonitoringPhoto(
 	await ensureMonitoringPhotosTable(db);
 
 	try {
-		// 1. Simpan foto ke database seketika dalam format teks Base64
-		// Hasil: Pengawas & Admin langsung melihat foto tanpa jeda (0 latency), tidak akan timeout/gagal!
+		let finalPhotoUrl = input.photoUrl;
+
+		// Jika ada kredensial Cloudinary dan berjalan di Vercel (tanpa waitUntil),
+		// upload ke Cloudinary terlebih dahulu agar Neon PostgreSQL hanya menyimpan URL (~80 byte),
+		// bukan string Base64 raksasa (~300 KB) yang membakar kuota compute dan memori
+		const hasCloudinary = Boolean(
+			env?.CLOUDINARY_API_KEY ||
+			env?.PUBLIC_CLOUDINARY_CLOUD_NAME ||
+			process?.env?.CLOUDINARY_API_KEY ||
+			process?.env?.PUBLIC_CLOUDINARY_CLOUD_NAME
+		);
+
+		if (input.photoUrl.startsWith('data:image/')) {
+			if (!waitUntil && hasCloudinary) {
+				try {
+					const uploadRes = await uploadToCloudinary(input.photoUrl, env, 'ujian_monitoring_photos');
+					if (uploadRes && uploadRes.success && uploadRes.url) {
+						finalPhotoUrl = uploadRes.url;
+					}
+				} catch (err) {
+					console.warn('Direct Cloudinary upload fallback:', err);
+				}
+			}
+		}
+
 		const insertRes = await db.prepare(`
 			INSERT INTO exam_monitoring_photos (school_id, exam_id, attempt_id, student_id, photo_type, photo_url, caption)
 			VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -102,34 +125,24 @@ export async function saveMonitoringPhoto(
 			input.attemptId || null,
 			input.studentId,
 			input.photoType,
-			input.photoUrl,
+			finalPhotoUrl,
 			input.caption || null
 		).run();
 
 		const photoId = insertRes?.meta?.last_row_id || insertRes?.lastInsertRowid;
 
-		// 2. Di latar belakang (asinkron), konversikan teks Base64 menjadi link Cloudinary
-		if (photoId && input.photoUrl.startsWith('data:image/')) {
-			const backgroundConversion = async () => {
+		// Jika di Cloudflare Workers dengan waitUntil dan belum di-upload:
+		if (photoId && finalPhotoUrl.startsWith('data:image/') && waitUntil && typeof waitUntil === 'function') {
+			waitUntil((async () => {
 				try {
-					const uploadRes = await uploadToCloudinary(input.photoUrl, env, 'ujian_monitoring_photos');
+					const uploadRes = await uploadToCloudinary(finalPhotoUrl, env, 'ujian_monitoring_photos');
 					if (uploadRes && uploadRes.success && uploadRes.url) {
-						await db.prepare(`
-							UPDATE exam_monitoring_photos 
-							SET photo_url = ? 
-							WHERE id = ?
-						`).bind(uploadRes.url, photoId).run();
+						await db.prepare(`UPDATE exam_monitoring_photos SET photo_url = ? WHERE id = ?`).bind(uploadRes.url, photoId).run();
 					}
 				} catch (uploadErr) {
 					console.warn('Background Cloudinary conversion skipped or failed:', uploadErr);
 				}
-			};
-
-			if (waitUntil && typeof waitUntil === 'function') {
-				waitUntil(backgroundConversion());
-			} else {
-				backgroundConversion().catch(() => {});
-			}
+			})());
 		}
 
 		return true;

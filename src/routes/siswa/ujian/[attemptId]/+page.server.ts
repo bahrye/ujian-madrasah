@@ -75,11 +75,13 @@ export const load: PageServerLoad = async ({ platform, locals, params, cookies }
 			throw redirect(302, `/siswa/ujian?exam_id=${attempt.exam_id}`);
 		}
 
-		// Ambil soal
+		// Ambil soal (Keamanan: jangan pernah sertakan correct_answer_json ke browser siswa)
 		let questionsList: any[] = [];
 		try {
 			const questions = await db.prepare(`
-				SELECT q.* FROM questions q
+				SELECT q.id, q.exam_id, q.type, q.question_text, q.question_number, q.points, 
+				       q.media_type, q.media_url, q.audio_max_plays, q.options_json, q.created_at
+				FROM questions q
 				WHERE q.exam_id = ?
 				ORDER BY q.question_number
 			`).bind(attempt.exam_id).all();

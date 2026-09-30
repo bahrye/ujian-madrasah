@@ -347,7 +347,7 @@ export async function deleteCloudinaryMediaList(
  * Pindai dan hapus file sampah (orphan) di Cloudinary yang tidak lagi digunakan oleh soal atau ujian mana pun
  */
 export async function cleanOrphanedMedia(
-	db: any,
+	db: D1Database,
 	env: Record<string, string | undefined> | any,
 	schoolId?: number | null
 ): Promise<{ success: boolean; deletedCount: number; errors: string[] }> {
@@ -556,7 +556,7 @@ export async function cleanOrphanedMedia(
  * Hapus semua gambar Cloudinary milik soal-soal tertentu berdasarkan ID soal
  */
 export async function deleteMediaForQuestionIds(
-	db: any,
+	db: D1Database,
 	env: any,
 	questionIds: number[],
 	schoolId?: number | null
@@ -608,7 +608,7 @@ export async function deleteMediaForQuestionIds(
  * Hapus semua gambar Cloudinary milik seluruh soal dalam satu ujian
  */
 export async function deleteMediaForExam(
-	db: any,
+	db: D1Database,
 	env: any,
 	examId: number,
 	schoolId?: number | null

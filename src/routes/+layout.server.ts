@@ -1,11 +1,28 @@
 import type { LayoutServerLoad } from './$types';
 import { getDB } from '$lib/server/db';
 
+interface CachedProfile {
+	userInfo: any;
+	schoolName: string;
+	expiresAt: number;
+}
+const profileCache = new Map<number, CachedProfile>();
+
 export const load: LayoutServerLoad = async ({ locals, platform }) => {
 	let userInfo: any = null;
 	let schoolName = '';
 
 	if (locals.user) {
+		const now = Date.now();
+		const cached = profileCache.get(locals.user.id);
+		if (cached && cached.expiresAt > now) {
+			return {
+				user: locals.user,
+				userInfo: cached.userInfo,
+				schoolName: cached.schoolName
+			};
+		}
+
 		try {
 			const db = getDB(platform);
 			userInfo = {};
@@ -52,6 +69,18 @@ export const load: LayoutServerLoad = async ({ locals, platform }) => {
 					.first<{ nip: string | null }>();
 				if (staff?.nip) {
 					userInfo.nip = staff.nip;
+				}
+			}
+
+			profileCache.set(locals.user.id, {
+				userInfo,
+				schoolName,
+				expiresAt: now + 300000 // 5 menit
+			});
+
+			if (profileCache.size > 1000) {
+				for (const [uid, item] of profileCache) {
+					if (now > item.expiresAt) profileCache.delete(uid);
 				}
 			}
 		} catch (e) {

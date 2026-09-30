@@ -28,10 +28,12 @@ export const POST: RequestHandler = async ({ request, locals, platform }) => {
 				.bind(url, locals.user.school_id)
 				.first<{ id: number; uploaded_by: number; school_id: number }>();
 
-			if (mediaRecord) {
-				if (locals.user.role === 'guru' && mediaRecord.uploaded_by !== locals.user.id) {
-					return json({ success: false, error: 'Forbidden: You cannot delete media uploaded by others.' }, { status: 403 });
-				}
+			if (!mediaRecord) {
+				return json({ success: false, error: 'Forbidden: Media tidak ditemukan atau bukan milik madrasah Anda.' }, { status: 403 });
+			}
+
+			if (locals.user.role === 'guru' && mediaRecord.uploaded_by !== locals.user.id) {
+				return json({ success: false, error: 'Forbidden: You cannot delete media uploaded by others.' }, { status: 403 });
 			}
 		}
 

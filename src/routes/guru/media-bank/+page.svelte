@@ -6,8 +6,8 @@
 	import { slide } from 'svelte/transition';
 	import { ICONS } from '$lib/utils/constants';
 
-	export let data: PageData;
-	export let form: ActionData;
+	export let data: any;
+	export let form: any;
 
 	let isDeleting = false;
 	let showUploadModal = false;

@@ -67,14 +67,16 @@ export const GET = async ({ params, platform, locals, url }: any) => {
 	const studentsRes = await db.prepare(studentsQuery).bind(...studentsParams).all();
 	const students = (studentsRes.results || []) as any[];
 
-	// 5. For each exam, fetch attempts & scores
+	// 5. Ambil semua percobaan & nilai untuk seluruh ujian dalam 1 query batch (hemat roundtrip & CPU Neon)
 	const examDetails: any[] = [];
 
-	for (const exam of exams) {
-		const examId = exam.id;
+	if (exams.length > 0) {
+		const examIds = exams.map((e) => e.id);
+		const placeholders = examIds.map(() => '?').join(',');
 
-		const attemptsRes = await db.prepare(`
+		const allAttemptsRes = await db.prepare(`
 			SELECT 
+				epart.exam_id,
 				epart.student_id,
 				sa.id as attempt_id,
 				sa.score,
@@ -82,20 +84,23 @@ export const GET = async ({ params, platform, locals, url }: any) => {
 				sa.submit_time
 			FROM exam_participants epart
 			LEFT JOIN student_attempts sa ON sa.student_id = epart.student_id AND sa.exam_id = epart.exam_id
-			WHERE epart.exam_id = ?
-		`).bind(examId).all();
+			WHERE epart.exam_id IN (${placeholders})
+		`).bind(...examIds).all();
 
-		const attemptsMap: Record<number, any> = {};
-		if (attemptsRes.results) {
-			for (const att of attemptsRes.results as any[]) {
-				attemptsMap[att.student_id] = att;
+		const attemptsByExam: Record<number, Record<number, any>> = {};
+		for (const att of (allAttemptsRes.results || []) as any[]) {
+			if (!attemptsByExam[att.exam_id]) {
+				attemptsByExam[att.exam_id] = {};
 			}
+			attemptsByExam[att.exam_id][att.student_id] = att;
 		}
 
-		examDetails.push({
-			exam,
-			attemptsMap
-		});
+		for (const exam of exams) {
+			examDetails.push({
+				exam,
+				attemptsMap: attemptsByExam[exam.id] || {}
+			});
+		}
 	}
 
 	return json({

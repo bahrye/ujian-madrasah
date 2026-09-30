@@ -573,7 +573,7 @@
 							</thead>
 							<tbody>
 								{#each attempts as att, attIdx}
-									{@const ans = answerMatrixMap[`${att.id}_${q.question_id || questions.find(qs => qs.question_number === q.question_number)?.id}`]}
+									{@const ans = answerMatrixMap[`${att.id}_${(q as any).question_id || q.id}`]}
 									{@const displayAns = formatAnswerDisplay(q.type, ans?.answer_given)}
 									{@const isCorrect = ans && (ans.is_correct === 1 || ans.is_correct === true)}
 									<tr>

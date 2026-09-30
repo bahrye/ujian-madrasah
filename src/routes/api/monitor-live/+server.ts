@@ -173,7 +173,10 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 				photoCountsMap[p.student_id] = p.c;
 				totalPhotos += p.c;
 				if (p.latest_photo) {
-					latestPhotosMap[p.student_id] = p.latest_photo;
+					// Hindari menyertakan teks Base64 besar (>1KB) pada polling live berkala agar hemat kuota bandwith & CPU
+					if (p.latest_photo.startsWith('http') || p.latest_photo.length < 1000) {
+						latestPhotosMap[p.student_id] = p.latest_photo;
+					}
 				}
 			});
 		} catch {}

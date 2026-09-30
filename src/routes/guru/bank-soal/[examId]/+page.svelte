@@ -65,7 +65,7 @@
 				toasts.success('Berhasil mengimpor soal');
 				location.reload();
 			} else {
-				const resJson = await response.json().catch(() => null);
+				const resJson: any = await response.json().catch(() => null);
 				toasts.error(resJson?.data?.error || resJson?.error || 'Gagal menyimpan soal ke server');
 			}
 		} catch (e: any) {
@@ -1086,8 +1086,8 @@
 						buttonClass="btn px-3 sm:px-4 bg-rose-600 text-white hover:bg-rose-700 shadow-sm border-none whitespace-nowrap flex items-center"
 						buttonTitle="Hapus {selectedQuestionIds.size} soal"
 						on:success={(e) => {
-							const deleted = e.detail?.deletedIds || Array.from(selectedQuestionIds);
-							deleted.forEach((id) => deletedLocalIds.add(Number(id)));
+							const deleted: any[] = e.detail?.deletedIds || Array.from(selectedQuestionIds);
+							deleted.forEach((id: any) => deletedLocalIds.add(Number(id)));
 							deletedLocalIds = deletedLocalIds;
 							selectedQuestionIds.clear();
 							selectedQuestionIds = selectedQuestionIds;
