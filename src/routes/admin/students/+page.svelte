@@ -385,7 +385,6 @@
 							/>
 						</th>
 						<th class="p-4 font-semibold whitespace-nowrap">Siswa</th>
-						<th class="p-4 font-semibold whitespace-nowrap">No. Peserta</th>
 						<th class="p-4 font-semibold whitespace-nowrap">NISN</th>
 						<th class="p-4 font-semibold whitespace-nowrap">Kelas</th>
 						<th class="p-4 font-semibold whitespace-nowrap text-center">JK</th>
@@ -431,12 +430,9 @@
 									</button>
 									<div class="whitespace-nowrap">
 										<div class="font-medium whitespace-nowrap {user.class_id ? 'text-slate-900' : 'text-red-600 drop-shadow-sm'}">{user.name}</div>
-										<div class="text-sm text-slate-500 whitespace-nowrap">@{user.username}</div>
+										<div class="text-xs font-mono text-slate-500 whitespace-nowrap">{user.nomor_peserta || user.username}</div>
 									</div>
 								</div>
-							</td>
-							<td class="p-4 whitespace-nowrap">
-								<span class="text-slate-700">{user.nomor_peserta || '-'}</span>
 							</td>
 							<td class="p-4 whitespace-nowrap">
 								<span class="text-slate-700">{user.nisn || user.username}</span>
@@ -527,7 +523,7 @@
 						</tr>
 					{:else}
 						<tr>
-							<td colspan="6" class="p-12 text-center">
+							<td colspan="8" class="p-12 text-center">
 								<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 text-slate-400 mb-4">
 									<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m3-2.803a4 4 0 11-8 0 4 4 0 018 0z" />
