@@ -222,7 +222,7 @@ export async function deleteMonitoringPhotos(
 
 export async function getMonitoringPhotos(
 	db: any,
-	filter: { examId?: number; attemptId?: number; studentId?: number; limit?: number }
+	filter: { schoolId?: number; examId?: number; attemptId?: number; studentId?: number; limit?: number }
 ) {
 	if (!db) return [];
 	await ensureMonitoringPhotosTable(db);
@@ -247,6 +247,10 @@ export async function getMonitoringPhotos(
 		`;
 		const params: any[] = [];
 
+		if (filter.schoolId) {
+			query += ` AND (p.school_id = ? OR u.school_id = ?)`;
+			params.push(filter.schoolId, filter.schoolId);
+		}
 		if (filter.examId) {
 			query += ` AND p.exam_id = ?`;
 			params.push(filter.examId);

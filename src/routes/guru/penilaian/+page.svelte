@@ -191,9 +191,9 @@
 					<!-- Jawaban Siswa -->
 					<div class="bg-slate-50 rounded-xl p-3.5 mb-3 border border-slate-100">
 						<p class="text-xs font-semibold text-slate-500 mb-1">Jawaban Siswa:</p>
-						<div class="prose prose-sm max-w-none text-slate-800">
+						<div class="prose prose-sm max-w-none text-slate-800 whitespace-pre-wrap font-sans">
 							{#if a.answer_given}
-								{@html a.answer_given}
+								{a.answer_given}
 							{:else}
 								<span class="italic text-slate-400">(Tidak dijawab)</span>
 							{/if}

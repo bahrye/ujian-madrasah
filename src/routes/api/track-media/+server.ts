@@ -3,6 +3,10 @@ import type { RequestHandler } from './$types';
 import { getDB, dbRun } from '$lib/server/db';
 
 export const POST: RequestHandler = async ({ request, platform, locals }) => {
+	if (!locals.user || !['admin', 'guru', 'superadmin', 'panitia'].includes(locals.user.role)) {
+		return json({ success: false, error: 'Unauthorized' }, { status: 401 });
+	}
+
 	try {
 		const db = getDB(platform);
 		const { url, media_type, name } = await request.json() as { url: string; media_type: string; name?: string };

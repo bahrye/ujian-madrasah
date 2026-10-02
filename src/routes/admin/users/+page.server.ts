@@ -159,6 +159,29 @@ export const actions: Actions = {
 			return fail(400, { error: 'Data tidak lengkap.' });
 		}
 
+		// Validasi role whitelist untuk mencegah privilege escalation
+		const allowedStaffRoles = ['guru', 'pengawas', 'panitia'];
+		const isSelf = parsedId === locals.user!.id;
+
+		if (isSelf) {
+			// Jika admin mengupdate dirinya sendiri, jaga perannya tetap sesuai
+			if (role !== locals.user!.role && !allowedStaffRoles.includes(role)) {
+				return fail(400, { error: 'Role tidak valid.' });
+			}
+		} else {
+			if (!allowedStaffRoles.includes(role)) {
+				return fail(400, { error: 'Role tidak valid. Hanya guru, pengawas, atau panitia yang diperbolehkan.' });
+			}
+
+			const targetUser = await db.prepare('SELECT role FROM users WHERE id = ? AND school_id = ?')
+				.bind(parsedId, schoolId)
+				.first<{ role: string }>();
+
+			if (!targetUser || targetUser.role === 'admin' || targetUser.role === 'superadmin') {
+				return fail(403, { error: 'Anda tidak memiliki hak untuk mengubah akun administrator ini.' });
+			}
+		}
+
 		try {
 			if (password) {
 				const passwordHash = await hashPassword(password);

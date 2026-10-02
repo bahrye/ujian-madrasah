@@ -163,6 +163,12 @@ export const actions: Actions = {
 		if (isNaN(parsedId)) return fail(400, { error: 'ID tidak valid' });
 
 		try {
+			const student = await db.prepare("SELECT id FROM users WHERE id = ? AND school_id = ? AND role = 'siswa'")
+				.bind(parsedId, locals.user.school_id).first();
+			if (!student) {
+				return fail(404, { error: 'Siswa tidak ditemukan atau bukan milik madrasah Anda.' });
+			}
+
 			const mergedEnv = platform?.env || env;
 			await deleteMonitoringPhotos(db, mergedEnv, { studentId: parsedId });
 
@@ -187,9 +193,22 @@ export const actions: Actions = {
 		if (!idsJson) return fail(400, { error: 'Pilih minimal satu siswa.' });
 
 		try {
-			const ids = JSON.parse(idsJson) as number[];
-			if (!Array.isArray(ids) || ids.length === 0) {
+			const rawIds = JSON.parse(idsJson) as number[];
+			if (!Array.isArray(rawIds) || rawIds.length === 0) {
 				return fail(400, { error: 'Pilih minimal satu siswa.' });
+			}
+
+			const validNumbers = rawIds.map(id => parseInt(String(id), 10)).filter(id => !isNaN(id));
+			if (validNumbers.length === 0) return fail(400, { error: 'Daftar ID tidak valid.' });
+
+			const placeholders = validNumbers.map(() => '?').join(',');
+			const validStudents = await db.prepare(
+				`SELECT id FROM users WHERE id IN (${placeholders}) AND school_id = ? AND role = 'siswa'`
+			).bind(...validNumbers, locals.user.school_id).all<{ id: number }>();
+
+			const ids = (validStudents.results || []).map(s => s.id);
+			if (ids.length === 0) {
+				return fail(400, { error: 'Tidak ada siswa valid dari madrasah Anda yang dipilih.' });
 			}
 
 			const mergedEnv = platform?.env || env;

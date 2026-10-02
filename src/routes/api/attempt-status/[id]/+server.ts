@@ -10,8 +10,7 @@ export const GET: RequestHandler = async ({ params, platform, locals }) => {
 	if (!attemptId) return json({ error: 'ID tidak valid' }, { status: 400 });
 
 	const attempt = await db.prepare(`
-		SELECT sa.is_paused, sa.status, sa.end_time, 
-		       e.exit_pin as exam_exit_pin
+		SELECT sa.is_paused, sa.status, sa.end_time 
 		FROM student_attempts sa
 		JOIN exams e ON sa.exam_id = e.id
 		WHERE sa.id = ? AND sa.student_id = ?
@@ -22,8 +21,7 @@ export const GET: RequestHandler = async ({ params, platform, locals }) => {
 	return json({
 		is_paused: attempt.is_paused === 1,
 		status: attempt.status,
-		end_time: attempt.end_time,
-		exam_exit_pin: attempt.exam_exit_pin || null
+		end_time: attempt.end_time
 	}, {
 		headers: {
 			'Cache-Control': 'no-store, no-cache, must-revalidate'

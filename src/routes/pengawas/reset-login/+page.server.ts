@@ -253,19 +253,36 @@ export const actions: Actions = {
 		}
 
 		try {
-			const student = await db.prepare('SELECT name FROM users WHERE id = ? AND role = \'siswa\'')
-				.bind(studentId)
-				.first<{ name: string }>();
+			const isSuperAdmin = locals.user.role === 'superadmin' || locals.user.school_id === null;
+			let student;
 
-			if (!student) {
-				return fail(404, { error: 'Data siswa tidak ditemukan.' });
+			if (isSuperAdmin) {
+				student = await db.prepare("SELECT name FROM users WHERE id = ? AND role = 'siswa'")
+					.bind(studentId)
+					.first<{ name: string }>();
+			} else {
+				student = await db.prepare("SELECT name FROM users WHERE id = ? AND school_id = ? AND role = 'siswa'")
+					.bind(studentId, locals.user.school_id)
+					.first<{ name: string }>();
 			}
 
-			await db.prepare(`
-				UPDATE users 
-				SET is_logged_in = 0, session_token = NULL 
-				WHERE id = ?
-			`).bind(studentId).run();
+			if (!student) {
+				return fail(404, { error: 'Data siswa tidak ditemukan di madrasah Anda.' });
+			}
+
+			if (isSuperAdmin) {
+				await db.prepare(`
+					UPDATE users 
+					SET is_logged_in = 0, session_token = NULL 
+					WHERE id = ?
+				`).bind(studentId).run();
+			} else {
+				await db.prepare(`
+					UPDATE users 
+					SET is_logged_in = 0, session_token = NULL 
+					WHERE id = ? AND school_id = ?
+				`).bind(studentId, locals.user.school_id).run();
+			}
 
 			return { success: `Login siswa "${student.name}" berhasil di-reset. Siswa sekarang dapat login kembali.` };
 		} catch (e: any) {

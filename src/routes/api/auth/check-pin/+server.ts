@@ -1,10 +1,12 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getDB, ensureUserLoginPinColumn } from '$lib/server/db';
+import { verifyQrLoginToken } from '$lib/server/auth';
 
 export const GET: RequestHandler = async ({ url, platform }) => {
 	const username = url.searchParams.get('u')?.trim();
-	if (!username) {
+	const qrToken = url.searchParams.get('t')?.trim();
+	if (!username || !qrToken) {
 		return json({ requires_pin: false });
 	}
 
@@ -12,11 +14,17 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 		const db = getDB(platform);
 		await ensureUserLoginPinColumn(db);
 
-		const user = await db.prepare('SELECT id, username, name, role, login_pin FROM users WHERE username = ? AND is_active = 1')
+		const user = await db.prepare('SELECT id, username, name, role, login_pin, password_hash FROM users WHERE username = ? AND is_active = 1')
 			.bind(username)
-			.first<{ id: number; username: string; name: string; role: string; login_pin: string | null }>();
+			.first<{ id: number; username: string; name: string; role: string; login_pin: string | null; password_hash: string }>();
 
 		if (!user) {
+			return json({ requires_pin: false });
+		}
+
+		// Cegah user enumeration: hanya proses jika QR token valid HMAC
+		const isValidQr = await verifyQrLoginToken(user.id, user.username, user.password_hash, qrToken);
+		if (!isValidQr) {
 			return json({ requires_pin: false });
 		}
 

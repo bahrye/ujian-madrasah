@@ -5,9 +5,11 @@ import { env } from '$env/dynamic/private';
 export function getJwtSecret(): Uint8Array {
 	const secret = env.JWT_SECRET || (typeof process !== 'undefined' ? process.env?.JWT_SECRET : undefined);
 	if (!secret) {
-		if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'production') {
-			throw new Error('JWT_SECRET environment variable is required in production!');
+		const isProd = typeof process !== 'undefined' && (process.env?.NODE_ENV === 'production' || Boolean(process.env?.VERCEL));
+		if (isProd) {
+			throw new Error('JWT_SECRET environment variable is required in production! Please set JWT_SECRET in your project environment settings.');
 		}
+		console.warn('⚠️ WARNING: JWT_SECRET tidak dikonfigurasi! Menggunakan fallback dev. Pastikan menyetel JWT_SECRET di production.');
 		return new TextEncoder().encode('ujian-madrasah-dev-secret-only-change-in-production');
 	}
 	return new TextEncoder().encode(secret);

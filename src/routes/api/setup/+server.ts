@@ -2,8 +2,21 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getDB } from '$lib/server/db';
 import { hashPassword } from '$lib/server/auth';
+import { env } from '$env/dynamic/private';
 
-export const GET: RequestHandler = async ({ platform }) => {
+export const GET: RequestHandler = async ({ platform, url }) => {
+	// Proteksi: Endpoint setup dinonaktifkan di production kecuali jika SETUP_KEY disediakan
+	const isProd = typeof process !== 'undefined' && process.env?.NODE_ENV === 'production';
+	const setupKey = url.searchParams.get('key');
+	const requiredKey = env?.SETUP_KEY || (platform?.env as any)?.SETUP_KEY;
+
+	if (isProd && (!requiredKey || setupKey !== requiredKey)) {
+		return json({
+			success: false,
+			message: 'Endpoint setup dinonaktifkan di lingkungan produksi. Konfigurasikan SETUP_KEY untuk menggunakannya.'
+		}, { status: 403 });
+	}
+
 	try {
 		const db = getDB(platform);
 

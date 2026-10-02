@@ -88,9 +88,6 @@
 				(window as any).ExambroBridge.setExamActive(true, attempt?.exam_exit_pin || '');
 			} catch (e) {}
 		}
-		if (attempt?.exam_exit_pin) {
-			(window as any).exambroExitPin = attempt.exam_exit_pin;
-		}
 	} else if (browser && (submitting || isSubmitted || showDisqualifiedModal || showTimeUpModal || attempt?.status === 'selesai')) {
 		if (typeof (window as any).ExambroBridge?.setExamActive === 'function') {
 			try {
@@ -185,7 +182,6 @@
 				isFullscreen = !!document.fullscreenElement;
 			}
 			if (attempt?.exam_exit_pin) {
-				(window as any).exambroExitPin = String(attempt.exam_exit_pin);
 				if ((window as any).ExambroBridge?.setExamExitPin) {
 					try {
 						(window as any).ExambroBridge.setExamExitPin(String(attempt.exam_exit_pin));
@@ -319,23 +315,6 @@
 						checkedMilestones.clear();
 					}
 					isPausedByProctor = data.is_paused === true || data.is_paused === 1;
-					// Sinkron PIN keluar per-ujian ke APK
-					if (data.exam_exit_pin) {
-						(window as any).exambroExitPin = String(data.exam_exit_pin);
-						try {
-							if ((window as any).ExambroBridge?.setExamExitPin) {
-								(window as any).ExambroBridge.setExamExitPin(String(data.exam_exit_pin));
-							}
-						} catch (e) {}
-					}
-					// Sinkron PIN master (dari Pengaturan APK admin) ke APK sebagai fallback
-					if (data.master_exit_pin) {
-						try {
-							if ((window as any).ExambroBridge?.setMasterPin) {
-								(window as any).ExambroBridge.setMasterPin(String(data.master_exit_pin));
-							}
-						} catch (e) {}
-					}
 					if (data.status !== 'mengerjakan' && data.status !== attempt.status) {
 						sessionStorage.setItem(officialReloadKey, 'true');
 						window.location.reload();
@@ -1281,9 +1260,6 @@
 
 <svelte:head>
 	<title>{attempt?.exam_title || 'Ujian Online'} — Ujian Online Madrasah</title>
-	{#if attempt?.exam_exit_pin}
-		<meta name="exambro-exit-pin" content={attempt.exam_exit_pin} />
-	{/if}
 	<meta name="exambro-paused" content={isPausedByProctor ? "1" : "0"} />
 	<meta name="exambro-active" content={(!isSubmitted && !submitting && attempt?.status !== 'selesai') ? "1" : "0"} />
 </svelte:head>

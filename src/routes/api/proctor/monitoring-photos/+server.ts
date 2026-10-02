@@ -25,18 +25,37 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 	const isAdmin = locals.user.role === 'admin';
 
 	if (!isSuperAdmin) {
-		if (isAdmin) {
-			if (examId) {
-				const check = await db.prepare(`SELECT 1 FROM exams WHERE id = ? AND school_id = ?`).bind(examId, locals.user.school_id).first();
-				if (!check) return json({ error: 'Forbidden' }, { status: 403 });
-			}
-		} else {
+		const userSchoolId = locals.user.school_id;
+
+		// 1. Validasi kepemilikan siswa terhadap madrasah
+		if (studentId) {
+			const studentCheck = await db.prepare('SELECT 1 FROM users WHERE id = ? AND school_id = ?')
+				.bind(studentId, userSchoolId).first();
+			if (!studentCheck) return json({ error: 'Forbidden: Siswa tidak ditemukan atau bukan milik madrasah Anda.' }, { status: 403 });
+		}
+
+		// 2. Validasi kepemilikan attempt terhadap madrasah
+		if (attemptId) {
+			const attemptCheck = await db.prepare('SELECT 1 FROM student_attempts sa JOIN exams e ON sa.exam_id = e.id WHERE sa.id = ? AND e.school_id = ?')
+				.bind(attemptId, userSchoolId).first();
+			if (!attemptCheck) return json({ error: 'Forbidden: Sesi ujian tidak ditemukan atau bukan milik madrasah Anda.' }, { status: 403 });
+		}
+
+		// 3. Validasi ujian
+		if (examId) {
+			const examCheck = await db.prepare('SELECT 1 FROM exams WHERE id = ? AND school_id = ?')
+				.bind(examId, userSchoolId).first();
+			if (!examCheck) return json({ error: 'Forbidden: Ujian tidak ditemukan atau bukan milik madrasah Anda.' }, { status: 403 });
+		}
+
+		// 4. Untuk peran selain admin/superadmin, validasi penugasan pengawas
+		if (!isAdmin) {
 			if (examId) {
 				const proctorCheck = await db.prepare(`
 					SELECT 1 FROM exams e
 					JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
 					WHERE e.id = ? AND e.school_id = ?
-				`).bind(locals.user.id, examId, locals.user.school_id).first();
+				`).bind(locals.user.id, examId, userSchoolId).first();
 				if (!proctorCheck) return json({ error: 'Forbidden: Anda tidak ditugaskan untuk ujian ini.' }, { status: 403 });
 			} else if (attemptId) {
 				const proctorCheck = await db.prepare(`
@@ -44,7 +63,7 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 					JOIN exams e ON sa.exam_id = e.id
 					JOIN exam_proctors ep ON e.id = ep.exam_id AND ep.proctor_id = ? AND COALESCE(ep.proctor_role, 'p1') NOT IN ('pt', 'cm')
 					WHERE sa.id = ? AND e.school_id = ?
-				`).bind(locals.user.id, attemptId, locals.user.school_id).first();
+				`).bind(locals.user.id, attemptId, userSchoolId).first();
 				if (!proctorCheck) return json({ error: 'Forbidden: Anda tidak ditugaskan untuk ujian ini.' }, { status: 403 });
 			}
 		}
@@ -52,6 +71,7 @@ export const GET: RequestHandler = async ({ url, platform, locals }) => {
 
 	try {
 		const photos = await getMonitoringPhotos(db, {
+			schoolId: isSuperAdmin ? undefined : (locals.user.school_id || undefined),
 			examId: isNaN(examId as any) ? undefined : examId,
 			studentId: isNaN(studentId as any) ? undefined : studentId,
 			attemptId: isNaN(attemptId as any) ? undefined : attemptId,

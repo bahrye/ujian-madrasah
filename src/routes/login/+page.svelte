@@ -39,7 +39,7 @@
 
 		// Check if this user (staff) requires 5-digit PIN
 		try {
-			const res = await fetch(`/api/auth/check-pin?u=${encodeURIComponent(qrUsername)}`);
+			const res = await fetch(`/api/auth/check-pin?u=${encodeURIComponent(qrUsername)}&t=${encodeURIComponent(qrToken)}`);
 			if (res.ok) {
 				const data = (await res.json()) as any;
 				if (data?.requires_pin) {

@@ -88,7 +88,7 @@ export const actions: Actions = {
 				JOIN exams e ON t.exam_id = e.id
 				JOIN exam_types et ON e.exam_type_id = et.id
 				JOIN users u ON u.id = ?
-				WHERE t.token_code = ? AND t.exam_id = ? AND et.is_active = 1
+				WHERE t.token_code = ? AND t.exam_id = ? AND e.school_id = u.school_id AND et.is_active = 1
 			`).bind(locals.user!.id, tokenCode, parsedExamId).first<any>();
 
 			if (!token) {
@@ -194,7 +194,7 @@ export const actions: Actions = {
 				JOIN exams e ON t.exam_id = e.id
 				JOIN exam_types et ON e.exam_type_id = et.id
 				JOIN users u ON u.id = ?
-				WHERE t.token_code = ? AND t.exam_id = ? AND et.is_active = 1
+				WHERE t.token_code = ? AND t.exam_id = ? AND e.school_id = u.school_id AND et.is_active = 1
 			`).bind(locals.user!.id, tokenCode, parsedExamId).first<any>();
 
 			if (!token) {
