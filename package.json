@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "svelte-kit sync && vite build",
     "build:cf": "cross-env ADAPTER=cloudflare vite build",
-    "build:vercel": "cross-env ADAPTER=vercel vite build",
+    "build:vercel": "cross-env ADAPTER=vercel svelte-kit sync && cross-env ADAPTER=vercel vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "deploy": "vite build && node -e \"try{require('fs').unlinkSync('.svelte-kit/cloudflare/_worker.js.map')}catch(e){}\" && cross-env NODE_OPTIONS=--dns-result-order=ipv4first wrangler pages deploy .svelte-kit/cloudflare --no-bundle --commit-dirty=true",

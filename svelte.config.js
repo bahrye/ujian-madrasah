@@ -38,7 +38,7 @@ const config = {
 	kit: {
 		adapter: isVercel
 			? vercel({
-					runtime: 'nodejs20.x',
+					runtime: 'nodejs22.x',
 					regions: ['sin1'],
 					split: false,
 					maxDuration: 15
